@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { projectDamage } from '../dist/frontend/projection.js';
+import { projectAttributes, projectDamage } from '../dist/frontend/projection.js';
 import { resolveMasterBeastEffects, resolveRightIceSetEffects } from '../dist/calculation/equipment-effects.js';
 
 const readJson = async path => JSON.parse(await readFile(new URL(`../data/${path}`, import.meta.url), 'utf8'));
@@ -38,6 +38,22 @@ function enableSelectedAccessoryAppraisals(data, values) {
     if (item) item.appraisal = { canAppraise: true, effectCount: group.inputCells.length };
   }
 }
+
+test('巨型魔力石新增選項會分別增加雙攻%與攻擊力等級', async () => {
+  const data = await loadData();
+  const baseState = { schemaVersion: 3, Job: 'KE', values: {}, lowerwearAlternativeEnabled: false };
+  const base = projectAttributes(data, baseState);
+  const cases = [
+    ['攻擊力+5%', 'doubleAttackPct', 5],
+    ['攻擊力等級+6', 'attackLevel', 6],
+  ];
+
+  for (const [option, stat, expectedIncrease] of cases) {
+    const values = { ...baseState.values, 'Weapon.GiantStone.1': option };
+    const actual = projectAttributes(data, { ...baseState, values });
+    assert.equal(actual.stats[stat].finalTotal - base.stats[stat].finalTotal, expectedIncrease);
+  }
+});
 
 test('JSON 選擇的全域來源進入角色彙總與 B163 傷害流程', async () => {
   const data = await loadData();
