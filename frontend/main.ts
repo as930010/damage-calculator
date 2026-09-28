@@ -71,6 +71,7 @@ async function start() {
   };
   function sourceLabel(sourceId: string): string {
     if (sourceId === 'character-base') return '角色基礎係數';
+    if (sourceId === 'character-base:crit-damage-product') return '角色原始乘算爆傷基準';
     if (sourceId === 'weapon-base-attack:C53:D53') return '武器基礎攻擊力';
     if (sourceId.startsWith('sheet:計算機!')) {
       const cell = sourceId.slice('sheet:計算機!'.length);
@@ -524,7 +525,8 @@ async function start() {
           }
         }
         const rateSources = (effects: typeof result.combatRates.critRate.multipliers) => effects.map(effect => `${effect.sourceId} ×${fmt(effect.factor)}`).join(' · ') || '無';
-        damageTarget.innerHTML = `<div class="damage-summary"><div><span>最小攻擊力</span><strong>${fmt(result.attack.lowerDamage)}</strong></div><div><span>最大攻擊力</span><strong>${fmt(result.attack.upperDamage)}</strong></div><div class="final-damage"><span>最終傷害</span><strong>${fmt(result.finalDamage.finalDamage)}</strong></div></div>${comparisonHtml}<details class="formula-detail"><summary>展開傷害計算明細</summary><p>致命傷害被動：${fmt(result.classCritDamagePassivePct)}%　乘算暴傷：${fmt(result.multiplicativeCritDamage.value)}%</p><p>爆擊乘算來源：${h(rateSources(result.combatRates.critRate.multipliers))}</p><p>極大乘算來源：${h(rateSources(result.combatRates.extremization.multipliers))}</p><p>乘算傷害：${fmt(result.generalMultiplicativeDamage.value)} 倍　強者／排熱因子：${fmt(result.finalDamage.conditionalFactor)}</p><p>適應力因子：${fmt(result.finalDamage.adaptationFactor)}　防禦因子：${fmt(result.finalDamage.defenseFactor)}</p></details>`;
+        const critDamageSources = result.multiplicativeCritDamage.factors.map(effect => `${sourceLabel(effect.sourceId)} ${fmt(effect.valuePct)}%`).join('、') || '無';
+        damageTarget.innerHTML = `<div class="damage-summary"><div><span>最小攻擊力</span><strong>${fmt(result.attack.lowerDamage)}</strong></div><div><span>最大攻擊力</span><strong>${fmt(result.attack.upperDamage)}</strong></div><div class="final-damage"><span>最終傷害</span><strong>${fmt(result.finalDamage.finalDamage)}</strong></div></div>${comparisonHtml}<details class="formula-detail"><summary>展開傷害計算明細</summary><p>致命傷害被動：${fmt(result.classCritDamagePassivePct)}%　乘算暴傷：${fmt(result.multiplicativeCritDamage.value)}%</p><p>乘算暴傷來源：${h(critDamageSources)}</p><p>爆擊乘算來源：${h(rateSources(result.combatRates.critRate.multipliers))}</p><p>極大乘算來源：${h(rateSources(result.combatRates.extremization.multipliers))}</p><p>乘算傷害：${fmt(result.generalMultiplicativeDamage.value)} 倍　強者／排熱因子：${fmt(result.finalDamage.conditionalFactor)}</p><p>適應力因子：${fmt(result.finalDamage.adaptationFactor)}　防禦因子：${fmt(result.finalDamage.defenseFactor)}</p></details>`;
       } catch (error) {
         damageTarget.innerHTML = `<p class="input-warning">尚未計算：${h(error instanceof Error ? error.message : error)}　請完成該部位的必要輸入。</p>`;
       }
