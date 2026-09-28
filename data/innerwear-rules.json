@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "source": "Google Sheets 計算機!38:42；D40 H21、Lv.13 G7 依使用者確認修正，正式／實驗組共用",
+  "baseLevel": 99,
+  "itemLevelBonus": 20,
+  "baselineCoefficient": 400,
+  "slots": [
+    {
+      "id": "upper",
+      "name": "上衣",
+      "enhancementCell": "H3",
+      "forgingCell": "J3",
+      "attackType": "physical",
+      "attackFraction": 0.03,
+      "wearSet": "shared"
+    },
+    {
+      "id": "lowerwear",
+      "name": "下衣",
+      "enhancementCell": "H12",
+      "forgingCell": "J12",
+      "attackType": "magical",
+      "attackFraction": 0.05,
+      "wearSet": "lowerwearA"
+    },
+    {
+      "id": "lowerwearAlternative",
+      "name": "強/排褲",
+      "enhancementCell": "H21",
+      "forgingCell": "J21",
+      "attackType": "magical",
+      "attackFraction": 0.05,
+      "wearSet": "lowerwearB",
+      "enabledBy": "F20"
+    },
+    {
+      "id": "gloves",
+      "name": "手套",
+      "enhancementCell": "H30",
+      "forgingCell": "J30",
+      "attackType": "physical",
+      "attackFraction": 0.05,
+      "wearSet": "shared",
+      "allSkillDamagePerEnhancement": 5
+    },
+    {
+      "id": "shoes",
+      "name": "鞋子",
+      "enhancementCell": "H39",
+      "forgingCell": "J39",
+      "attackType": "magical",
+      "attackFraction": 0.03,
+      "wearSet": "shared"
+    }
+  ],
+  "enhancementStats": {
+    "8": {
+      "bossDamagePct": 0,
+      "adaptabilityPct": 2
+    },
+    "9": {
+      "bossDamagePct": 0,
+      "adaptabilityPct": 2
+    },
+    "10": {
+      "bossDamagePct": 5,
+      "adaptabilityPct": 2
+    },
+    "11": {
+      "bossDamagePct": 5,
+      "adaptabilityPct": 3
+    },
+    "12": {
+      "bossDamagePct": 5,
+      "adaptabilityPct": 3
+    },
+    "13": {
+      "bossDamagePct": 5,
+      "adaptabilityPct": 3
+    }
+  },
+  "forgingAttack": {
+    "0": 0,
+    "1": 100,
+    "2": 198,
+    "3": 296,
+    "4": 393,
+    "5": 490,
+    "6": 586,
+    "7": 682,
+    "8": 778,
+    "9": 873,
+    "10": 968,
+    "11": 1063,
+    "12": 1158,
+    "13": 1252,
+    "14": 1346,
+    "15": 1440,
+    "16": 1534,
+    "17": 1628,
+    "18": 1721,
+    "19": 1814,
+    "20": 1907,
+    "21": 2000
+  },
+  "forgingBonuses": [
+    {
+      "statKey": "doubleAttackPct",
+      "steps": [
+        {
+          "minimum": 15,
+          "value": 2
+        }
+      ],
+      "otherwise": 0
+    },
+    {
+      "statKey": "critDamagePct",
+      "steps": [
+        {
+          "minimum": 9,
+          "value": 6
+        },
+        {
+          "minimum": 3,
+          "value": 3
+        }
+      ],
+      "otherwise": 0
+    },
+    {
+      "statKey": "transcendenceSkillDamagePct",
+      "steps": [
+        {
+          "minimum": 18,
+          "value": 10
+        },
+        {
+          "minimum": 12,
+          "value": 6
+        },
+        {
+          "minimum": 6,
+          "value": 3
+        }
+      ],
+      "otherwise": 0
+    }
+  ],
+  "extraAdaptability": {
+    "forgingEquals": 21,
+    "value": 2
+  }
+}

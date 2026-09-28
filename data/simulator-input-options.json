@@ -1,0 +1,3165 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "workbook": "Google Sheets current export",
+    "sheet": "裝備模擬區",
+    "extractedAt": "2026-09-26",
+    "purpose": "原始資料驗證規則；保留輸入格到選項來源範圍的對照，不代表計算效果映射已完成"
+  },
+  "note": "同一選項來源由多個輸入格共用一份 catalog；輸入格透過 catalogId 連結，避免重複維護。",
+  "catalogs": [
+    {
+      "id": "option-catalog-f86b43489660",
+      "source": {
+        "sheet": "係數區",
+        "range": "AL2:AL17"
+      },
+      "options": [
+        {
+          "cell": "AL2",
+          "value": "攻擊力+40"
+        },
+        {
+          "cell": "AL3",
+          "value": "攻擊力+80"
+        },
+        {
+          "cell": "AL4",
+          "value": "攻擊力+120"
+        },
+        {
+          "cell": "AL5",
+          "value": "攻擊力+160"
+        },
+        {
+          "cell": "AL6",
+          "value": "攻擊力+200"
+        },
+        {
+          "cell": "AL7",
+          "value": "雙攻+0.6%"
+        },
+        {
+          "cell": "AL8",
+          "value": "雙攻+1.2%"
+        },
+        {
+          "cell": "AL9",
+          "value": "雙攻+1.8%"
+        },
+        {
+          "cell": "AL10",
+          "value": "雙攻+2.4%"
+        },
+        {
+          "cell": "AL11",
+          "value": "雙攻+3%"
+        },
+        {
+          "cell": "AL12",
+          "value": "Boss傷害+1%"
+        },
+        {
+          "cell": "AL13",
+          "value": "Boss傷害+2%"
+        },
+        {
+          "cell": "AL14",
+          "value": "Boss傷害+3%"
+        },
+        {
+          "cell": "AL15",
+          "value": "Boss傷害+4%"
+        },
+        {
+          "cell": "AL16",
+          "value": "Boss傷害+5%"
+        },
+        {
+          "cell": "AL17",
+          "value": "無關傷害"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-88ecb3d3a560",
+      "source": {
+        "sheet": "係數區",
+        "range": "AF2:AF10"
+      },
+      "options": [
+        {
+          "cell": "AF2",
+          "value": "雙攻%"
+        },
+        {
+          "cell": "AF3",
+          "value": "兩極化%"
+        },
+        {
+          "cell": "AF4",
+          "value": "致命傷害%"
+        },
+        {
+          "cell": "AF5",
+          "value": "Boss傷害%"
+        },
+        {
+          "cell": "AF6",
+          "value": "超越技傷%"
+        },
+        {
+          "cell": "AF7",
+          "value": "所有技能傷害%"
+        },
+        {
+          "cell": "AF8",
+          "value": "致命一擊%"
+        },
+        {
+          "cell": "AF9",
+          "value": "極大化%"
+        },
+        {
+          "cell": "AF10",
+          "value": "無關傷害"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-a6df72b366dd",
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A42:A45"
+      },
+      "options": [
+        {
+          "cell": "A42",
+          "value": "騎士團"
+        },
+        {
+          "cell": "A43",
+          "value": "幻影面紗"
+        },
+        {
+          "cell": "A44",
+          "value": "日冕．灼耀花仙"
+        },
+        {
+          "cell": "A45",
+          "value": "厄瑞玻斯的哀歌"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-7d1f8d30c649",
+      "source": {
+        "sheet": "係數區",
+        "range": "AD13:AD18"
+      },
+      "options": [
+        {
+          "cell": "AD13",
+          "value": "雙攻%"
+        },
+        {
+          "cell": "AD14",
+          "value": "兩極化%"
+        },
+        {
+          "cell": "AD15",
+          "value": "致命傷害%"
+        },
+        {
+          "cell": "AD16",
+          "value": "所有技能傷害%"
+        },
+        {
+          "cell": "AD17",
+          "value": "無視防禦%"
+        },
+        {
+          "cell": "AD18",
+          "value": "其他"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-3a417dd00eea",
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A2:A13"
+      },
+      "options": [
+        {
+          "cell": "A2",
+          "value": "騎士團"
+        },
+        {
+          "cell": "A3",
+          "value": "幻影面紗"
+        },
+        {
+          "cell": "A4",
+          "value": "真理假面"
+        },
+        {
+          "cell": "A5",
+          "value": "紫霄花郎"
+        },
+        {
+          "cell": "A6",
+          "value": "星辰牧者"
+        },
+        {
+          "cell": "A7",
+          "value": "日冕．灼耀花仙"
+        },
+        {
+          "cell": "A8",
+          "value": "幽潮吞源"
+        },
+        {
+          "cell": "A9",
+          "value": "猛虎奇談"
+        },
+        {
+          "cell": "A10",
+          "value": "厄瑞玻斯的哀歌"
+        },
+        {
+          "cell": "A11",
+          "value": "薇塔芳塔娜"
+        },
+        {
+          "cell": "A12",
+          "value": "深淵的存在"
+        },
+        {
+          "cell": "A13",
+          "value": "飛龍乘雲"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-21e473c1c44f",
+      "source": {
+        "sheet": "係數區",
+        "range": "AB13:AB15"
+      },
+      "options": [
+        {
+          "cell": "AB13",
+          "value": "致命一擊"
+        },
+        {
+          "cell": "AB14",
+          "value": "極大化"
+        },
+        {
+          "cell": "AB15",
+          "value": "其他"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-6fa7e8aa123a",
+      "source": {
+        "literalList": true
+      },
+      "options": [
+        {
+          "value": "雙攻% × 強化"
+        },
+        {
+          "value": "攻擊力等級 × 強化"
+        },
+        {
+          "value": "技能傷害% × 強化"
+        },
+        {
+          "value": "致命傷害% × 強化"
+        },
+        {
+          "value": "雙攻%"
+        },
+        {
+          "value": "致命傷害%"
+        },
+        {
+          "value": "Boss傷害%"
+        },
+        {
+          "value": "兩極化%"
+        },
+        {
+          "value": "超越技傷%"
+        },
+        {
+          "value": "技能傷害%"
+        },
+        {
+          "value": "流血%"
+        },
+        {
+          "value": "攻擊力等級"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-0bc187fbcda5",
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A5:A7"
+      },
+      "options": [
+        {
+          "cell": "A5",
+          "value": "MAESTRO光環"
+        },
+        {
+          "cell": "A6",
+          "value": "魂靈皇冠"
+        },
+        {
+          "cell": "A7",
+          "value": "麻木皇冠"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-c914793cc91d",
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A33:A34"
+      },
+      "options": [
+        {
+          "cell": "A33",
+          "value": "亞特瑪手臂"
+        },
+        {
+          "cell": "A34",
+          "value": "新皇后的手臂裝飾"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-b8a66ebdd002",
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A35:A37"
+      },
+      "options": [
+        {
+          "cell": "A35",
+          "value": "亞特瑪項鍊"
+        },
+        {
+          "cell": "A36",
+          "value": "班德王國項鍊"
+        },
+        {
+          "cell": "A37",
+          "value": "堅毅的鬥士項鍊"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-5ed6c4802af7",
+      "source": {
+        "sheet": "係數區",
+        "range": "Y2:Y5"
+      },
+      "options": [
+        {
+          "cell": "Y2",
+          "value": "米色"
+        },
+        {
+          "cell": "Y3",
+          "value": "紫色"
+        },
+        {
+          "cell": "Y4",
+          "value": "綠色"
+        },
+        {
+          "cell": "Y5",
+          "value": "藍色"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-3ffd3537063b",
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A46:A53"
+      },
+      "options": [
+        {
+          "cell": "A46",
+          "value": "騎士團"
+        },
+        {
+          "cell": "A47",
+          "value": "神埃"
+        },
+        {
+          "cell": "A48",
+          "value": "幻影面紗"
+        },
+        {
+          "cell": "A49",
+          "value": "紫霄花郎"
+        },
+        {
+          "cell": "A50",
+          "value": "日冕．灼耀花仙"
+        },
+        {
+          "cell": "A51",
+          "value": "猛虎奇談"
+        },
+        {
+          "cell": "A52",
+          "value": "薇塔芳塔娜"
+        },
+        {
+          "cell": "A53",
+          "value": "飛龍乘雲"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-eb9040276ce5",
+      "source": {
+        "sheet": "係數區",
+        "range": "AC13:AC22"
+      },
+      "options": [
+        {
+          "cell": "AC13",
+          "value": 3.5
+        },
+        {
+          "cell": "AC14",
+          "value": 4.0
+        },
+        {
+          "cell": "AC15",
+          "value": 4.5
+        },
+        {
+          "cell": "AC16",
+          "value": 5.0
+        },
+        {
+          "cell": "AC17",
+          "value": 5.5
+        },
+        {
+          "cell": "AC18",
+          "value": 6.0
+        },
+        {
+          "cell": "AC19",
+          "value": 6.5
+        },
+        {
+          "cell": "AC20",
+          "value": 7.0
+        },
+        {
+          "cell": "AC21",
+          "value": 7.5
+        },
+        {
+          "cell": "AC22",
+          "value": 8.0
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-a71dcb0f0e70",
+      "source": {
+        "sheet": "係數區",
+        "range": "AU2:AU6"
+      },
+      "options": [
+        {
+          "cell": "AU2",
+          "value": "攻擊力+1%"
+        },
+        {
+          "cell": "AU3",
+          "value": "所有技能傷害+1%"
+        },
+        {
+          "cell": "AU4",
+          "value": "致命一擊+3%"
+        },
+        {
+          "cell": "AU5",
+          "value": "極大化+3%"
+        },
+        {
+          "cell": "AU6",
+          "value": "無關傷害"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-1bf0bfe45d3e",
+      "source": {
+        "literalList": true
+      },
+      "options": [
+        {
+          "value": "有"
+        },
+        {
+          "value": "沒有"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-ca5d8d24cebc",
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A18:A24"
+      },
+      "options": [
+        {
+          "cell": "A18",
+          "value": "騎士團"
+        },
+        {
+          "cell": "A19",
+          "value": "神埃"
+        },
+        {
+          "cell": "A20",
+          "value": "幻影面紗"
+        },
+        {
+          "cell": "A21",
+          "value": "星辰牧者"
+        },
+        {
+          "cell": "A22",
+          "value": "厄瑞玻斯的哀歌"
+        },
+        {
+          "cell": "A23",
+          "value": "深淵的存在"
+        },
+        {
+          "cell": "A24",
+          "value": "飛龍乘雲"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-a2c610f4bfac",
+      "source": {
+        "literalList": true
+      },
+      "options": [
+        {
+          "value": "嗜肉骨斷"
+        },
+        {
+          "value": "精神挑戰者"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-24917966f1aa",
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A2:A4"
+      },
+      "options": [
+        {
+          "cell": "A2",
+          "value": "Type-Q女王的勳章"
+        },
+        {
+          "cell": "A3",
+          "value": "暗鬼的徽章"
+        },
+        {
+          "cell": "A4",
+          "value": "火魔的印記"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-8e5b542aec9d",
+      "source": {
+        "sheet": "連身時裝資料庫",
+        "range": "A2:A8"
+      },
+      "options": [
+        {
+          "cell": "A2",
+          "value": "東方美食"
+        },
+        {
+          "cell": "A3",
+          "value": "天下一味"
+        },
+        {
+          "cell": "A4",
+          "value": "貝斯馬共存節"
+        },
+        {
+          "cell": "A5",
+          "value": "艾利亞諾德共存節"
+        },
+        {
+          "cell": "A6",
+          "value": "運動女僕"
+        },
+        {
+          "cell": "A7",
+          "value": "共存節禮服"
+        },
+        {
+          "cell": "A8",
+          "value": "高貴格鬥士"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-414d108fd752",
+      "source": {
+        "sheet": "係數區",
+        "range": "AB2:AB11"
+      },
+      "options": [
+        {
+          "cell": "AB2",
+          "value": "致命一擊8%"
+        },
+        {
+          "cell": "AB3",
+          "value": "致命一擊9%"
+        },
+        {
+          "cell": "AB4",
+          "value": "致命一擊10%"
+        },
+        {
+          "cell": "AB5",
+          "value": "致命一擊11%"
+        },
+        {
+          "cell": "AB6",
+          "value": "致命一擊12%"
+        },
+        {
+          "cell": "AB7",
+          "value": "極大化8%"
+        },
+        {
+          "cell": "AB8",
+          "value": "極大化9%"
+        },
+        {
+          "cell": "AB9",
+          "value": "極大化10%"
+        },
+        {
+          "cell": "AB10",
+          "value": "極大化11%"
+        },
+        {
+          "cell": "AB11",
+          "value": "極大化12%"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-629929671064",
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A31:A35"
+      },
+      "options": [
+        {
+          "cell": "A31",
+          "value": "騎士團"
+        },
+        {
+          "cell": "A32",
+          "value": "神埃"
+        },
+        {
+          "cell": "A33",
+          "value": "真理假面"
+        },
+        {
+          "cell": "A34",
+          "value": "日冕．灼耀花仙"
+        },
+        {
+          "cell": "A35",
+          "value": "厄瑞玻斯的哀歌"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-717ee30befef",
+      "source": {
+        "sheet": "係數區",
+        "range": "AE13:AE22"
+      },
+      "options": [
+        {
+          "cell": "AE13",
+          "value": 0.2
+        },
+        {
+          "cell": "AE14",
+          "value": 0.4
+        },
+        {
+          "cell": "AE15",
+          "value": 0.6
+        },
+        {
+          "cell": "AE16",
+          "value": 0.8
+        },
+        {
+          "cell": "AE17",
+          "value": 1.0
+        },
+        {
+          "cell": "AE18",
+          "value": 1.2
+        },
+        {
+          "cell": "AE19",
+          "value": 1.4
+        },
+        {
+          "cell": "AE20",
+          "value": 1.6
+        },
+        {
+          "cell": "AE21",
+          "value": 1.8
+        },
+        {
+          "cell": "AE22",
+          "value": 2.0
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-1ffd50e6c0ac",
+      "source": {
+        "sheet": "係數區",
+        "range": "N2:N4"
+      },
+      "options": [
+        {
+          "cell": "N2",
+          "value": "超越技傷%"
+        },
+        {
+          "cell": "N3",
+          "value": "Boss傷害%"
+        },
+        {
+          "cell": "N4",
+          "value": "無關傷害"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-d3b938610e58",
+      "source": {
+        "sheet": "係數區",
+        "range": "AF13:AF14"
+      },
+      "options": [
+        {
+          "cell": "AF13",
+          "value": "超越技傷%"
+        },
+        {
+          "cell": "AF14",
+          "value": "其他"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-f7853015a33f",
+      "source": {
+        "sheet": "係數區",
+        "range": "W2:W5"
+      },
+      "options": [
+        {
+          "cell": "W2",
+          "value": "攻擊力+5.5%"
+        },
+        {
+          "cell": "W3",
+          "value": "攻擊力+6%"
+        },
+        {
+          "cell": "W4",
+          "value": "攻擊力等級+7"
+        },
+        {
+          "cell": "W5",
+          "value": "攻擊力等級+8"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-9bd94655596d",
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A19:A25"
+      },
+      "options": [
+        {
+          "cell": "A19",
+          "value": "命運的預言書"
+        },
+        {
+          "cell": "A20",
+          "value": "機器人偶頭"
+        },
+        {
+          "cell": "A21",
+          "value": "夢緣香爐"
+        },
+        {
+          "cell": "A22",
+          "value": "普萊卡斯的形象"
+        },
+        {
+          "cell": "A23",
+          "value": "攜帶式能量環"
+        },
+        {
+          "cell": "A24",
+          "value": "魔族之眼"
+        },
+        {
+          "cell": "A25",
+          "value": "粉絲手燈"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-8c8ef2e12ca3",
+      "source": {
+        "sheet": "係數區",
+        "range": "AY2:AY5"
+      },
+      "options": [
+        {
+          "cell": "AY2",
+          "value": 0.0
+        },
+        {
+          "cell": "AY3",
+          "value": 71.92
+        },
+        {
+          "cell": "AY4",
+          "value": 83.94
+        },
+        {
+          "cell": "AY5",
+          "value": 96.01
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-ef87b39302a9",
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A9:A12"
+      },
+      "options": [
+        {
+          "cell": "A9",
+          "value": "亞特瑪臉下"
+        },
+        {
+          "cell": "A10",
+          "value": "精銳格雷特的面甲"
+        },
+        {
+          "cell": "A11",
+          "value": "巴力溫毛飾"
+        },
+        {
+          "cell": "A12",
+          "value": "瑪瑙碎片"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-a7da0a6a7424",
+      "source": {
+        "sheet": "係數區",
+        "range": "P2:P8"
+      },
+      "options": [
+        {
+          "cell": "P2",
+          "value": "流血%"
+        },
+        {
+          "cell": "P3",
+          "value": "兩極化%"
+        },
+        {
+          "cell": "P4",
+          "value": "強者%"
+        },
+        {
+          "cell": "P5",
+          "value": "排熱%"
+        },
+        {
+          "cell": "P6",
+          "value": "雙攻%"
+        },
+        {
+          "cell": "P7",
+          "value": "超越技傷%"
+        },
+        {
+          "cell": "P8",
+          "value": "Boss傷害%"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-8d928a8b48c0",
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A14:A17"
+      },
+      "options": [
+        {
+          "cell": "A14",
+          "value": "騎士團"
+        },
+        {
+          "cell": "A15",
+          "value": "神埃"
+        },
+        {
+          "cell": "A16",
+          "value": "真理假面"
+        },
+        {
+          "cell": "A17",
+          "value": "日冕．灼耀花仙"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-77524e534e9f",
+      "source": {
+        "sheet": "魔法石資料庫",
+        "range": "A9:A15"
+      },
+      "options": [
+        {
+          "cell": "A9",
+          "value": "狩獵5%B傷"
+        },
+        {
+          "cell": "A10",
+          "value": "賢者12%致命"
+        },
+        {
+          "cell": "A11",
+          "value": "賢者12%極大"
+        },
+        {
+          "cell": "A12",
+          "value": "亞特瑪6%B傷"
+        },
+        {
+          "cell": "A13",
+          "value": "亞特瑪4%技傷"
+        },
+        {
+          "cell": "A14",
+          "value": "亞特瑪5%超越"
+        },
+        {
+          "cell": "A15",
+          "value": "無關傷害"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-16acddec81de",
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A61:A65"
+      },
+      "options": [
+        {
+          "cell": "A61",
+          "value": "騎士團"
+        },
+        {
+          "cell": "A62",
+          "value": "神埃"
+        },
+        {
+          "cell": "A63",
+          "value": "紫霄花郎"
+        },
+        {
+          "cell": "A64",
+          "value": "幽潮吞源"
+        },
+        {
+          "cell": "A65",
+          "value": "深淵的存在"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-c4c9d626d9e6",
+      "source": {
+        "sheet": "係數區",
+        "range": "AZ2:AZ7"
+      },
+      "options": [
+        {
+          "cell": "AZ2",
+          "value": 50.0
+        },
+        {
+          "cell": "AZ3",
+          "value": 60.0
+        },
+        {
+          "cell": "AZ4",
+          "value": 70.0
+        },
+        {
+          "cell": "AZ5",
+          "value": 80.0
+        },
+        {
+          "cell": "AZ6",
+          "value": 90.0
+        },
+        {
+          "cell": "AZ7",
+          "value": 95.0
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-ff7fcde60871",
+      "source": {
+        "sheet": "係數區",
+        "range": "AP2:AP13"
+      },
+      "options": [
+        {
+          "cell": "AP2",
+          "value": "無視防禦%"
+        },
+        {
+          "cell": "AP3",
+          "value": "所有技能傷害%"
+        },
+        {
+          "cell": "AP4",
+          "value": "Boss傷害%"
+        },
+        {
+          "cell": "AP5",
+          "value": "致命傷害%"
+        },
+        {
+          "cell": "AP6",
+          "value": "雙攻%"
+        },
+        {
+          "cell": "AP7",
+          "value": "兩極化%"
+        },
+        {
+          "cell": "AP8",
+          "value": "適應力%"
+        },
+        {
+          "cell": "AP9",
+          "value": "100%血殺%"
+        },
+        {
+          "cell": "AP10",
+          "value": "流血%"
+        },
+        {
+          "cell": "AP11",
+          "value": "致命一擊%"
+        },
+        {
+          "cell": "AP12",
+          "value": "極大化%"
+        },
+        {
+          "cell": "AP13",
+          "value": "無關傷害"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-0fcc9c3dc7e6",
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A54:A60"
+      },
+      "options": [
+        {
+          "cell": "A54",
+          "value": "騎士團"
+        },
+        {
+          "cell": "A55",
+          "value": "神埃"
+        },
+        {
+          "cell": "A56",
+          "value": "真理假面"
+        },
+        {
+          "cell": "A57",
+          "value": "星辰牧者"
+        },
+        {
+          "cell": "A58",
+          "value": "幽潮吞源"
+        },
+        {
+          "cell": "A59",
+          "value": "厄瑞玻斯的哀歌"
+        },
+        {
+          "cell": "A60",
+          "value": "薇塔芳塔娜"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-64b257d9bcf4",
+      "source": {
+        "sheet": "係數區",
+        "range": "AG2:AG9"
+      },
+      "options": [
+        {
+          "cell": "AG2",
+          "value": "致命一擊+1%"
+        },
+        {
+          "cell": "AG3",
+          "value": "致命一擊+1.5%"
+        },
+        {
+          "cell": "AG4",
+          "value": "致命一擊+2%"
+        },
+        {
+          "cell": "AG5",
+          "value": "極大化+1%"
+        },
+        {
+          "cell": "AG6",
+          "value": "極大化+1.5%"
+        },
+        {
+          "cell": "AG7",
+          "value": "極大化+2%"
+        },
+        {
+          "cell": "AG8",
+          "value": "所有技能傷害+0.5%"
+        },
+        {
+          "cell": "AG9",
+          "value": "無關傷害"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-91e87fc4ab46",
+      "source": {
+        "sheet": "係數區",
+        "range": "AN2:AN22"
+      },
+      "options": [
+        {
+          "cell": "AN2",
+          "value": "所有技能傷害+0.6%"
+        },
+        {
+          "cell": "AN3",
+          "value": "所有技能傷害+1.2%"
+        },
+        {
+          "cell": "AN4",
+          "value": "所有技能傷害+1.8%"
+        },
+        {
+          "cell": "AN5",
+          "value": "所有技能傷害+2.4%"
+        },
+        {
+          "cell": "AN6",
+          "value": "所有技能傷害+3%"
+        },
+        {
+          "cell": "AN7",
+          "value": "所有技能傷害+0.6%"
+        },
+        {
+          "cell": "AN8",
+          "value": "致命傷害+1.2%"
+        },
+        {
+          "cell": "AN9",
+          "value": "致命傷害+1.8%"
+        },
+        {
+          "cell": "AN10",
+          "value": "致命傷害+2.4%"
+        },
+        {
+          "cell": "AN11",
+          "value": "致命傷害+3%"
+        },
+        {
+          "cell": "AN12",
+          "value": "強者+0.6%"
+        },
+        {
+          "cell": "AN13",
+          "value": "強者+1.2%"
+        },
+        {
+          "cell": "AN14",
+          "value": "強者+1.8%"
+        },
+        {
+          "cell": "AN15",
+          "value": "強者+2.4%"
+        },
+        {
+          "cell": "AN16",
+          "value": "強者+3%"
+        },
+        {
+          "cell": "AN17",
+          "value": "排熱+0.6%"
+        },
+        {
+          "cell": "AN18",
+          "value": "排熱+1.2%"
+        },
+        {
+          "cell": "AN19",
+          "value": "排熱+1.8%"
+        },
+        {
+          "cell": "AN20",
+          "value": "排熱+2.4%"
+        },
+        {
+          "cell": "AN21",
+          "value": "排熱+3%"
+        },
+        {
+          "cell": "AN22",
+          "value": "無關傷害"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-5309e5d65e7e",
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A25:A30"
+      },
+      "options": [
+        {
+          "cell": "A25",
+          "value": "騎士團"
+        },
+        {
+          "cell": "A26",
+          "value": "紫霄花郎"
+        },
+        {
+          "cell": "A27",
+          "value": "幽潮吞源"
+        },
+        {
+          "cell": "A28",
+          "value": "猛虎奇談"
+        },
+        {
+          "cell": "A29",
+          "value": "薇塔芳塔娜"
+        },
+        {
+          "cell": "A30",
+          "value": "飛龍乘雲"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-fca3ffaecf1f",
+      "source": {
+        "sheet": "右冰套效資料庫",
+        "range": "V2:V23"
+      },
+      "options": [
+        {
+          "cell": "V2",
+          "value": "騎士團"
+        },
+        {
+          "cell": "V3",
+          "value": "騎士團"
+        },
+        {
+          "cell": "V4",
+          "value": "幻影面紗"
+        },
+        {
+          "cell": "V5",
+          "value": "幻影面紗"
+        },
+        {
+          "cell": "V6",
+          "value": "真理假面"
+        },
+        {
+          "cell": "V7",
+          "value": "真理假面"
+        },
+        {
+          "cell": "V8",
+          "value": "紫霄花郎"
+        },
+        {
+          "cell": "V9",
+          "value": "紫霄花郎"
+        },
+        {
+          "cell": "V10",
+          "value": "星辰牧者"
+        },
+        {
+          "cell": "V11",
+          "value": "星辰牧者"
+        },
+        {
+          "cell": "V12",
+          "value": "日冕．灼耀花仙"
+        },
+        {
+          "cell": "V13",
+          "value": "日冕．灼耀花仙"
+        },
+        {
+          "cell": "V14",
+          "value": "幽潮吞源"
+        },
+        {
+          "cell": "V15",
+          "value": "幽潮吞源"
+        },
+        {
+          "cell": "V16",
+          "value": "猛虎奇談"
+        },
+        {
+          "cell": "V17",
+          "value": "猛虎奇談"
+        },
+        {
+          "cell": "V18",
+          "value": "厄瑞玻斯的哀歌"
+        },
+        {
+          "cell": "V19",
+          "value": "厄瑞玻斯的哀歌"
+        },
+        {
+          "cell": "V20",
+          "value": "薇塔芳塔娜"
+        },
+        {
+          "cell": "V21",
+          "value": "薇塔芳塔娜"
+        },
+        {
+          "cell": "V22",
+          "value": "深淵的存在"
+        },
+        {
+          "cell": "V23",
+          "value": "深淵的存在"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-83d51421effa",
+      "source": {
+        "sheet": "係數區",
+        "range": "BB2:BB5"
+      },
+      "options": [
+        {
+          "cell": "BB2",
+          "value": "適應靈藥"
+        },
+        {
+          "cell": "BB3",
+          "value": "天上甜點"
+        },
+        {
+          "cell": "BB4",
+          "value": "巨人靈藥"
+        },
+        {
+          "cell": "BB5",
+          "value": "其他"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-9063ccca31d6",
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A15:A18"
+      },
+      "options": [
+        {
+          "cell": "A15",
+          "value": "憤怒戒指"
+        },
+        {
+          "cell": "A16",
+          "value": "鬥士憤怒戒指"
+        },
+        {
+          "cell": "A17",
+          "value": "完整的能量變換裝置"
+        },
+        {
+          "cell": "A18",
+          "value": "鏡之世界的碎片"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-987fecd02ec8",
+      "source": {
+        "sheet": "係數區",
+        "range": "AW2:AW6"
+      },
+      "options": [
+        {
+          "cell": "AW2",
+          "value": "致命一擊+4%"
+        },
+        {
+          "cell": "AW3",
+          "value": "極大化+4%"
+        },
+        {
+          "cell": "AW4",
+          "value": "致命一擊+2%"
+        },
+        {
+          "cell": "AW5",
+          "value": "極大化+2%"
+        },
+        {
+          "cell": "AW6",
+          "value": "無關傷害"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-e68237ce7fa2",
+      "source": {
+        "sheet": "係數區",
+        "range": "Z2:Z29"
+      },
+      "options": [
+        {
+          "cell": "Z2",
+          "value": "致命傷害+1%"
+        },
+        {
+          "cell": "Z3",
+          "value": "致命傷害+2%"
+        },
+        {
+          "cell": "Z4",
+          "value": "致命傷害+3%"
+        },
+        {
+          "cell": "Z5",
+          "value": "致命傷害+4%"
+        },
+        {
+          "cell": "Z6",
+          "value": "致命傷害+5%"
+        },
+        {
+          "cell": "Z7",
+          "value": "適應力+1%"
+        },
+        {
+          "cell": "Z8",
+          "value": "適應力+2%"
+        },
+        {
+          "cell": "Z9",
+          "value": "適應力+3%"
+        },
+        {
+          "cell": "Z10",
+          "value": "Boss傷害+1%"
+        },
+        {
+          "cell": "Z11",
+          "value": "Boss傷害+2%"
+        },
+        {
+          "cell": "Z12",
+          "value": "Boss傷害+3%"
+        },
+        {
+          "cell": "Z13",
+          "value": "Boss傷害+4%"
+        },
+        {
+          "cell": "Z14",
+          "value": "Boss傷害+5%"
+        },
+        {
+          "cell": "Z15",
+          "value": "Boss傷害+6%"
+        },
+        {
+          "cell": "Z16",
+          "value": "Boss傷害+7%"
+        },
+        {
+          "cell": "Z17",
+          "value": "Boss傷害+8%"
+        },
+        {
+          "cell": "Z18",
+          "value": "Boss傷害+9%"
+        },
+        {
+          "cell": "Z19",
+          "value": "Boss傷害+10%"
+        },
+        {
+          "cell": "Z20",
+          "value": "Boss傷害+11%"
+        },
+        {
+          "cell": "Z21",
+          "value": "Boss傷害+12%"
+        },
+        {
+          "cell": "Z22",
+          "value": "Boss傷害+13%"
+        },
+        {
+          "cell": "Z23",
+          "value": "Boss傷害+14%"
+        },
+        {
+          "cell": "Z24",
+          "value": "Boss傷害+15%"
+        },
+        {
+          "cell": "Z25",
+          "value": "攻擊力+200"
+        },
+        {
+          "cell": "Z26",
+          "value": "攻擊力+300"
+        },
+        {
+          "cell": "Z27",
+          "value": "攻擊力+400"
+        },
+        {
+          "cell": "Z28",
+          "value": "攻擊力+500"
+        },
+        {
+          "cell": "Z29",
+          "value": "攻擊力+600"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-491562dd1e9d",
+      "source": {
+        "sheet": "係數區",
+        "range": "AV2:AV4"
+      },
+      "options": [
+        {
+          "cell": "AV2",
+          "value": "致命一擊+2%"
+        },
+        {
+          "cell": "AV3",
+          "value": "極大化+2%"
+        },
+        {
+          "cell": "AV4",
+          "value": "無關傷害"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-76b3d1d0fc12",
+      "source": {
+        "sheet": "係數區",
+        "range": "I2:I23"
+      },
+      "options": [
+        {
+          "cell": "I2",
+          "value": 0.0
+        },
+        {
+          "cell": "I3",
+          "value": 1.0
+        },
+        {
+          "cell": "I4",
+          "value": 2.0
+        },
+        {
+          "cell": "I5",
+          "value": 3.0
+        },
+        {
+          "cell": "I6",
+          "value": 4.0
+        },
+        {
+          "cell": "I7",
+          "value": 5.0
+        },
+        {
+          "cell": "I8",
+          "value": 6.0
+        },
+        {
+          "cell": "I9",
+          "value": 7.0
+        },
+        {
+          "cell": "I10",
+          "value": 8.0
+        },
+        {
+          "cell": "I11",
+          "value": 9.0
+        },
+        {
+          "cell": "I12",
+          "value": 10.0
+        },
+        {
+          "cell": "I13",
+          "value": 11.0
+        },
+        {
+          "cell": "I14",
+          "value": 12.0
+        },
+        {
+          "cell": "I15",
+          "value": 13.0
+        },
+        {
+          "cell": "I16",
+          "value": 14.0
+        },
+        {
+          "cell": "I17",
+          "value": 15.0
+        },
+        {
+          "cell": "I18",
+          "value": 16.0
+        },
+        {
+          "cell": "I19",
+          "value": 17.0
+        },
+        {
+          "cell": "I20",
+          "value": 18.0
+        },
+        {
+          "cell": "I21",
+          "value": 19.0
+        },
+        {
+          "cell": "I22",
+          "value": 20.0
+        },
+        {
+          "cell": "I23",
+          "value": 21.0
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-1a18d703db93",
+      "source": {
+        "sheet": "係數區",
+        "range": "L2:L5"
+      },
+      "options": [
+        {
+          "cell": "L2",
+          "value": "流血%"
+        },
+        {
+          "cell": "L3",
+          "value": "Boss傷害%"
+        },
+        {
+          "cell": "L4",
+          "value": "重置機率%"
+        },
+        {
+          "cell": "L5",
+          "value": "無關傷害"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-5f2425328fda",
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A66:A69"
+      },
+      "options": [
+        {
+          "cell": "A66",
+          "value": "騎士團"
+        },
+        {
+          "cell": "A67",
+          "value": "紫霄花郎"
+        },
+        {
+          "cell": "A68",
+          "value": "幽潮吞源"
+        },
+        {
+          "cell": "A69",
+          "value": "薇塔芳塔娜"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-fdda7268ce18",
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A8:A8"
+      },
+      "options": [
+        {
+          "cell": "A8",
+          "value": "亞特瑪臉中"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-23122e89a169",
+      "source": {
+        "sheet": "係數區",
+        "range": "Q2:Q7"
+      },
+      "options": [
+        {
+          "cell": "Q2",
+          "value": "+5"
+        },
+        {
+          "cell": "Q3",
+          "value": "+6"
+        },
+        {
+          "cell": "Q4",
+          "value": "+7"
+        },
+        {
+          "cell": "Q5",
+          "value": "+8"
+        },
+        {
+          "cell": "Q6",
+          "value": "+9"
+        },
+        {
+          "cell": "Q7",
+          "value": "+10"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-bb28ed8d39bf",
+      "source": {
+        "sheet": "係數區",
+        "range": "AG13:AG22"
+      },
+      "options": [
+        {
+          "cell": "AG13",
+          "value": 0.5
+        },
+        {
+          "cell": "AG14",
+          "value": 1.0
+        },
+        {
+          "cell": "AG15",
+          "value": 1.5
+        },
+        {
+          "cell": "AG16",
+          "value": 2.0
+        },
+        {
+          "cell": "AG17",
+          "value": 2.5
+        },
+        {
+          "cell": "AG18",
+          "value": 3.0
+        },
+        {
+          "cell": "AG19",
+          "value": 3.5
+        },
+        {
+          "cell": "AG20",
+          "value": 4.0
+        },
+        {
+          "cell": "AG21",
+          "value": 4.5
+        },
+        {
+          "cell": "AG22",
+          "value": 5.0
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-aecebaae726a",
+      "source": {
+        "sheet": "係數區",
+        "range": "V2:V3"
+      },
+      "options": [
+        {
+          "cell": "V2",
+          "value": "燦爛"
+        },
+        {
+          "cell": "V3",
+          "value": "深淵"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-a292118b7fc4",
+      "source": {
+        "sheet": "係數區",
+        "range": "U2:U11"
+      },
+      "options": [
+        {
+          "cell": "U2",
+          "value": "攻擊力等級+3.25"
+        },
+        {
+          "cell": "U3",
+          "value": "攻擊力等級+2.75"
+        },
+        {
+          "cell": "U4",
+          "value": "攻擊力等級+2.25"
+        },
+        {
+          "cell": "U5",
+          "value": "致命一擊+6.5%"
+        },
+        {
+          "cell": "U6",
+          "value": "致命一擊+5.5%"
+        },
+        {
+          "cell": "U7",
+          "value": "致命一擊+4.5%"
+        },
+        {
+          "cell": "U8",
+          "value": "極大化+6.5%"
+        },
+        {
+          "cell": "U9",
+          "value": "極大化+5.5%"
+        },
+        {
+          "cell": "U10",
+          "value": "極大化+4.5%"
+        },
+        {
+          "cell": "U11",
+          "value": "無關傷害"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-41bf529ba1aa",
+      "source": {
+        "sheet": "係數區",
+        "range": "BC2:BC5"
+      },
+      "options": [
+        {
+          "cell": "BC2",
+          "value": "小屋"
+        },
+        {
+          "cell": "BC3",
+          "value": "強化小屋"
+        },
+        {
+          "cell": "BC4",
+          "value": "集合地"
+        },
+        {
+          "cell": "BC5",
+          "value": "其他"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-b033738d4d5c",
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A70:A74"
+      },
+      "options": [
+        {
+          "cell": "A70",
+          "value": "騎士團"
+        },
+        {
+          "cell": "A71",
+          "value": "幻影面紗"
+        },
+        {
+          "cell": "A72",
+          "value": "星辰牧者"
+        },
+        {
+          "cell": "A73",
+          "value": "猛虎奇談"
+        },
+        {
+          "cell": "A74",
+          "value": "深淵的存在"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-5f3d8028fef2",
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A31:A32"
+      },
+      "options": [
+        {
+          "cell": "A31",
+          "value": "靈魂的枷鎖"
+        },
+        {
+          "cell": "A32",
+          "value": "發光之花"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-801126ce1802",
+      "source": {
+        "sheet": "係數區",
+        "range": "O2:O3"
+      },
+      "options": [
+        {
+          "cell": "O2",
+          "value": "Boss傷害%"
+        },
+        {
+          "cell": "O3",
+          "value": "無關傷害"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-9240a234397a",
+      "source": {
+        "sheet": "係數區",
+        "range": "BA2:BA7"
+      },
+      "options": [
+        {
+          "cell": "BA2",
+          "value": 0.0
+        },
+        {
+          "cell": "BA3",
+          "value": 10.0
+        },
+        {
+          "cell": "BA4",
+          "value": 20.0
+        },
+        {
+          "cell": "BA5",
+          "value": 30.0
+        },
+        {
+          "cell": "BA6",
+          "value": 35.0
+        },
+        {
+          "cell": "BA7",
+          "value": 40.0
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-be2a52193a9b",
+      "source": {
+        "sheet": "係數區",
+        "range": "A2:A61"
+      },
+      "options": [
+        {
+          "cell": "A2",
+          "value": "KE"
+        },
+        {
+          "cell": "A3",
+          "value": "RM"
+        },
+        {
+          "cell": "A4",
+          "value": "IM"
+        },
+        {
+          "cell": "A5",
+          "value": "GE"
+        },
+        {
+          "cell": "A6",
+          "value": "AS"
+        },
+        {
+          "cell": "A7",
+          "value": "OZ"
+        },
+        {
+          "cell": "A8",
+          "value": "MM"
+        },
+        {
+          "cell": "A9",
+          "value": "LA"
+        },
+        {
+          "cell": "A10",
+          "value": "AN"
+        },
+        {
+          "cell": "A11",
+          "value": "DaB"
+        },
+        {
+          "cell": "A12",
+          "value": "TW"
+        },
+        {
+          "cell": "A13",
+          "value": "PR"
+        },
+        {
+          "cell": "A14",
+          "value": "FB"
+        },
+        {
+          "cell": "A15",
+          "value": "RH"
+        },
+        {
+          "cell": "A16",
+          "value": "NI"
+        },
+        {
+          "cell": "A17",
+          "value": "RE"
+        },
+        {
+          "cell": "A18",
+          "value": "CU"
+        },
+        {
+          "cell": "A19",
+          "value": "CE"
+        },
+        {
+          "cell": "A20",
+          "value": "CS"
+        },
+        {
+          "cell": "A21",
+          "value": "CA"
+        },
+        {
+          "cell": "A22",
+          "value": "CC"
+        },
+        {
+          "cell": "A23",
+          "value": "FP"
+        },
+        {
+          "cell": "A24",
+          "value": "CeT"
+        },
+        {
+          "cell": "A25",
+          "value": "DiA"
+        },
+        {
+          "cell": "A26",
+          "value": "VI"
+        },
+        {
+          "cell": "A27",
+          "value": "BR"
+        },
+        {
+          "cell": "A28",
+          "value": "SH"
+        },
+        {
+          "cell": "A29",
+          "value": "SU"
+        },
+        {
+          "cell": "A30",
+          "value": "ES"
+        },
+        {
+          "cell": "A31",
+          "value": "FL"
+        },
+        {
+          "cell": "A32",
+          "value": "BQ"
+        },
+        {
+          "cell": "A33",
+          "value": "AD"
+        },
+        {
+          "cell": "A34",
+          "value": "DB"
+        },
+        {
+          "cell": "A35",
+          "value": "DN"
+        },
+        {
+          "cell": "A36",
+          "value": "MP"
+        },
+        {
+          "cell": "A37",
+          "value": "OM"
+        },
+        {
+          "cell": "A38",
+          "value": "CT"
+        },
+        {
+          "cell": "A39",
+          "value": "IN"
+        },
+        {
+          "cell": "A40",
+          "value": "DA"
+        },
+        {
+          "cell": "A41",
+          "value": "DE"
+        },
+        {
+          "cell": "A42",
+          "value": "TB"
+        },
+        {
+          "cell": "A43",
+          "value": "BMa"
+        },
+        {
+          "cell": "A44",
+          "value": "MN"
+        },
+        {
+          "cell": "A45",
+          "value": "PO"
+        },
+        {
+          "cell": "A46",
+          "value": "RI"
+        },
+        {
+          "cell": "A47",
+          "value": "BL"
+        },
+        {
+          "cell": "A48",
+          "value": "HE"
+        },
+        {
+          "cell": "A49",
+          "value": "BI"
+        },
+        {
+          "cell": "A50",
+          "value": "EW"
+        },
+        {
+          "cell": "A51",
+          "value": "RS"
+        },
+        {
+          "cell": "A52",
+          "value": "NL"
+        },
+        {
+          "cell": "A53",
+          "value": "TP"
+        },
+        {
+          "cell": "A54",
+          "value": "LI"
+        },
+        {
+          "cell": "A55",
+          "value": "CEL"
+        },
+        {
+          "cell": "A56",
+          "value": "NP"
+        },
+        {
+          "cell": "A57",
+          "value": "MO"
+        },
+        {
+          "cell": "A58",
+          "value": "GB"
+        },
+        {
+          "cell": "A59",
+          "value": "AV"
+        },
+        {
+          "cell": "A60",
+          "value": "AC"
+        },
+        {
+          "cell": "A61",
+          "value": "MI"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-0f9c5b87ae49",
+      "source": {
+        "sheet": "係數區",
+        "range": "X2:X4"
+      },
+      "options": [
+        {
+          "cell": "X2",
+          "value": "火焰"
+        },
+        {
+          "cell": "X3",
+          "value": "流水"
+        },
+        {
+          "cell": "X4",
+          "value": "草木"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-bc1e5293ab87",
+      "source": {
+        "literalList": true
+      },
+      "options": [
+        {
+          "value": "紅"
+        },
+        {
+          "value": "藍"
+        },
+        {
+          "value": "綠"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-409337b9f603",
+      "source": {
+        "sheet": "係數區",
+        "range": "AJ2:AJ12"
+      },
+      "options": [
+        {
+          "cell": "AJ2",
+          "value": "致命一擊+1%"
+        },
+        {
+          "cell": "AJ3",
+          "value": "致命一擊+2%"
+        },
+        {
+          "cell": "AJ4",
+          "value": "致命一擊+3%"
+        },
+        {
+          "cell": "AJ5",
+          "value": "致命一擊+4%"
+        },
+        {
+          "cell": "AJ6",
+          "value": "致命一擊+5%"
+        },
+        {
+          "cell": "AJ7",
+          "value": "極大化+1%"
+        },
+        {
+          "cell": "AJ8",
+          "value": "極大化+2%"
+        },
+        {
+          "cell": "AJ9",
+          "value": "極大化+3%"
+        },
+        {
+          "cell": "AJ10",
+          "value": "極大化+4%"
+        },
+        {
+          "cell": "AJ11",
+          "value": "極大化+5%"
+        },
+        {
+          "cell": "AJ12",
+          "value": "無關傷害"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-cd482ba318a5",
+      "source": {
+        "sheet": "係數區",
+        "range": "AI2:AI3"
+      },
+      "options": [
+        {
+          "cell": "AI2",
+          "value": "純淨"
+        },
+        {
+          "cell": "AI3",
+          "value": "Dogma"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-e4896ad96468",
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A13:A14"
+      },
+      "options": [
+        {
+          "cell": "A13",
+          "value": "天線耳環"
+        },
+        {
+          "cell": "A14",
+          "value": "軍團幹部裝飾"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-0d3104cf336b",
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A26:A30"
+      },
+      "options": [
+        {
+          "cell": "A26",
+          "value": "亞特瑪上衣 - 橘"
+        },
+        {
+          "cell": "A27",
+          "value": "亞特瑪上衣 - 米"
+        },
+        {
+          "cell": "A28",
+          "value": "亞特瑪上衣 - 紫"
+        },
+        {
+          "cell": "A29",
+          "value": "亞特瑪上衣 - 綠"
+        },
+        {
+          "cell": "A30",
+          "value": "亞特瑪上衣 - 藍"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-8ada2b66ee97",
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A38:A40"
+      },
+      "options": [
+        {
+          "cell": "A38",
+          "value": "超越的技術戒指"
+        },
+        {
+          "cell": "A39",
+          "value": "超越鬥士的技術戒指"
+        },
+        {
+          "cell": "A40",
+          "value": "技術的戒指"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-cf6fdd30db2b",
+      "source": {
+        "sheet": "左冰資料庫",
+        "range": "A2:A10"
+      },
+      "options": [
+        {
+          "cell": "A2",
+          "value": "幻影面紗"
+        },
+        {
+          "cell": "A3",
+          "value": "真理假面"
+        },
+        {
+          "cell": "A4",
+          "value": "紫霄花郎"
+        },
+        {
+          "cell": "A5",
+          "value": "星辰牧者"
+        },
+        {
+          "cell": "A6",
+          "value": "日冕．灼耀花仙"
+        },
+        {
+          "cell": "A7",
+          "value": "幽潮吞源"
+        },
+        {
+          "cell": "A8",
+          "value": "猛虎奇談"
+        },
+        {
+          "cell": "A9",
+          "value": "厄瑞玻斯的哀歌"
+        },
+        {
+          "cell": "A10",
+          "value": "薇塔芳塔娜"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-51dd8e26eb4d",
+      "source": {
+        "sheet": "係數區",
+        "range": "AD2:AD6"
+      },
+      "options": [
+        {
+          "cell": "AD2",
+          "value": "致命傷害+2%"
+        },
+        {
+          "cell": "AD3",
+          "value": "致命傷害+3%"
+        },
+        {
+          "cell": "AD4",
+          "value": "致命傷害+4%"
+        },
+        {
+          "cell": "AD5",
+          "value": "致命傷害+5%"
+        },
+        {
+          "cell": "AD6",
+          "value": "適應力+1%"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-d864c66e78f5",
+      "source": {
+        "sheet": "係數區",
+        "range": "G2:G7"
+      },
+      "options": [
+        {
+          "cell": "G2",
+          "value": "Lv.8"
+        },
+        {
+          "cell": "G3",
+          "value": "Lv.9"
+        },
+        {
+          "cell": "G4",
+          "value": "Lv.10"
+        },
+        {
+          "cell": "G5",
+          "value": "Lv.11"
+        },
+        {
+          "cell": "G6",
+          "value": "Lv.12"
+        },
+        {
+          "cell": "G7",
+          "value": "Lv.13"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-6bb70c5676bf",
+      "source": {
+        "sheet": "係數區",
+        "range": "K2:K8"
+      },
+      "options": [
+        {
+          "cell": "K2",
+          "value": "Lv.0"
+        },
+        {
+          "cell": "K3",
+          "value": "Lv.1"
+        },
+        {
+          "cell": "K4",
+          "value": "Lv.2"
+        },
+        {
+          "cell": "K5",
+          "value": "Lv.3"
+        },
+        {
+          "cell": "K6",
+          "value": "Lv.4"
+        },
+        {
+          "cell": "K7",
+          "value": "Lv.5"
+        },
+        {
+          "cell": "K8",
+          "value": "Lv.6"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-f6f2627f2c0f",
+      "source": {
+        "sheet": "係數區",
+        "range": "M2:M6"
+      },
+      "options": [
+        {
+          "cell": "M2",
+          "value": "強者%"
+        },
+        {
+          "cell": "M3",
+          "value": "排熱%"
+        },
+        {
+          "cell": "M4",
+          "value": "兩極化%"
+        },
+        {
+          "cell": "M5",
+          "value": "Boss傷害%"
+        },
+        {
+          "cell": "M6",
+          "value": "無關傷害"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-2f1611a1937d",
+      "source": {
+        "sheet": "係數區",
+        "range": "T2:T11"
+      },
+      "options": [
+        {
+          "cell": "T2",
+          "value": "攻擊力等級+4"
+        },
+        {
+          "cell": "T3",
+          "value": "攻擊力等級+3.5"
+        },
+        {
+          "cell": "T4",
+          "value": "攻擊力等級+3"
+        },
+        {
+          "cell": "T5",
+          "value": "致命一擊+8%"
+        },
+        {
+          "cell": "T6",
+          "value": "致命一擊+7%"
+        },
+        {
+          "cell": "T7",
+          "value": "致命一擊+6%"
+        },
+        {
+          "cell": "T8",
+          "value": "極大化+8%"
+        },
+        {
+          "cell": "T9",
+          "value": "極大化+7%"
+        },
+        {
+          "cell": "T10",
+          "value": "極大化+6%"
+        },
+        {
+          "cell": "T11",
+          "value": "無關傷害"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-fe60831365cd",
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A36:A41"
+      },
+      "options": [
+        {
+          "cell": "A36",
+          "value": "騎士團"
+        },
+        {
+          "cell": "A37",
+          "value": "神埃"
+        },
+        {
+          "cell": "A38",
+          "value": "真理假面"
+        },
+        {
+          "cell": "A39",
+          "value": "星辰牧者"
+        },
+        {
+          "cell": "A40",
+          "value": "猛虎奇談"
+        },
+        {
+          "cell": "A41",
+          "value": "深淵的存在"
+        }
+      ]
+    },
+    {
+      "id": "option-catalog-ac629c6b86cb",
+      "source": {
+        "sheet": "魔法石資料庫",
+        "range": "A2:A8"
+      },
+      "options": [
+        {
+          "cell": "A2",
+          "value": "狩獵2.5%B傷"
+        },
+        {
+          "cell": "A3",
+          "value": "賢者6%致命"
+        },
+        {
+          "cell": "A4",
+          "value": "賢者6%極大"
+        },
+        {
+          "cell": "A5",
+          "value": "亞特瑪3%B傷"
+        },
+        {
+          "cell": "A6",
+          "value": "亞特瑪2%技傷"
+        },
+        {
+          "cell": "A7",
+          "value": "亞特瑪2.5%超越"
+        },
+        {
+          "cell": "A8",
+          "value": "無關傷害"
+        }
+      ]
+    }
+  ],
+  "inputs": [
+    {
+      "simulatorCells": "S18",
+      "inputType": "list",
+      "catalogId": "option-catalog-f86b43489660"
+    },
+    {
+      "simulatorCells": "O27:O41",
+      "inputType": "list",
+      "catalogId": "option-catalog-88ecb3d3a560"
+    },
+    {
+      "simulatorCells": "D20",
+      "inputType": "list",
+      "catalogId": "option-catalog-a6df72b366dd"
+    },
+    {
+      "simulatorCells": "M36 M39",
+      "inputType": "list",
+      "catalogId": "option-catalog-7d1f8d30c649"
+    },
+    {
+      "simulatorCells": "B17",
+      "inputType": "list",
+      "catalogId": "option-catalog-3a417dd00eea"
+    },
+    {
+      "simulatorCells": "M27",
+      "inputType": "list",
+      "catalogId": "option-catalog-21e473c1c44f"
+    },
+    {
+      "simulatorCells": "B42:B45",
+      "inputType": "list",
+      "catalogId": "option-catalog-6fa7e8aa123a"
+    },
+    {
+      "simulatorCells": "M3",
+      "inputType": "list",
+      "catalogId": "option-catalog-0bc187fbcda5"
+    },
+    {
+      "simulatorCells": "O5",
+      "inputType": "list",
+      "catalogId": "option-catalog-c914793cc91d"
+    },
+    {
+      "simulatorCells": "O6",
+      "inputType": "list",
+      "catalogId": "option-catalog-b8a66ebdd002"
+    },
+    {
+      "simulatorCells": "N9",
+      "inputType": "list",
+      "catalogId": "option-catalog-5ed6c4802af7"
+    },
+    {
+      "simulatorCells": "D21",
+      "inputType": "list",
+      "catalogId": "option-catalog-3ffd3537063b"
+    },
+    {
+      "simulatorCells": "M28",
+      "inputType": "list",
+      "catalogId": "option-catalog-eb9040276ce5"
+    },
+    {
+      "simulatorCells": "O11:O13",
+      "inputType": "list",
+      "catalogId": "option-catalog-a71dcb0f0e70"
+    },
+    {
+      "simulatorCells": "B3 S21",
+      "inputType": "list",
+      "catalogId": "option-catalog-1bf0bfe45d3e"
+    },
+    {
+      "simulatorCells": "B21",
+      "inputType": "list",
+      "catalogId": "option-catalog-ca5d8d24cebc"
+    },
+    {
+      "simulatorCells": "S2",
+      "inputType": "list",
+      "catalogId": "option-catalog-a2c610f4bfac"
+    },
+    {
+      "simulatorCells": "M2",
+      "inputType": "list",
+      "catalogId": "option-catalog-24917966f1aa"
+    },
+    {
+      "simulatorCells": "B7",
+      "inputType": "list",
+      "catalogId": "option-catalog-8e5b542aec9d"
+    },
+    {
+      "simulatorCells": "N27:N28",
+      "inputType": "list",
+      "catalogId": "option-catalog-414d108fd752"
+    },
+    {
+      "simulatorCells": "B23",
+      "inputType": "list",
+      "catalogId": "option-catalog-629929671064"
+    },
+    {
+      "simulatorCells": "M37 M40",
+      "inputType": "list",
+      "catalogId": "option-catalog-717ee30befef"
+    },
+    {
+      "simulatorCells": "J31",
+      "inputType": "list",
+      "catalogId": "option-catalog-1ffd50e6c0ac"
+    },
+    {
+      "simulatorCells": "M33",
+      "inputType": "list",
+      "catalogId": "option-catalog-d3b938610e58"
+    },
+    {
+      "simulatorCells": "B38:B40",
+      "inputType": "list",
+      "catalogId": "option-catalog-f7853015a33f"
+    },
+    {
+      "simulatorCells": "O2",
+      "inputType": "list",
+      "catalogId": "option-catalog-9bd94655596d"
+    },
+    {
+      "simulatorCells": "D3",
+      "inputType": "list",
+      "catalogId": "option-catalog-8c8ef2e12ca3"
+    },
+    {
+      "simulatorCells": "M5",
+      "inputType": "list",
+      "catalogId": "option-catalog-ef87b39302a9"
+    },
+    {
+      "simulatorCells": "J6 J15 J24 J33 J42",
+      "inputType": "list",
+      "catalogId": "option-catalog-a7da0a6a7424"
+    },
+    {
+      "simulatorCells": "B20",
+      "inputType": "list",
+      "catalogId": "option-catalog-8d928a8b48c0"
+    },
+    {
+      "simulatorCells": "D17:D18 D32:D37",
+      "inputType": "list",
+      "catalogId": "option-catalog-77524e534e9f"
+    },
+    {
+      "simulatorCells": "D23",
+      "inputType": "list",
+      "catalogId": "option-catalog-16acddec81de"
+    },
+    {
+      "simulatorCells": "D1",
+      "inputType": "list",
+      "catalogId": "option-catalog-c4c9d626d9e6"
+    },
+    {
+      "simulatorCells": "M15:M17 M19:M21 O15:O17 O19:O21",
+      "inputType": "list",
+      "catalogId": "option-catalog-ff7fcde60871"
+    },
+    {
+      "simulatorCells": "D22",
+      "inputType": "list",
+      "catalogId": "option-catalog-0fcc9c3dc7e6"
+    },
+    {
+      "simulatorCells": "H8:H10 H17:H19 H26:H28 H35:H37 H44:H46",
+      "inputType": "list",
+      "catalogId": "option-catalog-64b257d9bcf4"
+    },
+    {
+      "simulatorCells": "S19",
+      "inputType": "list",
+      "catalogId": "option-catalog-91e87fc4ab46"
+    },
+    {
+      "simulatorCells": "B22",
+      "inputType": "list",
+      "catalogId": "option-catalog-5309e5d65e7e"
+    },
+    {
+      "simulatorCells": "B27:B29",
+      "inputType": "list",
+      "catalogId": "option-catalog-fca3ffaecf1f"
+    },
+    {
+      "simulatorCells": "B4",
+      "inputType": "list",
+      "catalogId": "option-catalog-83d51421effa"
+    },
+    {
+      "simulatorCells": "M7",
+      "inputType": "list",
+      "catalogId": "option-catalog-9063ccca31d6"
+    },
+    {
+      "simulatorCells": "S23",
+      "inputType": "list",
+      "catalogId": "option-catalog-987fecd02ec8"
+    },
+    {
+      "simulatorCells": "S25",
+      "inputType": "list",
+      "catalogId": "option-catalog-e68237ce7fa2"
+    },
+    {
+      "simulatorCells": "M23:M24 O23:O24",
+      "inputType": "list",
+      "catalogId": "option-catalog-491562dd1e9d"
+    },
+    {
+      "simulatorCells": "J3 J12 J21 J30 J39",
+      "inputType": "list",
+      "catalogId": "option-catalog-76b3d1d0fc12"
+    },
+    {
+      "simulatorCells": "J4",
+      "inputType": "list",
+      "catalogId": "option-catalog-1a18d703db93"
+    },
+    {
+      "simulatorCells": "D24",
+      "inputType": "list",
+      "catalogId": "option-catalog-5f2425328fda"
+    },
+    {
+      "simulatorCells": "M4",
+      "inputType": "list",
+      "catalogId": "option-catalog-fdda7268ce18"
+    },
+    {
+      "simulatorCells": "J7 J16 J25 J34 J43",
+      "inputType": "list",
+      "catalogId": "option-catalog-23122e89a169"
+    },
+    {
+      "simulatorCells": "M34",
+      "inputType": "list",
+      "catalogId": "option-catalog-bb28ed8d39bf"
+    },
+    {
+      "simulatorCells": "B37",
+      "inputType": "list",
+      "catalogId": "option-catalog-aecebaae726a"
+    },
+    {
+      "simulatorCells": "B35:B36",
+      "inputType": "list",
+      "catalogId": "option-catalog-a292118b7fc4"
+    },
+    {
+      "simulatorCells": "B5",
+      "inputType": "list",
+      "catalogId": "option-catalog-41bf529ba1aa"
+    },
+    {
+      "simulatorCells": "D25",
+      "inputType": "list",
+      "catalogId": "option-catalog-b033738d4d5c"
+    },
+    {
+      "simulatorCells": "O4",
+      "inputType": "list",
+      "catalogId": "option-catalog-5f3d8028fef2"
+    },
+    {
+      "simulatorCells": "J40",
+      "inputType": "list",
+      "catalogId": "option-catalog-801126ce1802"
+    },
+    {
+      "simulatorCells": "D2",
+      "inputType": "list",
+      "catalogId": "option-catalog-9240a234397a"
+    },
+    {
+      "simulatorCells": "B1 S4:S9",
+      "inputType": "list",
+      "catalogId": "option-catalog-be2a52193a9b"
+    },
+    {
+      "simulatorCells": "L9",
+      "inputType": "list",
+      "catalogId": "option-catalog-0f9c5b87ae49"
+    },
+    {
+      "simulatorCells": "G2",
+      "inputType": "list",
+      "catalogId": "option-catalog-bc1e5293ab87"
+    },
+    {
+      "simulatorCells": "S17",
+      "inputType": "list",
+      "catalogId": "option-catalog-409337b9f603"
+    },
+    {
+      "simulatorCells": "B2",
+      "inputType": "list",
+      "catalogId": "option-catalog-cd482ba318a5"
+    },
+    {
+      "simulatorCells": "M6",
+      "inputType": "list",
+      "catalogId": "option-catalog-e4896ad96468"
+    },
+    {
+      "simulatorCells": "O3",
+      "inputType": "list",
+      "catalogId": "option-catalog-0d3104cf336b"
+    },
+    {
+      "simulatorCells": "O7",
+      "inputType": "list",
+      "catalogId": "option-catalog-8ada2b66ee97"
+    },
+    {
+      "simulatorCells": "B10",
+      "inputType": "list",
+      "catalogId": "option-catalog-cf6fdd30db2b"
+    },
+    {
+      "simulatorCells": "N36:N37 N39:N40",
+      "inputType": "list",
+      "catalogId": "option-catalog-51dd8e26eb4d"
+    },
+    {
+      "simulatorCells": "B32 H3 H12 H21 H30 H39",
+      "inputType": "list",
+      "catalogId": "option-catalog-d864c66e78f5"
+    },
+    {
+      "simulatorCells": "B33",
+      "inputType": "list",
+      "catalogId": "option-catalog-6bb70c5676bf"
+    },
+    {
+      "simulatorCells": "J13 J22",
+      "inputType": "list",
+      "catalogId": "option-catalog-f6f2627f2c0f"
+    },
+    {
+      "simulatorCells": "B34",
+      "inputType": "list",
+      "catalogId": "option-catalog-2f1611a1937d"
+    },
+    {
+      "simulatorCells": "B24",
+      "inputType": "list",
+      "catalogId": "option-catalog-fe60831365cd"
+    },
+    {
+      "simulatorCells": "C8 C11:C15 H4:H7 H13:H16 H22:H25 H31:H34 H40:H43",
+      "inputType": "list",
+      "catalogId": "option-catalog-ac629c6b86cb"
+    }
+  ]
+}

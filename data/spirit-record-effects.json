@@ -1,0 +1,771 @@
+{
+  "schemaVersion": 1,
+  "dataUpdatedAt": "2026-09-25",
+  "selectorRange": "裝備模擬區!S4:S9；由係數區!A2:F61 查得支線及兩項特性，填入 T4:V9",
+  "defaultMaxedStats": {
+    "physicalAttack": 400,
+    "magicalAttack": 400,
+    "doubleAttackPct": 3.75,
+    "critRatePct": 5,
+    "extremizationPct": 5,
+    "critDamagePct": 1.5,
+    "bossDamagePct": 5,
+    "polarizationPct": 1.2,
+    "transcendenceSkillDamagePct": 3,
+    "allSkillDamagePct": 1,
+    "adaptabilityPct": 1,
+    "defenseIgnorePct": 1.2
+  },
+  "branchBonuses": [
+    {
+      "name": "1支線",
+      "eligibleClasses": [
+        "KE",
+        "AS",
+        "AN",
+        "FB",
+        "CU",
+        "CC",
+        "VI",
+        "ES",
+        "DB",
+        "CT",
+        "RI",
+        "EW",
+        "LI",
+        "GB"
+      ],
+      "statKey": "allSkillDamagePct",
+      "thresholds": [
+        {
+          "minimumCount": 6,
+          "value": 5
+        },
+        {
+          "minimumCount": 3,
+          "value": 3
+        }
+      ],
+      "otherwiseValue": "count",
+      "sourceCell": "計算機!L141"
+    },
+    {
+      "name": "2支線",
+      "eligibleClasses": [
+        "RM",
+        "OZ",
+        "DaB",
+        "RH",
+        "CE",
+        "FP",
+        "BR",
+        "FL",
+        "IN",
+        "BMa",
+        "BL",
+        "RS",
+        "CEL",
+        "AV"
+      ],
+      "statKey": "allSkillDamagePct",
+      "thresholds": [
+        {
+          "minimumCount": 6,
+          "value": 5
+        },
+        {
+          "minimumCount": 3,
+          "value": 3
+        }
+      ],
+      "otherwiseValue": "count",
+      "sourceCell": "計算機!L142"
+    },
+    {
+      "name": "3支線",
+      "eligibleClasses": [
+        "IM",
+        "MM",
+        "NI",
+        "CS",
+        "CeT",
+        "SH",
+        "BQ",
+        "MP",
+        "DA",
+        "MN",
+        "HE",
+        "NL",
+        "NP",
+        "AC"
+      ],
+      "statKey": "allSkillDamagePct",
+      "thresholds": [
+        {
+          "minimumCount": 6,
+          "value": 5
+        },
+        {
+          "minimumCount": 3,
+          "value": 3
+        }
+      ],
+      "otherwiseValue": "count",
+      "sourceCell": "計算機!L143"
+    },
+    {
+      "name": "4支線",
+      "eligibleClasses": [
+        "GE",
+        "LA",
+        "PR",
+        "RE",
+        "CA",
+        "DiA",
+        "SU",
+        "AD",
+        "DE",
+        "OM",
+        "PO",
+        "BI",
+        "TP",
+        "MO",
+        "MI"
+      ],
+      "statKey": "allSkillDamagePct",
+      "thresholds": [
+        {
+          "minimumCount": 6,
+          "value": 5
+        },
+        {
+          "minimumCount": 3,
+          "value": 3
+        }
+      ],
+      "otherwiseValue": "count",
+      "sourceCell": "計算機!L144"
+    }
+  ],
+  "traits": [
+    {
+      "name": "敏銳",
+      "statKey": "polarizationPct",
+      "countValues": [
+        {
+          "count": 6,
+          "value": 5
+        },
+        {
+          "minimumCount": 3,
+          "value": 3
+        }
+      ],
+      "otherwiseValue": 0,
+      "sourceCell": "計算機!J145"
+    },
+    {
+      "name": "巨人審判者",
+      "statKey": "strongerPct",
+      "countValues": [
+        {
+          "count": 5,
+          "value": 5
+        },
+        {
+          "minimumCount": 4,
+          "value": 3
+        },
+        {
+          "minimumCount": 2,
+          "value": 2
+        }
+      ],
+      "otherwiseValue": 0,
+      "sourceCell": "計算機!N146"
+    },
+    {
+      "name": "動武",
+      "statKey": "heatPct",
+      "countValues": [
+        {
+          "count": 5,
+          "value": 5
+        },
+        {
+          "minimumCount": 4,
+          "value": 3
+        },
+        {
+          "minimumCount": 2,
+          "value": 2
+        }
+      ],
+      "otherwiseValue": 0,
+      "sourceCell": "計算機!O147"
+    },
+    {
+      "name": "扭曲的視線",
+      "statKey": "bleedDamagePct",
+      "countValues": [
+        {
+          "minimumCount": 2,
+          "value": 2
+        }
+      ],
+      "otherwiseValue": 0,
+      "sourceCell": "計算機!M148"
+    },
+    {
+      "name": "物理特化",
+      "statKey": "doubleAttackPct",
+      "attackType": "physical",
+      "countValues": [
+        {
+          "minimumCount": 4,
+          "value": 3
+        },
+        {
+          "minimumCount": 2,
+          "value": 1
+        }
+      ],
+      "otherwiseValue": 0,
+      "sourceCell": "計算機!E149"
+    },
+    {
+      "name": "魔法特化",
+      "statKey": "doubleAttackPct",
+      "attackType": "magical",
+      "countValues": [
+        {
+          "minimumCount": 4,
+          "value": 3
+        },
+        {
+          "minimumCount": 2,
+          "value": 1
+        }
+      ],
+      "otherwiseValue": 0,
+      "sourceCell": "計算機!E150"
+    },
+    {
+      "name": "時空",
+      "statKey": "defenseIgnorePct",
+      "countValues": [
+        {
+          "minimumCount": 2,
+          "value": 2
+        }
+      ],
+      "otherwiseValue": 0,
+      "sourceCell": "計算機!R151"
+    },
+    {
+      "name": "魔族",
+      "statKey": "adaptabilityPct",
+      "countValues": [
+        {
+          "minimumCount": 2,
+          "value": 2
+        }
+      ],
+      "otherwiseValue": 0,
+      "sourceCell": "計算機!Q152"
+    }
+  ],
+  "classSelectors": {
+    "selectorCells": [
+      "S4",
+      "S5",
+      "S6",
+      "S7",
+      "S8",
+      "S9"
+    ],
+    "sourceRange": "係數區!A2:F61",
+    "classes": [
+      {
+        "classCode": "KE",
+        "branch": "1支線",
+        "traits": [
+          "原始行動",
+          "貫徹正義的人"
+        ]
+      },
+      {
+        "classCode": "RM",
+        "branch": "2支線",
+        "traits": [
+          "屬性鍛鍊者",
+          "魔法特化"
+        ]
+      },
+      {
+        "classCode": "IM",
+        "branch": "3支線",
+        "traits": [
+          "警覺",
+          "巨人審判者"
+        ]
+      },
+      {
+        "classCode": "GE",
+        "branch": "4支線",
+        "traits": [
+          "敏銳",
+          "貫徹正義的人"
+        ]
+      },
+      {
+        "classCode": "AS",
+        "branch": "1支線",
+        "traits": [
+          "探索之人",
+          "屬性鍛鍊者"
+        ]
+      },
+      {
+        "classCode": "OZ",
+        "branch": "2支線",
+        "traits": [
+          "魔力守護",
+          "渴求"
+        ]
+      },
+      {
+        "classCode": "MM",
+        "branch": "3支線",
+        "traits": [
+          "物理特化",
+          "時空"
+        ]
+      },
+      {
+        "classCode": "LA",
+        "branch": "4支線",
+        "traits": [
+          "探索之人",
+          "渴求"
+        ]
+      },
+      {
+        "classCode": "AN",
+        "branch": "1支線",
+        "traits": [
+          "精靈的守護",
+          "警覺"
+        ]
+      },
+      {
+        "classCode": "DaB",
+        "branch": "2支線",
+        "traits": [
+          "精靈的守護",
+          "敏銳"
+        ]
+      },
+      {
+        "classCode": "TW",
+        "branch": "3支線",
+        "traits": [
+          "精靈的守護",
+          "物理特化"
+        ]
+      },
+      {
+        "classCode": "PR",
+        "branch": "4支線",
+        "traits": [
+          "精靈的守護",
+          "魔法特化"
+        ]
+      },
+      {
+        "classCode": "FB",
+        "branch": "1支線",
+        "traits": [
+          "原始行動",
+          "警覺"
+        ]
+      },
+      {
+        "classCode": "RH",
+        "branch": "2支線",
+        "traits": [
+          "魔法特化",
+          "動武"
+        ]
+      },
+      {
+        "classCode": "NI",
+        "branch": "3支線",
+        "traits": [
+          "痛也沒關係",
+          "巨人審判者"
+        ]
+      },
+      {
+        "classCode": "RE",
+        "branch": "4支線",
+        "traits": [
+          "渴求",
+          "物理特化"
+        ]
+      },
+      {
+        "classCode": "CU",
+        "branch": "1支線",
+        "traits": [
+          "納斯德研究",
+          "敏銳"
+        ]
+      },
+      {
+        "classCode": "CE",
+        "branch": "2支線",
+        "traits": [
+          "納斯德研究",
+          "探索之人"
+        ]
+      },
+      {
+        "classCode": "CS",
+        "branch": "3支線",
+        "traits": [
+          "納斯德研究",
+          "戰場的天使"
+        ]
+      },
+      {
+        "classCode": "CA",
+        "branch": "4支線",
+        "traits": [
+          "敏銳",
+          "扭曲的視線"
+        ]
+      },
+      {
+        "classCode": "CC",
+        "branch": "1支線",
+        "traits": [
+          "貫徹正義的人",
+          "屬性鍛鍊者"
+        ]
+      },
+      {
+        "classCode": "FP",
+        "branch": "2支線",
+        "traits": [
+          "警覺",
+          "魔法特化"
+        ]
+      },
+      {
+        "classCode": "CeT",
+        "branch": "3支線",
+        "traits": [
+          "探索之人",
+          "巨人審判者"
+        ]
+      },
+      {
+        "classCode": "DiA",
+        "branch": "4支線",
+        "traits": [
+          "痛也沒關係",
+          "戰場的天使"
+        ]
+      },
+      {
+        "classCode": "VI",
+        "branch": "1支線",
+        "traits": [
+          "貫徹正義的人",
+          "貫徹的腳步"
+        ]
+      },
+      {
+        "classCode": "BR",
+        "branch": "2支線",
+        "traits": [
+          "渴求",
+          "富足的腳步"
+        ]
+      },
+      {
+        "classCode": "SH",
+        "branch": "3支線",
+        "traits": [
+          "魔力守護",
+          "熟練的腳步"
+        ]
+      },
+      {
+        "classCode": "SU",
+        "branch": "4支線",
+        "traits": [
+          "痛也沒關係",
+          "交流的腳步"
+        ]
+      },
+      {
+        "classCode": "ES",
+        "branch": "1支線",
+        "traits": [
+          "原始行動",
+          "貫徹正義的人"
+        ]
+      },
+      {
+        "classCode": "FL",
+        "branch": "2支線",
+        "traits": [
+          "屬性鍛鍊者",
+          "敏銳"
+        ]
+      },
+      {
+        "classCode": "BQ",
+        "branch": "3支線",
+        "traits": [
+          "痛也沒關係",
+          "渴求"
+        ]
+      },
+      {
+        "classCode": "AD",
+        "branch": "4支線",
+        "traits": [
+          "警覺",
+          "敏銳"
+        ]
+      },
+      {
+        "classCode": "DB",
+        "branch": "1支線",
+        "traits": [
+          "魔法特化",
+          "動武"
+        ]
+      },
+      {
+        "classCode": "DN",
+        "branch": "2支線",
+        "traits": [
+          "探索之人",
+          "納斯德研究"
+        ]
+      },
+      {
+        "classCode": "MP",
+        "branch": "3支線",
+        "traits": [
+          "時空",
+          "渴求"
+        ]
+      },
+      {
+        "classCode": "OM",
+        "branch": "4支線",
+        "traits": [
+          "探索之人",
+          "物理特化"
+        ]
+      },
+      {
+        "classCode": "CT",
+        "branch": "1支線",
+        "traits": [
+          "魔族",
+          "物理特化"
+        ]
+      },
+      {
+        "classCode": "IN",
+        "branch": "2支線",
+        "traits": [
+          "魔族",
+          "敏銳"
+        ]
+      },
+      {
+        "classCode": "DA",
+        "branch": "3支線",
+        "traits": [
+          "魔族",
+          "渴求"
+        ]
+      },
+      {
+        "classCode": "DE",
+        "branch": "4支線",
+        "traits": [
+          "魔族",
+          "痛也沒關係"
+        ]
+      },
+      {
+        "classCode": "TB",
+        "branch": "1支線",
+        "traits": [
+          "敏銳",
+          "巨人審判者"
+        ]
+      },
+      {
+        "classCode": "BMa",
+        "branch": "2支線",
+        "traits": [
+          "物理特化",
+          "渴求"
+        ]
+      },
+      {
+        "classCode": "MN",
+        "branch": "3支線",
+        "traits": [
+          "警覺",
+          "戰場的天使"
+        ]
+      },
+      {
+        "classCode": "PO",
+        "branch": "4支線",
+        "traits": [
+          "機械工學",
+          "探索之人"
+        ]
+      },
+      {
+        "classCode": "RI",
+        "branch": "1支線",
+        "traits": [
+          "貫徹正義的人",
+          "巨人審判者"
+        ]
+      },
+      {
+        "classCode": "BL",
+        "branch": "2支線",
+        "traits": [
+          "魔法特化",
+          "痛也沒關係"
+        ]
+      },
+      {
+        "classCode": "HE",
+        "branch": "3支線",
+        "traits": [
+          "時空",
+          "渴求"
+        ]
+      },
+      {
+        "classCode": "BI",
+        "branch": "4支線",
+        "traits": [
+          "渴求",
+          "扭曲的視線"
+        ]
+      },
+      {
+        "classCode": "EW",
+        "branch": "1支線",
+        "traits": [
+          "動武",
+          "敏銳"
+        ]
+      },
+      {
+        "classCode": "RS",
+        "branch": "2支線",
+        "traits": [
+          "魔力守護",
+          "痛也沒關係"
+        ]
+      },
+      {
+        "classCode": "NL",
+        "branch": "3支線",
+        "traits": [
+          "物理特化",
+          "菈比的朋友"
+        ]
+      },
+      {
+        "classCode": "TP",
+        "branch": "4支線",
+        "traits": [
+          "魔法特化",
+          "調皮王"
+        ]
+      },
+      {
+        "classCode": "LI",
+        "branch": "1支線",
+        "traits": [
+          "警覺",
+          "物理特化"
+        ]
+      },
+      {
+        "classCode": "CEL",
+        "branch": "2支線",
+        "traits": [
+          "探索之人",
+          "巨人審判者"
+        ]
+      },
+      {
+        "classCode": "NP",
+        "branch": "3支線",
+        "traits": [
+          "痛也沒關係",
+          "敏銳"
+        ]
+      },
+      {
+        "classCode": "MO",
+        "branch": "4支線",
+        "traits": [
+          "巨人審判者",
+          "扭曲的視線"
+        ]
+      },
+      {
+        "classCode": "GB",
+        "branch": "1支線",
+        "traits": [
+          "納斯德研究",
+          "巨人審判者"
+        ]
+      },
+      {
+        "classCode": "AV",
+        "branch": "2支線",
+        "traits": [
+          "物理特化",
+          "痛也沒關係"
+        ]
+      },
+      {
+        "classCode": "AC",
+        "branch": "3支線",
+        "traits": [
+          "魔法特化",
+          "敏銳"
+        ]
+      },
+      {
+        "classCode": "MI",
+        "branch": "4支線",
+        "traits": [
+          "渴求",
+          "扭曲的視線"
+        ]
+      }
+    ]
+  }
+}

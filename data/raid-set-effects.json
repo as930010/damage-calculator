@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "dataUpdatedAt": "2026-09-25",
+  "countedInputRange": "裝備模擬區!M2:O7",
+  "sets": [
+    {
+      "id": "raid-set-21",
+      "name": "21襲擊套效",
+      "matchTerms": [
+        "Type-Q女王的勳章",
+        "命運的預言書",
+        "靈魂的枷鎖"
+      ],
+      "implicitPieces": 1,
+      "pieceCountCap": 3,
+      "tiers": [
+        {
+          "requiredPieces": 2,
+          "stats": {
+            "critRatePct": 5,
+            "bossDamagePct": 7
+          },
+          "sourceCells": [
+            "計算機!F94",
+            "計算機!I94"
+          ]
+        },
+        {
+          "requiredPieces": 3,
+          "stats": {
+            "polarizationPct": 5,
+            "bleedDamagePct": 5
+          },
+          "sourceCells": [
+            "計算機!J95",
+            "計算機!M95"
+          ]
+        }
+      ],
+      "countFormulaCell": "計算機!Z90"
+    },
+    {
+      "id": "raid-set-18",
+      "name": "18襲擊套效",
+      "matchTerms": [
+        "暗鬼的徽章",
+        "夢緣香爐",
+        "夢繞氣息"
+      ],
+      "implicitPieces": 0,
+      "pieceCountCap": 3,
+      "tiers": [
+        {
+          "requiredPieces": 2,
+          "stats": {
+            "bossDamagePct": 5
+          },
+          "sourceCells": [
+            "計算機!I96"
+          ]
+        },
+        {
+          "requiredPieces": 3,
+          "stats": {
+            "polarizationPct": 3,
+            "bleedDamagePct": 3
+          },
+          "sourceCells": [
+            "計算機!J97",
+            "計算機!M97"
+          ]
+        }
+      ],
+      "countFormulaCell": "計算機!Z91"
+    },
+    {
+      "id": "raid-set-12",
+      "name": "12襲擊套效",
+      "matchTerms": [
+        "火魔的印記",
+        "魔族之眼",
+        "不息之火"
+      ],
+      "implicitPieces": 0,
+      "pieceCountCap": 3,
+      "tiers": [
+        {
+          "requiredPieces": 2,
+          "stats": {
+            "bossDamagePct": 5
+          },
+          "sourceCells": [
+            "計算機!I98"
+          ]
+        },
+        {
+          "requiredPieces": 3,
+          "stats": {
+            "polarizationPct": 5
+          },
+          "sourceCells": [
+            "計算機!J99"
+          ]
+        }
+      ],
+      "countFormulaCell": "計算機!Z92"
+    }
+  ]
+}

@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "dataUpdatedAt": "2026-09-25",
+  "sourceRange": "係數區!AG2:AH9",
+  "options": [
+    {
+      "id": "armor-appraisal-crit-1",
+      "name": "致命一擊+1%",
+      "stats": {
+        "critRatePct": 1
+      }
+    },
+    {
+      "id": "armor-appraisal-crit-1-5",
+      "name": "致命一擊+1.5%",
+      "stats": {
+        "critRatePct": 1.5
+      }
+    },
+    {
+      "id": "armor-appraisal-crit-2",
+      "name": "致命一擊+2%",
+      "stats": {
+        "critRatePct": 2
+      }
+    },
+    {
+      "id": "armor-appraisal-extremization-1",
+      "name": "極大化+1%",
+      "stats": {
+        "extremizationPct": 1
+      }
+    },
+    {
+      "id": "armor-appraisal-extremization-1-5",
+      "name": "極大化+1.5%",
+      "stats": {
+        "extremizationPct": 1.5
+      }
+    },
+    {
+      "id": "armor-appraisal-extremization-2",
+      "name": "極大化+2%",
+      "stats": {
+        "extremizationPct": 2
+      }
+    },
+    {
+      "id": "armor-appraisal-all-skill-0-5",
+      "name": "所有技能傷害+0.5%",
+      "stats": {
+        "allSkillDamagePct": 0.5
+      }
+    },
+    {
+      "id": "armor-appraisal-no-effect",
+      "name": "無關傷害",
+      "stats": {}
+    }
+  ],
+  "slots": [
+    {
+      "id": "upper",
+      "inputCells": [
+        "裝備模擬區!H8",
+        "裝備模擬區!H9",
+        "裝備模擬區!H10"
+      ],
+      "calculationRow": "計算機!38",
+      "wearSet": "shared"
+    },
+    {
+      "id": "lowerwear",
+      "inputCells": [
+        "裝備模擬區!H17",
+        "裝備模擬區!H18",
+        "裝備模擬區!H19"
+      ],
+      "calculationRow": "計算機!39",
+      "wearSet": "lowerwearA"
+    },
+    {
+      "id": "lowerwearAlternative",
+      "inputCells": [
+        "裝備模擬區!H26",
+        "裝備模擬區!H27",
+        "裝備模擬區!H28"
+      ],
+      "calculationRow": "計算機!40",
+      "wearSet": "lowerwearB",
+      "enabledBy": "裝備模擬區!F20"
+    },
+    {
+      "id": "gloves",
+      "inputCells": [
+        "裝備模擬區!H35",
+        "裝備模擬區!H36",
+        "裝備模擬區!H37"
+      ],
+      "calculationRow": "計算機!41",
+      "wearSet": "shared"
+    },
+    {
+      "id": "shoes",
+      "inputCells": [
+        "裝備模擬區!H44",
+        "裝備模擬區!H45",
+        "裝備模擬區!H46"
+      ],
+      "calculationRow": "計算機!42",
+      "wearSet": "shared"
+    }
+  ],
+  "notes": [
+    "選項按名稱內含致命一擊、極大化、所有技能傷害分類，效果值由係數區 AH 欄查得。",
+    "無關傷害在計算機 F/G/L 沒有匹配項，故輸出為 0。武器成長等級等額外效果不屬於這組三個鑑定選項，需由對應獨立規則計算。"
+  ]
+}

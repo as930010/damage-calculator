@@ -1,0 +1,183 @@
+{
+  "schemaVersion": 1,
+  "dataUpdatedAt": "2026-09-25",
+  "source": "Google Sheets: 計算機!C2:W2 and equipment database headers",
+  "attributes": [
+    {
+      "key": "physicalAttack",
+      "name": "物攻",
+      "unit": "flat",
+      "calculationScope": "characterTotal",
+      "aggregation": "sum",
+      "active": true
+    },
+    {
+      "key": "magicalAttack",
+      "name": "魔攻",
+      "unit": "flat",
+      "calculationScope": "characterTotal",
+      "aggregation": "sum",
+      "active": true
+    },
+    {
+      "key": "doubleAttackPct",
+      "name": "雙攻%",
+      "unit": "percent",
+      "calculationScope": "characterTotal",
+      "aggregation": "sum",
+      "active": true
+    },
+    {
+      "key": "critRatePct",
+      "name": "致命一擊%",
+      "unit": "percent",
+      "calculationScope": "characterTotal",
+      "aggregation": "sum",
+      "active": true
+    },
+    {
+      "key": "extremizationPct",
+      "name": "極大化%",
+      "unit": "percent",
+      "calculationScope": "characterTotal",
+      "aggregation": "sum",
+      "active": true
+    },
+    {
+      "key": "critDamagePct",
+      "name": "致命傷害%",
+      "unit": "percent",
+      "calculationScope": "characterTotal",
+      "aggregation": "sum",
+      "active": true
+    },
+    {
+      "key": "bossDamagePct",
+      "name": "Boss傷害%",
+      "unit": "percent",
+      "calculationScope": "characterTotal",
+      "aggregation": "sum",
+      "active": true
+    },
+    {
+      "key": "polarizationPct",
+      "name": "兩極化%",
+      "unit": "percent",
+      "calculationScope": "characterTotal",
+      "aggregation": "sum",
+      "cap": {
+        "value": 60,
+        "scope": "characterTotal"
+      },
+      "active": true
+    },
+    {
+      "key": "transcendenceSkillDamagePct",
+      "name": "超越技傷%",
+      "unit": "percent",
+      "calculationScope": "characterTotal",
+      "aggregation": "sum",
+      "active": true
+    },
+    {
+      "key": "allSkillDamagePct",
+      "name": "所有技能傷害%",
+      "unit": "percent",
+      "calculationScope": "characterTotal",
+      "aggregation": "sum",
+      "active": true
+    },
+    {
+      "key": "bleedDamagePct",
+      "name": "流血%",
+      "unit": "percent",
+      "calculationScope": "characterTotal",
+      "aggregation": "sum",
+      "active": true
+    },
+    {
+      "key": "strongerPct",
+      "name": "強者%",
+      "unit": "percent",
+      "calculationScope": "conditionalDamage",
+      "aggregation": "sum",
+      "active": true
+    },
+    {
+      "key": "heatPct",
+      "name": "排熱%",
+      "unit": "percent",
+      "calculationScope": "conditionalDamage",
+      "aggregation": "sum",
+      "active": true
+    },
+    {
+      "key": "fullHealthKillDamagePct",
+      "name": "100%血殺%",
+      "unit": "percent",
+      "calculationScope": "characterTotal",
+      "aggregation": "sum",
+      "active": true
+    },
+    {
+      "key": "adaptabilityPct",
+      "name": "適應力%",
+      "unit": "percent",
+      "calculationScope": "characterTotal",
+      "aggregation": "sum",
+      "cap": {
+        "value": 60,
+        "scope": "characterTotal"
+      },
+      "active": true
+    },
+    {
+      "key": "defenseIgnorePct",
+      "name": "無視防禦%",
+      "unit": "percent",
+      "calculationScope": "characterTotal",
+      "aggregation": "sum",
+      "active": true
+    },
+    {
+      "key": "multiplicativeDamagePct",
+      "name": "乘算效果",
+      "unit": "percent",
+      "calculationScope": "productSource",
+      "aggregation": "product",
+      "active": true
+    },
+    {
+      "key": "multiplicativeCritDamagePct",
+      "name": "乘算暴傷",
+      "unit": "percent",
+      "calculationScope": "productSource",
+      "aggregation": "product",
+      "active": true
+    },
+    {
+      "key": "attackLevel",
+      "name": "攻擊力等級",
+      "unit": "flat",
+      "calculationScope": "characterTotal",
+      "aggregation": "sum",
+      "active": true
+    },
+    {
+      "key": "skillTypeAttackPct",
+      "name": "技能類雙攻%",
+      "unit": "percent",
+      "calculationScope": "characterTotal",
+      "aggregation": "sum",
+      "active": true
+    },
+    {
+      "key": "superAdaptabilityPct",
+      "name": "超適應力%",
+      "unit": "percent",
+      "calculationScope": "characterTotal",
+      "aggregation": "sum",
+      "active": true
+    }
+  ]
+}

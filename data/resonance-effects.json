@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "dataUpdatedAt": "2026-09-25",
+  "selectorCells": [
+    "裝備模擬區!T11",
+    "裝備模擬區!T12",
+    "裝備模擬區!T13",
+    "裝備模擬區!T14",
+    "裝備模擬區!T15"
+  ],
+  "effects": [
+    {
+      "id": "resonance-double-attack",
+      "name": "雙攻",
+      "inputCell": "裝備模擬區!T11",
+      "multiplier": 10,
+      "stats": {
+        "physicalAttack": 1,
+        "magicalAttack": 1
+      },
+      "sourceCells": [
+        "計算機!C65",
+        "計算機!D65"
+      ],
+      "formula": "輸入值 × 10，分別加至物攻與魔攻"
+    },
+    {
+      "id": "resonance-skill-damage",
+      "name": "技傷",
+      "inputCell": "裝備模擬區!T12",
+      "multiplier": 0.35,
+      "stats": {
+        "transcendenceSkillDamagePct": 1
+      },
+      "sourceCells": [
+        "計算機!K66"
+      ],
+      "formula": "輸入值 × 0.35"
+    },
+    {
+      "id": "resonance-polarization",
+      "name": "兩極",
+      "inputCell": "裝備模擬區!T13",
+      "multiplier": 0.15,
+      "stats": {
+        "polarizationPct": 1
+      },
+      "sourceCells": [
+        "計算機!J67"
+      ],
+      "formula": "輸入值 × 0.15；之後由角色總值套用 60 上限"
+    },
+    {
+      "id": "resonance-boss-damage",
+      "name": "B傷",
+      "inputCell": "裝備模擬區!T14",
+      "multiplier": 0.3,
+      "stats": {
+        "bossDamagePct": 1
+      },
+      "sourceCells": [
+        "計算機!I68"
+      ],
+      "formula": "輸入值 × 0.3"
+    },
+    {
+      "id": "resonance-adaptability",
+      "name": "適應",
+      "inputCell": "裝備模擬區!T15",
+      "multiplier": 0.07,
+      "stats": {
+        "adaptabilityPct": 1
+      },
+      "sourceCells": [
+        "計算機!Q69"
+      ],
+      "formula": "輸入值 × 0.07；之後由角色總值套用 60 上限"
+    }
+  ]
+}

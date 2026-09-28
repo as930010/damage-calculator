@@ -1,0 +1,443 @@
+{
+  "schemaVersion": 1,
+  "dataUpdatedAt": "2026-09-25",
+  "source": "裝備模擬區下拉範圍與計算機第 22、24、27、30、32、33、35 列公式",
+  "groups": [
+    {
+      "id": "accessory-upper-clothing",
+      "label": "飾品上衣",
+      "inputCells": [
+        "O11",
+        "O12",
+        "O13"
+      ],
+      "source": "裝備模擬區!O11:O13 -> 計算機!E30:G30、L30; 係數區!AU2:AU6",
+      "options": [
+        {
+          "name": "攻擊力+1%",
+          "stats": {
+            "doubleAttackPct": 1
+          }
+        },
+        {
+          "name": "所有技能傷害+1%",
+          "stats": {
+            "allSkillDamagePct": 1
+          }
+        },
+        {
+          "name": "致命一擊+3%",
+          "stats": {
+            "critRatePct": 3
+          }
+        },
+        {
+          "name": "極大化+3%",
+          "stats": {
+            "extremizationPct": 3
+          }
+        },
+        {
+          "name": "無關傷害",
+          "stats": {}
+        }
+      ],
+      "selectionCell": "O3",
+      "slotId": "top"
+    },
+    {
+      "id": "accessory-face-middle",
+      "label": "飾品臉中",
+      "inputCells": [
+        "M15",
+        "M16",
+        "M17"
+      ],
+      "source": "裝備模擬區!M15:M17 -> 計算機!E22:R22; 致命一擊與極大化 x1，其餘 x1.5; 係數區!AP2:AP13",
+      "options": [
+        {
+          "name": "無視防禦%",
+          "stats": {
+            "defenseIgnorePct": 1.5
+          }
+        },
+        {
+          "name": "所有技能傷害%",
+          "stats": {
+            "allSkillDamagePct": 1.5
+          }
+        },
+        {
+          "name": "Boss傷害%",
+          "stats": {
+            "bossDamagePct": 1.5
+          }
+        },
+        {
+          "name": "致命傷害%",
+          "stats": {
+            "critDamagePct": 1.5
+          }
+        },
+        {
+          "name": "雙攻%",
+          "stats": {
+            "doubleAttackPct": 1.5
+          }
+        },
+        {
+          "name": "兩極化%",
+          "stats": {
+            "polarizationPct": 1.5
+          }
+        },
+        {
+          "name": "適應力%",
+          "stats": {
+            "adaptabilityPct": 1.5
+          }
+        },
+        {
+          "name": "100%血殺%",
+          "stats": {
+            "fullHealthKillDamagePct": 1.5
+          }
+        },
+        {
+          "name": "流血%",
+          "stats": {
+            "bleedDamagePct": 1.5
+          }
+        },
+        {
+          "name": "致命一擊%",
+          "stats": {
+            "critRatePct": 1
+          }
+        },
+        {
+          "name": "極大化%",
+          "stats": {
+            "extremizationPct": 1
+          }
+        },
+        {
+          "name": "無關傷害",
+          "stats": {}
+        }
+      ],
+      "selectionCell": "M4",
+      "slotId": "faceMiddle"
+    },
+    {
+      "id": "accessory-face-bottom",
+      "label": "飾品臉下",
+      "inputCells": [
+        "M19",
+        "M20",
+        "M21"
+      ],
+      "source": "裝備模擬區!M19:M21 -> 計算機!E24:R24; 全部 x2; 係數區!AP2:AP13",
+      "options": [
+        {
+          "name": "無視防禦%",
+          "stats": {
+            "defenseIgnorePct": 2
+          }
+        },
+        {
+          "name": "所有技能傷害%",
+          "stats": {
+            "allSkillDamagePct": 2
+          }
+        },
+        {
+          "name": "Boss傷害%",
+          "stats": {
+            "bossDamagePct": 2
+          }
+        },
+        {
+          "name": "致命傷害%",
+          "stats": {
+            "critDamagePct": 2
+          }
+        },
+        {
+          "name": "雙攻%",
+          "stats": {
+            "doubleAttackPct": 2
+          }
+        },
+        {
+          "name": "兩極化%",
+          "stats": {
+            "polarizationPct": 2
+          }
+        },
+        {
+          "name": "適應力%",
+          "stats": {
+            "adaptabilityPct": 2
+          }
+        },
+        {
+          "name": "100%血殺%",
+          "stats": {
+            "fullHealthKillDamagePct": 2
+          }
+        },
+        {
+          "name": "流血%",
+          "stats": {
+            "bleedDamagePct": 2
+          }
+        },
+        {
+          "name": "致命一擊%",
+          "stats": {
+            "critRatePct": 2
+          }
+        },
+        {
+          "name": "極大化%",
+          "stats": {
+            "extremizationPct": 2
+          }
+        },
+        {
+          "name": "無關傷害",
+          "stats": {}
+        }
+      ],
+      "selectionCell": "M5",
+      "slotId": "faceBottom"
+    },
+    {
+      "id": "accessory-arm",
+      "label": "飾品手臂",
+      "inputCells": [
+        "O15",
+        "O16",
+        "O17"
+      ],
+      "source": "裝備模擬區!O15:O17 -> 計算機!E32:R32; 致命一擊與極大化 x1.5，其餘 x1; 係數區!AP2:AP13",
+      "options": [
+        {
+          "name": "無視防禦%",
+          "stats": {
+            "defenseIgnorePct": 1
+          }
+        },
+        {
+          "name": "所有技能傷害%",
+          "stats": {
+            "allSkillDamagePct": 1
+          }
+        },
+        {
+          "name": "Boss傷害%",
+          "stats": {
+            "bossDamagePct": 1
+          }
+        },
+        {
+          "name": "致命傷害%",
+          "stats": {
+            "critDamagePct": 1
+          }
+        },
+        {
+          "name": "雙攻%",
+          "stats": {
+            "doubleAttackPct": 1
+          }
+        },
+        {
+          "name": "兩極化%",
+          "stats": {
+            "polarizationPct": 1
+          }
+        },
+        {
+          "name": "適應力%",
+          "stats": {
+            "adaptabilityPct": 1
+          }
+        },
+        {
+          "name": "100%血殺%",
+          "stats": {
+            "fullHealthKillDamagePct": 1
+          }
+        },
+        {
+          "name": "流血%",
+          "stats": {
+            "bleedDamagePct": 1
+          }
+        },
+        {
+          "name": "致命一擊%",
+          "stats": {
+            "critRatePct": 1.5
+          }
+        },
+        {
+          "name": "極大化%",
+          "stats": {
+            "extremizationPct": 1.5
+          }
+        },
+        {
+          "name": "無關傷害",
+          "stats": {}
+        }
+      ],
+      "selectionCell": "O5",
+      "slotId": "arm"
+    },
+    {
+      "id": "accessory-necklace",
+      "label": "飾品項鍊",
+      "inputCells": [
+        "O19",
+        "O20",
+        "O21"
+      ],
+      "source": "裝備模擬區!O19:O21 -> 計算機!E33:R33; 致命一擊與極大化 x2，其餘 x1; 係數區!AP2:AP13",
+      "options": [
+        {
+          "name": "無視防禦%",
+          "stats": {
+            "defenseIgnorePct": 1
+          }
+        },
+        {
+          "name": "所有技能傷害%",
+          "stats": {
+            "allSkillDamagePct": 1
+          }
+        },
+        {
+          "name": "Boss傷害%",
+          "stats": {
+            "bossDamagePct": 1
+          }
+        },
+        {
+          "name": "致命傷害%",
+          "stats": {
+            "critDamagePct": 1
+          }
+        },
+        {
+          "name": "雙攻%",
+          "stats": {
+            "doubleAttackPct": 1
+          }
+        },
+        {
+          "name": "兩極化%",
+          "stats": {
+            "polarizationPct": 1
+          }
+        },
+        {
+          "name": "適應力%",
+          "stats": {
+            "adaptabilityPct": 1
+          }
+        },
+        {
+          "name": "100%血殺%",
+          "stats": {
+            "fullHealthKillDamagePct": 1
+          }
+        },
+        {
+          "name": "流血%",
+          "stats": {
+            "bleedDamagePct": 1
+          }
+        },
+        {
+          "name": "致命一擊%",
+          "stats": {
+            "critRatePct": 2
+          }
+        },
+        {
+          "name": "極大化%",
+          "stats": {
+            "extremizationPct": 2
+          }
+        },
+        {
+          "name": "無關傷害",
+          "stats": {}
+        }
+      ],
+      "selectionCell": "O6",
+      "slotId": "necklace"
+    },
+    {
+      "id": "accessory-ring-one-special",
+      "label": "飾品戒指1",
+      "inputCells": [
+        "M23",
+        "M24"
+      ],
+      "source": "裝備模擬區!M23:M24 -> 計算機!F27:G27; 係數區!AV2:AV4",
+      "options": [
+        {
+          "name": "致命一擊+2%",
+          "stats": {
+            "critRatePct": 2
+          }
+        },
+        {
+          "name": "極大化+2%",
+          "stats": {
+            "extremizationPct": 2
+          }
+        },
+        {
+          "name": "無關傷害",
+          "stats": {}
+        }
+      ],
+      "selectionCell": "M7",
+      "slotId": "ringA"
+    },
+    {
+      "id": "accessory-ring-two-special",
+      "label": "飾品戒指2",
+      "inputCells": [
+        "O23",
+        "O24"
+      ],
+      "source": "裝備模擬區!O23:O24 -> 計算機!F35:G35; 係數區!AV2:AV4",
+      "options": [
+        {
+          "name": "致命一擊+2%",
+          "stats": {
+            "critRatePct": 2
+          }
+        },
+        {
+          "name": "極大化+2%",
+          "stats": {
+            "extremizationPct": 2
+          }
+        },
+        {
+          "name": "無關傷害",
+          "stats": {}
+        }
+      ],
+      "selectionCell": "O7",
+      "slotId": "ringB"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#111318" />
+    <title>DaB 傷害計算機</title>
+    <link rel="stylesheet" href="./frontend/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="./" aria-label="DaB 傷害計算機首頁">
+          <span class="brand-mark">D</span>
+          <span><strong>傷害計算機</strong><small>裝備模擬器</small></span>
+        </a>
+        <div class="top-meta"><span class="live-dot"></span><span id="version-label">資料載入中</span></div>
+      </header>
+      <main id="app" class="layout">
+        <section class="loading-card"><div class="spinner"></div><h1>正在載入遊戲資料</h1><p>讀取裝備目錄與計算參數…</p></section>
+      </main>
+      <footer>資料與計算均在此裝置的瀏覽器中處理。配裝設定只儲存在本機瀏覽器。</footer>
+    </div>
+    <script type="module" src="./frontend/main.js"></script>
+  </body>
+</html>

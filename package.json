@@ -1,0 +1,13 @@
+{
+  "name": "dab-damage-calculator",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "node scripts/build.mjs",
+    "preview": "node scripts/preview.mjs"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  }
+}

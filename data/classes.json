@@ -1,0 +1,727 @@
+{
+  "schemaVersion": 1,
+  "dataUpdatedAt": "2026-09-25",
+  "source": "Google Sheets: 係數區!A2:C61, 物魔對照; passive defaults confirmed by user",
+  "classes": [
+    {
+      "id": "KE",
+      "name": "KE",
+      "attackType": "physical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 580,
+        "magical": 400
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "RM",
+      "name": "RM",
+      "attackType": "magical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 400,
+        "magical": 590
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "IM",
+      "name": "IM",
+      "attackType": "physical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 590,
+        "magical": 400
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "GE",
+      "name": "GE",
+      "attackType": "magical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 400,
+        "magical": 590
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "AS",
+      "name": "AS",
+      "attackType": "magical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 400,
+        "magical": 580
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "OZ",
+      "name": "OZ",
+      "attackType": "magical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 400,
+        "magical": 590
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "MM",
+      "name": "MM",
+      "attackType": "physical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 590,
+        "magical": 400
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "LA",
+      "name": "LA",
+      "attackType": "physical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 580,
+        "magical": 400
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "AN",
+      "name": "AN",
+      "attackType": "physical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 590,
+        "magical": 400
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "DaB",
+      "name": "DaB",
+      "attackType": "magical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 400,
+        "magical": 580
+      },
+      "critDamagePassivePct": 30
+    },
+    {
+      "id": "TW",
+      "name": "TW",
+      "attackType": "physical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 590,
+        "magical": 400
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "PR",
+      "name": "PR",
+      "attackType": "magical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 400,
+        "magical": 580
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "FB",
+      "name": "FB",
+      "attackType": "physical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 590,
+        "magical": 400
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "RH",
+      "name": "RH",
+      "attackType": "magical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 400,
+        "magical": 580
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "NI",
+      "name": "NI",
+      "attackType": "magical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 400,
+        "magical": 590
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "RE",
+      "name": "RE",
+      "attackType": "physical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 580,
+        "magical": 400
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "CU",
+      "name": "CU",
+      "attackType": "magical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 400,
+        "magical": 590
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "CE",
+      "name": "CE",
+      "attackType": "physical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 590,
+        "magical": 400
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "CS",
+      "name": "CS",
+      "attackType": "magical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 400,
+        "magical": 590
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "CA",
+      "name": "CA",
+      "attackType": "physical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 590,
+        "magical": 400
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "CC",
+      "name": "CC",
+      "attackType": "physical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 580,
+        "magical": 400
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "FP",
+      "name": "FP",
+      "attackType": "magical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 400,
+        "magical": 580
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "CeT",
+      "name": "CeT",
+      "attackType": "magical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 400,
+        "magical": 580
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "DiA",
+      "name": "DiA",
+      "attackType": "physical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 580,
+        "magical": 400
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "VI",
+      "name": "VI",
+      "attackType": "physical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 580,
+        "magical": 400
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "BR",
+      "name": "BR",
+      "attackType": "magical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 400,
+        "magical": 590
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "SH",
+      "name": "SH",
+      "attackType": "physical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 590,
+        "magical": 400
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "SU",
+      "name": "SU",
+      "attackType": "magical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 400,
+        "magical": 580
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "ES",
+      "name": "ES",
+      "attackType": "physical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 580,
+        "magical": 400
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "FL",
+      "name": "FL",
+      "attackType": "magical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 400,
+        "magical": 590
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "BQ",
+      "name": "BQ",
+      "attackType": "physical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 590,
+        "magical": 400
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "AD",
+      "name": "AD",
+      "attackType": "magical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 400,
+        "magical": 590
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "DB",
+      "name": "DB",
+      "attackType": "magical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 400,
+        "magical": 590
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "DN",
+      "name": "DN",
+      "attackType": "physical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 590,
+        "magical": 400
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "MP",
+      "name": "MP",
+      "attackType": "magical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 400,
+        "magical": 590
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "OM",
+      "name": "OM",
+      "attackType": "physical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 580,
+        "magical": 400
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "CT",
+      "name": "CT",
+      "attackType": "physical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 580,
+        "magical": 400
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "IN",
+      "name": "IN",
+      "attackType": "magical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 400,
+        "magical": 580
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "DA",
+      "name": "DA",
+      "attackType": "physical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 590,
+        "magical": 400
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "DE",
+      "name": "DE",
+      "attackType": "magical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 400,
+        "magical": 580
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "TB",
+      "name": "TB",
+      "attackType": "physical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 580,
+        "magical": 400
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "BMa",
+      "name": "BMa",
+      "attackType": "physical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 580,
+        "magical": 400
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "MN",
+      "name": "MN",
+      "attackType": "magical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 400,
+        "magical": 580
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "PO",
+      "name": "PO",
+      "attackType": "magical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 400,
+        "magical": 580
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "RI",
+      "name": "RI",
+      "attackType": "physical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 590,
+        "magical": 400
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "BL",
+      "name": "BL",
+      "attackType": "magical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 400,
+        "magical": 580
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "HE",
+      "name": "HE",
+      "attackType": "magical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 400,
+        "magical": 590
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "BI",
+      "name": "BI",
+      "attackType": "physical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 580,
+        "magical": 400
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "EW",
+      "name": "EW",
+      "attackType": "physical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 590,
+        "magical": 400
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "RS",
+      "name": "RS",
+      "attackType": "magical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 400,
+        "magical": 580
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "NL",
+      "name": "NL",
+      "attackType": "physical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 590,
+        "magical": 400
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "TP",
+      "name": "TP",
+      "attackType": "magical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 400,
+        "magical": 590
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "LI",
+      "name": "LI",
+      "attackType": "physical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 590,
+        "magical": 400
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "CEL",
+      "name": "CEL",
+      "attackType": "magical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 400,
+        "magical": 590
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "NP",
+      "name": "NP",
+      "attackType": "physical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 580,
+        "magical": 400
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "MO",
+      "name": "MO",
+      "attackType": "magical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 400,
+        "magical": 590
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "GB",
+      "name": "GB",
+      "attackType": "physical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 590,
+        "magical": 400
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "AV",
+      "name": "AV",
+      "attackType": "physical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 580,
+        "magical": 400
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "AC",
+      "name": "AC",
+      "attackType": "magical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 400,
+        "magical": 590
+      },
+      "critDamagePassivePct": 0
+    },
+    {
+      "id": "MI",
+      "name": "MI",
+      "attackType": "magical",
+      "active": true,
+      "calculationReady": true,
+      "attackCoefficients": {
+        "physical": 400,
+        "magical": 590
+      },
+      "critDamagePassivePct": 0
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "dataUpdatedAt": "2026-09-25",
+  "source": "Google Sheets 計算機!B77, B103, B105",
+  "sources": [
+    {
+      "id": "sheet:計算機!B77",
+      "attributes": [
+        "critRate",
+        "extremization"
+      ],
+      "method": "multiplicative",
+      "sourceCell": "計算機!B77",
+      "valueSource": {
+        "kind": "parameter",
+        "key": "yellowBeastSpiritStoneRatePct"
+      },
+      "condition": {
+        "selectionKey": "masterBeastSpiritStoneColor",
+        "equals": "黃"
+      }
+    },
+    {
+      "id": "lowerwear-crit-rate-enhancement",
+      "attributes": [
+        "critRate"
+      ],
+      "method": "multiplicative",
+      "sourceCell": "計算機!B103",
+      "valueSource": {
+        "kind": "enhancementText",
+        "inputCell": "H12",
+        "bonusPct": 2
+      }
+    },
+    {
+      "id": "shoes-extremization-enhancement",
+      "attributes": [
+        "extremization"
+      ],
+      "method": "multiplicative",
+      "sourceCell": "計算機!B105",
+      "valueSource": {
+        "kind": "enhancementText",
+        "inputCell": "H39",
+        "bonusPct": 2
+      }
+    }
+  ]
+}

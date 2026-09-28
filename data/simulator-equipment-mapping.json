@@ -1,0 +1,413 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "workbook": "Google Sheets current export",
+    "sheet": "裝備模擬區",
+    "calculationSheet": "計算機",
+    "extractedAt": "2026-09-26"
+  },
+  "selections": [
+    {
+      "selectionCell": "B7",
+      "catalogFile": "equipment/one-piece-costumes.json",
+      "slotId": "one-piece-costumes",
+      "calculationRows": [
+        3
+      ]
+    },
+    {
+      "selectionCell": "B10",
+      "catalogFile": "equipment/left-ice.json",
+      "slotId": "left-ice",
+      "calculationRows": [
+        4
+      ]
+    },
+    {
+      "selectionCell": "B17",
+      "catalogFile": "equipment/right-ice.json",
+      "slotId": "weapon",
+      "calculationRows": [
+        5
+      ]
+    },
+    {
+      "selectionCell": "B20",
+      "catalogFile": "equipment/right-ice.json",
+      "slotId": "weaponAccessory",
+      "calculationRows": [
+        6
+      ]
+    },
+    {
+      "selectionCell": "B21",
+      "catalogFile": "equipment/right-ice.json",
+      "slotId": "faceTop",
+      "calculationRows": [
+        7
+      ]
+    },
+    {
+      "selectionCell": "B22",
+      "catalogFile": "equipment/right-ice.json",
+      "slotId": "faceMiddle",
+      "calculationRows": [
+        8
+      ]
+    },
+    {
+      "selectionCell": "B23",
+      "catalogFile": "equipment/right-ice.json",
+      "slotId": "faceBottom",
+      "calculationRows": [
+        9
+      ]
+    },
+    {
+      "selectionCell": "B24",
+      "catalogFile": "equipment/right-ice.json",
+      "slotId": "earring",
+      "calculationRows": [
+        10
+      ]
+    },
+    {
+      "selectionCell": "D20",
+      "catalogFile": "equipment/right-ice.json",
+      "slotId": "support",
+      "calculationRows": [
+        11
+      ]
+    },
+    {
+      "selectionCell": "D21",
+      "catalogFile": "equipment/right-ice.json",
+      "slotId": "top",
+      "calculationRows": [
+        12
+      ]
+    },
+    {
+      "selectionCell": "D22",
+      "catalogFile": "equipment/right-ice.json",
+      "slotId": "bottom",
+      "calculationRows": [
+        13
+      ]
+    },
+    {
+      "selectionCell": "D23",
+      "catalogFile": "equipment/right-ice.json",
+      "slotId": "arm",
+      "calculationRows": [
+        14
+      ]
+    },
+    {
+      "selectionCell": "D24",
+      "catalogFile": "equipment/right-ice.json",
+      "slotId": "necklace",
+      "calculationRows": [
+        15
+      ]
+    },
+    {
+      "selectionCell": "D25",
+      "catalogFile": "equipment/right-ice.json",
+      "slotId": "ring",
+      "calculationRows": [
+        16
+      ]
+    },
+    {
+      "selectionCell": "M2",
+      "catalogFile": "equipment/accessories.json",
+      "slotId": "weaponAccessory",
+      "calculationRows": [
+        20
+      ]
+    },
+    {
+      "selectionCell": "M3",
+      "catalogFile": "equipment/accessories.json",
+      "slotId": "faceTop",
+      "calculationRows": [
+        21
+      ]
+    },
+    {
+      "selectionCell": "M4",
+      "catalogFile": "equipment/accessories.json",
+      "slotId": "faceMiddle",
+      "calculationRows": [
+        22
+      ]
+    },
+    {
+      "selectionCell": "M5",
+      "catalogFile": "equipment/accessories.json",
+      "slotId": "faceBottom",
+      "calculationRows": [
+        23
+      ]
+    },
+    {
+      "selectionCell": "M6",
+      "catalogFile": "equipment/accessories.json",
+      "slotId": "earring",
+      "calculationRows": [
+        25
+      ]
+    },
+    {
+      "selectionCell": "M7",
+      "catalogFile": "equipment/accessories.json",
+      "slotId": "ringA",
+      "calculationRows": [
+        26
+      ]
+    },
+    {
+      "selectionCell": "O2",
+      "catalogFile": "equipment/accessories.json",
+      "slotId": "support",
+      "calculationRows": [
+        28
+      ]
+    },
+    {
+      "selectionCell": "O3",
+      "catalogFile": "equipment/accessories.json",
+      "slotId": "top",
+      "calculationRows": [
+        29
+      ]
+    },
+    {
+      "selectionCell": "O4",
+      "catalogFile": "equipment/accessories.json",
+      "slotId": "bottom",
+      "calculationRows": [
+        31
+      ]
+    },
+    {
+      "selectionCell": "O5",
+      "catalogFile": "equipment/accessories.json",
+      "slotId": "arm",
+      "calculationRows": [
+        32
+      ]
+    },
+    {
+      "selectionCell": "O6",
+      "catalogFile": "equipment/accessories.json",
+      "slotId": "necklace",
+      "calculationRows": [
+        33
+      ]
+    },
+    {
+      "selectionCell": "O7",
+      "catalogFile": "equipment/accessories.json",
+      "slotId": "ringB",
+      "calculationRows": [
+        34
+      ]
+    }
+  ],
+  "magicStoneSelections": {
+    "catalogFile": "equipment/magic-stones.json",
+    "slotId": "magicStone",
+    "inputGroups": [
+      {
+        "selectionCell": "C8",
+        "application": "armor",
+        "calculationRow": 104
+      },
+      {
+        "selectionCell": "C11",
+        "application": "armor",
+        "calculationRow": 105
+      },
+      {
+        "selectionCell": "C12",
+        "application": "armor",
+        "calculationRow": 106
+      },
+      {
+        "selectionCell": "C13",
+        "application": "armor",
+        "calculationRow": 107
+      },
+      {
+        "selectionCell": "C14",
+        "application": "armor",
+        "calculationRow": 108
+      },
+      {
+        "selectionCell": "C15",
+        "application": "armor",
+        "calculationRow": 109
+      },
+      {
+        "selectionCell": "H4",
+        "application": "armor",
+        "calculationRow": 110
+      },
+      {
+        "selectionCell": "H5",
+        "application": "armor",
+        "calculationRow": 111
+      },
+      {
+        "selectionCell": "H6",
+        "application": "armor",
+        "calculationRow": 112
+      },
+      {
+        "selectionCell": "H7",
+        "application": "armor",
+        "calculationRow": 113
+      },
+      {
+        "selectionCell": "H13",
+        "application": "armor",
+        "calculationRow": 114,
+        "configuration": "lowerwearA"
+      },
+      {
+        "selectionCell": "H14",
+        "application": "armor",
+        "calculationRow": 115,
+        "configuration": "lowerwearA"
+      },
+      {
+        "selectionCell": "H15",
+        "application": "armor",
+        "calculationRow": 116,
+        "configuration": "lowerwearA"
+      },
+      {
+        "selectionCell": "H16",
+        "application": "armor",
+        "calculationRow": 117,
+        "configuration": "lowerwearA"
+      },
+      {
+        "selectionCell": "H22",
+        "application": "armor",
+        "calculationRow": 118,
+        "enabledBy": "F20",
+        "configuration": "lowerwearB"
+      },
+      {
+        "selectionCell": "H23",
+        "application": "armor",
+        "calculationRow": 119,
+        "enabledBy": "F20",
+        "configuration": "lowerwearB"
+      },
+      {
+        "selectionCell": "H24",
+        "application": "armor",
+        "calculationRow": 120,
+        "enabledBy": "F20",
+        "configuration": "lowerwearB"
+      },
+      {
+        "selectionCell": "H25",
+        "application": "armor",
+        "calculationRow": 121,
+        "enabledBy": "F20",
+        "configuration": "lowerwearB"
+      },
+      {
+        "selectionCell": "H31",
+        "application": "armor",
+        "calculationRow": 122
+      },
+      {
+        "selectionCell": "H32",
+        "application": "armor",
+        "calculationRow": 123
+      },
+      {
+        "selectionCell": "H33",
+        "application": "armor",
+        "calculationRow": 124
+      },
+      {
+        "selectionCell": "H34",
+        "application": "armor",
+        "calculationRow": 125
+      },
+      {
+        "selectionCell": "H40",
+        "application": "armor",
+        "calculationRow": 126
+      },
+      {
+        "selectionCell": "H41",
+        "application": "armor",
+        "calculationRow": 127
+      },
+      {
+        "selectionCell": "H42",
+        "application": "armor",
+        "calculationRow": 128
+      },
+      {
+        "selectionCell": "H43",
+        "application": "armor",
+        "calculationRow": 129
+      },
+      {
+        "selectionCell": "D32",
+        "application": "weapon",
+        "calculationRow": 130
+      },
+      {
+        "selectionCell": "D33",
+        "application": "weapon",
+        "calculationRow": 131
+      },
+      {
+        "selectionCell": "D34",
+        "application": "weapon",
+        "calculationRow": 132
+      },
+      {
+        "selectionCell": "D35",
+        "application": "weapon",
+        "calculationRow": 133
+      },
+      {
+        "selectionCell": "D36",
+        "application": "weapon",
+        "calculationRow": 134
+      },
+      {
+        "selectionCell": "D37",
+        "application": "weapon",
+        "calculationRow": 135
+      },
+      {
+        "selectionCell": "D17",
+        "application": "weapon",
+        "calculationRow": 136
+      },
+      {
+        "selectionCell": "D18",
+        "application": "weapon",
+        "calculationRow": 137
+      }
+    ]
+  },
+  "notes": [
+    "selectionCell and calculationRows describe the traced input-to-output references; computed contribution handling lives in Calculation Engine modules.",
+    "The calculation sheet uses two separate lowerwear configurations. Their common attributes are averaged; strongerPct and heatPct stay conditional and are evaluated in the boss-health formula.",
+    "Innerwear body selection is not present in the current workbook. Slots remain extensible for future catalog data.",
+    "Rows 32 and 33 in 計算機 have no database FILTER formula; the selected accessory is preserved as catalog data but has no direct row contribution in the current sheet."
+  ]
+}

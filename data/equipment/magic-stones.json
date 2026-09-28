@@ -1,0 +1,231 @@
+{
+  "schemaVersion": 1,
+  "dataUpdatedAt": "2026-09-25",
+  "source": {
+    "workbook": "Google Sheets live export",
+    "sheet": "魔法石資料庫",
+    "notes": "Rows 2–8 are armor application values; rows 9–15 are weapon application values. Paired entries are one selectable stone with scope-specific values."
+  },
+  "items": [
+    {
+      "id": "magic-stone-hunting-boss-damage",
+      "name": "狩獵 B傷",
+      "slotId": "magicStone",
+      "typeId": "magicStone",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "effects": [],
+      "stats": {},
+      "targetApplications": {
+        "armor": {
+          "sourceName": "狩獵2.5%B傷",
+          "stats": {
+            "bossDamagePct": 2.5
+          }
+        },
+        "weapon": {
+          "sourceName": "狩獵5%B傷",
+          "stats": {
+            "bossDamagePct": 5
+          }
+        }
+      },
+      "source": {
+        "sheet": "魔法石資料庫",
+        "ranges": [
+          "A2:S2",
+          "A9:S9"
+        ]
+      }
+    },
+    {
+      "id": "magic-stone-sage-crit-rate",
+      "name": "賢者致命",
+      "slotId": "magicStone",
+      "typeId": "magicStone",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "effects": [],
+      "stats": {},
+      "targetApplications": {
+        "armor": {
+          "sourceName": "賢者6%致命",
+          "stats": {
+            "critRatePct": 6
+          }
+        },
+        "weapon": {
+          "sourceName": "賢者12%致命",
+          "stats": {
+            "critRatePct": 12
+          }
+        }
+      },
+      "source": {
+        "sheet": "魔法石資料庫",
+        "ranges": [
+          "A3:S3",
+          "A10:S10"
+        ]
+      }
+    },
+    {
+      "id": "magic-stone-sage-extremization",
+      "name": "賢者極大",
+      "slotId": "magicStone",
+      "typeId": "magicStone",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "effects": [],
+      "stats": {},
+      "targetApplications": {
+        "armor": {
+          "sourceName": "賢者6%極大",
+          "stats": {
+            "extremizationPct": 6
+          }
+        },
+        "weapon": {
+          "sourceName": "賢者12%極大",
+          "stats": {
+            "extremizationPct": 12
+          }
+        }
+      },
+      "source": {
+        "sheet": "魔法石資料庫",
+        "ranges": [
+          "A4:S4",
+          "A11:S11"
+        ]
+      }
+    },
+    {
+      "id": "magic-stone-atma-boss-damage",
+      "name": "亞特瑪 B傷",
+      "slotId": "magicStone",
+      "typeId": "magicStone",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "effects": [],
+      "stats": {},
+      "targetApplications": {
+        "armor": {
+          "sourceName": "亞特瑪3%B傷",
+          "stats": {
+            "bossDamagePct": 3
+          }
+        },
+        "weapon": {
+          "sourceName": "亞特瑪6%B傷",
+          "stats": {
+            "bossDamagePct": 6
+          }
+        }
+      },
+      "source": {
+        "sheet": "魔法石資料庫",
+        "ranges": [
+          "A5:S5",
+          "A12:S12"
+        ]
+      }
+    },
+    {
+      "id": "magic-stone-atma-all-skill-damage",
+      "name": "亞特瑪所有技能傷害",
+      "slotId": "magicStone",
+      "typeId": "magicStone",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "effects": [],
+      "stats": {},
+      "targetApplications": {
+        "armor": {
+          "sourceName": "亞特瑪2%技傷",
+          "stats": {
+            "allSkillDamagePct": 2
+          }
+        },
+        "weapon": {
+          "sourceName": "亞特瑪4%技傷",
+          "stats": {
+            "allSkillDamagePct": 4
+          }
+        }
+      },
+      "source": {
+        "sheet": "魔法石資料庫",
+        "ranges": [
+          "A6:S6",
+          "A13:S13"
+        ]
+      }
+    },
+    {
+      "id": "magic-stone-atma-transcendence-skill-damage",
+      "name": "亞特瑪超越技傷",
+      "slotId": "magicStone",
+      "typeId": "magicStone",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "effects": [],
+      "stats": {},
+      "targetApplications": {
+        "armor": {
+          "sourceName": "亞特瑪2.5%超越",
+          "stats": {
+            "transcendenceSkillDamagePct": 2.5
+          }
+        },
+        "weapon": {
+          "sourceName": "亞特瑪5%超越",
+          "stats": {
+            "transcendenceSkillDamagePct": 5
+          }
+        }
+      },
+      "source": {
+        "sheet": "魔法石資料庫",
+        "ranges": [
+          "A7:S7",
+          "A14:S14"
+        ]
+      }
+    },
+    {
+      "id": "magic-stone-no-damage",
+      "name": "無關傷害",
+      "slotId": "magicStone",
+      "typeId": "magicStone",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "effects": [],
+      "stats": {},
+      "targetApplications": {
+        "armor": {
+          "sourceName": "無關傷害",
+          "stats": {}
+        },
+        "weapon": {
+          "sourceName": "無關傷害",
+          "stats": {}
+        }
+      },
+      "source": {
+        "sheet": "魔法石資料庫",
+        "ranges": [
+          "A8:S8",
+          "A15:S15"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,521 @@
+{
+  "schemaVersion": 1,
+  "dataUpdatedAt": "2026-09-25",
+  "sourceSheets": [
+    "裝備模擬區",
+    "係數區",
+    "計算機"
+  ],
+  "armorSpiritStoneSetEffect": {
+    "id": "master-beast:armor-spirit-stone-set:S77",
+    "multiplicativeDamagePct": 4,
+    "source": "計算機!S77；預設聖獸精靈石成套"
+  },
+  "spiritStoneColorSelector": {
+    "defaultColor": "黃",
+    "options": [
+      "黃",
+      "綠"
+    ],
+    "yellowRateSourceCell": "計算機!B77",
+    "yellowRateValuePct": 8
+  },
+  "overallPotentialSourceCells": {
+    "physicalAttack": "C78",
+    "magicalAttack": "D78",
+    "critDamagePct": "H78",
+    "bossDamagePct": "I78",
+    "adaptabilityPct": "Q78"
+  },
+  "options": [
+    {
+      "id": "master-beast-overall-critical-damage-1",
+      "category": "overall",
+      "name": "致命傷害+1%",
+      "stats": {
+        "critDamagePct": 1
+      },
+      "source": "係數區!Z2:AA2 -> 計算機!H78"
+    },
+    {
+      "id": "master-beast-overall-critical-damage-2",
+      "category": "overall",
+      "name": "致命傷害+2%",
+      "stats": {
+        "critDamagePct": 2
+      },
+      "source": "係數區!Z3:AA3 -> 計算機!H78"
+    },
+    {
+      "id": "master-beast-overall-critical-damage-3",
+      "category": "overall",
+      "name": "致命傷害+3%",
+      "stats": {
+        "critDamagePct": 3
+      },
+      "source": "係數區!Z4:AA4 -> 計算機!H78"
+    },
+    {
+      "id": "master-beast-overall-critical-damage-4",
+      "category": "overall",
+      "name": "致命傷害+4%",
+      "stats": {
+        "critDamagePct": 4
+      },
+      "source": "係數區!Z5:AA5 -> 計算機!H78"
+    },
+    {
+      "id": "master-beast-overall-critical-damage-5",
+      "category": "overall",
+      "name": "致命傷害+5%",
+      "stats": {
+        "critDamagePct": 5
+      },
+      "source": "係數區!Z6:AA6 -> 計算機!H78"
+    },
+    {
+      "id": "master-beast-overall-adaptability-1",
+      "category": "overall",
+      "name": "適應力+1%",
+      "stats": {
+        "adaptabilityPct": 1
+      },
+      "source": "係數區!Z7:AA7 -> 計算機!Q78"
+    },
+    {
+      "id": "master-beast-overall-adaptability-2",
+      "category": "overall",
+      "name": "適應力+2%",
+      "stats": {
+        "adaptabilityPct": 2
+      },
+      "source": "係數區!Z8:AA8 -> 計算機!Q78"
+    },
+    {
+      "id": "master-beast-overall-adaptability-3",
+      "category": "overall",
+      "name": "適應力+3%",
+      "stats": {
+        "adaptabilityPct": 3
+      },
+      "source": "係數區!Z9:AA9 -> 計算機!Q78"
+    },
+    {
+      "id": "master-beast-overall-boss-damage-1",
+      "category": "overall",
+      "name": "Boss傷害+1%",
+      "stats": {
+        "bossDamagePct": 1
+      },
+      "source": "係數區!Z10:AA10 -> 計算機!I78"
+    },
+    {
+      "id": "master-beast-overall-boss-damage-2",
+      "category": "overall",
+      "name": "Boss傷害+2%",
+      "stats": {
+        "bossDamagePct": 2
+      },
+      "source": "係數區!Z11:AA11 -> 計算機!I78"
+    },
+    {
+      "id": "master-beast-overall-boss-damage-3",
+      "category": "overall",
+      "name": "Boss傷害+3%",
+      "stats": {
+        "bossDamagePct": 3
+      },
+      "source": "係數區!Z12:AA12 -> 計算機!I78"
+    },
+    {
+      "id": "master-beast-overall-boss-damage-4",
+      "category": "overall",
+      "name": "Boss傷害+4%",
+      "stats": {
+        "bossDamagePct": 4
+      },
+      "source": "係數區!Z13:AA13 -> 計算機!I78"
+    },
+    {
+      "id": "master-beast-overall-boss-damage-5",
+      "category": "overall",
+      "name": "Boss傷害+5%",
+      "stats": {
+        "bossDamagePct": 5
+      },
+      "source": "係數區!Z14:AA14 -> 計算機!I78"
+    },
+    {
+      "id": "master-beast-overall-boss-damage-6",
+      "category": "overall",
+      "name": "Boss傷害+6%",
+      "stats": {
+        "bossDamagePct": 6
+      },
+      "source": "係數區!Z15:AA15 -> 計算機!I78"
+    },
+    {
+      "id": "master-beast-overall-boss-damage-7",
+      "category": "overall",
+      "name": "Boss傷害+7%",
+      "stats": {
+        "bossDamagePct": 7
+      },
+      "source": "係數區!Z16:AA16 -> 計算機!I78"
+    },
+    {
+      "id": "master-beast-overall-boss-damage-8",
+      "category": "overall",
+      "name": "Boss傷害+8%",
+      "stats": {
+        "bossDamagePct": 8
+      },
+      "source": "係數區!Z17:AA17 -> 計算機!I78"
+    },
+    {
+      "id": "master-beast-overall-boss-damage-9",
+      "category": "overall",
+      "name": "Boss傷害+9%",
+      "stats": {
+        "bossDamagePct": 9
+      },
+      "source": "係數區!Z18:AA18 -> 計算機!I78"
+    },
+    {
+      "id": "master-beast-overall-boss-damage-10",
+      "category": "overall",
+      "name": "Boss傷害+10%",
+      "stats": {
+        "bossDamagePct": 10
+      },
+      "source": "係數區!Z19:AA19 -> 計算機!I78"
+    },
+    {
+      "id": "master-beast-overall-boss-damage-11",
+      "category": "overall",
+      "name": "Boss傷害+11%",
+      "stats": {
+        "bossDamagePct": 11
+      },
+      "source": "係數區!Z20:AA20 -> 計算機!I78"
+    },
+    {
+      "id": "master-beast-overall-boss-damage-12",
+      "category": "overall",
+      "name": "Boss傷害+12%",
+      "stats": {
+        "bossDamagePct": 12
+      },
+      "source": "係數區!Z21:AA21 -> 計算機!I78"
+    },
+    {
+      "id": "master-beast-overall-boss-damage-13",
+      "category": "overall",
+      "name": "Boss傷害+13%",
+      "stats": {
+        "bossDamagePct": 13
+      },
+      "source": "係數區!Z22:AA22 -> 計算機!I78"
+    },
+    {
+      "id": "master-beast-overall-boss-damage-14",
+      "category": "overall",
+      "name": "Boss傷害+14%",
+      "stats": {
+        "bossDamagePct": 14
+      },
+      "source": "係數區!Z23:AA23 -> 計算機!I78"
+    },
+    {
+      "id": "master-beast-overall-boss-damage-15",
+      "category": "overall",
+      "name": "Boss傷害+15%",
+      "stats": {
+        "bossDamagePct": 15
+      },
+      "source": "係數區!Z24:AA24 -> 計算機!I78"
+    },
+    {
+      "id": "master-beast-overall-attack-200",
+      "category": "overall",
+      "name": "攻擊力+200",
+      "stats": {
+        "physicalAttack": 200,
+        "magicalAttack": 200
+      },
+      "source": "係數區!Z25:AA25 -> 計算機!C78:D78"
+    },
+    {
+      "id": "master-beast-overall-attack-300",
+      "category": "overall",
+      "name": "攻擊力+300",
+      "stats": {
+        "physicalAttack": 300,
+        "magicalAttack": 300
+      },
+      "source": "係數區!Z26:AA26 -> 計算機!C78:D78"
+    },
+    {
+      "id": "master-beast-overall-attack-400",
+      "category": "overall",
+      "name": "攻擊力+400",
+      "stats": {
+        "physicalAttack": 400,
+        "magicalAttack": 400
+      },
+      "source": "係數區!Z27:AA27 -> 計算機!C78:D78"
+    },
+    {
+      "id": "master-beast-overall-attack-500",
+      "category": "overall",
+      "name": "攻擊力+500",
+      "stats": {
+        "physicalAttack": 500,
+        "magicalAttack": 500
+      },
+      "source": "係數區!Z28:AA28 -> 計算機!C78:D78"
+    },
+    {
+      "id": "master-beast-overall-attack-600",
+      "category": "overall",
+      "name": "攻擊力+600",
+      "stats": {
+        "physicalAttack": 600,
+        "magicalAttack": 600
+      },
+      "source": "係數區!Z29:AA29 -> 計算機!C78:D78"
+    },
+    {
+      "id": "master-beast-head-critical-rate-8",
+      "category": "head",
+      "name": "致命一擊8%",
+      "stats": {
+        "critRatePct": 8
+      },
+      "source": "係數區!AB2:AC2 -> 計算機!F70:F71"
+    },
+    {
+      "id": "master-beast-head-critical-rate-9",
+      "category": "head",
+      "name": "致命一擊9%",
+      "stats": {
+        "critRatePct": 9
+      },
+      "source": "係數區!AB3:AC3 -> 計算機!F70:F71"
+    },
+    {
+      "id": "master-beast-head-critical-rate-10",
+      "category": "head",
+      "name": "致命一擊10%",
+      "stats": {
+        "critRatePct": 10
+      },
+      "source": "係數區!AB4:AC4 -> 計算機!F70:F71"
+    },
+    {
+      "id": "master-beast-head-critical-rate-11",
+      "category": "head",
+      "name": "致命一擊11%",
+      "stats": {
+        "critRatePct": 11
+      },
+      "source": "係數區!AB5:AC5 -> 計算機!F70:F71"
+    },
+    {
+      "id": "master-beast-head-critical-rate-12",
+      "category": "head",
+      "name": "致命一擊12%",
+      "stats": {
+        "critRatePct": 12
+      },
+      "source": "係數區!AB6:AC6 -> 計算機!F70:F71"
+    },
+    {
+      "id": "master-beast-head-extremization-8",
+      "category": "head",
+      "name": "極大化8%",
+      "stats": {
+        "extremizationPct": 8
+      },
+      "source": "係數區!AB7:AC7 -> 計算機!G70:G71"
+    },
+    {
+      "id": "master-beast-head-extremization-9",
+      "category": "head",
+      "name": "極大化9%",
+      "stats": {
+        "extremizationPct": 9
+      },
+      "source": "係數區!AB8:AC8 -> 計算機!G70:G71"
+    },
+    {
+      "id": "master-beast-head-extremization-10",
+      "category": "head",
+      "name": "極大化10%",
+      "stats": {
+        "extremizationPct": 10
+      },
+      "source": "係數區!AB9:AC9 -> 計算機!G70:G71"
+    },
+    {
+      "id": "master-beast-head-extremization-11",
+      "category": "head",
+      "name": "極大化11%",
+      "stats": {
+        "extremizationPct": 11
+      },
+      "source": "係數區!AB10:AC10 -> 計算機!G70:G71"
+    },
+    {
+      "id": "master-beast-head-extremization-12",
+      "category": "head",
+      "name": "極大化12%",
+      "stats": {
+        "extremizationPct": 12
+      },
+      "source": "係數區!AB11:AC11 -> 計算機!G70:G71"
+    },
+    {
+      "id": "master-beast-ring-crit-damage-2",
+      "category": "ring",
+      "name": "致命傷害+2%",
+      "stats": {
+        "critDamagePct": 2
+      },
+      "source": "係數區!AD2:AE2 -> 計算機!H72:H75"
+    },
+    {
+      "id": "master-beast-ring-crit-damage-3",
+      "category": "ring",
+      "name": "致命傷害+3%",
+      "stats": {
+        "critDamagePct": 3
+      },
+      "source": "係數區!AD3:AE3 -> 計算機!H72:H75"
+    },
+    {
+      "id": "master-beast-ring-crit-damage-4",
+      "category": "ring",
+      "name": "致命傷害+4%",
+      "stats": {
+        "critDamagePct": 4
+      },
+      "source": "係數區!AD4:AE4 -> 計算機!H72:H75"
+    },
+    {
+      "id": "master-beast-ring-crit-damage-5",
+      "category": "ring",
+      "name": "致命傷害+5%",
+      "stats": {
+        "critDamagePct": 5
+      },
+      "source": "係數區!AD5:AE5 -> 計算機!H72:H75"
+    },
+    {
+      "id": "master-beast-ring-adaptability-1",
+      "category": "ring",
+      "name": "適應力+1%",
+      "stats": {
+        "adaptabilityPct": 1
+      },
+      "source": "係數區!AD6:AE6 -> 計算機!Q72:Q75"
+    }
+  ],
+  "customAttributeOptions": {
+    "head": [
+      "致命一擊",
+      "極大化",
+      "其他"
+    ],
+    "necklace": [
+      "超越技傷%",
+      "其他"
+    ],
+    "ring": [
+      "雙攻%",
+      "兩極化%",
+      "致命傷害%",
+      "所有技能傷害%",
+      "無視防禦%",
+      "其他"
+    ],
+    "mirror": [
+      "雙攻%",
+      "兩極化%",
+      "致命傷害%",
+      "Boss傷害%",
+      "超越技傷%",
+      "所有技能傷害%",
+      "致命一擊%",
+      "極大化%",
+      "無關傷害"
+    ]
+  },
+  "mirrorValueRules": {
+    "default": {
+      "minPct": 0.1,
+      "maxPct": 1,
+      "stepPct": 0.1
+    },
+    "byAttribute": {
+      "致命一擊": {
+        "minPct": 0.3,
+        "maxPct": 3,
+        "stepPct": 0.3
+      },
+      "致命一擊%": {
+        "minPct": 0.3,
+        "maxPct": 3,
+        "stepPct": 0.3
+      },
+      "極大化": {
+        "minPct": 0.3,
+        "maxPct": 3,
+        "stepPct": 0.3
+      },
+      "極大化%": {
+        "minPct": 0.3,
+        "maxPct": 3,
+        "stepPct": 0.3
+      }
+    }
+  },
+  "statKeyBySheetName": {
+    "致命一擊": "critRatePct",
+    "致命一擊%": "critRatePct",
+    "極大化": "extremizationPct",
+    "極大化%": "extremizationPct",
+    "雙攻%": "doubleAttackPct",
+    "兩極化%": "polarizationPct",
+    "致命傷害%": "critDamagePct",
+    "Boss傷害%": "bossDamagePct",
+    "超越技傷%": "transcendenceSkillDamagePct",
+    "所有技能傷害%": "allSkillDamagePct"
+  },
+  "inputRules": [
+    {
+      "input": "裝備模擬區!M27:M28",
+      "calculation": "計算機!F80:G80",
+      "rule": "屬性選致命一擊時將數值寫入致命一擊%；選極大化時寫入極大化%；其他不產生效果。"
+    },
+    {
+      "input": "裝備模擬區!M33:M34",
+      "calculation": "計算機!K81",
+      "rule": "超越技傷%選項將輸入數值直接寫入超越技傷%；其他不產生效果。"
+    },
+    {
+      "input": "裝備模擬區!M36:M40",
+      "calculation": "計算機!E82:R83",
+      "rule": "兩個指環自訂屬性值直接寫入同名計算機欄；無關傷害不在計算標頭中而不產生效果。"
+    },
+    {
+      "input": "裝備模擬區!O27:P41",
+      "calculation": "計算機!E79:V79",
+      "rule": "依選擇屬性彙總 P 欄數值，再乘 100 寫入同名屬性；不在計算標頭中的無關傷害無計算輸出。"
+    }
+  ],
+  "notes": [
+    "亞特瑪四件套效果需件數正好為 4，依計算機!B100；聖獸列 70:83 則依各輸入格和選擇項目直接套用。",
+    "屬性及數值映射源自線上係數區 Z:AE 及計算機列 70:83。"
+  ]
+}

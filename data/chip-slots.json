@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "lowerwearAlternativeEnabledBy": "F20",
+  "slots": [
+    {
+      "id": "upper",
+      "attributeCell": "J6",
+      "tuningCell": "J7",
+      "calculationRow": 48,
+      "wearSet": "shared"
+    },
+    {
+      "id": "lowerwear",
+      "attributeCell": "J15",
+      "tuningCell": "J16",
+      "calculationRow": 49,
+      "wearSet": "lowerwearA"
+    },
+    {
+      "id": "lowerwearAlternative",
+      "attributeCell": "J24",
+      "tuningCell": "J25",
+      "calculationRow": 50,
+      "wearSet": "lowerwearB",
+      "enabledBy": "F20"
+    },
+    {
+      "id": "gloves",
+      "attributeCell": "J33",
+      "tuningCell": "J34",
+      "calculationRow": 51,
+      "wearSet": "shared"
+    },
+    {
+      "id": "shoes",
+      "attributeCell": "J42",
+      "tuningCell": "J43",
+      "calculationRow": 52,
+      "wearSet": "shared"
+    }
+  ]
+}

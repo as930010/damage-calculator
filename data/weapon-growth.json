@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+  "dataUpdatedAt": "2026-09-25",
+  "sourceSheet": "係數區",
+  "selectorCell": "裝備模擬區!B33",
+  "levels": [
+    {
+      "id": "weapon-growth-0",
+      "name": "Lv.0",
+      "stats": {},
+      "source": {
+        "sheet": "係數區",
+        "cell": "K2",
+        "calculationCells": [
+          "計算機!L64",
+          "計算機!U64"
+        ]
+      }
+    },
+    {
+      "id": "weapon-growth-1",
+      "name": "Lv.1",
+      "stats": {
+        "allSkillDamagePct": 15
+      },
+      "source": {
+        "sheet": "係數區",
+        "cell": "K3",
+        "calculationCells": [
+          "計算機!L64",
+          "計算機!U64"
+        ]
+      }
+    },
+    {
+      "id": "weapon-growth-2",
+      "name": "Lv.2",
+      "stats": {
+        "allSkillDamagePct": 15,
+        "attackLevel": 15
+      },
+      "source": {
+        "sheet": "係數區",
+        "cell": "K4",
+        "calculationCells": [
+          "計算機!L64",
+          "計算機!U64"
+        ]
+      }
+    },
+    {
+      "id": "weapon-growth-3",
+      "name": "Lv.3",
+      "stats": {
+        "allSkillDamagePct": 15,
+        "attackLevel": 20
+      },
+      "source": {
+        "sheet": "係數區",
+        "cell": "K5",
+        "calculationCells": [
+          "計算機!L64",
+          "計算機!U64"
+        ]
+      }
+    },
+    {
+      "id": "weapon-growth-4",
+      "name": "Lv.4",
+      "stats": {
+        "allSkillDamagePct": 20,
+        "attackLevel": 20
+      },
+      "source": {
+        "sheet": "係數區",
+        "cell": "K6",
+        "calculationCells": [
+          "計算機!L64",
+          "計算機!U64"
+        ]
+      }
+    },
+    {
+      "id": "weapon-growth-5",
+      "name": "Lv.5",
+      "stats": {
+        "allSkillDamagePct": 20,
+        "attackLevel": 25
+      },
+      "source": {
+        "sheet": "係數區",
+        "cell": "K7",
+        "calculationCells": [
+          "計算機!L64",
+          "計算機!U64"
+        ]
+      }
+    },
+    {
+      "id": "weapon-growth-6",
+      "name": "Lv.6",
+      "stats": {
+        "allSkillDamagePct": 20,
+        "attackLevel": 25
+      },
+      "source": {
+        "sheet": "係數區",
+        "cell": "K8",
+        "calculationCells": [
+          "計算機!L64",
+          "計算機!U64"
+        ]
+      }
+    }
+  ],
+  "notes": [
+    "所有技能傷害%依計算機!L64，攻擊力等級依計算機!U64；Lv.0 的兩項效果均為 0。"
+  ]
+}

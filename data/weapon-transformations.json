@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "dataUpdatedAt": "2026-09-25",
+  "source": {
+    "sheet": "裝備模擬區",
+    "choiceRange": "B42:B45",
+    "valueCells": [
+      "C42",
+      "C43",
+      "C44",
+      "C45"
+    ],
+    "calculationRows": [
+      "計算機!54:57"
+    ]
+  },
+  "options": [
+    "雙攻%",
+    "雙攻% × 強化",
+    "攻擊力等級 × 強化",
+    "技能傷害% × 強化",
+    "致命傷害% × 強化",
+    "致命傷害%",
+    "Boss傷害%",
+    "兩極化%",
+    "超越技傷%",
+    "技能傷害%",
+    "流血%",
+    "攻擊力等級"
+  ],
+  "slots": [
+    {
+      "choiceCell": "B42",
+      "valueCell": "C42",
+      "scalingTextCell": "B32"
+    },
+    {
+      "choiceCell": "B43",
+      "valueCell": "C43",
+      "scalingTextCell": "B32"
+    },
+    {
+      "choiceCell": "B44",
+      "valueCell": "C44",
+      "scalingTextCell": "B32"
+    },
+    {
+      "choiceCell": "B45",
+      "valueCell": "C45",
+      "scalingTextCell": "B32"
+    }
+  ],
+  "rules": [
+    {
+      "choice": "雙攻%",
+      "statKey": "doubleAttackPct",
+      "valueMultiplier": 100
+    },
+    {
+      "choice": "雙攻% × 強化",
+      "statKey": "doubleAttackPct",
+      "valueMultiplier": 100,
+      "strengthenByFirstIntegerFrom": "correspondingEnhancementText"
+    },
+    {
+      "choice": "攻擊力等級 × 強化",
+      "statKey": "attackLevel",
+      "valueMultiplier": 1,
+      "strengthenByFirstIntegerFrom": "correspondingEnhancementText"
+    },
+    {
+      "choice": "技能傷害% × 強化",
+      "statKey": "allSkillDamagePct",
+      "valueMultiplier": 100,
+      "strengthenByFirstIntegerFrom": "correspondingEnhancementText"
+    },
+    {
+      "choice": "致命傷害% × 強化",
+      "statKey": "critDamagePct",
+      "valueMultiplier": 100,
+      "strengthenByFirstIntegerFrom": "correspondingEnhancementText"
+    },
+    {
+      "choice": "致命傷害%",
+      "statKey": "critDamagePct",
+      "valueMultiplier": 100
+    },
+    {
+      "choice": "Boss傷害%",
+      "statKey": "bossDamagePct",
+      "valueMultiplier": 100
+    },
+    {
+      "choice": "兩極化%",
+      "statKey": "polarizationPct",
+      "valueMultiplier": 100
+    },
+    {
+      "choice": "超越技傷%",
+      "statKey": "transcendenceSkillDamagePct",
+      "valueMultiplier": 100
+    },
+    {
+      "choice": "技能傷害%",
+      "statKey": "allSkillDamagePct",
+      "valueMultiplier": 100
+    },
+    {
+      "choice": "流血%",
+      "statKey": "bleedDamagePct",
+      "valueMultiplier": 100
+    },
+    {
+      "choice": "攻擊力等級",
+      "statKey": "attackLevel",
+      "valueMultiplier": 1
+    }
+  ],
+  "notes": [
+    "百分比值乘 100；攻擊力等級值不乘 100。",
+    "所有 × 強化效果均使用裝備模擬區!$B$32 的武器強化等級。",
+    "「技能傷害%」依計算機欄 L 的實際引用歸入所有技能傷害%；未將名稱自行改寫。"
+  ]
+}

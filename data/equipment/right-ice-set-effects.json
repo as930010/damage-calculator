@@ -1,0 +1,722 @@
+{
+  "schemaVersion": 1,
+  "dataUpdatedAt": "2026-09-25",
+  "selectionCells": [
+    "B27",
+    "B28",
+    "B29"
+  ],
+  "maxSelectedSets": 3,
+  "source": {
+    "workbook": "Google Sheets current export",
+    "sheet": "右冰套效資料庫"
+  },
+  "notes": [
+    "T 欄門檻公式轉為所需件數條件；W 欄統計已選右冰部位的各套裝件數。",
+    "只計算使用者在裝備模擬區 B27:B29 選取的套裝；再依已裝備件數套用效果。同一套裝只套用目前件數所符合的最高階效果，最多可選三套。"
+  ],
+  "effects": [
+    {
+      "id": "right-ice-set-effects-eb590d92a2b9",
+      "name": "騎士團3set",
+      "setName": "騎士團",
+      "requiredPieces": {
+        "operator": "exactly",
+        "count": 3
+      },
+      "active": true,
+      "stats": {
+        "allSkillDamagePct": 5
+      },
+      "condition": {
+        "type": "rightIcePieceCount",
+        "setName": "騎士團",
+        "operator": "exactly",
+        "count": 3,
+        "sourceFormula": "T2: =IF(W2=3,True)"
+      },
+      "source": {
+        "sheet": "右冰套效資料庫",
+        "range": "A2:W2",
+        "statFormulas": {
+          "K2": "=IF($T2=True,5,)"
+        }
+      }
+    },
+    {
+      "id": "right-ice-set-effects-c979fe541d3c",
+      "name": "騎士團4set",
+      "setName": "騎士團",
+      "requiredPieces": {
+        "operator": "atLeast",
+        "count": 4
+      },
+      "active": true,
+      "stats": {
+        "allSkillDamagePct": 5,
+        "adaptabilityPct": 5
+      },
+      "condition": {
+        "type": "rightIcePieceCount",
+        "setName": "騎士團",
+        "operator": "atLeast",
+        "count": 4,
+        "sourceFormula": "T3: =IF(AND(W2>=4,T2<>True),True)"
+      },
+      "source": {
+        "sheet": "右冰套效資料庫",
+        "range": "A3:W3",
+        "statFormulas": {
+          "K3": "=IF($T3=True,5,)",
+          "P3": "=IF($T3=True,5,)"
+        }
+      }
+    },
+    {
+      "id": "right-ice-set-effects-656dd55982fe",
+      "name": "面紗2set",
+      "setName": "幻影面紗",
+      "requiredPieces": {
+        "operator": "exactly",
+        "count": 2
+      },
+      "active": true,
+      "stats": {
+        "bleedDamagePct": 10
+      },
+      "condition": {
+        "type": "rightIcePieceCount",
+        "setName": "幻影面紗",
+        "operator": "exactly",
+        "count": 2,
+        "sourceFormula": "T4: =IF(W4=2,True)"
+      },
+      "source": {
+        "sheet": "右冰套效資料庫",
+        "range": "A4:W4",
+        "statFormulas": {
+          "L4": "=IF($T4=True,10,)"
+        }
+      }
+    },
+    {
+      "id": "right-ice-set-effects-68641ac41a43",
+      "name": "面紗3set",
+      "setName": "幻影面紗",
+      "requiredPieces": {
+        "operator": "atLeast",
+        "count": 3
+      },
+      "active": true,
+      "stats": {
+        "fullHealthKillDamagePct": 10
+      },
+      "condition": {
+        "type": "rightIcePieceCount",
+        "setName": "幻影面紗",
+        "operator": "atLeast",
+        "count": 3,
+        "sourceFormula": "T5: =IF(AND(W4>=3,T4<>True),True)"
+      },
+      "source": {
+        "sheet": "右冰套效資料庫",
+        "range": "A5:W5",
+        "statFormulas": {
+          "O5": "=IF($T5=True,10,)"
+        }
+      }
+    },
+    {
+      "id": "right-ice-set-effects-0f6e4a7c77c3",
+      "name": "真理2set",
+      "setName": "真理假面",
+      "requiredPieces": {
+        "operator": "exactly",
+        "count": 2
+      },
+      "active": true,
+      "stats": {
+        "polarizationPct": 3,
+        "bleedDamagePct": 3
+      },
+      "condition": {
+        "type": "rightIcePieceCount",
+        "setName": "真理假面",
+        "operator": "exactly",
+        "count": 2,
+        "sourceFormula": "T6: =IF(W6=2,True)"
+      },
+      "source": {
+        "sheet": "右冰套效資料庫",
+        "range": "A6:W6",
+        "statFormulas": {
+          "I6": "=IF($T6=True,3,)",
+          "L6": "=IF($T6=True,3,)"
+        }
+      }
+    },
+    {
+      "id": "right-ice-set-effects-187f73c42a2a",
+      "name": "真理3set",
+      "setName": "真理假面",
+      "requiredPieces": {
+        "operator": "atLeast",
+        "count": 3
+      },
+      "active": true,
+      "stats": {
+        "transcendenceSkillDamagePct": 4,
+        "strongerPct": 10,
+        "heatPct": 10
+      },
+      "condition": {
+        "type": "rightIcePieceCount",
+        "setName": "真理假面",
+        "operator": "atLeast",
+        "count": 3,
+        "sourceFormula": "T7: =IF(AND(W6>=3,T6<>True),True)"
+      },
+      "source": {
+        "sheet": "右冰套效資料庫",
+        "range": "A7:W7",
+        "statFormulas": {
+          "J7": "=IF($T7=True,4,)",
+          "M7": "=IF($T7=True,10,)",
+          "N7": "=IF($T7=True,10,)"
+        }
+      }
+    },
+    {
+      "id": "right-ice-set-effects-54245a7bd7c9",
+      "name": "花郎2set",
+      "setName": "紫霄花郎",
+      "requiredPieces": {
+        "operator": "exactly",
+        "count": 2
+      },
+      "active": true,
+      "stats": {
+        "bleedDamagePct": 5
+      },
+      "condition": {
+        "type": "rightIcePieceCount",
+        "setName": "紫霄花郎",
+        "operator": "exactly",
+        "count": 2,
+        "sourceFormula": "T8: =IF(W8=2,True)"
+      },
+      "source": {
+        "sheet": "右冰套效資料庫",
+        "range": "A8:W8",
+        "statFormulas": {
+          "L8": "=IF($T8=True,5,)"
+        }
+      }
+    },
+    {
+      "id": "right-ice-set-effects-5f8643cf2f6f",
+      "name": "花郎3set",
+      "setName": "紫霄花郎",
+      "requiredPieces": {
+        "operator": "atLeast",
+        "count": 3
+      },
+      "active": true,
+      "stats": {
+        "allSkillDamagePct": 5,
+        "bleedDamagePct": 5,
+        "fullHealthKillDamagePct": 6
+      },
+      "condition": {
+        "type": "rightIcePieceCount",
+        "setName": "紫霄花郎",
+        "operator": "atLeast",
+        "count": 3,
+        "sourceFormula": "T9: =IF(AND(W8>=3,T8<>True),True)"
+      },
+      "source": {
+        "sheet": "右冰套效資料庫",
+        "range": "A9:W9",
+        "statFormulas": {
+          "K9": "=IF($T9=True,5,)",
+          "L9": "=IF($T9=True,5,)",
+          "O9": "=IF($T9=True,6,)"
+        }
+      }
+    },
+    {
+      "id": "right-ice-set-effects-d4e0d29be3de",
+      "name": "牡羊2set",
+      "setName": "星辰牧者",
+      "requiredPieces": {
+        "operator": "exactly",
+        "count": 2
+      },
+      "active": true,
+      "stats": {
+        "critDamagePct": 3,
+        "fullHealthKillDamagePct": 4
+      },
+      "condition": {
+        "type": "rightIcePieceCount",
+        "setName": "星辰牧者",
+        "operator": "exactly",
+        "count": 2,
+        "sourceFormula": "T10: =IF(W10=2,True)"
+      },
+      "source": {
+        "sheet": "右冰套效資料庫",
+        "range": "A10:W10",
+        "statFormulas": {
+          "G10": "=IF($T10=True,3,)",
+          "O10": "=IF($T10=True,4,)"
+        }
+      }
+    },
+    {
+      "id": "right-ice-set-effects-614cec1b8a5d",
+      "name": "牡羊3set",
+      "setName": "星辰牧者",
+      "requiredPieces": {
+        "operator": "atLeast",
+        "count": 3
+      },
+      "active": true,
+      "stats": {
+        "critDamagePct": 3,
+        "allSkillDamagePct": 3,
+        "strongerPct": 6,
+        "heatPct": 6,
+        "fullHealthKillDamagePct": 4
+      },
+      "condition": {
+        "type": "rightIcePieceCount",
+        "setName": "星辰牧者",
+        "operator": "atLeast",
+        "count": 3,
+        "sourceFormula": "T11: =IF(AND(W10>=3,T10<>True),True)"
+      },
+      "source": {
+        "sheet": "右冰套效資料庫",
+        "range": "A11:W11",
+        "statFormulas": {
+          "G11": "=IF($T11=True,3,)",
+          "K11": "=IF($T11=True,3,)",
+          "M11": "=IF($T11=True,6,)",
+          "N11": "=IF($T11=True,6,)",
+          "O11": "=IF($T11=True,4,)"
+        }
+      }
+    },
+    {
+      "id": "right-ice-set-effects-29d2a4e6f143",
+      "name": "繁花2set",
+      "setName": "日冕．灼耀花仙",
+      "requiredPieces": {
+        "operator": "exactly",
+        "count": 2
+      },
+      "active": true,
+      "stats": {
+        "strongerPct": 5,
+        "heatPct": 5
+      },
+      "condition": {
+        "type": "rightIcePieceCount",
+        "setName": "日冕．灼耀花仙",
+        "operator": "exactly",
+        "count": 2,
+        "sourceFormula": "T12: =IF(W12=2,True)"
+      },
+      "source": {
+        "sheet": "右冰套效資料庫",
+        "range": "A12:W12",
+        "statFormulas": {
+          "M12": "=IF($T12=True,5,)",
+          "N12": "=IF($T12=True,5,)"
+        }
+      }
+    },
+    {
+      "id": "right-ice-set-effects-cf29c386218b",
+      "name": "繁花3set",
+      "setName": "日冕．灼耀花仙",
+      "requiredPieces": {
+        "operator": "atLeast",
+        "count": 3
+      },
+      "active": true,
+      "stats": {
+        "allSkillDamagePct": 5,
+        "bleedDamagePct": 6,
+        "strongerPct": 5,
+        "heatPct": 5
+      },
+      "condition": {
+        "type": "rightIcePieceCount",
+        "setName": "日冕．灼耀花仙",
+        "operator": "atLeast",
+        "count": 3,
+        "sourceFormula": "T13: =IF(AND(W12>=3,T12<>True),True)"
+      },
+      "source": {
+        "sheet": "右冰套效資料庫",
+        "range": "A13:W13",
+        "statFormulas": {
+          "K13": "=IF($T13=True,5,)",
+          "L13": "=IF($T13=True,6,)",
+          "M13": "=IF($T13=True,5,)",
+          "N13": "=IF($T13=True,5,)"
+        }
+      }
+    },
+    {
+      "id": "right-ice-set-effects-f51e8d7cca2b",
+      "name": "幽潮2set",
+      "setName": "幽潮吞源",
+      "requiredPieces": {
+        "operator": "exactly",
+        "count": 2
+      },
+      "active": true,
+      "stats": {
+        "allSkillDamagePct": 2,
+        "fullHealthKillDamagePct": 4
+      },
+      "condition": {
+        "type": "rightIcePieceCount",
+        "setName": "幽潮吞源",
+        "operator": "exactly",
+        "count": 2,
+        "sourceFormula": "T14: =IF(W14=2,True)"
+      },
+      "source": {
+        "sheet": "右冰套效資料庫",
+        "range": "A14:W14",
+        "statFormulas": {
+          "K14": "=IF($T14=True,2,)",
+          "O14": "=IF($T14=True,4,)"
+        }
+      }
+    },
+    {
+      "id": "right-ice-set-effects-e144e9f45752",
+      "name": "幽潮3set",
+      "setName": "幽潮吞源",
+      "requiredPieces": {
+        "operator": "atLeast",
+        "count": 3
+      },
+      "active": true,
+      "stats": {
+        "doubleAttackPct": 6,
+        "allSkillDamagePct": 2,
+        "fullHealthKillDamagePct": 4,
+        "adaptabilityPct": 2
+      },
+      "condition": {
+        "type": "rightIcePieceCount",
+        "setName": "幽潮吞源",
+        "operator": "atLeast",
+        "count": 3,
+        "sourceFormula": "T15: =IF(AND(W14>=3,T14<>True),True)"
+      },
+      "source": {
+        "sheet": "右冰套效資料庫",
+        "range": "A15:W15",
+        "statFormulas": {
+          "D15": "=IF($T15=True,6,)",
+          "K15": "=IF($T15=True,2,)",
+          "O15": "=IF($T15=True,4,)",
+          "P15": "=IF($T15=True,2,)"
+        }
+      }
+    },
+    {
+      "id": "right-ice-set-effects-71df282c7844",
+      "name": "猛虎2set",
+      "setName": "猛虎奇談",
+      "requiredPieces": {
+        "operator": "exactly",
+        "count": 2
+      },
+      "active": true,
+      "stats": {
+        "polarizationPct": 4,
+        "transcendenceSkillDamagePct": 4
+      },
+      "condition": {
+        "type": "rightIcePieceCount",
+        "setName": "猛虎奇談",
+        "operator": "exactly",
+        "count": 2,
+        "sourceFormula": "T16: =IF(W16=2,True)"
+      },
+      "source": {
+        "sheet": "右冰套效資料庫",
+        "range": "A16:W16",
+        "statFormulas": {
+          "I16": "=IF($T16=True,4,)",
+          "J16": "=IF($T16=True,4,)"
+        }
+      }
+    },
+    {
+      "id": "right-ice-set-effects-0ef89e0b78cb",
+      "name": "猛虎3set",
+      "setName": "猛虎奇談",
+      "requiredPieces": {
+        "operator": "atLeast",
+        "count": 3
+      },
+      "active": true,
+      "stats": {
+        "polarizationPct": 4,
+        "transcendenceSkillDamagePct": 4,
+        "fullHealthKillDamagePct": 6
+      },
+      "condition": {
+        "type": "rightIcePieceCount",
+        "setName": "猛虎奇談",
+        "operator": "atLeast",
+        "count": 3,
+        "sourceFormula": "T17: =IF(AND(W16>=3,T16<>True),True)"
+      },
+      "source": {
+        "sheet": "右冰套效資料庫",
+        "range": "A17:W17",
+        "statFormulas": {
+          "I17": "=IF($T17=True,4,)",
+          "J17": "=IF($T17=True,4,)",
+          "O17": "=IF($T17=True,6,)"
+        }
+      }
+    },
+    {
+      "id": "right-ice-set-effects-a3a7d9ebc87c",
+      "name": "哀歌2set",
+      "setName": "厄瑞玻斯的哀歌",
+      "requiredPieces": {
+        "operator": "exactly",
+        "count": 2
+      },
+      "active": true,
+      "stats": {
+        "fullHealthKillDamagePct": 5
+      },
+      "condition": {
+        "type": "rightIcePieceCount",
+        "setName": "厄瑞玻斯的哀歌",
+        "operator": "exactly",
+        "count": 2,
+        "sourceFormula": "T18: =IF(W18=2,True)"
+      },
+      "source": {
+        "sheet": "右冰套效資料庫",
+        "range": "A18:W18",
+        "statFormulas": {
+          "O18": "=IF($T18=True,5,)"
+        }
+      }
+    },
+    {
+      "id": "right-ice-set-effects-b7558aa028fd",
+      "name": "哀歌3set",
+      "setName": "厄瑞玻斯的哀歌",
+      "requiredPieces": {
+        "operator": "atLeast",
+        "count": 3
+      },
+      "active": true,
+      "stats": {
+        "critDamagePct": 2,
+        "bleedDamagePct": 7,
+        "fullHealthKillDamagePct": 5
+      },
+      "condition": {
+        "type": "rightIcePieceCount",
+        "setName": "厄瑞玻斯的哀歌",
+        "operator": "atLeast",
+        "count": 3,
+        "sourceFormula": "T19: =IF(AND(W18>=3,T18<>True),True)"
+      },
+      "source": {
+        "sheet": "右冰套效資料庫",
+        "range": "A19:W19",
+        "statFormulas": {
+          "G19": "=IF($T19=True,2,)",
+          "L19": "=IF($T19=True,7,)",
+          "O19": "=IF($T19=True,5,)"
+        }
+      }
+    },
+    {
+      "id": "right-ice-set-effects-aa7966721de3",
+      "name": "生命2set",
+      "setName": "薇塔芳塔娜",
+      "requiredPieces": {
+        "operator": "exactly",
+        "count": 2
+      },
+      "active": true,
+      "stats": {
+        "polarizationPct": 5
+      },
+      "condition": {
+        "type": "rightIcePieceCount",
+        "setName": "薇塔芳塔娜",
+        "operator": "exactly",
+        "count": 2,
+        "sourceFormula": "T20: =IF(W20=2,True)"
+      },
+      "source": {
+        "sheet": "右冰套效資料庫",
+        "range": "A20:W20",
+        "statFormulas": {
+          "I20": "=IF($T20=True,5,)"
+        }
+      }
+    },
+    {
+      "id": "right-ice-set-effects-6bf10c0db76c",
+      "name": "生命3set",
+      "setName": "薇塔芳塔娜",
+      "requiredPieces": {
+        "operator": "atLeast",
+        "count": 3
+      },
+      "active": true,
+      "stats": {
+        "polarizationPct": 5,
+        "bleedDamagePct": 7
+      },
+      "condition": {
+        "type": "rightIcePieceCount",
+        "setName": "薇塔芳塔娜",
+        "operator": "atLeast",
+        "count": 3,
+        "sourceFormula": "T21: =IF(AND(W20>=3,T20<>True),True)"
+      },
+      "source": {
+        "sheet": "右冰套效資料庫",
+        "range": "A21:W21",
+        "statFormulas": {
+          "I21": "=IF($T21=True,5,)",
+          "L21": "=IF($T21=True,7,)"
+        }
+      }
+    },
+    {
+      "id": "right-ice-set-effects-289d1e845c0d",
+      "name": "深淵2set",
+      "setName": "深淵的存在",
+      "requiredPieces": {
+        "operator": "exactly",
+        "count": 2
+      },
+      "active": true,
+      "stats": {
+        "bleedDamagePct": 5
+      },
+      "condition": {
+        "type": "rightIcePieceCount",
+        "setName": "深淵的存在",
+        "operator": "exactly",
+        "count": 2,
+        "sourceFormula": "T22: =IF(W22=2,True)"
+      },
+      "source": {
+        "sheet": "右冰套效資料庫",
+        "range": "A22:W22",
+        "statFormulas": {
+          "L22": "=IF($T22=True,5,)"
+        }
+      }
+    },
+    {
+      "id": "right-ice-set-effects-9e01ffacad37",
+      "name": "深淵3set",
+      "setName": "深淵的存在",
+      "requiredPieces": {
+        "operator": "atLeast",
+        "count": 3
+      },
+      "active": true,
+      "stats": {
+        "doubleAttackPct": 7,
+        "bleedDamagePct": 5
+      },
+      "condition": {
+        "type": "rightIcePieceCount",
+        "setName": "深淵的存在",
+        "operator": "atLeast",
+        "count": 3,
+        "sourceFormula": "T23: =IF(AND(W22>=3,T22<>True),True)"
+      },
+      "source": {
+        "sheet": "右冰套效資料庫",
+        "range": "A23:W23",
+        "statFormulas": {
+          "D23": "=IF($T23=True,7,)",
+          "L23": "=IF($T23=True,5,)"
+        }
+      }
+    },
+    {
+      "id": "right-ice-set-effects-0bffe8b2686f",
+      "name": "飛龍2set",
+      "setName": "飛龍乘雲",
+      "requiredPieces": {
+        "operator": "exactly",
+        "count": 2
+      },
+      "active": true,
+      "stats": {
+        "bleedDamagePct": 3
+      },
+      "condition": {
+        "type": "rightIcePieceCount",
+        "setName": "飛龍乘雲",
+        "operator": "exactly",
+        "count": 2,
+        "sourceFormula": "T24: =IF(W24=2,True)"
+      },
+      "source": {
+        "sheet": "右冰套效資料庫",
+        "range": "A24:W24",
+        "statFormulas": {
+          "L24": "=IF($T24=True,3,)"
+        }
+      }
+    },
+    {
+      "id": "right-ice-set-effects-e08dcb21e78c",
+      "name": "飛龍3set",
+      "setName": "飛龍乘雲",
+      "requiredPieces": {
+        "operator": "atLeast",
+        "count": 3
+      },
+      "active": true,
+      "stats": {
+        "polarizationPct": 7,
+        "bleedDamagePct": 3
+      },
+      "condition": {
+        "type": "rightIcePieceCount",
+        "setName": "飛龍乘雲",
+        "operator": "atLeast",
+        "count": 3,
+        "sourceFormula": "T25: =IF(AND(W24>=3,T24<>True),True)"
+      },
+      "source": {
+        "sheet": "右冰套效資料庫",
+        "range": "A25:W25",
+        "statFormulas": {
+          "I25": "=IF($T25=True,7,)",
+          "L25": "=IF($T25=True,3,)"
+        }
+      }
+    }
+  ]
+}

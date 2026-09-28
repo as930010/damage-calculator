@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "dataUpdatedAt": "2026-09-25",
+  "source": "Google Sheets equipment database slot columns; virtual categories from worksheet names",
+  "slots": [
+    {
+      "id": "top",
+      "name": "上衣",
+      "active": true
+    },
+    {
+      "id": "bottom",
+      "name": "下衣",
+      "active": true
+    },
+    {
+      "id": "ringA",
+      "name": "戒指A",
+      "active": true
+    },
+    {
+      "id": "ringB",
+      "name": "戒指B",
+      "active": true
+    },
+    {
+      "id": "ring",
+      "name": "戒指",
+      "active": true
+    },
+    {
+      "id": "necklace",
+      "name": "項鍊",
+      "active": true
+    },
+    {
+      "id": "arm",
+      "name": "手臂",
+      "active": true
+    },
+    {
+      "id": "support",
+      "name": "支援",
+      "active": true
+    },
+    {
+      "id": "weapon",
+      "name": "武器",
+      "active": true
+    },
+    {
+      "id": "weaponAccessory",
+      "name": "武飾",
+      "active": true
+    },
+    {
+      "id": "earring",
+      "name": "耳環",
+      "active": true
+    },
+    {
+      "id": "faceTop",
+      "name": "臉上",
+      "active": true
+    },
+    {
+      "id": "faceMiddle",
+      "name": "臉中",
+      "active": true
+    },
+    {
+      "id": "faceBottom",
+      "name": "臉下",
+      "active": true
+    },
+    {
+      "id": "magicStone",
+      "name": "魔法石",
+      "active": true
+    },
+    {
+      "id": "one-piece-costumes",
+      "name": "連身時裝",
+      "active": true
+    },
+    {
+      "id": "left-ice",
+      "name": "左冰",
+      "active": true
+    }
+  ]
+}

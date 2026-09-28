@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "dataUpdatedAt": "2026-09-25",
+  "source": "Google Sheets: 計算機!C154, D154, H154, E76, E93, Q37, Q53, Q86, R86, T101, T102, B77 (formerly B76), V87; fixed cells and color-conditioned spirit-stone rate source",
+  "characterBase": {
+    "physicalAttack": 1202,
+    "magicalAttack": 1202,
+    "critDamagePct": 150,
+    "skillTypeAttackPct": 26.5
+  },
+  "fixedEffects": [
+    {
+      "sourceId": "sheet:計算機!E76",
+      "stats": {
+        "doubleAttackPct": 3
+      }
+    },
+    {
+      "sourceId": "sheet:計算機!E93",
+      "stats": {
+        "doubleAttackPct": 2
+      }
+    },
+    {
+      "sourceId": "sheet:計算機!Q37",
+      "stats": {
+        "adaptabilityPct": 2
+      }
+    },
+    {
+      "sourceId": "sheet:計算機!Q53",
+      "stats": {
+        "adaptabilityPct": 5
+      }
+    },
+    {
+      "sourceId": "sheet:計算機!Q86",
+      "stats": {
+        "adaptabilityPct": 5
+      }
+    },
+    {
+      "sourceId": "sheet:計算機!R86",
+      "stats": {
+        "defenseIgnorePct": 5
+      }
+    },
+    {
+      "sourceId": "sheet:計算機!T101",
+      "stats": {
+        "multiplicativeCritDamagePct": 10
+      }
+    },
+    {
+      "sourceId": "sheet:計算機!T102",
+      "stats": {
+        "multiplicativeCritDamagePct": 2
+      }
+    }
+  ],
+  "critDamageProductBasePct": 50,
+  "critDamageProductBaselinePctToSubtract": 150,
+  "yellowBeastSpiritStoneRatePct": 8
+}

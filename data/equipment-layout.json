@@ -1,0 +1,433 @@
+{
+  "schemaVersion": 1,
+  "source": "使用者遊戲裝備部位圖與裝備模擬區順序；左冰五件共用 B10",
+  "groups": [
+    {
+      "id": "costume",
+      "name": "連身時裝",
+      "color": "#f4878a"
+    },
+    {
+      "id": "leftIce",
+      "name": "左冰",
+      "color": "#83d9a4"
+    },
+    {
+      "id": "innerwear",
+      "name": "內裝左四",
+      "color": "#65d4ef"
+    },
+    {
+      "id": "iceWeapon",
+      "name": "冰武",
+      "color": "#f2accc"
+    },
+    {
+      "id": "weapon",
+      "name": "武器",
+      "color": "#efca84"
+    },
+    {
+      "id": "rightIce",
+      "name": "右冰",
+      "color": "#c095ee"
+    },
+    {
+      "id": "accessories",
+      "name": "飾品",
+      "color": "#9aacf5"
+    }
+  ],
+  "slots": [
+    {
+      "id": "costume",
+      "label": "連身時裝",
+      "group": "costume",
+      "x": 7,
+      "y": 15,
+      "icon": "連身時裝",
+      "selectionCell": "B7",
+      "stoneCells": [
+        "C8"
+      ]
+    },
+    {
+      "id": "ice-left-0",
+      "label": "頭髮",
+      "group": "leftIce",
+      "x": 7,
+      "y": 30,
+      "icon": "頭髮",
+      "selectionCell": "B10",
+      "stoneCells": [
+        "C11"
+      ],
+      "sharedSelection": true
+    },
+    {
+      "id": "ice-left-1",
+      "label": "上衣",
+      "group": "leftIce",
+      "x": 7,
+      "y": 42,
+      "icon": "上衣",
+      "selectionCell": "B10",
+      "stoneCells": [
+        "C12"
+      ],
+      "sharedSelection": true
+    },
+    {
+      "id": "ice-left-2",
+      "label": "下衣",
+      "group": "leftIce",
+      "x": 7,
+      "y": 54,
+      "icon": "下衣",
+      "selectionCell": "B10",
+      "stoneCells": [
+        "C13"
+      ],
+      "sharedSelection": true
+    },
+    {
+      "id": "ice-left-3",
+      "label": "手套",
+      "group": "leftIce",
+      "x": 7,
+      "y": 66,
+      "icon": "手套",
+      "selectionCell": "B10",
+      "stoneCells": [
+        "C14"
+      ],
+      "sharedSelection": true
+    },
+    {
+      "id": "ice-left-4",
+      "label": "鞋子",
+      "group": "leftIce",
+      "x": 7,
+      "y": 78,
+      "icon": "鞋子",
+      "selectionCell": "B10",
+      "stoneCells": [
+        "C15"
+      ],
+      "sharedSelection": true
+    },
+    {
+      "id": "inner-upper",
+      "label": "上衣",
+      "group": "innerwear",
+      "x": 19,
+      "y": 42,
+      "icon": "上衣",
+      "innerwearId": "upper",
+      "stoneCells": [
+        "H4",
+        "H5",
+        "H6",
+        "H7"
+      ]
+    },
+    {
+      "id": "inner-lowerwear",
+      "label": "下衣",
+      "group": "innerwear",
+      "x": 19,
+      "y": 54,
+      "icon": "下衣",
+      "innerwearId": "lowerwear",
+      "stoneCells": [
+        "H13",
+        "H14",
+        "H15",
+        "H16"
+      ]
+    },
+    {
+      "id": "inner-gloves",
+      "label": "手套",
+      "group": "innerwear",
+      "x": 19,
+      "y": 66,
+      "icon": "手套",
+      "innerwearId": "gloves",
+      "stoneCells": [
+        "H31",
+        "H32",
+        "H33",
+        "H34"
+      ]
+    },
+    {
+      "id": "inner-shoes",
+      "label": "鞋子",
+      "group": "innerwear",
+      "x": 19,
+      "y": 78,
+      "icon": "鞋子",
+      "innerwearId": "shoes",
+      "stoneCells": [
+        "H40",
+        "H41",
+        "H42",
+        "H43"
+      ]
+    },
+    {
+      "id": "inner-lowerwearAlternative",
+      "label": "強/排褲",
+      "group": "innerwear",
+      "x": 19,
+      "y": 90,
+      "icon": "強/排褲",
+      "innerwearId": "lowerwearAlternative",
+      "stoneCells": [
+        "H22",
+        "H23",
+        "H24",
+        "H25"
+      ],
+      "enabledBy": "F20"
+    },
+    {
+      "id": "ice-weapon",
+      "label": "冰武",
+      "group": "iceWeapon",
+      "x": 84,
+      "y": 15,
+      "icon": "冰武",
+      "selectionCell": "B17",
+      "stoneCells": [
+        "D17",
+        "D18"
+      ]
+    },
+    {
+      "id": "weapon",
+      "label": "武器",
+      "group": "weapon",
+      "x": 93,
+      "y": 15,
+      "icon": "武器",
+      "stoneCells": [
+        "D32",
+        "D33",
+        "D34",
+        "D35",
+        "D36",
+        "D37"
+      ],
+      "weapon": true
+    },
+    {
+      "id": "ice-B20",
+      "label": "武飾",
+      "group": "rightIce",
+      "x": 64,
+      "y": 35,
+      "icon": "武飾",
+      "selectionCell": "B20"
+    },
+    {
+      "id": "ice-B21",
+      "label": "臉上",
+      "group": "rightIce",
+      "x": 64,
+      "y": 46,
+      "icon": "臉上",
+      "selectionCell": "B21"
+    },
+    {
+      "id": "ice-B22",
+      "label": "臉中",
+      "group": "rightIce",
+      "x": 64,
+      "y": 57,
+      "icon": "臉中",
+      "selectionCell": "B22"
+    },
+    {
+      "id": "ice-B23",
+      "label": "臉下",
+      "group": "rightIce",
+      "x": 64,
+      "y": 68,
+      "icon": "臉下",
+      "selectionCell": "B23"
+    },
+    {
+      "id": "ice-B24",
+      "label": "耳環",
+      "group": "rightIce",
+      "x": 64,
+      "y": 79,
+      "icon": "耳環",
+      "selectionCell": "B24"
+    },
+    {
+      "id": "ice-D20",
+      "label": "支援",
+      "group": "rightIce",
+      "x": 73,
+      "y": 35,
+      "icon": "支援",
+      "selectionCell": "D20"
+    },
+    {
+      "id": "ice-D21",
+      "label": "上衣",
+      "group": "rightIce",
+      "x": 73,
+      "y": 46,
+      "icon": "上衣",
+      "selectionCell": "D21"
+    },
+    {
+      "id": "ice-D22",
+      "label": "下衣",
+      "group": "rightIce",
+      "x": 73,
+      "y": 57,
+      "icon": "下衣",
+      "selectionCell": "D22"
+    },
+    {
+      "id": "ice-D23",
+      "label": "手臂",
+      "group": "rightIce",
+      "x": 73,
+      "y": 68,
+      "icon": "手臂",
+      "selectionCell": "D23"
+    },
+    {
+      "id": "ice-D24",
+      "label": "項鍊",
+      "group": "rightIce",
+      "x": 73,
+      "y": 79,
+      "icon": "項鍊",
+      "selectionCell": "D24"
+    },
+    {
+      "id": "ice-D25",
+      "label": "戒指",
+      "group": "rightIce",
+      "x": 73,
+      "y": 90,
+      "icon": "戒指",
+      "selectionCell": "D25"
+    },
+    {
+      "id": "accessory-M2",
+      "label": "武飾",
+      "group": "accessories",
+      "x": 84,
+      "y": 35,
+      "icon": "武飾",
+      "selectionCell": "M2"
+    },
+    {
+      "id": "accessory-M3",
+      "label": "臉上",
+      "group": "accessories",
+      "x": 84,
+      "y": 46,
+      "icon": "臉上",
+      "selectionCell": "M3"
+    },
+    {
+      "id": "accessory-M4",
+      "label": "臉中",
+      "group": "accessories",
+      "x": 84,
+      "y": 57,
+      "icon": "臉中",
+      "selectionCell": "M4"
+    },
+    {
+      "id": "accessory-M5",
+      "label": "臉下",
+      "group": "accessories",
+      "x": 84,
+      "y": 68,
+      "icon": "臉下",
+      "selectionCell": "M5"
+    },
+    {
+      "id": "accessory-M6",
+      "label": "耳環",
+      "group": "accessories",
+      "x": 84,
+      "y": 79,
+      "icon": "耳環",
+      "selectionCell": "M6"
+    },
+    {
+      "id": "accessory-M7",
+      "label": "戒指A",
+      "group": "accessories",
+      "x": 84,
+      "y": 90,
+      "icon": "戒指A",
+      "selectionCell": "M7"
+    },
+    {
+      "id": "accessory-O2",
+      "label": "支援",
+      "group": "accessories",
+      "x": 93,
+      "y": 35,
+      "icon": "支援",
+      "selectionCell": "O2"
+    },
+    {
+      "id": "accessory-O3",
+      "label": "上衣",
+      "group": "accessories",
+      "x": 93,
+      "y": 46,
+      "icon": "上衣",
+      "selectionCell": "O3"
+    },
+    {
+      "id": "accessory-O4",
+      "label": "下衣",
+      "group": "accessories",
+      "x": 93,
+      "y": 57,
+      "icon": "下衣",
+      "selectionCell": "O4"
+    },
+    {
+      "id": "accessory-O5",
+      "label": "手臂",
+      "group": "accessories",
+      "x": 93,
+      "y": 68,
+      "icon": "手臂",
+      "selectionCell": "O5"
+    },
+    {
+      "id": "accessory-O6",
+      "label": "項鍊",
+      "group": "accessories",
+      "x": 93,
+      "y": 79,
+      "icon": "項鍊",
+      "selectionCell": "O6"
+    },
+    {
+      "id": "accessory-O7",
+      "label": "戒指B",
+      "group": "accessories",
+      "x": 93,
+      "y": 90,
+      "icon": "戒指B",
+      "selectionCell": "O7"
+    }
+  ]
+}

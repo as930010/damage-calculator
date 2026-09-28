@@ -1,0 +1,852 @@
+{
+  "schemaVersion": 1,
+  "dataUpdatedAt": "2026-09-25",
+  "source": {
+    "workbook": "Google Sheets live export",
+    "sheet": "飾品資料庫"
+  },
+  "items": [
+    {
+      "id": "accessories-55f06471666f",
+      "name": "Type-Q女王的勳章",
+      "slotId": "weaponAccessory",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "allSkillDamagePct": 18
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A2:T2"
+      },
+      "appraisal": {
+        "canAppraise": null,
+        "effectCount": null
+      }
+    },
+    {
+      "id": "accessories-c26cb94abffc",
+      "name": "暗鬼的徽章",
+      "slotId": "weaponAccessory",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "allSkillDamagePct": 15
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A3:T3"
+      },
+      "appraisal": {
+        "canAppraise": null,
+        "effectCount": null
+      }
+    },
+    {
+      "id": "accessories-6903afb73192",
+      "name": "火魔的印記",
+      "slotId": "weaponAccessory",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "allSkillDamagePct": 10
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A4:T4"
+      },
+      "appraisal": {
+        "canAppraise": null,
+        "effectCount": null
+      }
+    },
+    {
+      "id": "accessories-52b0a3f7e43a",
+      "name": "MAESTRO光環",
+      "slotId": "faceTop",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "adaptabilityPct": 2,
+        "multiplicativeDamagePct": 10.25
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A5:T5"
+      },
+      "appraisal": {
+        "canAppraise": null,
+        "effectCount": null
+      }
+    },
+    {
+      "id": "accessories-3c8801d7376b",
+      "name": "魂靈皇冠",
+      "slotId": "faceTop",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "adaptabilityPct": 2,
+        "multiplicativeDamagePct": 5
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A6:T6"
+      },
+      "appraisal": {
+        "canAppraise": null,
+        "effectCount": null
+      }
+    },
+    {
+      "id": "accessories-e3208062ddd2",
+      "name": "麻木皇冠",
+      "slotId": "faceTop",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "doubleAttackPct": -5,
+        "multiplicativeDamagePct": 10
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A7:T7"
+      },
+      "appraisal": {
+        "canAppraise": null,
+        "effectCount": null
+      }
+    },
+    {
+      "id": "accessories-78963f024026",
+      "name": "亞特瑪臉中",
+      "slotId": "faceMiddle",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {},
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A8:T8"
+      },
+      "appraisal": {
+        "canAppraise": true,
+        "effectCount": 3
+      }
+    },
+    {
+      "id": "accessories-a6048e80cfef",
+      "name": "亞特瑪臉下",
+      "slotId": "faceBottom",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {},
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A9:T9"
+      },
+      "appraisal": {
+        "canAppraise": true,
+        "effectCount": 3
+      }
+    },
+    {
+      "id": "accessories-aceceeff098c",
+      "name": "精銳格雷特的面甲",
+      "slotId": "faceBottom",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "adaptabilityPct": 3,
+        "multiplicativeDamagePct": 6
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A10:T10"
+      },
+      "appraisal": {
+        "canAppraise": true,
+        "effectCount": 3
+      }
+    },
+    {
+      "id": "accessories-ed320a117d68",
+      "name": "巴力溫毛飾",
+      "slotId": "faceBottom",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "adaptabilityPct": 2,
+        "multiplicativeDamagePct": 5
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A11:T11"
+      },
+      "appraisal": {
+        "canAppraise": true,
+        "effectCount": 3
+      }
+    },
+    {
+      "id": "accessories-935dedaba0b2",
+      "name": "瑪瑙碎片",
+      "slotId": "faceBottom",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "adaptabilityPct": 2,
+        "defenseIgnorePct": 5
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A12:T12"
+      },
+      "appraisal": {
+        "canAppraise": true,
+        "effectCount": 3
+      }
+    },
+    {
+      "id": "accessories-00b2b054cdd1",
+      "name": "天線耳環",
+      "slotId": "earring",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "critDamagePct": 3,
+        "adaptabilityPct": 2
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A13:T13"
+      },
+      "appraisal": {
+        "canAppraise": null,
+        "effectCount": null
+      }
+    },
+    {
+      "id": "accessories-2bb5f7c00dfb",
+      "name": "軍團幹部裝飾",
+      "slotId": "earring",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "critDamagePct": 3,
+        "adaptabilityPct": 2
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A14:T14"
+      },
+      "appraisal": {
+        "canAppraise": null,
+        "effectCount": null
+      }
+    },
+    {
+      "id": "accessories-7e998f1b36ba",
+      "name": "憤怒戒指",
+      "slotId": "ringA",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {},
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A15:T15"
+      },
+      "appraisal": {
+        "canAppraise": true,
+        "effectCount": 2
+      }
+    },
+    {
+      "id": "accessories-88ae18e2898b",
+      "name": "鬥士憤怒戒指",
+      "slotId": "ringA",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "doubleAttackPct": 0.5,
+        "critRatePct": 1
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A16:T16"
+      },
+      "appraisal": {
+        "canAppraise": true,
+        "effectCount": 2
+      }
+    },
+    {
+      "id": "accessories-0530073b32cc",
+      "name": "完整的能量變換裝置",
+      "slotId": "ringA",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "multiplicativeDamagePct": 3
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A17:T17"
+      },
+      "appraisal": {
+        "canAppraise": true,
+        "effectCount": 2
+      }
+    },
+    {
+      "id": "accessories-e9c1d70ee92e",
+      "name": "鏡之世界的碎片",
+      "slotId": "ringA",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "multiplicativeDamagePct": 4
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A18:T18"
+      },
+      "appraisal": {
+        "canAppraise": true,
+        "effectCount": 2
+      }
+    },
+    {
+      "id": "accessories-7c03d2195006",
+      "name": "命運的預言書",
+      "slotId": "support",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "critDamagePct": 5,
+        "adaptabilityPct": 3
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A19:T19"
+      },
+      "appraisal": {
+        "canAppraise": null,
+        "effectCount": null
+      }
+    },
+    {
+      "id": "accessories-8ba1f88318c3",
+      "name": "機器人偶頭",
+      "slotId": "support",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "extremizationPct": 10,
+        "adaptabilityPct": 2
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A20:T20"
+      },
+      "appraisal": {
+        "canAppraise": null,
+        "effectCount": null
+      }
+    },
+    {
+      "id": "accessories-4d58c9af9855",
+      "name": "夢緣香爐",
+      "slotId": "support",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "adaptabilityPct": 3
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A21:T21"
+      },
+      "appraisal": {
+        "canAppraise": null,
+        "effectCount": null
+      }
+    },
+    {
+      "id": "accessories-f3023522a762",
+      "name": "普萊卡斯的形象",
+      "slotId": "support",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "adaptabilityPct": 5
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A22:T22"
+      },
+      "appraisal": {
+        "canAppraise": null,
+        "effectCount": null
+      }
+    },
+    {
+      "id": "accessories-94c39a781ccf",
+      "name": "攜帶式能量環",
+      "slotId": "support",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "critDamagePct": 3,
+        "adaptabilityPct": 2
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A23:T23"
+      },
+      "appraisal": {
+        "canAppraise": null,
+        "effectCount": null
+      }
+    },
+    {
+      "id": "accessories-5267ea0433a4",
+      "name": "魔族之眼",
+      "slotId": "support",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "critDamagePct": 5
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A24:T24"
+      },
+      "appraisal": {
+        "canAppraise": null,
+        "effectCount": null
+      }
+    },
+    {
+      "id": "accessories-524951c1617b",
+      "name": "粉絲手燈",
+      "slotId": "support",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "allSkillDamagePct": 1
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A25:T25"
+      },
+      "appraisal": {
+        "canAppraise": null,
+        "effectCount": null
+      }
+    },
+    {
+      "id": "accessories-95e201845618",
+      "name": "亞特瑪上衣 - 橘",
+      "slotId": "top",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "bleedDamagePct": 6,
+        "fullHealthKillDamagePct": 10,
+        "adaptabilityPct": 3
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A26:T26"
+      },
+      "appraisal": {
+        "canAppraise": true,
+        "effectCount": 3
+      }
+    },
+    {
+      "id": "accessories-16419061ad91",
+      "name": "亞特瑪上衣 - 米",
+      "slotId": "top",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "bleedDamagePct": 5,
+        "fullHealthKillDamagePct": 10,
+        "adaptabilityPct": 2
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A27:T27"
+      },
+      "appraisal": {
+        "canAppraise": true,
+        "effectCount": 3
+      }
+    },
+    {
+      "id": "accessories-6df481e697c8",
+      "name": "亞特瑪上衣 - 紫",
+      "slotId": "top",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "bleedDamagePct": 4,
+        "fullHealthKillDamagePct": 10,
+        "adaptabilityPct": 2
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A28:T28"
+      },
+      "appraisal": {
+        "canAppraise": true,
+        "effectCount": 3
+      }
+    },
+    {
+      "id": "accessories-dfe5aa6a6da8",
+      "name": "亞特瑪上衣 - 綠",
+      "slotId": "top",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "bleedDamagePct": 3,
+        "fullHealthKillDamagePct": 10,
+        "adaptabilityPct": 2
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A29:T29"
+      },
+      "appraisal": {
+        "canAppraise": true,
+        "effectCount": 3
+      }
+    },
+    {
+      "id": "accessories-cd17fc7008c5",
+      "name": "亞特瑪上衣 - 藍",
+      "slotId": "top",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "bleedDamagePct": 2,
+        "fullHealthKillDamagePct": 10,
+        "adaptabilityPct": 2
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A30:T30"
+      },
+      "appraisal": {
+        "canAppraise": true,
+        "effectCount": 3
+      }
+    },
+    {
+      "id": "accessories-9fda9b758b7f",
+      "name": "靈魂的枷鎖",
+      "slotId": "bottom",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "allSkillDamagePct": 5
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A31:T31"
+      },
+      "appraisal": {
+        "canAppraise": null,
+        "effectCount": null
+      }
+    },
+    {
+      "id": "accessories-e625c38fc206",
+      "name": "發光之花",
+      "slotId": "bottom",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "critRatePct": 10,
+        "adaptabilityPct": 2
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A32:T32"
+      },
+      "appraisal": {
+        "canAppraise": null,
+        "effectCount": null
+      }
+    },
+    {
+      "id": "accessories-b1c45bb85f99",
+      "name": "亞特瑪手臂",
+      "slotId": "arm",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {},
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A33:T33"
+      },
+      "appraisal": {
+        "canAppraise": true,
+        "effectCount": 3
+      }
+    },
+    {
+      "id": "accessories-82cab3c7f6d7",
+      "name": "新皇后的手臂裝飾",
+      "slotId": "arm",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "polarizationPct": 1,
+        "adaptabilityPct": 2
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A34:T34"
+      },
+      "appraisal": {
+        "canAppraise": true,
+        "effectCount": 3
+      }
+    },
+    {
+      "id": "accessories-53df98059aae",
+      "name": "亞特瑪項鍊",
+      "slotId": "necklace",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {},
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A35:T35"
+      },
+      "appraisal": {
+        "canAppraise": true,
+        "effectCount": 3
+      }
+    },
+    {
+      "id": "accessories-58a63def64ee",
+      "name": "班德王國項鍊",
+      "slotId": "necklace",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 25,
+        "magicalAttack": 25,
+        "doubleAttackPct": 3,
+        "critRatePct": 1.5
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A36:T36"
+      },
+      "appraisal": {
+        "canAppraise": true,
+        "effectCount": 3
+      }
+    },
+    {
+      "id": "accessories-c7472449e875",
+      "name": "堅毅的鬥士項鍊",
+      "slotId": "necklace",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "critRatePct": 1
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A37:T37"
+      },
+      "appraisal": {
+        "canAppraise": true,
+        "effectCount": 3
+      }
+    },
+    {
+      "id": "accessories-decc7e3a2bd6",
+      "name": "超越的技術戒指",
+      "slotId": "ringB",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "transcendenceSkillDamagePct": 20
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A38:T38"
+      },
+      "appraisal": {
+        "canAppraise": true,
+        "effectCount": 2
+      }
+    },
+    {
+      "id": "accessories-ddbdfcbdbd3e",
+      "name": "超越鬥士的技術戒指",
+      "slotId": "ringB",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "doubleAttackPct": 0.5,
+        "critRatePct": 1,
+        "transcendenceSkillDamagePct": 20
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A39:T39"
+      },
+      "appraisal": {
+        "canAppraise": true,
+        "effectCount": 2
+      }
+    },
+    {
+      "id": "accessories-63bcda2a2d49",
+      "name": "技術的戒指",
+      "slotId": "ringB",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "transcendenceSkillDamagePct": 20
+      },
+      "effects": [],
+      "source": {
+        "sheet": "飾品資料庫",
+        "range": "A40:T40"
+      },
+      "appraisal": {
+        "canAppraise": true,
+        "effectCount": 2
+      }
+    }
+  ],
+  "notes": [
+    "各有鑑定下拉式選單的飾品部位，依 accessory-special-effects.json 的可選列數設定 appraisal.canAppraise 與 appraisal.effectCount；目前上衣、臉中、臉下、手臂、項鍊各 3 條，戒指 1、2 各 2 條。",
+    "飾品鑑定輸入位置由 accessory-special-effects.json 綁定至對應部位；未有對應選單的部位仍保留 null，不推定為可鑑定或不可鑑定。"
+  ]
+}

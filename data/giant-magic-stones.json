@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "dataUpdatedAt": "2026-09-25",
+  "sourceSheet": "係數區",
+  "selectorCells": [
+    "裝備模擬區!B38",
+    "裝備模擬區!B39",
+    "裝備模擬區!B40"
+  ],
+  "effectOutputRows": [
+    "計算機!61",
+    "計算機!62",
+    "計算機!63"
+  ],
+  "options": [
+    {
+      "id": "giant-stone-2",
+      "name": "攻擊力+5.5%",
+      "stats": {
+        "doubleAttackPct": 5.5
+      },
+      "source": {
+        "sheet": "係數區",
+        "cell": "W2"
+      }
+    },
+    {
+      "id": "giant-stone-3",
+      "name": "攻擊力+6%",
+      "stats": {
+        "doubleAttackPct": 6.0
+      },
+      "source": {
+        "sheet": "係數區",
+        "cell": "W3"
+      }
+    },
+    {
+      "id": "giant-stone-4",
+      "name": "攻擊力等級+7",
+      "stats": {
+        "attackLevel": 7.0
+      },
+      "source": {
+        "sheet": "係數區",
+        "cell": "W4"
+      }
+    },
+    {
+      "id": "giant-stone-5",
+      "name": "攻擊力等級+8",
+      "stats": {
+        "attackLevel": 8.0
+      },
+      "source": {
+        "sheet": "係數區",
+        "cell": "W5"
+      }
+    }
+  ],
+  "notes": [
+    "攻擊力+百分比依計算機 E61:E63 實際欄位彙入雙攻%。",
+    "攻擊力等級+數值依計算機 U61:U63 實際欄位彙入攻擊力等級。"
+  ]
+}

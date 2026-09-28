@@ -1,0 +1,773 @@
+{
+  "schemaVersion": 1,
+  "dataUpdatedAt": "2026-09-25",
+  "sourceSheets": [
+    "裝備模擬區",
+    "係數區",
+    "計算機"
+  ],
+  "consumables": [
+    {
+      "id": "consumable-2",
+      "name": "適應靈藥",
+      "stats": {
+        "adaptabilityPct": 3.0
+      },
+      "status": "mapped",
+      "source": {
+        "sheet": "係數區",
+        "range": "BB2:BB2",
+        "calculationCells": [
+          "計算機!Q84"
+        ]
+      }
+    },
+    {
+      "id": "consumable-3",
+      "name": "天上甜點",
+      "stats": {
+        "multiplicativeDamagePct": 5.0
+      },
+      "status": "mapped",
+      "source": {
+        "sheet": "係數區",
+        "range": "BB3:BB3"
+      }
+    },
+    {
+      "id": "consumable-4",
+      "name": "巨人靈藥",
+      "stats": {
+        "critRatePct": 30.0
+      },
+      "status": "mapped",
+      "source": {
+        "sheet": "係數區",
+        "range": "BB4:BB4"
+      }
+    },
+    {
+      "id": "consumable-5",
+      "name": "其他",
+      "stats": {},
+      "status": "mapped",
+      "source": {
+        "sheet": "係數區",
+        "range": "BB5:BB5"
+      }
+    }
+  ],
+  "environments": [
+    {
+      "id": "location-2",
+      "name": "小屋",
+      "stats": {
+        "critRatePct": 5.0
+      },
+      "source": {
+        "sheet": "係數區",
+        "cell": "BC2"
+      }
+    },
+    {
+      "id": "location-3",
+      "name": "強化小屋",
+      "stats": {
+        "critRatePct": 5.0,
+        "bossDamagePct": 2.0
+      },
+      "source": {
+        "sheet": "係數區",
+        "cell": "BC3"
+      }
+    },
+    {
+      "id": "location-4",
+      "name": "集合地",
+      "stats": {
+        "bossDamagePct": 2.0,
+        "adaptabilityPct": 2.0
+      },
+      "source": {
+        "sheet": "係數區",
+        "cell": "BC4"
+      }
+    },
+    {
+      "id": "location-5",
+      "name": "其他",
+      "stats": {},
+      "source": {
+        "sheet": "係數區",
+        "cell": "BC5"
+      }
+    }
+  ],
+  "titles": [
+    {
+      "id": "title-pure",
+      "name": "純淨",
+      "stats": {
+        "multiplicativeDamagePct": 18.0,
+        "superAdaptabilityPct": 0.0
+      },
+      "source": {
+        "sheet": "係數區",
+        "cell": "AI2",
+        "calculationCells": [
+          "計算機!S86",
+          "計算機!W86"
+        ]
+      }
+    },
+    {
+      "id": "title-dogma",
+      "name": "Dogma",
+      "stats": {
+        "multiplicativeDamagePct": 25.0,
+        "superAdaptabilityPct": 5.0
+      },
+      "source": {
+        "sheet": "係數區",
+        "cell": "AI3",
+        "calculationCells": [
+          "計算機!S86",
+          "計算機!W86"
+        ]
+      }
+    }
+  ],
+  "guildFountain": [
+    {
+      "stage": 2,
+      "selectorCell": "裝備模擬區!S17",
+      "options": [
+        {
+          "id": "guild-fountain-2-2",
+          "name": "致命一擊+1%",
+          "stats": {
+            "critRatePct": 1.0
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AJ2:AK2"
+          }
+        },
+        {
+          "id": "guild-fountain-2-3",
+          "name": "致命一擊+2%",
+          "stats": {
+            "critRatePct": 2.0
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AJ3:AK3"
+          }
+        },
+        {
+          "id": "guild-fountain-2-4",
+          "name": "致命一擊+3%",
+          "stats": {
+            "critRatePct": 3.0
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AJ4:AK4"
+          }
+        },
+        {
+          "id": "guild-fountain-2-5",
+          "name": "致命一擊+4%",
+          "stats": {
+            "critRatePct": 4.0
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AJ5:AK5"
+          }
+        },
+        {
+          "id": "guild-fountain-2-6",
+          "name": "致命一擊+5%",
+          "stats": {
+            "critRatePct": 5.0
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AJ6:AK6"
+          }
+        },
+        {
+          "id": "guild-fountain-2-7",
+          "name": "極大化+1%",
+          "stats": {
+            "extremizationPct": 1.0
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AJ7:AK7"
+          }
+        },
+        {
+          "id": "guild-fountain-2-8",
+          "name": "極大化+2%",
+          "stats": {
+            "extremizationPct": 2.0
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AJ8:AK8"
+          }
+        },
+        {
+          "id": "guild-fountain-2-9",
+          "name": "極大化+3%",
+          "stats": {
+            "extremizationPct": 3.0
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AJ9:AK9"
+          }
+        },
+        {
+          "id": "guild-fountain-2-10",
+          "name": "極大化+4%",
+          "stats": {
+            "extremizationPct": 4.0
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AJ10:AK10"
+          }
+        },
+        {
+          "id": "guild-fountain-2-11",
+          "name": "極大化+5%",
+          "stats": {
+            "extremizationPct": 5.0
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AJ11:AK11"
+          }
+        },
+        {
+          "id": "guild-fountain-2-12",
+          "name": "無關傷害",
+          "stats": {},
+          "source": {
+            "sheet": "係數區",
+            "range": "AJ12:AK12"
+          }
+        }
+      ]
+    },
+    {
+      "stage": 3,
+      "selectorCell": "裝備模擬區!S18",
+      "options": [
+        {
+          "id": "guild-fountain-3-2",
+          "name": "攻擊力+40",
+          "stats": {
+            "physicalAttack": 40.0,
+            "magicalAttack": 40.0
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AL2:AM2"
+          }
+        },
+        {
+          "id": "guild-fountain-3-3",
+          "name": "攻擊力+80",
+          "stats": {
+            "physicalAttack": 80.0,
+            "magicalAttack": 80.0
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AL3:AM3"
+          }
+        },
+        {
+          "id": "guild-fountain-3-4",
+          "name": "攻擊力+120",
+          "stats": {
+            "physicalAttack": 120.0,
+            "magicalAttack": 120.0
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AL4:AM4"
+          }
+        },
+        {
+          "id": "guild-fountain-3-5",
+          "name": "攻擊力+160",
+          "stats": {
+            "physicalAttack": 160.0,
+            "magicalAttack": 160.0
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AL5:AM5"
+          }
+        },
+        {
+          "id": "guild-fountain-3-6",
+          "name": "攻擊力+200",
+          "stats": {
+            "physicalAttack": 200.0,
+            "magicalAttack": 200.0
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AL6:AM6"
+          }
+        },
+        {
+          "id": "guild-fountain-3-7",
+          "name": "雙攻+0.6%",
+          "stats": {
+            "doubleAttackPct": 0.6
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AL7:AM7"
+          }
+        },
+        {
+          "id": "guild-fountain-3-8",
+          "name": "雙攻+1.2%",
+          "stats": {
+            "doubleAttackPct": 1.2
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AL8:AM8"
+          }
+        },
+        {
+          "id": "guild-fountain-3-9",
+          "name": "雙攻+1.8%",
+          "stats": {
+            "doubleAttackPct": 1.8
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AL9:AM9"
+          }
+        },
+        {
+          "id": "guild-fountain-3-10",
+          "name": "雙攻+2.4%",
+          "stats": {
+            "doubleAttackPct": 2.4
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AL10:AM10"
+          }
+        },
+        {
+          "id": "guild-fountain-3-11",
+          "name": "雙攻+3%",
+          "stats": {
+            "doubleAttackPct": 3.0
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AL11:AM11"
+          }
+        },
+        {
+          "id": "guild-fountain-3-12",
+          "name": "Boss傷害+1%",
+          "stats": {
+            "bossDamagePct": 1.0
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AL12:AM12"
+          }
+        },
+        {
+          "id": "guild-fountain-3-13",
+          "name": "Boss傷害+2%",
+          "stats": {
+            "bossDamagePct": 2.0
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AL13:AM13"
+          }
+        },
+        {
+          "id": "guild-fountain-3-14",
+          "name": "Boss傷害+3%",
+          "stats": {
+            "bossDamagePct": 3.0
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AL14:AM14"
+          }
+        },
+        {
+          "id": "guild-fountain-3-15",
+          "name": "Boss傷害+4%",
+          "stats": {
+            "bossDamagePct": 4.0
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AL15:AM15"
+          }
+        },
+        {
+          "id": "guild-fountain-3-16",
+          "name": "Boss傷害+5%",
+          "stats": {
+            "bossDamagePct": 5.0
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AL16:AM16"
+          }
+        },
+        {
+          "id": "guild-fountain-3-17",
+          "name": "無關傷害",
+          "stats": {},
+          "source": {
+            "sheet": "係數區",
+            "range": "AL17:AM17"
+          }
+        }
+      ]
+    },
+    {
+      "stage": 4,
+      "selectorCell": "裝備模擬區!S19",
+      "options": [
+        {
+          "id": "guild-fountain-4-2",
+          "name": "所有技能傷害+0.6%",
+          "stats": {
+            "allSkillDamagePct": 0.6
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AN2:AO2"
+          }
+        },
+        {
+          "id": "guild-fountain-4-3",
+          "name": "所有技能傷害+1.2%",
+          "stats": {
+            "allSkillDamagePct": 1.2
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AN3:AO3"
+          }
+        },
+        {
+          "id": "guild-fountain-4-4",
+          "name": "所有技能傷害+1.8%",
+          "stats": {
+            "allSkillDamagePct": 1.8
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AN4:AO4"
+          }
+        },
+        {
+          "id": "guild-fountain-4-5",
+          "name": "所有技能傷害+2.4%",
+          "stats": {
+            "allSkillDamagePct": 2.4
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AN5:AO5"
+          }
+        },
+        {
+          "id": "guild-fountain-4-6",
+          "name": "所有技能傷害+3%",
+          "stats": {
+            "allSkillDamagePct": 3.0
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AN6:AO6"
+          }
+        },
+        {
+          "id": "guild-fountain-4-7",
+          "name": "所有技能傷害+0.6%",
+          "stats": {
+            "allSkillDamagePct": 0.6
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AN7:AO7"
+          }
+        },
+        {
+          "id": "guild-fountain-4-8",
+          "name": "致命傷害+1.2%",
+          "stats": {
+            "critDamagePct": 1.2
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AN8:AO8"
+          }
+        },
+        {
+          "id": "guild-fountain-4-9",
+          "name": "致命傷害+1.8%",
+          "stats": {
+            "critDamagePct": 1.8
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AN9:AO9"
+          }
+        },
+        {
+          "id": "guild-fountain-4-10",
+          "name": "致命傷害+2.4%",
+          "stats": {
+            "critDamagePct": 2.4
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AN10:AO10"
+          }
+        },
+        {
+          "id": "guild-fountain-4-11",
+          "name": "致命傷害+3%",
+          "stats": {
+            "critDamagePct": 3.0
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AN11:AO11"
+          }
+        },
+        {
+          "id": "guild-fountain-4-12",
+          "name": "強者+0.6%",
+          "stats": {
+            "strongerPct": 0.6
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AN12:AO12"
+          }
+        },
+        {
+          "id": "guild-fountain-4-13",
+          "name": "強者+1.2%",
+          "stats": {
+            "strongerPct": 1.2
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AN13:AO13"
+          }
+        },
+        {
+          "id": "guild-fountain-4-14",
+          "name": "強者+1.8%",
+          "stats": {
+            "strongerPct": 1.8
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AN14:AO14"
+          }
+        },
+        {
+          "id": "guild-fountain-4-15",
+          "name": "強者+2.4%",
+          "stats": {
+            "strongerPct": 2.4
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AN15:AO15"
+          }
+        },
+        {
+          "id": "guild-fountain-4-16",
+          "name": "強者+3%",
+          "stats": {
+            "strongerPct": 3.0
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AN16:AO16"
+          }
+        },
+        {
+          "id": "guild-fountain-4-17",
+          "name": "排熱+0.6%",
+          "stats": {
+            "heatPct": 0.6
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AN17:AO17"
+          }
+        },
+        {
+          "id": "guild-fountain-4-18",
+          "name": "排熱+1.2%",
+          "stats": {
+            "heatPct": 1.2
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AN18:AO18"
+          }
+        },
+        {
+          "id": "guild-fountain-4-19",
+          "name": "排熱+1.8%",
+          "stats": {
+            "heatPct": 1.8
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AN19:AO19"
+          }
+        },
+        {
+          "id": "guild-fountain-4-20",
+          "name": "排熱+2.4%",
+          "stats": {
+            "heatPct": 2.4
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AN20:AO20"
+          }
+        },
+        {
+          "id": "guild-fountain-4-21",
+          "name": "排熱+3%",
+          "stats": {
+            "heatPct": 3.0
+          },
+          "source": {
+            "sheet": "係數區",
+            "range": "AN21:AO21"
+          }
+        },
+        {
+          "id": "guild-fountain-4-22",
+          "name": "無關傷害",
+          "stats": {},
+          "source": {
+            "sheet": "係數區",
+            "range": "AN22:AO22"
+          }
+        }
+      ]
+    }
+  ],
+  "binaryEffects": [
+    {
+      "selectorCell": "裝備模擬區!B3",
+      "name": "標誌",
+      "options": [
+        {
+          "id": "mark-present",
+          "name": "有",
+          "stats": {
+            "superAdaptabilityPct": 3
+          }
+        },
+        {
+          "id": "mark-absent",
+          "name": "沒有",
+          "stats": {}
+        }
+      ],
+      "source": "計算機!W91=IF(B89=\"有\",3,0)"
+    },
+    {
+      "selectorCell": "裝備模擬區!S21",
+      "name": "立繪、覺醒",
+      "options": [
+        {
+          "id": "illustration-present",
+          "name": "有",
+          "stats": {
+            "transcendenceSkillDamagePct": 5
+          }
+        },
+        {
+          "id": "illustration-absent",
+          "name": "沒有",
+          "stats": {}
+        }
+      ],
+      "source": "計算機!K92=IF(B90=\"有\",5,0)"
+    }
+  ],
+  "notes": [
+    "屬性映射依計算機 F82/S82、F83/I83、S84/W84、F86:U88 的實際輸出欄位轉換。",
+    "適應靈藥依使用者確認的計算機 Q82 公式套用適應力 +3。巔峰選項依計算機 I36、V36 公式，分別提供 Boss傷害% 與技能類雙攻%。"
+  ],
+  "peakOptions": [
+    {
+      "id": "peak-option-meatbone",
+      "name": "嗜肉骨斷",
+      "stats": {
+        "bossDamagePct": 80,
+        "skillTypeAttackPct": -24
+      },
+      "source": {
+        "sheet": "計算機",
+        "selectionCell": "裝備模擬區!S2",
+        "calculationCells": [
+          "I36",
+          "V36"
+        ],
+        "formulas": [
+          "IFS(B36=\"嗜肉骨斷\",80,B36=\"精神挑戰者\",45)",
+          "IFS(B36=\"嗜肉骨斷\",-24,B36=\"精神挑戰者\",0)"
+        ]
+      }
+    },
+    {
+      "id": "peak-option-spirit-challenger",
+      "name": "精神挑戰者",
+      "stats": {
+        "bossDamagePct": 45,
+        "skillTypeAttackPct": 0
+      },
+      "source": {
+        "sheet": "計算機",
+        "selectionCell": "裝備模擬區!S2",
+        "calculationCells": [
+          "I36",
+          "V36"
+        ],
+        "formulas": [
+          "IFS(B36=\"嗜肉骨斷\",80,B36=\"精神挑戰者\",45)",
+          "IFS(B36=\"嗜肉骨斷\",-24,B36=\"精神挑戰者\",0)"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,217 @@
+{
+  "schemaVersion": 1,
+  "dataUpdatedAt": "2026-09-25",
+  "source": {
+    "workbook": "Google Sheets live export",
+    "sheet": "左冰資料庫"
+  },
+  "items": [
+    {
+      "id": "left-ice-734c964b39a6",
+      "name": "幻影面紗",
+      "slotId": "left-ice",
+      "typeId": "left-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 250.0,
+        "magicalAttack": 250.0,
+        "critRatePct": 14.0,
+        "extremizationPct": 20.0,
+        "polarizationPct": 10.0,
+        "strongerPct": 10.0,
+        "heatPct": 10.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "左冰資料庫",
+        "range": "A2:S2"
+      }
+    },
+    {
+      "id": "left-ice-70e8bd7bfbb8",
+      "name": "真理假面",
+      "slotId": "left-ice",
+      "typeId": "left-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 250.0,
+        "magicalAttack": 250.0,
+        "critRatePct": 20.0,
+        "extremizationPct": 8.0,
+        "polarizationPct": 5.0,
+        "bleedDamagePct": 5.0,
+        "fullHealthKillDamagePct": 10.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "左冰資料庫",
+        "range": "A3:S3"
+      }
+    },
+    {
+      "id": "left-ice-470c33d294a5",
+      "name": "紫霄花郎",
+      "slotId": "left-ice",
+      "typeId": "left-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 250.0,
+        "magicalAttack": 250.0,
+        "critRatePct": 17.0,
+        "extremizationPct": 13.0,
+        "polarizationPct": 2.0,
+        "bleedDamagePct": 3.0,
+        "strongerPct": 10.0,
+        "heatPct": 10.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "左冰資料庫",
+        "range": "A4:S4"
+      }
+    },
+    {
+      "id": "left-ice-428091305670",
+      "name": "星辰牧者",
+      "slotId": "left-ice",
+      "typeId": "left-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 250.0,
+        "magicalAttack": 250.0,
+        "critRatePct": 10.0,
+        "extremizationPct": 20.0,
+        "polarizationPct": 2.0,
+        "bleedDamagePct": 3.0,
+        "fullHealthKillDamagePct": 10.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "左冰資料庫",
+        "range": "A5:S5"
+      }
+    },
+    {
+      "id": "left-ice-30f5e8befebf",
+      "name": "日冕．灼耀花仙",
+      "slotId": "left-ice",
+      "typeId": "left-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 250.0,
+        "magicalAttack": 250.0,
+        "critRatePct": 17.0,
+        "extremizationPct": 13.0,
+        "bleedDamagePct": 10.0,
+        "strongerPct": 5.0,
+        "heatPct": 5.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "左冰資料庫",
+        "range": "A6:S6"
+      }
+    },
+    {
+      "id": "left-ice-ccf7fa891692",
+      "name": "幽潮吞源",
+      "slotId": "left-ice",
+      "typeId": "left-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 250.0,
+        "magicalAttack": 250.0,
+        "critRatePct": 20.0,
+        "extremizationPct": 10.0,
+        "polarizationPct": 9.0,
+        "fullHealthKillDamagePct": 6.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "左冰資料庫",
+        "range": "A7:S7"
+      }
+    },
+    {
+      "id": "left-ice-20c88b3b11d9",
+      "name": "猛虎奇談",
+      "slotId": "left-ice",
+      "typeId": "left-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 250.0,
+        "magicalAttack": 250.0,
+        "critRatePct": 12.0,
+        "extremizationPct": 8.0,
+        "critDamagePct": 8.0,
+        "bleedDamagePct": 5.0,
+        "fullHealthKillDamagePct": 4.0,
+        "adaptabilityPct": 5.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "左冰資料庫",
+        "range": "A8:S8"
+      }
+    },
+    {
+      "id": "left-ice-c67eb4b17855",
+      "name": "厄瑞玻斯的哀歌",
+      "slotId": "left-ice",
+      "typeId": "left-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 250.0,
+        "magicalAttack": 250.0,
+        "critRatePct": 17.0,
+        "extremizationPct": 13.0,
+        "polarizationPct": 5.0,
+        "bleedDamagePct": 5.0,
+        "adaptabilityPct": 5.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "左冰資料庫",
+        "range": "A9:S9"
+      }
+    },
+    {
+      "id": "left-ice-a66b917b6af3",
+      "name": "薇塔芳塔娜",
+      "slotId": "left-ice",
+      "typeId": "left-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 250.0,
+        "magicalAttack": 250.0,
+        "critRatePct": 10.0,
+        "extremizationPct": 20.0,
+        "bleedDamagePct": 8.0,
+        "fullHealthKillDamagePct": 6.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "左冰資料庫",
+        "range": "A10:S10"
+      }
+    }
+  ]
+}

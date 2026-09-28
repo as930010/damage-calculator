@@ -1,0 +1,284 @@
+{
+  "schemaVersion": 1,
+  "dataUpdatedAt": "2026-09-25",
+  "sourceSheet": "係數區",
+  "notes": [
+    "芯片屬性與調校數值依使用者確認的 P/Q/R/S 欄對照。",
+    "除超越技傷%、Boss傷害%取芯片調校屬性B（S欄）外，其餘取芯片調校屬性A（R欄）。"
+  ],
+  "chips": [
+    {
+      "id": "chip-bleedDamagePct",
+      "name": "流血%",
+      "attributeKey": "bleedDamagePct",
+      "unit": "percent",
+      "tuningLevels": [
+        {
+          "level": "+5",
+          "value": 3.5
+        },
+        {
+          "level": "+6",
+          "value": 4.0
+        },
+        {
+          "level": "+7",
+          "value": 5.0
+        },
+        {
+          "level": "+8",
+          "value": 6.0
+        },
+        {
+          "level": "+9",
+          "value": 7.5
+        },
+        {
+          "level": "+10",
+          "value": 10.0
+        }
+      ],
+      "valueSourceColumn": "R",
+      "source": {
+        "sheet": "係數區",
+        "optionCell": "P2",
+        "levelRange": "Q2:Q7",
+        "valueRange": "R2:R7"
+      }
+    },
+    {
+      "id": "chip-polarizationPct",
+      "name": "兩極化%",
+      "attributeKey": "polarizationPct",
+      "unit": "percent",
+      "tuningLevels": [
+        {
+          "level": "+5",
+          "value": 3.5
+        },
+        {
+          "level": "+6",
+          "value": 4.0
+        },
+        {
+          "level": "+7",
+          "value": 5.0
+        },
+        {
+          "level": "+8",
+          "value": 6.0
+        },
+        {
+          "level": "+9",
+          "value": 7.5
+        },
+        {
+          "level": "+10",
+          "value": 10.0
+        }
+      ],
+      "valueSourceColumn": "R",
+      "source": {
+        "sheet": "係數區",
+        "optionCell": "P3",
+        "levelRange": "Q2:Q7",
+        "valueRange": "R2:R7"
+      }
+    },
+    {
+      "id": "chip-strongerPct",
+      "name": "強者%",
+      "attributeKey": "strongerPct",
+      "unit": "percent",
+      "tuningLevels": [
+        {
+          "level": "+5",
+          "value": 3.5
+        },
+        {
+          "level": "+6",
+          "value": 4.0
+        },
+        {
+          "level": "+7",
+          "value": 5.0
+        },
+        {
+          "level": "+8",
+          "value": 6.0
+        },
+        {
+          "level": "+9",
+          "value": 7.5
+        },
+        {
+          "level": "+10",
+          "value": 10.0
+        }
+      ],
+      "valueSourceColumn": "R",
+      "source": {
+        "sheet": "係數區",
+        "optionCell": "P4",
+        "levelRange": "Q2:Q7",
+        "valueRange": "R2:R7"
+      }
+    },
+    {
+      "id": "chip-heatPct",
+      "name": "排熱%",
+      "attributeKey": "heatPct",
+      "unit": "percent",
+      "tuningLevels": [
+        {
+          "level": "+5",
+          "value": 3.5
+        },
+        {
+          "level": "+6",
+          "value": 4.0
+        },
+        {
+          "level": "+7",
+          "value": 5.0
+        },
+        {
+          "level": "+8",
+          "value": 6.0
+        },
+        {
+          "level": "+9",
+          "value": 7.5
+        },
+        {
+          "level": "+10",
+          "value": 10.0
+        }
+      ],
+      "valueSourceColumn": "R",
+      "source": {
+        "sheet": "係數區",
+        "optionCell": "P5",
+        "levelRange": "Q2:Q7",
+        "valueRange": "R2:R7"
+      }
+    },
+    {
+      "id": "chip-doubleAttackPct",
+      "name": "雙攻%",
+      "attributeKey": "doubleAttackPct",
+      "unit": "percent",
+      "tuningLevels": [
+        {
+          "level": "+5",
+          "value": 3.5
+        },
+        {
+          "level": "+6",
+          "value": 4.0
+        },
+        {
+          "level": "+7",
+          "value": 5.0
+        },
+        {
+          "level": "+8",
+          "value": 6.0
+        },
+        {
+          "level": "+9",
+          "value": 7.5
+        },
+        {
+          "level": "+10",
+          "value": 10.0
+        }
+      ],
+      "valueSourceColumn": "R",
+      "source": {
+        "sheet": "係數區",
+        "optionCell": "P6",
+        "levelRange": "Q2:Q7",
+        "valueRange": "R2:R7"
+      }
+    },
+    {
+      "id": "chip-transcendenceSkillDamagePct",
+      "name": "超越技傷%",
+      "attributeKey": "transcendenceSkillDamagePct",
+      "unit": "percent",
+      "tuningLevels": [
+        {
+          "level": "+5",
+          "value": 5.0
+        },
+        {
+          "level": "+6",
+          "value": 6.0
+        },
+        {
+          "level": "+7",
+          "value": 7.5
+        },
+        {
+          "level": "+8",
+          "value": 9.0
+        },
+        {
+          "level": "+9",
+          "value": 11.0
+        },
+        {
+          "level": "+10",
+          "value": 14.0
+        }
+      ],
+      "valueSourceColumn": "S",
+      "source": {
+        "sheet": "係數區",
+        "optionCell": "P7",
+        "levelRange": "Q2:Q7",
+        "valueRange": "S2:S7"
+      }
+    },
+    {
+      "id": "chip-bossDamagePct",
+      "name": "Boss傷害%",
+      "attributeKey": "bossDamagePct",
+      "unit": "percent",
+      "tuningLevels": [
+        {
+          "level": "+5",
+          "value": 5.0
+        },
+        {
+          "level": "+6",
+          "value": 6.0
+        },
+        {
+          "level": "+7",
+          "value": 7.5
+        },
+        {
+          "level": "+8",
+          "value": 9.0
+        },
+        {
+          "level": "+9",
+          "value": 11.0
+        },
+        {
+          "level": "+10",
+          "value": 14.0
+        }
+      ],
+      "valueSourceColumn": "S",
+      "source": {
+        "sheet": "係數區",
+        "optionCell": "P8",
+        "levelRange": "Q2:Q7",
+        "valueRange": "S2:S7"
+      }
+    }
+  ]
+}

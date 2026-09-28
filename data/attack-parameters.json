@@ -1,0 +1,254 @@
+{
+  "schemaVersion": 1,
+  "source": "Google Sheets: 係數區!A1:C62 and 係數區!G1:H7",
+  "classes": {
+    "KE": {
+      "physical": 580,
+      "magical": 400
+    },
+    "RM": {
+      "physical": 400,
+      "magical": 590
+    },
+    "IM": {
+      "physical": 590,
+      "magical": 400
+    },
+    "GE": {
+      "physical": 400,
+      "magical": 590
+    },
+    "AS": {
+      "physical": 400,
+      "magical": 580
+    },
+    "OZ": {
+      "physical": 400,
+      "magical": 590
+    },
+    "MM": {
+      "physical": 590,
+      "magical": 400
+    },
+    "LA": {
+      "physical": 580,
+      "magical": 400
+    },
+    "AN": {
+      "physical": 590,
+      "magical": 400
+    },
+    "DaB": {
+      "physical": 400,
+      "magical": 580
+    },
+    "TW": {
+      "physical": 590,
+      "magical": 400
+    },
+    "PR": {
+      "physical": 400,
+      "magical": 580
+    },
+    "FB": {
+      "physical": 590,
+      "magical": 400
+    },
+    "RH": {
+      "physical": 400,
+      "magical": 580
+    },
+    "NI": {
+      "physical": 400,
+      "magical": 590
+    },
+    "RE": {
+      "physical": 580,
+      "magical": 400
+    },
+    "CU": {
+      "physical": 400,
+      "magical": 590
+    },
+    "CE": {
+      "physical": 590,
+      "magical": 400
+    },
+    "CS": {
+      "physical": 400,
+      "magical": 590
+    },
+    "CA": {
+      "physical": 590,
+      "magical": 400
+    },
+    "CC": {
+      "physical": 580,
+      "magical": 400
+    },
+    "FP": {
+      "physical": 400,
+      "magical": 580
+    },
+    "CeT": {
+      "physical": 400,
+      "magical": 580
+    },
+    "DiA": {
+      "physical": 580,
+      "magical": 400
+    },
+    "VI": {
+      "physical": 580,
+      "magical": 400
+    },
+    "BR": {
+      "physical": 400,
+      "magical": 590
+    },
+    "SH": {
+      "physical": 590,
+      "magical": 400
+    },
+    "SU": {
+      "physical": 400,
+      "magical": 580
+    },
+    "ES": {
+      "physical": 580,
+      "magical": 400
+    },
+    "FL": {
+      "physical": 400,
+      "magical": 590
+    },
+    "BQ": {
+      "physical": 590,
+      "magical": 400
+    },
+    "AD": {
+      "physical": 400,
+      "magical": 590
+    },
+    "DB": {
+      "physical": 400,
+      "magical": 590
+    },
+    "DN": {
+      "physical": 590,
+      "magical": 400
+    },
+    "MP": {
+      "physical": 400,
+      "magical": 590
+    },
+    "OM": {
+      "physical": 580,
+      "magical": 400
+    },
+    "CT": {
+      "physical": 580,
+      "magical": 400
+    },
+    "IN": {
+      "physical": 400,
+      "magical": 580
+    },
+    "DA": {
+      "physical": 590,
+      "magical": 400
+    },
+    "DE": {
+      "physical": 400,
+      "magical": 580
+    },
+    "TB": {
+      "physical": 580,
+      "magical": 400
+    },
+    "BMa": {
+      "physical": 580,
+      "magical": 400
+    },
+    "MN": {
+      "physical": 400,
+      "magical": 580
+    },
+    "PO": {
+      "physical": 400,
+      "magical": 580
+    },
+    "RI": {
+      "physical": 590,
+      "magical": 400
+    },
+    "BL": {
+      "physical": 400,
+      "magical": 580
+    },
+    "HE": {
+      "physical": 400,
+      "magical": 590
+    },
+    "BI": {
+      "physical": 580,
+      "magical": 400
+    },
+    "EW": {
+      "physical": 590,
+      "magical": 400
+    },
+    "RS": {
+      "physical": 400,
+      "magical": 580
+    },
+    "NL": {
+      "physical": 590,
+      "magical": 400
+    },
+    "TP": {
+      "physical": 400,
+      "magical": 590
+    },
+    "LI": {
+      "physical": 590,
+      "magical": 400
+    },
+    "CEL": {
+      "physical": 400,
+      "magical": 590
+    },
+    "NP": {
+      "physical": 580,
+      "magical": 400
+    },
+    "MO": {
+      "physical": 400,
+      "magical": 590
+    },
+    "GB": {
+      "physical": 590,
+      "magical": 400
+    },
+    "AV": {
+      "physical": 580,
+      "magical": 400
+    },
+    "AC": {
+      "physical": 400,
+      "magical": 590
+    },
+    "MI": {
+      "physical": 400,
+      "magical": 590
+    }
+  },
+  "weaponEnhancementFactors": {
+    "8": 1.6,
+    "9": 1.75,
+    "10": 2.15,
+    "11": 2.55,
+    "12": 2.95,
+    "13": 3.35
+  }
+}

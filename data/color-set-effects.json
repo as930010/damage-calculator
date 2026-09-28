@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "dataUpdatedAt": "2026-09-25",
+  "selectorCell": "G2",
+  "source": "裝備模擬區!G2 -> 計算機!S37; 綠色另外引用 計算機!K46，對應裝備模擬區!J31:J32 的內裝手電路。",
+  "options": [
+    {
+      "name": "紅",
+      "stats": {
+        "multiplicativeDamagePct": 20
+      },
+      "sourceFormula": "計算機!S37 = 20"
+    },
+    {
+      "name": "藍",
+      "stats": {
+        "multiplicativeDamagePct": 8
+      },
+      "sourceFormula": "計算機!S37 = 8"
+    },
+    {
+      "name": "綠",
+      "calculatedStat": {
+        "outputKey": "multiplicativeDamagePct",
+        "sourceAttributeCell": "J31",
+        "sourceValueCell": "J32",
+        "requiredAttribute": "超越技傷%",
+        "baseMultiplier": 1.1,
+        "inputMultiplier": 0.8,
+        "inputValueToPoints": 100
+      },
+      "sourceFormula": "計算機!S37=((1.1*(1+(K46%*0.8)))-1)*100；計算機!K46=IF(J31=\"超越技傷%\",J32*100,)"
+    }
+  ]
+}

@@ -1,0 +1,1044 @@
+{
+  "schemaVersion": 1,
+  "source": "user-provided class passive table",
+  "classCodeAliases": {
+    "OS": "OZ"
+  },
+  "methods": {
+    "diminishing": "遞減+",
+    "nonDiminishing": "非遞減+",
+    "multiplicative": "乘算x"
+  },
+  "classes": {
+    "KE": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "multiplicative",
+          "valuePct": 20
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "multiplicative",
+          "valuePct": 20
+        }
+      ]
+    },
+    "RM": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "multiplicative",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ]
+    },
+    "IM": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "diminishing",
+          "valuePct": 23
+        },
+        {
+          "id": "crit-2",
+          "method": "nonDiminishing",
+          "valuePct": 20
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "diminishing",
+          "valuePct": 23
+        }
+      ]
+    },
+    "GE": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ]
+    },
+    "AS": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ]
+    },
+    "OZ": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ]
+    },
+    "MM": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ]
+    },
+    "LA": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ]
+    },
+    "AN": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "diminishing",
+          "valuePct": 20
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "diminishing",
+          "valuePct": 20
+        }
+      ]
+    },
+    "DaB": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ]
+    },
+    "TW": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ]
+    },
+    "PR": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ]
+    },
+    "FB": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ]
+    },
+    "RH": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "multiplicative",
+          "valuePct": 20
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "multiplicative",
+          "valuePct": 20
+        }
+      ]
+    },
+    "NI": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "multiplicative",
+          "valuePct": 20
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "multiplicative",
+          "valuePct": 20
+        }
+      ]
+    },
+    "RE": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ]
+    },
+    "CU": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "diminishing",
+          "valuePct": 20
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "multiplicative",
+          "valuePct": 23
+        }
+      ]
+    },
+    "CE": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "multiplicative",
+          "valuePct": 23
+        }
+      ]
+    },
+    "CS": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "diminishing",
+          "valuePct": 20
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "multiplicative",
+          "valuePct": 23
+        }
+      ]
+    },
+    "CA": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "multiplicative",
+          "valuePct": 23
+        }
+      ]
+    },
+    "CC": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ]
+    },
+    "FP": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "diminishing",
+          "valuePct": 10
+        },
+        {
+          "id": "crit-2",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ]
+    },
+    "CeT": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ]
+    },
+    "DiA": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ]
+    },
+    "VI": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "multiplicative",
+          "valuePct": 23
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "multiplicative",
+          "valuePct": 23
+        }
+      ]
+    },
+    "BR": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "multiplicative",
+          "valuePct": 23
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "multiplicative",
+          "valuePct": 23
+        }
+      ]
+    },
+    "SH": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "multiplicative",
+          "valuePct": 23
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "multiplicative",
+          "valuePct": 23
+        }
+      ]
+    },
+    "SU": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "multiplicative",
+          "valuePct": 23
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "multiplicative",
+          "valuePct": 23
+        }
+      ]
+    },
+    "ES": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "diminishing",
+          "valuePct": 10
+        },
+        {
+          "id": "crit-2",
+          "method": "multiplicative",
+          "valuePct": 15
+        },
+        {
+          "id": "crit-3",
+          "method": "multiplicative",
+          "valuePct": 3
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "diminishing",
+          "valuePct": 10
+        },
+        {
+          "id": "ext-2",
+          "method": "multiplicative",
+          "valuePct": 15
+        },
+        {
+          "id": "ext-3",
+          "method": "multiplicative",
+          "valuePct": 3
+        }
+      ]
+    },
+    "FL": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "nonDiminishing",
+          "valuePct": 20
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "nonDiminishing",
+          "valuePct": 12
+        }
+      ]
+    },
+    "BQ": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "nonDiminishing",
+          "valuePct": 18
+        },
+        {
+          "id": "crit-2",
+          "method": "multiplicative",
+          "valuePct": 5
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "nonDiminishing",
+          "valuePct": 20
+        },
+        {
+          "id": "ext-2",
+          "method": "multiplicative",
+          "valuePct": 5
+        }
+      ]
+    },
+    "AD": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ]
+    },
+    "DB": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "multiplicative",
+          "valuePct": 20
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "multiplicative",
+          "valuePct": 20
+        }
+      ]
+    },
+    "DN": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "multiplicative",
+          "valuePct": 21
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ]
+    },
+    "MP": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ]
+    },
+    "OM": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "multiplicative",
+          "valuePct": 20
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "multiplicative",
+          "valuePct": 20
+        }
+      ]
+    },
+    "CT": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "diminishing",
+          "valuePct": 23
+        },
+        {
+          "id": "crit-2",
+          "method": "diminishing",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "diminishing",
+          "valuePct": 15
+        }
+      ]
+    },
+    "IN": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "diminishing",
+          "valuePct": 23
+        },
+        {
+          "id": "crit-2",
+          "method": "diminishing",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "diminishing",
+          "valuePct": 15
+        }
+      ]
+    },
+    "DA": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "diminishing",
+          "valuePct": 23
+        },
+        {
+          "id": "crit-2",
+          "method": "diminishing",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ]
+    },
+    "DE": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "diminishing",
+          "valuePct": 23
+        },
+        {
+          "id": "crit-2",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ]
+    },
+    "TB": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "diminishing",
+          "valuePct": 21
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "diminishing",
+          "valuePct": 21
+        }
+      ]
+    },
+    "BMa": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "multiplicative",
+          "valuePct": 24
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "multiplicative",
+          "valuePct": 24
+        }
+      ]
+    },
+    "MN": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ]
+    },
+    "PO": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ]
+    },
+    "RI": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "multiplicative",
+          "valuePct": 23
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "multiplicative",
+          "valuePct": 23
+        }
+      ]
+    },
+    "BL": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "multiplicative",
+          "valuePct": 23
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "multiplicative",
+          "valuePct": 23
+        }
+      ]
+    },
+    "HE": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "multiplicative",
+          "valuePct": 23
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "multiplicative",
+          "valuePct": 23
+        }
+      ]
+    },
+    "BI": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "multiplicative",
+          "valuePct": 23
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "multiplicative",
+          "valuePct": 23
+        }
+      ]
+    },
+    "EW": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ]
+    },
+    "RS": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "diminishing",
+          "valuePct": 20
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "diminishing",
+          "valuePct": 20
+        }
+      ]
+    },
+    "NL": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ]
+    },
+    "TP": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ]
+    },
+    "LI": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "diminishing",
+          "valuePct": 20
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "diminishing",
+          "valuePct": 20
+        }
+      ]
+    },
+    "CEL": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "multiplicative",
+          "valuePct": 20
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "multiplicative",
+          "valuePct": 20
+        }
+      ]
+    },
+    "NP": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ]
+    },
+    "MO": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ]
+    },
+    "GB": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ]
+    },
+    "AV": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "diminishing",
+          "valuePct": 5
+        },
+        {
+          "id": "crit-2",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        },
+        {
+          "id": "ext-2",
+          "method": "diminishing",
+          "valuePct": 5
+        }
+      ]
+    },
+    "AC": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ]
+    },
+    "MI": {
+      "critRate": [
+        {
+          "id": "crit-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ],
+      "extremization": [
+        {
+          "id": "ext-1",
+          "method": "nonDiminishing",
+          "valuePct": 15
+        }
+      ]
+    }
+  }
+}

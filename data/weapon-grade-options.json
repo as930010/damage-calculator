@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "dataUpdatedAt": "2026-09-25",
+  "source": "裝備模擬區!B37 -> 計算機!E53、U53; 係數區!V2:V3",
+  "selectorCell": "B37",
+  "options": [
+    {
+      "id": "weapon-grade-brilliant",
+      "name": "燦爛",
+      "stats": {
+        "doubleAttackPct": 22.5,
+        "attackLevel": 13.5
+      },
+      "source": "E53=雙攻% +22.5; U53=攻擊力等級 +13.5"
+    },
+    {
+      "id": "weapon-grade-abyss",
+      "name": "深淵",
+      "stats": {
+        "doubleAttackPct": 31.5,
+        "attackLevel": 18
+      },
+      "source": "E53=雙攻% +31.5; U53=攻擊力等級 +18"
+    }
+  ]
+}

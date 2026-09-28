@@ -1,0 +1,1431 @@
+{
+  "schemaVersion": 1,
+  "dataUpdatedAt": "2026-09-25",
+  "source": {
+    "workbook": "Google Sheets live export",
+    "sheet": "右冰資料庫"
+  },
+  "items": [
+    {
+      "id": "right-ice-31f837c78c3e",
+      "name": "騎士團",
+      "slotId": "weapon",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 150.0,
+        "magicalAttack": 150.0,
+        "allSkillDamagePct": 4.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A2:T2"
+      }
+    },
+    {
+      "id": "right-ice-8b30ee371504",
+      "name": "幻影面紗",
+      "slotId": "weapon",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 200.0,
+        "magicalAttack": 200.0,
+        "strongerPct": 5.0,
+        "heatPct": 5.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A3:T3"
+      }
+    },
+    {
+      "id": "right-ice-212411181d4b",
+      "name": "真理假面",
+      "slotId": "weapon",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 200.0,
+        "magicalAttack": 200.0,
+        "strongerPct": 5.0,
+        "heatPct": 5.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A4:T4"
+      }
+    },
+    {
+      "id": "right-ice-6e9290e986d6",
+      "name": "紫霄花郎",
+      "slotId": "weapon",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 200.0,
+        "magicalAttack": 200.0,
+        "fullHealthKillDamagePct": 5.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A5:T5"
+      }
+    },
+    {
+      "id": "right-ice-2429b45ddf91",
+      "name": "星辰牧者",
+      "slotId": "weapon",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 200.0,
+        "magicalAttack": 200.0,
+        "fullHealthKillDamagePct": 5.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A6:T6"
+      }
+    },
+    {
+      "id": "right-ice-e55ee3207cea",
+      "name": "日冕．灼耀花仙",
+      "slotId": "weapon",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 200.0,
+        "magicalAttack": 200.0,
+        "fullHealthKillDamagePct": 5.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A7:T7"
+      }
+    },
+    {
+      "id": "right-ice-02a81e40927d",
+      "name": "幽潮吞源",
+      "slotId": "weapon",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 200.0,
+        "magicalAttack": 200.0,
+        "fullHealthKillDamagePct": 5.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A8:T8"
+      }
+    },
+    {
+      "id": "right-ice-41a6da7a5f9d",
+      "name": "猛虎奇談",
+      "slotId": "weapon",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 200.0,
+        "magicalAttack": 200.0,
+        "fullHealthKillDamagePct": 5.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A9:T9"
+      }
+    },
+    {
+      "id": "right-ice-f5d8da0ce0c6",
+      "name": "厄瑞玻斯的哀歌",
+      "slotId": "weapon",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 200.0,
+        "magicalAttack": 200.0,
+        "critDamagePct": 2.0,
+        "bleedDamagePct": 5.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A10:T10"
+      }
+    },
+    {
+      "id": "right-ice-a288692bfe4a",
+      "name": "薇塔芳塔娜",
+      "slotId": "weapon",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 200.0,
+        "magicalAttack": 200.0,
+        "fullHealthKillDamagePct": 5.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A11:T11"
+      }
+    },
+    {
+      "id": "right-ice-a2a986093d78",
+      "name": "深淵的存在",
+      "slotId": "weapon",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 200.0,
+        "magicalAttack": 200.0,
+        "fullHealthKillDamagePct": 5.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A12:T12"
+      }
+    },
+    {
+      "id": "right-ice-72700e9dcdab",
+      "name": "飛龍乘雲",
+      "slotId": "weapon",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 200.0,
+        "magicalAttack": 200.0,
+        "fullHealthKillDamagePct": 5.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A13:T13"
+      }
+    },
+    {
+      "id": "right-ice-eaebc73db589",
+      "name": "騎士團",
+      "slotId": "weaponAccessory",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 25.0,
+        "magicalAttack": 25.0,
+        "extremizationPct": 2.0,
+        "adaptabilityPct": 2.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A14:T14"
+      }
+    },
+    {
+      "id": "right-ice-494667811336",
+      "name": "神埃",
+      "slotId": "weaponAccessory",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "critRatePct": 1.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A15:T15"
+      }
+    },
+    {
+      "id": "right-ice-c6066883e5fc",
+      "name": "真理假面",
+      "slotId": "weaponAccessory",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 50.0,
+        "magicalAttack": 50.0,
+        "bleedDamagePct": 3.0,
+        "adaptabilityPct": 2.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A16:T16"
+      }
+    },
+    {
+      "id": "right-ice-354dfaba9259",
+      "name": "日冕．灼耀花仙",
+      "slotId": "weaponAccessory",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
+        "critRatePct": 2.0,
+        "polarizationPct": 2.0,
+        "adaptabilityPct": 2.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A17:T17"
+      }
+    },
+    {
+      "id": "right-ice-b94c65720795",
+      "name": "騎士團",
+      "slotId": "faceTop",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 25.0,
+        "magicalAttack": 25.0,
+        "critRatePct": 3.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A18:T18"
+      }
+    },
+    {
+      "id": "right-ice-4906468faf57",
+      "name": "神埃",
+      "slotId": "faceTop",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 20.0,
+        "magicalAttack": 20.0,
+        "critRatePct": 1.5
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A19:T19"
+      }
+    },
+    {
+      "id": "right-ice-2aadb08e4674",
+      "name": "幻影面紗",
+      "slotId": "faceTop",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
+        "bleedDamagePct": 2.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A20:T20"
+      }
+    },
+    {
+      "id": "right-ice-322d214d7234",
+      "name": "星辰牧者",
+      "slotId": "faceTop",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
+        "allSkillDamagePct": 1.0,
+        "bleedDamagePct": 1.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A21:T21"
+      }
+    },
+    {
+      "id": "right-ice-af450dd14aaf",
+      "name": "厄瑞玻斯的哀歌",
+      "slotId": "faceTop",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
+        "extremizationPct": 2.0,
+        "polarizationPct": 1.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A22:T22"
+      }
+    },
+    {
+      "id": "right-ice-55a84ad16ec8",
+      "name": "深淵的存在",
+      "slotId": "faceTop",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
+        "extremizationPct": 2.0,
+        "polarizationPct": 1.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A23:T23"
+      }
+    },
+    {
+      "id": "right-ice-7df7ca526399",
+      "name": "飛龍乘雲",
+      "slotId": "faceTop",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A24:T24"
+      }
+    },
+    {
+      "id": "right-ice-43a1d059a6ab",
+      "name": "騎士團",
+      "slotId": "faceMiddle",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 25.0,
+        "magicalAttack": 25.0,
+        "critRatePct": 3.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A25:T25"
+      }
+    },
+    {
+      "id": "right-ice-77560b5664c3",
+      "name": "紫霄花郎",
+      "slotId": "faceMiddle",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
+        "fullHealthKillDamagePct": 2.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A26:T26"
+      }
+    },
+    {
+      "id": "right-ice-efd2d668c486",
+      "name": "幽潮吞源",
+      "slotId": "faceMiddle",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
+        "bleedDamagePct": 2.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A27:T27"
+      }
+    },
+    {
+      "id": "right-ice-c207f596d1d9",
+      "name": "猛虎奇談",
+      "slotId": "faceMiddle",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
+        "extremizationPct": 1.0,
+        "polarizationPct": 2.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A28:T28"
+      }
+    },
+    {
+      "id": "right-ice-ad4be631a942",
+      "name": "薇塔芳塔娜",
+      "slotId": "faceMiddle",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
+        "adaptabilityPct": 1.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A29:T29"
+      }
+    },
+    {
+      "id": "right-ice-603e3eb5dfe9",
+      "name": "飛龍乘雲",
+      "slotId": "faceMiddle",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
+        "allSkillDamagePct": 2.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A30:T30"
+      }
+    },
+    {
+      "id": "right-ice-30a72cbfed8c",
+      "name": "騎士團",
+      "slotId": "faceBottom",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 25.0,
+        "magicalAttack": 25.0,
+        "critRatePct": 3.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A31:T31"
+      }
+    },
+    {
+      "id": "right-ice-a42a0cffd6f4",
+      "name": "神埃",
+      "slotId": "faceBottom",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 35.0,
+        "magicalAttack": 35.0,
+        "critRatePct": 2.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A32:T32"
+      }
+    },
+    {
+      "id": "right-ice-a148d4beb802",
+      "name": "真理假面",
+      "slotId": "faceBottom",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
+        "polarizationPct": 2.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A33:T33"
+      }
+    },
+    {
+      "id": "right-ice-59ed1b451860",
+      "name": "日冕．灼耀花仙",
+      "slotId": "faceBottom",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
+        "bleedDamagePct": 2.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A34:T34"
+      }
+    },
+    {
+      "id": "right-ice-800aa3066323",
+      "name": "厄瑞玻斯的哀歌",
+      "slotId": "faceBottom",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
+        "polarizationPct": 1.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A35:T35"
+      }
+    },
+    {
+      "id": "right-ice-634d66c34ae3",
+      "name": "騎士團",
+      "slotId": "earring",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 25.0,
+        "magicalAttack": 25.0,
+        "critRatePct": 2.0,
+        "extremizationPct": 2.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A36:T36"
+      }
+    },
+    {
+      "id": "right-ice-356ccef5a543",
+      "name": "神埃",
+      "slotId": "earring",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 35.0,
+        "magicalAttack": 35.0,
+        "critRatePct": 2.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A37:T37"
+      }
+    },
+    {
+      "id": "right-ice-25c4646b686c",
+      "name": "真理假面",
+      "slotId": "earring",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
+        "polarizationPct": 1.0,
+        "bleedDamagePct": 2.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A38:T38"
+      }
+    },
+    {
+      "id": "right-ice-e56069acc642",
+      "name": "星辰牧者",
+      "slotId": "earring",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
+        "polarizationPct": 2.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A39:T39"
+      }
+    },
+    {
+      "id": "right-ice-c5cdd5fcee3d",
+      "name": "猛虎奇談",
+      "slotId": "earring",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
+        "allSkillDamagePct": 1.0,
+        "bleedDamagePct": 1.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A40:T40"
+      }
+    },
+    {
+      "id": "right-ice-8710328740f4",
+      "name": "深淵的存在",
+      "slotId": "earring",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
+        "critDamagePct": 1.0,
+        "polarizationPct": 1.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A41:T41"
+      }
+    },
+    {
+      "id": "right-ice-3d1a517ff1aa",
+      "name": "騎士團",
+      "slotId": "support",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 25.0,
+        "magicalAttack": 25.0,
+        "critRatePct": 2.0,
+        "extremizationPct": 2.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A42:T42"
+      }
+    },
+    {
+      "id": "right-ice-72a31f36ed70",
+      "name": "幻影面紗",
+      "slotId": "support",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
+        "polarizationPct": 2.0,
+        "adaptabilityPct": 2.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A43:T43"
+      }
+    },
+    {
+      "id": "right-ice-88d6408d870b",
+      "name": "日冕．灼耀花仙",
+      "slotId": "support",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
+        "polarizationPct": 2.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A44:T44"
+      }
+    },
+    {
+      "id": "right-ice-084193316ee7",
+      "name": "厄瑞玻斯的哀歌",
+      "slotId": "support",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
+        "extremizationPct": 1.0,
+        "bleedDamagePct": 2.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A45:T45"
+      }
+    },
+    {
+      "id": "right-ice-63ba64ad3119",
+      "name": "騎士團",
+      "slotId": "top",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 25.0,
+        "magicalAttack": 25.0,
+        "extremizationPct": 3.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A46:T46"
+      }
+    },
+    {
+      "id": "right-ice-6fcf6ba3ea3e",
+      "name": "神埃",
+      "slotId": "top",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 20.0,
+        "magicalAttack": 20.0,
+        "critRatePct": 1.5
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A47:T47"
+      }
+    },
+    {
+      "id": "right-ice-ce41f415cc50",
+      "name": "幻影面紗",
+      "slotId": "top",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
+        "adaptabilityPct": 2.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A48:T48"
+      }
+    },
+    {
+      "id": "right-ice-cd749d053a5c",
+      "name": "紫霄花郎",
+      "slotId": "top",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 50.0,
+        "magicalAttack": 50.0,
+        "bleedDamagePct": 2.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A49:T49"
+      }
+    },
+    {
+      "id": "right-ice-9b8b6c29f507",
+      "name": "日冕．灼耀花仙",
+      "slotId": "top",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 50.0,
+        "magicalAttack": 50.0,
+        "polarizationPct": 1.0,
+        "bleedDamagePct": 1.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A50:T50"
+      }
+    },
+    {
+      "id": "right-ice-9d68dcb2a666",
+      "name": "猛虎奇談",
+      "slotId": "top",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
+        "allSkillDamagePct": 1.0,
+        "bleedDamagePct": 1.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A51:T51"
+      }
+    },
+    {
+      "id": "right-ice-0d73beb8d41d",
+      "name": "薇塔芳塔娜",
+      "slotId": "top",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
+        "allSkillDamagePct": 1.0,
+        "adaptabilityPct": 1.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A52:T52"
+      }
+    },
+    {
+      "id": "right-ice-1cf1cb2ff544",
+      "name": "飛龍乘雲",
+      "slotId": "top",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
+        "critRatePct": 2.0,
+        "allSkillDamagePct": 2.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A53:T53"
+      }
+    },
+    {
+      "id": "right-ice-179b3506d0a2",
+      "name": "騎士團",
+      "slotId": "bottom",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 25.0,
+        "magicalAttack": 25.0,
+        "extremizationPct": 3.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A54:T54"
+      }
+    },
+    {
+      "id": "right-ice-82ef8b84cbc3",
+      "name": "神埃",
+      "slotId": "bottom",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
+        "critRatePct": 2.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A55:T55"
+      }
+    },
+    {
+      "id": "right-ice-4a7308dc37dd",
+      "name": "真理假面",
+      "slotId": "bottom",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
+        "polarizationPct": 1.0,
+        "adaptabilityPct": 1.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A56:T56"
+      }
+    },
+    {
+      "id": "right-ice-607805724c45",
+      "name": "星辰牧者",
+      "slotId": "bottom",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 50.0,
+        "magicalAttack": 50.0,
+        "polarizationPct": 1.0,
+        "bleedDamagePct": 1.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A57:T57"
+      }
+    },
+    {
+      "id": "right-ice-eef8eee48601",
+      "name": "幽潮吞源",
+      "slotId": "bottom",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
+        "allSkillDamagePct": 1.0,
+        "bleedDamagePct": 1.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A58:T58"
+      }
+    },
+    {
+      "id": "right-ice-e54091011ff5",
+      "name": "厄瑞玻斯的哀歌",
+      "slotId": "bottom",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
+        "polarizationPct": 1.0,
+        "allSkillDamagePct": 1.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A59:T59"
+      }
+    },
+    {
+      "id": "right-ice-0bc1d5ef2971",
+      "name": "薇塔芳塔娜",
+      "slotId": "bottom",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
+        "critDamagePct": 1.0,
+        "adaptabilityPct": 1.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A60:T60"
+      }
+    },
+    {
+      "id": "right-ice-e460d7818ae1",
+      "name": "騎士團",
+      "slotId": "arm",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 25.0,
+        "magicalAttack": 25.0,
+        "extremizationPct": 3.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A61:T61"
+      }
+    },
+    {
+      "id": "right-ice-b9729ef76858",
+      "name": "神埃",
+      "slotId": "arm",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 20.0,
+        "magicalAttack": 20.0,
+        "critRatePct": 2.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A62:T62"
+      }
+    },
+    {
+      "id": "right-ice-67c0ec54a812",
+      "name": "紫霄花郎",
+      "slotId": "arm",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
+        "polarizationPct": 1.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A63:T63"
+      }
+    },
+    {
+      "id": "right-ice-3438aa894001",
+      "name": "幽潮吞源",
+      "slotId": "arm",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
+        "allSkillDamagePct": 1.0,
+        "bleedDamagePct": 1.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A64:T64"
+      }
+    },
+    {
+      "id": "right-ice-b851f39f6995",
+      "name": "深淵的存在",
+      "slotId": "arm",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
+        "polarizationPct": 1.0,
+        "allSkillDamagePct": 1.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A65:T65"
+      }
+    },
+    {
+      "id": "right-ice-5cc25a99ed68",
+      "name": "騎士團",
+      "slotId": "necklace",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 25.0,
+        "magicalAttack": 25.0,
+        "adaptabilityPct": 2.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A66:T66"
+      }
+    },
+    {
+      "id": "right-ice-d9fa6ed29818",
+      "name": "紫霄花郎",
+      "slotId": "necklace",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
+        "doubleAttackPct": 2.0,
+        "adaptabilityPct": 2.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A67:T67"
+      }
+    },
+    {
+      "id": "right-ice-c3dc537fe977",
+      "name": "幽潮吞源",
+      "slotId": "necklace",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 50.0,
+        "magicalAttack": 50.0,
+        "bleedDamagePct": 2.0,
+        "adaptabilityPct": 2.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A68:T68"
+      }
+    },
+    {
+      "id": "right-ice-33320153a23a",
+      "name": "薇塔芳塔娜",
+      "slotId": "necklace",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 50.0,
+        "magicalAttack": 50.0,
+        "polarizationPct": 2.0,
+        "adaptabilityPct": 2.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A69:T69"
+      }
+    },
+    {
+      "id": "right-ice-8bfd0b19b4ad",
+      "name": "騎士團",
+      "slotId": "ring",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 25.0,
+        "magicalAttack": 25.0,
+        "critRatePct": 2.0,
+        "allSkillDamagePct": 2.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A70:T70"
+      }
+    },
+    {
+      "id": "right-ice-0d08974ee88c",
+      "name": "幻影面紗",
+      "slotId": "ring",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 50.0,
+        "magicalAttack": 50.0,
+        "transcendenceSkillDamagePct": 3.0,
+        "fullHealthKillDamagePct": 3.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A71:T71"
+      }
+    },
+    {
+      "id": "right-ice-42770cc1e51e",
+      "name": "星辰牧者",
+      "slotId": "ring",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 50.0,
+        "magicalAttack": 50.0,
+        "polarizationPct": 2.0,
+        "bleedDamagePct": 3.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A72:T72"
+      }
+    },
+    {
+      "id": "right-ice-ba962007ec06",
+      "name": "猛虎奇談",
+      "slotId": "ring",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 50.0,
+        "magicalAttack": 50.0,
+        "doubleAttackPct": 3.0,
+        "polarizationPct": 2.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A73:T73"
+      }
+    },
+    {
+      "id": "right-ice-8df834a3c6f3",
+      "name": "深淵的存在",
+      "slotId": "ring",
+      "typeId": "right-ice",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-25",
+      "stats": {
+        "physicalAttack": 50.0,
+        "magicalAttack": 50.0,
+        "doubleAttackPct": 3.0,
+        "bleedDamagePct": 2.0
+      },
+      "effects": [],
+      "source": {
+        "sheet": "右冰資料庫",
+        "range": "A74:T74"
+      }
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "dataUpdatedAt": "2026-09-25",
+  "statKeyBySheetName": {
+    "物攻": "physicalAttack",
+    "魔攻": "magicalAttack",
+    "雙攻%": "doubleAttackPct",
+    "致命一擊%": "critRatePct",
+    "極大化%": "extremizationPct",
+    "致命傷害%": "critDamagePct",
+    "Boss傷害%": "bossDamagePct",
+    "兩極化%": "polarizationPct",
+    "超越技傷%": "transcendenceSkillDamagePct",
+    "所有技能傷害%": "allSkillDamagePct",
+    "流血%": "bleedDamagePct",
+    "強者%": "strongerPct",
+    "排熱%": "heatPct",
+    "100%血殺%": "fullHealthKillDamagePct",
+    "適應力%": "adaptabilityPct",
+    "無視防禦%": "defenseIgnorePct"
+  },
+  "inputs": [
+    {
+      "slot": "upper",
+      "attributeCell": "裝備模擬區!J4",
+      "valueCell": "裝備模擬區!J5",
+      "calculationRow": "計算機!43",
+      "wearSet": "shared"
+    },
+    {
+      "slot": "lowerwear",
+      "attributeCell": "裝備模擬區!J13",
+      "valueCell": "裝備模擬區!J14",
+      "calculationRow": "計算機!44",
+      "wearSet": "lowerwearA"
+    },
+    {
+      "slot": "lowerwearAlternative",
+      "attributeCell": "裝備模擬區!J22",
+      "valueCell": "裝備模擬區!J23",
+      "calculationRow": "計算機!45",
+      "wearSet": "lowerwearB"
+    },
+    {
+      "slot": "gloves",
+      "attributeCell": "裝備模擬區!J31",
+      "valueCell": "裝備模擬區!J32",
+      "calculationRow": "計算機!46",
+      "wearSet": "shared"
+    },
+    {
+      "slot": "shoes",
+      "attributeCell": "裝備模擬區!J40",
+      "valueCell": "裝備模擬區!J41",
+      "calculationRow": "計算機!47",
+      "wearSet": "shared"
+    }
+  ],
+  "formulaRule": "各欄依輸入項目是否等於計算機第 2 列欄名，符合時將電路%數乘 100 寫入該屬性；其他欄空白。",
+  "notes": [
+    "下衣與強/排褲的電路數值各屬一套下衣配置，交由裝備彙總分別放入 lowerwearA/lowerwearB，不可同時當作穿戴值。",
+    "無關傷害不對應計算機 C:R 標題，因此不產生屬性輸出。"
+  ]
+}

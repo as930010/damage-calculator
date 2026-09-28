@@ -1,0 +1,365 @@
+{
+  "schemaVersion": 1,
+  "dataUpdatedAt": "2026-09-25",
+  "sourceSheet": "係數區",
+  "groups": {
+    "primary": {
+      "selectorCell": "裝備模擬區!B34",
+      "effectOutputCells": [
+        "計算機!F58",
+        "計算機!G58",
+        "計算機!U58"
+      ],
+      "options": [
+        {
+          "id": "weapon-appraisal-a-2",
+          "name": "攻擊力等級+4",
+          "stats": {
+            "attackLevel": 4.0
+          },
+          "source": {
+            "sheet": "係數區",
+            "cell": "T2"
+          }
+        },
+        {
+          "id": "weapon-appraisal-a-3",
+          "name": "攻擊力等級+3.5",
+          "stats": {
+            "attackLevel": 3.5
+          },
+          "source": {
+            "sheet": "係數區",
+            "cell": "T3"
+          }
+        },
+        {
+          "id": "weapon-appraisal-a-4",
+          "name": "攻擊力等級+3",
+          "stats": {
+            "attackLevel": 3.0
+          },
+          "source": {
+            "sheet": "係數區",
+            "cell": "T4"
+          }
+        },
+        {
+          "id": "weapon-appraisal-a-5",
+          "name": "致命一擊+8%",
+          "stats": {
+            "critRatePct": 8.0
+          },
+          "source": {
+            "sheet": "係數區",
+            "cell": "T5"
+          }
+        },
+        {
+          "id": "weapon-appraisal-a-6",
+          "name": "致命一擊+7%",
+          "stats": {
+            "critRatePct": 7.0
+          },
+          "source": {
+            "sheet": "係數區",
+            "cell": "T6"
+          }
+        },
+        {
+          "id": "weapon-appraisal-a-7",
+          "name": "致命一擊+6%",
+          "stats": {
+            "critRatePct": 6.0
+          },
+          "source": {
+            "sheet": "係數區",
+            "cell": "T7"
+          }
+        },
+        {
+          "id": "weapon-appraisal-a-8",
+          "name": "極大化+8%",
+          "stats": {
+            "extremizationPct": 8.0
+          },
+          "source": {
+            "sheet": "係數區",
+            "cell": "T8"
+          }
+        },
+        {
+          "id": "weapon-appraisal-a-9",
+          "name": "極大化+7%",
+          "stats": {
+            "extremizationPct": 7.0
+          },
+          "source": {
+            "sheet": "係數區",
+            "cell": "T9"
+          }
+        },
+        {
+          "id": "weapon-appraisal-a-10",
+          "name": "極大化+6%",
+          "stats": {
+            "extremizationPct": 6.0
+          },
+          "source": {
+            "sheet": "係數區",
+            "cell": "T10"
+          }
+        },
+        {
+          "id": "weapon-appraisal-a-11",
+          "name": "無關傷害",
+          "stats": {},
+          "source": {
+            "sheet": "係數區",
+            "cell": "T11"
+          }
+        }
+      ]
+    },
+    "additionalA": {
+      "selectorCell": "裝備模擬區!B35",
+      "effectOutputCells": [
+        "計算機!F59",
+        "計算機!G59",
+        "計算機!U59"
+      ],
+      "options": [
+        {
+          "id": "weapon-appraisal-b-2",
+          "name": "攻擊力等級+3.25",
+          "stats": {
+            "attackLevel": 3.25
+          },
+          "source": {
+            "sheet": "係數區",
+            "cell": "U2"
+          }
+        },
+        {
+          "id": "weapon-appraisal-b-3",
+          "name": "攻擊力等級+2.75",
+          "stats": {
+            "attackLevel": 2.75
+          },
+          "source": {
+            "sheet": "係數區",
+            "cell": "U3"
+          }
+        },
+        {
+          "id": "weapon-appraisal-b-4",
+          "name": "攻擊力等級+2.25",
+          "stats": {
+            "attackLevel": 2.25
+          },
+          "source": {
+            "sheet": "係數區",
+            "cell": "U4"
+          }
+        },
+        {
+          "id": "weapon-appraisal-b-5",
+          "name": "致命一擊+6.5%",
+          "stats": {
+            "critRatePct": 6.5
+          },
+          "source": {
+            "sheet": "係數區",
+            "cell": "U5"
+          }
+        },
+        {
+          "id": "weapon-appraisal-b-6",
+          "name": "致命一擊+5.5%",
+          "stats": {
+            "critRatePct": 5.5
+          },
+          "source": {
+            "sheet": "係數區",
+            "cell": "U6"
+          }
+        },
+        {
+          "id": "weapon-appraisal-b-7",
+          "name": "致命一擊+4.5%",
+          "stats": {
+            "critRatePct": 4.5
+          },
+          "source": {
+            "sheet": "係數區",
+            "cell": "U7"
+          }
+        },
+        {
+          "id": "weapon-appraisal-b-8",
+          "name": "極大化+6.5%",
+          "stats": {
+            "extremizationPct": 6.5
+          },
+          "source": {
+            "sheet": "係數區",
+            "cell": "U8"
+          }
+        },
+        {
+          "id": "weapon-appraisal-b-9",
+          "name": "極大化+5.5%",
+          "stats": {
+            "extremizationPct": 5.5
+          },
+          "source": {
+            "sheet": "係數區",
+            "cell": "U9"
+          }
+        },
+        {
+          "id": "weapon-appraisal-b-10",
+          "name": "極大化+4.5%",
+          "stats": {
+            "extremizationPct": 4.5
+          },
+          "source": {
+            "sheet": "係數區",
+            "cell": "U10"
+          }
+        },
+        {
+          "id": "weapon-appraisal-b-11",
+          "name": "無關傷害",
+          "stats": {},
+          "source": {
+            "sheet": "係數區",
+            "cell": "U11"
+          }
+        }
+      ]
+    },
+    "additionalB": {
+      "selectorCell": "裝備模擬區!B36",
+      "effectOutputCells": [
+        "計算機!F60",
+        "計算機!G60",
+        "計算機!U60"
+      ],
+      "options": [
+        {
+          "id": "weapon-appraisal-b-2",
+          "name": "攻擊力等級+3.25",
+          "stats": {
+            "attackLevel": 3.25
+          },
+          "source": {
+            "sheet": "係數區",
+            "cell": "U2"
+          }
+        },
+        {
+          "id": "weapon-appraisal-b-3",
+          "name": "攻擊力等級+2.75",
+          "stats": {
+            "attackLevel": 2.75
+          },
+          "source": {
+            "sheet": "係數區",
+            "cell": "U3"
+          }
+        },
+        {
+          "id": "weapon-appraisal-b-4",
+          "name": "攻擊力等級+2.25",
+          "stats": {
+            "attackLevel": 2.25
+          },
+          "source": {
+            "sheet": "係數區",
+            "cell": "U4"
+          }
+        },
+        {
+          "id": "weapon-appraisal-b-5",
+          "name": "致命一擊+6.5%",
+          "stats": {
+            "critRatePct": 6.5
+          },
+          "source": {
+            "sheet": "係數區",
+            "cell": "U5"
+          }
+        },
+        {
+          "id": "weapon-appraisal-b-6",
+          "name": "致命一擊+5.5%",
+          "stats": {
+            "critRatePct": 5.5
+          },
+          "source": {
+            "sheet": "係數區",
+            "cell": "U6"
+          }
+        },
+        {
+          "id": "weapon-appraisal-b-7",
+          "name": "致命一擊+4.5%",
+          "stats": {
+            "critRatePct": 4.5
+          },
+          "source": {
+            "sheet": "係數區",
+            "cell": "U7"
+          }
+        },
+        {
+          "id": "weapon-appraisal-b-8",
+          "name": "極大化+6.5%",
+          "stats": {
+            "extremizationPct": 6.5
+          },
+          "source": {
+            "sheet": "係數區",
+            "cell": "U8"
+          }
+        },
+        {
+          "id": "weapon-appraisal-b-9",
+          "name": "極大化+5.5%",
+          "stats": {
+            "extremizationPct": 5.5
+          },
+          "source": {
+            "sheet": "係數區",
+            "cell": "U9"
+          }
+        },
+        {
+          "id": "weapon-appraisal-b-10",
+          "name": "極大化+4.5%",
+          "stats": {
+            "extremizationPct": 4.5
+          },
+          "source": {
+            "sheet": "係數區",
+            "cell": "U10"
+          }
+        },
+        {
+          "id": "weapon-appraisal-b-11",
+          "name": "無關傷害",
+          "stats": {},
+          "source": {
+            "sheet": "係數區",
+            "cell": "U11"
+          }
+        }
+      ]
+    }
+  },
+  "notes": [
+    "屬性種類與輸出欄依計算機!F58:G60、U58:U60公式確認；「無關傷害」不產生屬性來源。",
+    "B34 使用武器鑑定屬性A (T欄)；B35、B36 使用武器鑑定屬性B (U欄)。"
+  ]
+}
