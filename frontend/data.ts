@@ -70,7 +70,8 @@ export interface GameData {
 }
 
 export async function readJson<T>(path: string): Promise<T> {
-  const response = await fetch(`./data/${path}`, { cache: "no-store" });
+  const buildRevision = document.querySelector<HTMLMetaElement>('meta[name="build-revision"]')?.content ?? "dev";
+  const response = await fetch(`./data/${path}?v=${encodeURIComponent(buildRevision)}`, { cache: "no-store" });
   if (!response.ok) throw new Error(`無法讀取 ${path}：${response.status}`);
   return response.json() as Promise<T>;
 }
