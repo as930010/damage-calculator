@@ -10,9 +10,8 @@ import { icon, silhouette } from './icons.ts';
 
 async function start() {
   const data = await loadGameData();
-  document.querySelector('#version-label')!.textContent = `資料 ${data.manifest.displayDate}`;
   const sampleId = new URLSearchParams(location.search).get('sample');
-  if (sampleId !== null && !/^[a-z0-9-]+$/.test(sampleId)) throw new RangeError('試算表範例名稱無效。');
+  if (sampleId !== null && !/^[a-z0-9-]+$/.test(sampleId)) throw new RangeError('驗算範例名稱無效。');
   const sampleMode = sampleId !== null;
   const state: LoadoutState = sampleMode
     ? await readJson<LoadoutState>(`examples/${sampleId}.json`)
@@ -36,12 +35,12 @@ async function start() {
     { id: 'ring-two', label: '指環 2', icon: 'ring', fixedCells: ['N39', 'N40'], stoneCells: ['M39', 'M40'], stoneCategory: 'ring', mirrorRows: [39, 40, 41] },
   ];
   const app = document.querySelector<HTMLElement>('#app')!;
-  app.innerHTML = `<section class="workbench"><header class="workspace-heading"><div><span class="eyebrow">EQUIPMENT SIMULATOR</span><h1>配出你的戰鬥風格</h1><p>依照裝備位置點選部位，調整搭配與數值。</p></div><span class="date-badge">${h(data.manifest.displayDate ?? data.manifest.dataUpdatedAt)}</span></header><div class="toolbar"><div id="class-picker"></div><label class="toggle"><input id="alternate" type="checkbox">啟用強/排褲切換</label><button id="baseline" type="button">設為比較基準</button><span id="save-status" role="status"></span></div><section class="battle-panel"><div class="panel-heading"><h2>關卡設定</h2><span>依試算表 D1:D3</span></div><div id="battle-settings" class="battle-fields"></div></section><div class="equipment-workspace"><section class="equipment-panel"><div class="panel-heading"><h2>裝備配置</h2><span>點選部位以編輯</span></div><div class="canvas-scroll"><div class="equipment-canvas">${silhouette}<div class="figure-caption"><span id="figure-class"></span><small>裝備位置示意</small></div><span class="group-label costume-label">連身時裝</span><span class="group-label left-label">左冰</span><span class="group-label inner-label">內裝左四</span><span class="group-label weapon-label">冰武 / 武器</span><span class="group-label right-label">右冰</span><span class="group-label accessory-label">飾品</span><div id="title-input" class="canvas-title-input"></div><div id="slots"></div></div></div><p class="panel-note">左冰共用一組套裝選擇，各部位魔法石分別設定。強/排褲開啟後，普通屬性依兩套下衣平均。</p><section class="right-ice-set-area"><div class="beast-accessories-heading"><h3>右冰套效</h3><span>最多選擇 ${data.rightIceSets.maxSelectedSets} 套</span></div><p class="panel-note">先選擇要套用效果的套裝，再依已裝備的右冰件數計算效果。</p><div id="right-ice-set-selectors" class="right-ice-set-selectors"></div></section><div class="beast-accessories-area"><div class="beast-accessories-heading"><h3>聖獸飾品</h3><span>頭飾、盔甲、項鍊、指環 1、指環 2</span></div><p class="panel-note">依部位設定固定效果、精靈石與三組迷鏡效果。盔甲精靈石套裝增幅 ${fmt(data.masterBeast.armorSpiritStoneSetEffect.multiplicativeDamagePct)}% 已預設套用。</p><div id="beast-accessory-fields" class="beast-accessories-grid"></div></div></section><aside id="inspector" class="inspector" aria-label="部位設定"></aside></div><details class="global-source-panel"><summary>其他效果來源設定</summary><p class="panel-note">資料選項取自試算表映射。未列在此處的特殊條件或 Buff／Debuff 尚未納入計算。</p><div id="global-source-fields"></div></details><section class="results-panel"><div class="panel-heading"><h2>目前已接入的屬性</h2><span id="comparison-label"></span></div><p class="panel-note">屬性彙總與傷害依畫面已接入的裝備、內裝、關卡及其他效果設定計算。特殊條件與 Buff／Debuff 若尚無明確欄位映射，不會計入結果。</p><div id="results" aria-live="polite"></div><section class="damage-panel"><div class="panel-heading"><h2>攻擊與最終傷害</h2><span>依 B157:B163</span></div><p class="panel-note">此數值只反映已接入的輸入；其餘來源完成接線前，請視為部分配置的估算。</p><div id="damage-result" aria-live="polite"></div></section></section></section>`;
+  app.innerHTML = `<section class="workbench"><header class="workspace-heading"><div><span class="eyebrow">EQUIPMENT SIMULATOR</span><h1>配出你的戰鬥風格</h1><p>依照裝備位置點選部位，調整搭配與數值。</p></div></header><div class="toolbar"><div id="class-picker"></div><label class="toggle"><input id="alternate" type="checkbox">啟用強/排褲切換</label><button id="baseline" type="button">設為比較基準</button><span id="save-status" role="status"></span></div><section class="battle-panel"><div class="panel-heading"><h2>關卡設定</h2></div><div id="battle-settings" class="battle-fields"></div></section><div class="equipment-workspace"><section class="equipment-panel"><div class="panel-heading"><h2>裝備配置</h2><span>點選部位以編輯</span></div><div class="canvas-scroll"><div class="equipment-canvas">${silhouette}<div class="figure-caption"><small>裝備位置示意</small></div><span class="group-label costume-label">連身時裝</span><span class="group-label left-label">左冰</span><span class="group-label inner-label">內裝左四</span><span class="group-label weapon-label">冰武 / 武器</span><span class="group-label right-label">右冰</span><span class="group-label accessory-label">飾品</span><div id="title-input" class="canvas-title-input"></div><div id="slots"></div></div></div><p class="panel-note">左冰共用一組套裝選擇，各部位魔法石分別設定。強/排褲開啟後，普通屬性依兩套下衣平均。</p><section class="right-ice-set-area"><div class="beast-accessories-heading"><h3>右冰套效</h3><span>最多選擇 ${data.rightIceSets.maxSelectedSets} 套</span></div><p class="panel-note">先選擇要套用效果的套裝，再依已裝備的右冰件數計算效果。</p><div id="right-ice-set-selectors" class="right-ice-set-selectors"></div></section><div class="beast-accessories-area"><div class="beast-accessories-heading"><h3>聖獸飾品</h3><span>頭飾、盔甲、項鍊、指環 1、指環 2</span></div><p class="panel-note">依部位設定固定效果、精靈石與三組迷鏡效果。盔甲精靈石套裝增幅 ${fmt(data.masterBeast.armorSpiritStoneSetEffect.multiplicativeDamagePct)}% 已預設套用。</p><div id="beast-accessory-fields" class="beast-accessories-grid"></div></div></section><aside id="inspector" class="inspector" aria-label="部位設定"></aside></div><details class="global-source-panel"><summary>其他效果來源設定</summary><p class="panel-note">未列在此處的特殊條件或 Buff／Debuff 尚未納入計算。</p><div id="global-source-fields"></div></details><section class="results-panel"><div class="panel-heading"><h2>目前已接入的屬性</h2><span id="comparison-label"></span></div><p class="panel-note">屬性彙總與傷害依畫面已接入的裝備、內裝、關卡及其他效果設定計算。特殊條件與 Buff／Debuff 若尚無明確欄位映射，不會計入結果。</p><div id="results" aria-live="polite"></div><section class="damage-panel"><div class="panel-heading"><h2>攻擊與最終傷害</h2></div><p class="panel-note">此數值只反映已接入的輸入；其餘來源完成接線前，請視為部分配置的估算。</p><div id="damage-result" aria-live="polite"></div></section></section></section>`;
   if (sampleMode) {
-    app.querySelector('.workspace-heading')!.insertAdjacentHTML('afterend', '<p class="sample-banner">已載入 Google Sheets 驗算配置。這個分頁的調整不會覆蓋你原本儲存在瀏覽器的配裝。</p>');
+    app.querySelector('.workspace-heading')!.insertAdjacentHTML('afterend', '<p class="sample-banner">已載入驗算範例。這個分頁的調整不會覆蓋你原本儲存在瀏覽器的配裝。</p>');
     app.querySelector('.results-panel')!.insertAdjacentHTML('beforeend', '<section id="sheet-parity" class="sheet-parity" aria-live="polite"></section>');
-    document.querySelector('footer')!.textContent = '這個分頁使用試算表驗算配置；調整只保留至關閉或重新整理頁面。';
-    document.querySelector('#save-status')!.textContent = '試算表範例模式';
+    document.querySelector('footer')!.textContent = '這個分頁使用驗算範例；調整只保留至關閉或重新整理頁面。';
+    document.querySelector('#save-status')!.textContent = '驗算範例模式';
   }
   document.querySelector('#beast-accessory-fields')!.insertAdjacentHTML('beforebegin', '<div id="master-beast-controls" class="master-beast-controls"></div>');
   const val = (cell: string) => String(state.values[localCell(cell)] ?? '');
@@ -67,7 +66,7 @@ async function start() {
     });
   };
   const update = () => {
-    document.querySelector('#save-status')!.textContent = sampleMode ? '試算表範例模式：本頁調整不儲存' : saveState(state) ? '已儲存於此裝置' : '此瀏覽器無法儲存設定';
+    document.querySelector('#save-status')!.textContent = sampleMode ? '驗算範例模式：本頁調整不儲存' : saveState(state) ? '已儲存於此裝置' : '此瀏覽器無法儲存設定';
     renderSlots(); renderBeastAccessories(); renderMasterBeastColorSelector(); renderResults();
   };
   const field = (parent: HTMLElement, label: string, cell: string, choices: readonly PickerOption[], redraw = false) => {
@@ -161,9 +160,9 @@ async function start() {
     field(inputs, '聖獸潛力', 'S25', options(data.masterBeast.options.filter(option => option.category === 'overall').map(option => option.name)));
     const potential = data.masterBeast.options.find(option => option.category === 'overall' && option.name === val('S25'));
     const potentialText = potential
-      ? Object.entries(potential.stats).map(([key, value]) => `${data.attributes.attributes.find(entry => entry.key === key)?.name ?? key} +${fmt(value)}（計算機!${data.masterBeast.overallPotentialSourceCells[key]}）`).join('、')
+      ? Object.entries(potential.stats).map(([key, value]) => `${data.attributes.attributes.find(entry => entry.key === key)?.name ?? key} +${fmt(value)}`).join('、')
       : '尚未選擇潛力效果';
-    root.insertAdjacentHTML('beforeend', `<div class="master-beast-source-notes"><p><strong>固定效果：</strong>技能類雙攻 +3%（計算機!E76，轉職後固定擁有）。</p><p><strong>精靈石效果：</strong>選黃時，致命一擊與極大化各乘算 +${fmt(data.parameters.yellowBeastSpiritStoneRatePct)}%（${h(data.masterBeast.spiritStoneColorSelector.yellowRateSourceCell)}）；選綠時不套用。</p><p><strong>潛力效果：</strong>${h(potentialText)}</p></div>`);
+    root.insertAdjacentHTML('beforeend', `<div class="master-beast-source-notes"><p><strong>固定效果：</strong>技能類雙攻 +3%（轉職後固定擁有）。</p><p><strong>精靈石效果：</strong>選黃時，致命一擊與極大化各乘算 +${fmt(data.parameters.yellowBeastSpiritStoneRatePct)}%；選綠時不套用。</p><p><strong>潛力效果：</strong>${h(potentialText)}</p></div>`);
   }
   function renderTitleInput() {
     field(document.querySelector<HTMLElement>('#title-input')!, '稱號', 'B2', options([...new Set(data.otherEffects.titles.map(entry => entry.name))]));
@@ -226,7 +225,6 @@ async function start() {
   }
   function renderSlots() {
     const container = document.querySelector('#slots')!; container.replaceChildren();
-    document.querySelector('#figure-class')!.textContent = state.classId;
     for (const slot of data.layout.slots) {
       const group = data.layout.groups.find(group => group.id === slot.group)!;
       const button = document.createElement('button'); button.type = 'button'; button.className = 'gear-slot';
@@ -256,7 +254,7 @@ async function start() {
         const appraisalGroup = data.accessoryEffects.groups.find(entry => entry.selectionCell === selectionCell);
         const selectedItem = items.find(item => item.name === val(selectionCell));
         if (selectedItem && !appraisalGroup) {
-          panel.insertAdjacentHTML('beforeend', '<p class="panel-note">試算表目前沒有映射此飾品部位的鑑定效果欄位；即使資料目錄填入可鑑定狀態，這裡仍不會顯示或計算鑑定效果。</p>');
+          panel.insertAdjacentHTML('beforeend', '<p class="panel-note">目前沒有設定此飾品部位的鑑定效果欄位；即使資料目錄填入可鑑定狀態，這裡仍不會顯示或計算鑑定效果。</p>');
         }
         if (appraisalGroup && selectedItem) {
           const appraisal = selectedItem.appraisal;
@@ -318,7 +316,7 @@ async function start() {
     const rows = compareSheetParity(result, sheetReference);
     const mismatches = rows.filter(row => !row.matches);
     const precise = (value: number) => new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 10 }).format(value);
-    const table = (items: typeof rows) => `<div class="sheet-parity-scroll"><table><thead><tr><th>儲存格／項目</th><th>試算表／公式重算</th><th>網站</th><th>網站－參考值</th></tr></thead><tbody>${items.map(row => `<tr class="${row.matches ? '' : 'sheet-parity-difference'}"><th scope="row">${h(row.cell)} ${h(row.label)}</th><td>${precise(row.expected)}</td><td>${precise(row.actual)}</td><td>${row.delta > 0 ? '+' : ''}${precise(row.delta)}</td></tr>`).join('')}</tbody></table></div>`;
+    const table = (items: typeof rows) => `<div class="sheet-parity-scroll"><table><thead><tr><th>項目</th><th>參考值</th><th>網站</th><th>差異</th></tr></thead><tbody>${items.map(row => `<tr class="${row.matches ? '' : 'sheet-parity-difference'}"><th scope="row">${h(row.label)}</th><td>${precise(row.expected)}</td><td>${precise(row.actual)}</td><td>${row.delta > 0 ? '+' : ''}${precise(row.delta)}</td></tr>`).join('')}</tbody></table></div>`;
     const bleed = rows.find(row => row.cell === 'M1');
     const damage = rows.find(row => row.cell === 'B163');
     const damageWithoutBleedDifference = bleed && damage
@@ -328,7 +326,7 @@ async function start() {
       && bleed?.matches === false && Math.abs(bleed.delta - 5) < 1e-9
       && damage?.matches === false
       && Math.abs(damageWithoutBleedDifference - damage.expected) < 1e-6;
-    document.querySelector('#sheet-parity')!.innerHTML = `<h3>Google Sheets 原值與公式重算比對</h3><p>依未格式化數值比對 ${rows.length} 項：${rows.length - mismatches.length} 項相同、${mismatches.length} 項不同。B163 使用原式與來源值重算的參考值；匯出快取只有小數兩位。</p>${mismatches.length ? table(mismatches) : ''}${knownRightIceDifference ? '<p>目前差異可由流血 +5% 解釋。網站依 B27:B29 選中的套裝及右冰實際件數計算套效；請核對所選套裝與試算表的比較配置。</p>' : ''}<details><summary>本次比對採用的固定數值假設</summary><p>計算機的 E76、E93、Q37、Q53、Q86、R86、T101、T102 都是直接填入的數字，沒有啟用條件公式。網站暫依原表計入以重現此配置，不能據此認定它們對所有配裝都有效。</p></details><details><summary>查看全部 ${rows.length} 項比較值</summary>${table(rows)}</details>`;
+    document.querySelector('#sheet-parity')!.innerHTML = `<h3>計算結果驗算</h3><p>依未格式化數值比對 ${rows.length} 項：${rows.length - mismatches.length} 項相同、${mismatches.length} 項不同。最終傷害參考值依來源公式與原始數值重算，避免顯示精度影響比較。</p>${mismatches.length ? table(mismatches) : ''}${knownRightIceDifference ? '<p>目前差異可由流血 +5% 解釋。網站依選中的套裝及右冰實際件數計算套效；請核對所選套裝與參考配置。</p>' : ''}<details><summary>本次比對採用的固定數值假設</summary><p>部分固定數值沒有啟用條件公式。網站暫依參考配置計入以重現此配置，不能據此認定它們對所有配裝都有效。</p></details><details><summary>查看全部 ${rows.length} 項比較值</summary>${table(rows)}</details>`;
   }
   function renderResults() {
     if (sheetReference) document.querySelector('#sheet-parity')!.replaceChildren();
@@ -341,8 +339,7 @@ async function start() {
         const meta = data.attributes.attributes.find(entry => entry.key === key); const delta = before ? stat.finalTotal - (before.stats[key]?.finalTotal ?? 0) : null;
         const previous = before?.stats[key]?.finalTotal ?? 0;
         const comparison = delta === null ? '' : `<p>基準 ${fmt(previous)} → 目前 ${fmt(stat.finalTotal)}；相對變化 ${previous === 0 ? '—（基準為 0）' : `${fmt(delta / previous * 100)}%`}</p>`;
-        const sourceDetails = stat.sharedSources.filter(source => source.sourceId.startsWith('sheet:計算機!')).map(source => `${source.sourceId.replace('sheet:', '')} ${source.valuePct > 0 ? '+' : ''}${fmt(source.valuePct)}${meta?.unit === 'percent' ? '%' : ''}`).join(' · ');
-        return `<details class="stat"><summary><span>${h(meta?.name ?? key)}</span><strong>${fmt(stat.finalTotal)}${meta?.unit === 'percent' ? '%' : ''}</strong>${delta === null ? '' : `<small class="${delta >= 0 ? 'positive' : 'negative'}">${delta > 0 ? '+' : ''}${fmt(delta)}</small>`}</summary><p>共同來源 ${fmt(stat.sharedTotal)} + 下衣配置 ${fmt(stat.lowerwearAverage)} = ${fmt(stat.totalBeforeCap)}${stat.cap === undefined ? '' : `；角色上限 ${stat.cap}`}</p><p>下衣 ${fmt(stat.lowerwearA)} ／ 強/排褲 ${fmt(stat.lowerwearB)}</p>${sourceDetails ? `<p>試算表來源：${h(sourceDetails)}</p>` : ''}${comparison}</details>`;
+        return `<details class="stat"><summary><span>${h(meta?.name ?? key)}</span><strong>${fmt(stat.finalTotal)}${meta?.unit === 'percent' ? '%' : ''}</strong>${delta === null ? '' : `<small class="${delta >= 0 ? 'positive' : 'negative'}">${delta > 0 ? '+' : ''}${fmt(delta)}</small>`}</summary><p>共同來源 ${fmt(stat.sharedTotal)} + 下衣配置 ${fmt(stat.lowerwearAverage)} = ${fmt(stat.totalBeforeCap)}${stat.cap === undefined ? '' : `；角色上限 ${stat.cap}`}</p><p>下衣 ${fmt(stat.lowerwearA)} ／ 強/排褲 ${fmt(stat.lowerwearB)}</p>${comparison}</details>`;
       }).join('')}<div class="stat"><p>強者（Boss 體力 &gt; 50%）</p><strong>${fmt(current.conditionalDamage.strongerPct)}%</strong></div><div class="stat"><p>排熱（Boss 體力 ≤ 50%）</p><strong>${fmt(current.conditionalDamage.heatPct)}%</strong></div></div>`;
       const damageTarget = document.querySelector('#damage-result')!;
       try {
@@ -376,7 +373,7 @@ async function start() {
       document.querySelector('#damage-result')!.innerHTML = `<p class="input-warning">尚未計算：${message}</p>`;
     }
   }
-  document.querySelector('#class-picker')!.append(createPicker('職業', data.classes.classes.filter(entry => entry.active).map(entry => ({ value: entry.id, label: `${entry.id} · ${entry.name}` })), state.classId, value => { state.classId = value; update(); }));
+  document.querySelector('#class-picker')!.append(createPicker('職業', data.classes.classes.filter(entry => entry.active).map(entry => ({ value: entry.id, label: entry.name })), state.classId, value => { state.classId = value; update(); }));
   const toggle = document.querySelector<HTMLInputElement>('#alternate')!; toggle.checked = state.lowerwearAlternativeEnabled;
   const battle = document.querySelector<HTMLElement>('#battle-settings')!;
   for (const [cell, label] of [['D1','關卡適應力'],['D2','關卡扣致命'],['D3','Boss防禦']] as const) {

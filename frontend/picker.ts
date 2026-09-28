@@ -3,17 +3,18 @@ let sequence = 0;
 /** Only explicit selections are saved; typing filters the list. */
 export function createPicker(label: string, options: readonly PickerOption[], value: string, onChange: (value: string) => void): HTMLElement {
   const root = document.createElement('div'); root.className = 'picker field';
+  const displayValue = (selected: string) => options.find(option => option.value === selected)?.label ?? selected;
   const caption = document.createElement('label'); caption.textContent = label;
   const input = document.createElement('input'); input.id = `picker-${++sequence}`; caption.htmlFor = input.id;
   input.setAttribute('aria-label', label);
   input.setAttribute('role', 'combobox'); input.setAttribute('aria-autocomplete', 'list'); input.setAttribute('aria-expanded', 'false');
-  input.autocomplete = 'off'; input.placeholder = '搜尋或選擇…'; input.value = value;
+  input.autocomplete = 'off'; input.placeholder = '搜尋或選擇…'; input.value = displayValue(value);
   const control = document.createElement('div'); control.className = 'picker-control';
   const list = document.createElement('div'); list.id = `${input.id}-list`; list.className = 'picker-list'; list.role = 'listbox'; list.hidden = true;
   const clear = document.createElement('button'); clear.type = 'button'; clear.className = 'picker-clear'; clear.textContent = '×'; clear.title = '清除目前選擇'; clear.setAttribute('aria-label', `清除${label}`); clear.hidden = value === '';
   input.setAttribute('aria-controls', list.id);
   let matches: PickerOption[] = [], index = -1, committed = value;
-  const close = () => { list.hidden = true; input.setAttribute('aria-expanded', 'false'); input.removeAttribute('aria-activedescendant'); input.value = committed; clear.hidden = committed === ''; };
+  const close = () => { list.hidden = true; input.setAttribute('aria-expanded', 'false'); input.removeAttribute('aria-activedescendant'); input.value = displayValue(committed); clear.hidden = committed === ''; };
   const commit = (option: PickerOption) => { committed = option.value; close(); onChange(option.value); };
   const draw = (query: string) => {
     matches = options.filter(option => option.label.toLocaleLowerCase().includes(query.toLocaleLowerCase()));
