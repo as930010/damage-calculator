@@ -188,10 +188,16 @@ async function start() {
     }
     return `來源名稱待確認（${sourceId}）`;
   }
-  const sourceRows = (sources: readonly { sourceId: string; valuePct: number }[], isPercent: boolean) =>
-    sources.length
-      ? sources.map(source => `<p class="stat-source-row"><span>${h(sourceLabel(source.sourceId))}</span><strong>${fmt(source.valuePct)}${isPercent ? '%' : ''}</strong></p>`).join('')
-      : '';
+  const sourceRows = (sources: readonly { sourceId: string; valuePct: number }[], isPercent: boolean) => {
+    const totals = new Map<string, number>();
+    for (const source of sources) {
+      const label = sourceLabel(source.sourceId);
+      totals.set(label, (totals.get(label) ?? 0) + source.valuePct);
+    }
+    return [...totals].map(([label, total]) =>
+      `<p class="stat-source-row"><span>${h(label)}</span><strong>${fmt(total)}${isPercent ? '%' : ''}</strong></p>`,
+    ).join('');
+  };
   const field = (parent: HTMLElement, label: string, cell: string, choices: readonly PickerOption[], redraw = false) => {
     parent.append(createPicker(label, choices, val(cell), value => {
       state.values[localCell(cell)] = value; update(); renderRightIceSetSelectors();
@@ -502,10 +508,10 @@ async function start() {
       const deltaText = delta === null ? '' : `${delta > 0 ? '+' : ''}${isPercent ? percentFormat(delta) : fmt(delta)}${isPercent ? '%' : ''}`;
       const shownName = key === 'attackPower' ? '攻擊力' : meta?.name ?? key;
       const lowerwearAverageLabel = state.lowerwearAlternativeEnabled ? '下衣+強/排褲平均' : '下衣配置';
-      const sharedDetails = stat.sharedSources.length ? `<p class="stat-detail-heading">共同來源</p>${sourceRows(stat.sharedSources, isPercent)}` : '';
-      const lowerwearADetails = stat.lowerwearASources.length ? `<p class="stat-detail-heading">下衣來源</p>${sourceRows(stat.lowerwearASources, isPercent)}` : '';
+      const commonSources = [...stat.sharedSources, ...stat.lowerwearASources];
+      const sharedDetails = commonSources.length ? `<p class="stat-detail-heading">共同來源</p>${sourceRows(commonSources, isPercent)}` : '';
       const lowerwearBDetails = state.lowerwearAlternativeEnabled && stat.lowerwearBSources.length ? `<p class="stat-detail-heading">強/排褲來源</p>${sourceRows(stat.lowerwearBSources, isPercent)}` : '';
-      return `<details class="stat"><summary><span>${h(shownName)}</span>${stat.cap === undefined ? '' : `<small class="stat-cap">上限 ${fmt(stat.cap)}%</small>`}<strong>${fmt(stat.finalTotal)}${isPercent ? '%' : ''}</strong>${delta === null ? '' : `<small class="${delta > 0 ? 'positive' : delta < 0 ? 'negative' : ''}">${deltaText}</small>`}</summary><div class="stat-details">${sharedDetails}<p class="stat-lowerwear-total">下衣 ${fmt(stat.lowerwearA)} ／ 強/排褲 ${fmt(stat.lowerwearB)}</p>${lowerwearADetails}${lowerwearBDetails}<p class="stat-average">${lowerwearAverageLabel} ${fmt(stat.lowerwearAverage)}${isPercent ? '%' : ''}</p>${stat.cap === undefined ? '' : `<p>套用角色上限 ${fmt(stat.cap)}%</p>`}${comparison}</div></details>`;
+      return `<details class="stat"><summary><span>${h(shownName)}</span>${stat.cap === undefined ? '' : `<small class="stat-cap">上限 ${fmt(stat.cap)}%</small>`}<strong>${fmt(stat.finalTotal)}${isPercent ? '%' : ''}</strong>${delta === null ? '' : `<small class="${delta > 0 ? 'positive' : delta < 0 ? 'negative' : ''}">${deltaText}</small>`}</summary><div class="stat-details">${sharedDetails}${lowerwearBDetails}<p class="stat-average">${lowerwearAverageLabel} ${fmt(stat.lowerwearAverage)}${isPercent ? '%' : ''}</p>${stat.cap === undefined ? '' : `<p>套用角色上限 ${fmt(stat.cap)}%</p>`}${comparison}</div></details>`;
     }).join('')}${combatRateCards}<div class="stat"><p>強者（Boss 體力 &gt; 50%）</p><strong>${fmt(current.conditionalDamage.strongerPct)}%</strong></div><div class="stat"><p>排熱（Boss 體力 ≤ 50%）</p><strong>${fmt(current.conditionalDamage.heatPct)}%</strong></div></div>`;
       const damageTarget = document.querySelector('#damage-result')!;
       try {
