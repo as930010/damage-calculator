@@ -41,7 +41,7 @@ const comparedCells: readonly (readonly [string, string, ValueReader])[] = [
   ["S1", "乘算效果", (result) => result.generalMultiplicativeDamage.value],
   ["T1", "乘算暴傷", (result) => result.multiplicativeCritDamage.value],
   ["U1", "攻擊力等級", attribute("attackLevel")],
-  ["V1", "技能類雙攻%", attribute("skillTypeAttackPct")],
+  ["V1", "技能類攻%", attribute("skillTypeAttackPct")],
   ["W1", "超適應力%", attribute("superAdaptabilityPct")],
   ["C53", "武器物攻基值", (result) => result.attack.c53],
   ["D53", "武器魔攻基值", (result) => result.attack.d53],

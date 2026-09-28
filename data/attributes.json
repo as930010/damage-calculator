@@ -165,7 +165,7 @@
     },
     {
       "key": "skillTypeAttackPct",
-      "name": "技能類雙攻%",
+      "name": "技能類攻%",
       "unit": "percent",
       "calculationScope": "characterTotal",
       "aggregation": "sum",
