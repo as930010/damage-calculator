@@ -185,6 +185,17 @@ async function start() {
     }
     return `來源名稱待確認（${sourceId}）`;
   }
+  function calculationIssue(error: unknown): string {
+    const message = error instanceof Error ? error.message : String(error ?? '未知錯誤');
+    const missingEnhancement = message.match(/Missing enhancement selection: ([A-Z]+\d+)/);
+    if (missingEnhancement?.[1] === 'H12') {
+      return '內裝左四的「下衣」尚未選擇強化等級。請點選裝備配置中的「下衣」，填寫「強化」欄位；試算表對應位置為 H12。';
+    }
+    if (missingEnhancement?.[1] === 'H39') {
+      return '內裝左四的「鞋子」尚未選擇強化等級。請點選裝備配置中的「鞋子」，填寫「強化」欄位；試算表對應位置為 H39。';
+    }
+    return message;
+  }
   const sourceRows = (sources: readonly { sourceId: string; valuePct: number }[], isPercent: boolean) => {
     const totals = new Map<string, number>();
     for (const source of sources) {
@@ -498,7 +509,7 @@ async function start() {
     const attackKey = currentClass?.attackType === 'physical' ? 'physicalAttack' : 'magicalAttack';
     const baselineAttackKey = baselineClass?.attackType === 'physical' ? 'physicalAttack' : 'magicalAttack';
     const visibleStats = Object.entries(current.stats)
-      .filter(([key, stat]) => !['physicalAttack', 'magicalAttack', 'critRatePct', 'extremizationPct'].includes(key) && (stat.finalTotal !== 0 || (before?.stats[key]?.finalTotal ?? 0) !== 0))
+      .filter(([key, stat]) => !['physicalAttack', 'magicalAttack', 'critRatePct', 'extremizationPct'].includes(key) && (stat.finalTotal !== 0 || (before?.stats[key]?.finalTotal ?? 0) !== 0 || key === 'superAdaptabilityPct'))
       .map(([key, stat]) => ({ key, stat, previousStat: before?.stats[key] }));
     const superAdaptabilityIndex = visibleStats.findIndex(entry => entry.key === 'superAdaptabilityPct');
     if (superAdaptabilityIndex >= 0) {
@@ -515,7 +526,9 @@ async function start() {
       const overflow = capOverflowPercentage(valueBeforeCap * 100, 100);
       return overflow === null ? '' : `<small class="cap-overflow" role="status">超出上限 ${fmt(overflow)}%</small>`;
     };
-    const combatRateCards = currentCombatRates ? `<div class="combat-rate-pair"><div class="stat"><p>實戰致命一擊機率</p><strong>${fmt(currentCombatRates.critRate.finalRate * 100)}%</strong>${probabilityCapWarning(currentCombatRates.critRate.valueBeforeUpperCap)}</div><div class="stat"><p>實戰極大化</p><strong>${fmt(currentCombatRates.extremization.finalRate * 100)}%</strong>${probabilityCapWarning(currentCombatRates.extremization.valueBeforeUpperCap)}</div></div>` : '';
+    const combatRateCards = currentCombatRates
+      ? `<div class="combat-rate-pair"><div class="stat"><p>實戰致命一擊機率</p><strong>${fmt(currentCombatRates.critRate.finalRate * 100)}%</strong>${probabilityCapWarning(currentCombatRates.critRate.valueBeforeUpperCap)}</div><div class="stat"><p>實戰極大化</p><strong>${fmt(currentCombatRates.extremization.finalRate * 100)}%</strong>${probabilityCapWarning(currentCombatRates.extremization.valueBeforeUpperCap)}</div></div>`
+      : `<div class="combat-rate-pair"><div class="stat"><p>實戰致命一擊機率</p><strong>待補輸入</strong><small class="input-hint">${h(calculationIssue(damageCalculationError))}</small></div><div class="stat"><p>實戰極大化</p><strong>待補輸入</strong><small class="input-hint">${h(calculationIssue(damageCalculationError))}</small></div></div>`;
     target.innerHTML = `<div class="stat-list">${visibleStats.map(({ key, stat, previousStat }) => {
       const meta = data.attributes.attributes.find(entry => entry.key === key);
       const isPercent = meta?.unit === 'percent';
@@ -573,10 +586,10 @@ async function start() {
         const critDamageSources = result.multiplicativeCritDamage.factors.map(effect => `${sourceLabel(effect.sourceId)} ${fmt(effect.valuePct)}%`).join('、') || '無';
         damageTarget.innerHTML = `<div class="damage-summary"><div><span>最小攻擊力</span><strong>${fmt(result.attack.lowerDamage)}</strong></div><div><span>最大攻擊力</span><strong>${fmt(result.attack.upperDamage)}</strong></div><div class="final-damage"><span>最終傷害</span><strong>${percentFormat(result.finalDamage.finalDamage)}</strong></div></div>${damageRatioHtml}${comparisonHtml}<details class="formula-detail"><summary>展開傷害計算明細</summary><p>致命傷害被動：${fmt(result.classCritDamagePassivePct)}%　乘算暴傷：${fmt(result.multiplicativeCritDamage.value)}%</p><p>乘算暴傷來源：${h(critDamageSources)}</p><p>爆擊乘算來源：${h(rateSources(result.combatRates.critRate.multipliers))}</p><p>極大乘算來源：${h(rateSources(result.combatRates.extremization.multipliers))}</p><p>乘算傷害：${fmt(result.generalMultiplicativeDamage.value)} 倍　強者／排熱因子：${fmt(result.finalDamage.conditionalFactor)}</p><p>適應力因子：${fmt(result.finalDamage.adaptationFactor)}　防禦因子：${fmt(result.finalDamage.defenseFactor)}</p></details>`;
       } catch (error) {
-        damageTarget.innerHTML = `<p class="input-warning">尚未計算：${h(error instanceof Error ? error.message : error)}　請完成該部位的必要輸入。</p>`;
+        damageTarget.innerHTML = `<p class="input-warning">尚未計算：${h(calculationIssue(error))}　請完成後再試。</p>`;
       }
     } catch (error) {
-      const message = h(error instanceof Error ? error.message : error);
+      const message = h(calculationIssue(error));
       target.innerHTML = `<p class="input-warning" role="status">${message}</p>`;
       document.querySelector('#damage-result')!.innerHTML = `<p class="input-warning">尚未計算：${message}</p>`;
     }
