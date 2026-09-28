@@ -1,5 +1,5 @@
 {
-  "name": "dab-damage-calculator",
+  "name": "damage-calculator",
   "private": true,
   "type": "module",
   "scripts": {

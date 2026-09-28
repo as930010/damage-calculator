@@ -113,7 +113,7 @@
     },
     {
       "id": "DaB",
-      "name": "Daybreaker",
+      "name": "DaB",
       "attackType": "magical",
       "active": true,
       "calculationReady": true,
