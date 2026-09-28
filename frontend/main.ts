@@ -452,13 +452,23 @@ async function start() {
     const rows = compareSheetParity(result, sheetReference);
     const mismatches = rows.filter(row => !row.matches);
     const precise = (value: number) => new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 10 }).format(value);
+    const visiblePrecise = (value: number) => new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 3 }).format(value);
+    const displayParityValue = (row: typeof rows[number], value: number) => {
+      if (row.cell === 'B159' || row.cell === 'B160') return `${precise(value * 100)}%`;
+      return row.cell === 'B163' ? visiblePrecise(value) : precise(value);
+    };
+    const displayParityDelta = (row: typeof rows[number]) => {
+      const sign = row.delta > 0 ? '+' : '';
+      if (row.cell === 'B159' || row.cell === 'B160') return `${sign}${precise(row.delta * 100)}%`;
+      return `${sign}${row.cell === 'B163' ? visiblePrecise(row.delta) : precise(row.delta)}`;
+    };
     const activeAttackType = data.classes.classes.find(entry => entry.id === state.classId)?.attackType;
     const relevantAttackCell = activeAttackType === 'physical' ? 'C1' : 'D1';
     const relevantWeaponBaseCell = activeAttackType === 'physical' ? 'C53' : 'D53';
     const table = (items: typeof rows) => `<div class="sheet-parity-scroll"><table><thead><tr><th>項目</th><th>原配置</th><th>新配置</th><th>差異</th></tr></thead><tbody>${items.filter(row => !['C1', 'D1'].includes(row.cell) || row.cell === relevantAttackCell).filter(row => !['C53', 'D53'].includes(row.cell) || row.cell === relevantWeaponBaseCell).map(row => {
       const label = ['C1', 'D1'].includes(row.cell) ? '攻擊力' : ['C53', 'D53'].includes(row.cell) ? '武器基礎攻擊力' : row.label;
       const rowClass = row.matches ? '' : `sheet-parity-difference ${row.delta > 0 ? 'sheet-parity-positive' : row.delta < 0 ? 'sheet-parity-negative' : ''}`;
-      return `<tr class="${rowClass}"><th scope="row">${h(label)}</th><td>${precise(row.expected)}</td><td>${precise(row.actual)}</td><td class="${row.delta > 0 ? 'positive' : row.delta < 0 ? 'negative' : ''}">${row.delta > 0 ? '+' : ''}${precise(row.delta)}</td></tr>`;
+      return `<tr class="${rowClass}"><th scope="row">${h(label)}</th><td>${displayParityValue(row, row.expected)}</td><td>${displayParityValue(row, row.actual)}</td><td class="${row.delta > 0 ? 'positive' : row.delta < 0 ? 'negative' : ''}">${displayParityDelta(row)}</td></tr>`;
     }).join('')}</tbody></table></div>`;
     const bleed = rows.find(row => row.cell === 'M1');
     const damage = rows.find(row => row.cell === 'B163');
@@ -490,6 +500,12 @@ async function start() {
     const visibleStats = Object.entries(current.stats)
       .filter(([key, stat]) => !['physicalAttack', 'magicalAttack', 'critRatePct', 'extremizationPct'].includes(key) && (stat.finalTotal !== 0 || (before?.stats[key]?.finalTotal ?? 0) !== 0))
       .map(([key, stat]) => ({ key, stat, previousStat: before?.stats[key] }));
+    const superAdaptabilityIndex = visibleStats.findIndex(entry => entry.key === 'superAdaptabilityPct');
+    if (superAdaptabilityIndex >= 0) {
+      const [superAdaptability] = visibleStats.splice(superAdaptabilityIndex, 1);
+      const adaptabilityIndex = visibleStats.findIndex(entry => entry.key === 'adaptabilityPct');
+      visibleStats.splice(adaptabilityIndex < 0 ? visibleStats.length : adaptabilityIndex + 1, 0, superAdaptability);
+    }
     const attackStat = current.stats[attackKey];
     if (attackStat && (attackStat.finalTotal !== 0 || (before?.stats[baselineAttackKey]?.finalTotal ?? 0) !== 0)) {
       visibleStats.unshift({ key: 'attackPower', stat: attackStat, previousStat: before?.stats[baselineAttackKey] });
@@ -499,7 +515,7 @@ async function start() {
       const overflow = capOverflowPercentage(valueBeforeCap * 100, 100);
       return overflow === null ? '' : `<small class="cap-overflow" role="status">超出上限 ${fmt(overflow)}%</small>`;
     };
-    const combatRateCards = currentCombatRates ? `<div class="stat"><p>實戰致命一擊機率</p><strong>${fmt(currentCombatRates.critRate.finalRate * 100)}%</strong>${probabilityCapWarning(currentCombatRates.critRate.valueBeforeUpperCap)}</div><div class="stat"><p>實戰極大化機率</p><strong>${fmt(currentCombatRates.extremization.finalRate * 100)}%</strong>${probabilityCapWarning(currentCombatRates.extremization.valueBeforeUpperCap)}</div>` : '';
+    const combatRateCards = currentCombatRates ? `<div class="combat-rate-pair"><div class="stat"><p>實戰致命一擊機率</p><strong>${fmt(currentCombatRates.critRate.finalRate * 100)}%</strong>${probabilityCapWarning(currentCombatRates.critRate.valueBeforeUpperCap)}</div><div class="stat"><p>實戰極大化</p><strong>${fmt(currentCombatRates.extremization.finalRate * 100)}%</strong>${probabilityCapWarning(currentCombatRates.extremization.valueBeforeUpperCap)}</div></div>` : '';
     target.innerHTML = `<div class="stat-list">${visibleStats.map(({ key, stat, previousStat }) => {
       const meta = data.attributes.attributes.find(entry => entry.key === key);
       const isPercent = meta?.unit === 'percent';
@@ -524,7 +540,7 @@ async function start() {
       else commonSources.push(...innerwearSources);
       const sharedDetails = commonSources.length ? `<p class="stat-detail-heading">共同來源</p>${sourceRows(commonSources, isPercent)}` : '';
       const lowerwearBDetails = state.lowerwearAlternativeEnabled && stat.lowerwearBSources.length ? `<p class="stat-detail-heading">強/排褲來源</p>${sourceRows(stat.lowerwearBSources, isPercent)}` : '';
-      return `<details class="stat"><summary><span>${h(shownName)}</span>${stat.cap === undefined ? '' : `<small class="stat-cap">上限 ${fmt(stat.cap)}%</small>`}<strong>${fmt(stat.finalTotal)}${isPercent ? '%' : ''}</strong>${attributeCapWarning}${delta === null ? '' : `<small class="${delta > 0 ? 'positive' : delta < 0 ? 'negative' : ''}">${deltaText}</small>`}</summary><div class="stat-details">${sharedDetails}${lowerwearBDetails}<p class="stat-average">${lowerwearAverageLabel} ${fmt(stat.lowerwearAverage)}${isPercent ? '%' : ''}</p>${stat.cap === undefined ? '' : `<p>套用角色上限 ${fmt(stat.cap)}%</p>`}${comparison}</div></details>`;
+      return `<details class="stat"><summary><span>${h(shownName)}</span><strong>${fmt(stat.finalTotal)}${isPercent ? '%' : ''}</strong>${attributeCapWarning}${delta === null ? '' : `<small class="${delta > 0 ? 'positive' : delta < 0 ? 'negative' : ''}">${deltaText}</small>`}</summary><div class="stat-details">${sharedDetails}${lowerwearBDetails}<p class="stat-average">${lowerwearAverageLabel} ${fmt(stat.lowerwearAverage)}${isPercent ? '%' : ''}</p>${comparison}</div></details>`;
     }).join('')}${combatRateCards}<div class="stat"><p>強者（Boss 體力 &gt; 50%）</p><strong>${fmt(current.conditionalDamage.strongerPct)}%</strong></div><div class="stat"><p>排熱（Boss 體力 ≤ 50%）</p><strong>${fmt(current.conditionalDamage.heatPct)}%</strong></div></div>`;
       const damageTarget = document.querySelector('#damage-result')!;
       try {
@@ -532,10 +548,15 @@ async function start() {
         const { result } = currentDamage;
         renderSheetParity(result);
         let comparisonHtml = '';
+        let damageRatioHtml = '';
         if (baseline && before) {
           try {
             const previous = projectDamage(data, baseline).result;
             const rows = compareDamageResults(result, previous);
+            const damageRatio = previous.finalDamage.finalDamage === 0
+              ? null
+              : result.finalDamage.finalDamage / previous.finalDamage.finalDamage * 100;
+            damageRatioHtml = `<div class="damage-ratio"><span>新配置是舊配置的</span><strong>${damageRatio === null ? '無法計算（原配置為 0）' : `${percentFormat(damageRatio)}%`}</strong></div>`;
             comparisonHtml = `<section class="damage-comparison"><h3>與比較基準</h3><div class="damage-comparison-scroll"><table><thead><tr><th>項目</th><th>基準</th><th>目前</th><th>差異</th><th>變化率</th></tr></thead><tbody>${rows.map(row => {
               const unit = row.unit === 'percent' ? '%' : '';
               const deltaUnit = row.unit === 'percent' ? '%' : '';
@@ -550,7 +571,7 @@ async function start() {
         }
         const rateSources = (effects: typeof result.combatRates.critRate.multipliers) => effects.map(effect => `${effect.sourceId} ×${fmt(effect.factor)}`).join(' · ') || '無';
         const critDamageSources = result.multiplicativeCritDamage.factors.map(effect => `${sourceLabel(effect.sourceId)} ${fmt(effect.valuePct)}%`).join('、') || '無';
-        damageTarget.innerHTML = `<div class="damage-summary"><div><span>最小攻擊力</span><strong>${fmt(result.attack.lowerDamage)}</strong></div><div><span>最大攻擊力</span><strong>${fmt(result.attack.upperDamage)}</strong></div><div class="final-damage"><span>最終傷害</span><strong>${fmt(result.finalDamage.finalDamage)}</strong></div></div>${comparisonHtml}<details class="formula-detail"><summary>展開傷害計算明細</summary><p>致命傷害被動：${fmt(result.classCritDamagePassivePct)}%　乘算暴傷：${fmt(result.multiplicativeCritDamage.value)}%</p><p>乘算暴傷來源：${h(critDamageSources)}</p><p>爆擊乘算來源：${h(rateSources(result.combatRates.critRate.multipliers))}</p><p>極大乘算來源：${h(rateSources(result.combatRates.extremization.multipliers))}</p><p>乘算傷害：${fmt(result.generalMultiplicativeDamage.value)} 倍　強者／排熱因子：${fmt(result.finalDamage.conditionalFactor)}</p><p>適應力因子：${fmt(result.finalDamage.adaptationFactor)}　防禦因子：${fmt(result.finalDamage.defenseFactor)}</p></details>`;
+        damageTarget.innerHTML = `<div class="damage-summary"><div><span>最小攻擊力</span><strong>${fmt(result.attack.lowerDamage)}</strong></div><div><span>最大攻擊力</span><strong>${fmt(result.attack.upperDamage)}</strong></div><div class="final-damage"><span>最終傷害</span><strong>${percentFormat(result.finalDamage.finalDamage)}</strong></div></div>${damageRatioHtml}${comparisonHtml}<details class="formula-detail"><summary>展開傷害計算明細</summary><p>致命傷害被動：${fmt(result.classCritDamagePassivePct)}%　乘算暴傷：${fmt(result.multiplicativeCritDamage.value)}%</p><p>乘算暴傷來源：${h(critDamageSources)}</p><p>爆擊乘算來源：${h(rateSources(result.combatRates.critRate.multipliers))}</p><p>極大乘算來源：${h(rateSources(result.combatRates.extremization.multipliers))}</p><p>乘算傷害：${fmt(result.generalMultiplicativeDamage.value)} 倍　強者／排熱因子：${fmt(result.finalDamage.conditionalFactor)}</p><p>適應力因子：${fmt(result.finalDamage.adaptationFactor)}　防禦因子：${fmt(result.finalDamage.defenseFactor)}</p></details>`;
       } catch (error) {
         damageTarget.innerHTML = `<p class="input-warning">尚未計算：${h(error instanceof Error ? error.message : error)}　請完成該部位的必要輸入。</p>`;
       }
