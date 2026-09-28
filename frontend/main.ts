@@ -76,8 +76,8 @@ async function start() {
     if (sourceId.startsWith('sheet:計算機!')) {
       const cell = sourceId.slice('sheet:計算機!'.length);
       if (Object.values(data.masterBeast.overallPotentialSourceCells).includes(cell)) return '聖獸潛力';
-      if (cell === 'E76') return '大師聖獸固定效果（技能類雙攻）';
-      if (cell === 'E93') return '寵物被動（技能類雙攻）';
+      if (cell === 'E76') return '大師聖獸固定效果（雙攻%）';
+      if (cell === 'E93') return '寵物被動（雙攻%）';
       if (cell === 'Q37') return '百億套效';
       if (cell === 'Q53') return '武器';
       if (cell === 'Q86' || cell === 'R86') return '稱號';
@@ -122,8 +122,7 @@ async function start() {
       const [, part, detail] = sourceId.split(':');
       const partNames: Record<string, string> = { head: '頭飾', ring: '指環' };
       if (part === 'mirror') {
-        const row = Number(detail) + 26;
-        return `聖獸迷鏡效果：${String(state.values[`O${row}`] ?? '')}`;
+        return '聖獸迷鏡效果';
       }
       if (part === 'head-manual') return `聖獸頭飾精靈石：${String(state.values.M27 ?? '')}`;
       if (part === 'necklace-manual') return `聖獸項鍊精靈石：${String(state.values.M33 ?? '')}`;
@@ -270,7 +269,7 @@ async function start() {
     petSkillCheckbox.checked = state.petSkillAttackEnabled;
     petSkillCheckbox.addEventListener('change', () => { state.petSkillAttackEnabled = petSkillCheckbox.checked; update(); });
     const petSkillLabel = document.createElement('span');
-    petSkillLabel.textContent = '寵物具有 2% 技能類雙攻';
+    petSkillLabel.textContent = '寵物具有 2% 雙攻';
     petSkillToggle.append(petSkillCheckbox, petSkillLabel);
     general.append(petSkillToggle);
     for (const effect of data.otherEffects.binaryEffects) pick(general, effect.name, localCell(effect.selectorCell), effect.options);
@@ -301,7 +300,7 @@ async function start() {
     const potentialText = potential
       ? Object.entries(potential.stats).map(([key, value]) => `${data.attributes.attributes.find(entry => entry.key === key)?.name ?? key} +${fmt(value)}`).join('、')
       : '尚未選擇潛力效果';
-    root.insertAdjacentHTML('beforeend', `<div class="master-beast-source-notes"><p><strong>固定效果：</strong>技能類雙攻 +3%（轉職後固定擁有）。</p><p><strong>精靈石效果：</strong>選黃時，致命一擊與極大化各乘算 +${fmt(data.parameters.yellowBeastSpiritStoneRatePct)}%；選綠時不套用。</p><p><strong>潛力效果：</strong>${h(potentialText)}</p></div>`);
+    root.insertAdjacentHTML('beforeend', `<div class="master-beast-source-notes"><p><strong>固定效果：</strong>雙攻 +3%（轉職後固定擁有）。</p><p><strong>精靈石效果：</strong>選黃時，致命一擊與極大化各乘算 +${fmt(data.parameters.yellowBeastSpiritStoneRatePct)}%；選綠時不套用。</p><p><strong>潛力效果：</strong>${h(potentialText)}</p></div>`);
   }
   function renderTitleInput() {
     field(document.querySelector<HTMLElement>('#title-input')!, '稱號', 'B2', options([...new Set(data.otherEffects.titles.map(entry => entry.name))]));
@@ -508,7 +507,15 @@ async function start() {
       const deltaText = delta === null ? '' : `${delta > 0 ? '+' : ''}${isPercent ? percentFormat(delta) : fmt(delta)}${isPercent ? '%' : ''}`;
       const shownName = key === 'attackPower' ? '攻擊力' : meta?.name ?? key;
       const lowerwearAverageLabel = state.lowerwearAlternativeEnabled ? '下衣+強/排褲平均' : '下衣配置';
-      const commonSources = [...stat.sharedSources, ...stat.lowerwearASources];
+      const allCommonSources = [...stat.sharedSources, ...stat.lowerwearASources];
+      const innerwearOrder = new Map(data.innerwear.slots.map((slot, index) => [`innerwear:${slot.id}`, index]));
+      const firstInnerwearIndex = allCommonSources.findIndex(source => innerwearOrder.has(source.sourceId));
+      const innerwearSources = allCommonSources
+        .filter(source => innerwearOrder.has(source.sourceId))
+        .sort((left, right) => innerwearOrder.get(left.sourceId)! - innerwearOrder.get(right.sourceId)!);
+      const commonSources = allCommonSources.filter(source => !innerwearOrder.has(source.sourceId));
+      if (firstInnerwearIndex >= 0) commonSources.splice(Math.min(firstInnerwearIndex, commonSources.length), 0, ...innerwearSources);
+      else commonSources.push(...innerwearSources);
       const sharedDetails = commonSources.length ? `<p class="stat-detail-heading">共同來源</p>${sourceRows(commonSources, isPercent)}` : '';
       const lowerwearBDetails = state.lowerwearAlternativeEnabled && stat.lowerwearBSources.length ? `<p class="stat-detail-heading">強/排褲來源</p>${sourceRows(stat.lowerwearBSources, isPercent)}` : '';
       return `<details class="stat"><summary><span>${h(shownName)}</span>${stat.cap === undefined ? '' : `<small class="stat-cap">上限 ${fmt(stat.cap)}%</small>`}<strong>${fmt(stat.finalTotal)}${isPercent ? '%' : ''}</strong>${delta === null ? '' : `<small class="${delta > 0 ? 'positive' : delta < 0 ? 'negative' : ''}">${deltaText}</small>`}</summary><div class="stat-details">${sharedDetails}${lowerwearBDetails}<p class="stat-average">${lowerwearAverageLabel} ${fmt(stat.lowerwearAverage)}${isPercent ? '%' : ''}</p>${stat.cap === undefined ? '' : `<p>套用角色上限 ${fmt(stat.cap)}%</p>`}${comparison}</div></details>`;
