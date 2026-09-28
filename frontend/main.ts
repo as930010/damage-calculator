@@ -76,8 +76,8 @@ async function start() {
     if (sourceId.startsWith('sheet:計算機!')) {
       const cell = sourceId.slice('sheet:計算機!'.length);
       if (Object.values(data.masterBeast.overallPotentialSourceCells).includes(cell)) return '聖獸潛力';
-      if (cell === 'E76') return '大師聖獸固定效果（雙攻%）';
-      if (cell === 'E93') return '寵物被動（雙攻%）';
+      if (cell === 'E76') return '大師聖獸固定效果';
+      if (cell === 'E93') return '寵物被動';
       if (cell === 'Q37') return '百億套效';
       if (cell === 'Q53') return '武器';
       if (cell === 'Q86' || cell === 'R86') return '稱號';
@@ -155,13 +155,11 @@ async function start() {
       return `武器鑑定${group ? `：${String(state.values[cell] ?? '')}` : ''}`;
     }
     if (sourceId.startsWith('giant-stone:')) {
-      const cell = sourceId.slice('giant-stone:'.length);
-      return `巨型魔力石：${String(state.values[cell] ?? '')}`;
+      return '巨型魔力石';
     }
     if (sourceId.startsWith('weapon-grade:')) return '武器等級效果';
     if (sourceId.startsWith('weapon-transform:')) {
-      const cell = sourceId.slice('weapon-transform:'.length);
-      return `武器變換：${String(state.values[cell] ?? '')}`;
+      return '武器變換';
     }
     if (sourceId.startsWith('armor-appraisal:')) {
       const slotId = sourceId.split(':')[1];
@@ -182,8 +180,7 @@ async function start() {
     const binaryEffect = data.otherEffects.binaryEffects.find(entry => entry.name === sourceId);
     if (binaryEffect) return `${binaryEffect.name}：${String(state.values[localCell(binaryEffect.selectorCell)] ?? '')}`;
     if (sourceId.startsWith('guild-fountain-')) {
-      const stage = data.otherEffects.guildFountain.find(entry => sourceId === `guild-fountain-${entry.stage}`);
-      return `公會噴泉（${stage ? String(state.values[localCell(stage.selectorCell)] ?? '') : sourceId.slice('guild-fountain-'.length)}）`;
+      return '公會噴泉';
     }
     return `來源名稱待確認（${sourceId}）`;
   }
