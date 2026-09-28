@@ -1,7 +1,7 @@
 import { getEquipmentOptionName, type EquipmentCatalogItem, type SimulatorEquipmentSelectionMapping } from '../calculation/equipment-catalog.ts';
 import type { GameData } from './data.ts';
-import { codeForFieldId, fieldIdForCell, fieldIdForCode, isFieldId } from './field-ids.ts';
-import { createFieldValues, type LoadoutState } from './state.ts';
+import { codeForFieldId, fieldIdForCode, isFieldId } from './field-ids.ts';
+import type { LoadoutState } from './state.ts';
 import { findValidationCatalog } from './sheet-validation.ts';
 
 type TransferData = Pick<GameData,
@@ -33,18 +33,9 @@ function inputOption(data: TransferData, cell: string) {
   return catalog ? { catalog, options: catalog.options } : null;
 }
 
-function localCell(cell: string): string {
-  return cell.split('!').at(-1)!.replaceAll('$', '');
-}
-
-function fieldKeyForReference(reference: string): string {
-  const local = localCell(reference);
-  return fieldIdForCell(local) ?? local;
-}
-
 /** Options for controls whose values are not represented in the imported sheet validation table. */
 function customOptions(data: TransferData, cell: string, values: Record<string, unknown>): readonly (string | number)[] | null {
-  const address = fieldKeyForReference(cell);
+  const address = cell;
   const direct: Record<string, readonly (string | number)[]> = {
     'Effect.Title': data.otherEffects.titles.map(option => option.name),
     'Effect.Consumable': data.otherEffects.consumables.map(option => option.name),
@@ -56,33 +47,33 @@ function customOptions(data: TransferData, cell: string, values: Record<string, 
     'MasterBeast.OverallPotential': data.masterBeast.options.filter(option => option.category === 'overall').map(option => option.name),
   };
   if (address in direct) return direct[address];
-  for (const entry of data.otherEffects.binaryEffects) if (fieldKeyForReference(entry.selectorCell) === address) return entry.options.map(option => option.name);
-  for (const entry of data.otherEffects.guildFountain) if (fieldKeyForReference(entry.selectorCell) === address) return entry.options.map(option => option.name);
-  if (data.colorSetEffects.selectorCell && fieldKeyForReference(data.colorSetEffects.selectorCell) === address) return data.colorSetEffects.options.map(option => option.name);
-  if (data.spiritRecord.classSelectors.selectorCells.some(cell => fieldKeyForReference(cell) === address)) return data.spiritRecord.classSelectors.classes.map(entry => entry.classCode);
+  for (const entry of data.otherEffects.binaryEffects) if (entry.selectorCell === address) return entry.options.map(option => option.name);
+  for (const entry of data.otherEffects.guildFountain) if (entry.selectorCell === address) return entry.options.map(option => option.name);
+  if (data.colorSetEffects.selectorCell && data.colorSetEffects.selectorCell === address) return data.colorSetEffects.options.map(option => option.name);
+  if (data.spiritRecord.classSelectors.selectorCells.some(cell => cell === address)) return data.spiritRecord.classSelectors.classes.map(entry => entry.classCode);
   for (const slot of data.layout.slots) {
     if (slot.innerwearId) {
       const innerwear = data.innerwear.slots.find(entry => entry.id === slot.innerwearId);
-      if (innerwear && fieldKeyForReference(innerwear.enhancementCell) === address) return Object.keys(data.innerwear.enhancementStats).map(level => `Lv.${level}`);
-      if (innerwear && fieldKeyForReference(innerwear.forgingCell) === address) return Object.keys(data.innerwear.forgingAttack);
+      if (innerwear && innerwear.enhancementCell === address) return Object.keys(data.innerwear.enhancementStats).map(level => `Lv.${level}`);
+      if (innerwear && innerwear.forgingCell === address) return Object.keys(data.innerwear.forgingAttack);
     }
   }
-  if (fieldKeyForReference(data.weaponGrades.selectorCell) === address) return data.weaponGrades.options.map(option => option.name);
+  if (data.weaponGrades.selectorCell === address) return data.weaponGrades.options.map(option => option.name);
   if (address === 'Weapon.ENHC') return Object.keys(data.attack.weaponEnhancementFactors).map(level => `Lv.${level}`);
-  if (fieldKeyForReference(data.growth.selectorCell) === address) return data.growth.levels.map(level => level.name);
-  for (const slot of data.appraisals.slots) if (slot.inputCells.some(cell => fieldKeyForReference(cell) === address)) return data.appraisals.options.map(option => option.name);
-  for (const input of data.circuits.inputs) if (fieldKeyForReference(input.attributeCell) === address) return [...Object.keys(data.circuits.statKeyBySheetName), '無關傷害'];
+  if (data.growth.selectorCell === address) return data.growth.levels.map(level => level.name);
+  for (const slot of data.appraisals.slots) if (slot.inputCells.some(cell => cell === address)) return data.appraisals.options.map(option => option.name);
+  for (const input of data.circuits.inputs) if (input.attributeCell === address) return [...Object.keys(data.circuits.statKeyBySheetName), '無關傷害'];
   for (const slot of data.chipSlots.slots) {
-    if (fieldKeyForReference(slot.attributeCell) === address) return data.chips.chips.map(chip => chip.name);
-    if (fieldKeyForReference(slot.tuningCell) === address) {
-      const chipName = values[fieldKeyForReference(slot.attributeCell)];
+    if (slot.attributeCell === address) return data.chips.chips.map(chip => chip.name);
+    if (slot.tuningCell === address) {
+      const chipName = values[slot.attributeCell];
       return data.chips.chips.find(chip => chip.name === chipName)?.tuningLevels.map(level => level.level) ?? [];
     }
   }
-  for (const group of Object.values(data.weaponAppraisals.groups)) if (fieldKeyForReference(group.selectorCell) === address) return group.options.map(option => option.name);
-  if (data.giantStones.selectorCells.some(cell => fieldKeyForReference(cell) === address)) return data.giantStones.options.map(option => option.name);
-  for (const slot of data.transformations.slots) if (fieldKeyForReference(slot.choiceCell) === address) return data.transformations.options;
-  if (data.rightIceSets.selectionCells.some(cell => fieldKeyForReference(cell) === address)) {
+  for (const group of Object.values(data.weaponAppraisals.groups)) if (group.selectorCell === address) return group.options.map(option => option.name);
+  if (data.giantStones.selectorCells.some(cell => cell === address)) return data.giantStones.options.map(option => option.name);
+  for (const slot of data.transformations.slots) if (slot.choiceCell === address) return data.transformations.options;
+  if (data.rightIceSets.selectionCells.some(cell => cell === address)) {
     return [...new Set(data.rightIceSets.effects.map(effect => effect.setName))];
   }
   const masterBeastAttributes = data.masterBeast.customAttributeOptions;
@@ -105,9 +96,9 @@ function cellOptions(data: TransferData, cell: string, values: Record<string, un
 }
 
 function equipmentMappings(data: TransferData): Map<string, SimulatorEquipmentSelectionMapping> {
-  const mappings = new Map(data.mapping.selections.map(mapping => [fieldKeyForReference(mapping.selectionCell), mapping]));
+  const mappings = new Map(data.mapping.selections.map(mapping => [mapping.selectionCell, mapping]));
   for (const mapping of data.mapping.magicStoneSelections.inputGroups) {
-    mappings.set(fieldKeyForReference(mapping.selectionCell), {
+    mappings.set(mapping.selectionCell, {
       selectionCell: mapping.selectionCell,
       catalogFile: data.mapping.magicStoneSelections.catalogFile,
       slotId: data.mapping.magicStoneSelections.slotId,
@@ -144,19 +135,18 @@ export function serializeLoadout(state: LoadoutState, data: TransferData): { jso
   const mappings = equipmentMappings(data);
   const values: Record<string, string | number> = {};
   const omittedFields: string[] = [];
-  const fieldValues = createFieldValues(state.values);
+  const fieldValues = state.values;
 
   for (const [key, value] of Object.entries(fieldValues)) {
-    const fieldId = isFieldId(key) ? key : fieldIdForCell(key);
-    const cell = fieldId;
+    const fieldId = isFieldId(key) ? key : undefined;
     const fieldCode = fieldId ? codeForFieldId(fieldId) : undefined;
-    if (!fieldId || !fieldCode || !cell || !isValidPrimitive(value)) {
+    if (!fieldId || !fieldCode || !isValidPrimitive(value)) {
       omittedFields.push(key);
       continue;
     }
     if (typeof value === 'string' && value.trim() === '') continue;
 
-    const mapping = mappings.get(cell);
+    const mapping = mappings.get(fieldId);
     if (mapping) {
       if (typeof value !== 'string') { omittedFields.push(fieldId); continue; }
       const matches = matchEquipment(data, mapping, value);
@@ -165,7 +155,7 @@ export function serializeLoadout(state: LoadoutState, data: TransferData): { jso
       continue;
     }
 
-    const choices = cellOptions(data, cell, fieldValues);
+    const choices = cellOptions(data, fieldId, fieldValues);
     if (choices) {
       if (!choices.some(option => String(option) === String(value))) { omittedFields.push(fieldId); continue; }
       values[String(fieldCode)] = value;
@@ -197,7 +187,7 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
   const clearedFields: string[] = [];
   const classes = data.classes.classes.filter(entry => entry.active);
   const validCurrentClass = classes.some(entry => entry.id === current.Job) ? current.Job : classes[0]?.id;
-  const candidateJob = typeof candidate.Job === 'string' ? candidate.Job : candidate.classId;
+  const candidateJob = candidate.Job;
   const Job = typeof candidateJob === 'string' && classes.some(entry => entry.id === candidateJob)
     ? candidateJob
     : validCurrentClass;
@@ -212,18 +202,17 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
     const fieldId = fieldIdForCode(code);
     if (fieldId && isValidPrimitive(value)) optionValuesById[fieldId] = value;
   }
-  const optionValues = createFieldValues(optionValuesById);
+  const optionValues = optionValuesById;
   if (isRecord(rawValues)) {
     for (const [code, value] of Object.entries(rawValues)) {
       const fieldId = fieldIdForCode(code);
-      const cell = fieldId;
-      if (!fieldId || !cell || !isValidPrimitive(value)) {
+      if (!fieldId || !isValidPrimitive(value)) {
         clearedFields.push(fieldId ?? code);
         continue;
       }
-      if (mappings.has(cell)) continue;
+      if (mappings.has(fieldId)) continue;
       if (typeof value === 'string' && value.trim() === '') continue;
-      const choices = cellOptions(data, cell, optionValues);
+      const choices = cellOptions(data, fieldId, optionValues);
       if (choices) {
         if (choices.some(option => String(option) === String(value))) values[fieldId] = value;
         else clearedFields.push(fieldId);
@@ -232,7 +221,7 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
   }
 
   for (const [cell, mapping] of mappings) {
-    const fieldId = isFieldId(cell) ? cell : fieldIdForCell(cell)!;
+    const fieldId = cell;
     const fieldCode = codeForFieldId(fieldId)!;
     const selection = rawValues[String(fieldCode)];
     if (selection === undefined || selection === null || selection === '') continue;
@@ -256,7 +245,7 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
     state: {
       schemaVersion: 3,
       Job: Job ?? current.Job,
-      values: createFieldValues(values),
+      values,
       lowerwearAlternativeEnabled,
       masterBeastSpiritStoneColor,
       petSkillAttackEnabled,

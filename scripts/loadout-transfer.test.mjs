@@ -5,7 +5,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { getEquipmentOptionName } from "../dist/calculation/equipment-catalog.js";
 import { parseLoadoutJson, serializeLoadout } from "../dist/frontend/loadout-transfer.js";
-import { codeForFieldId, fieldIdForCell, isFieldId } from "../dist/frontend/field-ids.js";
+import { codeForFieldId, isFieldId } from "../dist/frontend/field-ids.js";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = async (path) => JSON.parse(await readFile(join(root, path), "utf8"));
@@ -25,28 +25,24 @@ const data = { classes, mapping, simulatorInputs, manifest, masterBeast, catalog
 const semanticState = (value) => ({
   ...value,
   schemaVersion: 3,
-  values: Object.fromEntries(Object.entries(value.values).flatMap(([cell, item]) => {
-    const fieldId = fieldIdForCell(cell);
-    const key = fieldId ?? (isFieldId(cell) ? cell : undefined);
-    return key ? [[key, item]] : [];
-  })),
+  values: Object.fromEntries(Object.entries(value.values).filter(([fieldId]) => isFieldId(fieldId))),
 });
 const firstMapping = mapping.selections.find((entry) => catalogs[entry.catalogFile].items.some((item) => item.active && item.slotId === entry.slotId));
-const firstMappingFieldId = fieldIdForCell(firstMapping.selectionCell) ?? firstMapping.selectionCell;
+const firstMappingFieldId = firstMapping.selectionCell;
 const firstItem = catalogs[firstMapping.catalogFile].items.find((item) => item.active && item.slotId === firstMapping.slotId);
 const equipmentName = getEquipmentOptionName(firstItem, firstMapping.application);
 const mappedCells = new Set([
-  ...mapping.selections.map((entry) => fieldIdForCell(entry.selectionCell) ?? entry.selectionCell),
-  ...mapping.magicStoneSelections.inputGroups.map((entry) => fieldIdForCell(entry.selectionCell) ?? entry.selectionCell),
+  ...mapping.selections.map((entry) => entry.selectionCell),
+  ...mapping.magicStoneSelections.inputGroups.map((entry) => entry.selectionCell),
 ]);
 const firstInput = simulatorInputs.inputs.find((input) => {
   const cell = input.simulatorCells.trim();
-  const fieldId = fieldIdForCell(cell) ?? (isFieldId(cell) ? cell : undefined);
-  return fieldId && !mappedCells.has(fieldId)
+  const fieldId = cell;
+  return isFieldId(fieldId) && !mappedCells.has(fieldId)
     && simulatorInputs.catalogs.find((catalog) => catalog.id === input.catalogId)?.options.some((option) => String(option.value).trim() !== "");
 });
 const inputCell = firstInput.simulatorCells.trim();
-const inputFieldId = fieldIdForCell(inputCell) ?? (isFieldId(inputCell) ? inputCell : undefined);
+const inputFieldId = isFieldId(inputCell) ? inputCell : undefined;
 const firstOption = simulatorInputs.catalogs.find((catalog) => catalog.id === firstInput.catalogId).options.find((option) => String(option.value).trim() !== "");
 const state = {
   schemaVersion: 3,
@@ -119,15 +115,15 @@ test("corrupted option codes and invalid cells are cleared without losing valid 
 
 test("deleted custom dropdown options clear only the affected field", () => {
   const customName = data.otherEffects.titles[0].name;
-  const customState = { ...state, values: { ...state.values, B2: customName, B4: data.otherEffects.consumables[0].name } };
+  const customState = { ...state, values: { ...state.values, "Effect.Title": customName, "Effect.Consumable": data.otherEffects.consumables[0].name } };
   const exported = JSON.parse(serializeLoadout(customState, data).json);
   const changedData = structuredClone(data);
   changedData.otherEffects.titles = changedData.otherEffects.titles.filter((option) => option.name !== customName);
   const result = parseLoadoutJson(JSON.stringify(exported), customState, changedData);
-  assert.equal(result.state.values[fieldIdForCell("B2")], undefined);
-  assert.equal(result.state.values[fieldIdForCell("B4")], customState.values.B4);
+  assert.equal(result.state.values["Effect.Title"], undefined);
+  assert.equal(result.state.values["Effect.Consumable"], customState.values["Effect.Consumable"]);
   assert.equal(result.state.values[firstMappingFieldId], equipmentName);
-  assert.ok(result.clearedFields.includes(fieldIdForCell("B2")));
+  assert.ok(result.clearedFields.includes("Effect.Title"));
 });
 
 test("previous name-based format is rejected because this site has not been released", () => {
@@ -142,7 +138,7 @@ test("previous name-based format is rejected because this site has not been rele
 test("coordinate-keyed version-2 JSON is rejected and unknown numeric field codes stay empty", () => {
   const oldPayload = {
     format: "damage-calculator-loadout", formatVersion: 2,
-    Job: state.Job, values: { [firstMapping.selectionCell]: equipmentName },
+    Job: state.Job, values: { B20: equipmentName },
   };
   assert.throws(() => parseLoadoutJson(JSON.stringify(oldPayload), state, data), /不支援/);
 

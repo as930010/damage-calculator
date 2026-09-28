@@ -112,7 +112,6 @@ export async function readJson<T>(path: string, cache: RequestCache = "no-store"
 export async function loadGameData(): Promise<GameData> {
   return readJson<GameData>("game-data.json", "force-cache");
 }
-export const localCell = (cell: string): string => cell.split("!").at(-1)!.replaceAll("$", "");
 export const escapeHtml = (value: unknown): string => String(value ?? "").replace(/[&<>"']/g, (character) =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]!);
 export const formatNumber = (value: number): string => new Intl.NumberFormat("zh-TW", { maximumFractionDigits: 5 }).format(value);

@@ -6,43 +6,25 @@ import { resolveAccessoryEffectOptions, resolveArmorAppraisals, resolveAtmaSetEf
 import { calculateWeaponBaseAttack, resolveAttackParameters } from "../calculation/attack.ts";
 import type { AttributeRule, StatContribution } from "../calculation/types.ts";
 import { calculateLoadout, calculateLoadoutCombatRates } from "../calculation/loadout-engine.ts";
-import { localCell, type GameData } from "./data.ts";
-import { cellForFieldId, fieldIdForCell, isFieldId } from "./field-ids.ts";
-import { createFieldValues, type LoadoutState } from "./state.ts";
-
-function valueForCell(values: Record<string, string | number>, cell: string): string | number | undefined {
-  const address = localCell(cell);
-  const fieldId = isFieldId(address) ? address : fieldIdForCell(address);
-  return (fieldId ? values[fieldId] ?? values[cellForFieldId(fieldId) ?? ""] : undefined) ?? values[address];
-}
-
-function valuesByFieldId(values: Record<string, string | number>): Record<string, string | number> {
-  return Object.fromEntries(Object.entries(values).map(([key, value]) => [isFieldId(key) ? key : fieldIdForCell(key) ?? key, value]));
-}
-
-function valuesWithCompatibilityReads(values: Record<string, string | number>): Record<string, string | number> {
-  return createFieldValues(valuesByFieldId(values));
-}
+import type { GameData } from "./data.ts";
+import type { LoadoutState } from "./state.ts";
 
 /** UI state to supported stat sources; game arithmetic remains in calculation/. */
 export function projectAttributes(data: GameData, state: LoadoutState) {
   const values = state.values;
-  const text = (key: string) => String(valueForCell(values, key) ?? "");
-  const number = (key: string) => valueForCell(values, key) === undefined || valueForCell(values, key) === "" ? undefined : Number(valueForCell(values, key));
+  const text = (key: string) => String(values[key] ?? "");
+  const number = (key: string) => values[key] === undefined || values[key] === "" ? undefined : Number(values[key]);
   const equipment = resolveSimulatorEquipmentContributions(data.mapping, data.catalogs, {
-    selectedItems: Object.fromEntries(Object.entries(valuesByFieldId(values)).flatMap(([fieldId, value]) => [
-      [fieldId, String(value)],
-      [cellForFieldId(fieldId) ?? fieldId, String(value)],
-    ])),
+    selectedItems: Object.fromEntries(Object.entries(values).map(([fieldId, value]) => [fieldId, String(value)])),
     enabledValues: { "Lowerwear.Alternative.Enabled": state.lowerwearAlternativeEnabled },
   });
-  const inner = resolveInnerwearSources(data.innerwear, data.attack, state.Job, valuesWithCompatibilityReads(values), state.lowerwearAlternativeEnabled);
+  const inner = resolveInnerwearSources(data.innerwear, data.attack, state.Job, values, state.lowerwearAlternativeEnabled);
   const configuredEffects: StatContribution[] = [
     ...data.parameters.optionalEffects
       .filter(effect => state[effect.stateKey] ?? effect.defaultEnabled)
       .map(({ sourceId, stats }) => ({ sourceId, stats })),
     ...data.parameters.conditionalEffects
-      .filter(effect => text(localCell(effect.selectorCell)) === effect.selectorValue)
+      .filter(effect => text(effect.selectorCell) === effect.selectorValue)
       .map(({ sourceId, stats }) => ({ sourceId, stats })),
   ];
   const groups: Record<"shared" | "lowerwearA" | "lowerwearB", StatContribution[]> = {
@@ -74,15 +56,15 @@ export function projectAttributes(data: GameData, state: LoadoutState) {
   for (const entry of resolveCircuitBoardEffects(data.circuits, circuits)) if (entry.contribution) groups[entry.wearSet].push(entry.contribution);
   const colorSet = resolveColorSetEffect(data.colorSetEffects, text(data.colorSetEffects.selectorCell), text("Left.Armor.Gloves.Circuit.Attribute"), number("Left.Armor.Gloves.Circuit.Value") ?? 0);
   if (colorSet) groups.shared.push(colorSet);
-  groups.shared.push(...resolveWeaponTransformationsFromCells(data.transformations, valuesWithCompatibilityReads(values)));
+  groups.shared.push(...resolveWeaponTransformationsFromCells(data.transformations, values));
   const growth = resolveWeaponGrowth(data.growth, text(data.growth.selectorCell));
   if (growth) groups.shared.push(growth);
   for (const group of Object.values(data.weaponAppraisals.groups)) {
-    const source = resolveNamedStatOption(group.options, text(group.selectorCell), `weapon-appraisal:${localCell(group.selectorCell)}`);
+    const source = resolveNamedStatOption(group.options, text(group.selectorCell), `weapon-appraisal:${group.selectorCell}`);
     if (source) groups.shared.push(source);
   }
   for (const cell of data.giantStones.selectorCells) {
-    const source = resolveNamedStatOption(data.giantStones.options, text(cell), `giant-stone:${localCell(cell)}`);
+    const source = resolveNamedStatOption(data.giantStones.options, text(cell), `giant-stone:${cell}`);
     if (source) groups.shared.push(source);
   }
   const weaponGrade = resolveNamedStatOption(data.weaponGrades.options, text(data.weaponGrades.selectorCell), "weapon-grade:Weapon.MagicStone.Grade");
@@ -144,8 +126,8 @@ export function projectAttributes(data: GameData, state: LoadoutState) {
   addNamedOption(data.otherEffects.environments, "Effect.Environment", "environment");
   addNamedOption(data.otherEffects.peakOptions, "Peak.Option", "peak-option");
   addNamedOption(data.pets.options, "Pet.Passive", "pet");
-  for (const effect of data.otherEffects.binaryEffects) addNamedOption(effect.options, localCell(effect.selectorCell), effect.name);
-  for (const stage of data.otherEffects.guildFountain) addNamedOption(stage.options, localCell(stage.selectorCell), `guild-fountain-${stage.stage}`);
+  for (const effect of data.otherEffects.binaryEffects) addNamedOption(effect.options, effect.selectorCell, effect.name);
+  for (const stage of data.otherEffects.guildFountain) addNamedOption(stage.options, stage.selectorCell, `guild-fountain-${stage.stage}`);
   if (!state.lowerwearAlternativeEnabled) groups.lowerwearB = [];
   const rules: AttributeRule[] = data.attributes.attributes.filter((entry) => entry.active && entry.aggregation === "sum")
     .map((entry) => ({ key: entry.key, aggregation: "sum", cap: entry.cap }));
@@ -171,7 +153,7 @@ function combatRateInputs(data: GameData, state: LoadoutState, attributes: Retur
   const job = data.classes.classes.find(entry => entry.id === state.Job);
   if (!job) throw new RangeError(`找不到職業設定：${state.Job}`);
   const percentage = (cell: string) => {
-    const value = valueForCell(state.values, cell);
+    const value = state.values[cell];
     if (value == null || value === "") return 0;
     const parsed = Number(value);
     if (!Number.isFinite(parsed)) throw new RangeError(`${cell} 必須是數值。`);
@@ -180,8 +162,8 @@ function combatRateInputs(data: GameData, state: LoadoutState, attributes: Retur
   const combatRateSourceValues = {
     parameters: { yellowBeastSpiritStoneRatePct: data.parameters.yellowBeastSpiritStoneRatePct },
     selections: {
-      "Left.Armor.Bottom.ENHC": valueForCell(state.values, "Left.Armor.Bottom.ENHC"),
-      "Left.Armor.Shoes.ENHC": valueForCell(state.values, "Left.Armor.Shoes.ENHC"),
+      "Left.Armor.Bottom.ENHC": state.values["Left.Armor.Bottom.ENHC"],
+      "Left.Armor.Shoes.ENHC": state.values["Left.Armor.Shoes.ENHC"],
       masterBeastSpiritStoneColor: state.masterBeastSpiritStoneColor ?? data.masterBeast.spiritStoneColorSelector.defaultColor,
     },
   };
@@ -207,11 +189,11 @@ export function projectDamage(data: GameData, state: LoadoutState) {
   const attributes = projectAttributes(data, state);
   const job = data.classes.classes.find(entry => entry.id === state.Job);
   if (!job) throw new RangeError(`找不到職業設定：${state.Job}`);
-  const weaponText = String(valueForCell(state.values, "Weapon.ENHC") ?? "");
+  const weaponText = String(state.values["Weapon.ENHC"] ?? "");
   const weaponLevel = Number(weaponText.match(/[0-9]+/)?.[0]);
   if (!Number.isSafeInteger(weaponLevel)) throw new RangeError("請先選擇武器強化等級。");
   const percentage = (cell: string) => {
-    const value = valueForCell(state.values, cell);
+    const value = state.values[cell];
     if (value == null || value === "") return 0;
     const parsed = Number(value);
     if (!Number.isFinite(parsed)) throw new RangeError(`${cell} 必須是數值。`);

@@ -1,5 +1,5 @@
 import { getEquipmentOptionName } from '../calculation/equipment-catalog.ts';
-import { loadGameData, localCell, readJson, escapeHtml as h, formatNumber as fmt } from './data.ts';
+import { loadGameData, readJson, escapeHtml as h, formatNumber as fmt } from './data.ts';
 import { readState, readBaseline, saveState, type LoadoutState } from './state.ts';
 import { parseLoadoutJson, serializeLoadout } from './loadout-transfer.ts';
 import { projectAttributes, projectCombatRates, projectDamage } from './projection.ts';
@@ -47,7 +47,7 @@ async function start() {
     document.querySelector('#save-status')!.textContent = '驗算範例模式';
   }
   document.querySelector('#beast-accessory-fields')!.insertAdjacentHTML('beforebegin', '<div id="master-beast-controls" class="master-beast-controls"></div>');
-  const val = (cell: string) => String(state.values[localCell(cell)] ?? '');
+  const val = (fieldId: string) => String(state.values[fieldId] ?? '');
   const summary = (stats: Readonly<Record<string, number>>) => Object.entries(stats).filter(([, value]) => value !== 0).map(([key, value]) => `${data.attributes.attributes.find(a => a.key === key)?.name ?? key} ${fmt(value)}`).join(' · ');
   const options = (names: readonly string[]): PickerOption[] => names.map(name => ({ value: name, label: name }));
   const validationChoices = (cell: string, percentLabel = false): PickerOption[] => {
@@ -110,7 +110,7 @@ async function start() {
     if (sourceId.startsWith('circuit-board:')) {
       const slotId = sourceId.slice('circuit-board:'.length);
       const slot = data.circuits.inputs.find(entry => entry.slot === slotId);
-      return slot ? `電路板 ${slotId}：${String(state.values[localCell(slot.attributeCell)] ?? '')} ${fmt(Number(state.values[localCell(slot.valueCell)] ?? 0) * 100)}%` : `電路板來源待確認（${sourceId}）`;
+      return slot ? `電路板 ${slotId}：${String(state.values[slot.attributeCell] ?? '')} ${fmt(Number(state.values[slot.valueCell] ?? 0) * 100)}%` : `電路板來源待確認（${sourceId}）`;
     }
     if (sourceId.startsWith('color-set:')) return `百億套效：${sourceId.slice('color-set:'.length)}`;
     if (sourceId.startsWith('master-beast:')) {
@@ -143,10 +143,10 @@ async function start() {
       'atma-wood-multiplicative-crit-damage': '草木亞特瑪乘算致命傷害',
     };
     if (atma) return atmaNames[atma.id] ?? `亞特瑪來源待確認（${atma.id}）`;
-    if (sourceId.startsWith('weapon-growth')) return `武器成長：${String(state.values[localCell(data.growth.selectorCell)] ?? '')}`;
+    if (sourceId.startsWith('weapon-growth')) return `武器成長：${String(state.values[data.growth.selectorCell] ?? '')}`;
     if (sourceId.startsWith('weapon-appraisal:')) {
       const cell = sourceId.slice('weapon-appraisal:'.length);
-      const group = Object.values(data.weaponAppraisals.groups).find(entry => localCell(entry.selectorCell) === cell);
+      const group = Object.values(data.weaponAppraisals.groups).find(entry => entry.selectorCell === cell);
       return `武器鑑定${group ? `：${String(state.values[cell] ?? '')}` : ''}`;
     }
     if (sourceId.startsWith('giant-stone:')) {
@@ -173,7 +173,7 @@ async function start() {
     if (sourceId.startsWith('peak-option:')) return `巔峰選項：${String(state.values['Peak.Option'] ?? '')}`;
     if (sourceId.startsWith('pet:')) return `寵物：${String(state.values['Pet.Passive'] ?? '')}`;
     const binaryEffect = data.otherEffects.binaryEffects.find(entry => entry.name === sourceId);
-    if (binaryEffect) return `${binaryEffect.name}：${String(state.values[localCell(binaryEffect.selectorCell)] ?? '')}`;
+    if (binaryEffect) return `${binaryEffect.name}：${String(state.values[binaryEffect.selectorCell] ?? '')}`;
     if (sourceId.startsWith('guild-fountain-')) {
       return '公會噴泉';
     }
@@ -182,10 +182,10 @@ async function start() {
   function calculationIssue(error: unknown): string {
     const message = error instanceof Error ? error.message : String(error ?? '未知錯誤');
     const missingEnhancement = message.match(/Missing enhancement selection: (\S+)/);
-    if (missingEnhancement?.[1] === 'Left.Armor.Bottom.ENHC' || missingEnhancement?.[1] === 'H12') {
+    if (missingEnhancement?.[1] === 'Left.Armor.Bottom.ENHC') {
       return '內裝左四的「下衣」尚未選擇強化等級。請點選裝備配置中的「下衣」，填寫「強化」欄位。';
     }
-    if (missingEnhancement?.[1] === 'Left.Armor.Shoes.ENHC' || missingEnhancement?.[1] === 'H39') {
+    if (missingEnhancement?.[1] === 'Left.Armor.Shoes.ENHC') {
       return '內裝左四的「鞋子」尚未選擇強化等級。請點選裝備配置中的「鞋子」，填寫「強化」欄位。';
     }
     return message;
@@ -202,7 +202,7 @@ async function start() {
   };
   const field = (parent: HTMLElement, label: string, cell: string, choices: readonly PickerOption[], redraw = false) => {
     parent.append(createPicker(label, choices, val(cell), value => {
-      state.values[localCell(cell)] = value; update(); renderRightIceSetSelectors();
+      state.values[cell] = value; update(); renderRightIceSetSelectors();
       if (redraw) {
         const opened = [...document.querySelectorAll<HTMLDetailsElement>('#inspector details[open]')].map(node => node.querySelector('summary')!.textContent);
         renderInspector();
@@ -226,7 +226,7 @@ async function start() {
         .filter(name => !usedElsewhere.has(name) || name === selectedNames[index])
         .map(name => ({ value: name, label: name, detail: `目前裝備 ${equipped.filter(item => item === name).length} 件` }));
       root.append(createPicker(`套效選擇 ${index + 1}`, choices, selectedNames[index], value => {
-        state.values[localCell(cell)] = value;
+        state.values[cell] = value;
         update();
         renderRightIceSetSelectors();
       }));
@@ -243,7 +243,7 @@ async function start() {
     const input = document.createElement('input'); input.type = 'number'; input.step = 'any'; input.placeholder = '請填寫數值';
     if (constraints) { input.min = String(constraints.min); input.max = String(constraints.max); input.step = String(constraints.step); }
     input.value = val(cell) === '' ? '' : String(Number(val(cell)) * (percentage ? 100 : 1));
-    input.addEventListener('input', () => { if (!input.validity.valid) return; state.values[localCell(cell)] = input.value === '' ? '' : Number(input.value) / (percentage ? 100 : 1); update(); });
+    input.addEventListener('input', () => { if (!input.validity.valid) return; state.values[cell] = input.value === '' ? '' : Number(input.value) / (percentage ? 100 : 1); update(); });
     wrapper.append(input); parent.append(wrapper);
   };
   const section = (parent: HTMLElement, label: string, open = false) => {
@@ -275,18 +275,18 @@ async function start() {
     petSkillLabel.textContent = '寵物具有 2% 雙攻';
     petSkillToggle.append(petSkillCheckbox, petSkillLabel);
     general.append(petSkillToggle);
-    for (const effect of data.otherEffects.binaryEffects) pick(general, effect.name, localCell(effect.selectorCell), effect.options);
+    for (const effect of data.otherEffects.binaryEffects) pick(general, effect.name, effect.selectorCell, effect.options);
     field(general, '百億套效', data.colorSetEffects.selectorCell, options(data.colorSetEffects.options.map(option => option.name)));
     const atma = group('亞特瑪');
     field(atma, '亞特瑪屬性', 'Atma.Element', options(['火焰', '流水', '草木']));
     field(atma, '亞特瑪顏色', 'Atma.Color', options(['藍色', '綠色', '紫色', '米色']));
     const resonance = group('共鳴輸入');
-    for (const effect of data.resonance.effects) numeric(resonance, effect.name, localCell(effect.inputCell), false);
+    for (const effect of data.resonance.effects) numeric(resonance, effect.name, effect.inputCell, false);
     const spirit = group('賦靈錄');
     const spiritClassOptions = options(data.spiritRecord.classSelectors.classes.map(entry => entry.classCode));
     data.spiritRecord.classSelectors.selectorCells.forEach((cell, index) => field(spirit, `職業 ${index + 1}`, cell, spiritClassOptions));
     const fountain = group('公會噴泉');
-    for (const stage of data.otherEffects.guildFountain) pick(fountain, `${stage.stage}階`, localCell(stage.selectorCell), stage.options);
+    for (const stage of data.otherEffects.guildFountain) pick(fountain, `${stage.stage}階`, stage.selectorCell, stage.options);
   }
   function renderMasterBeastColorSelector() {
     const root = document.querySelector<HTMLElement>('#master-beast-controls')!;

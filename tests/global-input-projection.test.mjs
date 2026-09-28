@@ -3,7 +3,6 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { projectDamage } from '../dist/frontend/projection.js';
 import { resolveMasterBeastEffects, resolveRightIceSetEffects } from '../dist/calculation/equipment-effects.js';
-import { cellForFieldId } from '../dist/frontend/field-ids.js';
 
 const readJson = async path => JSON.parse(await readFile(new URL(`../data/${path}`, import.meta.url), 'utf8'));
 
@@ -34,7 +33,7 @@ async function loadData() {
 function enableSelectedAccessoryAppraisals(data, values) {
   const catalog = data.catalogs['equipment/accessories.json'];
   for (const group of data.accessoryEffects.groups) {
-    const name = values[group.selectionCell] ?? values[cellForFieldId(group.selectionCell)];
+    const name = values[group.selectionCell];
     const item = catalog.items.find(entry => entry.slotId === group.slotId && entry.name === name);
     if (item) item.appraisal = { canAppraise: true, effectCount: group.inputCells.length };
   }
@@ -42,21 +41,21 @@ function enableSelectedAccessoryAppraisals(data, values) {
 
 test('JSON 選擇的全域來源進入角色彙總與 B163 傷害流程', async () => {
   const data = await loadData();
-  const baseValues = { B32: 'Lv.8', H3: 'Lv.8', H12: 'Lv.8', H30: 'Lv.8', H39: 'Lv.8', J3: 0, J12: 0, J30: 0, J39: 0 };
+  const baseValues = { "Weapon.ENHC": 'Lv.8', "Left.Armor.Upper.ENHC": 'Lv.8', "Left.Armor.Bottom.ENHC": 'Lv.8', "Left.Armor.Gloves.ENHC": 'Lv.8', "Left.Armor.Shoes.ENHC": 'Lv.8', "Left.Armor.Upper.FORGE": 0, "Left.Armor.Bottom.FORGE": 0, "Left.Armor.Gloves.FORGE": 0, "Left.Armor.Shoes.FORGE": 0 };
   const base = projectDamage(data, { schemaVersion: 2, Job: 'KE', values: baseValues, lowerwearAlternativeEnabled: false }).result;
   const values = {
     ...baseValues,
-    B2: 'Dogma', B3: '有', B4: '適應靈藥', B5: '集合地', S2: '精神挑戰者', S21: '有', S23: '致命一擊+4%', S25: 'Boss傷害+1%',
-    B17: '騎士團', B20: '騎士團', B21: '騎士團',
-    M4: '亞特瑪臉中', M5: '亞特瑪臉下', O5: '亞特瑪手臂', O6: '亞特瑪項鍊', L9: '草木', N9: '米色',
-    S17: '致命一擊+3%', S18: '雙攻+0.6%', S19: '強者+3%', T11: 1, T12: 10, T13: 10, T14: 10, T15: 10,
-    N27: '致命一擊8%', N28: '極大化8%', M27: '致命一擊', M28: 5, M33: '超越技傷%', M34: 5,
-    M36: '雙攻%', M37: 1.5, M39: '無視防禦%', M40: 2, O27: '所有技能傷害%', P27: 0.01,
-    S4: 'KE', S5: 'KE', S6: 'KE',
+    "Effect.Title": 'Dogma', "Effect.Emblem": '有', "Effect.Consumable": '適應靈藥', "Effect.Environment": '集合地', "Peak.Option": '精神挑戰者', "Effect.PortraitAwakening": '有', "Pet.Passive": '致命一擊+4%', "MasterBeast.OverallPotential": 'Boss傷害+1%',
+    "Ice.Weapon.Set": '騎士團', "Right.Ice.WeaponAccessory": '騎士團', "Right.Ice.FaceTop": '騎士團',
+    "Accessory.FaceMiddle": '亞特瑪臉中', "Accessory.FaceBottom": '亞特瑪臉下', "Accessory.Arm": '亞特瑪手臂', "Accessory.Necklace": '亞特瑪項鍊', "Atma.Element": '草木', "Atma.Color": '米色',
+    "GuildFountain.Stage2": '致命一擊+3%', "GuildFountain.Stage3": '雙攻+0.6%', "GuildFountain.Stage4": '強者+3%', "Resonance.AllATK.Points": 1, "Resonance.TranscendenceSkillDMG.Points": 10, "Resonance.Polarization.Points": 10, "Resonance.BossDMG.Points": 10, "Resonance.Adapt.Points": 10,
+    "MasterBeast.Head.Option1": '致命一擊8%', "MasterBeast.Head.Option2": '極大化8%', "MasterBeast.Head.CustomAttribute": '致命一擊', "MasterBeast.Head.CustomValue": 5, "MasterBeast.Necklace.CustomAttribute": '超越技傷%', "MasterBeast.Necklace.CustomValue": 5,
+    "MasterBeast.Ring1.CustomAttribute": '雙攻%', "MasterBeast.Ring1.CustomValue": 1.5, "MasterBeast.Ring2.CustomAttribute": '無視防禦%', "MasterBeast.Ring2.CustomValue": 2, "MasterBeast.Head.Mirror.1.Attribute": '所有技能傷害%', "MasterBeast.Head.Mirror.1.Value": 0.01,
+    "SpiritRecord.Class.1": 'KE', "SpiritRecord.Class.2": 'KE', "SpiritRecord.Class.3": 'KE',
   };
   const withEffects = projectDamage(data, { schemaVersion: 2, Job: 'KE', values, lowerwearAlternativeEnabled: false }).result;
-  const withoutBinaryEffects = projectDamage(data, { schemaVersion: 2, Job: 'KE', values: { ...values, B3: '沒有', S21: '沒有' }, lowerwearAlternativeEnabled: false }).result;
-  const withoutSpiritRecords = projectDamage(data, { schemaVersion: 2, Job: 'KE', values: { ...values, S4: '', S5: '', S6: '' }, lowerwearAlternativeEnabled: false }).result;
+  const withoutBinaryEffects = projectDamage(data, { schemaVersion: 2, Job: 'KE', values: { ...values, "Effect.Emblem": '沒有', "Effect.PortraitAwakening": '沒有' }, lowerwearAlternativeEnabled: false }).result;
+  const withoutSpiritRecords = projectDamage(data, { schemaVersion: 2, Job: 'KE', values: { ...values, "SpiritRecord.Class.1": '', "SpiritRecord.Class.2": '', "SpiritRecord.Class.3": '' }, lowerwearAlternativeEnabled: false }).result;
 
   assert.equal(base.generalMultiplicativeDamage.value, 1.04);
   assert.equal(withEffects.generalMultiplicativeDamage.value, 1.3);
@@ -77,16 +76,16 @@ test('JSON 選擇的全域來源進入角色彙總與 B163 傷害流程', async 
 
 test('武器等級、飾品倍率與聖獸指環選項依各自公式映射', async () => {
   const data = await loadData();
-  const baseValues = { B32: 'Lv.8', H3: 'Lv.8', H12: 'Lv.8', H30: 'Lv.8', H39: 'Lv.8', J3: 0, J12: 0, J30: 0, J39: 0,
-    O3: '亞特瑪上衣 - 橘', M4: '亞特瑪臉中', M5: '亞特瑪臉下', O5: '亞特瑪手臂', O6: '亞特瑪項鍊', M7: '憤怒戒指', O7: '超越的技術戒指' };
+  const baseValues = { "Weapon.ENHC": 'Lv.8', "Left.Armor.Upper.ENHC": 'Lv.8', "Left.Armor.Bottom.ENHC": 'Lv.8', "Left.Armor.Gloves.ENHC": 'Lv.8', "Left.Armor.Shoes.ENHC": 'Lv.8', "Left.Armor.Upper.FORGE": 0, "Left.Armor.Bottom.FORGE": 0, "Left.Armor.Gloves.FORGE": 0, "Left.Armor.Shoes.FORGE": 0,
+    "Accessory.Top": '亞特瑪上衣 - 橘', "Accessory.FaceMiddle": '亞特瑪臉中', "Accessory.FaceBottom": '亞特瑪臉下', "Accessory.Arm": '亞特瑪手臂', "Accessory.Necklace": '亞特瑪項鍊', "Accessory.Ring1": '憤怒戒指', "Accessory.Ring2": '超越的技術戒指' };
   const baseline = projectDamage(data, { schemaVersion: 2, Job: 'KE', values: baseValues, lowerwearAlternativeEnabled: false }).result;
   const values = {
-    ...baseValues, B37: '深淵',
-    O3: '亞特瑪上衣 - 橘', M4: '亞特瑪臉中', M5: '亞特瑪臉下', O5: '亞特瑪手臂', O6: '亞特瑪項鍊',
-    M7: '憤怒戒指', O7: '超越的技術戒指',
-    O11: '攻擊力+1%', M15: '雙攻%', M16: '致命一擊%', M19: '致命一擊%',
-    O16: '致命一擊%', O19: '致命一擊%', M23: '致命一擊+2%', O24: '極大化+2%',
-    N36: '致命傷害+2%', N37: '適應力+1%', N39: '致命傷害+3%', N40: '適應力+1%',
+    ...baseValues, "Weapon.MagicStone.Grade": '深淵',
+    "Accessory.Top": '亞特瑪上衣 - 橘', "Accessory.FaceMiddle": '亞特瑪臉中', "Accessory.FaceBottom": '亞特瑪臉下', "Accessory.Arm": '亞特瑪手臂', "Accessory.Necklace": '亞特瑪項鍊',
+    "Accessory.Ring1": '憤怒戒指', "Accessory.Ring2": '超越的技術戒指',
+    "Accessory.Top.Appraisal.1": '攻擊力+1%', "Accessory.FaceMiddle.Appraisal.1": '雙攻%', "Accessory.FaceMiddle.Appraisal.2": '致命一擊%', "Accessory.FaceBottom.Appraisal.1": '致命一擊%',
+    "Accessory.Arm.Appraisal.2": '致命一擊%', "Accessory.Necklace.Appraisal.1": '致命一擊%', "Accessory.Ring1.Appraisal.1": '致命一擊+2%', "Accessory.Ring2.Appraisal.2": '極大化+2%',
+    "MasterBeast.Ring1.Option1": '致命傷害+2%', "MasterBeast.Ring1.Option2": '適應力+1%', "MasterBeast.Ring2.Option1": '致命傷害+3%', "MasterBeast.Ring2.Option2": '適應力+1%',
   };
   enableSelectedAccessoryAppraisals(data, values);
   const result = projectDamage(data, { schemaVersion: 2, Job: 'KE', values, lowerwearAlternativeEnabled: false }).result;
@@ -101,8 +100,8 @@ test('武器等級、飾品倍率與聖獸指環選項依各自公式映射', as
 
 test('大師聖獸固定效果、精靈石乘算與五種潛力來源分開處理', async () => {
   const data = await loadData();
-  const baseValues = { B32: 'Lv.8', H3: 'Lv.8', H12: 'Lv.8', H30: 'Lv.8', H39: 'Lv.8', J3: 0, J12: 0, J30: 0, J39: 0 };
-  const selectedPotential = { ...baseValues, S25: 'Boss傷害+15%' };
+  const baseValues = { "Weapon.ENHC": 'Lv.8', "Left.Armor.Upper.ENHC": 'Lv.8', "Left.Armor.Bottom.ENHC": 'Lv.8', "Left.Armor.Gloves.ENHC": 'Lv.8', "Left.Armor.Shoes.ENHC": 'Lv.8', "Left.Armor.Upper.FORGE": 0, "Left.Armor.Bottom.FORGE": 0, "Left.Armor.Gloves.FORGE": 0, "Left.Armor.Shoes.FORGE": 0 };
+  const selectedPotential = { ...baseValues, "MasterBeast.OverallPotential": 'Boss傷害+15%' };
   const yellow = projectDamage(data, {
     schemaVersion: 2, Job: 'KE', values: selectedPotential, lowerwearAlternativeEnabled: false,
     masterBeastSpiritStoneColor: '黃',
@@ -132,23 +131,23 @@ test('大師聖獸固定效果、精靈石乘算與五種潛力來源分開處�
 
 test('右冰套效只計算使用者選取的套裝，效果依實際裝備件數判定', async () => {
   const data = await loadData();
-  const baseValues = { B32: 'Lv.8', H3: 'Lv.8', H12: 'Lv.8', H30: 'Lv.8', H39: 'Lv.8', J3: 0, J12: 0, J30: 0, J39: 0 };
+  const baseValues = { "Weapon.ENHC": 'Lv.8', "Left.Armor.Upper.ENHC": 'Lv.8', "Left.Armor.Bottom.ENHC": 'Lv.8', "Left.Armor.Gloves.ENHC": 'Lv.8', "Left.Armor.Shoes.ENHC": 'Lv.8', "Left.Armor.Upper.FORGE": 0, "Left.Armor.Bottom.FORGE": 0, "Left.Armor.Gloves.FORGE": 0, "Left.Armor.Shoes.FORGE": 0 };
   const withoutSetEffects = structuredClone(data);
   for (const effect of withoutSetEffects.rightIceSets.effects) effect.active = false;
-  const threePieceValues = { ...baseValues, B17: '騎士團', B20: '騎士團', B21: '騎士團' };
-  const fourPieceValues = { ...threePieceValues, B22: '騎士團' };
+  const threePieceValues = { ...baseValues, "Ice.Weapon.Set": '騎士團', "Right.Ice.WeaponAccessory": '騎士團', "Right.Ice.FaceTop": '騎士團' };
+  const fourPieceValues = { ...threePieceValues, "Right.Ice.FaceMiddle": '騎士團' };
   const unselectedThreePieces = projectDamage(data, { schemaVersion: 2, Job: 'KE', values: threePieceValues, lowerwearAlternativeEnabled: false }).result;
   const baselineThree = projectDamage(withoutSetEffects, { schemaVersion: 2, Job: 'KE', values: threePieceValues, lowerwearAlternativeEnabled: false }).result;
   const baselineFour = projectDamage(withoutSetEffects, { schemaVersion: 2, Job: 'KE', values: fourPieceValues, lowerwearAlternativeEnabled: false }).result;
-  const threePieces = projectDamage(data, { schemaVersion: 2, Job: 'KE', values: { ...threePieceValues, B27: '騎士團' }, lowerwearAlternativeEnabled: false }).result;
-  const fourPieces = projectDamage(data, { schemaVersion: 2, Job: 'KE', values: { ...fourPieceValues, B27: '騎士團' }, lowerwearAlternativeEnabled: false }).result;
+  const threePieces = projectDamage(data, { schemaVersion: 2, Job: 'KE', values: { ...threePieceValues, "Right.Ice.SetEffect.1": '騎士團' }, lowerwearAlternativeEnabled: false }).result;
+  const fourPieces = projectDamage(data, { schemaVersion: 2, Job: 'KE', values: { ...fourPieceValues, "Right.Ice.SetEffect.1": '騎士團' }, lowerwearAlternativeEnabled: false }).result;
 
   assert.equal(unselectedThreePieces.attributes.stats.allSkillDamagePct.finalTotal, baselineThree.attributes.stats.allSkillDamagePct.finalTotal);
   assert.equal(threePieces.attributes.stats.allSkillDamagePct.finalTotal - baselineThree.attributes.stats.allSkillDamagePct.finalTotal, 5);
   assert.equal(fourPieces.attributes.stats.allSkillDamagePct.finalTotal - baselineFour.attributes.stats.allSkillDamagePct.finalTotal, 5);
   assert.equal(fourPieces.attributes.stats.adaptabilityPct.finalTotal - baselineFour.attributes.stats.adaptabilityPct.finalTotal, 5);
 
-  assert.throws(() => projectDamage(data, { schemaVersion: 2, Job: 'KE', values: { ...threePieceValues, B27: '騎士團', B28: '騎士團' }, lowerwearAlternativeEnabled: false }), /不可重複/);
+  assert.throws(() => projectDamage(data, { schemaVersion: 2, Job: 'KE', values: { ...threePieceValues, "Right.Ice.SetEffect.1": '騎士團', "Right.Ice.SetEffect.2": '騎士團' }, lowerwearAlternativeEnabled: false }), /不可重複/);
   assert.throws(() => resolveRightIceSetEffects(data.rightIceSets, [], ['騎士團', '幽潮吞源', '日冕．灼耀花仙', '猛虎奇談']), /最多選擇3套/);
 });
 
@@ -157,21 +156,21 @@ test('未確認鑑定資料的飾品不會套用其鑑定輸入', async () => {
   const item = data.catalogs['equipment/accessories.json'].items.find(entry => entry.slotId === 'top' && entry.name === '亞特瑪上衣 - 橘');
   assert.ok(item);
   item.appraisal = { canAppraise: null, effectCount: null };
-  const baseValues = { B32: 'Lv.8', H3: 'Lv.8', H12: 'Lv.8', H30: 'Lv.8', H39: 'Lv.8', J3: 0, J12: 0, J30: 0, J39: 0 };
-  const baseline = projectDamage(data, { schemaVersion: 2, Job: 'KE', values: { ...baseValues, O3: '亞特瑪上衣 - 橘' }, lowerwearAlternativeEnabled: false }).result;
-  const result = projectDamage(data, { schemaVersion: 2, Job: 'KE', values: { ...baseValues, O3: '亞特瑪上衣 - 橘', O11: '攻擊力+1%' }, lowerwearAlternativeEnabled: false }).result;
+  const baseValues = { "Weapon.ENHC": 'Lv.8', "Left.Armor.Upper.ENHC": 'Lv.8', "Left.Armor.Bottom.ENHC": 'Lv.8', "Left.Armor.Gloves.ENHC": 'Lv.8', "Left.Armor.Shoes.ENHC": 'Lv.8', "Left.Armor.Upper.FORGE": 0, "Left.Armor.Bottom.FORGE": 0, "Left.Armor.Gloves.FORGE": 0, "Left.Armor.Shoes.FORGE": 0 };
+  const baseline = projectDamage(data, { schemaVersion: 2, Job: 'KE', values: { ...baseValues, "Accessory.Top": '亞特瑪上衣 - 橘' }, lowerwearAlternativeEnabled: false }).result;
+  const result = projectDamage(data, { schemaVersion: 2, Job: 'KE', values: { ...baseValues, "Accessory.Top": '亞特瑪上衣 - 橘', "Accessory.Top.Appraisal.1": '攻擊力+1%' }, lowerwearAlternativeEnabled: false }).result;
   assert.equal(result.attributes.stats.doubleAttackPct.finalTotal, baseline.attributes.stats.doubleAttackPct.finalTotal);
 });
 
 test('百億套效紅藍固定值與綠色依內裝手電路的超越技傷計算', async () => {
   const data = await loadData();
-  const baseValues = { B32: 'Lv.8', H3: 'Lv.8', H12: 'Lv.8', H30: 'Lv.8', H39: 'Lv.8', J3: 0, J12: 0, J30: 0, J39: 0 };
+  const baseValues = { "Weapon.ENHC": 'Lv.8', "Left.Armor.Upper.ENHC": 'Lv.8', "Left.Armor.Bottom.ENHC": 'Lv.8', "Left.Armor.Gloves.ENHC": 'Lv.8', "Left.Armor.Shoes.ENHC": 'Lv.8', "Left.Armor.Upper.FORGE": 0, "Left.Armor.Bottom.FORGE": 0, "Left.Armor.Gloves.FORGE": 0, "Left.Armor.Shoes.FORGE": 0 };
   const baseState = { schemaVersion: 2, Job: 'KE', lowerwearAlternativeEnabled: false };
   const base = projectDamage(data, { ...baseState, values: baseValues }).result.generalMultiplicativeDamage.value;
-  const red = projectDamage(data, { ...baseState, values: { ...baseValues, G2: '紅' } }).result.generalMultiplicativeDamage.value;
-  const blue = projectDamage(data, { ...baseState, values: { ...baseValues, G2: '藍' } }).result.generalMultiplicativeDamage.value;
-  const greenWithoutCircuit = projectDamage(data, { ...baseState, values: { ...baseValues, G2: '綠' } }).result.generalMultiplicativeDamage.value;
-  const greenWithCircuit = projectDamage(data, { ...baseState, values: { ...baseValues, G2: '綠', J31: '超越技傷%', J32: 0.05 } }).result.generalMultiplicativeDamage.value;
+  const red = projectDamage(data, { ...baseState, values: { ...baseValues, "Left.Armor.SetColor": '紅' } }).result.generalMultiplicativeDamage.value;
+  const blue = projectDamage(data, { ...baseState, values: { ...baseValues, "Left.Armor.SetColor": '藍' } }).result.generalMultiplicativeDamage.value;
+  const greenWithoutCircuit = projectDamage(data, { ...baseState, values: { ...baseValues, "Left.Armor.SetColor": '綠' } }).result.generalMultiplicativeDamage.value;
+  const greenWithCircuit = projectDamage(data, { ...baseState, values: { ...baseValues, "Left.Armor.SetColor": '綠', "Left.Armor.Gloves.Circuit.Attribute": '超越技傷%', "Left.Armor.Gloves.Circuit.Value": 0.05 } }).result.generalMultiplicativeDamage.value;
 
   assert.equal(red / base, 1.2);
   assert.equal(blue / base, 1.08);
