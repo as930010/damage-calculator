@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "typecheck": "tsc --noEmit",
+    "validate:data": "node scripts/validate-data.mjs",
     "build": "node scripts/build.mjs",
     "preview": "node scripts/preview.mjs"
   },

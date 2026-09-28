@@ -1,6 +1,6 @@
 # 資料模型與靜態資料結構
 
-狀態：Phase 2 結構已定稿；由 Google Sheets 線上匯出建立首批 JSON 目錄。其他選項表與效果條件仍待轉換／映射  
+狀態：裝備資料、選項與效果映射，以及瀏覽器端計算流程已接入；部署前會檢查 JSON 結構與資料引用。所有職業及完整配裝組合仍未逐一完成數值比對。
 資料更新日：2026-09-25（`260925`）  
 部署架構：GitHub Pages、靜態 JSON、瀏覽器端計算、`localStorage`
 
@@ -8,7 +8,7 @@
 
 本專案不設 API、伺服器、資料庫或 Admin UI，也不要求登入。網站從同一個 GitHub Pages 網域讀取公開 JSON；計算在瀏覽器執行。裝備與遊戲資料以 Git 儲存，提交紀錄作為修改歷程。使用者選擇的配裝／手動設定僅依先前決定存於本機 `localStorage`，不傳送到伺服器；不蒐集帳號或個人資料。
 
-不設發布前的數值驗收或資料驗證關卡。JSON 仍須是可解析格式，前端不得自行保存第二份裝備清單或屬性定義。
+部署流程會檢查 JSON 是否可解析、屬性 key 是否存在、裝備目錄部位是否與映射相符，以及選項目錄引用是否有效。這些是結構與引用檢查，不會驗算遊戲數值或作為 Google Sheets 數值相同的證明；前端不得自行保存第二份裝備清單或屬性定義。
 
 資料來源採 Google Sheets 線上內容為唯一最新基準。附件匯出檔只供輔助比對；公式、欄位或資料若與線上內容不一致，應回查 Google Sheets，並以其現行版本更新 JSON 與 Calculation Engine 規格。
 
@@ -191,24 +191,20 @@ tsconfig.json
 
 ## 6. 瀏覽器配裝與 `localStorage`
 
-使用者狀態建議存一份具結構版本的 JSON：
+目前使用者狀態以 `schemaVersion: 2` 儲存於瀏覽器 `localStorage`：
 
 ```json
 {
-  "schemaVersion": 1,
-  "dataUpdatedAt": "2026-09-25",
-  "classId": null,
-  "loadout": {},
-  "alternateLowerwearLoadout": {},
-  "manualStats": {},
-  "buffIds": [],
-  "debuffIds": [],
-  "comparisonLoadout": null,
-  "updatedAt": "2026-09-25T00:00:00.000Z"
+  "schemaVersion": 2,
+  "classId": "DaB",
+  "values": { "D1": 0 },
+  "lowerwearAlternativeEnabled": false,
+  "masterBeastSpiritStoneColor": "黃",
+  "petSkillAttackEnabled": true
 }
 ```
 
-資料只存於目前瀏覽器來源的 `localStorage`，不送回伺服器，也不會在不同裝置或不同瀏覽器自動同步。應提供匯出／匯入設定功能。讀取舊版設定時需依 `schemaVersion` 遷移；找不到的裝備 ID 應顯示需重新選擇，不可靜默改選別件裝備。
+狀態只存於目前瀏覽器來源的 `localStorage`，不送回伺服器，也不會在不同裝置或不同瀏覽器自動同步。工具列可匯出及匯入 JSON 配裝檔；檔案使用 `format: "damage-calculator-loadout"` 與 `formatVersion: 1` 包裝目前配裝，不包含比較基準。匯入會檢查格式、職業、欄位及裝備／魔法石名稱；若目前資料庫找不到檔案中的已選項目，會拒絕匯入並提示重新選擇，不會靜默換成其他裝備。舊版瀏覽器儲存資料仍由 `state.ts` 相容解析。
 
 ## 7. 直接發布流程
 
@@ -216,7 +212,7 @@ tsconfig.json
 2. Push 至 GitHub，GitHub Pages 自動部署。
 3. 部署完成後，前端載入最新 JSON，並顯示 `manifest.json` 的資料日期。
 
-不設遊戲數值驗收、版本審核或部署前資料檢查。JSON 必須維持可解析格式，因為瀏覽器需讀取它；若檔案格式錯誤或載入失敗，前端應顯示讀取錯誤，不能把錯誤資料當成 0 繼續計算。Push 後會在 Pages 完成部署及瀏覽器取得新資料時套用更新，不保證提交瞬間所有使用者頁面同步刷新。
+部署前執行 `pnpm run validate:data` 檢查 JSON 格式、屬性 key、裝備目錄及選項目錄引用；不執行遊戲公式驗算或完整數值比對。前端若遇到資料格式錯誤或載入失敗，應顯示讀取錯誤，不能把錯誤資料當成 0 繼續計算。Push 後會在 Pages 完成部署及瀏覽器取得新資料時套用更新，不保證提交瞬間所有使用者頁面同步刷新。
 
 ## 8. 尚待公式／欄位追蹤
 

@@ -36,7 +36,7 @@ async function start() {
     { id: 'ring-two', label: '指環 2', icon: 'ring', fixedCells: ['N39', 'N40'], stoneCells: ['M39', 'M40'], stoneCategory: 'ring', mirrorRows: [39, 40, 41] },
   ];
   const app = document.querySelector<HTMLElement>('#app')!;
-  app.innerHTML = `<section class="workbench"><header class="workspace-heading"><div><span class="eyebrow">EQUIPMENT SIMULATOR</span><h1>配出你的戰鬥風格</h1><p>依照裝備位置點選部位，調整搭配與數值。</p></div></header><div class="toolbar"><div id="class-picker"></div><label class="toggle"><input id="alternate" type="checkbox">啟用強/排褲切換</label><button id="baseline" type="button">設為比較基準</button><span id="save-status" role="status"></span></div><section class="battle-panel"><div class="panel-heading"><h2>關卡設定</h2></div><div id="battle-settings" class="battle-fields"></div></section><div class="equipment-workspace"><section class="equipment-panel"><div class="panel-heading"><h2>裝備配置</h2><span>點選部位以編輯</span></div><div class="canvas-scroll"><div class="equipment-canvas"><span class="group-label costume-label">連身時裝</span><span class="group-label left-label">左冰</span><span class="group-label inner-label">內裝左四</span><span class="group-label weapon-label">冰武 / 武器</span><span class="group-label right-label">右冰</span><span class="group-label accessory-label">飾品</span><div id="title-input" class="canvas-title-input"></div><div id="slots"></div></div></div><p class="panel-note">左冰共用一組套裝選擇，各部位魔法石分別設定。強/排褲開啟後，普通屬性依兩套下衣平均。</p><section class="right-ice-set-area"><div class="beast-accessories-heading"><h3>右冰套效</h3><span>最多選擇 ${data.rightIceSets.maxSelectedSets} 套</span></div><p class="panel-note">先選擇要套用效果的套裝，再依已裝備的右冰件數計算效果。</p><div id="right-ice-set-selectors" class="right-ice-set-selectors"></div></section><div class="beast-accessories-area"><div class="beast-accessories-heading"><h3>聖獸飾品</h3><span>頭飾、盔甲、項鍊、指環 1、指環 2</span></div><p class="panel-note">依部位設定固定效果、精靈石與三組迷鏡效果。盔甲精靈石套裝增幅 ${fmt(data.masterBeast.armorSpiritStoneSetEffect.multiplicativeDamagePct)}% 已預設套用。</p><div id="beast-accessory-fields" class="beast-accessories-grid"></div></div></section><aside id="inspector" class="inspector" aria-label="部位設定"></aside></div><details class="global-source-panel"><summary>其他效果來源設定</summary><p class="panel-note">未列在此處的特殊條件或 Buff／Debuff 尚未納入計算。</p><div id="global-source-fields"></div></details><section class="results-panel"><div class="panel-heading"><h2>目前填寫的屬性</h2><span id="comparison-label"></span></div><p class="panel-note">屬性彙總與傷害依畫面已接入的裝備、內裝、關卡及其他效果設定計算。特殊條件與 Buff／Debuff 若尚無明確欄位映射，不會計入結果。</p><div id="results" aria-live="polite"></div><section class="damage-panel"><div class="panel-heading"><h2>攻擊與最終傷害</h2></div><p class="panel-note">此數值只反映已接入的輸入；其餘來源完成接線前，請視為部分配置的估算。</p><div id="damage-result" aria-live="polite"></div></section></section></section>`;
+  app.innerHTML = `<section class="workbench"><header class="workspace-heading"><div><span class="eyebrow">EQUIPMENT SIMULATOR</span><h1>配出你的戰鬥風格</h1><p>依照裝備位置點選部位，調整搭配與數值。</p></div></header><div class="toolbar"><div id="class-picker"></div><label class="toggle"><input id="alternate" type="checkbox">啟用強/排褲切換</label><button id="baseline" type="button">設為比較基準</button><button id="export-loadout" type="button">匯出配裝</button><button id="import-loadout" type="button">匯入配裝</button><input id="loadout-file" type="file" accept="application/json,.json" hidden><span id="transfer-status" role="status" aria-live="polite"></span><span id="save-status" role="status"></span></div><section class="battle-panel"><div class="panel-heading"><h2>關卡設定</h2></div><div id="battle-settings" class="battle-fields"></div></section><div class="equipment-workspace"><section class="equipment-panel"><div class="panel-heading"><h2>裝備配置</h2><span>點選部位以編輯</span></div><div class="canvas-scroll"><div class="equipment-canvas"><span class="group-label costume-label">連身時裝</span><span class="group-label left-label">左冰</span><span class="group-label inner-label">內裝左四</span><span class="group-label weapon-label">冰武 / 武器</span><span class="group-label right-label">右冰</span><span class="group-label accessory-label">飾品</span><div id="title-input" class="canvas-title-input"></div><div id="slots"></div></div></div><p class="panel-note">左冰共用一組套裝選擇，各部位魔法石分別設定。強/排褲開啟後，普通屬性依兩套下衣平均。</p><section class="right-ice-set-area"><div class="beast-accessories-heading"><h3>右冰套效</h3><span>最多選擇 ${data.rightIceSets.maxSelectedSets} 套</span></div><p class="panel-note">先選擇要套用效果的套裝，再依已裝備的右冰件數計算效果。</p><div id="right-ice-set-selectors" class="right-ice-set-selectors"></div></section><div class="beast-accessories-area"><div class="beast-accessories-heading"><h3>聖獸飾品</h3><span>頭飾、盔甲、項鍊、指環 1、指環 2</span></div><p class="panel-note">依部位設定固定效果、精靈石與三組迷鏡效果。盔甲精靈石套裝增幅 ${fmt(data.masterBeast.armorSpiritStoneSetEffect.multiplicativeDamagePct)}% 已預設套用。</p><div id="beast-accessory-fields" class="beast-accessories-grid"></div></div></section><aside id="inspector" class="inspector" aria-label="部位設定"></aside></div><details class="global-source-panel"><summary>其他效果來源設定</summary><p class="panel-note">未列在此處的特殊條件或 Buff／Debuff 尚未納入計算。</p><div id="global-source-fields"></div></details><section class="results-panel"><div class="panel-heading"><h2>目前填寫的屬性</h2><span id="comparison-label"></span></div><p class="panel-note">屬性彙總與傷害依畫面已接入的裝備、內裝、關卡及其他效果設定計算。特殊條件與 Buff／Debuff 若尚無明確欄位映射，不會計入結果。</p><div id="results" aria-live="polite"></div><section class="damage-panel"><div class="panel-heading"><h2>攻擊與最終傷害</h2></div><p class="panel-note">此數值只反映已接入的輸入；其餘來源完成接線前，請視為部分配置的估算。</p><div id="damage-result" aria-live="polite"></div></section></section></section>`;
   if (sampleMode) {
     app.querySelector('.workspace-heading')!.insertAdjacentHTML('afterend', '<p class="sample-banner">已載入驗算範例。這個分頁的調整不會覆蓋你原本儲存在瀏覽器的配裝。</p>');
     app.querySelector('.results-panel')!.insertAdjacentHTML('beforeend', '<section id="sheet-parity" class="sheet-parity" aria-live="polite"></section>');
@@ -69,6 +69,46 @@ async function start() {
   const update = () => {
     document.querySelector('#save-status')!.textContent = sampleMode ? '驗算範例模式：本頁調整不儲存' : saveState(state) ? '已儲存於此裝置' : '此瀏覽器無法儲存設定';
     renderSlots(); renderBeastAccessories(); renderMasterBeastColorSelector(); renderResults();
+  };
+  const validateImportedLoadout = (raw: unknown): LoadoutState => {
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw new TypeError('檔案內容不是有效的配裝資料。');
+    const envelope = raw as Record<string, unknown>;
+    if (envelope.format !== 'damage-calculator-loadout' || envelope.formatVersion !== 1) throw new TypeError('檔案格式或版本不支援，請使用本網站匯出的 JSON 配裝檔。');
+    const candidate = envelope.loadout;
+    if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) throw new TypeError('配裝資料缺少必要欄位。');
+    const record = candidate as Record<string, unknown>;
+    const classes = data.classes.classes.filter(entry => entry.active);
+    if (record.schemaVersion !== 2 || typeof record.classId !== 'string' || !classes.some(entry => entry.id === record.classId)) throw new TypeError('職業或配裝版本與目前網站不相容。');
+    if (!record.values || typeof record.values !== 'object' || Array.isArray(record.values)) throw new TypeError('配裝數值格式無效。');
+    const values: Record<string, string | number> = {};
+    for (const [key, value] of Object.entries(record.values)) {
+      if (!/^[A-Z]+[0-9]+$/.test(key) || !(typeof value === 'string' || typeof value === 'number' && Number.isFinite(value))) throw new TypeError('配裝包含無效的欄位或數值。');
+      values[key] = value;
+    }
+    if (typeof record.lowerwearAlternativeEnabled !== 'boolean' || typeof record.petSkillAttackEnabled !== 'boolean' || !['黃', '綠', ''].includes(String(record.masterBeastSpiritStoneColor))) throw new TypeError('配裝的切換設定格式無效。');
+    const missing: string[] = [];
+    for (const mapping of data.mapping.selections) {
+      const selection = values[mapping.selectionCell];
+      if (typeof selection !== 'string' || !selection.trim()) continue;
+      const catalog = data.catalogs[mapping.catalogFile];
+      const found = catalog?.items.some(item => item.active && item.slotId === mapping.slotId && getEquipmentOptionName(item, mapping.application) === selection);
+      if (!found) missing.push(selection);
+    }
+    for (const mapping of data.mapping.magicStoneSelections.inputGroups) {
+      const selection = values[mapping.selectionCell];
+      if (typeof selection !== 'string' || !selection.trim()) continue;
+      const found = data.catalogs[data.mapping.magicStoneSelections.catalogFile]?.items.some(item => item.active && item.slotId === data.mapping.magicStoneSelections.slotId && getEquipmentOptionName(item, mapping.application) === selection);
+      if (!found) missing.push(selection);
+    }
+    if (missing.length) throw new TypeError(`這份配裝含有目前資料庫找不到的裝備／魔法石：${[...new Set(missing)].join('、')}。請更新配裝檔或重新選擇項目。`);
+    return {
+      schemaVersion: 2,
+      classId: record.classId,
+      values,
+      lowerwearAlternativeEnabled: record.lowerwearAlternativeEnabled,
+      masterBeastSpiritStoneColor: record.masterBeastSpiritStoneColor as LoadoutState['masterBeastSpiritStoneColor'],
+      petSkillAttackEnabled: record.petSkillAttackEnabled,
+    };
   };
   function sourceLabel(sourceId: string): string {
     if (sourceId === 'character-base') return '角色基礎係數';
@@ -595,7 +635,8 @@ async function start() {
       document.querySelector('#damage-result')!.innerHTML = `<p class="input-warning">尚未計算：${message}</p>`;
     }
   }
-  document.querySelector('#class-picker')!.append(createPicker('職業', data.classes.classes.filter(entry => entry.active).map(entry => ({ value: entry.id, label: entry.name })), state.classId, value => { state.classId = value; update(); }));
+  const renderClassPicker = () => document.querySelector('#class-picker')!.replaceChildren(createPicker('職業', data.classes.classes.filter(entry => entry.active).map(entry => ({ value: entry.id, label: entry.name })), state.classId, value => { state.classId = value; update(); }));
+  renderClassPicker();
   const toggle = document.querySelector<HTMLInputElement>('#alternate')!; toggle.checked = state.lowerwearAlternativeEnabled;
   const battle = document.querySelector<HTMLElement>('#battle-settings')!;
   for (const [cell, label] of [['D1','關卡適應力'],['D2','關卡扣致命'],['D3','Boss防禦']] as const) {
@@ -605,6 +646,35 @@ async function start() {
   }
   toggle.addEventListener('change', () => { state.lowerwearAlternativeEnabled = toggle.checked; update(); renderInspector(); });
   document.querySelector('#baseline')!.addEventListener('click', () => { try { projectAttributes(data, state); baseline = structuredClone(state); const stored = sampleMode ? false : saveState(baseline, true); renderResults(); document.querySelector('#save-status')!.textContent = stored ? '比較基準已儲存' : '比較基準僅保留至關閉頁面'; } catch { renderResults(); } });
+  document.querySelector<HTMLButtonElement>('#export-loadout')!.addEventListener('click', () => {
+    const payload = { format: 'damage-calculator-loadout', formatVersion: 1, exportedAt: new Date().toISOString(), loadout: structuredClone(state) };
+    const blobUrl = URL.createObjectURL(new Blob([`${JSON.stringify(payload, null, 2)}\n`], { type: 'application/json' }));
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = `damage-calculator-loadout-${new Date().toISOString().slice(0, 10)}.json`;
+    link.click();
+    URL.revokeObjectURL(blobUrl);
+    document.querySelector<HTMLElement>('#transfer-status')!.textContent = '配裝 JSON 已匯出。';
+  });
+  const fileInput = document.querySelector<HTMLInputElement>('#loadout-file')!;
+  document.querySelector<HTMLButtonElement>('#import-loadout')!.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', async () => {
+    const file = fileInput.files?.[0];
+    if (!file) return;
+    try {
+      const imported = validateImportedLoadout(JSON.parse(await file.text()) as unknown);
+      Object.assign(state, imported);
+      renderClassPicker();
+      toggle.checked = state.lowerwearAlternativeEnabled;
+      update();
+      renderInspector(); renderTitleInput(); renderGlobalInputs(); renderRightIceSetSelectors();
+      document.querySelector<HTMLElement>('#transfer-status')!.textContent = sampleMode ? '配裝已匯入；範例模式不會儲存到此裝置。' : '配裝已匯入並儲存於此裝置。';
+    } catch (error) {
+      document.querySelector<HTMLElement>('#transfer-status')!.textContent = `匯入失敗：${error instanceof Error ? error.message : '檔案無法讀取。'}`;
+    } finally {
+      fileInput.value = '';
+    }
+  });
   renderSlots(); renderInspector(); renderTitleInput(); renderBeastAccessories(); renderMasterBeastColorSelector(); renderGlobalInputs(); renderRightIceSetSelectors(); renderResults();
 }
 start().catch(error => { document.querySelector('#app')!.innerHTML = `<section class="error-card"><h1>無法載入工具</h1><p>${h(error instanceof Error ? error.message : error)}</p></section>`; });
