@@ -32,6 +32,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm run validate:data
       - run: pnpm run build
+      - run: pnpm run test:transfer
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

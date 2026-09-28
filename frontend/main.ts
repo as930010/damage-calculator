@@ -1,6 +1,7 @@
 import { getEquipmentOptionName } from '../calculation/equipment-catalog.ts';
 import { loadGameData, localCell, readJson, escapeHtml as h, formatNumber as fmt } from './data.ts';
 import { readState, readBaseline, saveState, type LoadoutState } from './state.ts';
+import { parseLoadoutJson, serializeLoadout } from './loadout-transfer.ts';
 import { projectAttributes } from './projection.ts';
 import { projectCombatRates, projectDamage } from './projection.ts';
 import { compareDamageResults } from './damage-comparison.ts';
@@ -69,46 +70,6 @@ async function start() {
   const update = () => {
     document.querySelector('#save-status')!.textContent = sampleMode ? '驗算範例模式：本頁調整不儲存' : saveState(state) ? '已儲存於此裝置' : '此瀏覽器無法儲存設定';
     renderSlots(); renderBeastAccessories(); renderMasterBeastColorSelector(); renderResults();
-  };
-  const validateImportedLoadout = (raw: unknown): LoadoutState => {
-    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw new TypeError('檔案內容不是有效的配裝資料。');
-    const envelope = raw as Record<string, unknown>;
-    if (envelope.format !== 'damage-calculator-loadout' || envelope.formatVersion !== 1) throw new TypeError('檔案格式或版本不支援，請使用本網站匯出的 JSON 配裝檔。');
-    const candidate = envelope.loadout;
-    if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) throw new TypeError('配裝資料缺少必要欄位。');
-    const record = candidate as Record<string, unknown>;
-    const classes = data.classes.classes.filter(entry => entry.active);
-    if (record.schemaVersion !== 2 || typeof record.classId !== 'string' || !classes.some(entry => entry.id === record.classId)) throw new TypeError('職業或配裝版本與目前網站不相容。');
-    if (!record.values || typeof record.values !== 'object' || Array.isArray(record.values)) throw new TypeError('配裝數值格式無效。');
-    const values: Record<string, string | number> = {};
-    for (const [key, value] of Object.entries(record.values)) {
-      if (!/^[A-Z]+[0-9]+$/.test(key) || !(typeof value === 'string' || typeof value === 'number' && Number.isFinite(value))) throw new TypeError('配裝包含無效的欄位或數值。');
-      values[key] = value;
-    }
-    if (typeof record.lowerwearAlternativeEnabled !== 'boolean' || typeof record.petSkillAttackEnabled !== 'boolean' || !['黃', '綠', ''].includes(String(record.masterBeastSpiritStoneColor))) throw new TypeError('配裝的切換設定格式無效。');
-    const missing: string[] = [];
-    for (const mapping of data.mapping.selections) {
-      const selection = values[mapping.selectionCell];
-      if (typeof selection !== 'string' || !selection.trim()) continue;
-      const catalog = data.catalogs[mapping.catalogFile];
-      const found = catalog?.items.some(item => item.active && item.slotId === mapping.slotId && getEquipmentOptionName(item, mapping.application) === selection);
-      if (!found) missing.push(selection);
-    }
-    for (const mapping of data.mapping.magicStoneSelections.inputGroups) {
-      const selection = values[mapping.selectionCell];
-      if (typeof selection !== 'string' || !selection.trim()) continue;
-      const found = data.catalogs[data.mapping.magicStoneSelections.catalogFile]?.items.some(item => item.active && item.slotId === data.mapping.magicStoneSelections.slotId && getEquipmentOptionName(item, mapping.application) === selection);
-      if (!found) missing.push(selection);
-    }
-    if (missing.length) throw new TypeError(`這份配裝含有目前資料庫找不到的裝備／魔法石：${[...new Set(missing)].join('、')}。請更新配裝檔或重新選擇項目。`);
-    return {
-      schemaVersion: 2,
-      classId: record.classId,
-      values,
-      lowerwearAlternativeEnabled: record.lowerwearAlternativeEnabled,
-      masterBeastSpiritStoneColor: record.masterBeastSpiritStoneColor as LoadoutState['masterBeastSpiritStoneColor'],
-      petSkillAttackEnabled: record.petSkillAttackEnabled,
-    };
   };
   function sourceLabel(sourceId: string): string {
     if (sourceId === 'character-base') return '角色基礎係數';
@@ -647,14 +608,15 @@ async function start() {
   toggle.addEventListener('change', () => { state.lowerwearAlternativeEnabled = toggle.checked; update(); renderInspector(); });
   document.querySelector('#baseline')!.addEventListener('click', () => { try { projectAttributes(data, state); baseline = structuredClone(state); const stored = sampleMode ? false : saveState(baseline, true); renderResults(); document.querySelector('#save-status')!.textContent = stored ? '比較基準已儲存' : '比較基準僅保留至關閉頁面'; } catch { renderResults(); } });
   document.querySelector<HTMLButtonElement>('#export-loadout')!.addEventListener('click', () => {
-    const payload = { format: 'damage-calculator-loadout', formatVersion: 1, exportedAt: new Date().toISOString(), loadout: structuredClone(state) };
-    const blobUrl = URL.createObjectURL(new Blob([`${JSON.stringify(payload, null, 2)}\n`], { type: 'application/json' }));
+    const exported = serializeLoadout(state, data);
+    const blobUrl = URL.createObjectURL(new Blob([exported.json], { type: 'application/json' }));
     const link = document.createElement('a');
     link.href = blobUrl;
     link.download = `damage-calculator-loadout-${new Date().toISOString().slice(0, 10)}.json`;
     link.click();
     URL.revokeObjectURL(blobUrl);
-    document.querySelector<HTMLElement>('#transfer-status')!.textContent = '配裝 JSON 已匯出。';
+    const details = exported.omittedFields.length ? `；${exported.omittedFields.length} 個無法識別欄位已留空` : '';
+    document.querySelector<HTMLElement>('#transfer-status')!.textContent = `配裝 JSON 已匯出${details}。`;
   });
   const fileInput = document.querySelector<HTMLInputElement>('#loadout-file')!;
   document.querySelector<HTMLButtonElement>('#import-loadout')!.addEventListener('click', () => fileInput.click());
@@ -662,13 +624,15 @@ async function start() {
     const file = fileInput.files?.[0];
     if (!file) return;
     try {
-      const imported = validateImportedLoadout(JSON.parse(await file.text()) as unknown);
-      Object.assign(state, imported);
+      const imported = parseLoadoutJson(await file.text(), state, data);
+      Object.assign(state, imported.state);
       renderClassPicker();
       toggle.checked = state.lowerwearAlternativeEnabled;
       update();
       renderInspector(); renderTitleInput(); renderGlobalInputs(); renderRightIceSetSelectors();
-      document.querySelector<HTMLElement>('#transfer-status')!.textContent = sampleMode ? '配裝已匯入；範例模式不會儲存到此裝置。' : '配裝已匯入並儲存於此裝置。';
+      const partial = imported.clearedFields.length ? `；${imported.clearedFields.length} 個無法對應的欄位已留空（${imported.clearedFields.slice(0, 5).join('、')}${imported.clearedFields.length > 5 ? '…' : ''}）` : '';
+      const version = imported.legacyFormat ? '（舊版檔案）' : '';
+      document.querySelector<HTMLElement>('#transfer-status')!.textContent = `${sampleMode ? '配裝已匯入；範例模式不會儲存到此裝置' : '配裝已匯入並儲存於此裝置'}${version}${partial}。`;
     } catch (error) {
       document.querySelector<HTMLElement>('#transfer-status')!.textContent = `匯入失敗：${error instanceof Error ? error.message : '檔案無法讀取。'}`;
     } finally {

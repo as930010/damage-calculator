@@ -5,6 +5,7 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "validate:data": "node scripts/validate-data.mjs",
+    "test:transfer": "node --test scripts/loadout-transfer.test.mjs",
     "build": "node scripts/build.mjs",
     "preview": "node scripts/preview.mjs"
   },
