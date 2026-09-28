@@ -2,15 +2,17 @@ import { getEquipmentOptionName } from '../calculation/equipment-catalog.ts';
 import { loadGameData, localCell, readJson, escapeHtml as h, formatNumber as fmt } from './data.ts';
 import { readState, readBaseline, saveState, type LoadoutState } from './state.ts';
 import { parseLoadoutJson, serializeLoadout } from './loadout-transfer.ts';
-import { projectAttributes } from './projection.ts';
-import { projectCombatRates, projectDamage } from './projection.ts';
+import { projectAttributes, projectCombatRates, projectDamage } from './projection.ts';
 import { compareDamageResults } from './damage-comparison.ts';
 import { compareSheetParity, type SheetParityReference } from './sheet-parity.ts';
 import { createPicker, type PickerOption } from './picker.ts';
 import { icon } from './icons.ts';
 import { capOverflowPercentage } from './cap-warnings.ts';
+import { findValidationCatalog } from './sheet-validation.ts';
+import { initializeThemeToggle } from './theme.ts';
 
 async function start() {
+  initializeThemeToggle(document.querySelector<HTMLButtonElement>('#theme-toggle')!, document.documentElement);
   const data = await loadGameData();
   const sampleId = new URLSearchParams(location.search).get('sample');
   if (sampleId !== null && !/^[a-z0-9-]+$/.test(sampleId)) throw new RangeError('驗算範例名稱無效。');
@@ -48,20 +50,8 @@ async function start() {
   const val = (cell: string) => String(state.values[localCell(cell)] ?? '');
   const summary = (stats: Readonly<Record<string, number>>) => Object.entries(stats).filter(([, value]) => value !== 0).map(([key, value]) => `${data.attributes.attributes.find(a => a.key === key)?.name ?? key} ${fmt(value)}`).join(' · ');
   const options = (names: readonly string[]): PickerOption[] => names.map(name => ({ value: name, label: name }));
-  const columnNumber = (letters: string) => [...letters].reduce((sum, letter) => sum * 26 + letter.charCodeAt(0) - 64, 0);
-  const rangeContains = (range: string, cell: string) => {
-    if (!range.includes(':')) return range === cell;
-    const [start, end] = range.split(':');
-    const parse = (address: string) => {
-      const match = address.match(/^([A-Z]+)([0-9]+)$/);
-      return match ? { column: columnNumber(match[1]), row: Number(match[2]) } : null;
-    };
-    const a = parse(start), b = parse(end), target = parse(cell);
-    return !!a && !!b && !!target && target.column >= a.column && target.column <= b.column && target.row >= a.row && target.row <= b.row;
-  };
   const validationChoices = (cell: string, percentLabel = false): PickerOption[] => {
-    const input = data.simulatorInputs.inputs.find(entry => entry.simulatorCells.split(/\s+/).some(range => rangeContains(range, cell)));
-    const catalog = input && data.simulatorInputs.catalogs.find(entry => entry.id === input.catalogId);
+    const catalog = findValidationCatalog(data.simulatorInputs.inputs, data.simulatorInputs.catalogs, cell);
     return (catalog?.options ?? []).map(option => {
       const value = String(option.value);
       return { value, label: percentLabel && typeof option.value === 'number' ? `${value}%` : value };
@@ -531,6 +521,7 @@ async function start() {
       ? `<div class="combat-rate-pair"><div class="stat"><p>實戰致命一擊機率</p><strong>${fmt(currentCombatRates.critRate.finalRate * 100)}%</strong>${probabilityCapWarning(currentCombatRates.critRate.valueBeforeUpperCap)}</div><div class="stat"><p>實戰極大化</p><strong>${fmt(currentCombatRates.extremization.finalRate * 100)}%</strong>${probabilityCapWarning(currentCombatRates.extremization.valueBeforeUpperCap)}</div></div>`
       : `<div class="combat-rate-pair"><div class="stat"><p>實戰致命一擊機率</p><strong>待補輸入</strong><small class="input-hint">${h(calculationIssue(damageCalculationError))}</small></div><div class="stat"><p>實戰極大化</p><strong>待補輸入</strong><small class="input-hint">${h(calculationIssue(damageCalculationError))}</small></div></div>`;
     const conditionalDamageCards = `<div class="conditional-damage-pair"><div class="stat"><p>強者（Boss 體力 &gt; 50%）</p><strong>${fmt(current.conditionalDamage.strongerPct)}%</strong></div><div class="stat"><p>排熱（Boss 體力 ≤ 50%）</p><strong>${fmt(current.conditionalDamage.heatPct)}%</strong></div></div>`;
+    const innerwearOrder = new Map(data.innerwear.slots.map((slot, index) => [`innerwear:${slot.id}`, index]));
     target.innerHTML = `<div class="stat-list">${visibleStats.map(({ key, stat, previousStat }) => {
       const meta = data.attributes.attributes.find(entry => entry.key === key);
       const isPercent = meta?.unit === 'percent';
@@ -545,7 +536,6 @@ async function start() {
         : `<small class="cap-overflow" role="status">超出上限 ${fmt(attributeOverflow)}%</small>`;
       const lowerwearAverageLabel = state.lowerwearAlternativeEnabled ? '下衣+強/排褲平均' : '下衣配置';
       const allCommonSources = [...stat.sharedSources, ...stat.lowerwearASources];
-      const innerwearOrder = new Map(data.innerwear.slots.map((slot, index) => [`innerwear:${slot.id}`, index]));
       const firstInnerwearIndex = allCommonSources.findIndex(source => innerwearOrder.has(source.sourceId));
       const innerwearSources = allCommonSources
         .filter(source => innerwearOrder.has(source.sourceId))
@@ -601,8 +591,7 @@ async function start() {
   const toggle = document.querySelector<HTMLInputElement>('#alternate')!; toggle.checked = state.lowerwearAlternativeEnabled;
   const battle = document.querySelector<HTMLElement>('#battle-settings')!;
   for (const [cell, label] of [['D1','關卡適應力'],['D2','關卡扣致命'],['D3','Boss防禦']] as const) {
-    const input = data.simulatorInputs.inputs.find(entry => entry.simulatorCells === cell);
-    const catalog = input && data.simulatorInputs.catalogs.find(entry => entry.id === input.catalogId);
+    const catalog = findValidationCatalog(data.simulatorInputs.inputs, data.simulatorInputs.catalogs, cell);
     field(battle, label, cell, options((catalog?.options ?? []).map(option => String(option.value))));
   }
   toggle.addEventListener('change', () => { state.lowerwearAlternativeEnabled = toggle.checked; update(); renderInspector(); });

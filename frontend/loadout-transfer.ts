@@ -1,6 +1,7 @@
 import { getEquipmentOptionName, type EquipmentCatalogItem, type SimulatorEquipmentSelectionMapping } from '../calculation/equipment-catalog.ts';
 import type { GameData } from './data.ts';
 import type { LoadoutState } from './state.ts';
+import { findValidationCatalog } from './sheet-validation.ts';
 
 type TransferData = Pick<GameData,
   | 'classes' | 'mapping' | 'catalogs' | 'simulatorInputs' | 'manifest' | 'masterBeast'
@@ -31,24 +32,8 @@ export function equipmentTransferCode(itemId: string): number {
   return hash >>> 0;
 }
 
-function columnNumber(letters: string): number {
-  return [...letters].reduce((sum, letter) => sum * 26 + letter.charCodeAt(0) - 64, 0);
-}
-
-function containsCell(range: string, cell: string): boolean {
-  if (!range.includes(':')) return range === cell;
-  const [start, end] = range.split(':');
-  const parse = (address: string) => {
-    const match = address.match(/^([A-Z]+)([0-9]+)$/);
-    return match ? { column: columnNumber(match[1]), row: Number(match[2]) } : null;
-  };
-  const a = parse(start), b = parse(end), target = parse(cell);
-  return !!a && !!b && !!target && target.column <= b.column && target.column >= a.column && target.row >= a.row && target.row <= b.row;
-}
-
 function inputOption(data: TransferData, cell: string) {
-  const input = data.simulatorInputs.inputs.find(entry => entry.simulatorCells.split(/\s+/).some(range => containsCell(range, cell)));
-  const catalog = input && data.simulatorInputs.catalogs.find(entry => entry.id === input.catalogId);
+  const catalog = findValidationCatalog(data.simulatorInputs.inputs, data.simulatorInputs.catalogs, cell);
   return catalog ? { catalog, options: catalog.options } : null;
 }
 
