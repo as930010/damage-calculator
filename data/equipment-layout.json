@@ -53,11 +53,11 @@
     },
     {
       "id": "ice-left-0",
-      "label": "頭髮",
+      "label": "髮型",
       "group": "leftIce",
       "x": 7,
       "y": 30,
-      "icon": "頭髮",
+      "icon": "髮型",
       "selectionCell": "Left.Ice.Set",
       "stoneCells": [
         "Left.Ice.Hair.MagicStone"
@@ -180,7 +180,7 @@
       "id": "inner-lowerwearAlternative",
       "label": "強/排褲",
       "group": "innerwear",
-      "x": 19,
+      "x": 28,
       "y": 90,
       "icon": "強/排褲",
       "innerwearId": "lowerwearAlternative",
