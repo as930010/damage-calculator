@@ -25,10 +25,8 @@ export function compareDamageResults(
     };
   };
   return [
-    row('攻擊下界', 'number', current.attack.lowerDamage, baseline.attack.lowerDamage),
-    row('攻擊上界', 'number', current.attack.upperDamage, baseline.attack.upperDamage),
-    row('致命一擊', 'percent', current.combatRates.critRate.finalRate * 100, baseline.combatRates.critRate.finalRate * 100),
-    row('極大化', 'percent', current.combatRates.extremization.finalRate * 100, baseline.combatRates.extremization.finalRate * 100),
+    row('最小攻擊力', 'number', current.attack.lowerDamage, baseline.attack.lowerDamage),
+    row('最大攻擊力', 'number', current.attack.upperDamage, baseline.attack.upperDamage),
     row('最終傷害', 'number', current.finalDamage.finalDamage, baseline.finalDamage.finalDamage),
   ];
 }
