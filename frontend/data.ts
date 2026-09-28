@@ -69,40 +69,48 @@ export interface GameData {
   simulatorInputs: { catalogs: { id: string; source?: { sheet?: string; range?: string }; options: { value: string | number }[] }[]; inputs: { simulatorCells: string; inputType: string; catalogId: string }[] };
 }
 
-export async function readJson<T>(path: string): Promise<T> {
+export const GAME_DATA_FILES = {
+  layout: "equipment-layout.json",
+  classes: "classes.json",
+  attributes: "attributes.json",
+  parameters: "parameters.json",
+  manifest: "manifest.json",
+  mapping: "simulator-equipment-mapping.json",
+  attack: "attack-parameters.json",
+  innerwear: "innerwear-rules.json",
+  appraisals: "armor-appraisals.json",
+  chips: "equipment/chips.json",
+  chipSlots: "chip-slots.json",
+  circuits: "circuit-board-rules.json",
+  transformations: "weapon-transformations.json",
+  growth: "weapon-growth.json",
+  weaponAppraisals: "weapon-appraisals.json",
+  weaponGrades: "weapon-grade-options.json",
+  giantStones: "giant-magic-stones.json",
+  accessoryEffects: "accessory-special-effects.json",
+  classCombatEffects: "class-combat-effects.json",
+  classDamagePassives: "class-damage-passives.json",
+  combatRateSources: "combat-rate-source-rules.json",
+  simulatorInputs: "simulator-input-options.json",
+  rightIceSets: "equipment/right-ice-set-effects.json",
+  resonance: "resonance-effects.json",
+  raidSets: "raid-set-effects.json",
+  atma: "atma-effects.json",
+  masterBeast: "master-beast-effects.json",
+  spiritRecord: "spirit-record-effects.json",
+  otherEffects: "other-effect-options.json",
+  pets: "pet-effects.json",
+  colorSetEffects: "color-set-effects.json",
+} as const satisfies Record<Exclude<keyof GameData, "catalogs">, string>;
+
+export async function readJson<T>(path: string, cache: RequestCache = "no-store"): Promise<T> {
   const buildRevision = document.querySelector<HTMLMetaElement>('meta[name="build-revision"]')?.content ?? "dev";
-  const response = await fetch(`./data/${path}?v=${encodeURIComponent(buildRevision)}`, { cache: "no-store" });
+  const response = await fetch(`./data/${path}?v=${encodeURIComponent(buildRevision)}`, { cache });
   if (!response.ok) throw new Error(`無法讀取 ${path}：${response.status}`);
   return response.json() as Promise<T>;
 }
 export async function loadGameData(): Promise<GameData> {
-  const [layout, classes, attributes, parameters, manifest, mapping, attack, innerwear, appraisals,
-    chips, chipSlots, circuits, transformations, growth, weaponAppraisals, weaponGrades, giantStones, accessoryEffects,
-    classCombatEffects, classDamagePassives, combatRateSources, simulatorInputs, rightIceSets, resonance,
-    raidSets, atma, masterBeast, spiritRecord, otherEffects, pets, colorSetEffects] = await Promise.all([
-    readJson<GameData["layout"]>("equipment-layout.json"), readJson<GameData["classes"]>("classes.json"),
-    readJson<GameData["attributes"]>("attributes.json"), readJson<GameData["parameters"]>("parameters.json"),
-    readJson<GameData["manifest"]>("manifest.json"), readJson<GameData["mapping"]>("simulator-equipment-mapping.json"),
-    readJson<GameData["attack"]>("attack-parameters.json"), readJson<GameData["innerwear"]>("innerwear-rules.json"),
-    readJson<GameData["appraisals"]>("armor-appraisals.json"), readJson<GameData["chips"]>("equipment/chips.json"),
-    readJson<GameData["chipSlots"]>("chip-slots.json"), readJson<GameData["circuits"]>("circuit-board-rules.json"),
-    readJson<GameData["transformations"]>("weapon-transformations.json"), readJson<GameData["growth"]>("weapon-growth.json"),
-    readJson<GameData["weaponAppraisals"]>("weapon-appraisals.json"), readJson<GameData["weaponGrades"]>("weapon-grade-options.json"),
-    readJson<GameData["giantStones"]>("giant-magic-stones.json"), readJson<GameData["accessoryEffects"]>("accessory-special-effects.json"),
-    readJson<GameData["classCombatEffects"]>("class-combat-effects.json"), readJson<GameData["classDamagePassives"]>("class-damage-passives.json"),
-    readJson<GameData["combatRateSources"]>("combat-rate-source-rules.json"), readJson<GameData["simulatorInputs"]>("simulator-input-options.json"),
-    readJson<GameData["rightIceSets"]>("equipment/right-ice-set-effects.json"), readJson<GameData["resonance"]>("resonance-effects.json"),
-    readJson<GameData["raidSets"]>("raid-set-effects.json"), readJson<GameData["atma"]>("atma-effects.json"),
-    readJson<GameData["masterBeast"]>("master-beast-effects.json"), readJson<GameData["spiritRecord"]>("spirit-record-effects.json"),
-    readJson<GameData["otherEffects"]>("other-effect-options.json"), readJson<GameData["pets"]>("pet-effects.json"),
-    readJson<GameData["colorSetEffects"]>("color-set-effects.json"),
-  ]);
-  const files = [...new Set([...mapping.selections.map((entry) => entry.catalogFile), mapping.magicStoneSelections.catalogFile])];
-  const catalogs = Object.fromEntries(await Promise.all(files.map(async (file) => [file, await readJson<EquipmentCatalogDocument>(file)])));
-  return { layout, classes, attributes, parameters, manifest, mapping, catalogs, attack, innerwear, appraisals,
-    chips, chipSlots, circuits, transformations, growth, weaponAppraisals, weaponGrades, giantStones, accessoryEffects,
-    classCombatEffects, classDamagePassives, combatRateSources, simulatorInputs, rightIceSets, resonance,
-    raidSets, atma, masterBeast, spiritRecord, otherEffects, pets, colorSetEffects };
+  return readJson<GameData>("game-data.json", "force-cache");
 }
 export const localCell = (cell: string): string => cell.split("!").at(-1)!.replaceAll("$", "");
 export const escapeHtml = (value: unknown): string => String(value ?? "").replace(/[&<>"']/g, (character) =>
