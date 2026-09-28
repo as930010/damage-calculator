@@ -354,7 +354,9 @@ async function start() {
     root.insertAdjacentHTML('beforeend', `<div class="master-beast-source-notes"><p><strong>固定效果：</strong>雙攻 +3%（轉職後固定擁有）。</p><p><strong>精靈石效果：</strong>選黃時，致命一擊與極大化各乘算 +${fmt(data.parameters.yellowBeastSpiritStoneRatePct)}%；選綠時不套用。</p><p><strong>潛力效果：</strong>${h(potentialText)}</p></div>`);
   }
   function renderTitleInput() {
-    field(document.querySelector<HTMLElement>('#title-input')!, '稱號', 'Effect.Title', options([...new Set(data.otherEffects.titles.map(entry => entry.name))]));
+    const root = document.querySelector<HTMLElement>('#title-input')!;
+    root.replaceChildren();
+    field(root, '稱號', 'Effect.Title', options([...new Set(data.otherEffects.titles.map(entry => entry.name))]));
   }
   function renderBeastAccessories() {
     const root = document.querySelector<HTMLElement>('#beast-accessory-fields')!;
