@@ -58,6 +58,18 @@ export interface LoadoutCalculationResult {
   finalDamage: FinalDamageResult;
 }
 
+export interface CombatRateCalculationInput {
+  classId: string;
+  classCombatEffects: ClassCombatEffectsDocument;
+  baseCritRatePct: number;
+  baseExtremizationPct: number;
+  combatRateSourceRules: CombatRateSourceRulesDocument;
+  combatRateSourceValues: CombatRateSourceValues;
+  additionalCritRateEffects?: readonly ResolvedPercentEffect[];
+  additionalExtremizationEffects?: readonly ResolvedPercentEffect[];
+  targetCritPenaltyPct: number;
+}
+
 function statTotal(result: CharacterAttributeResult, key: string): number {
   return result.stats[key]?.finalTotal ?? 0;
 }
@@ -76,6 +88,29 @@ function withCharacterBaseStats(
     lowerwearB: sources.lowerwearB,
     lowerwearAlternativeEnabled: sources.lowerwearAlternativeEnabled,
   };
+}
+
+/** Calculate actual in-combat rates without requiring weapon attack inputs. */
+export function calculateLoadoutCombatRates(input: CombatRateCalculationInput): CombatRateEngineResult {
+  const resolvedRateSources = resolveCombatRateSources(
+    input.combatRateSourceRules,
+    input.combatRateSourceValues,
+  );
+  return calculateCombatRates({
+    classId: input.classId,
+    classEffects: input.classCombatEffects,
+    baseCritRatePct: input.baseCritRatePct,
+    baseExtremizationPct: input.baseExtremizationPct,
+    otherCritEffects: [
+      ...resolvedRateSources.critRate.map((effect) => ({ ...effect, sourceId: effect.id })),
+      ...(input.additionalCritRateEffects ?? []),
+    ],
+    otherExtremizationEffects: [
+      ...resolvedRateSources.extremization.map((effect) => ({ ...effect, sourceId: effect.id })),
+      ...(input.additionalExtremizationEffects ?? []),
+    ],
+    targetCritPenaltyPct: input.targetCritPenaltyPct,
+  });
 }
 
 /** Run the spreadsheet-mapped source groups through the complete combat calculation chain. */
@@ -122,23 +157,15 @@ export function calculateLoadout(input: LoadoutCalculationInput): LoadoutCalcula
     attackLevel: statTotal(attributes, "attackLevel"),
     ...resolvedAttack,
   });
-  const resolvedRateSources = resolveCombatRateSources(
-    input.combatRateSourceRules,
-    input.combatRateSourceValues,
-  );
-  const combatRates = calculateCombatRates({
+  const combatRates = calculateLoadoutCombatRates({
     classId: input.classId,
-    classEffects: input.classCombatEffects,
+    classCombatEffects: input.classCombatEffects,
     baseCritRatePct: statTotal(attributes, "critRatePct"),
     baseExtremizationPct: statTotal(attributes, "extremizationPct"),
-    otherCritEffects: [
-      ...resolvedRateSources.critRate.map((effect) => ({ ...effect, sourceId: effect.id })),
-      ...(input.additionalCritRateEffects ?? []),
-    ],
-    otherExtremizationEffects: [
-      ...resolvedRateSources.extremization.map((effect) => ({ ...effect, sourceId: effect.id })),
-      ...(input.additionalExtremizationEffects ?? []),
-    ],
+    combatRateSourceRules: input.combatRateSourceRules,
+    combatRateSourceValues: input.combatRateSourceValues,
+    additionalCritRateEffects: input.additionalCritRateEffects,
+    additionalExtremizationEffects: input.additionalExtremizationEffects,
     targetCritPenaltyPct: input.targetCritPenaltyPct,
   });
 

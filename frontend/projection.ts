@@ -5,7 +5,7 @@ import { resolveWeaponTransformationsFromCells } from "../calculation/weapon-tra
 import { resolveAccessoryEffectOptions, resolveArmorAppraisals, resolveAtmaSetEffects, resolveChipContribution, resolveCircuitBoardEffects, resolveColorSetEffect, resolveMasterBeastEffects, resolveNamedStatOption, resolveRaidSetEffects, resolveResonanceEffects, resolveRightIceSetEffects, resolveSpiritRecordEffects, resolveSpiritRecordSelections, resolveWeaponGrowth } from "../calculation/equipment-effects.ts";
 import { calculateWeaponBaseAttack, resolveAttackParameters } from "../calculation/attack.ts";
 import type { AttributeRule, StatContribution } from "../calculation/types.ts";
-import { calculateLoadout } from "../calculation/loadout-engine.ts";
+import { calculateLoadout, calculateLoadoutCombatRates } from "../calculation/loadout-engine.ts";
 import { localCell, type GameData } from "./data.ts";
 import type { LoadoutState } from "./state.ts";
 
@@ -145,6 +145,40 @@ export function projectAttributes(data: GameData, state: LoadoutState) {
   return { ...result, calculationSources };
 }
 
+function combatRateInputs(data: GameData, state: LoadoutState, attributes: ReturnType<typeof projectAttributes>) {
+  const job = data.classes.classes.find(entry => entry.id === state.classId);
+  if (!job) throw new RangeError(`找不到職業設定：${state.classId}`);
+  const percentage = (cell: string) => {
+    const value = state.values[cell];
+    if (value == null || value === "") return 0;
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) throw new RangeError(`${cell} 必須是數值。`);
+    return parsed;
+  };
+  const combatRateSourceValues = {
+    parameters: { yellowBeastSpiritStoneRatePct: data.parameters.yellowBeastSpiritStoneRatePct },
+    selections: {
+      H12: state.values.H12, H39: state.values.H39,
+      masterBeastSpiritStoneColor: state.masterBeastSpiritStoneColor ?? data.masterBeast.spiritStoneColorSelector.defaultColor,
+    },
+  };
+  return {
+    classId: job.id,
+    classCombatEffects: data.classCombatEffects,
+    baseCritRatePct: attributes.stats.critRatePct?.finalTotal ?? 0,
+    baseExtremizationPct: attributes.stats.extremizationPct?.finalTotal ?? 0,
+    combatRateSourceRules: data.combatRateSources,
+    combatRateSourceValues,
+    targetCritPenaltyPct: percentage("D2"),
+  };
+}
+
+/** Calculate final in-combat probability without requiring weapon level. */
+export function projectCombatRates(data: GameData, state: LoadoutState) {
+  const attributes = projectAttributes(data, state);
+  return calculateLoadoutCombatRates(combatRateInputs(data, state, attributes));
+}
+
 /** Full formula path through B157:B163 using the selected spreadsheet-mapped values. */
 export function projectDamage(data: GameData, state: LoadoutState) {
   const attributes = projectAttributes(data, state);
@@ -160,13 +194,7 @@ export function projectDamage(data: GameData, state: LoadoutState) {
     if (!Number.isFinite(parsed)) throw new RangeError(`${cell} 必須是數值。`);
     return parsed;
   };
-  const combatRateSourceValues = {
-    parameters: { yellowBeastSpiritStoneRatePct: data.parameters.yellowBeastSpiritStoneRatePct },
-    selections: {
-      H12: state.values.H12, H39: state.values.H39,
-      masterBeastSpiritStoneColor: state.masterBeastSpiritStoneColor ?? data.masterBeast.spiritStoneColorSelector.defaultColor,
-    },
-  };
+  const rateInputs = combatRateInputs(data, state, attributes);
   const result = calculateLoadout({
     classId: job.id, attackType: job.attackType,
     attributeRules: data.attributes.attributes.filter(entry => entry.active && entry.aggregation === "sum")
@@ -178,8 +206,8 @@ export function projectDamage(data: GameData, state: LoadoutState) {
     classCombatEffects: data.classCombatEffects,
     classDamagePassives: data.classDamagePassives,
     combatRateSourceRules: data.combatRateSources,
-    combatRateSourceValues,
-    targetCritPenaltyPct: percentage("D2"),
+    combatRateSourceValues: rateInputs.combatRateSourceValues,
+    targetCritPenaltyPct: rateInputs.targetCritPenaltyPct,
     stageAdaptabilityPenaltyPct: percentage("D1"),
     enemyDefensePct: percentage("D3"),
     critDamageProductBasePct: data.parameters.critDamageProductBasePct,

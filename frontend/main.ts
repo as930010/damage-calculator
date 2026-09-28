@@ -2,7 +2,7 @@ import { getEquipmentOptionName } from '../calculation/equipment-catalog.ts';
 import { loadGameData, localCell, readJson, escapeHtml as h, formatNumber as fmt } from './data.ts';
 import { readState, readBaseline, saveState, type LoadoutState } from './state.ts';
 import { projectAttributes } from './projection.ts';
-import { projectDamage } from './projection.ts';
+import { projectCombatRates, projectDamage } from './projection.ts';
 import { compareDamageResults } from './damage-comparison.ts';
 import { compareSheetParity, type SheetParityReference } from './sheet-parity.ts';
 import { createPicker, type PickerOption } from './picker.ts';
@@ -191,7 +191,7 @@ async function start() {
   const sourceRows = (sources: readonly { sourceId: string; valuePct: number }[], isPercent: boolean) =>
     sources.length
       ? sources.map(source => `<p class="stat-source-row"><span>${h(sourceLabel(source.sourceId))}</span><strong>${fmt(source.valuePct)}${isPercent ? '%' : ''}</strong></p>`).join('')
-      : '<p class="stat-source-empty">無來源</p>';
+      : '';
   const field = (parent: HTMLElement, label: string, cell: string, choices: readonly PickerOption[], redraw = false) => {
     parent.append(createPicker(label, choices, val(cell), value => {
       state.values[localCell(cell)] = value; update(); renderRightIceSetSelectors();
@@ -478,19 +478,21 @@ async function start() {
       let currentDamage: ReturnType<typeof projectDamage> | null = null;
       let damageCalculationError: unknown;
       try { currentDamage = projectDamage(data, state); } catch (error) { damageCalculationError = error; }
+      let currentCombatRates: ReturnType<typeof projectCombatRates> | null = null;
+      try { currentCombatRates = projectCombatRates(data, state); } catch { /* Show other attributes even if rate inputs are incomplete. */ }
     const currentClass = data.classes.classes.find(entry => entry.id === state.classId);
     const baselineClass = baseline ? data.classes.classes.find(entry => entry.id === baseline?.classId) : undefined;
     const attackKey = currentClass?.attackType === 'physical' ? 'physicalAttack' : 'magicalAttack';
     const baselineAttackKey = baselineClass?.attackType === 'physical' ? 'physicalAttack' : 'magicalAttack';
     const visibleStats = Object.entries(current.stats)
-      .filter(([key, stat]) => !['physicalAttack', 'magicalAttack'].includes(key) && (stat.finalTotal !== 0 || (before?.stats[key]?.finalTotal ?? 0) !== 0))
+      .filter(([key, stat]) => !['physicalAttack', 'magicalAttack', 'critRatePct', 'extremizationPct'].includes(key) && (stat.finalTotal !== 0 || (before?.stats[key]?.finalTotal ?? 0) !== 0))
       .map(([key, stat]) => ({ key, stat, previousStat: before?.stats[key] }));
     const attackStat = current.stats[attackKey];
     if (attackStat && (attackStat.finalTotal !== 0 || (before?.stats[baselineAttackKey]?.finalTotal ?? 0) !== 0)) {
       visibleStats.unshift({ key: 'attackPower', stat: attackStat, previousStat: before?.stats[baselineAttackKey] });
     }
     const percentFormat = (value: number) => new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 3 }).format(value);
-    const combatRateCards = currentDamage ? `<div class="stat"><p>實戰致命一擊機率</p><strong>${fmt(currentDamage.result.combatRates.critRate.finalRate * 100)}%</strong></div><div class="stat"><p>實戰極大化機率</p><strong>${fmt(currentDamage.result.combatRates.extremization.finalRate * 100)}%</strong></div>` : '';
+    const combatRateCards = currentCombatRates ? `<div class="stat"><p>實戰致命一擊機率</p><strong>${fmt(currentCombatRates.critRate.finalRate * 100)}%</strong></div><div class="stat"><p>實戰極大化機率</p><strong>${fmt(currentCombatRates.extremization.finalRate * 100)}%</strong></div>` : '';
     target.innerHTML = `<div class="stat-list">${visibleStats.map(({ key, stat, previousStat }) => {
       const meta = data.attributes.attributes.find(entry => entry.key === key);
       const isPercent = meta?.unit === 'percent';
@@ -500,7 +502,10 @@ async function start() {
       const deltaText = delta === null ? '' : `${delta > 0 ? '+' : ''}${isPercent ? percentFormat(delta) : fmt(delta)}${isPercent ? '%' : ''}`;
       const shownName = key === 'attackPower' ? '攻擊力' : meta?.name ?? key;
       const lowerwearAverageLabel = state.lowerwearAlternativeEnabled ? '下衣+強/排褲平均' : '下衣配置';
-      return `<details class="stat"><summary><span>${h(shownName)}</span>${stat.cap === undefined ? '' : `<small class="stat-cap">上限 ${fmt(stat.cap)}%</small>`}<strong>${fmt(stat.finalTotal)}${isPercent ? '%' : ''}</strong>${delta === null ? '' : `<small class="${delta > 0 ? 'positive' : delta < 0 ? 'negative' : ''}">${deltaText}</small>`}</summary><div class="stat-details"><p class="stat-detail-heading">共同來源</p>${sourceRows(stat.sharedSources, isPercent)}<p class="stat-lowerwear-total">下衣 ${fmt(stat.lowerwearA)} ／ 強/排褲 ${fmt(stat.lowerwearB)}</p><p class="stat-detail-heading">下衣來源</p>${sourceRows(stat.lowerwearASources, isPercent)}${state.lowerwearAlternativeEnabled ? `<p class="stat-detail-heading">強/排褲來源</p>${sourceRows(stat.lowerwearBSources, isPercent)}` : ''}<p class="stat-average">${lowerwearAverageLabel} ${fmt(stat.lowerwearAverage)}${isPercent ? '%' : ''}</p>${stat.cap === undefined ? '' : `<p>套用角色上限 ${fmt(stat.cap)}%</p>`}${comparison}</div></details>`;
+      const sharedDetails = stat.sharedSources.length ? `<p class="stat-detail-heading">共同來源</p>${sourceRows(stat.sharedSources, isPercent)}` : '';
+      const lowerwearADetails = stat.lowerwearASources.length ? `<p class="stat-detail-heading">下衣來源</p>${sourceRows(stat.lowerwearASources, isPercent)}` : '';
+      const lowerwearBDetails = state.lowerwearAlternativeEnabled && stat.lowerwearBSources.length ? `<p class="stat-detail-heading">強/排褲來源</p>${sourceRows(stat.lowerwearBSources, isPercent)}` : '';
+      return `<details class="stat"><summary><span>${h(shownName)}</span>${stat.cap === undefined ? '' : `<small class="stat-cap">上限 ${fmt(stat.cap)}%</small>`}<strong>${fmt(stat.finalTotal)}${isPercent ? '%' : ''}</strong>${delta === null ? '' : `<small class="${delta > 0 ? 'positive' : delta < 0 ? 'negative' : ''}">${deltaText}</small>`}</summary><div class="stat-details">${sharedDetails}<p class="stat-lowerwear-total">下衣 ${fmt(stat.lowerwearA)} ／ 強/排褲 ${fmt(stat.lowerwearB)}</p>${lowerwearADetails}${lowerwearBDetails}<p class="stat-average">${lowerwearAverageLabel} ${fmt(stat.lowerwearAverage)}${isPercent ? '%' : ''}</p>${stat.cap === undefined ? '' : `<p>套用角色上限 ${fmt(stat.cap)}%</p>`}${comparison}</div></details>`;
     }).join('')}${combatRateCards}<div class="stat"><p>強者（Boss 體力 &gt; 50%）</p><strong>${fmt(current.conditionalDamage.strongerPct)}%</strong></div><div class="stat"><p>排熱（Boss 體力 ≤ 50%）</p><strong>${fmt(current.conditionalDamage.heatPct)}%</strong></div></div>`;
       const damageTarget = document.querySelector('#damage-result')!;
       try {
