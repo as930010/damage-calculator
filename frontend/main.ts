@@ -7,6 +7,7 @@ import { compareDamageResults } from './damage-comparison.ts';
 import { compareSheetParity, type SheetParityReference } from './sheet-parity.ts';
 import { createPicker, type PickerOption } from './picker.ts';
 import { icon } from './icons.ts';
+import { capOverflowPercentage } from './cap-warnings.ts';
 
 async function start() {
   const data = await loadGameData();
@@ -494,7 +495,11 @@ async function start() {
       visibleStats.unshift({ key: 'attackPower', stat: attackStat, previousStat: before?.stats[baselineAttackKey] });
     }
     const percentFormat = (value: number) => new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 3 }).format(value);
-    const combatRateCards = currentCombatRates ? `<div class="stat"><p>實戰致命一擊機率</p><strong>${fmt(currentCombatRates.critRate.finalRate * 100)}%</strong></div><div class="stat"><p>實戰極大化機率</p><strong>${fmt(currentCombatRates.extremization.finalRate * 100)}%</strong></div>` : '';
+    const probabilityCapWarning = (valueBeforeCap: number) => {
+      const overflow = capOverflowPercentage(valueBeforeCap * 100, 100);
+      return overflow === null ? '' : `<small class="cap-overflow" role="status">超出上限 ${fmt(overflow)}%</small>`;
+    };
+    const combatRateCards = currentCombatRates ? `<div class="stat"><p>實戰致命一擊機率</p><strong>${fmt(currentCombatRates.critRate.finalRate * 100)}%</strong>${probabilityCapWarning(currentCombatRates.critRate.valueBeforeUpperCap)}</div><div class="stat"><p>實戰極大化機率</p><strong>${fmt(currentCombatRates.extremization.finalRate * 100)}%</strong>${probabilityCapWarning(currentCombatRates.extremization.valueBeforeUpperCap)}</div>` : '';
     target.innerHTML = `<div class="stat-list">${visibleStats.map(({ key, stat, previousStat }) => {
       const meta = data.attributes.attributes.find(entry => entry.key === key);
       const isPercent = meta?.unit === 'percent';
@@ -503,6 +508,10 @@ async function start() {
       const comparison = delta === null ? '' : `<p>基準 ${fmt(previous)}${isPercent ? '%' : ''} → 目前 ${fmt(stat.finalTotal)}${isPercent ? '%' : ''}；相對變化 ${previous === 0 ? '—（基準為 0）' : `${percentFormat(delta / previous * 100)}%`}</p>`;
       const deltaText = delta === null ? '' : `${delta > 0 ? '+' : ''}${isPercent ? percentFormat(delta) : fmt(delta)}${isPercent ? '%' : ''}`;
       const shownName = key === 'attackPower' ? '攻擊力' : meta?.name ?? key;
+      const attributeOverflow = stat.cap === undefined ? null : capOverflowPercentage(stat.totalBeforeCap, stat.cap);
+      const attributeCapWarning = attributeOverflow === null
+        ? ''
+        : `<small class="cap-overflow" role="status">超出上限 ${fmt(attributeOverflow)}%</small>`;
       const lowerwearAverageLabel = state.lowerwearAlternativeEnabled ? '下衣+強/排褲平均' : '下衣配置';
       const allCommonSources = [...stat.sharedSources, ...stat.lowerwearASources];
       const innerwearOrder = new Map(data.innerwear.slots.map((slot, index) => [`innerwear:${slot.id}`, index]));
@@ -515,7 +524,7 @@ async function start() {
       else commonSources.push(...innerwearSources);
       const sharedDetails = commonSources.length ? `<p class="stat-detail-heading">共同來源</p>${sourceRows(commonSources, isPercent)}` : '';
       const lowerwearBDetails = state.lowerwearAlternativeEnabled && stat.lowerwearBSources.length ? `<p class="stat-detail-heading">強/排褲來源</p>${sourceRows(stat.lowerwearBSources, isPercent)}` : '';
-      return `<details class="stat"><summary><span>${h(shownName)}</span>${stat.cap === undefined ? '' : `<small class="stat-cap">上限 ${fmt(stat.cap)}%</small>`}<strong>${fmt(stat.finalTotal)}${isPercent ? '%' : ''}</strong>${delta === null ? '' : `<small class="${delta > 0 ? 'positive' : delta < 0 ? 'negative' : ''}">${deltaText}</small>`}</summary><div class="stat-details">${sharedDetails}${lowerwearBDetails}<p class="stat-average">${lowerwearAverageLabel} ${fmt(stat.lowerwearAverage)}${isPercent ? '%' : ''}</p>${stat.cap === undefined ? '' : `<p>套用角色上限 ${fmt(stat.cap)}%</p>`}${comparison}</div></details>`;
+      return `<details class="stat"><summary><span>${h(shownName)}</span>${stat.cap === undefined ? '' : `<small class="stat-cap">上限 ${fmt(stat.cap)}%</small>`}<strong>${fmt(stat.finalTotal)}${isPercent ? '%' : ''}</strong>${attributeCapWarning}${delta === null ? '' : `<small class="${delta > 0 ? 'positive' : delta < 0 ? 'negative' : ''}">${deltaText}</small>`}</summary><div class="stat-details">${sharedDetails}${lowerwearBDetails}<p class="stat-average">${lowerwearAverageLabel} ${fmt(stat.lowerwearAverage)}${isPercent ? '%' : ''}</p>${stat.cap === undefined ? '' : `<p>套用角色上限 ${fmt(stat.cap)}%</p>`}${comparison}</div></details>`;
     }).join('')}${combatRateCards}<div class="stat"><p>強者（Boss 體力 &gt; 50%）</p><strong>${fmt(current.conditionalDamage.strongerPct)}%</strong></div><div class="stat"><p>排熱（Boss 體力 ≤ 50%）</p><strong>${fmt(current.conditionalDamage.heatPct)}%</strong></div></div>`;
       const damageTarget = document.querySelector('#damage-result')!;
       try {

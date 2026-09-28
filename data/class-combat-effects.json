@@ -479,11 +479,6 @@
           "id": "crit-2",
           "method": "multiplicative",
           "valuePct": 15
-        },
-        {
-          "id": "crit-3",
-          "method": "multiplicative",
-          "valuePct": 3
         }
       ],
       "extremization": [
@@ -496,11 +491,6 @@
           "id": "ext-2",
           "method": "multiplicative",
           "valuePct": 15
-        },
-        {
-          "id": "ext-3",
-          "method": "multiplicative",
-          "valuePct": 3
         }
       ]
     },

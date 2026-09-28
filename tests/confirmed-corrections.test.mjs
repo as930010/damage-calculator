@@ -45,6 +45,42 @@ test('四個武器變換共用 B32 強化，不受 B33:B35 文字內數字影響
   assert.deepEqual(resolveWeaponTransformationsFromCells(transforms, { ...values, B33: '成長1', B34: '9%', B35: '8%' }), result);
 });
 
+test('十二種武器變換都依自己的規則換算，所有「×強化」只讀取 B32', () => {
+  const values = { B32: 'Lv.11', B33: 'Lv.2', B34: 'Lv.3', B35: 'Lv.4' };
+  for (const slot of transforms.slots) {
+    values[slot.choiceCell] = '';
+    values[slot.valueCell] = 0.02;
+  }
+  for (const rule of transforms.rules) {
+    for (const slot of transforms.slots) {
+      values[slot.choiceCell] = rule.choice;
+      const [actual] = resolveWeaponTransformationsFromCells(transforms, values).filter(entry => entry.sourceId === `weapon-transform:${slot.choiceCell}`);
+      const expected = 0.02 * rule.valueMultiplier * (rule.strengthenByFirstIntegerFrom ? 11 : 1);
+      assert.equal(actual.stats[rule.statKey], expected, `${slot.choiceCell}: ${rule.choice}`);
+      values[slot.choiceCell] = '';
+    }
+  }
+  const withoutEnhancement = { ...values, B32: '', B33: 'Lv.13' };
+  values.B42 = '雙攻% × 強化';
+  withoutEnhancement.B42 = '雙攻% × 強化';
+  assert.equal(resolveWeaponTransformationsFromCells(transforms, withoutEnhancement)[0].stats.doubleAttackPct, 0);
+});
+
+test('Google Sheets 計算機第 54～57 列的「×強化」公式都明確引用裝備模擬區 B32', async () => {
+  const sourceMap = JSON.parse(await readFile(new URL('../docs/reference/calculation-source-map.json', import.meta.url), 'utf8'));
+  const scaledFormulaCells = sourceMap.rows
+    .filter(row => row.row >= 54 && row.row <= 57)
+    .flatMap(row => row.cells)
+    .filter(cell => cell.formula?.includes('REGEXEXTRACT'));
+
+  assert.equal(scaledFormulaCells.length, 16);
+  for (const cell of scaledFormulaCells) {
+    const references = cell.references.map(reference => reference.range);
+    assert.ok(references.includes('B32'), `${cell.cell} should reference B32`);
+    assert.ok(!references.some(reference => ['B33', 'B34', 'B35'].includes(reference)), `${cell.cell} should not reference B33:B35`);
+  }
+});
+
 test('兩極化／適應力上限在全角色彙總後套用，極大化無 60 上限', () => {
   const rules = ['polarizationPct','adaptabilityPct','extremizationPct'].map(key => ({ key, aggregation:'sum', ...(key !== 'extremizationPct' ? { cap: { value:60, scope: 'characterTotal' } } : {}) }));
   const prepared = prepareCharacterAttributeInput(rules, { shared:[{ sourceId:'shared',stats:{polarizationPct:55,adaptabilityPct:55,extremizationPct:90}}],lowerwearA:[{sourceId:'a',stats:{polarizationPct:20,adaptabilityPct:20}}],lowerwearB:[{sourceId:'b',stats:{polarizationPct:40,adaptabilityPct:40}}],lowerwearAlternativeEnabled:true });
