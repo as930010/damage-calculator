@@ -25,7 +25,15 @@ export interface GameData {
   layout: LayoutDocument;
   classes: { classes: { id: string; name: string; active: boolean; attackType: "physical" | "magical" }[] };
   attributes: { attributes: AttributeMetadata[] };
-  parameters: { characterBase: Record<string, number>; fixedEffects: StatContribution[]; critDamageProductBasePct: number; critDamageProductBaselinePctToSubtract: number; yellowBeastSpiritStoneRatePct: number };
+  parameters: {
+    characterBase: Record<string, number>;
+    fixedEffects: StatContribution[];
+    conditionalEffects: { sourceId: string; selectorCell: string; selectorValue: string; stats: Readonly<Record<string, number>> }[];
+    optionalEffects: { sourceId: string; stateKey: "petSkillAttackEnabled"; defaultEnabled: boolean; stats: Readonly<Record<string, number>> }[];
+    critDamageProductBasePct: number;
+    critDamageProductBaselinePctToSubtract: number;
+    yellowBeastSpiritStoneRatePct: number;
+  };
   manifest: { displayDate: string; dataUpdatedAt: string };
   mapping: SimulatorEquipmentMappingDocument;
   catalogs: Record<string, EquipmentCatalogDocument>;

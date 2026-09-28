@@ -4,6 +4,7 @@ export interface LoadoutState {
   values: Record<string, string | number>;
   lowerwearAlternativeEnabled: boolean;
   masterBeastSpiritStoneColor: "黃" | "綠" | "";
+  petSkillAttackEnabled: boolean;
 }
 const stateKey = "dab-loadout-v1";
 const baselineKey = "dab-baseline-v1";
@@ -22,11 +23,13 @@ function parseState(raw: string | null): LoadoutState | null {
     schemaVersion: 2, classId: value.classId, values,
     lowerwearAlternativeEnabled: candidate.lowerwearAlternativeEnabled === true,
     masterBeastSpiritStoneColor: stoneColor === "綠" || stoneColor === "" ? stoneColor : "黃",
+    // Older saved configurations predate this toggle; preserve their former always-on result.
+    petSkillAttackEnabled: candidate.petSkillAttackEnabled !== false,
   };
 }
 export function readState(defaultClass: string): LoadoutState {
   try { const stored = parseState(localStorage.getItem(stateKey)); if (stored) return stored; } catch { /* Storage is optional. */ }
-  return { schemaVersion: 2, classId: defaultClass, values: {}, lowerwearAlternativeEnabled: false, masterBeastSpiritStoneColor: "黃" };
+  return { schemaVersion: 2, classId: defaultClass, values: {}, lowerwearAlternativeEnabled: false, masterBeastSpiritStoneColor: "黃", petSkillAttackEnabled: true };
 }
 export function readBaseline(): LoadoutState | null {
   try { return parseState(localStorage.getItem(baselineKey)); } catch { return null; }

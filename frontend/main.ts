@@ -69,6 +69,128 @@ async function start() {
     document.querySelector('#save-status')!.textContent = sampleMode ? '驗算範例模式：本頁調整不儲存' : saveState(state) ? '已儲存於此裝置' : '此瀏覽器無法儲存設定';
     renderSlots(); renderBeastAccessories(); renderMasterBeastColorSelector(); renderResults();
   };
+  function sourceLabel(sourceId: string): string {
+    if (sourceId === 'character-base') return '角色基礎係數';
+    if (sourceId === 'weapon-base-attack:C53:D53') return '武器基礎攻擊力';
+    if (sourceId.startsWith('sheet:計算機!')) {
+      const cell = sourceId.slice('sheet:計算機!'.length);
+      if (Object.values(data.masterBeast.overallPotentialSourceCells).includes(cell)) return '聖獸潛力';
+      if (cell === 'E76') return '大師聖獸固定效果（技能類雙攻）';
+      if (cell === 'E93') return '寵物被動（技能類雙攻）';
+      if (cell === 'Q37') return '百億套效';
+      if (cell === 'Q53') return '武器';
+      if (cell === 'Q86' || cell === 'R86') return '稱號';
+      if (cell === 'T101') return '百億紅上衣、暴上';
+      if (cell === 'T102') return 'MAESTRO光環';
+      return `試算表固定數值（計算機!${cell}）`;
+    }
+    if (sourceId.startsWith('simulator:')) {
+      const cell = sourceId.slice('simulator:'.length);
+      const stoneSlot = data.layout.slots.find(entry => entry.stoneCells?.includes(cell));
+      const selectedSlots = data.layout.slots.filter(entry => entry.selectionCell === cell);
+      const slot = stoneSlot ?? selectedSlots[0];
+      const selected = String(state.values[cell] ?? '').trim();
+      if (stoneSlot) return `${stoneSlot.label}魔法石：${selected}`;
+      if (selectedSlots.length > 1) {
+        const group = data.layout.groups.find(entry => entry.id === selectedSlots[0].group);
+        return `${group?.name ?? selectedSlots[0].group}套裝：${selected}`;
+      }
+      if (slot) return `${slot.label}：${selected}`;
+      return `裝備選擇（${cell}）${selected ? `：${selected}` : ''}`;
+    }
+    if (sourceId.startsWith('innerwear:')) {
+      const slot = data.innerwear.slots.find(entry => entry.id === sourceId.slice('innerwear:'.length));
+      return slot ? `內裝${slot.name}（強化／鍛造）` : `內裝來源待確認（${sourceId}）`;
+    }
+    if (sourceId === 'spirit-record:default-maxed') return '賦靈錄';
+    if (sourceId.startsWith('spirit-record:branch:')) return `賦靈錄：${sourceId.slice('spirit-record:branch:'.length)}`;
+    if (sourceId.startsWith('spirit-record:trait:')) return `賦靈錄特性：${sourceId.slice('spirit-record:trait:'.length)}`;
+    if (sourceId.startsWith('chip:')) {
+      const slotId = sourceId.slice('chip:'.length);
+      const slot = data.chipSlots.slots.find(entry => entry.id === slotId);
+      const slotNames: Record<string, string> = { upper: '上衣', lowerwear: '下衣', lowerwearAlternative: '強/排褲', gloves: '手套', shoes: '鞋子' };
+      return slot ? `${slotNames[slot.id] ?? slot.id}芯片：${String(state.values[slot.attributeCell] ?? '')}（調校 ${String(state.values[slot.tuningCell] ?? '')}）` : `芯片調校來源待確認（${sourceId}）`;
+    }
+    if (sourceId.startsWith('circuit-board:')) {
+      const slotId = sourceId.slice('circuit-board:'.length);
+      const slot = data.circuits.inputs.find(entry => entry.slot === slotId);
+      return slot ? `電路板 ${slotId}：${String(state.values[localCell(slot.attributeCell)] ?? '')} ${fmt(Number(state.values[localCell(slot.valueCell)] ?? 0) * 100)}%` : `電路板來源待確認（${sourceId}）`;
+    }
+    if (sourceId.startsWith('color-set:')) return `百億套效：${sourceId.slice('color-set:'.length)}`;
+    if (sourceId.startsWith('master-beast:')) {
+      const [, part, detail] = sourceId.split(':');
+      const partNames: Record<string, string> = { head: '頭飾', ring: '指環' };
+      if (part === 'mirror') {
+        const row = Number(detail) + 26;
+        return `聖獸迷鏡效果：${String(state.values[`O${row}`] ?? '')}`;
+      }
+      if (part === 'head-manual') return `聖獸頭飾精靈石：${String(state.values.M27 ?? '')}`;
+      if (part === 'necklace-manual') return `聖獸項鍊精靈石：${String(state.values.M33 ?? '')}`;
+      if (part === 'ring-manual') {
+        const cell = detail === '1' ? 'M36' : 'M39';
+        return `聖獸指環精靈石：${String(state.values[cell] ?? '')}`;
+      }
+      if (partNames[part]) {
+        const cell = part === 'head' ? detail === '1' ? 'N27' : 'N28' : detail === '1' ? 'N36' : 'N39';
+        return `聖獸${partNames[part]}固定效果：${String(state.values[cell] ?? '')}`;
+      }
+    }
+    const rightIce = data.rightIceSets.effects.find(entry => entry.id === sourceId);
+    if (rightIce) return `右冰套效：${rightIce.setName}`;
+    const resonance = data.resonance.effects.find(entry => entry.id === sourceId);
+    if (resonance) return `共鳴：${resonance.name}`;
+    const raid = data.raidSets.sets.find(entry => sourceId.startsWith(`${entry.id}:`));
+    if (raid) return `襲擊套效：${raid.name}（${sourceId.slice(raid.id.length + 1)}）`;
+    const atma = data.atma.rules.find(entry => entry.id === sourceId);
+    const atmaNames: Record<string, string> = {
+      'atma-wood-crit-rate': '草木亞特瑪致命一擊',
+      'atma-water-fire-multiplicative-damage': '流水／火焰亞特瑪乘算傷害',
+      'atma-wood-multiplicative-crit-damage': '草木亞特瑪乘算致命傷害',
+    };
+    if (atma) return atmaNames[atma.id] ?? `亞特瑪來源待確認（${atma.id}）`;
+    if (sourceId.startsWith('weapon-growth')) return `武器成長：${String(state.values[localCell(data.growth.selectorCell)] ?? '')}`;
+    if (sourceId.startsWith('weapon-appraisal:')) {
+      const cell = sourceId.slice('weapon-appraisal:'.length);
+      const group = Object.values(data.weaponAppraisals.groups).find(entry => localCell(entry.selectorCell) === cell);
+      return `武器鑑定${group ? `：${String(state.values[cell] ?? '')}` : ''}`;
+    }
+    if (sourceId.startsWith('giant-stone:')) {
+      const cell = sourceId.slice('giant-stone:'.length);
+      return `巨型魔力石：${String(state.values[cell] ?? '')}`;
+    }
+    if (sourceId.startsWith('weapon-grade:')) return '武器等級效果';
+    if (sourceId.startsWith('weapon-transform:')) {
+      const cell = sourceId.slice('weapon-transform:'.length);
+      return `武器變換：${String(state.values[cell] ?? '')}`;
+    }
+    if (sourceId.startsWith('armor-appraisal:')) {
+      const slotId = sourceId.split(':')[1];
+      const slot = data.appraisals.slots.find(entry => entry.id === slotId);
+      const slotNames: Record<string, string> = { upper: '上衣', lowerwear: '下衣', lowerwearAlternative: '強/排褲', gloves: '手套', shoes: '鞋子' };
+      return slot ? `內裝${slotNames[slot.id] ?? slot.id}鑑定` : `防具鑑定來源待確認（${sourceId}）`;
+    }
+    if (sourceId.startsWith('accessory-effect:')) {
+      const groupId = sourceId.split(':')[1];
+      const group = data.accessoryEffects.groups.find(entry => entry.id === groupId);
+      return group ? `${group.label}鑑定` : `飾品效果來源待確認（${sourceId}）`;
+    }
+    if (sourceId.startsWith('title:')) return `稱號：${String(state.values.B2 ?? '')}`;
+    if (sourceId.startsWith('consumable:')) return `消耗品：${String(state.values.B4 ?? '')}`;
+    if (sourceId.startsWith('environment:')) return `場地：${String(state.values.B5 ?? '')}`;
+    if (sourceId.startsWith('peak-option:')) return `巔峰選項：${String(state.values.S2 ?? '')}`;
+    if (sourceId.startsWith('pet:')) return `寵物：${String(state.values.S23 ?? '')}`;
+    const binaryEffect = data.otherEffects.binaryEffects.find(entry => entry.name === sourceId);
+    if (binaryEffect) return `${binaryEffect.name}：${String(state.values[localCell(binaryEffect.selectorCell)] ?? '')}`;
+    if (sourceId.startsWith('guild-fountain-')) {
+      const stage = data.otherEffects.guildFountain.find(entry => sourceId === `guild-fountain-${entry.stage}`);
+      return `公會噴泉（${stage ? String(state.values[localCell(stage.selectorCell)] ?? '') : sourceId.slice('guild-fountain-'.length)}）`;
+    }
+    return `來源名稱待確認（${sourceId}）`;
+  }
+  const sourceRows = (sources: readonly { sourceId: string; valuePct: number }[], isPercent: boolean) =>
+    sources.length
+      ? sources.map(source => `<p class="stat-source-row"><span>${h(sourceLabel(source.sourceId))}</span><strong>${fmt(source.valuePct)}${isPercent ? '%' : ''}</strong></p>`).join('')
+      : '<p class="stat-source-empty">無來源</p>';
   const field = (parent: HTMLElement, label: string, cell: string, choices: readonly PickerOption[], redraw = false) => {
     parent.append(createPicker(label, choices, val(cell), value => {
       state.values[localCell(cell)] = value; update(); renderRightIceSetSelectors();
@@ -134,6 +256,16 @@ async function start() {
     pick(general, '場地', 'B5', data.otherEffects.environments);
     pick(general, '巔峰選項', 'S2', data.otherEffects.peakOptions);
     pick(general, '寵物', 'S23', data.pets.options);
+    const petSkillToggle = document.createElement('label');
+    petSkillToggle.className = 'pet-skill-toggle';
+    const petSkillCheckbox = document.createElement('input');
+    petSkillCheckbox.type = 'checkbox';
+    petSkillCheckbox.checked = state.petSkillAttackEnabled;
+    petSkillCheckbox.addEventListener('change', () => { state.petSkillAttackEnabled = petSkillCheckbox.checked; update(); });
+    const petSkillLabel = document.createElement('span');
+    petSkillLabel.textContent = '寵物具有 2% 技能類雙攻';
+    petSkillToggle.append(petSkillCheckbox, petSkillLabel);
+    general.append(petSkillToggle);
     for (const effect of data.otherEffects.binaryEffects) pick(general, effect.name, localCell(effect.selectorCell), effect.options);
     field(general, '百億套效', data.colorSetEffects.selectorCell, options(data.colorSetEffects.options.map(option => option.name)));
     const atma = group('亞特瑪');
@@ -316,7 +448,14 @@ async function start() {
     const rows = compareSheetParity(result, sheetReference);
     const mismatches = rows.filter(row => !row.matches);
     const precise = (value: number) => new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 10 }).format(value);
-    const table = (items: typeof rows) => `<div class="sheet-parity-scroll"><table><thead><tr><th>項目</th><th>原配置</th><th>新配置</th><th>差異</th></tr></thead><tbody>${items.map(row => `<tr class="${row.matches ? '' : `sheet-parity-difference ${row.delta > 0 ? 'sheet-parity-positive' : row.delta < 0 ? 'sheet-parity-negative' : ''}`}" ><th scope="row">${h(row.label)}</th><td>${precise(row.expected)}</td><td>${precise(row.actual)}</td><td class="${row.delta > 0 ? 'positive' : row.delta < 0 ? 'negative' : ''}">${row.delta > 0 ? '+' : ''}${precise(row.delta)}</td></tr>`).join('')}</tbody></table></div>`;
+    const activeAttackType = data.classes.classes.find(entry => entry.id === state.classId)?.attackType;
+    const relevantAttackCell = activeAttackType === 'physical' ? 'C1' : 'D1';
+    const relevantWeaponBaseCell = activeAttackType === 'physical' ? 'C53' : 'D53';
+    const table = (items: typeof rows) => `<div class="sheet-parity-scroll"><table><thead><tr><th>項目</th><th>原配置</th><th>新配置</th><th>差異</th></tr></thead><tbody>${items.filter(row => !['C1', 'D1'].includes(row.cell) || row.cell === relevantAttackCell).filter(row => !['C53', 'D53'].includes(row.cell) || row.cell === relevantWeaponBaseCell).map(row => {
+      const label = ['C1', 'D1'].includes(row.cell) ? '攻擊力' : ['C53', 'D53'].includes(row.cell) ? '武器基礎攻擊力' : row.label;
+      const rowClass = row.matches ? '' : `sheet-parity-difference ${row.delta > 0 ? 'sheet-parity-positive' : row.delta < 0 ? 'sheet-parity-negative' : ''}`;
+      return `<tr class="${rowClass}"><th scope="row">${h(label)}</th><td>${precise(row.expected)}</td><td>${precise(row.actual)}</td><td class="${row.delta > 0 ? 'positive' : row.delta < 0 ? 'negative' : ''}">${row.delta > 0 ? '+' : ''}${precise(row.delta)}</td></tr>`;
+    }).join('')}</tbody></table></div>`;
     const bleed = rows.find(row => row.cell === 'M1');
     const damage = rows.find(row => row.cell === 'B163');
     const damageWithoutBleedDifference = bleed && damage
@@ -326,7 +465,7 @@ async function start() {
       && bleed?.matches === false && Math.abs(bleed.delta - 5) < 1e-9
       && damage?.matches === false
       && Math.abs(damageWithoutBleedDifference - damage.expected) < 1e-6;
-    document.querySelector('#sheet-parity')!.innerHTML = `<h3>計算結果驗算</h3><p>依未格式化數值比對 ${rows.length} 項：${rows.length - mismatches.length} 項相同、${mismatches.length} 項不同。最終傷害參考值依來源公式與原始數值重算，避免顯示精度影響比較。</p>${mismatches.length ? table(mismatches) : ''}${knownRightIceDifference ? '<p>目前差異可由流血 +5% 解釋。網站依選中的套裝及右冰實際件數計算套效；請核對所選套裝與參考配置。</p>' : ''}<details><summary>本次比對採用的固定數值假設</summary><p>部分固定數值沒有啟用條件公式。網站暫依參考配置計入以重現此配置，不能據此認定它們對所有配裝都有效。</p></details><details><summary>查看全部 ${rows.length} 項比較值</summary>${table(rows)}</details>`;
+    document.querySelector('#sheet-parity')!.innerHTML = `<h3>計算結果驗算</h3><p>依未格式化數值比對 ${rows.length} 項：${rows.length - mismatches.length} 項相同、${mismatches.length} 項不同。最終傷害參考值依來源公式與原始數值重算，避免顯示精度影響比較。</p>${mismatches.length ? table(mismatches) : ''}${knownRightIceDifference ? '<p>目前差異可由流血 +5% 解釋。網站依選中的套裝及右冰實際件數計算套效；請核對所選套裝與參考配置。</p>' : ''}<details><summary>本次比對採用的固定數值假設</summary><p>部分固定數值沒有啟用條件公式。網站暫依參考配置計入以重現此配置，不能據此認定它們對所有配裝都有效。</p></details><details><summary>查看適用的比較值（${rows.length} 項已驗算）</summary>${table(rows)}</details>`;
   }
   function renderResults() {
     if (sheetReference) document.querySelector('#sheet-parity')!.replaceChildren();
@@ -335,8 +474,9 @@ async function start() {
       const current = projectAttributes(data, state); let before: ReturnType<typeof projectAttributes> | null = null;
       try { if (baseline) before = projectAttributes(data, baseline); } catch { /* Old data cannot hide current results. */ }
     document.querySelector('#comparison-label')!.textContent = before ? '與已儲存配置比較' : baseline ? '比較基準已不適用目前資料，請重新設定' : '可儲存目前配置作為比較基準';
-    let currentCalculation: ReturnType<typeof projectDamage>['result'] | null = null;
-    try { currentCalculation = projectDamage(data, state).result; } catch { /* Keep the attribute summary available before damage inputs are complete. */ }
+      let currentDamage: ReturnType<typeof projectDamage> | null = null;
+      let damageCalculationError: unknown;
+      try { currentDamage = projectDamage(data, state); } catch (error) { damageCalculationError = error; }
     const currentClass = data.classes.classes.find(entry => entry.id === state.classId);
     const baselineClass = baseline ? data.classes.classes.find(entry => entry.id === baseline?.classId) : undefined;
     const attackKey = currentClass?.attackType === 'physical' ? 'physicalAttack' : 'magicalAttack';
@@ -349,7 +489,7 @@ async function start() {
       visibleStats.unshift({ key: 'attackPower', stat: attackStat, previousStat: before?.stats[baselineAttackKey] });
     }
     const percentFormat = (value: number) => new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 3 }).format(value);
-    const combatRateCards = currentCalculation ? `<div class="stat"><p>實戰致命一擊機率</p><strong>${fmt(currentCalculation.combatRates.critRate.finalRate * 100)}%</strong></div><div class="stat"><p>實戰極大化機率</p><strong>${fmt(currentCalculation.combatRates.extremization.finalRate * 100)}%</strong></div>` : '';
+    const combatRateCards = currentDamage ? `<div class="stat"><p>實戰致命一擊機率</p><strong>${fmt(currentDamage.result.combatRates.critRate.finalRate * 100)}%</strong></div><div class="stat"><p>實戰極大化機率</p><strong>${fmt(currentDamage.result.combatRates.extremization.finalRate * 100)}%</strong></div>` : '';
     target.innerHTML = `<div class="stat-list">${visibleStats.map(({ key, stat, previousStat }) => {
       const meta = data.attributes.attributes.find(entry => entry.key === key);
       const isPercent = meta?.unit === 'percent';
@@ -358,11 +498,13 @@ async function start() {
       const comparison = delta === null ? '' : `<p>基準 ${fmt(previous)}${isPercent ? '%' : ''} → 目前 ${fmt(stat.finalTotal)}${isPercent ? '%' : ''}；相對變化 ${previous === 0 ? '—（基準為 0）' : `${percentFormat(delta / previous * 100)}%`}</p>`;
       const deltaText = delta === null ? '' : `${delta > 0 ? '+' : ''}${isPercent ? percentFormat(delta) : fmt(delta)}${isPercent ? '%' : ''}`;
       const shownName = key === 'attackPower' ? '攻擊力' : meta?.name ?? key;
-      return `<details class="stat"><summary><span>${h(shownName)}</span><strong>${fmt(stat.finalTotal)}${isPercent ? '%' : ''}</strong>${delta === null ? '' : `<small class="${delta > 0 ? 'positive' : delta < 0 ? 'negative' : ''}">${deltaText}</small>`}</summary><p>共同來源 ${fmt(stat.sharedTotal)} + 下衣配置 ${fmt(stat.lowerwearAverage)} = ${fmt(stat.totalBeforeCap)}${stat.cap === undefined ? '' : `；角色上限 ${stat.cap}`}</p><p>下衣 ${fmt(stat.lowerwearA)} ／ 強/排褲 ${fmt(stat.lowerwearB)}</p>${comparison}</details>`;
+      const lowerwearAverageLabel = state.lowerwearAlternativeEnabled ? '下衣+強/排褲平均' : '下衣配置';
+      return `<details class="stat"><summary><span>${h(shownName)}</span>${stat.cap === undefined ? '' : `<small class="stat-cap">上限 ${fmt(stat.cap)}%</small>`}<strong>${fmt(stat.finalTotal)}${isPercent ? '%' : ''}</strong>${delta === null ? '' : `<small class="${delta > 0 ? 'positive' : delta < 0 ? 'negative' : ''}">${deltaText}</small>`}</summary><div class="stat-details"><p class="stat-detail-heading">共同來源</p>${sourceRows(stat.sharedSources, isPercent)}<p class="stat-lowerwear-total">下衣 ${fmt(stat.lowerwearA)} ／ 強/排褲 ${fmt(stat.lowerwearB)}</p><p class="stat-detail-heading">下衣來源</p>${sourceRows(stat.lowerwearASources, isPercent)}${state.lowerwearAlternativeEnabled ? `<p class="stat-detail-heading">強/排褲來源</p>${sourceRows(stat.lowerwearBSources, isPercent)}` : ''}<p class="stat-average">${lowerwearAverageLabel} ${fmt(stat.lowerwearAverage)}${isPercent ? '%' : ''}</p>${stat.cap === undefined ? '' : `<p>套用角色上限 ${fmt(stat.cap)}%</p>`}${comparison}</div></details>`;
     }).join('')}${combatRateCards}<div class="stat"><p>強者（Boss 體力 &gt; 50%）</p><strong>${fmt(current.conditionalDamage.strongerPct)}%</strong></div><div class="stat"><p>排熱（Boss 體力 ≤ 50%）</p><strong>${fmt(current.conditionalDamage.heatPct)}%</strong></div></div>`;
       const damageTarget = document.querySelector('#damage-result')!;
       try {
-        const { result } = projectDamage(data, state);
+        if (!currentDamage) throw damageCalculationError;
+        const { result } = currentDamage;
         renderSheetParity(result);
         let comparisonHtml = '';
         if (baseline && before) {

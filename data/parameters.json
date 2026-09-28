@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "dataUpdatedAt": "2026-09-25",
-  "source": "Google Sheets: 計算機!C154, D154, H154, E76, E93, Q37, Q53, Q86, R86, T101, T102, B77 (formerly B76), V87; fixed cells and color-conditioned spirit-stone rate source",
+  "source": "Google Sheets: 計算機!C154, D154, H154, E76, E93, Q37, Q53, Q86, R86, T101, T102, B77 (formerly B76), V87; fixed cells and conditional sources",
   "characterBase": {
     "physicalAttack": 1202,
     "magicalAttack": 1202,
@@ -13,12 +13,6 @@
       "sourceId": "sheet:計算機!E76",
       "stats": {
         "doubleAttackPct": 3
-      }
-    },
-    {
-      "sourceId": "sheet:計算機!E93",
-      "stats": {
-        "doubleAttackPct": 2
       }
     },
     {
@@ -51,11 +45,21 @@
         "multiplicativeCritDamagePct": 10
       }
     },
+  ],
+  "optionalEffects": [
+    {
+      "sourceId": "sheet:計算機!E93",
+      "stateKey": "petSkillAttackEnabled",
+      "defaultEnabled": true,
+      "stats": { "doubleAttackPct": 2 }
+    }
+  ],
+  "conditionalEffects": [
     {
       "sourceId": "sheet:計算機!T102",
-      "stats": {
-        "multiplicativeCritDamagePct": 2
-      }
+      "selectorCell": "裝備模擬區!M3",
+      "selectorValue": "MAESTRO光環",
+      "stats": { "multiplicativeCritDamagePct": 2 }
     }
   ],
   "critDamageProductBasePct": 50,

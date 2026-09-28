@@ -19,8 +19,16 @@ export function projectAttributes(data: GameData, state: LoadoutState) {
     enabledValues: { F20: state.lowerwearAlternativeEnabled },
   });
   const inner = resolveInnerwearSources(data.innerwear, data.attack, state.classId, values, state.lowerwearAlternativeEnabled);
+  const configuredEffects: StatContribution[] = [
+    ...data.parameters.optionalEffects
+      .filter(effect => state[effect.stateKey] ?? effect.defaultEnabled)
+      .map(({ sourceId, stats }) => ({ sourceId, stats })),
+    ...data.parameters.conditionalEffects
+      .filter(effect => text(localCell(effect.selectorCell)) === effect.selectorValue)
+      .map(({ sourceId, stats }) => ({ sourceId, stats })),
+  ];
   const groups: Record<"shared" | "lowerwearA" | "lowerwearB", StatContribution[]> = {
-    shared: [{ sourceId: "character-base", stats: data.parameters.characterBase }, ...data.parameters.fixedEffects, ...equipment.shared, ...inner.shared],
+    shared: [{ sourceId: "character-base", stats: data.parameters.characterBase }, ...data.parameters.fixedEffects, ...configuredEffects, ...equipment.shared, ...inner.shared],
     lowerwearA: [...equipment.lowerwearA, ...inner.lowerwearA], lowerwearB: [...equipment.lowerwearB, ...inner.lowerwearB],
   };
   for (const entry of resolveArmorAppraisals(data.appraisals, {
