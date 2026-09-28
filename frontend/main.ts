@@ -20,6 +20,21 @@ async function start() {
   const state: LoadoutState = sampleMode
     ? await readJson<LoadoutState>(`examples/${sampleId}.json`)
     : readState(data.classes.classes.find(entry => entry.active)?.id ?? 'DaB');
+  const clearDuplicateTransformationChoices = (target: LoadoutState) => {
+    const seen = new Set<string>();
+    const clearedCells: string[] = [];
+    for (const slot of data.transformations.slots) {
+      const choice = String(target.values[slot.choiceCell] ?? '');
+      if (!choice) continue;
+      if (seen.has(choice)) {
+        delete target.values[slot.choiceCell];
+        clearedCells.push(slot.choiceCell);
+      } else seen.add(choice);
+    }
+    return clearedCells;
+  };
+  const startupDuplicateTransformationCells = clearDuplicateTransformationChoices(state);
+  if (startupDuplicateTransformationCells.length && !sampleMode) saveState(state);
   const weaponMagicStoneCells = data.weaponGrades.colorGroups.flatMap(group => group.selectorCells);
   const applyWeaponMagicStonePreset = (grade: string, overwrite = false) => {
     if (!grade) return;
@@ -57,6 +72,9 @@ async function start() {
     app.querySelector('.results-panel')!.insertAdjacentHTML('beforeend', '<section id="sheet-parity" class="sheet-parity" aria-live="polite"></section>');
     document.querySelector('footer')!.textContent = '這個分頁使用驗算範例；調整只保留至關閉或重新整理頁面。';
     document.querySelector('#save-status')!.textContent = '驗算範例模式';
+  }
+  if (startupDuplicateTransformationCells.length) {
+    document.querySelector<HTMLElement>('#transfer-status')!.textContent = `已清除舊配裝中的重複武器變換詞條（${startupDuplicateTransformationCells.length} 個欄位）。`;
   }
   document.querySelector('#beast-accessory-fields')!.insertAdjacentHTML('beforebegin', '<div id="master-beast-controls" class="master-beast-controls"></div>');
   const val = (fieldId: string) => String(state.values[fieldId] ?? '');
@@ -492,8 +510,15 @@ async function start() {
     }
     if (selected.weapon) {
       const appraisal = section(panel, '武器鑑定'); Object.values(data.weaponAppraisals.groups).forEach((group, i) => field(appraisal, `鑑定 ${i + 1}`, group.selectorCell, group.options.map(option => ({ value: option.name, label: option.name }))));
-      const transform = section(panel, '武器變換'); data.transformations.slots.forEach((slot, i) => {
-        field(transform, `變換 ${i + 1}`, slot.choiceCell, options(data.transformations.options), true);
+      const transform = section(panel, '武器變換');
+      transform.insertAdjacentHTML('beforeend', '<p class="panel-note">每個變換詞條限選一次；含「× 強化」者視為不同詞條。</p>');
+      data.transformations.slots.forEach((slot, i) => {
+        const selectedElsewhere = new Set(data.transformations.slots
+          .filter(other => other.choiceCell !== slot.choiceCell)
+          .map(other => val(other.choiceCell))
+          .filter(Boolean));
+        const availableOptions = data.transformations.options.filter(option => !selectedElsewhere.has(option));
+        field(transform, `變換 ${i + 1}`, slot.choiceCell, options(availableOptions), true);
         const percentage = data.transformations.rules.find(rule => rule.choice === val(slot.choiceCell))?.valueMultiplier !== 1;
         numeric(transform, `變換 ${i + 1} 數值${percentage ? '（%）' : '（等級）'}`, slot.valueCell, percentage);
       });
@@ -665,12 +690,14 @@ async function start() {
     try {
       const imported = parseLoadoutJson(await file.text(), state, data);
       Object.assign(state, imported.state);
+      const duplicateTransformationCells = clearDuplicateTransformationChoices(state);
       applyWeaponMagicStonePreset(String(state.values[data.weaponGrades.selectorCell] ?? ''));
       renderClassPicker();
       toggle.checked = state.lowerwearAlternativeEnabled;
       update();
       renderInspector(); renderTitleInput(); renderGlobalInputs(); renderWeaponMagicStones(); renderRightIceSetSelectors();
-      const partial = imported.clearedFields.length ? `；${imported.clearedFields.length} 個無法對應的欄位已留空（${imported.clearedFields.slice(0, 5).join('、')}${imported.clearedFields.length > 5 ? '…' : ''}）` : '';
+      const clearedFields = [...new Set([...imported.clearedFields, ...duplicateTransformationCells])];
+      const partial = clearedFields.length ? `；${clearedFields.length} 個無法對應或重複的欄位已留空（${clearedFields.slice(0, 5).join('、')}${clearedFields.length > 5 ? '…' : ''}）` : '';
       document.querySelector<HTMLElement>('#transfer-status')!.textContent = `${sampleMode ? '配裝已匯入；範例模式不會儲存到此裝置' : '配裝已匯入並儲存於此裝置'}${partial}。`;
     } catch (error) {
       document.querySelector<HTMLElement>('#transfer-status')!.textContent = `匯入失敗：${error instanceof Error ? error.message : '檔案無法讀取。'}`;
