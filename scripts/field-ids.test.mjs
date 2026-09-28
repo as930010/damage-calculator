@@ -26,6 +26,13 @@ test("class selection is represented by Job and option catalogs reference semant
   assert.ok(!inputOptions.inputs.some(input => /(?:^|\s)[A-Z]+[0-9]+(?=\s|$)/.test(input.simulatorCells)));
   assert.ok(inputOptions.inputs.some(input => input.simulatorCells.includes("SpiritRecord.Class.1")));
   assert.equal(sample.Job, "DaB");
+  for (const color of ["Red", "Blue", "Yellow"]) {
+    for (let index = 1; index <= 9; index++) {
+      const fieldId = `Weapon.MagicStone.${color}.${index}`;
+      assert.ok(isFieldId(fieldId), `${fieldId} has a stable semantic ID`);
+      assert.ok(Number.isInteger(FIELD_ID_TO_CODE[fieldId]), `${fieldId} has a compact transfer code`);
+    }
+  }
 });
 
 test("saved state accepts semantic IDs and ignores unrecognized field keys", () => {

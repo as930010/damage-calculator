@@ -59,6 +59,9 @@ function customOptions(data: TransferData, cell: string, values: Record<string, 
     }
   }
   if (data.weaponGrades.selectorCell === address) return data.weaponGrades.options.map(option => option.name);
+  for (const group of data.weaponGrades.colorGroups) {
+    if (group.selectorCells.includes(address)) return group.options.map(option => option.name);
+  }
   if (address === 'Weapon.ENHC') return Object.keys(data.attack.weaponEnhancementFactors).map(level => `Lv.${level}`);
   if (data.growth.selectorCell === address) return data.growth.levels.map(level => level.name);
   for (const slot of data.appraisals.slots) if (slot.inputCells.some(cell => cell === address)) return data.appraisals.options.map(option => option.name);

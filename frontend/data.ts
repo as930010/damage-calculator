@@ -46,7 +46,14 @@ export interface GameData {
   transformations: WeaponTransformationDocument & { options: string[] };
   growth: WeaponGrowthDocument & { selectorCell: string };
   weaponAppraisals: { groups: Record<string, { selectorCell: string; options: NamedStatOption[] }> };
-  weaponGrades: { selectorCell: string; options: NamedStatOption[] };
+  weaponGrades: {
+    selectorCell: string;
+    options: NamedStatOption[];
+    colorGroups: {
+      id: string; name: string; selectorCells: string[]; options: NamedStatOption[];
+      presetByGrade: Record<string, string>;
+    }[];
+  };
   giantStones: { selectorCells: string[]; options: NamedStatOption[] };
   accessoryEffects: AccessoryEffectDocument;
   colorSetEffects: ColorSetEffectDocument;

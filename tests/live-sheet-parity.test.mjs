@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { projectDamage } from '../dist/frontend/projection.js';
+import { projectAttributes, projectDamage } from '../dist/frontend/projection.js';
 import { compareSheetParity } from '../dist/frontend/sheet-parity.js';
 
 const readJson = async path => JSON.parse(await readFile(new URL(`../data/${path}`, import.meta.url), 'utf8'));
@@ -50,4 +50,21 @@ test('線上試算表範例的三套右冰套效選擇可逐項重現計算機�
   assert.equal(damage.expected, expected.b163RecomputedFromFormula);
   assert.notEqual(damage.expected, expected.cells.B163);
   assert.ok(Math.abs(damage.actual - damage.expected) < 1e-6);
+  const weaponStoneSources = projectAttributes(data, sample).calculationSources.shared.filter(source => source.sourceId.startsWith('weapon-magic-stone:'));
+  const level = weaponStoneSources.reduce((sum, source) => sum + (source.stats.attackLevel ?? 0), 0);
+  const doubleAttack = weaponStoneSources.reduce((sum, source) => sum + (source.stats.doubleAttackPct ?? 0), 0);
+  assert.equal(level, 18);
+  assert.equal(doubleAttack, 31.5);
+
+  const manuallyChanged = structuredClone(sample);
+  for (const group of data.weaponGrades.colorGroups) {
+    const preset = group.options.find(option => option.id === group.presetByGrade['深淵']);
+    for (const cell of group.selectorCells) manuallyChanged.values[cell] = preset.name;
+  }
+  manuallyChanged.values['Weapon.MagicStone.Red.1'] = '攻擊力等級+1.5';
+  manuallyChanged.values['Weapon.MagicStone.Yellow.1'] = '致命一擊傷害+1.7%';
+  const custom = projectDamage(data, manuallyChanged).result.attributes.stats;
+  assert.equal(custom.attackLevel.finalTotal, result.attributes.stats.attackLevel.finalTotal - 0.5);
+  assert.equal(custom.doubleAttackPct.finalTotal, result.attributes.stats.doubleAttackPct.finalTotal - 1.5);
+  assert.equal(custom.critDamagePct.finalTotal, result.attributes.stats.critDamagePct.finalTotal + 1.7);
 });

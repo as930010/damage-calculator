@@ -65,6 +65,18 @@ test("numeric-code JSON export imports back to the same loadout", () => {
   assert.deepEqual(exported.omittedFields, ["Z999"]);
 });
 
+test("colored weapon magic-stone selections round-trip as compact numeric-code fields", () => {
+  const values = {};
+  for (const group of weaponGrades.colorGroups) {
+    values[group.selectorCells[0]] = group.options[0].name;
+  }
+  const configured = { ...state, values: { ...state.values, [weaponGrades.selectorCell]: "深淵", ...values } };
+  const exported = serializeLoadout(configured, data);
+  assert.deepEqual(parseLoadoutJson(exported.json, state, data).state, semanticState(configured));
+  assert.equal(Object.keys(values).length, 3);
+  assert.ok(Object.keys(values).every(fieldId => Number.isInteger(codeForFieldId(fieldId))));
+});
+
 test("the complete saved example round-trips and stays smaller than the previous name-based export", async () => {
   const saved = await read("data/examples/live-sheet-2026-09-28.json");
   const full = { ...saved, masterBeastSpiritStoneColor: "黃", petSkillAttackEnabled: true };

@@ -20,6 +20,18 @@ async function start() {
   const state: LoadoutState = sampleMode
     ? await readJson<LoadoutState>(`examples/${sampleId}.json`)
     : readState(data.classes.classes.find(entry => entry.active)?.id ?? 'DaB');
+  const weaponMagicStoneCells = data.weaponGrades.colorGroups.flatMap(group => group.selectorCells);
+  const applyWeaponMagicStonePreset = (grade: string, overwrite = false) => {
+    if (!grade) return;
+    if (!overwrite && weaponMagicStoneCells.some(cell => state.values[cell] !== undefined)) return;
+    for (const colorGroup of data.weaponGrades.colorGroups) {
+      const optionId = colorGroup.presetByGrade[grade];
+      const option = colorGroup.options.find(entry => entry.id === optionId);
+      if (!option) continue;
+      for (const cell of colorGroup.selectorCells) state.values[cell] = option.name;
+    }
+  };
+  applyWeaponMagicStonePreset(String(state.values[data.weaponGrades.selectorCell] ?? ''));
   const sheetReference = sampleMode
     ? await readJson<SheetParityReference>(`examples/${sampleId}-expected.json`)
     : null;
@@ -39,7 +51,7 @@ async function start() {
     { id: 'ring-two', label: '指環 2', icon: 'ring', fixedCells: ['MasterBeast.Ring2.Option1', 'MasterBeast.Ring2.Option2'], stoneCells: ['MasterBeast.Ring2.CustomAttribute', 'MasterBeast.Ring2.CustomValue'], stoneCategory: 'ring', mirrorCells: [['MasterBeast.Ring2.Mirror.1.Attribute', 'MasterBeast.Ring2.Mirror.1.Value'], ['MasterBeast.Ring2.Mirror.2.Attribute', 'MasterBeast.Ring2.Mirror.2.Value'], ['MasterBeast.Ring2.Mirror.3.Attribute', 'MasterBeast.Ring2.Mirror.3.Value']] },
   ];
   const app = document.querySelector<HTMLElement>('#app')!;
-  app.innerHTML = `<section class="workbench"><header class="workspace-heading"><div><span class="eyebrow">EQUIPMENT SIMULATOR</span><h1>配出你的戰鬥風格</h1><p>依照裝備位置點選部位，調整搭配與數值。</p></div></header><div class="toolbar"><div id="class-picker"></div><label class="toggle"><input id="alternate" type="checkbox">啟用強/排褲切換</label><button id="baseline" type="button">設為比較基準</button><button id="export-loadout" type="button">匯出配裝</button><button id="import-loadout" type="button">匯入配裝</button><input id="loadout-file" type="file" accept="application/json,.json" hidden><span id="transfer-status" role="status" aria-live="polite"></span><span id="save-status" role="status"></span></div><section class="battle-panel"><div class="panel-heading"><h2>關卡設定</h2></div><div id="battle-settings" class="battle-fields"></div></section><div class="equipment-workspace"><section class="equipment-panel"><div class="panel-heading"><h2>裝備配置</h2><span>點選部位以編輯</span></div><div class="canvas-scroll"><div class="equipment-canvas"><span class="group-label costume-label">連身時裝</span><span class="group-label left-label">左冰</span><span class="group-label inner-label">內裝左四</span><span class="group-label weapon-label">冰武 / 武器</span><span class="group-label right-label">右冰</span><span class="group-label accessory-label">飾品</span><div id="title-input" class="canvas-title-input"></div><div id="slots"></div></div></div><p class="panel-note">左冰共用一組套裝選擇，各部位魔法石分別設定。強/排褲開啟後，普通屬性依兩套下衣平均。</p><section class="right-ice-set-area"><div class="beast-accessories-heading"><h3>右冰套效</h3><span>最多選擇 ${data.rightIceSets.maxSelectedSets} 套</span></div><p class="panel-note">先選擇要套用效果的套裝，再依已裝備的右冰件數計算效果。</p><div id="right-ice-set-selectors" class="right-ice-set-selectors"></div></section><div class="beast-accessories-area"><div class="beast-accessories-heading"><h3>聖獸飾品</h3><span>頭飾、盔甲、項鍊、指環 1、指環 2</span></div><p class="panel-note">依部位設定固定效果、精靈石與三組迷鏡效果。盔甲精靈石套裝增幅 ${fmt(data.masterBeast.armorSpiritStoneSetEffect.multiplicativeDamagePct)}% 已預設套用。</p><div id="beast-accessory-fields" class="beast-accessories-grid"></div></div></section><aside id="inspector" class="inspector" aria-label="部位設定"></aside></div><details class="global-source-panel"><summary>其他效果來源設定</summary><p class="panel-note">未列在此處的特殊條件或 Buff／Debuff 尚未納入計算。</p><div id="global-source-fields"></div></details><section class="results-panel"><div class="panel-heading"><h2>目前填寫的屬性</h2><span id="comparison-label"></span></div><p class="panel-note">屬性彙總與傷害依畫面已接入的裝備、內裝、關卡及其他效果設定計算。特殊條件與 Buff／Debuff 若尚無明確欄位映射，不會計入結果。</p><div id="results" aria-live="polite"></div><section class="damage-panel"><div class="panel-heading"><h2>攻擊與最終傷害</h2></div><p class="panel-note">此數值只反映已接入的輸入；其餘來源完成接線前，請視為部分配置的估算。</p><div id="damage-result" aria-live="polite"></div></section></section></section>`;
+  app.innerHTML = `<section class="workbench"><header class="workspace-heading"><div><span class="eyebrow">EQUIPMENT SIMULATOR</span><h1>配出你的戰鬥風格</h1><p>依照裝備位置點選部位，調整搭配與數值。</p></div></header><div class="toolbar"><div id="class-picker"></div><label class="toggle"><input id="alternate" type="checkbox">啟用強/排褲切換</label><button id="baseline" type="button">設為比較基準</button><button id="export-loadout" type="button">匯出配裝</button><button id="import-loadout" type="button">匯入配裝</button><input id="loadout-file" type="file" accept="application/json,.json" hidden><span id="transfer-status" role="status" aria-live="polite"></span><span id="save-status" role="status"></span></div><section class="battle-panel"><div class="panel-heading"><h2>關卡設定</h2></div><div id="battle-settings" class="battle-fields"></div></section><div class="equipment-workspace"><section class="equipment-panel"><div class="panel-heading"><h2>裝備配置</h2><span>點選部位以編輯</span></div><div class="canvas-scroll"><div class="equipment-canvas"><span class="group-label costume-label">連身時裝</span><span class="group-label left-label">左冰</span><span class="group-label inner-label">內裝左四</span><span class="group-label weapon-label">冰武 / 武器</span><span class="group-label right-label">右冰</span><span class="group-label accessory-label">飾品</span><div id="title-input" class="canvas-title-input"></div><div id="slots"></div></div></div><p class="panel-note">左冰共用一組套裝選擇，各部位魔法石分別設定。強/排褲開啟後，普通屬性依兩套下衣平均。</p><section class="right-ice-set-area"><div class="beast-accessories-heading"><h3>右冰套效</h3><span>最多選擇 ${data.rightIceSets.maxSelectedSets} 套</span></div><p class="panel-note">先選擇要套用效果的套裝，再依已裝備的右冰件數計算效果。</p><div id="right-ice-set-selectors" class="right-ice-set-selectors"></div></section><div class="beast-accessories-area"><div class="beast-accessories-heading"><h3>聖獸飾品</h3><span>頭飾、盔甲、項鍊、指環 1、指環 2</span></div><p class="panel-note">依部位設定固定效果、精靈石與三組迷鏡效果。盔甲精靈石套裝增幅 ${fmt(data.masterBeast.armorSpiritStoneSetEffect.multiplicativeDamagePct)}% 已預設套用。</p><div id="beast-accessory-fields" class="beast-accessories-grid"></div></div></section><aside id="inspector" class="inspector" aria-label="部位設定"></aside></div><section class="weapon-magic-stone-panel"><div class="panel-heading"><h2>武器魔力石</h2></div><div id="weapon-magic-stone-fields"></div></section><details class="global-source-panel"><summary>其他效果來源設定</summary><p class="panel-note">未列在此處的特殊條件或 Buff／Debuff 尚未納入計算。</p><div id="global-source-fields"></div></details><section class="results-panel"><div class="panel-heading"><h2>目前填寫的屬性</h2><span id="comparison-label"></span></div><p class="panel-note">已填入的屬性彙總，包含內裝、冰裝、武器、關卡與其他效果設定、需要特殊觸發條件的暫時沒有計入。</p><div id="results" aria-live="polite"></div><section class="damage-panel"><div class="panel-heading"><h2>攻擊與最終傷害</h2></div><p class="panel-note">此數值只反映已填寫的內容。</p><div id="damage-result" aria-live="polite"></div></section></section></section>`;
   if (sampleMode) {
     app.querySelector('.workspace-heading')!.insertAdjacentHTML('afterend', '<p class="sample-banner">已載入驗算範例。這個分頁的調整不會覆蓋你原本儲存在瀏覽器的配裝。</p>');
     app.querySelector('.results-panel')!.insertAdjacentHTML('beforeend', '<section id="sheet-parity" class="sheet-parity" aria-live="polite"></section>');
@@ -152,7 +164,11 @@ async function start() {
     if (sourceId.startsWith('giant-stone:')) {
       return '巨型魔力石';
     }
-    if (sourceId.startsWith('weapon-grade:')) return '武器等級效果';
+    if (sourceId.startsWith('weapon-magic-stone:')) {
+      const colorId = sourceId.split(':')[1];
+      return `${data.weaponGrades.colorGroups.find(group => group.id === colorId)?.name ?? '武器魔力石'}效果`;
+    }
+    if (sourceId.startsWith('weapon-grade:')) return '武器魔力石';
     if (sourceId.startsWith('weapon-transform:')) {
       return '武器變換';
     }
@@ -288,6 +304,38 @@ async function start() {
     const fountain = group('公會噴泉');
     for (const stage of data.otherEffects.guildFountain) pick(fountain, `${stage.stage}階`, stage.selectorCell, stage.options);
   }
+  function renderWeaponMagicStones() {
+    const root = document.querySelector<HTMLElement>('#weapon-magic-stone-fields')!;
+    root.replaceChildren();
+    const grid = document.createElement('div'); grid.className = 'weapon-magic-stone-grid'; root.append(grid);
+    const gradePicker = createPicker('武器魔力石', options(data.weaponGrades.options.map(option => option.name)), val(data.weaponGrades.selectorCell), value => {
+      state.values[data.weaponGrades.selectorCell] = value;
+      applyWeaponMagicStonePreset(value, true);
+      update();
+      renderWeaponMagicStones();
+    });
+    gradePicker.classList.add('weapon-magic-stone-grade');
+    grid.append(gradePicker);
+    data.giantStones.selectorCells.forEach((cell, index) => field(
+      grid,
+      `巨型魔力石 ${index + 1}`,
+      cell,
+      data.giantStones.options.map(option => ({ value: option.name, label: option.name })),
+    ));
+    const colors = document.createElement('div'); colors.className = 'weapon-magic-stone-colors'; root.append(colors);
+    for (const colorGroup of data.weaponGrades.colorGroups) {
+      const card = document.createElement('section'); card.className = `weapon-magic-stone-color weapon-magic-stone-${colorGroup.id}`;
+      const heading = document.createElement('h3'); heading.textContent = `${colorGroup.name}（9 格）`; card.append(heading);
+      const slots = document.createElement('div'); slots.className = 'weapon-magic-stone-slots'; card.append(slots);
+      colorGroup.selectorCells.forEach((cell, index) => field(
+        slots,
+        `${index + 1}`,
+        cell,
+        colorGroup.options.map(option => ({ value: option.name, label: option.name })),
+      ));
+      colors.append(card);
+    }
+  }
   function renderMasterBeastColorSelector() {
     const root = document.querySelector<HTMLElement>('#master-beast-controls')!;
     root.replaceChildren();
@@ -418,7 +466,6 @@ async function start() {
       panel.insertAdjacentHTML('beforeend', '<p class="panel-note">鍛造達到門檻才套用對應效果，未達門檻為 0。</p>');
     }
     if (selected.weapon) {
-      field(panel, '武器等級', data.weaponGrades.selectorCell, data.weaponGrades.options.map(option => ({ value: option.name, label: option.name })));
       field(panel, '武器強化', 'Weapon.ENHC', options(Object.keys(data.attack.weaponEnhancementFactors).map(level => `Lv.${level}`)));
       field(panel, '武器成長', data.growth.selectorCell, data.growth.levels.map(level => ({ value: level.name, label: level.name, detail: summary(level.stats) })));
     }
@@ -443,7 +490,6 @@ async function start() {
     }
     if (selected.weapon) {
       const appraisal = section(panel, '武器鑑定'); Object.values(data.weaponAppraisals.groups).forEach((group, i) => field(appraisal, `鑑定 ${i + 1}`, group.selectorCell, group.options.map(option => ({ value: option.name, label: option.name }))));
-      const giant = section(panel, '巨型魔力石'); data.giantStones.selectorCells.forEach((cell, i) => field(giant, `巨型魔力石 ${i + 1}`, cell, data.giantStones.options.map(option => ({ value: option.name, label: option.name }))));
       const transform = section(panel, '武器變換'); data.transformations.slots.forEach((slot, i) => {
         field(transform, `變換 ${i + 1}`, slot.choiceCell, options(data.transformations.options), true);
         const percentage = data.transformations.rules.find(rule => rule.choice === val(slot.choiceCell))?.valueMultiplier !== 1;
@@ -580,7 +626,7 @@ async function start() {
         const critDamageSources = result.multiplicativeCritDamage.factors.map(effect => `${sourceLabel(effect.sourceId)} ${fmt(effect.valuePct)}%`).join('、') || '無';
         damageTarget.innerHTML = `<div class="damage-summary"><div><span>最小攻擊力</span><strong>${fmt(result.attack.lowerDamage)}</strong></div><div><span>最大攻擊力</span><strong>${fmt(result.attack.upperDamage)}</strong></div><div class="final-damage"><span>最終傷害</span><strong>${percentFormat(result.finalDamage.finalDamage)}</strong></div></div>${damageRatioHtml}${comparisonHtml}<details class="formula-detail"><summary>展開傷害計算明細</summary><p>致命傷害被動：${fmt(result.classCritDamagePassivePct)}%　乘算暴傷：${fmt(result.multiplicativeCritDamage.value)}%</p><p>乘算暴傷來源：${h(critDamageSources)}</p><p>爆擊乘算來源：${h(rateSources(result.combatRates.critRate.multipliers))}</p><p>極大乘算來源：${h(rateSources(result.combatRates.extremization.multipliers))}</p><p>乘算傷害：${fmt(result.generalMultiplicativeDamage.value)} 倍　強者／排熱因子：${fmt(result.finalDamage.conditionalFactor)}</p><p>適應力因子：${fmt(result.finalDamage.adaptationFactor)}　防禦因子：${fmt(result.finalDamage.defenseFactor)}</p></details>`;
       } catch (error) {
-        damageTarget.innerHTML = `<p class="input-warning">尚未計算：${h(calculationIssue(error))}　請完成後再試。</p>`;
+        damageTarget.innerHTML = `<p class="input-warning">尚未計算：${h(calculationIssue(error))}請完成後再試。</p>`;
       }
     } catch (error) {
       const message = h(calculationIssue(error));
@@ -617,10 +663,11 @@ async function start() {
     try {
       const imported = parseLoadoutJson(await file.text(), state, data);
       Object.assign(state, imported.state);
+      applyWeaponMagicStonePreset(String(state.values[data.weaponGrades.selectorCell] ?? ''));
       renderClassPicker();
       toggle.checked = state.lowerwearAlternativeEnabled;
       update();
-      renderInspector(); renderTitleInput(); renderGlobalInputs(); renderRightIceSetSelectors();
+      renderInspector(); renderTitleInput(); renderGlobalInputs(); renderWeaponMagicStones(); renderRightIceSetSelectors();
       const partial = imported.clearedFields.length ? `；${imported.clearedFields.length} 個無法對應的欄位已留空（${imported.clearedFields.slice(0, 5).join('、')}${imported.clearedFields.length > 5 ? '…' : ''}）` : '';
       document.querySelector<HTMLElement>('#transfer-status')!.textContent = `${sampleMode ? '配裝已匯入；範例模式不會儲存到此裝置' : '配裝已匯入並儲存於此裝置'}${partial}。`;
     } catch (error) {
@@ -629,6 +676,6 @@ async function start() {
       fileInput.value = '';
     }
   });
-  renderSlots(); renderInspector(); renderTitleInput(); renderBeastAccessories(); renderMasterBeastColorSelector(); renderGlobalInputs(); renderRightIceSetSelectors(); renderResults();
+  renderSlots(); renderInspector(); renderTitleInput(); renderBeastAccessories(); renderMasterBeastColorSelector(); renderGlobalInputs(); renderWeaponMagicStones(); renderRightIceSetSelectors(); renderResults();
 }
 start().catch(error => { document.querySelector('#app')!.innerHTML = `<section class="error-card"><h1>無法載入工具</h1><p>${h(error instanceof Error ? error.message : error)}</p></section>`; });

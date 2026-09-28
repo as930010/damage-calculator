@@ -22,5 +22,41 @@
       },
       "source": "E53=雙攻% +31.5; U53=攻擊力等級 +18"
     }
+  ],
+  "colorGroups": [
+    {
+      "id": "red",
+      "name": "紅色魔力石",
+      "selectorCells": ["Weapon.MagicStone.Red.1", "Weapon.MagicStone.Red.2", "Weapon.MagicStone.Red.3", "Weapon.MagicStone.Red.4", "Weapon.MagicStone.Red.5", "Weapon.MagicStone.Red.6", "Weapon.MagicStone.Red.7", "Weapon.MagicStone.Red.8", "Weapon.MagicStone.Red.9"],
+      "options": [
+        { "id": "red-attack-level-1-5", "name": "攻擊力等級+1.5", "stats": { "attackLevel": 1.5 } },
+        { "id": "red-attack-level-2", "name": "攻擊力等級+2", "stats": { "attackLevel": 2 } }
+      ],
+      "presetByGrade": { "燦爛": "red-attack-level-1-5", "深淵": "red-attack-level-2" }
+    },
+    {
+      "id": "blue",
+      "name": "藍色魔力石",
+      "selectorCells": ["Weapon.MagicStone.Blue.1", "Weapon.MagicStone.Blue.2", "Weapon.MagicStone.Blue.3", "Weapon.MagicStone.Blue.4", "Weapon.MagicStone.Blue.5", "Weapon.MagicStone.Blue.6", "Weapon.MagicStone.Blue.7", "Weapon.MagicStone.Blue.8", "Weapon.MagicStone.Blue.9"],
+      "options": [
+        { "id": "blue-double-attack-1-5", "name": "攻擊力+1.5%", "stats": { "doubleAttackPct": 1.5 } },
+        { "id": "blue-double-attack-2", "name": "攻擊力+2%", "stats": { "doubleAttackPct": 2 } }
+      ],
+      "presetByGrade": { "燦爛": "blue-double-attack-1-5", "深淵": "blue-double-attack-2" }
+    },
+    {
+      "id": "yellow",
+      "name": "黃色魔力石",
+      "selectorCells": ["Weapon.MagicStone.Yellow.1", "Weapon.MagicStone.Yellow.2", "Weapon.MagicStone.Yellow.3", "Weapon.MagicStone.Yellow.4", "Weapon.MagicStone.Yellow.5", "Weapon.MagicStone.Yellow.6", "Weapon.MagicStone.Yellow.7", "Weapon.MagicStone.Yellow.8", "Weapon.MagicStone.Yellow.9"],
+      "options": [
+        { "id": "yellow-attack-level-1", "name": "攻擊力等級+1", "stats": { "attackLevel": 1 } },
+        { "id": "yellow-double-attack-1", "name": "攻擊力+1%", "stats": { "doubleAttackPct": 1 } },
+        { "id": "yellow-crit-damage-1-5", "name": "致命一擊傷害+1.5%", "stats": { "critDamagePct": 1.5 } },
+        { "id": "yellow-attack-level-1-5", "name": "攻擊力等級+1.5", "stats": { "attackLevel": 1.5 } },
+        { "id": "yellow-double-attack-1-5", "name": "攻擊力+1.5%", "stats": { "doubleAttackPct": 1.5 } },
+        { "id": "yellow-crit-damage-1-7", "name": "致命一擊傷害+1.7%", "stats": { "critDamagePct": 1.7 } }
+      ],
+      "presetByGrade": { "燦爛": "yellow-double-attack-1", "深淵": "yellow-double-attack-1-5" }
+    }
   ]
 }

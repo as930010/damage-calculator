@@ -67,8 +67,16 @@ export function projectAttributes(data: GameData, state: LoadoutState) {
     const source = resolveNamedStatOption(data.giantStones.options, text(cell), `giant-stone:${cell}`);
     if (source) groups.shared.push(source);
   }
-  const weaponGrade = resolveNamedStatOption(data.weaponGrades.options, text(data.weaponGrades.selectorCell), "weapon-grade:Weapon.MagicStone.Grade");
-  if (weaponGrade) groups.shared.push(weaponGrade);
+  for (const colorGroup of data.weaponGrades.colorGroups) {
+    const presetId = colorGroup.presetByGrade[text(data.weaponGrades.selectorCell)];
+    const presetOption = colorGroup.options.find(option => option.id === presetId);
+    const hasSavedSlotSelection = colorGroup.selectorCells.some(cell => values[cell] !== undefined);
+    for (const [index, cell] of colorGroup.selectorCells.entries()) {
+      const selection = hasSavedSlotSelection ? text(cell) : presetOption?.name ?? "";
+      const source = resolveNamedStatOption(colorGroup.options, selection, `weapon-magic-stone:${colorGroup.id}:${index + 1}`);
+      if (source) groups.shared.push(source);
+    }
+  }
   const accessoryAppraisalSelections: Record<string, string> = {};
   for (const group of data.accessoryEffects.groups) {
     const mapping = data.mapping.selections.find(entry => entry.selectionCell === group.selectionCell);

@@ -65,7 +65,7 @@ const requiredFields = {
   "data/slots.json": ["schemaVersion", "slots"],
   "data/spirit-record-effects.json": ["schemaVersion", "classSelectors", "defaultMaxedStats", "branchBonuses", "traits"],
   "data/weapon-appraisals.json": ["schemaVersion", "groups"],
-  "data/weapon-grade-options.json": ["schemaVersion", "selectorCell", "options"],
+  "data/weapon-grade-options.json": ["schemaVersion", "selectorCell", "options", "colorGroups"],
   "data/weapon-growth.json": ["schemaVersion", "selectorCell", "levels"],
   "data/weapon-transformations.json": ["schemaVersion", "rules", "slots"],
   "data/examples/live-sheet-2026-09-28.json": ["schemaVersion", "Job", "values", "lowerwearAlternativeEnabled"],
@@ -184,6 +184,28 @@ if (simulatorOptions) {
   for (const input of simulatorOptions.inputs ?? []) {
     if (!catalogIds.has(input.catalogId)) errors.push(`data/simulator-input-options.json: ${input.simulatorCells} 引用不存在的選項目錄 ${input.catalogId}。`);
     if (input.inputType !== "list") errors.push(`data/simulator-input-options.json: ${input.simulatorCells} 使用不支援的輸入類型 ${input.inputType}。`);
+  }
+}
+
+const weaponGrades = documents.get("data/weapon-grade-options.json");
+if (weaponGrades) {
+  const gradesByName = new Map((weaponGrades.options ?? []).map(option => [option.name, option]));
+  const groups = weaponGrades.colorGroups ?? [];
+  if (groups.length !== 3) errors.push("data/weapon-grade-options.json: 武器魔力石必須有紅、藍、黃三組。");
+  const allCells = groups.flatMap(group => group.selectorCells ?? []);
+  if (allCells.length !== 27 || new Set(allCells).size !== 27) errors.push("data/weapon-grade-options.json: 三色魔力石必須各有 9 個不重複欄位。");
+  for (const grade of gradesByName.keys()) {
+    const totals = {};
+    for (const group of groups) {
+      if ((group.selectorCells ?? []).length !== 9) errors.push(`data/weapon-grade-options.json: ${group.name} 必須有 9 格。`);
+      const option = group.options?.find(entry => entry.id === group.presetByGrade?.[grade]);
+      if (!option) { errors.push(`data/weapon-grade-options.json: ${grade} 缺少 ${group.name} 預設。`); continue; }
+      for (const [stat, value] of Object.entries(option.stats ?? {})) totals[stat] = (totals[stat] ?? 0) + value * 9;
+    }
+    const aggregate = gradesByName.get(grade)?.stats ?? {};
+    for (const stat of new Set([...Object.keys(totals), ...Object.keys(aggregate)])) {
+      if (totals[stat] !== aggregate[stat]) errors.push(`data/weapon-grade-options.json: ${grade} 預設加總 ${stat} 與工作表彙總不一致。`);
+    }
   }
 }
 
