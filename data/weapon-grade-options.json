@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "dataUpdatedAt": "2026-09-25",
   "source": "裝備模擬區!B37 -> 計算機!E53、U53; 係數區!V2:V3",
-  "selectorCell": "B37",
+  "selectorCell": "Weapon.MagicStone.Grade",
   "options": [
     {
       "id": "weapon-grade-brilliant",

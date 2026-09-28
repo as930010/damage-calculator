@@ -30,13 +30,13 @@ async function start() {
   const beastAccessorySlots: readonly {
     id: BeastAccessorySlotId; label: string; icon: string;
     fixedCells?: readonly [string, string]; stoneCells?: readonly [string, string]; stoneCategory?: BeastManualCategory;
-    mirrorRows: readonly [number, number, number];
+    mirrorCells: readonly (readonly [string, string])[];
   }[] = [
-    { id: 'headwear', label: '頭飾', icon: 'hair', fixedCells: ['N27', 'N28'], stoneCells: ['M27', 'M28'], stoneCategory: 'head', mirrorRows: [27, 28, 29] },
-    { id: 'armor', label: '盔甲', icon: 'upper', mirrorRows: [30, 31, 32] },
-    { id: 'necklace', label: '項鍊', icon: 'necklace', stoneCells: ['M33', 'M34'], stoneCategory: 'necklace', mirrorRows: [33, 34, 35] },
-    { id: 'ring-one', label: '指環 1', icon: 'ring', fixedCells: ['N36', 'N37'], stoneCells: ['M36', 'M37'], stoneCategory: 'ring', mirrorRows: [36, 37, 38] },
-    { id: 'ring-two', label: '指環 2', icon: 'ring', fixedCells: ['N39', 'N40'], stoneCells: ['M39', 'M40'], stoneCategory: 'ring', mirrorRows: [39, 40, 41] },
+    { id: 'headwear', label: '頭飾', icon: 'hair', fixedCells: ['MasterBeast.Head.Option1', 'MasterBeast.Head.Option2'], stoneCells: ['MasterBeast.Head.CustomAttribute', 'MasterBeast.Head.CustomValue'], stoneCategory: 'head', mirrorCells: [['MasterBeast.Head.Mirror.1.Attribute', 'MasterBeast.Head.Mirror.1.Value'], ['MasterBeast.Head.Mirror.2.Attribute', 'MasterBeast.Head.Mirror.2.Value'], ['MasterBeast.Head.Mirror.3.Attribute', 'MasterBeast.Head.Mirror.3.Value']] },
+    { id: 'armor', label: '盔甲', icon: 'upper', mirrorCells: [['MasterBeast.Armor.Mirror.1.Attribute', 'MasterBeast.Armor.Mirror.1.Value'], ['MasterBeast.Armor.Mirror.2.Attribute', 'MasterBeast.Armor.Mirror.2.Value'], ['MasterBeast.Armor.Mirror.3.Attribute', 'MasterBeast.Armor.Mirror.3.Value']] },
+    { id: 'necklace', label: '項鍊', icon: 'necklace', stoneCells: ['MasterBeast.Necklace.CustomAttribute', 'MasterBeast.Necklace.CustomValue'], stoneCategory: 'necklace', mirrorCells: [['MasterBeast.Necklace.Mirror.1.Attribute', 'MasterBeast.Necklace.Mirror.1.Value'], ['MasterBeast.Necklace.Mirror.2.Attribute', 'MasterBeast.Necklace.Mirror.2.Value'], ['MasterBeast.Necklace.Mirror.3.Attribute', 'MasterBeast.Necklace.Mirror.3.Value']] },
+    { id: 'ring-one', label: '指環 1', icon: 'ring', fixedCells: ['MasterBeast.Ring1.Option1', 'MasterBeast.Ring1.Option2'], stoneCells: ['MasterBeast.Ring1.CustomAttribute', 'MasterBeast.Ring1.CustomValue'], stoneCategory: 'ring', mirrorCells: [['MasterBeast.Ring1.Mirror.1.Attribute', 'MasterBeast.Ring1.Mirror.1.Value'], ['MasterBeast.Ring1.Mirror.2.Attribute', 'MasterBeast.Ring1.Mirror.2.Value'], ['MasterBeast.Ring1.Mirror.3.Attribute', 'MasterBeast.Ring1.Mirror.3.Value']] },
+    { id: 'ring-two', label: '指環 2', icon: 'ring', fixedCells: ['MasterBeast.Ring2.Option1', 'MasterBeast.Ring2.Option2'], stoneCells: ['MasterBeast.Ring2.CustomAttribute', 'MasterBeast.Ring2.CustomValue'], stoneCategory: 'ring', mirrorCells: [['MasterBeast.Ring2.Mirror.1.Attribute', 'MasterBeast.Ring2.Mirror.1.Value'], ['MasterBeast.Ring2.Mirror.2.Attribute', 'MasterBeast.Ring2.Mirror.2.Value'], ['MasterBeast.Ring2.Mirror.3.Attribute', 'MasterBeast.Ring2.Mirror.3.Value']] },
   ];
   const app = document.querySelector<HTMLElement>('#app')!;
   app.innerHTML = `<section class="workbench"><header class="workspace-heading"><div><span class="eyebrow">EQUIPMENT SIMULATOR</span><h1>配出你的戰鬥風格</h1><p>依照裝備位置點選部位，調整搭配與數值。</p></div></header><div class="toolbar"><div id="class-picker"></div><label class="toggle"><input id="alternate" type="checkbox">啟用強/排褲切換</label><button id="baseline" type="button">設為比較基準</button><button id="export-loadout" type="button">匯出配裝</button><button id="import-loadout" type="button">匯入配裝</button><input id="loadout-file" type="file" accept="application/json,.json" hidden><span id="transfer-status" role="status" aria-live="polite"></span><span id="save-status" role="status"></span></div><section class="battle-panel"><div class="panel-heading"><h2>關卡設定</h2></div><div id="battle-settings" class="battle-fields"></div></section><div class="equipment-workspace"><section class="equipment-panel"><div class="panel-heading"><h2>裝備配置</h2><span>點選部位以編輯</span></div><div class="canvas-scroll"><div class="equipment-canvas"><span class="group-label costume-label">連身時裝</span><span class="group-label left-label">左冰</span><span class="group-label inner-label">內裝左四</span><span class="group-label weapon-label">冰武 / 武器</span><span class="group-label right-label">右冰</span><span class="group-label accessory-label">飾品</span><div id="title-input" class="canvas-title-input"></div><div id="slots"></div></div></div><p class="panel-note">左冰共用一組套裝選擇，各部位魔法石分別設定。強/排褲開啟後，普通屬性依兩套下衣平均。</p><section class="right-ice-set-area"><div class="beast-accessories-heading"><h3>右冰套效</h3><span>最多選擇 ${data.rightIceSets.maxSelectedSets} 套</span></div><p class="panel-note">先選擇要套用效果的套裝，再依已裝備的右冰件數計算效果。</p><div id="right-ice-set-selectors" class="right-ice-set-selectors"></div></section><div class="beast-accessories-area"><div class="beast-accessories-heading"><h3>聖獸飾品</h3><span>頭飾、盔甲、項鍊、指環 1、指環 2</span></div><p class="panel-note">依部位設定固定效果、精靈石與三組迷鏡效果。盔甲精靈石套裝增幅 ${fmt(data.masterBeast.armorSpiritStoneSetEffect.multiplicativeDamagePct)}% 已預設套用。</p><div id="beast-accessory-fields" class="beast-accessories-grid"></div></div></section><aside id="inspector" class="inspector" aria-label="部位設定"></aside></div><details class="global-source-panel"><summary>其他效果來源設定</summary><p class="panel-note">未列在此處的特殊條件或 Buff／Debuff 尚未納入計算。</p><div id="global-source-fields"></div></details><section class="results-panel"><div class="panel-heading"><h2>目前填寫的屬性</h2><span id="comparison-label"></span></div><p class="panel-note">屬性彙總與傷害依畫面已接入的裝備、內裝、關卡及其他效果設定計算。特殊條件與 Buff／Debuff 若尚無明確欄位映射，不會計入結果。</p><div id="results" aria-live="polite"></div><section class="damage-panel"><div class="panel-heading"><h2>攻擊與最終傷害</h2></div><p class="panel-note">此數值只反映已接入的輸入；其餘來源完成接線前，請視為部分配置的估算。</p><div id="damage-result" aria-live="polite"></div></section></section></section>`;
@@ -70,12 +70,15 @@ async function start() {
       if (Object.values(data.masterBeast.overallPotentialSourceCells).includes(cell)) return '聖獸潛力';
       if (cell === 'E76') return '大師聖獸固定效果';
       if (cell === 'E93') return '寵物被動';
+      if (cell === 'B77') return '黃色聖獸精靈石效果';
+      if (cell === 'B103') return '下衣強化爆擊效果';
+      if (cell === 'B105') return '鞋子強化極大效果';
       if (cell === 'Q37') return '百億套效';
       if (cell === 'Q53') return '武器';
       if (cell === 'Q86' || cell === 'R86') return '稱號';
       if (cell === 'T101') return '百億紅上衣、暴上';
       if (cell === 'T102') return 'MAESTRO光環';
-      return `試算表固定數值（計算機!${cell}）`;
+      return '已接入的固定效果';
     }
     if (sourceId.startsWith('simulator:')) {
       const cell = sourceId.slice('simulator:'.length);
@@ -116,15 +119,15 @@ async function start() {
       if (part === 'mirror') {
         return '聖獸迷鏡效果';
       }
-      if (part === 'head-manual') return `聖獸頭飾精靈石：${String(state.values.M27 ?? '')}`;
-      if (part === 'necklace-manual') return `聖獸項鍊精靈石：${String(state.values.M33 ?? '')}`;
+      if (part === 'head-manual') return `聖獸頭飾精靈石：${String(state.values['MasterBeast.Head.CustomAttribute'] ?? '')}`;
+      if (part === 'necklace-manual') return `聖獸項鍊精靈石：${String(state.values['MasterBeast.Necklace.CustomAttribute'] ?? '')}`;
       if (part === 'ring-manual') {
-        const cell = detail === '1' ? 'M36' : 'M39';
-        return `聖獸指環精靈石：${String(state.values[cell] ?? '')}`;
+        const fieldId = detail === '1' ? 'MasterBeast.Ring1.CustomAttribute' : 'MasterBeast.Ring2.CustomAttribute';
+        return `聖獸指環精靈石：${String(state.values[fieldId] ?? '')}`;
       }
       if (partNames[part]) {
-        const cell = part === 'head' ? detail === '1' ? 'N27' : 'N28' : detail === '1' ? 'N36' : 'N39';
-        return `聖獸${partNames[part]}固定效果：${String(state.values[cell] ?? '')}`;
+        const fieldId = part === 'head' ? detail === '1' ? 'MasterBeast.Head.Option1' : 'MasterBeast.Head.Option2' : detail === '1' ? 'MasterBeast.Ring1.Option1' : 'MasterBeast.Ring2.Option1';
+        return `聖獸${partNames[part]}固定效果：${String(state.values[fieldId] ?? '')}`;
       }
     }
     const rightIce = data.rightIceSets.effects.find(entry => entry.id === sourceId);
@@ -164,11 +167,11 @@ async function start() {
       const group = data.accessoryEffects.groups.find(entry => entry.id === groupId);
       return group ? `${group.label}鑑定` : `飾品效果來源待確認（${sourceId}）`;
     }
-    if (sourceId.startsWith('title:')) return `稱號：${String(state.values.B2 ?? '')}`;
-    if (sourceId.startsWith('consumable:')) return `消耗品：${String(state.values.B4 ?? '')}`;
-    if (sourceId.startsWith('environment:')) return `場地：${String(state.values.B5 ?? '')}`;
-    if (sourceId.startsWith('peak-option:')) return `巔峰選項：${String(state.values.S2 ?? '')}`;
-    if (sourceId.startsWith('pet:')) return `寵物：${String(state.values.S23 ?? '')}`;
+    if (sourceId.startsWith('title:')) return `稱號：${String(state.values['Effect.Title'] ?? '')}`;
+    if (sourceId.startsWith('consumable:')) return `消耗品：${String(state.values['Effect.Consumable'] ?? '')}`;
+    if (sourceId.startsWith('environment:')) return `場地：${String(state.values['Effect.Environment'] ?? '')}`;
+    if (sourceId.startsWith('peak-option:')) return `巔峰選項：${String(state.values['Peak.Option'] ?? '')}`;
+    if (sourceId.startsWith('pet:')) return `寵物：${String(state.values['Pet.Passive'] ?? '')}`;
     const binaryEffect = data.otherEffects.binaryEffects.find(entry => entry.name === sourceId);
     if (binaryEffect) return `${binaryEffect.name}：${String(state.values[localCell(binaryEffect.selectorCell)] ?? '')}`;
     if (sourceId.startsWith('guild-fountain-')) {
@@ -178,11 +181,11 @@ async function start() {
   }
   function calculationIssue(error: unknown): string {
     const message = error instanceof Error ? error.message : String(error ?? '未知錯誤');
-    const missingEnhancement = message.match(/Missing enhancement selection: ([A-Z]+\d+)/);
-    if (missingEnhancement?.[1] === 'H12') {
+    const missingEnhancement = message.match(/Missing enhancement selection: (\S+)/);
+    if (missingEnhancement?.[1] === 'Left.Armor.Bottom.ENHC' || missingEnhancement?.[1] === 'H12') {
       return '內裝左四的「下衣」尚未選擇強化等級。請點選裝備配置中的「下衣」，填寫「強化」欄位。';
     }
-    if (missingEnhancement?.[1] === 'H39') {
+    if (missingEnhancement?.[1] === 'Left.Armor.Shoes.ENHC' || missingEnhancement?.[1] === 'H39') {
       return '內裝左四的「鞋子」尚未選擇強化等級。請點選裝備配置中的「鞋子」，填寫「強化」欄位。';
     }
     return message;
@@ -258,10 +261,10 @@ async function start() {
     const pick = (container: HTMLElement, label: string, cell: string, entries: readonly { name: string }[]) =>
       field(container, label, cell, options([...new Set(entries.map(entry => entry.name))]));
     const general = group('增益與環境');
-    pick(general, '消耗品', 'B4', data.otherEffects.consumables);
-    pick(general, '場地', 'B5', data.otherEffects.environments);
-    pick(general, '巔峰選項', 'S2', data.otherEffects.peakOptions);
-    pick(general, '寵物', 'S23', data.pets.options);
+    pick(general, '消耗品', 'Effect.Consumable', data.otherEffects.consumables);
+    pick(general, '場地', 'Effect.Environment', data.otherEffects.environments);
+    pick(general, '巔峰選項', 'Peak.Option', data.otherEffects.peakOptions);
+    pick(general, '寵物', 'Pet.Passive', data.pets.options);
     const petSkillToggle = document.createElement('label');
     petSkillToggle.className = 'pet-skill-toggle';
     const petSkillCheckbox = document.createElement('input');
@@ -275,8 +278,8 @@ async function start() {
     for (const effect of data.otherEffects.binaryEffects) pick(general, effect.name, localCell(effect.selectorCell), effect.options);
     field(general, '百億套效', data.colorSetEffects.selectorCell, options(data.colorSetEffects.options.map(option => option.name)));
     const atma = group('亞特瑪');
-    field(atma, '亞特瑪屬性', 'L9', options(['火焰', '流水', '草木']));
-    field(atma, '亞特瑪顏色', 'N9', options(['藍色', '綠色', '紫色', '米色']));
+    field(atma, '亞特瑪屬性', 'Atma.Element', options(['火焰', '流水', '草木']));
+    field(atma, '亞特瑪顏色', 'Atma.Color', options(['藍色', '綠色', '紫色', '米色']));
     const resonance = group('共鳴輸入');
     for (const effect of data.resonance.effects) numeric(resonance, effect.name, localCell(effect.inputCell), false);
     const spirit = group('賦靈錄');
@@ -295,22 +298,22 @@ async function start() {
       state.masterBeastSpiritStoneColor ?? data.masterBeast.spiritStoneColorSelector.defaultColor,
       value => { state.masterBeastSpiritStoneColor = value as LoadoutState['masterBeastSpiritStoneColor']; update(); },
     ));
-    field(inputs, '聖獸潛力', 'S25', options(data.masterBeast.options.filter(option => option.category === 'overall').map(option => option.name)));
-    const potential = data.masterBeast.options.find(option => option.category === 'overall' && option.name === val('S25'));
+    field(inputs, '聖獸潛力', 'MasterBeast.OverallPotential', options(data.masterBeast.options.filter(option => option.category === 'overall').map(option => option.name)));
+    const potential = data.masterBeast.options.find(option => option.category === 'overall' && option.name === val('MasterBeast.OverallPotential'));
     const potentialText = potential
       ? Object.entries(potential.stats).map(([key, value]) => `${data.attributes.attributes.find(entry => entry.key === key)?.name ?? key} +${fmt(value)}`).join('、')
       : '尚未選擇潛力效果';
     root.insertAdjacentHTML('beforeend', `<div class="master-beast-source-notes"><p><strong>固定效果：</strong>雙攻 +3%（轉職後固定擁有）。</p><p><strong>精靈石效果：</strong>選黃時，致命一擊與極大化各乘算 +${fmt(data.parameters.yellowBeastSpiritStoneRatePct)}%；選綠時不套用。</p><p><strong>潛力效果：</strong>${h(potentialText)}</p></div>`);
   }
   function renderTitleInput() {
-    field(document.querySelector<HTMLElement>('#title-input')!, '稱號', 'B2', options([...new Set(data.otherEffects.titles.map(entry => entry.name))]));
+    field(document.querySelector<HTMLElement>('#title-input')!, '稱號', 'Effect.Title', options([...new Set(data.otherEffects.titles.map(entry => entry.name))]));
   }
   function renderBeastAccessories() {
     const root = document.querySelector<HTMLElement>('#beast-accessory-fields')!;
     root.replaceChildren();
     for (const slot of beastAccessorySlots) {
       const button = document.createElement('button'); button.type = 'button'; button.className = 'beast-accessory-slot';
-      const cells = [...(slot.fixedCells ?? []), ...(slot.stoneCells ?? []), ...slot.mirrorRows.flatMap(row => [`O${row}`, `P${row}`])];
+      const cells = [...(slot.fixedCells ?? []), ...(slot.stoneCells ?? []), ...slot.mirrorCells.flat()];
       const hasValue = cells.some(cell => val(cell) !== '');
       button.classList.toggle('configured', hasValue);
       button.classList.toggle('selected', selectedBeastSlotId === slot.id);
@@ -348,14 +351,13 @@ async function start() {
     const mirrorArea = section(panel, '迷鏡效果', true);
     mirrorArea.classList.add('beast-mirror-section');
     const mirrorGrid = document.createElement('div'); mirrorGrid.className = 'beast-mirror-grid'; mirrorArea.append(mirrorGrid);
-    slot.mirrorRows.forEach((row, index) => {
-      const attributeCell = `O${row}`;
+    slot.mirrorCells.forEach(([attributeCell, valueCell], index) => {
       field(mirrorGrid, `迷鏡效果 ${index + 1} 屬性`, attributeCell, options(data.masterBeast.customAttributeOptions.mirror), true);
       const valueRule = data.masterBeast.mirrorValueRules.byAttribute[val(attributeCell)] ?? data.masterBeast.mirrorValueRules.default;
       numeric(
         mirrorGrid,
         `迷鏡效果 ${index + 1} 數值（%）`,
-        `P${row}`,
+        valueCell,
         true,
         { min: valueRule.minPct, max: valueRule.maxPct, step: valueRule.stepPct },
       );
@@ -367,7 +369,7 @@ async function start() {
       const group = data.layout.groups.find(group => group.id === slot.group)!;
       const button = document.createElement('button'); button.type = 'button'; button.className = 'gear-slot';
       button.style.cssText = `left:${slot.x}%;top:${slot.y}%;--group-color:${group.color}`;
-      const configured = slot.selectionCell ? val(slot.selectionCell) : slot.weapon ? val('B32') : slot.innerwearId ? val(data.innerwear.slots.find(s => s.id === slot.innerwearId)!.enhancementCell) : '';
+      const configured = slot.selectionCell ? val(slot.selectionCell) : slot.weapon ? val('Weapon.ENHC') : slot.innerwearId ? val(data.innerwear.slots.find(s => s.id === slot.innerwearId)!.enhancementCell) : '';
       button.classList.toggle('configured', !!configured); button.classList.toggle('selected', selected.id === slot.id);
       button.classList.toggle('inactive', !!slot.enabledBy && !state.lowerwearAlternativeEnabled);
       button.setAttribute('aria-label', `${group.name} ${slot.label}：${configured || '未設定'}`); button.setAttribute('aria-pressed', String(selected.id === slot.id));
@@ -417,7 +419,7 @@ async function start() {
     }
     if (selected.weapon) {
       field(panel, '武器等級', data.weaponGrades.selectorCell, data.weaponGrades.options.map(option => ({ value: option.name, label: option.name })));
-      field(panel, '武器強化', 'B32', options(Object.keys(data.attack.weaponEnhancementFactors).map(level => `Lv.${level}`)));
+      field(panel, '武器強化', 'Weapon.ENHC', options(Object.keys(data.attack.weaponEnhancementFactors).map(level => `Lv.${level}`)));
       field(panel, '武器成長', data.growth.selectorCell, data.growth.levels.map(level => ({ value: level.name, label: level.name, detail: summary(level.stats) })));
     }
     if (selected.stoneCells?.length) {
@@ -464,7 +466,7 @@ async function start() {
       if (row.cell === 'B159' || row.cell === 'B160') return `${sign}${precise(row.delta * 100)}%`;
       return `${sign}${row.cell === 'B163' ? visiblePrecise(row.delta) : precise(row.delta)}`;
     };
-    const activeAttackType = data.classes.classes.find(entry => entry.id === state.classId)?.attackType;
+    const activeAttackType = data.classes.classes.find(entry => entry.id === state.Job)?.attackType;
     const relevantAttackCell = activeAttackType === 'physical' ? 'C1' : 'D1';
     const relevantWeaponBaseCell = activeAttackType === 'physical' ? 'C53' : 'D53';
     const table = (items: typeof rows) => `<div class="sheet-parity-scroll"><table><thead><tr><th>項目</th><th>原配置</th><th>新配置</th><th>差異</th></tr></thead><tbody>${items.filter(row => !['C1', 'D1'].includes(row.cell) || row.cell === relevantAttackCell).filter(row => !['C53', 'D53'].includes(row.cell) || row.cell === relevantWeaponBaseCell).map(row => {
@@ -495,8 +497,8 @@ async function start() {
       try { currentDamage = projectDamage(data, state); } catch (error) { damageCalculationError = error; }
       let currentCombatRates: ReturnType<typeof projectCombatRates> | null = null;
       try { currentCombatRates = projectCombatRates(data, state); } catch { /* Show other attributes even if rate inputs are incomplete. */ }
-    const currentClass = data.classes.classes.find(entry => entry.id === state.classId);
-    const baselineClass = baseline ? data.classes.classes.find(entry => entry.id === baseline?.classId) : undefined;
+    const currentClass = data.classes.classes.find(entry => entry.id === state.Job);
+    const baselineClass = baseline ? data.classes.classes.find(entry => entry.id === baseline?.Job) : undefined;
     const attackKey = currentClass?.attackType === 'physical' ? 'physicalAttack' : 'magicalAttack';
     const baselineAttackKey = baselineClass?.attackType === 'physical' ? 'physicalAttack' : 'magicalAttack';
     const visibleStats = Object.entries(current.stats)
@@ -574,7 +576,7 @@ async function start() {
             comparisonHtml = `<p class="damage-comparison-note">比較基準無法計算傷害：${h(error instanceof Error ? error.message : error)}。請重新設定比較基準。</p>`;
           }
         }
-        const rateSources = (effects: typeof result.combatRates.critRate.multipliers) => effects.map(effect => `${effect.sourceId} ×${fmt(effect.factor)}`).join(' · ') || '無';
+        const rateSources = (effects: typeof result.combatRates.critRate.multipliers) => effects.map(effect => `${sourceLabel(effect.sourceId)} ×${fmt(effect.factor)}`).join(' · ') || '無';
         const critDamageSources = result.multiplicativeCritDamage.factors.map(effect => `${sourceLabel(effect.sourceId)} ${fmt(effect.valuePct)}%`).join('、') || '無';
         damageTarget.innerHTML = `<div class="damage-summary"><div><span>最小攻擊力</span><strong>${fmt(result.attack.lowerDamage)}</strong></div><div><span>最大攻擊力</span><strong>${fmt(result.attack.upperDamage)}</strong></div><div class="final-damage"><span>最終傷害</span><strong>${percentFormat(result.finalDamage.finalDamage)}</strong></div></div>${damageRatioHtml}${comparisonHtml}<details class="formula-detail"><summary>展開傷害計算明細</summary><p>致命傷害被動：${fmt(result.classCritDamagePassivePct)}%　乘算暴傷：${fmt(result.multiplicativeCritDamage.value)}%</p><p>乘算暴傷來源：${h(critDamageSources)}</p><p>爆擊乘算來源：${h(rateSources(result.combatRates.critRate.multipliers))}</p><p>極大乘算來源：${h(rateSources(result.combatRates.extremization.multipliers))}</p><p>乘算傷害：${fmt(result.generalMultiplicativeDamage.value)} 倍　強者／排熱因子：${fmt(result.finalDamage.conditionalFactor)}</p><p>適應力因子：${fmt(result.finalDamage.adaptationFactor)}　防禦因子：${fmt(result.finalDamage.defenseFactor)}</p></details>`;
       } catch (error) {
@@ -586,13 +588,13 @@ async function start() {
       document.querySelector('#damage-result')!.innerHTML = `<p class="input-warning">尚未計算：${message}</p>`;
     }
   }
-  const renderClassPicker = () => document.querySelector('#class-picker')!.replaceChildren(createPicker('職業', data.classes.classes.filter(entry => entry.active).map(entry => ({ value: entry.id, label: entry.name })), state.classId, value => { state.classId = value; update(); }));
+  const renderClassPicker = () => document.querySelector('#class-picker')!.replaceChildren(createPicker('職業', data.classes.classes.filter(entry => entry.active).map(entry => ({ value: entry.id, label: entry.name })), state.Job, value => { state.Job = value; update(); }));
   renderClassPicker();
   const toggle = document.querySelector<HTMLInputElement>('#alternate')!; toggle.checked = state.lowerwearAlternativeEnabled;
   const battle = document.querySelector<HTMLElement>('#battle-settings')!;
-  for (const [cell, label] of [['D1','關卡適應力'],['D2','關卡扣致命'],['D3','Boss防禦']] as const) {
-    const catalog = findValidationCatalog(data.simulatorInputs.inputs, data.simulatorInputs.catalogs, cell);
-    field(battle, label, cell, options((catalog?.options ?? []).map(option => String(option.value))));
+  for (const [fieldId, label] of [['Stage.Adapt','關卡適應力'],['Stage.CritRatePenalty','關卡扣致命'],['Stage.BossDEF','Boss防禦']] as const) {
+    const catalog = findValidationCatalog(data.simulatorInputs.inputs, data.simulatorInputs.catalogs, fieldId);
+    field(battle, label, fieldId, options((catalog?.options ?? []).map(option => String(option.value))));
   }
   toggle.addEventListener('change', () => { state.lowerwearAlternativeEnabled = toggle.checked; update(); renderInspector(); });
   document.querySelector('#baseline')!.addEventListener('click', () => { try { projectAttributes(data, state); baseline = structuredClone(state); const stored = sampleMode ? false : saveState(baseline, true); renderResults(); document.querySelector('#save-status')!.textContent = stored ? '比較基準已儲存' : '比較基準僅保留至關閉頁面'; } catch { renderResults(); } });
@@ -620,8 +622,7 @@ async function start() {
       update();
       renderInspector(); renderTitleInput(); renderGlobalInputs(); renderRightIceSetSelectors();
       const partial = imported.clearedFields.length ? `；${imported.clearedFields.length} 個無法對應的欄位已留空（${imported.clearedFields.slice(0, 5).join('、')}${imported.clearedFields.length > 5 ? '…' : ''}）` : '';
-      const version = imported.legacyFormat ? '（舊版檔案）' : '';
-      document.querySelector<HTMLElement>('#transfer-status')!.textContent = `${sampleMode ? '配裝已匯入；範例模式不會儲存到此裝置' : '配裝已匯入並儲存於此裝置'}${version}${partial}。`;
+      document.querySelector<HTMLElement>('#transfer-status')!.textContent = `${sampleMode ? '配裝已匯入；範例模式不會儲存到此裝置' : '配裝已匯入並儲存於此裝置'}${partial}。`;
     } catch (error) {
       document.querySelector<HTMLElement>('#transfer-status')!.textContent = `匯入失敗：${error instanceof Error ? error.message : '檔案無法讀取。'}`;
     } finally {

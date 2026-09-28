@@ -8,8 +8,8 @@
     {
       "id": "upper",
       "name": "上衣",
-      "enhancementCell": "H3",
-      "forgingCell": "J3",
+      "enhancementCell": "Left.Armor.Upper.ENHC",
+      "forgingCell": "Left.Armor.Upper.FORGE",
       "attackType": "physical",
       "attackFraction": 0.03,
       "wearSet": "shared"
@@ -17,8 +17,8 @@
     {
       "id": "lowerwear",
       "name": "下衣",
-      "enhancementCell": "H12",
-      "forgingCell": "J12",
+      "enhancementCell": "Left.Armor.Bottom.ENHC",
+      "forgingCell": "Left.Armor.Bottom.FORGE",
       "attackType": "magical",
       "attackFraction": 0.05,
       "wearSet": "lowerwearA"
@@ -26,18 +26,18 @@
     {
       "id": "lowerwearAlternative",
       "name": "強/排褲",
-      "enhancementCell": "H21",
-      "forgingCell": "J21",
+      "enhancementCell": "Left.Armor.SwitchBottom.ENHC",
+      "forgingCell": "Left.Armor.SwitchBottom.FORGE",
       "attackType": "magical",
       "attackFraction": 0.05,
       "wearSet": "lowerwearB",
-      "enabledBy": "F20"
+      "enabledBy": "Lowerwear.Alternative.Enabled"
     },
     {
       "id": "gloves",
       "name": "手套",
-      "enhancementCell": "H30",
-      "forgingCell": "J30",
+      "enhancementCell": "Left.Armor.Gloves.ENHC",
+      "forgingCell": "Left.Armor.Gloves.FORGE",
       "attackType": "physical",
       "attackFraction": 0.05,
       "wearSet": "shared",
@@ -46,8 +46,8 @@
     {
       "id": "shoes",
       "name": "鞋子",
-      "enhancementCell": "H39",
-      "forgingCell": "J39",
+      "enhancementCell": "Left.Armor.Shoes.ENHC",
+      "forgingCell": "Left.Armor.Shoes.FORGE",
       "attackType": "magical",
       "attackFraction": 0.03,
       "wearSet": "shared"

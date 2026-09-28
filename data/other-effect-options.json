@@ -11,7 +11,7 @@
       "id": "consumable-2",
       "name": "適應靈藥",
       "stats": {
-        "adaptabilityPct": 3.0
+        "adaptabilityPct": 3
       },
       "status": "mapped",
       "source": {
@@ -26,7 +26,7 @@
       "id": "consumable-3",
       "name": "天上甜點",
       "stats": {
-        "multiplicativeDamagePct": 5.0
+        "multiplicativeDamagePct": 5
       },
       "status": "mapped",
       "source": {
@@ -38,7 +38,7 @@
       "id": "consumable-4",
       "name": "巨人靈藥",
       "stats": {
-        "critRatePct": 30.0
+        "critRatePct": 30
       },
       "status": "mapped",
       "source": {
@@ -62,7 +62,7 @@
       "id": "location-2",
       "name": "小屋",
       "stats": {
-        "critRatePct": 5.0
+        "critRatePct": 5
       },
       "source": {
         "sheet": "係數區",
@@ -73,8 +73,8 @@
       "id": "location-3",
       "name": "強化小屋",
       "stats": {
-        "critRatePct": 5.0,
-        "bossDamagePct": 2.0
+        "critRatePct": 5,
+        "bossDamagePct": 2
       },
       "source": {
         "sheet": "係數區",
@@ -85,8 +85,8 @@
       "id": "location-4",
       "name": "集合地",
       "stats": {
-        "bossDamagePct": 2.0,
-        "adaptabilityPct": 2.0
+        "bossDamagePct": 2,
+        "adaptabilityPct": 2
       },
       "source": {
         "sheet": "係數區",
@@ -108,8 +108,8 @@
       "id": "title-pure",
       "name": "純淨",
       "stats": {
-        "multiplicativeDamagePct": 18.0,
-        "superAdaptabilityPct": 0.0
+        "multiplicativeDamagePct": 18,
+        "superAdaptabilityPct": 0
       },
       "source": {
         "sheet": "係數區",
@@ -124,8 +124,8 @@
       "id": "title-dogma",
       "name": "Dogma",
       "stats": {
-        "multiplicativeDamagePct": 25.0,
-        "superAdaptabilityPct": 5.0
+        "multiplicativeDamagePct": 25,
+        "superAdaptabilityPct": 5
       },
       "source": {
         "sheet": "係數區",
@@ -140,13 +140,13 @@
   "guildFountain": [
     {
       "stage": 2,
-      "selectorCell": "裝備模擬區!S17",
+      "selectorCell": "GuildFountain.Stage2",
       "options": [
         {
           "id": "guild-fountain-2-2",
           "name": "致命一擊+1%",
           "stats": {
-            "critRatePct": 1.0
+            "critRatePct": 1
           },
           "source": {
             "sheet": "係數區",
@@ -157,7 +157,7 @@
           "id": "guild-fountain-2-3",
           "name": "致命一擊+2%",
           "stats": {
-            "critRatePct": 2.0
+            "critRatePct": 2
           },
           "source": {
             "sheet": "係數區",
@@ -168,7 +168,7 @@
           "id": "guild-fountain-2-4",
           "name": "致命一擊+3%",
           "stats": {
-            "critRatePct": 3.0
+            "critRatePct": 3
           },
           "source": {
             "sheet": "係數區",
@@ -179,7 +179,7 @@
           "id": "guild-fountain-2-5",
           "name": "致命一擊+4%",
           "stats": {
-            "critRatePct": 4.0
+            "critRatePct": 4
           },
           "source": {
             "sheet": "係數區",
@@ -190,7 +190,7 @@
           "id": "guild-fountain-2-6",
           "name": "致命一擊+5%",
           "stats": {
-            "critRatePct": 5.0
+            "critRatePct": 5
           },
           "source": {
             "sheet": "係數區",
@@ -201,7 +201,7 @@
           "id": "guild-fountain-2-7",
           "name": "極大化+1%",
           "stats": {
-            "extremizationPct": 1.0
+            "extremizationPct": 1
           },
           "source": {
             "sheet": "係數區",
@@ -212,7 +212,7 @@
           "id": "guild-fountain-2-8",
           "name": "極大化+2%",
           "stats": {
-            "extremizationPct": 2.0
+            "extremizationPct": 2
           },
           "source": {
             "sheet": "係數區",
@@ -223,7 +223,7 @@
           "id": "guild-fountain-2-9",
           "name": "極大化+3%",
           "stats": {
-            "extremizationPct": 3.0
+            "extremizationPct": 3
           },
           "source": {
             "sheet": "係數區",
@@ -234,7 +234,7 @@
           "id": "guild-fountain-2-10",
           "name": "極大化+4%",
           "stats": {
-            "extremizationPct": 4.0
+            "extremizationPct": 4
           },
           "source": {
             "sheet": "係數區",
@@ -245,7 +245,7 @@
           "id": "guild-fountain-2-11",
           "name": "極大化+5%",
           "stats": {
-            "extremizationPct": 5.0
+            "extremizationPct": 5
           },
           "source": {
             "sheet": "係數區",
@@ -265,14 +265,14 @@
     },
     {
       "stage": 3,
-      "selectorCell": "裝備模擬區!S18",
+      "selectorCell": "GuildFountain.Stage3",
       "options": [
         {
           "id": "guild-fountain-3-2",
           "name": "攻擊力+40",
           "stats": {
-            "physicalAttack": 40.0,
-            "magicalAttack": 40.0
+            "physicalAttack": 40,
+            "magicalAttack": 40
           },
           "source": {
             "sheet": "係數區",
@@ -283,8 +283,8 @@
           "id": "guild-fountain-3-3",
           "name": "攻擊力+80",
           "stats": {
-            "physicalAttack": 80.0,
-            "magicalAttack": 80.0
+            "physicalAttack": 80,
+            "magicalAttack": 80
           },
           "source": {
             "sheet": "係數區",
@@ -295,8 +295,8 @@
           "id": "guild-fountain-3-4",
           "name": "攻擊力+120",
           "stats": {
-            "physicalAttack": 120.0,
-            "magicalAttack": 120.0
+            "physicalAttack": 120,
+            "magicalAttack": 120
           },
           "source": {
             "sheet": "係數區",
@@ -307,8 +307,8 @@
           "id": "guild-fountain-3-5",
           "name": "攻擊力+160",
           "stats": {
-            "physicalAttack": 160.0,
-            "magicalAttack": 160.0
+            "physicalAttack": 160,
+            "magicalAttack": 160
           },
           "source": {
             "sheet": "係數區",
@@ -319,8 +319,8 @@
           "id": "guild-fountain-3-6",
           "name": "攻擊力+200",
           "stats": {
-            "physicalAttack": 200.0,
-            "magicalAttack": 200.0
+            "physicalAttack": 200,
+            "magicalAttack": 200
           },
           "source": {
             "sheet": "係數區",
@@ -375,7 +375,7 @@
           "id": "guild-fountain-3-11",
           "name": "雙攻+3%",
           "stats": {
-            "doubleAttackPct": 3.0
+            "doubleAttackPct": 3
           },
           "source": {
             "sheet": "係數區",
@@ -386,7 +386,7 @@
           "id": "guild-fountain-3-12",
           "name": "Boss傷害+1%",
           "stats": {
-            "bossDamagePct": 1.0
+            "bossDamagePct": 1
           },
           "source": {
             "sheet": "係數區",
@@ -397,7 +397,7 @@
           "id": "guild-fountain-3-13",
           "name": "Boss傷害+2%",
           "stats": {
-            "bossDamagePct": 2.0
+            "bossDamagePct": 2
           },
           "source": {
             "sheet": "係數區",
@@ -408,7 +408,7 @@
           "id": "guild-fountain-3-14",
           "name": "Boss傷害+3%",
           "stats": {
-            "bossDamagePct": 3.0
+            "bossDamagePct": 3
           },
           "source": {
             "sheet": "係數區",
@@ -419,7 +419,7 @@
           "id": "guild-fountain-3-15",
           "name": "Boss傷害+4%",
           "stats": {
-            "bossDamagePct": 4.0
+            "bossDamagePct": 4
           },
           "source": {
             "sheet": "係數區",
@@ -430,7 +430,7 @@
           "id": "guild-fountain-3-16",
           "name": "Boss傷害+5%",
           "stats": {
-            "bossDamagePct": 5.0
+            "bossDamagePct": 5
           },
           "source": {
             "sheet": "係數區",
@@ -450,7 +450,7 @@
     },
     {
       "stage": 4,
-      "selectorCell": "裝備模擬區!S19",
+      "selectorCell": "GuildFountain.Stage4",
       "options": [
         {
           "id": "guild-fountain-4-2",
@@ -500,7 +500,7 @@
           "id": "guild-fountain-4-6",
           "name": "所有技能傷害+3%",
           "stats": {
-            "allSkillDamagePct": 3.0
+            "allSkillDamagePct": 3
           },
           "source": {
             "sheet": "係數區",
@@ -555,7 +555,7 @@
           "id": "guild-fountain-4-11",
           "name": "致命傷害+3%",
           "stats": {
-            "critDamagePct": 3.0
+            "critDamagePct": 3
           },
           "source": {
             "sheet": "係數區",
@@ -610,7 +610,7 @@
           "id": "guild-fountain-4-16",
           "name": "強者+3%",
           "stats": {
-            "strongerPct": 3.0
+            "strongerPct": 3
           },
           "source": {
             "sheet": "係數區",
@@ -665,7 +665,7 @@
           "id": "guild-fountain-4-21",
           "name": "排熱+3%",
           "stats": {
-            "heatPct": 3.0
+            "heatPct": 3
           },
           "source": {
             "sheet": "係數區",
@@ -686,7 +686,7 @@
   ],
   "binaryEffects": [
     {
-      "selectorCell": "裝備模擬區!B3",
+      "selectorCell": "Effect.Emblem",
       "name": "標誌",
       "options": [
         {
@@ -705,7 +705,7 @@
       "source": "計算機!W91=IF(B89=\"有\",3,0)"
     },
     {
-      "selectorCell": "裝備模擬區!S21",
+      "selectorCell": "Effect.PortraitAwakening",
       "name": "立繪、覺醒",
       "options": [
         {
@@ -738,7 +738,7 @@
       },
       "source": {
         "sheet": "計算機",
-        "selectionCell": "裝備模擬區!S2",
+        "selectionCell": "Peak.Option",
         "calculationCells": [
           "I36",
           "V36"
@@ -758,7 +758,7 @@
       },
       "source": {
         "sheet": "計算機",
-        "selectionCell": "裝備模擬區!S2",
+        "selectionCell": "Peak.Option",
         "calculationCells": [
           "I36",
           "V36"

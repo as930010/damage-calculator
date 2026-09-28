@@ -8,7 +8,7 @@
   },
   "selections": [
     {
-      "selectionCell": "B7",
+      "selectionCell": "Costume.OnePiece",
       "catalogFile": "equipment/one-piece-costumes.json",
       "slotId": "one-piece-costumes",
       "calculationRows": [
@@ -16,7 +16,7 @@
       ]
     },
     {
-      "selectionCell": "B10",
+      "selectionCell": "Left.Ice.Set",
       "catalogFile": "equipment/left-ice.json",
       "slotId": "left-ice",
       "calculationRows": [
@@ -24,7 +24,7 @@
       ]
     },
     {
-      "selectionCell": "B17",
+      "selectionCell": "Ice.Weapon.Set",
       "catalogFile": "equipment/right-ice.json",
       "slotId": "weapon",
       "calculationRows": [
@@ -32,7 +32,7 @@
       ]
     },
     {
-      "selectionCell": "B20",
+      "selectionCell": "Right.Ice.WeaponAccessory",
       "catalogFile": "equipment/right-ice.json",
       "slotId": "weaponAccessory",
       "calculationRows": [
@@ -40,7 +40,7 @@
       ]
     },
     {
-      "selectionCell": "B21",
+      "selectionCell": "Right.Ice.FaceTop",
       "catalogFile": "equipment/right-ice.json",
       "slotId": "faceTop",
       "calculationRows": [
@@ -48,7 +48,7 @@
       ]
     },
     {
-      "selectionCell": "B22",
+      "selectionCell": "Right.Ice.FaceMiddle",
       "catalogFile": "equipment/right-ice.json",
       "slotId": "faceMiddle",
       "calculationRows": [
@@ -56,7 +56,7 @@
       ]
     },
     {
-      "selectionCell": "B23",
+      "selectionCell": "Right.Ice.FaceBottom",
       "catalogFile": "equipment/right-ice.json",
       "slotId": "faceBottom",
       "calculationRows": [
@@ -64,7 +64,7 @@
       ]
     },
     {
-      "selectionCell": "B24",
+      "selectionCell": "Right.Ice.Earring",
       "catalogFile": "equipment/right-ice.json",
       "slotId": "earring",
       "calculationRows": [
@@ -72,7 +72,7 @@
       ]
     },
     {
-      "selectionCell": "D20",
+      "selectionCell": "Right.Ice.Support",
       "catalogFile": "equipment/right-ice.json",
       "slotId": "support",
       "calculationRows": [
@@ -80,7 +80,7 @@
       ]
     },
     {
-      "selectionCell": "D21",
+      "selectionCell": "Right.Ice.Top",
       "catalogFile": "equipment/right-ice.json",
       "slotId": "top",
       "calculationRows": [
@@ -88,7 +88,7 @@
       ]
     },
     {
-      "selectionCell": "D22",
+      "selectionCell": "Right.Ice.Bottom",
       "catalogFile": "equipment/right-ice.json",
       "slotId": "bottom",
       "calculationRows": [
@@ -96,7 +96,7 @@
       ]
     },
     {
-      "selectionCell": "D23",
+      "selectionCell": "Right.Ice.Arm",
       "catalogFile": "equipment/right-ice.json",
       "slotId": "arm",
       "calculationRows": [
@@ -104,7 +104,7 @@
       ]
     },
     {
-      "selectionCell": "D24",
+      "selectionCell": "Right.Ice.Necklace",
       "catalogFile": "equipment/right-ice.json",
       "slotId": "necklace",
       "calculationRows": [
@@ -112,7 +112,7 @@
       ]
     },
     {
-      "selectionCell": "D25",
+      "selectionCell": "Right.Ice.Ring",
       "catalogFile": "equipment/right-ice.json",
       "slotId": "ring",
       "calculationRows": [
@@ -120,7 +120,7 @@
       ]
     },
     {
-      "selectionCell": "M2",
+      "selectionCell": "Accessory.WeaponAccessory",
       "catalogFile": "equipment/accessories.json",
       "slotId": "weaponAccessory",
       "calculationRows": [
@@ -128,7 +128,7 @@
       ]
     },
     {
-      "selectionCell": "M3",
+      "selectionCell": "Accessory.FaceTop",
       "catalogFile": "equipment/accessories.json",
       "slotId": "faceTop",
       "calculationRows": [
@@ -136,7 +136,7 @@
       ]
     },
     {
-      "selectionCell": "M4",
+      "selectionCell": "Accessory.FaceMiddle",
       "catalogFile": "equipment/accessories.json",
       "slotId": "faceMiddle",
       "calculationRows": [
@@ -144,7 +144,7 @@
       ]
     },
     {
-      "selectionCell": "M5",
+      "selectionCell": "Accessory.FaceBottom",
       "catalogFile": "equipment/accessories.json",
       "slotId": "faceBottom",
       "calculationRows": [
@@ -152,7 +152,7 @@
       ]
     },
     {
-      "selectionCell": "M6",
+      "selectionCell": "Accessory.Earring",
       "catalogFile": "equipment/accessories.json",
       "slotId": "earring",
       "calculationRows": [
@@ -160,7 +160,7 @@
       ]
     },
     {
-      "selectionCell": "M7",
+      "selectionCell": "Accessory.Ring1",
       "catalogFile": "equipment/accessories.json",
       "slotId": "ringA",
       "calculationRows": [
@@ -168,7 +168,7 @@
       ]
     },
     {
-      "selectionCell": "O2",
+      "selectionCell": "Accessory.Support",
       "catalogFile": "equipment/accessories.json",
       "slotId": "support",
       "calculationRows": [
@@ -176,7 +176,7 @@
       ]
     },
     {
-      "selectionCell": "O3",
+      "selectionCell": "Accessory.Top",
       "catalogFile": "equipment/accessories.json",
       "slotId": "top",
       "calculationRows": [
@@ -184,7 +184,7 @@
       ]
     },
     {
-      "selectionCell": "O4",
+      "selectionCell": "Accessory.Bottom",
       "catalogFile": "equipment/accessories.json",
       "slotId": "bottom",
       "calculationRows": [
@@ -192,7 +192,7 @@
       ]
     },
     {
-      "selectionCell": "O5",
+      "selectionCell": "Accessory.Arm",
       "catalogFile": "equipment/accessories.json",
       "slotId": "arm",
       "calculationRows": [
@@ -200,7 +200,7 @@
       ]
     },
     {
-      "selectionCell": "O6",
+      "selectionCell": "Accessory.Necklace",
       "catalogFile": "equipment/accessories.json",
       "slotId": "necklace",
       "calculationRows": [
@@ -208,7 +208,7 @@
       ]
     },
     {
-      "selectionCell": "O7",
+      "selectionCell": "Accessory.Ring2",
       "catalogFile": "equipment/accessories.json",
       "slotId": "ringB",
       "calculationRows": [
@@ -221,184 +221,184 @@
     "slotId": "magicStone",
     "inputGroups": [
       {
-        "selectionCell": "C8",
+        "selectionCell": "Costume.MagicStone",
         "application": "armor",
         "calculationRow": 104
       },
       {
-        "selectionCell": "C11",
+        "selectionCell": "Left.Ice.Hair.MagicStone",
         "application": "armor",
         "calculationRow": 105
       },
       {
-        "selectionCell": "C12",
+        "selectionCell": "Left.Ice.Upper.MagicStone",
         "application": "armor",
         "calculationRow": 106
       },
       {
-        "selectionCell": "C13",
+        "selectionCell": "Left.Ice.Bottom.MagicStone",
         "application": "armor",
         "calculationRow": 107
       },
       {
-        "selectionCell": "C14",
+        "selectionCell": "Left.Ice.Gloves.MagicStone",
         "application": "armor",
         "calculationRow": 108
       },
       {
-        "selectionCell": "C15",
+        "selectionCell": "Left.Ice.Shoes.MagicStone",
         "application": "armor",
         "calculationRow": 109
       },
       {
-        "selectionCell": "H4",
+        "selectionCell": "Left.Armor.Upper.MagicStone.1",
         "application": "armor",
         "calculationRow": 110
       },
       {
-        "selectionCell": "H5",
+        "selectionCell": "Left.Armor.Upper.MagicStone.2",
         "application": "armor",
         "calculationRow": 111
       },
       {
-        "selectionCell": "H6",
+        "selectionCell": "Left.Armor.Upper.MagicStone.3",
         "application": "armor",
         "calculationRow": 112
       },
       {
-        "selectionCell": "H7",
+        "selectionCell": "Left.Armor.Upper.MagicStone.4",
         "application": "armor",
         "calculationRow": 113
       },
       {
-        "selectionCell": "H13",
+        "selectionCell": "Left.Armor.Bottom.MagicStone.1",
         "application": "armor",
         "calculationRow": 114,
         "configuration": "lowerwearA"
       },
       {
-        "selectionCell": "H14",
+        "selectionCell": "Left.Armor.Bottom.MagicStone.2",
         "application": "armor",
         "calculationRow": 115,
         "configuration": "lowerwearA"
       },
       {
-        "selectionCell": "H15",
+        "selectionCell": "Left.Armor.Bottom.MagicStone.3",
         "application": "armor",
         "calculationRow": 116,
         "configuration": "lowerwearA"
       },
       {
-        "selectionCell": "H16",
+        "selectionCell": "Left.Armor.Bottom.MagicStone.4",
         "application": "armor",
         "calculationRow": 117,
         "configuration": "lowerwearA"
       },
       {
-        "selectionCell": "H22",
+        "selectionCell": "Left.Armor.SwitchBottom.MagicStone.1",
         "application": "armor",
         "calculationRow": 118,
-        "enabledBy": "F20",
+        "enabledBy": "Lowerwear.Alternative.Enabled",
         "configuration": "lowerwearB"
       },
       {
-        "selectionCell": "H23",
+        "selectionCell": "Left.Armor.SwitchBottom.MagicStone.2",
         "application": "armor",
         "calculationRow": 119,
-        "enabledBy": "F20",
+        "enabledBy": "Lowerwear.Alternative.Enabled",
         "configuration": "lowerwearB"
       },
       {
-        "selectionCell": "H24",
+        "selectionCell": "Left.Armor.SwitchBottom.MagicStone.3",
         "application": "armor",
         "calculationRow": 120,
-        "enabledBy": "F20",
+        "enabledBy": "Lowerwear.Alternative.Enabled",
         "configuration": "lowerwearB"
       },
       {
-        "selectionCell": "H25",
+        "selectionCell": "Left.Armor.SwitchBottom.MagicStone.4",
         "application": "armor",
         "calculationRow": 121,
-        "enabledBy": "F20",
+        "enabledBy": "Lowerwear.Alternative.Enabled",
         "configuration": "lowerwearB"
       },
       {
-        "selectionCell": "H31",
+        "selectionCell": "Left.Armor.Gloves.MagicStone.1",
         "application": "armor",
         "calculationRow": 122
       },
       {
-        "selectionCell": "H32",
+        "selectionCell": "Left.Armor.Gloves.MagicStone.2",
         "application": "armor",
         "calculationRow": 123
       },
       {
-        "selectionCell": "H33",
+        "selectionCell": "Left.Armor.Gloves.MagicStone.3",
         "application": "armor",
         "calculationRow": 124
       },
       {
-        "selectionCell": "H34",
+        "selectionCell": "Left.Armor.Gloves.MagicStone.4",
         "application": "armor",
         "calculationRow": 125
       },
       {
-        "selectionCell": "H40",
+        "selectionCell": "Left.Armor.Shoes.MagicStone.1",
         "application": "armor",
         "calculationRow": 126
       },
       {
-        "selectionCell": "H41",
+        "selectionCell": "Left.Armor.Shoes.MagicStone.2",
         "application": "armor",
         "calculationRow": 127
       },
       {
-        "selectionCell": "H42",
+        "selectionCell": "Left.Armor.Shoes.MagicStone.3",
         "application": "armor",
         "calculationRow": 128
       },
       {
-        "selectionCell": "H43",
+        "selectionCell": "Left.Armor.Shoes.MagicStone.4",
         "application": "armor",
         "calculationRow": 129
       },
       {
-        "selectionCell": "D32",
+        "selectionCell": "Weapon.MagicStone.1",
         "application": "weapon",
         "calculationRow": 130
       },
       {
-        "selectionCell": "D33",
+        "selectionCell": "Weapon.MagicStone.2",
         "application": "weapon",
         "calculationRow": 131
       },
       {
-        "selectionCell": "D34",
+        "selectionCell": "Weapon.MagicStone.3",
         "application": "weapon",
         "calculationRow": 132
       },
       {
-        "selectionCell": "D35",
+        "selectionCell": "Weapon.MagicStone.4",
         "application": "weapon",
         "calculationRow": 133
       },
       {
-        "selectionCell": "D36",
+        "selectionCell": "Weapon.MagicStone.5",
         "application": "weapon",
         "calculationRow": 134
       },
       {
-        "selectionCell": "D37",
+        "selectionCell": "Weapon.MagicStone.6",
         "application": "weapon",
         "calculationRow": 135
       },
       {
-        "selectionCell": "D17",
+        "selectionCell": "Ice.Weapon.MagicStone.1",
         "application": "weapon",
         "calculationRow": 136
       },
       {
-        "selectionCell": "D18",
+        "selectionCell": "Ice.Weapon.MagicStone.2",
         "application": "weapon",
         "calculationRow": 137
       }

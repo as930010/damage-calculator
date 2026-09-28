@@ -277,12 +277,12 @@
   ],
   "classSelectors": {
     "selectorCells": [
-      "S4",
-      "S5",
-      "S6",
-      "S7",
-      "S8",
-      "S9"
+      "SpiritRecord.Class.1",
+      "SpiritRecord.Class.2",
+      "SpiritRecord.Class.3",
+      "SpiritRecord.Class.4",
+      "SpiritRecord.Class.5",
+      "SpiritRecord.Class.6"
     ],
     "sourceRange": "係數區!A2:F61",
     "classes": [

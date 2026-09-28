@@ -7,6 +7,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = async (path) => JSON.parse(await readFile(join(root, path), "utf8"));
 const { findValidationCatalog, rangeContainsCell } = await import(pathToFileURL(join(root, "dist/frontend/sheet-validation.js")));
+const { fieldIdForCell } = await import(pathToFileURL(join(root, "dist/frontend/field-ids.js")));
 const simulatorInputs = await read("data/simulator-input-options.json");
 
 function legacyContains(range, cell) {
@@ -69,8 +70,10 @@ test("single cells, rectangular ranges, and non-matching addresses retain their 
 
 test("battle setting fields still resolve the same exact option catalogs", () => {
   for (const cell of ["D1", "D2", "D3"]) {
-    const previous = simulatorInputs.inputs.find(input => input.simulatorCells === cell);
+    const fieldId = fieldIdForCell(cell);
+    const previous = simulatorInputs.inputs.find(input => input.simulatorCells.split(/\s+/).includes(fieldId));
     const actual = findValidationCatalog(simulatorInputs.inputs, simulatorInputs.catalogs, cell);
     assert.equal(actual?.id, previous ? simulatorInputs.catalogs.find(catalog => catalog.id === previous.catalogId)?.id : undefined, cell);
+    assert.equal(findValidationCatalog(simulatorInputs.inputs, simulatorInputs.catalogs, fieldId)?.id, actual?.id, `${fieldId} and its old input reference`);
   }
 });

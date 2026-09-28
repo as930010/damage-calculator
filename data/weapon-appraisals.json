@@ -4,7 +4,7 @@
   "sourceSheet": "係數區",
   "groups": {
     "primary": {
-      "selectorCell": "裝備模擬區!B34",
+      "selectorCell": "Weapon.Appraisal.Primary",
       "effectOutputCells": [
         "計算機!F58",
         "計算機!G58",
@@ -15,7 +15,7 @@
           "id": "weapon-appraisal-a-2",
           "name": "攻擊力等級+4",
           "stats": {
-            "attackLevel": 4.0
+            "attackLevel": 4
           },
           "source": {
             "sheet": "係數區",
@@ -37,7 +37,7 @@
           "id": "weapon-appraisal-a-4",
           "name": "攻擊力等級+3",
           "stats": {
-            "attackLevel": 3.0
+            "attackLevel": 3
           },
           "source": {
             "sheet": "係數區",
@@ -48,7 +48,7 @@
           "id": "weapon-appraisal-a-5",
           "name": "致命一擊+8%",
           "stats": {
-            "critRatePct": 8.0
+            "critRatePct": 8
           },
           "source": {
             "sheet": "係數區",
@@ -59,7 +59,7 @@
           "id": "weapon-appraisal-a-6",
           "name": "致命一擊+7%",
           "stats": {
-            "critRatePct": 7.0
+            "critRatePct": 7
           },
           "source": {
             "sheet": "係數區",
@@ -70,7 +70,7 @@
           "id": "weapon-appraisal-a-7",
           "name": "致命一擊+6%",
           "stats": {
-            "critRatePct": 6.0
+            "critRatePct": 6
           },
           "source": {
             "sheet": "係數區",
@@ -81,7 +81,7 @@
           "id": "weapon-appraisal-a-8",
           "name": "極大化+8%",
           "stats": {
-            "extremizationPct": 8.0
+            "extremizationPct": 8
           },
           "source": {
             "sheet": "係數區",
@@ -92,7 +92,7 @@
           "id": "weapon-appraisal-a-9",
           "name": "極大化+7%",
           "stats": {
-            "extremizationPct": 7.0
+            "extremizationPct": 7
           },
           "source": {
             "sheet": "係數區",
@@ -103,7 +103,7 @@
           "id": "weapon-appraisal-a-10",
           "name": "極大化+6%",
           "stats": {
-            "extremizationPct": 6.0
+            "extremizationPct": 6
           },
           "source": {
             "sheet": "係數區",
@@ -122,7 +122,7 @@
       ]
     },
     "additionalA": {
-      "selectorCell": "裝備模擬區!B35",
+      "selectorCell": "Weapon.Appraisal.Additional1",
       "effectOutputCells": [
         "計算機!F59",
         "計算機!G59",
@@ -240,7 +240,7 @@
       ]
     },
     "additionalB": {
-      "selectorCell": "裝備模擬區!B36",
+      "selectorCell": "Weapon.Appraisal.Additional2",
       "effectOutputCells": [
         "計算機!F60",
         "計算機!G60",

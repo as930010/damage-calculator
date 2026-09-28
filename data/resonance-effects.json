@@ -2,17 +2,17 @@
   "schemaVersion": 1,
   "dataUpdatedAt": "2026-09-25",
   "selectorCells": [
-    "裝備模擬區!T11",
-    "裝備模擬區!T12",
-    "裝備模擬區!T13",
-    "裝備模擬區!T14",
-    "裝備模擬區!T15"
+    "Resonance.AllATK.Points",
+    "Resonance.TranscendenceSkillDMG.Points",
+    "Resonance.Polarization.Points",
+    "Resonance.BossDMG.Points",
+    "Resonance.Adapt.Points"
   ],
   "effects": [
     {
       "id": "resonance-double-attack",
       "name": "雙攻",
-      "inputCell": "裝備模擬區!T11",
+      "inputCell": "Resonance.AllATK.Points",
       "multiplier": 10,
       "stats": {
         "physicalAttack": 1,
@@ -27,7 +27,7 @@
     {
       "id": "resonance-skill-damage",
       "name": "技傷",
-      "inputCell": "裝備模擬區!T12",
+      "inputCell": "Resonance.TranscendenceSkillDMG.Points",
       "multiplier": 0.35,
       "stats": {
         "transcendenceSkillDamagePct": 1
@@ -40,7 +40,7 @@
     {
       "id": "resonance-polarization",
       "name": "兩極",
-      "inputCell": "裝備模擬區!T13",
+      "inputCell": "Resonance.Polarization.Points",
       "multiplier": 0.15,
       "stats": {
         "polarizationPct": 1
@@ -53,7 +53,7 @@
     {
       "id": "resonance-boss-damage",
       "name": "B傷",
-      "inputCell": "裝備模擬區!T14",
+      "inputCell": "Resonance.BossDMG.Points",
       "multiplier": 0.3,
       "stats": {
         "bossDamagePct": 1
@@ -66,7 +66,7 @@
     {
       "id": "resonance-adaptability",
       "name": "適應",
-      "inputCell": "裝備模擬區!T15",
+      "inputCell": "Resonance.Adapt.Points",
       "multiplier": 0.07,
       "stats": {
         "adaptabilityPct": 1

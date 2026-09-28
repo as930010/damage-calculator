@@ -25,7 +25,7 @@ try {
 const state = JSON.parse(await readFile(pathToFileURL(resolve(stateFile)), 'utf8'));
 const { result } = projectDamage(data, state);
 const metrics = {
-  classId: state.classId,
+  Job: state.Job,
   alternateLowerwear: state.lowerwearAlternativeEnabled,
   stats: Object.fromEntries(Object.entries(result.attributes.stats).map(([key, item]) => [key, item.finalTotal])),
   strongerPct: result.attributes.conditionalDamage.strongerPct,

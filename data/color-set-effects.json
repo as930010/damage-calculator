@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "dataUpdatedAt": "2026-09-25",
-  "selectorCell": "G2",
+  "selectorCell": "Left.Armor.SetColor",
   "source": "裝備模擬區!G2 -> 計算機!S37; 綠色另外引用 計算機!K46，對應裝備模擬區!J31:J32 的內裝手電路。",
   "options": [
     {

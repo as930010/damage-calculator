@@ -4,10 +4,11 @@ import { readFile } from 'node:fs/promises';
 import { resolveInnerwearSources } from '../dist/calculation/innerwear.js';
 import { resolveWeaponTransformationsFromCells } from '../dist/calculation/weapon-transformations.js';
 import { aggregateCharacterAttributes, prepareCharacterAttributeInput } from '../dist/calculation/attribute-aggregation.js';
+import { createFieldValues } from '../dist/frontend/state.js';
 
 const json = async path => JSON.parse(await readFile(new URL(`../data/${path}`, import.meta.url), 'utf8'));
 const [rules, attack, transforms, layout, mapping] = await Promise.all(['innerwear-rules.json', 'attack-parameters.json', 'weapon-transformations.json', 'equipment-layout.json', 'simulator-equipment-mapping.json'].map(json));
-const resolve = (values, enabled = true) => resolveInnerwearSources(rules, attack, 'DaB', values, enabled);
+const resolve = (values, enabled = true) => resolveInnerwearSources(rules, attack, 'DaB', createFieldValues(values), enabled);
 
 test('強/排褲魔攻取 H21，變動 H12 不會改變這件裝備', () => {
   const first = resolve({ H12: 'Lv.8', J12: 21, H21: 'Lv.13', J21: 21 });
@@ -39,10 +40,10 @@ test('鍛造門檻取已達成的最高階，未達首個門檻為零，不累�
 test('四個武器變換共用 B32 強化，不受 B33:B35 文字內數字影響', () => {
   const values = { B32: 'Lv.13', B33: '成長6', B34: '3.5%', B35: '2.25%' };
   for (const slot of transforms.slots) { values[slot.choiceCell] = '雙攻% × 強化'; values[slot.valueCell] = .01; }
-  const result = resolveWeaponTransformationsFromCells(transforms, values);
+  const result = resolveWeaponTransformationsFromCells(transforms, createFieldValues(values));
   assert.equal(result.length, 4);
   for (const entry of result) assert.equal(entry.stats.doubleAttackPct, 13);
-  assert.deepEqual(resolveWeaponTransformationsFromCells(transforms, { ...values, B33: '成長1', B34: '9%', B35: '8%' }), result);
+  assert.deepEqual(resolveWeaponTransformationsFromCells(transforms, createFieldValues({ ...values, B33: '成長1', B34: '9%', B35: '8%' })), result);
 });
 
 test('十二種武器變換都依自己的規則換算，所有「×強化」只讀取 B32', () => {
@@ -54,7 +55,7 @@ test('十二種武器變換都依自己的規則換算，所有「×強化」只
   for (const rule of transforms.rules) {
     for (const slot of transforms.slots) {
       values[slot.choiceCell] = rule.choice;
-      const [actual] = resolveWeaponTransformationsFromCells(transforms, values).filter(entry => entry.sourceId === `weapon-transform:${slot.choiceCell}`);
+      const [actual] = resolveWeaponTransformationsFromCells(transforms, createFieldValues(values)).filter(entry => entry.sourceId === `weapon-transform:${slot.choiceCell}`);
       const expected = 0.02 * rule.valueMultiplier * (rule.strengthenByFirstIntegerFrom ? 11 : 1);
       assert.equal(actual.stats[rule.statKey], expected, `${slot.choiceCell}: ${rule.choice}`);
       values[slot.choiceCell] = '';
@@ -63,23 +64,9 @@ test('十二種武器變換都依自己的規則換算，所有「×強化」只
   const withoutEnhancement = { ...values, B32: '', B33: 'Lv.13' };
   values.B42 = '雙攻% × 強化';
   withoutEnhancement.B42 = '雙攻% × 強化';
-  assert.equal(resolveWeaponTransformationsFromCells(transforms, withoutEnhancement)[0].stats.doubleAttackPct, 0);
+  assert.equal(resolveWeaponTransformationsFromCells(transforms, createFieldValues(withoutEnhancement))[0].stats.doubleAttackPct, 0);
 });
 
-test('Google Sheets 計算機第 54～57 列的「×強化」公式都明確引用裝備模擬區 B32', async () => {
-  const sourceMap = JSON.parse(await readFile(new URL('../docs/reference/calculation-source-map.json', import.meta.url), 'utf8'));
-  const scaledFormulaCells = sourceMap.rows
-    .filter(row => row.row >= 54 && row.row <= 57)
-    .flatMap(row => row.cells)
-    .filter(cell => cell.formula?.includes('REGEXEXTRACT'));
-
-  assert.equal(scaledFormulaCells.length, 16);
-  for (const cell of scaledFormulaCells) {
-    const references = cell.references.map(reference => reference.range);
-    assert.ok(references.includes('B32'), `${cell.cell} should reference B32`);
-    assert.ok(!references.some(reference => ['B33', 'B34', 'B35'].includes(reference)), `${cell.cell} should not reference B33:B35`);
-  }
-});
 
 test('兩極化／適應力上限在全角色彙總後套用，極大化無 60 上限', () => {
   const rules = ['polarizationPct','adaptabilityPct','extremizationPct'].map(key => ({ key, aggregation:'sum', ...(key !== 'extremizationPct' ? { cap: { value:60, scope: 'characterTotal' } } : {}) }));

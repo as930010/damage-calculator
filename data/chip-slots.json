@@ -1,40 +1,40 @@
 {
   "schemaVersion": 1,
-  "lowerwearAlternativeEnabledBy": "F20",
+  "lowerwearAlternativeEnabledBy": "Lowerwear.Alternative.Enabled",
   "slots": [
     {
       "id": "upper",
-      "attributeCell": "J6",
-      "tuningCell": "J7",
+      "attributeCell": "Left.Armor.Upper.Chip.Attribute",
+      "tuningCell": "Left.Armor.Upper.Chip.Tuning",
       "calculationRow": 48,
       "wearSet": "shared"
     },
     {
       "id": "lowerwear",
-      "attributeCell": "J15",
-      "tuningCell": "J16",
+      "attributeCell": "Left.Armor.Bottom.Chip.Attribute",
+      "tuningCell": "Left.Armor.Bottom.Chip.Tuning",
       "calculationRow": 49,
       "wearSet": "lowerwearA"
     },
     {
       "id": "lowerwearAlternative",
-      "attributeCell": "J24",
-      "tuningCell": "J25",
+      "attributeCell": "Left.Armor.SwitchBottom.Chip.Attribute",
+      "tuningCell": "Left.Armor.SwitchBottom.Chip.Tuning",
       "calculationRow": 50,
       "wearSet": "lowerwearB",
-      "enabledBy": "F20"
+      "enabledBy": "Lowerwear.Alternative.Enabled"
     },
     {
       "id": "gloves",
-      "attributeCell": "J33",
-      "tuningCell": "J34",
+      "attributeCell": "Left.Armor.Gloves.Chip.Attribute",
+      "tuningCell": "Left.Armor.Gloves.Chip.Tuning",
       "calculationRow": 51,
       "wearSet": "shared"
     },
     {
       "id": "shoes",
-      "attributeCell": "J42",
-      "tuningCell": "J43",
+      "attributeCell": "Left.Armor.Shoes.Chip.Attribute",
+      "tuningCell": "Left.Armor.Shoes.Chip.Tuning",
       "calculationRow": 52,
       "wearSet": "shared"
     }

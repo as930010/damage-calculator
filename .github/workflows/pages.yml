@@ -33,6 +33,7 @@ jobs:
       - run: pnpm run validate:data
       - run: pnpm run build
       - run: pnpm run test:transfer
+      - run: pnpm run test:field-ids
       - run: pnpm run test:data-loading
       - run: pnpm run test:sheet-validation
       - run: pnpm run test:theme

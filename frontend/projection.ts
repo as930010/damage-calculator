@@ -7,18 +7,36 @@ import { calculateWeaponBaseAttack, resolveAttackParameters } from "../calculati
 import type { AttributeRule, StatContribution } from "../calculation/types.ts";
 import { calculateLoadout, calculateLoadoutCombatRates } from "../calculation/loadout-engine.ts";
 import { localCell, type GameData } from "./data.ts";
-import type { LoadoutState } from "./state.ts";
+import { cellForFieldId, fieldIdForCell, isFieldId } from "./field-ids.ts";
+import { createFieldValues, type LoadoutState } from "./state.ts";
+
+function valueForCell(values: Record<string, string | number>, cell: string): string | number | undefined {
+  const address = localCell(cell);
+  const fieldId = isFieldId(address) ? address : fieldIdForCell(address);
+  return (fieldId ? values[fieldId] ?? values[cellForFieldId(fieldId) ?? ""] : undefined) ?? values[address];
+}
+
+function valuesByFieldId(values: Record<string, string | number>): Record<string, string | number> {
+  return Object.fromEntries(Object.entries(values).map(([key, value]) => [isFieldId(key) ? key : fieldIdForCell(key) ?? key, value]));
+}
+
+function valuesWithCompatibilityReads(values: Record<string, string | number>): Record<string, string | number> {
+  return createFieldValues(valuesByFieldId(values));
+}
 
 /** UI state to supported stat sources; game arithmetic remains in calculation/. */
 export function projectAttributes(data: GameData, state: LoadoutState) {
   const values = state.values;
-  const text = (key: string) => String(values[localCell(key)] ?? "");
-  const number = (key: string) => values[localCell(key)] === undefined || values[localCell(key)] === "" ? undefined : Number(values[localCell(key)]);
+  const text = (key: string) => String(valueForCell(values, key) ?? "");
+  const number = (key: string) => valueForCell(values, key) === undefined || valueForCell(values, key) === "" ? undefined : Number(valueForCell(values, key));
   const equipment = resolveSimulatorEquipmentContributions(data.mapping, data.catalogs, {
-    selectedItems: Object.fromEntries(Object.entries(values).map(([cell, value]) => [cell, String(value)])),
-    enabledValues: { F20: state.lowerwearAlternativeEnabled },
+    selectedItems: Object.fromEntries(Object.entries(valuesByFieldId(values)).flatMap(([fieldId, value]) => [
+      [fieldId, String(value)],
+      [cellForFieldId(fieldId) ?? fieldId, String(value)],
+    ])),
+    enabledValues: { "Lowerwear.Alternative.Enabled": state.lowerwearAlternativeEnabled },
   });
-  const inner = resolveInnerwearSources(data.innerwear, data.attack, state.classId, values, state.lowerwearAlternativeEnabled);
+  const inner = resolveInnerwearSources(data.innerwear, data.attack, state.Job, valuesWithCompatibilityReads(values), state.lowerwearAlternativeEnabled);
   const configuredEffects: StatContribution[] = [
     ...data.parameters.optionalEffects
       .filter(effect => state[effect.stateKey] ?? effect.defaultEnabled)
@@ -33,7 +51,7 @@ export function projectAttributes(data: GameData, state: LoadoutState) {
   };
   for (const entry of resolveArmorAppraisals(data.appraisals, {
     optionsBySlot: Object.fromEntries(data.appraisals.slots.map((slot) => [slot.id, slot.inputCells.map(text)])),
-    enabledInputs: { "裝備模擬區!F20": state.lowerwearAlternativeEnabled },
+    enabledInputs: { "Lowerwear.Alternative.Enabled": state.lowerwearAlternativeEnabled },
   })) groups[entry.wearSet].push(...entry.contributions);
   for (const slot of data.chipSlots.slots) {
     if (slot.enabledBy && !state.lowerwearAlternativeEnabled) continue;
@@ -54,9 +72,9 @@ export function projectAttributes(data: GameData, state: LoadoutState) {
     return [slot.slot, { attribute, percentageValue }];
   }));
   for (const entry of resolveCircuitBoardEffects(data.circuits, circuits)) if (entry.contribution) groups[entry.wearSet].push(entry.contribution);
-  const colorSet = resolveColorSetEffect(data.colorSetEffects, text(data.colorSetEffects.selectorCell), text("J31"), number("J32") ?? 0);
+  const colorSet = resolveColorSetEffect(data.colorSetEffects, text(data.colorSetEffects.selectorCell), text("Left.Armor.Gloves.Circuit.Attribute"), number("Left.Armor.Gloves.Circuit.Value") ?? 0);
   if (colorSet) groups.shared.push(colorSet);
-  groups.shared.push(...resolveWeaponTransformationsFromCells(data.transformations, values));
+  groups.shared.push(...resolveWeaponTransformationsFromCells(data.transformations, valuesWithCompatibilityReads(values)));
   const growth = resolveWeaponGrowth(data.growth, text(data.growth.selectorCell));
   if (growth) groups.shared.push(growth);
   for (const group of Object.values(data.weaponAppraisals.groups)) {
@@ -67,7 +85,7 @@ export function projectAttributes(data: GameData, state: LoadoutState) {
     const source = resolveNamedStatOption(data.giantStones.options, text(cell), `giant-stone:${localCell(cell)}`);
     if (source) groups.shared.push(source);
   }
-  const weaponGrade = resolveNamedStatOption(data.weaponGrades.options, text(data.weaponGrades.selectorCell), "weapon-grade:B37");
+  const weaponGrade = resolveNamedStatOption(data.weaponGrades.options, text(data.weaponGrades.selectorCell), "weapon-grade:Weapon.MagicStone.Grade");
   if (weaponGrade) groups.shared.push(weaponGrade);
   const accessoryAppraisalSelections: Record<string, string> = {};
   for (const group of data.accessoryEffects.groups) {
@@ -87,7 +105,9 @@ export function projectAttributes(data: GameData, state: LoadoutState) {
     }
   }
   groups.shared.push(...resolveAccessoryEffectOptions(data.accessoryEffects, accessoryAppraisalSelections));
-  const accessoryCells = data.mapping.selections.map(entry => entry.selectionCell).filter(cell => /^[M-O][2-7]$/.test(cell));
+  const accessoryCells = data.mapping.selections
+    .filter(entry => entry.catalogFile.endsWith("accessories.json"))
+    .map(entry => entry.selectionCell);
   const rightIceCells = data.mapping.selections.filter(entry => entry.catalogFile.endsWith("right-ice.json")).map(entry => entry.selectionCell);
   groups.shared.push(
     ...resolveRightIceSetEffects(data.rightIceSets, rightIceCells.map(text), data.rightIceSets.selectionCells.map(text)),
@@ -95,33 +115,35 @@ export function projectAttributes(data: GameData, state: LoadoutState) {
     ...resolveRaidSetEffects(data.raidSets, accessoryCells.map(text)),
   );
   const atmaPieces = accessoryCells.map(text).filter(name => name.includes("亞特瑪")).length;
-  groups.shared.push(...resolveAtmaSetEffects(data.atma, atmaPieces, text("L9"), text("N9")));
+  groups.shared.push(...resolveAtmaSetEffects(data.atma, atmaPieces, text("Atma.Element"), text("Atma.Color")));
   groups.shared.push(...resolveMasterBeastEffects(data.masterBeast, {
-    overallOption: text("S25"), headOptions: [text("N27"), text("N28")],
-    ringOptions: ["N36", "N37", "N39", "N40"].map(text),
-    headManual: { attribute: text("M27"), value: number("M28") },
-    necklaceManual: { attribute: text("M33"), value: number("M34") },
+    overallOption: text("MasterBeast.OverallPotential"), headOptions: [text("MasterBeast.Head.Option1"), text("MasterBeast.Head.Option2")],
+    ringOptions: ["MasterBeast.Ring1.Option1", "MasterBeast.Ring1.Option2", "MasterBeast.Ring2.Option1", "MasterBeast.Ring2.Option2"].map(text),
+    headManual: { attribute: text("MasterBeast.Head.CustomAttribute"), value: number("MasterBeast.Head.CustomValue") },
+    necklaceManual: { attribute: text("MasterBeast.Necklace.CustomAttribute"), value: number("MasterBeast.Necklace.CustomValue") },
     ringManual: [
-      { attribute: text("M36"), value: number("M37") },
-      { attribute: text("M39"), value: number("M40") },
+      { attribute: text("MasterBeast.Ring1.CustomAttribute"), value: number("MasterBeast.Ring1.CustomValue") },
+      { attribute: text("MasterBeast.Ring2.CustomAttribute"), value: number("MasterBeast.Ring2.CustomValue") },
     ],
     mirrorManual: Array.from({ length: 15 }, (_, index) => {
       const row = index + 27;
-      return { attribute: text(`O${row}`), value: number(`P${row}`), fractionToPercentagePoints: true };
+      const [part, firstRow] = row <= 29 ? ["Head", 27] : row <= 32 ? ["Armor", 30] : row <= 35 ? ["Necklace", 33] : row <= 38 ? ["Ring1", 36] : ["Ring2", 39];
+      const slot = row - firstRow + 1;
+      return { attribute: text(`MasterBeast.${part}.Mirror.${slot}.Attribute`), value: number(`MasterBeast.${part}.Mirror.${slot}.Value`), fractionToPercentagePoints: true };
     }),
   }));
   const selectedSpiritClasses = data.spiritRecord.classSelectors.selectorCells.map(text);
   const selectedSpiritRecords = resolveSpiritRecordSelections(data.spiritRecord, selectedSpiritClasses);
-  groups.shared.push(...resolveSpiritRecordEffects(data.spiritRecord, state.classId, data.classes.classes.find(entry => entry.id === state.classId)!.attackType, selectedSpiritRecords));
+  groups.shared.push(...resolveSpiritRecordEffects(data.spiritRecord, state.Job, data.classes.classes.find(entry => entry.id === state.Job)!.attackType, selectedSpiritRecords));
   const addNamedOption = (catalog: readonly import("../calculation/equipment-effects.ts").NamedStatOption[], cell: string, source: string) => {
     const contribution = resolveNamedStatOption(catalog, text(cell), `${source}:${cell}`);
     if (contribution) groups.shared.push(contribution);
   };
-  addNamedOption(data.otherEffects.titles, "B2", "title");
-  addNamedOption(data.otherEffects.consumables, "B4", "consumable");
-  addNamedOption(data.otherEffects.environments, "B5", "environment");
-  addNamedOption(data.otherEffects.peakOptions, "S2", "peak-option");
-  addNamedOption(data.pets.options, "S23", "pet");
+  addNamedOption(data.otherEffects.titles, "Effect.Title", "title");
+  addNamedOption(data.otherEffects.consumables, "Effect.Consumable", "consumable");
+  addNamedOption(data.otherEffects.environments, "Effect.Environment", "environment");
+  addNamedOption(data.otherEffects.peakOptions, "Peak.Option", "peak-option");
+  addNamedOption(data.pets.options, "Pet.Passive", "pet");
   for (const effect of data.otherEffects.binaryEffects) addNamedOption(effect.options, localCell(effect.selectorCell), effect.name);
   for (const stage of data.otherEffects.guildFountain) addNamedOption(stage.options, localCell(stage.selectorCell), `guild-fountain-${stage.stage}`);
   if (!state.lowerwearAlternativeEnabled) groups.lowerwearB = [];
@@ -131,8 +153,8 @@ export function projectAttributes(data: GameData, state: LoadoutState) {
     ...groups, lowerwearAlternativeEnabled: state.lowerwearAlternativeEnabled,
   }).attributeInput);
   const first = aggregate();
-  if (text("B32")) {
-    const params = resolveAttackParameters(data.attack, state.classId, Number(text("B32").match(/\d+/)?.[0]));
+  if (text("Weapon.ENHC")) {
+    const params = resolveAttackParameters(data.attack, state.Job, Number(text("Weapon.ENHC").match(/\d+/)?.[0]));
     const stats = calculateWeaponBaseAttack({ ...params, attackLevel: first.stats.attackLevel?.finalTotal ?? 0 });
     groups.shared.push({ sourceId: "weapon-base-attack:C53:D53", stats });
   }
@@ -146,10 +168,10 @@ export function projectAttributes(data: GameData, state: LoadoutState) {
 }
 
 function combatRateInputs(data: GameData, state: LoadoutState, attributes: ReturnType<typeof projectAttributes>) {
-  const job = data.classes.classes.find(entry => entry.id === state.classId);
-  if (!job) throw new RangeError(`找不到職業設定：${state.classId}`);
+  const job = data.classes.classes.find(entry => entry.id === state.Job);
+  if (!job) throw new RangeError(`找不到職業設定：${state.Job}`);
   const percentage = (cell: string) => {
-    const value = state.values[cell];
+    const value = valueForCell(state.values, cell);
     if (value == null || value === "") return 0;
     const parsed = Number(value);
     if (!Number.isFinite(parsed)) throw new RangeError(`${cell} 必須是數值。`);
@@ -158,7 +180,8 @@ function combatRateInputs(data: GameData, state: LoadoutState, attributes: Retur
   const combatRateSourceValues = {
     parameters: { yellowBeastSpiritStoneRatePct: data.parameters.yellowBeastSpiritStoneRatePct },
     selections: {
-      H12: state.values.H12, H39: state.values.H39,
+      "Left.Armor.Bottom.ENHC": valueForCell(state.values, "Left.Armor.Bottom.ENHC"),
+      "Left.Armor.Shoes.ENHC": valueForCell(state.values, "Left.Armor.Shoes.ENHC"),
       masterBeastSpiritStoneColor: state.masterBeastSpiritStoneColor ?? data.masterBeast.spiritStoneColorSelector.defaultColor,
     },
   };
@@ -169,7 +192,7 @@ function combatRateInputs(data: GameData, state: LoadoutState, attributes: Retur
     baseExtremizationPct: attributes.stats.extremizationPct?.finalTotal ?? 0,
     combatRateSourceRules: data.combatRateSources,
     combatRateSourceValues,
-    targetCritPenaltyPct: percentage("D2"),
+    targetCritPenaltyPct: percentage("Stage.CritRatePenalty"),
   };
 }
 
@@ -182,13 +205,13 @@ export function projectCombatRates(data: GameData, state: LoadoutState) {
 /** Full formula path through B157:B163 using the selected spreadsheet-mapped values. */
 export function projectDamage(data: GameData, state: LoadoutState) {
   const attributes = projectAttributes(data, state);
-  const job = data.classes.classes.find(entry => entry.id === state.classId);
-  if (!job) throw new RangeError(`找不到職業設定：${state.classId}`);
-  const weaponText = String(state.values.B32 ?? "");
+  const job = data.classes.classes.find(entry => entry.id === state.Job);
+  if (!job) throw new RangeError(`找不到職業設定：${state.Job}`);
+  const weaponText = String(valueForCell(state.values, "Weapon.ENHC") ?? "");
   const weaponLevel = Number(weaponText.match(/[0-9]+/)?.[0]);
   if (!Number.isSafeInteger(weaponLevel)) throw new RangeError("請先選擇武器強化等級。");
   const percentage = (cell: string) => {
-    const value = state.values[cell];
+    const value = valueForCell(state.values, cell);
     if (value == null || value === "") return 0;
     const parsed = Number(value);
     if (!Number.isFinite(parsed)) throw new RangeError(`${cell} 必須是數值。`);
@@ -208,8 +231,8 @@ export function projectDamage(data: GameData, state: LoadoutState) {
     combatRateSourceRules: data.combatRateSources,
     combatRateSourceValues: rateInputs.combatRateSourceValues,
     targetCritPenaltyPct: rateInputs.targetCritPenaltyPct,
-    stageAdaptabilityPenaltyPct: percentage("D1"),
-    enemyDefensePct: percentage("D3"),
+    stageAdaptabilityPenaltyPct: percentage("Stage.Adapt"),
+    enemyDefensePct: percentage("Stage.BossDEF"),
     critDamageProductBasePct: data.parameters.critDamageProductBasePct,
     critDamageProductBaselinePctToSubtract: data.parameters.critDamageProductBaselinePctToSubtract,
   });

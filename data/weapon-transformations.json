@@ -5,10 +5,10 @@
     "sheet": "裝備模擬區",
     "choiceRange": "B42:B45",
     "valueCells": [
-      "C42",
-      "C43",
-      "C44",
-      "C45"
+      "Weapon.Transform.1.Value",
+      "Weapon.Transform.2.Value",
+      "Weapon.Transform.3.Value",
+      "Weapon.Transform.4.Value"
     ],
     "calculationRows": [
       "計算機!54:57"
@@ -30,24 +30,24 @@
   ],
   "slots": [
     {
-      "choiceCell": "B42",
-      "valueCell": "C42",
-      "scalingTextCell": "B32"
+      "choiceCell": "Weapon.Transform.1.Stat",
+      "valueCell": "Weapon.Transform.1.Value",
+      "scalingTextCell": "Weapon.ENHC"
     },
     {
-      "choiceCell": "B43",
-      "valueCell": "C43",
-      "scalingTextCell": "B32"
+      "choiceCell": "Weapon.Transform.2.Stat",
+      "valueCell": "Weapon.Transform.2.Value",
+      "scalingTextCell": "Weapon.ENHC"
     },
     {
-      "choiceCell": "B44",
-      "valueCell": "C44",
-      "scalingTextCell": "B32"
+      "choiceCell": "Weapon.Transform.3.Stat",
+      "valueCell": "Weapon.Transform.3.Value",
+      "scalingTextCell": "Weapon.ENHC"
     },
     {
-      "choiceCell": "B45",
-      "valueCell": "C45",
-      "scalingTextCell": "B32"
+      "choiceCell": "Weapon.Transform.4.Stat",
+      "valueCell": "Weapon.Transform.4.Value",
+      "scalingTextCell": "Weapon.ENHC"
     }
   ],
   "rules": [

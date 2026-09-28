@@ -106,7 +106,7 @@
     "otherOptions": "依裝備模擬區下拉式選單與計算機公式映射。"
   },
   "rightIceSetEffects": {
-    "selectorCells": "裝備模擬區!B27:B29",
+    "selectorCells": "Right.Ice.SetEffect.1 Right.Ice.SetEffect.2 Right.Ice.SetEffect.3",
     "maxSelectedSets": 3,
     "duplicateSelection": "invalid",
     "activation": "Only user-selected set names are checked against their equipped piece count and tier requirements."

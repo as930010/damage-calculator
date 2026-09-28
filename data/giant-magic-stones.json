@@ -3,9 +3,9 @@
   "dataUpdatedAt": "2026-09-25",
   "sourceSheet": "係數區",
   "selectorCells": [
-    "裝備模擬區!B38",
-    "裝備模擬區!B39",
-    "裝備模擬區!B40"
+    "Weapon.GiantStone.1",
+    "Weapon.GiantStone.2",
+    "Weapon.GiantStone.3"
   ],
   "effectOutputRows": [
     "計算機!61",
@@ -28,7 +28,7 @@
       "id": "giant-stone-3",
       "name": "攻擊力+6%",
       "stats": {
-        "doubleAttackPct": 6.0
+        "doubleAttackPct": 6
       },
       "source": {
         "sheet": "係數區",
@@ -39,7 +39,7 @@
       "id": "giant-stone-4",
       "name": "攻擊力等級+7",
       "stats": {
-        "attackLevel": 7.0
+        "attackLevel": 7
       },
       "source": {
         "sheet": "係數區",
@@ -50,7 +50,7 @@
       "id": "giant-stone-5",
       "name": "攻擊力等級+8",
       "stats": {
-        "attackLevel": 8.0
+        "attackLevel": 8
       },
       "source": {
         "sheet": "係數區",

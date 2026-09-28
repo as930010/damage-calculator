@@ -22,36 +22,36 @@
   "inputs": [
     {
       "slot": "upper",
-      "attributeCell": "裝備模擬區!J4",
-      "valueCell": "裝備模擬區!J5",
+      "attributeCell": "Left.Armor.Upper.Circuit.Attribute",
+      "valueCell": "Left.Armor.Upper.Circuit.Value",
       "calculationRow": "計算機!43",
       "wearSet": "shared"
     },
     {
       "slot": "lowerwear",
-      "attributeCell": "裝備模擬區!J13",
-      "valueCell": "裝備模擬區!J14",
+      "attributeCell": "Left.Armor.Bottom.Circuit.Attribute",
+      "valueCell": "Left.Armor.Bottom.Circuit.Value",
       "calculationRow": "計算機!44",
       "wearSet": "lowerwearA"
     },
     {
       "slot": "lowerwearAlternative",
-      "attributeCell": "裝備模擬區!J22",
-      "valueCell": "裝備模擬區!J23",
+      "attributeCell": "Left.Armor.SwitchBottom.Circuit.Attribute",
+      "valueCell": "Left.Armor.SwitchBottom.Circuit.Value",
       "calculationRow": "計算機!45",
       "wearSet": "lowerwearB"
     },
     {
       "slot": "gloves",
-      "attributeCell": "裝備模擬區!J31",
-      "valueCell": "裝備模擬區!J32",
+      "attributeCell": "Left.Armor.Gloves.Circuit.Attribute",
+      "valueCell": "Left.Armor.Gloves.Circuit.Value",
       "calculationRow": "計算機!46",
       "wearSet": "shared"
     },
     {
       "slot": "shoes",
-      "attributeCell": "裝備模擬區!J40",
-      "valueCell": "裝備模擬區!J41",
+      "attributeCell": "Left.Armor.Shoes.Circuit.Attribute",
+      "valueCell": "Left.Armor.Shoes.Circuit.Value",
       "calculationRow": "計算機!47",
       "wearSet": "shared"
     }

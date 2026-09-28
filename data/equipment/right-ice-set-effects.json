@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "dataUpdatedAt": "2026-09-25",
   "selectionCells": [
-    "B27",
-    "B28",
-    "B29"
+    "Right.Ice.SetEffect.1",
+    "Right.Ice.SetEffect.2",
+    "Right.Ice.SetEffect.3"
   ],
   "maxSelectedSets": 3,
   "source": {

@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { projectDamage } from '../dist/frontend/projection.js';
+import { fieldIdForCell } from '../dist/frontend/field-ids.js';
 import { compareSheetParity } from '../dist/frontend/sheet-parity.js';
 
 const readJson = async path => JSON.parse(await readFile(new URL(`../data/${path}`, import.meta.url), 'utf8'));
@@ -37,6 +38,12 @@ test('線上試算表範例的三套右冰套效選擇可逐項重現計算機�
     readJson('examples/live-sheet-2026-09-28-expected.json'),
   ]);
   const result = projectDamage(data, sample).result;
+  const semanticSample = {
+    ...sample,
+    values: Object.fromEntries(Object.entries(sample.values).map(([cell, value]) => [fieldIdForCell(cell), value])),
+  };
+  const semanticResult = projectDamage(data, semanticSample).result;
+  assert.deepEqual(semanticResult, result, 'semantic field IDs must preserve the existing calculation result');
   const rows = compareSheetParity(result, expected);
   assert.equal(rows.length, 31);
   assert.deepEqual(rows.filter(row => !row.matches).map(row => row.cell), []);

@@ -1,6 +1,6 @@
 # Google Sheets 輸入範例
 
-`live-sheet-2026-09-28.json` 於 2026-09-28 從[目前使用的 Google Sheets](https://docs.google.com/spreadsheets/d/11_e193bPTA5ykzhXSS4uptEU_w0midIJGqmhleGeMQY/edit)匯出的 `DaB 9_23.xlsx`，擷取「裝備模擬區」已填寫的網站輸入格。檔案符合網站的 `LoadoutState` 格式，包含 216 個 `values` 欄位、職業 `DaB` 及 `F20` 對應的切換狀態。
+`live-sheet-2026-09-28.json` 於 2026-09-28 從[目前使用的 Google Sheets](https://docs.google.com/spreadsheets/d/11_e193bPTA5ykzhXSS4uptEU_w0midIJGqmhleGeMQY/edit)匯出的 `DaB 9_23.xlsx`，擷取「裝備模擬區」已填寫的網站輸入格。檔案符合網站的 `LoadoutState` 格式，包含 216 個 `values` 欄位、職業 `Job: DaB` 及 `lowerwearAlternativeEnabled` 切換狀態。
 
 數字保留試算表原生值；標籤與公式儲存格未匯入。`B27:B29` 三個右冰套效選擇已一併納入，網站只會計算使用者選取的套裝，並依其已裝備件數套用效果。
 

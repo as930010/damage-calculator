@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "dataUpdatedAt": "2026-09-25",
   "sourceSheet": "係數區",
-  "selectorCell": "裝備模擬區!B33",
+  "selectorCell": "Weapon.Growth",
   "levels": [
     {
       "id": "weapon-growth-0",

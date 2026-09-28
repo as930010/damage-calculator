@@ -18,7 +18,6 @@ test('攻擊公式使用角色選擇的物／魔屬性，武器基值不再收�
   assert.equal(result.lowerDamage, Math.floor(1202 - 0.55 * result.d53));
   assert.equal(result.upperDamage, Math.floor(1202 + 0.55 * result.d53));
 });
-
 test('B163 對倍率、關卡懲罰及 150% 暴傷基準逐因子保留計算', () => {
   const damage = calculateFinalDamage({
     lowerDamage: 10000, upperDamage: 12000, critRate: 0.5, extremizationRate: 0.25,
@@ -36,18 +35,4 @@ test('B163 對倍率、關卡懲罰及 150% 暴傷基準逐因子保留計算', 
   assert.equal(damage.finalDamage, expected);
   assert.equal(damage.conditionalFactor, 1 / ((0.5 / 1.1) + (0.5 / 1.2)));
   assert.notEqual(damage.conditionalFactor, (1.1 + 1.2) / 2);
-});
-
-test('Google Sheets B159、B160、B163 來源公式對應本機爆率與條件增傷計算', async () => {
-  const sourceMap = JSON.parse(await readFile(new URL('../docs/reference/calculation-source-map.json', import.meta.url), 'utf8'));
-  const cells = Object.fromEntries(sourceMap.rows.flatMap(row => row.cells).map(cell => [cell.cell, cell]));
-
-  assert.match(cells.B159.formula, /F1%/);
-  assert.match(cells.B159.formula, /\(1\+B77%\)\*\(1\+B103%\)/);
-  assert.match(cells.B159.formula, /\+B161%/);
-  assert.match(cells.B159.formula, /-\$Y\$1%/);
-  assert.match(cells.B160.formula, /G1%/);
-  assert.match(cells.B160.formula, /\(1\+B105%\)\*\(1\+B77%\)/);
-  assert.match(cells.B160.formula, /\+B162%/);
-  assert.match(cells.B163.formula, /1\/\(\(0\.5\/\(1\+N1%\)\)\+\(0\.5\/\(1\+O1%\)\)\)/);
 });

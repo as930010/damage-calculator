@@ -1,3 +1,5 @@
+import { cellForFieldId, fieldIdForCell } from "./field-ids.ts";
+
 export interface SheetInputReference {
   simulatorCells: string;
   catalogId: string;
@@ -32,6 +34,9 @@ export function findValidationCatalog<
   TInput extends SheetInputReference,
   TCatalog extends SheetChoiceCatalog,
 >(inputs: readonly TInput[], catalogs: readonly TCatalog[], cell: string): TCatalog | undefined {
-  const input = inputs.find(entry => entry.simulatorCells.split(/\s+/).some(range => rangeContainsCell(range, cell)));
+  const fieldId = fieldIdForCell(cell) ?? cell;
+  const address = cellForFieldId(fieldId) ?? cell;
+  const input = inputs.find(entry => entry.simulatorCells.split(/\s+/).some(reference =>
+    reference === fieldId || reference === cell || rangeContainsCell(reference, address)));
   return input ? catalogs.find(catalog => catalog.id === input.catalogId) : undefined;
 }

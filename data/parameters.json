@@ -51,15 +51,19 @@
       "sourceId": "sheet:計算機!E93",
       "stateKey": "petSkillAttackEnabled",
       "defaultEnabled": true,
-      "stats": { "doubleAttackPct": 2 }
+      "stats": {
+        "doubleAttackPct": 2
+      }
     }
   ],
   "conditionalEffects": [
     {
       "sourceId": "sheet:計算機!T102",
-      "selectorCell": "裝備模擬區!M3",
+      "selectorCell": "Accessory.FaceTop",
       "selectorValue": "MAESTRO光環",
-      "stats": { "multiplicativeCritDamagePct": 2 }
+      "stats": {
+        "multiplicativeCritDamagePct": 2
+      }
     }
   ],
   "critDamageProductBasePct": 50,

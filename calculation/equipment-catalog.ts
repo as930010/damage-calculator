@@ -59,7 +59,7 @@ export interface SimulatorEquipmentMappingDocument {
 export interface SimulatorEquipmentSelectionInput {
   /** Selected visible item names, keyed by the original simulator cell. */
   selectedItems: Readonly<Record<string, string | null | undefined>>;
-  /** Checkbox and toggle values such as 裝備模擬區!F20. */
+  /** Named boolean switches such as Lowerwear.Alternative.Enabled. */
   enabledValues?: Readonly<Record<string, boolean | undefined>>;
 }
 

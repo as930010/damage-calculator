@@ -62,9 +62,9 @@
     {
       "id": "upper",
       "inputCells": [
-        "裝備模擬區!H8",
-        "裝備模擬區!H9",
-        "裝備模擬區!H10"
+        "Left.Armor.Upper.Appraisal.1",
+        "Left.Armor.Upper.Appraisal.2",
+        "Left.Armor.Upper.Appraisal.3"
       ],
       "calculationRow": "計算機!38",
       "wearSet": "shared"
@@ -72,9 +72,9 @@
     {
       "id": "lowerwear",
       "inputCells": [
-        "裝備模擬區!H17",
-        "裝備模擬區!H18",
-        "裝備模擬區!H19"
+        "Left.Armor.Bottom.Appraisal.1",
+        "Left.Armor.Bottom.Appraisal.2",
+        "Left.Armor.Bottom.Appraisal.3"
       ],
       "calculationRow": "計算機!39",
       "wearSet": "lowerwearA"
@@ -82,20 +82,20 @@
     {
       "id": "lowerwearAlternative",
       "inputCells": [
-        "裝備模擬區!H26",
-        "裝備模擬區!H27",
-        "裝備模擬區!H28"
+        "Left.Armor.SwitchBottom.Appraisal.1",
+        "Left.Armor.SwitchBottom.Appraisal.2",
+        "Left.Armor.SwitchBottom.Appraisal.3"
       ],
       "calculationRow": "計算機!40",
       "wearSet": "lowerwearB",
-      "enabledBy": "裝備模擬區!F20"
+      "enabledBy": "Lowerwear.Alternative.Enabled"
     },
     {
       "id": "gloves",
       "inputCells": [
-        "裝備模擬區!H35",
-        "裝備模擬區!H36",
-        "裝備模擬區!H37"
+        "Left.Armor.Gloves.Appraisal.1",
+        "Left.Armor.Gloves.Appraisal.2",
+        "Left.Armor.Gloves.Appraisal.3"
       ],
       "calculationRow": "計算機!41",
       "wearSet": "shared"
@@ -103,9 +103,9 @@
     {
       "id": "shoes",
       "inputCells": [
-        "裝備模擬區!H44",
-        "裝備模擬區!H45",
-        "裝備模擬區!H46"
+        "Left.Armor.Shoes.Appraisal.1",
+        "Left.Armor.Shoes.Appraisal.2",
+        "Left.Armor.Shoes.Appraisal.3"
       ],
       "calculationRow": "計算機!42",
       "wearSet": "shared"

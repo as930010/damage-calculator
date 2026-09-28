@@ -46,9 +46,9 @@
       "x": 7,
       "y": 15,
       "icon": "連身時裝",
-      "selectionCell": "B7",
+      "selectionCell": "Costume.OnePiece",
       "stoneCells": [
-        "C8"
+        "Costume.MagicStone"
       ]
     },
     {
@@ -58,9 +58,9 @@
       "x": 7,
       "y": 30,
       "icon": "頭髮",
-      "selectionCell": "B10",
+      "selectionCell": "Left.Ice.Set",
       "stoneCells": [
-        "C11"
+        "Left.Ice.Hair.MagicStone"
       ],
       "sharedSelection": true
     },
@@ -71,9 +71,9 @@
       "x": 7,
       "y": 42,
       "icon": "上衣",
-      "selectionCell": "B10",
+      "selectionCell": "Left.Ice.Set",
       "stoneCells": [
-        "C12"
+        "Left.Ice.Upper.MagicStone"
       ],
       "sharedSelection": true
     },
@@ -84,9 +84,9 @@
       "x": 7,
       "y": 54,
       "icon": "下衣",
-      "selectionCell": "B10",
+      "selectionCell": "Left.Ice.Set",
       "stoneCells": [
-        "C13"
+        "Left.Ice.Bottom.MagicStone"
       ],
       "sharedSelection": true
     },
@@ -97,9 +97,9 @@
       "x": 7,
       "y": 66,
       "icon": "手套",
-      "selectionCell": "B10",
+      "selectionCell": "Left.Ice.Set",
       "stoneCells": [
-        "C14"
+        "Left.Ice.Gloves.MagicStone"
       ],
       "sharedSelection": true
     },
@@ -110,9 +110,9 @@
       "x": 7,
       "y": 78,
       "icon": "鞋子",
-      "selectionCell": "B10",
+      "selectionCell": "Left.Ice.Set",
       "stoneCells": [
-        "C15"
+        "Left.Ice.Shoes.MagicStone"
       ],
       "sharedSelection": true
     },
@@ -125,10 +125,10 @@
       "icon": "上衣",
       "innerwearId": "upper",
       "stoneCells": [
-        "H4",
-        "H5",
-        "H6",
-        "H7"
+        "Left.Armor.Upper.MagicStone.1",
+        "Left.Armor.Upper.MagicStone.2",
+        "Left.Armor.Upper.MagicStone.3",
+        "Left.Armor.Upper.MagicStone.4"
       ]
     },
     {
@@ -140,10 +140,10 @@
       "icon": "下衣",
       "innerwearId": "lowerwear",
       "stoneCells": [
-        "H13",
-        "H14",
-        "H15",
-        "H16"
+        "Left.Armor.Bottom.MagicStone.1",
+        "Left.Armor.Bottom.MagicStone.2",
+        "Left.Armor.Bottom.MagicStone.3",
+        "Left.Armor.Bottom.MagicStone.4"
       ]
     },
     {
@@ -155,10 +155,10 @@
       "icon": "手套",
       "innerwearId": "gloves",
       "stoneCells": [
-        "H31",
-        "H32",
-        "H33",
-        "H34"
+        "Left.Armor.Gloves.MagicStone.1",
+        "Left.Armor.Gloves.MagicStone.2",
+        "Left.Armor.Gloves.MagicStone.3",
+        "Left.Armor.Gloves.MagicStone.4"
       ]
     },
     {
@@ -170,10 +170,10 @@
       "icon": "鞋子",
       "innerwearId": "shoes",
       "stoneCells": [
-        "H40",
-        "H41",
-        "H42",
-        "H43"
+        "Left.Armor.Shoes.MagicStone.1",
+        "Left.Armor.Shoes.MagicStone.2",
+        "Left.Armor.Shoes.MagicStone.3",
+        "Left.Armor.Shoes.MagicStone.4"
       ]
     },
     {
@@ -185,12 +185,12 @@
       "icon": "強/排褲",
       "innerwearId": "lowerwearAlternative",
       "stoneCells": [
-        "H22",
-        "H23",
-        "H24",
-        "H25"
+        "Left.Armor.SwitchBottom.MagicStone.1",
+        "Left.Armor.SwitchBottom.MagicStone.2",
+        "Left.Armor.SwitchBottom.MagicStone.3",
+        "Left.Armor.SwitchBottom.MagicStone.4"
       ],
-      "enabledBy": "F20"
+      "enabledBy": "Lowerwear.Alternative.Enabled"
     },
     {
       "id": "ice-weapon",
@@ -199,10 +199,10 @@
       "x": 84,
       "y": 15,
       "icon": "冰武",
-      "selectionCell": "B17",
+      "selectionCell": "Ice.Weapon.Set",
       "stoneCells": [
-        "D17",
-        "D18"
+        "Ice.Weapon.MagicStone.1",
+        "Ice.Weapon.MagicStone.2"
       ]
     },
     {
@@ -213,12 +213,12 @@
       "y": 15,
       "icon": "武器",
       "stoneCells": [
-        "D32",
-        "D33",
-        "D34",
-        "D35",
-        "D36",
-        "D37"
+        "Weapon.MagicStone.1",
+        "Weapon.MagicStone.2",
+        "Weapon.MagicStone.3",
+        "Weapon.MagicStone.4",
+        "Weapon.MagicStone.5",
+        "Weapon.MagicStone.6"
       ],
       "weapon": true
     },
@@ -229,7 +229,7 @@
       "x": 64,
       "y": 35,
       "icon": "武飾",
-      "selectionCell": "B20"
+      "selectionCell": "Right.Ice.WeaponAccessory"
     },
     {
       "id": "ice-B21",
@@ -238,7 +238,7 @@
       "x": 64,
       "y": 46,
       "icon": "臉上",
-      "selectionCell": "B21"
+      "selectionCell": "Right.Ice.FaceTop"
     },
     {
       "id": "ice-B22",
@@ -247,7 +247,7 @@
       "x": 64,
       "y": 57,
       "icon": "臉中",
-      "selectionCell": "B22"
+      "selectionCell": "Right.Ice.FaceMiddle"
     },
     {
       "id": "ice-B23",
@@ -256,7 +256,7 @@
       "x": 64,
       "y": 68,
       "icon": "臉下",
-      "selectionCell": "B23"
+      "selectionCell": "Right.Ice.FaceBottom"
     },
     {
       "id": "ice-B24",
@@ -265,7 +265,7 @@
       "x": 64,
       "y": 79,
       "icon": "耳環",
-      "selectionCell": "B24"
+      "selectionCell": "Right.Ice.Earring"
     },
     {
       "id": "ice-D20",
@@ -274,7 +274,7 @@
       "x": 73,
       "y": 35,
       "icon": "支援",
-      "selectionCell": "D20"
+      "selectionCell": "Right.Ice.Support"
     },
     {
       "id": "ice-D21",
@@ -283,7 +283,7 @@
       "x": 73,
       "y": 46,
       "icon": "上衣",
-      "selectionCell": "D21"
+      "selectionCell": "Right.Ice.Top"
     },
     {
       "id": "ice-D22",
@@ -292,7 +292,7 @@
       "x": 73,
       "y": 57,
       "icon": "下衣",
-      "selectionCell": "D22"
+      "selectionCell": "Right.Ice.Bottom"
     },
     {
       "id": "ice-D23",
@@ -301,7 +301,7 @@
       "x": 73,
       "y": 68,
       "icon": "手臂",
-      "selectionCell": "D23"
+      "selectionCell": "Right.Ice.Arm"
     },
     {
       "id": "ice-D24",
@@ -310,7 +310,7 @@
       "x": 73,
       "y": 79,
       "icon": "項鍊",
-      "selectionCell": "D24"
+      "selectionCell": "Right.Ice.Necklace"
     },
     {
       "id": "ice-D25",
@@ -319,7 +319,7 @@
       "x": 73,
       "y": 90,
       "icon": "戒指",
-      "selectionCell": "D25"
+      "selectionCell": "Right.Ice.Ring"
     },
     {
       "id": "accessory-M2",
@@ -328,7 +328,7 @@
       "x": 84,
       "y": 35,
       "icon": "武飾",
-      "selectionCell": "M2"
+      "selectionCell": "Accessory.WeaponAccessory"
     },
     {
       "id": "accessory-M3",
@@ -337,7 +337,7 @@
       "x": 84,
       "y": 46,
       "icon": "臉上",
-      "selectionCell": "M3"
+      "selectionCell": "Accessory.FaceTop"
     },
     {
       "id": "accessory-M4",
@@ -346,7 +346,7 @@
       "x": 84,
       "y": 57,
       "icon": "臉中",
-      "selectionCell": "M4"
+      "selectionCell": "Accessory.FaceMiddle"
     },
     {
       "id": "accessory-M5",
@@ -355,7 +355,7 @@
       "x": 84,
       "y": 68,
       "icon": "臉下",
-      "selectionCell": "M5"
+      "selectionCell": "Accessory.FaceBottom"
     },
     {
       "id": "accessory-M6",
@@ -364,7 +364,7 @@
       "x": 84,
       "y": 79,
       "icon": "耳環",
-      "selectionCell": "M6"
+      "selectionCell": "Accessory.Earring"
     },
     {
       "id": "accessory-M7",
@@ -373,7 +373,7 @@
       "x": 84,
       "y": 90,
       "icon": "戒指A",
-      "selectionCell": "M7"
+      "selectionCell": "Accessory.Ring1"
     },
     {
       "id": "accessory-O2",
@@ -382,7 +382,7 @@
       "x": 93,
       "y": 35,
       "icon": "支援",
-      "selectionCell": "O2"
+      "selectionCell": "Accessory.Support"
     },
     {
       "id": "accessory-O3",
@@ -391,7 +391,7 @@
       "x": 93,
       "y": 46,
       "icon": "上衣",
-      "selectionCell": "O3"
+      "selectionCell": "Accessory.Top"
     },
     {
       "id": "accessory-O4",
@@ -400,7 +400,7 @@
       "x": 93,
       "y": 57,
       "icon": "下衣",
-      "selectionCell": "O4"
+      "selectionCell": "Accessory.Bottom"
     },
     {
       "id": "accessory-O5",
@@ -409,7 +409,7 @@
       "x": 93,
       "y": 68,
       "icon": "手臂",
-      "selectionCell": "O5"
+      "selectionCell": "Accessory.Arm"
     },
     {
       "id": "accessory-O6",
@@ -418,7 +418,7 @@
       "x": 93,
       "y": 79,
       "icon": "項鍊",
-      "selectionCell": "O6"
+      "selectionCell": "Accessory.Necklace"
     },
     {
       "id": "accessory-O7",
@@ -427,7 +427,7 @@
       "x": 93,
       "y": 90,
       "icon": "戒指B",
-      "selectionCell": "O7"
+      "selectionCell": "Accessory.Ring2"
     }
   ]
 }

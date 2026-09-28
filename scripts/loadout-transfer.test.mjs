@@ -5,6 +5,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { getEquipmentOptionName } from "../dist/calculation/equipment-catalog.js";
 import { parseLoadoutJson, serializeLoadout } from "../dist/frontend/loadout-transfer.js";
+import { codeForFieldId, fieldIdForCell, isFieldId } from "../dist/frontend/field-ids.js";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = async (path) => JSON.parse(await readFile(join(root, path), "utf8"));
@@ -21,24 +22,36 @@ const [classes, mapping, simulatorInputs, manifest, masterBeast, layout, attack,
 const catalogFiles = [...new Set([...mapping.selections.map((item) => item.catalogFile), mapping.magicStoneSelections.catalogFile])];
 const catalogs = Object.fromEntries(await Promise.all(catalogFiles.map(async (file) => [file, await read(`data/${file}`)])));
 const data = { classes, mapping, simulatorInputs, manifest, masterBeast, catalogs, layout, attack, innerwear, appraisals, chips, chipSlots, circuits, transformations, growth, weaponAppraisals, weaponGrades, giantStones, colorSetEffects, spiritRecord, otherEffects, pets, rightIceSets };
+const semanticState = (value) => ({
+  ...value,
+  schemaVersion: 3,
+  values: Object.fromEntries(Object.entries(value.values).flatMap(([cell, item]) => {
+    const fieldId = fieldIdForCell(cell);
+    const key = fieldId ?? (isFieldId(cell) ? cell : undefined);
+    return key ? [[key, item]] : [];
+  })),
+});
 const firstMapping = mapping.selections.find((entry) => catalogs[entry.catalogFile].items.some((item) => item.active && item.slotId === entry.slotId));
+const firstMappingFieldId = fieldIdForCell(firstMapping.selectionCell) ?? firstMapping.selectionCell;
 const firstItem = catalogs[firstMapping.catalogFile].items.find((item) => item.active && item.slotId === firstMapping.slotId);
 const equipmentName = getEquipmentOptionName(firstItem, firstMapping.application);
 const mappedCells = new Set([
-  ...mapping.selections.map((entry) => entry.selectionCell),
-  ...mapping.magicStoneSelections.inputGroups.map((entry) => entry.selectionCell),
+  ...mapping.selections.map((entry) => fieldIdForCell(entry.selectionCell) ?? entry.selectionCell),
+  ...mapping.magicStoneSelections.inputGroups.map((entry) => fieldIdForCell(entry.selectionCell) ?? entry.selectionCell),
 ]);
 const firstInput = simulatorInputs.inputs.find((input) => {
   const cell = input.simulatorCells.trim();
-  return /^[A-Z]+[0-9]+$/.test(cell) && !mappedCells.has(cell)
+  const fieldId = fieldIdForCell(cell) ?? (isFieldId(cell) ? cell : undefined);
+  return fieldId && !mappedCells.has(fieldId)
     && simulatorInputs.catalogs.find((catalog) => catalog.id === input.catalogId)?.options.some((option) => String(option.value).trim() !== "");
 });
 const inputCell = firstInput.simulatorCells.trim();
+const inputFieldId = fieldIdForCell(inputCell) ?? (isFieldId(inputCell) ? inputCell : undefined);
 const firstOption = simulatorInputs.catalogs.find((catalog) => catalog.id === firstInput.catalogId).options.find((option) => String(option.value).trim() !== "");
 const state = {
-  schemaVersion: 2,
-  classId: classes.classes.find((entry) => entry.active).id,
-  values: { [firstMapping.selectionCell]: equipmentName, [inputCell]: String(firstOption.value), Z999: 123.45 },
+  schemaVersion: 3,
+  Job: classes.classes.find((entry) => entry.active).id,
+  values: { [firstMappingFieldId]: equipmentName, [inputFieldId]: String(firstOption.value), Z999: 123.45 },
   lowerwearAlternativeEnabled: true,
   masterBeastSpiritStoneColor: "綠",
   petSkillAttackEnabled: false,
@@ -47,12 +60,13 @@ const state = {
 test("numeric-code JSON export imports back to the same loadout", () => {
   const exported = serializeLoadout(state, data);
   const envelope = JSON.parse(exported.json);
-  assert.equal(envelope.formatVersion, 2);
-  assert.equal(typeof envelope.values[firstMapping.selectionCell], "number");
-  assert.equal(envelope.values[inputCell], String(firstOption.value));
-  assert.equal(envelope.values.Z999, 123.45);
-  assert.deepEqual(parseLoadoutJson(exported.json, state, data).state, state);
-  assert.deepEqual(exported.omittedFields, []);
+  assert.equal(envelope.formatVersion, 3);
+  assert.equal(envelope.Job, state.Job);
+  assert.equal(typeof envelope.values[String(codeForFieldId(firstMappingFieldId))], "number");
+  assert.equal(envelope.values[String(codeForFieldId(inputFieldId))], String(firstOption.value));
+  assert.equal(envelope.values.Z999, undefined);
+  assert.deepEqual(parseLoadoutJson(exported.json, state, data).state, semanticState(state));
+  assert.deepEqual(exported.omittedFields, ["Z999"]);
 });
 
 test("the complete saved example round-trips and stays smaller than the previous name-based export", async () => {
@@ -64,7 +78,7 @@ test("the complete saved example round-trips and stays smaller than the previous
     exportedAt: "2026-09-28T00:00:00.000Z", loadout: full,
   }, null, 2);
   assert.deepEqual(exported.omittedFields, []);
-  assert.deepEqual(parseLoadoutJson(exported.json, full, data).state, full);
+  assert.deepEqual(parseLoadoutJson(exported.json, full, data).state, semanticState(full));
   assert.ok(exported.json.length < previousFormat.length, `compact transfer is ${exported.json.length} bytes; previous format was ${previousFormat.length}`);
 });
 
@@ -73,10 +87,11 @@ test("a removed equipment option clears only its cell and keeps the rest", () =>
   const changedData = structuredClone(data);
   changedData.catalogs[firstMapping.catalogFile].items = changedData.catalogs[firstMapping.catalogFile].items.filter((item) => item.id !== firstItem.id);
   const result = parseLoadoutJson(JSON.stringify(exported), state, changedData);
-  assert.equal(result.state.values[firstMapping.selectionCell], undefined);
-  assert.equal(result.state.values[inputCell], String(firstOption.value));
-  assert.equal(result.state.values.Z999, 123.45);
-  assert.ok(result.clearedFields.includes(firstMapping.selectionCell));
+  const selectionFieldId = firstMappingFieldId;
+  assert.equal(result.state.values[selectionFieldId], undefined);
+  assert.equal(result.state.values[inputFieldId], String(firstOption.value));
+  assert.equal(result.state.values.Z999, undefined);
+  assert.ok(result.clearedFields.includes(selectionFieldId));
 });
 
 test("a changed item label keeps the selected item by stable numeric ID", () => {
@@ -85,19 +100,20 @@ test("a changed item label keeps the selected item by stable numeric ID", () => 
   const item = changedData.catalogs[firstMapping.catalogFile].items.find((entry) => entry.id === firstItem.id);
   item.name = "更新後的測試名稱";
   const result = parseLoadoutJson(exported, state, changedData);
-  assert.equal(result.state.values[firstMapping.selectionCell], getEquipmentOptionName(item, firstMapping.application));
-  assert.ok(!result.clearedFields.includes(firstMapping.selectionCell));
+  const selectionFieldId = firstMappingFieldId;
+  assert.equal(result.state.values[selectionFieldId], getEquipmentOptionName(item, firstMapping.application));
+  assert.ok(!result.clearedFields.includes(selectionFieldId));
 });
 
 test("corrupted option codes and invalid cells are cleared without losing valid selections", () => {
   const exported = JSON.parse(serializeLoadout(state, data).json);
-  exported.values[inputCell] = "deleted-option";
+  exported.values[String(codeForFieldId(inputFieldId))] = "deleted-option";
   exported.values.BAD = {};
   const result = parseLoadoutJson(JSON.stringify(exported), state, data);
-  assert.equal(result.state.values[inputCell], undefined);
+  assert.equal(result.state.values[inputFieldId], undefined);
   assert.equal(result.state.values.BAD, undefined);
-  assert.equal(result.state.values[firstMapping.selectionCell], equipmentName);
-  assert.ok(result.clearedFields.includes(inputCell));
+  assert.equal(result.state.values[firstMappingFieldId], equipmentName);
+  assert.ok(result.clearedFields.includes(inputFieldId));
   assert.ok(result.clearedFields.includes("BAD"));
 });
 
@@ -108,23 +124,32 @@ test("deleted custom dropdown options clear only the affected field", () => {
   const changedData = structuredClone(data);
   changedData.otherEffects.titles = changedData.otherEffects.titles.filter((option) => option.name !== customName);
   const result = parseLoadoutJson(JSON.stringify(exported), customState, changedData);
-  assert.equal(result.state.values.B2, undefined);
-  assert.equal(result.state.values.B4, customState.values.B4);
-  assert.equal(result.state.values[firstMapping.selectionCell], equipmentName);
-  assert.ok(result.clearedFields.includes("B2"));
+  assert.equal(result.state.values[fieldIdForCell("B2")], undefined);
+  assert.equal(result.state.values[fieldIdForCell("B4")], customState.values.B4);
+  assert.equal(result.state.values[firstMappingFieldId], equipmentName);
+  assert.ok(result.clearedFields.includes(fieldIdForCell("B2")));
 });
 
-test("legacy name-based files remain importable and unknown names become blank", () => {
-  const legacy = {
+test("previous name-based format is rejected because this site has not been released", () => {
+  const previousFormat = {
     format: "damage-calculator-loadout",
     formatVersion: 1,
     loadout: { ...state, values: { ...state.values, [firstMapping.selectionCell]: "已刪除裝備" } },
   };
-  const result = parseLoadoutJson(JSON.stringify(legacy), state, data);
-  assert.equal(result.legacyFormat, true);
-  assert.equal(result.state.values[firstMapping.selectionCell], undefined);
-  assert.equal(result.state.values[inputCell], String(firstOption.value));
-  assert.ok(result.clearedFields.includes(firstMapping.selectionCell));
+  assert.throws(() => parseLoadoutJson(JSON.stringify(previousFormat), state, data), /不支援/);
+});
+
+test("coordinate-keyed version-2 JSON is rejected and unknown numeric field codes stay empty", () => {
+  const oldPayload = {
+    format: "damage-calculator-loadout", formatVersion: 2,
+    Job: state.Job, values: { [firstMapping.selectionCell]: equipmentName },
+  };
+  assert.throws(() => parseLoadoutJson(JSON.stringify(oldPayload), state, data), /不支援/);
+
+  const exported = JSON.parse(serializeLoadout(state, data).json);
+  exported.values["999999"] = "stale-field";
+  const result = parseLoadoutJson(JSON.stringify(exported), state, data);
+  assert.ok(result.clearedFields.includes("999999"));
 });
 
 test("malformed JSON and unsupported format versions are rejected", () => {

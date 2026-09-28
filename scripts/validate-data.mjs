@@ -35,7 +35,6 @@ const requiredFields = {
   "data/atma-effects.json": ["schemaVersion", "activeWhenPieceCountEquals", "rules"],
   "data/attack-parameters.json": ["schemaVersion", "classes", "weaponEnhancementFactors"],
   "data/attributes.json": ["schemaVersion", "attributes"],
-  "data/calculation-lookups.json": ["schemaVersion", "tables"],
   "data/chip-slots.json": ["schemaVersion", "slots"],
   "data/circuit-board-rules.json": ["schemaVersion", "statKeyBySheetName", "inputs"],
   "data/class-combat-effects.json": ["schemaVersion", "methods", "classes"],
@@ -69,7 +68,7 @@ const requiredFields = {
   "data/weapon-grade-options.json": ["schemaVersion", "selectorCell", "options"],
   "data/weapon-growth.json": ["schemaVersion", "selectorCell", "levels"],
   "data/weapon-transformations.json": ["schemaVersion", "rules", "slots"],
-  "data/examples/live-sheet-2026-09-28.json": ["schemaVersion", "classId", "values", "lowerwearAlternativeEnabled"],
+  "data/examples/live-sheet-2026-09-28.json": ["schemaVersion", "Job", "values", "lowerwearAlternativeEnabled"],
   "data/examples/live-sheet-2026-09-28-expected.json": ["sourceSheet", "cells", "b163RecomputedFromFormula"],
 };
 

@@ -29,7 +29,7 @@
       "sourceCell": "計算機!B103",
       "valueSource": {
         "kind": "enhancementText",
-        "inputCell": "H12",
+        "inputCell": "Left.Armor.Bottom.ENHC",
         "bonusPct": 2
       }
     },
@@ -42,7 +42,7 @@
       "sourceCell": "計算機!B105",
       "valueSource": {
         "kind": "enhancementText",
-        "inputCell": "H39",
+        "inputCell": "Left.Armor.Shoes.ENHC",
         "bonusPct": 2
       }
     }
