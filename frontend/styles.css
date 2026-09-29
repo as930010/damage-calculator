@@ -74,3 +74,39 @@
 .left-label{top:22%}
 .inner-label{left:18%}
 .beast-label{left:53%}
+
+/* UX polish preview: strengthen hierarchy and make dense controls easier to scan. */
+:root{--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:24px}
+body{font-size:15px;line-height:1.55}
+.topbar{height:auto;min-height:68px;padding-block:10px}
+.developer-info{font-size:12px;line-height:1.45;gap:3px}
+.brand small{font-size:11px}
+.top-meta{font-size:12px}
+.panel-heading{padding:18px 22px}
+.panel-heading>span,.beast-accessories-heading span{font-size:12px}
+.panel-note{font-size:13px;line-height:1.6;padding:15px 22px}
+.inspector .panel-note{font-size:12px}
+.group-label{font-size:12px;letter-spacing:.04em}
+.gear-slot span,.beast-accessory-slot span{font-size:11px}
+.field{font-size:13px;line-height:1.45}
+.field input{min-height:44px;font-size:14px;padding:11px 13px}
+.picker-list button{font-size:14px}
+.picker-list small{font-size:12px}
+.global-input-group h3{font-size:13px}
+.stat summary{font-size:13px}
+.stat p{font-size:12px;line-height:1.55}
+.damage-summary span{font-size:13px}
+.damage-summary .final-damage strong{display:flex;align-items:baseline;white-space:nowrap}
+.damage-summary .damage-integer{font-size:24px}
+.damage-summary .damage-decimal{font-size:16px}
+.footer,footer{font-size:12px;line-height:1.6}
+@media(max-width:600px){
+  .topbar{align-items:flex-start}
+  .developer-info{font-size:11px;line-height:1.4}
+  .panel-heading{padding:16px 17px}
+  .panel-note{font-size:12px;padding:13px 17px}
+  .inspector .panel-note{font-size:12px}
+  .gear-slot span,.beast-accessory-slot span{font-size:11px}
+  .field{font-size:12px}
+  .field input{font-size:13px}
+}
