@@ -68,3 +68,36 @@ test('線上試算表範例的三套右冰套效選擇可逐項重現計算機�
   assert.equal(custom.doubleAttackPct.finalTotal, result.attributes.stats.doubleAttackPct.finalTotal - 1.5);
   assert.equal(custom.critDamagePct.finalTotal, result.attributes.stats.critDamagePct.finalTotal + 1.7);
 });
+
+test('被侵蝕的荊棘角把310秒Buff週期平均放入乘算效果，並單獨記錄適應力與動作速度', async () => {
+  const [data, sourceState] = await Promise.all([
+    loadData(),
+    readJson('examples/live-sheet-2026-09-28.json'),
+  ]);
+  const base = projectDamage(data, sourceState).result;
+  const baseProjection = projectAttributes(data, sourceState);
+  const previousFaceTop = baseProjection.calculationSources.shared.find(source => source.sourceId === 'simulator:Accessory.FaceTop');
+  const previousMultiplicativePct = previousFaceTop?.stats.multiplicativeDamagePct ?? 0;
+  const equippedState = structuredClone(sourceState);
+  equippedState.values['Accessory.FaceTop'] = '被侵蝕的荊棘角';
+
+  const formulaPct = (0.04 * (5 / 310) + 0.08 * (5 / 310) + ((1 + 0.12) * (1 + 0.03) - 1) * (300 / 310)) * 100;
+  const equippedProjection = projectAttributes(data, equippedState);
+  const contribution = equippedProjection.calculationSources.shared.find(source => source.sourceId === 'simulator:Accessory.FaceTop');
+  assert.ok(contribution);
+  assert.equal(contribution.stats.adaptabilityPct, 3);
+  assert.equal(contribution.stats.actionSpeedPct, 3);
+  assert.equal(contribution.stats.multiplicativeDamagePct, 15.0580645161291);
+
+  const equipped = projectDamage(data, equippedState).result;
+  assert.equal(equipped.attributes.stats.actionSpeedPct.finalTotal, 3);
+  assert.equal(equipped.attributes.stats.allSkillDamagePct.finalTotal, base.attributes.stats.allSkillDamagePct.finalTotal);
+  assert.equal(equipped.attributes.stats.doubleAttackPct.finalTotal, base.attributes.stats.doubleAttackPct.finalTotal);
+  const expectedProduct = base.generalMultiplicativeDamage.value / (1 + previousMultiplicativePct / 100) * (1 + formulaPct / 100);
+  assert.ok(Math.abs(equipped.generalMultiplicativeDamage.value - expectedProduct) < 1e-12);
+
+  const item = data.catalogs['equipment/accessories.json'].items.find(entry => entry.name === '被侵蝕的荊棘角');
+  assert.equal(item.appraisal.canAppraise, false);
+  assert.match(item.description, /使用特殊主動技能時/);
+  assert.match(item.developerNote, /15\.0580645161291%/);
+});

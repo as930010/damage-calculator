@@ -132,6 +132,14 @@
       "active": true
     },
     {
+      "key": "actionSpeedPct",
+      "name": "動作速度%",
+      "unit": "percent",
+      "calculationScope": "characterTotal",
+      "aggregation": "sum",
+      "active": true
+    },
+    {
       "key": "defenseIgnorePct",
       "name": "無視防禦%",
       "unit": "percent",

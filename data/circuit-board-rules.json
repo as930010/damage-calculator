@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "dataUpdatedAt": "2026-09-25",
+  "dataUpdatedAt": "2026-09-29",
   "statKeyBySheetName": {
     "物攻": "physicalAttack",
     "魔攻": "magicalAttack",
@@ -25,40 +25,75 @@
       "attributeCell": "Left.Armor.Upper.Circuit.Attribute",
       "valueCell": "Left.Armor.Upper.Circuit.Value",
       "calculationRow": "計算機!43",
-      "wearSet": "shared"
+      "wearSet": "shared",
+      "optionSource": "係數區!L2:L5",
+      "attributeOptions": [
+        "流血%",
+        "Boss傷害%",
+        "重置機率%",
+        "無關傷害"
+      ]
     },
     {
       "slot": "lowerwear",
       "attributeCell": "Left.Armor.Bottom.Circuit.Attribute",
       "valueCell": "Left.Armor.Bottom.Circuit.Value",
       "calculationRow": "計算機!44",
-      "wearSet": "lowerwearA"
+      "wearSet": "lowerwearA",
+      "optionSource": "係數區!M2:M6",
+      "attributeOptions": [
+        "強者%",
+        "排熱%",
+        "兩極化%",
+        "Boss傷害%",
+        "無關傷害"
+      ]
     },
     {
       "slot": "lowerwearAlternative",
       "attributeCell": "Left.Armor.SwitchBottom.Circuit.Attribute",
       "valueCell": "Left.Armor.SwitchBottom.Circuit.Value",
       "calculationRow": "計算機!45",
-      "wearSet": "lowerwearB"
+      "wearSet": "lowerwearB",
+      "optionSource": "係數區!M2:M6",
+      "attributeOptions": [
+        "強者%",
+        "排熱%",
+        "兩極化%",
+        "Boss傷害%",
+        "無關傷害"
+      ]
     },
     {
       "slot": "gloves",
       "attributeCell": "Left.Armor.Gloves.Circuit.Attribute",
       "valueCell": "Left.Armor.Gloves.Circuit.Value",
       "calculationRow": "計算機!46",
-      "wearSet": "shared"
+      "wearSet": "shared",
+      "optionSource": "係數區!N2:N4",
+      "attributeOptions": [
+        "超越技傷%",
+        "Boss傷害%",
+        "無關傷害"
+      ]
     },
     {
       "slot": "shoes",
       "attributeCell": "Left.Armor.Shoes.Circuit.Attribute",
       "valueCell": "Left.Armor.Shoes.Circuit.Value",
       "calculationRow": "計算機!47",
-      "wearSet": "shared"
+      "wearSet": "shared",
+      "optionSource": "係數區!O2:O3",
+      "attributeOptions": [
+        "Boss傷害%",
+        "無關傷害"
+      ]
     }
   ],
   "formulaRule": "各欄依輸入項目是否等於計算機第 2 列欄名，符合時將電路%數乘 100 寫入該屬性；其他欄空白。",
   "notes": [
+    "電路板屬性選項逐欄對應 DaB 9/23 試算表「係數區」L:O：上衣 L、下衣 M、手套 N、鞋子 O；強/排褲與下衣共用 M 欄選項。",
     "下衣與強/排褲的電路數值各屬一套下衣配置，交由裝備彙總分別放入 lowerwearA/lowerwearB，不可同時當作穿戴值。",
-    "無關傷害不對應計算機 C:R 標題，因此不產生屬性輸出。"
+    "效果只會套用至計算機第 2 列存在的屬性欄；「無關傷害」及沒有對應輸出欄的項目不產生屬性輸出。"
   ]
 }

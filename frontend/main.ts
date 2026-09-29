@@ -1,4 +1,5 @@
 import { getEquipmentOptionName } from '../calculation/equipment-catalog.ts';
+import { type AccessoryEffectOption } from '../calculation/equipment-effects.ts';
 import { loadGameData, readJson, escapeHtml as h, formatNumber as fmt } from './data.ts';
 import { readState, readBaseline, saveState, type LoadoutState } from './state.ts';
 import { parseLoadoutJson, serializeLoadout } from './loadout-transfer.ts';
@@ -20,6 +21,29 @@ async function start() {
   const state: LoadoutState = sampleMode
     ? await readJson<LoadoutState>(`examples/${sampleId}.json`)
     : readState(data.classes.classes.find(entry => entry.active)?.id ?? 'DaB');
+  const clearInvalidAccessoryAppraisals = (target: LoadoutState) => {
+    const clearedCells: string[] = [];
+    for (const group of data.accessoryEffects.groups) {
+      const mapping = data.mapping.selections.find(entry => entry.selectionCell === group.selectionCell);
+      const itemName = String(target.values[group.selectionCell] ?? '');
+      const item = mapping && itemName
+        ? data.catalogs[mapping.catalogFile].items.find(entry => entry.slotId === group.slotId && entry.name === itemName)
+        : undefined;
+      const options = itemName ? group.optionsByEquipmentName?.[itemName] ?? group.options : group.options;
+      const effectCount = item?.appraisal?.canAppraise && Number.isInteger(item.appraisal.effectCount)
+        && item.appraisal.effectCount! > 0 && item.appraisal.effectCount! <= group.inputCells.length
+        ? item.appraisal.effectCount!
+        : 0;
+      for (const [index, cell] of group.inputCells.entries()) {
+        const value = String(target.values[cell] ?? '');
+        if (!value || (index < effectCount && options.some(option => option.name === value))) continue;
+        delete target.values[cell];
+        clearedCells.push(cell);
+      }
+    }
+    return clearedCells;
+  };
+  const startupInvalidAccessoryAppraisalCells = clearInvalidAccessoryAppraisals(state);
   const clearDuplicateTransformationChoices = (target: LoadoutState) => {
     const seen = new Set<string>();
     const clearedCells: string[] = [];
@@ -34,7 +58,7 @@ async function start() {
     return clearedCells;
   };
   const startupDuplicateTransformationCells = clearDuplicateTransformationChoices(state);
-  if (startupDuplicateTransformationCells.length && !sampleMode) saveState(state);
+  if ((startupDuplicateTransformationCells.length || startupInvalidAccessoryAppraisalCells.length) && !sampleMode) saveState(state);
   const weaponMagicStoneCells = data.weaponGrades.colorGroups.flatMap(group => group.selectorCells);
   const applyWeaponMagicStonePreset = (grade: string, overwrite = false) => {
     if (!grade) return;
@@ -66,7 +90,7 @@ async function start() {
     { id: 'ring-two', label: '指環 2', icon: 'ring', fixedCells: ['MasterBeast.Ring2.Option1', 'MasterBeast.Ring2.Option2'], stoneCells: ['MasterBeast.Ring2.CustomAttribute', 'MasterBeast.Ring2.CustomValue'], stoneCategory: 'ring', mirrorCells: [['MasterBeast.Ring2.Mirror.1.Attribute', 'MasterBeast.Ring2.Mirror.1.Value'], ['MasterBeast.Ring2.Mirror.2.Attribute', 'MasterBeast.Ring2.Mirror.2.Value'], ['MasterBeast.Ring2.Mirror.3.Attribute', 'MasterBeast.Ring2.Mirror.3.Value']] },
   ];
   const app = document.querySelector<HTMLElement>('#app')!;
-  app.innerHTML = `<section class="workbench"><header class="workspace-heading"><div><span class="eyebrow">EQUIPMENT SIMULATOR</span><h1>1. 填入當前數值<br>2. 設為比較基準<br>3. 填入新數值<br>即可開始進行裝備比較。</h1></div></header><div class="toolbar"><div id="class-picker"></div><label class="toggle"><input id="alternate" type="checkbox">啟用強/排褲切換</label><button id="baseline" type="button">設為比較基準</button><div class="transfer-actions"><button id="import-loadout" type="button">匯入配裝</button><button id="export-loadout" type="button">匯出配裝</button></div><input id="loadout-file" type="file" accept="application/json,.json" hidden><span id="transfer-status" role="status" aria-live="polite"></span><span id="save-status" role="status"></span></div><section class="battle-panel"><div class="panel-heading"><h2>關卡設定</h2></div><div id="battle-settings" class="battle-fields"></div></section><div class="equipment-workspace"><section class="equipment-panel"><div class="panel-heading"><h2>裝備配置</h2><span>點選部位以編輯</span></div><div class="canvas-scroll"><div class="equipment-canvas"><span class="group-label costume-label">連身時裝</span><span class="group-label left-label">左冰</span><span class="group-label inner-label">內裝左四</span><span class="group-label weapon-label">冰武 / 武器</span><span class="group-label right-label">右冰</span><span class="group-label accessory-label">飾品</span><div id="title-input" class="canvas-title-input"></div><div id="slots"></div></div></div><p class="panel-note">左冰不支援混搭，但各部位魔法石仍須獨立設定。擁有強/排褲則褲子的傷害增幅會被平均計算。</p><section class="right-ice-set-area"><div class="beast-accessories-heading"><h3>右冰套效</h3><span>最多選擇 ${data.rightIceSets.maxSelectedSets} 套</span></div><p class="panel-note">選擇要啟用的套裝效果。</p><div id="right-ice-set-selectors" class="right-ice-set-selectors"></div></section><div class="beast-accessories-area"><div class="beast-accessories-heading"><h3>聖獸飾品</h3><span>頭飾、盔甲、項鍊、指環 1、指環 2</span></div><p class="panel-note">依部位設置效果，精靈石套效不支援混搭。</p><div id="beast-accessory-fields" class="beast-accessories-grid"></div></div></section><aside id="inspector" class="inspector" aria-label="部位設定"></aside></div><section class="weapon-magic-stone-panel"><div class="panel-heading"><h2>武器魔力石</h2></div><div id="weapon-magic-stone-fields"></div></section><details class="global-source-panel"><summary>其他效果來源設定</summary><p class="panel-note">未列在此處的特殊條件或 Buff／Debuff 尚未納入計算。</p><div id="global-source-fields"></div></details><section class="results-panel"><div class="panel-heading"><h2>目前填寫的屬性</h2><span id="comparison-label"></span></div><p class="panel-note">已填入的屬性彙總，包含內裝、冰裝、武器、關卡與其他效果設定、需要特殊觸發條件的暫時沒有計入。</p><div id="results" aria-live="polite"></div><section class="damage-panel"><div class="panel-heading"><h2>攻擊與最終傷害</h2></div><p class="panel-note">此數值只反映已填寫的內容。</p><div id="damage-result" aria-live="polite"></div></section></section></section>`;
+  app.innerHTML = `<section class="workbench"><header class="workspace-heading"><div><span class="eyebrow">EQUIPMENT SIMULATOR</span><h1>1. 填入當前數值<br>2. 設為比較基準<br>3. 填入新數值<br>即可開始進行裝備比較。</h1></div></header><div class="toolbar"><div id="class-picker"></div><label class="toggle"><input id="alternate" type="checkbox">啟用強/排褲切換</label><button id="baseline" type="button">設為比較基準</button><div class="transfer-actions"><button id="import-loadout" type="button">匯入配裝</button><button id="export-loadout" type="button">匯出配裝</button></div><input id="loadout-file" type="file" accept="application/json,.json" hidden><span id="transfer-status" role="status" aria-live="polite"></span><span id="save-status" role="status"></span></div><section class="battle-panel"><div class="panel-heading"><h2>關卡設定</h2></div><div id="battle-settings" class="battle-fields"></div></section><div class="equipment-workspace"><section class="equipment-panel"><div class="panel-heading"><h2>裝備配置</h2><span>點選部位以編輯</span></div><div class="canvas-scroll"><div class="equipment-canvas"><span class="group-label costume-label">連身時裝</span><span class="group-label left-label">左冰</span><span class="group-label inner-label">內裝左四</span><span class="group-label weapon-label">冰武 / 武器</span><span class="group-label right-label">右冰</span><span class="group-label accessory-label">飾品</span><span class="group-label beast-label">聖獸飾品</span><div id="title-input" class="canvas-title-input"></div><div id="slots"></div><div id="beast-accessory-fields" class="beast-accessories-grid gear-beast-slots" aria-label="聖獸飾品配置"></div></div></div><p class="panel-note">左冰不支援混搭，但各部位魔法石仍須獨立設定。擁有強/排褲則褲子的傷害增幅會被平均計算。</p><section class="right-ice-set-area"><div class="beast-accessories-heading"><h3>右冰套效</h3><span>最多選擇 ${data.rightIceSets.maxSelectedSets} 套</span></div><p class="panel-note">選擇要啟用的套裝效果。</p><div id="right-ice-set-selectors" class="right-ice-set-selectors"></div></section><div class="beast-accessories-area"><div class="beast-accessories-heading"><h3>聖獸效果設定</h3><span>頭飾、盔甲、項鍊、指環 1、指環 2</span></div><p class="panel-note">共通顏色與潛力設定；各部位效果請使用裝備配置中的聖獸飾品欄位。</p><div id="master-beast-controls" class="master-beast-controls"></div></div></section><aside id="inspector" class="inspector" aria-label="部位設定"></aside></div><section class="weapon-magic-stone-panel"><div class="panel-heading"><h2>武器魔力石</h2></div><div id="weapon-magic-stone-fields"></div></section><details class="global-source-panel"><summary>其他效果來源設定</summary><p class="panel-note">未列在此處的特殊條件或 Buff／Debuff 尚未納入計算。</p><div id="global-source-fields"></div></details><section class="results-panel"><div class="panel-heading"><h2>目前填寫的屬性</h2><span id="comparison-label"></span></div><p class="panel-note">已填入的屬性彙總，包含內裝、冰裝、武器、關卡與其他效果設定、需要特殊觸發條件的暫時沒有計入。</p><div id="results" aria-live="polite"></div><section class="damage-panel"><div class="panel-heading"><h2>攻擊與最終傷害</h2></div><p class="panel-note">此數值只反映已填寫的內容。</p><div id="damage-result" aria-live="polite"></div></section></section></section>`;
   if (sampleMode) {
     app.querySelector('.workspace-heading')!.insertAdjacentHTML('afterend', '<p class="sample-banner">已載入驗算範例。這個分頁的調整不會覆蓋你原本儲存在瀏覽器的配裝。</p>');
     app.querySelector('.results-panel')!.insertAdjacentHTML('beforeend', '<section id="sheet-parity" class="sheet-parity" aria-live="polite"></section>');
@@ -76,7 +100,9 @@ async function start() {
   if (startupDuplicateTransformationCells.length) {
     document.querySelector<HTMLElement>('#transfer-status')!.textContent = `已清除舊配裝中的重複武器變換詞條（${startupDuplicateTransformationCells.length} 個欄位）。`;
   }
-  document.querySelector('#beast-accessory-fields')!.insertAdjacentHTML('beforebegin', '<div id="master-beast-controls" class="master-beast-controls"></div>');
+  if (startupInvalidAccessoryAppraisalCells.length) {
+    document.querySelector<HTMLElement>('#transfer-status')!.textContent = `已清除不符合目前裝備的鑑定選項（${startupInvalidAccessoryAppraisalCells.length} 個欄位）。`;
+  }
   const val = (fieldId: string) => String(state.values[fieldId] ?? '');
   const summary = (stats: Readonly<Record<string, number>>) => Object.entries(stats).filter(([, value]) => value !== 0).map(([key, value]) => `${data.attributes.attributes.find(a => a.key === key)?.name ?? key} ${fmt(value)}`).join(' · ');
   const options = (names: readonly string[]): PickerOption[] => names.map(name => ({ value: name, label: name }));
@@ -103,7 +129,7 @@ async function start() {
       if (cell === 'B77') return '黃色聖獸精靈石效果';
       if (cell === 'B103') return '下衣強化爆擊效果';
       if (cell === 'B105') return '鞋子強化極大效果';
-      if (cell === 'Q37') return '百億套效';
+      if (cell === 'Q37') return '百億/內布隆套效';
       if (cell === 'Q53') return '武器';
       if (cell === 'Q86' || cell === 'R86') return '稱號';
       if (cell === 'T101') return '百億紅上衣、暴上';
@@ -236,7 +262,15 @@ async function start() {
   };
   const field = (parent: HTMLElement, label: string, cell: string, choices: readonly PickerOption[], redraw = false) => {
     parent.append(createPicker(label, choices, val(cell), value => {
-      state.values[cell] = value; update(); renderRightIceSetSelectors();
+      state.values[cell] = value;
+      if (data.accessoryEffects.groups.some(group => group.selectionCell === cell)) {
+        const cleared = clearInvalidAccessoryAppraisals(state);
+        if (cleared.length) {
+          if (!sampleMode) saveState(state);
+          document.querySelector<HTMLElement>('#transfer-status')!.textContent = `已清除不符合目前裝備的鑑定選項（${cleared.length} 個欄位）。`;
+        }
+      }
+      update(); renderRightIceSetSelectors();
       if (redraw) {
         const opened = [...document.querySelectorAll<HTMLDetailsElement>('#inspector details[open]')].map(node => node.querySelector('summary')!.textContent);
         renderInspector();
@@ -310,7 +344,7 @@ async function start() {
     petSkillToggle.append(petSkillCheckbox, petSkillLabel);
     general.append(petSkillToggle);
     for (const effect of data.otherEffects.binaryEffects) pick(general, effect.name, effect.selectorCell, effect.options);
-    field(general, '百億套效', data.colorSetEffects.selectorCell, options(data.colorSetEffects.options.map(option => option.name)));
+    field(general, '百億/內布隆套效', data.colorSetEffects.selectorCell, options(data.colorSetEffects.options.map(option => option.name)));
     const atma = group('亞特瑪');
     field(atma, '亞特瑪屬性', 'Atma.Element', options(['火焰', '流水', '草木']));
     field(atma, '亞特瑪顏色', 'Atma.Color', options(['藍色', '綠色', '紫色', '米色']));
@@ -380,7 +414,7 @@ async function start() {
     const root = document.querySelector<HTMLElement>('#beast-accessory-fields')!;
     root.replaceChildren();
     for (const slot of beastAccessorySlots) {
-      const button = document.createElement('button'); button.type = 'button'; button.className = 'beast-accessory-slot';
+      const button = document.createElement('button'); button.type = 'button'; button.className = `beast-accessory-slot beast-accessory-slot-${slot.id}`;
       const cells = [...(slot.fixedCells ?? []), ...(slot.stoneCells ?? []), ...slot.mirrorCells.flat()];
       const hasValue = cells.some(cell => val(cell) !== '');
       button.classList.toggle('configured', hasValue);
@@ -461,7 +495,15 @@ async function start() {
       if (isAccessory) {
         const appraisalGroup = data.accessoryEffects.groups.find(entry => entry.selectionCell === selectionCell);
         const selectedItem = items.find(item => item.name === val(selectionCell));
-        if (selectedItem && !appraisalGroup) {
+        if (selectedItem?.description) {
+          const description = document.createElement('p');
+          description.className = 'panel-note accessory-item-description';
+          description.textContent = selectedItem.description;
+          panel.append(description);
+        }
+        if (selectedItem?.appraisal?.canAppraise === false) {
+          panel.insertAdjacentHTML('beforeend', '<p class="panel-note">此飾品不可鑑定。</p>');
+        } else if (selectedItem && !appraisalGroup) {
           panel.insertAdjacentHTML('beforeend', '<p class="panel-note">目前沒有設定此飾品部位的鑑定效果欄位；即使資料目錄填入可鑑定狀態，這裡仍不會顯示或計算鑑定效果。</p>');
         }
         if (appraisalGroup && selectedItem) {
@@ -472,7 +514,9 @@ async function start() {
             panel.insertAdjacentHTML('beforeend', '<p class="panel-note">此飾品不可鑑定。</p>');
           } else if (Number.isInteger(appraisal.effectCount) && appraisal.effectCount > 0 && appraisal.effectCount <= appraisalGroup.inputCells.length) {
             const appraisalArea = section(panel, '飾品鑑定', true);
-            appraisalGroup.inputCells.slice(0, appraisal.effectCount).forEach((cell, index) => field(appraisalArea, `鑑定效果 ${index + 1}`, cell, validationChoices(cell)));
+            const itemOptions = appraisalGroup.optionsByEquipmentName?.[selectedItem.name] ?? appraisalGroup.options;
+            const choices: PickerOption[] = itemOptions.map((option: AccessoryEffectOption) => ({ value: option.name, label: option.name }));
+            appraisalGroup.inputCells.slice(0, appraisal.effectCount).forEach((cell, index) => field(appraisalArea, `鑑定效果 ${index + 1}`, cell, choices));
           } else {
             panel.insertAdjacentHTML('beforeend', '<p class="input-warning">此飾品的鑑定效果條數資料不正確，請檢查裝備 JSON。</p>');
           }
@@ -501,7 +545,7 @@ async function start() {
       const appraisal = data.appraisals.slots.find(slot => slot.id === selected.innerwearId)!;
       const area = section(panel, '鑑定'); appraisal.inputCells.forEach((cell, i) => field(area, `鑑定 ${i + 1}`, cell, data.appraisals.options.map(option => ({ value: option.name, label: option.name }))));
       const circuit = data.circuits.inputs.find(slot => slot.slot === selected.innerwearId)!;
-      const board = section(panel, '電路板'); field(board, '電路板項目', circuit.attributeCell, options([...Object.keys(data.circuits.statKeyBySheetName), '無關傷害'])); numeric(board, '電路板數值（%）', circuit.valueCell);
+      const board = section(panel, '電路板'); field(board, '電路板項目', circuit.attributeCell, options(circuit.attributeOptions)); numeric(board, '電路板數值（%）', circuit.valueCell);
       const chip = data.chipSlots.slots.find(slot => slot.id === selected.innerwearId)!;
       const chipArea = section(panel, '芯片與芯片調校');
       field(chipArea, '芯片屬性', chip.attributeCell, options(data.chips.chips.map(entry => entry.name)), true);

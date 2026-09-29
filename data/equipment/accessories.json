@@ -87,8 +87,8 @@
         "range": "A5:T5"
       },
       "appraisal": {
-        "canAppraise": null,
-        "effectCount": null
+        "canAppraise": false,
+        "effectCount": 0
       }
     },
     {
@@ -109,8 +109,8 @@
         "range": "A6:T6"
       },
       "appraisal": {
-        "canAppraise": null,
-        "effectCount": null
+        "canAppraise": false,
+        "effectCount": 0
       }
     },
     {
@@ -131,8 +131,33 @@
         "range": "A7:T7"
       },
       "appraisal": {
-        "canAppraise": null,
-        "effectCount": null
+        "canAppraise": false,
+        "effectCount": 0
+      }
+    },
+    {
+      "id": "accessories-corrupted-thorn-horn",
+      "name": "被侵蝕的荊棘角",
+      "slotId": "faceTop",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "dataUpdatedAt": "2026-09-29",
+      "description": "使用特殊主動技能時，增加所有技能傷害+4%(最大3重疊、再發動等待時間為5秒)；重疊至上限時變更為持續300秒的Buff，增加12%所有技能傷害、3%攻擊力。",
+      "developerNote": "以310秒週期平均換算乘算效果：=(4%*(5/310))+(8%*(5/310))+((1+12%)*(1+3%)-1)*(300/310)=15.0580645161291%。前5秒為4% Buff，接續5秒為8% Buff，之後300秒為12%所有技能傷害與3%攻擊力的獨立乘算；不可併入面板 allSkillDamagePct 或 doubleAttackPct。",
+      "stats": {
+        "adaptabilityPct": 3,
+        "actionSpeedPct": 3,
+        "multiplicativeDamagePct": 15.0580645161291
+      },
+      "effects": [],
+      "source": {
+        "sheet": "使用者提供",
+        "range": "人工新增"
+      },
+      "appraisal": {
+        "canAppraise": false,
+        "effectCount": 0
       }
     },
     {
@@ -191,8 +216,8 @@
         "range": "A10:T10"
       },
       "appraisal": {
-        "canAppraise": true,
-        "effectCount": 3
+        "canAppraise": false,
+        "effectCount": 0
       }
     },
     {
@@ -213,8 +238,8 @@
         "range": "A11:T11"
       },
       "appraisal": {
-        "canAppraise": true,
-        "effectCount": 3
+        "canAppraise": false,
+        "effectCount": 0
       }
     },
     {
@@ -235,8 +260,8 @@
         "range": "A12:T12"
       },
       "appraisal": {
-        "canAppraise": true,
-        "effectCount": 3
+        "canAppraise": false,
+        "effectCount": 0
       }
     },
     {
@@ -257,8 +282,8 @@
         "range": "A13:T13"
       },
       "appraisal": {
-        "canAppraise": null,
-        "effectCount": null
+        "canAppraise": false,
+        "effectCount": 0
       }
     },
     {
@@ -279,8 +304,8 @@
         "range": "A14:T14"
       },
       "appraisal": {
-        "canAppraise": null,
-        "effectCount": null
+        "canAppraise": false,
+        "effectCount": 0
       }
     },
     {
@@ -298,8 +323,8 @@
         "range": "A15:T15"
       },
       "appraisal": {
-        "canAppraise": true,
-        "effectCount": 2
+        "canAppraise": false,
+        "effectCount": 0
       }
     },
     {
@@ -341,8 +366,8 @@
         "range": "A17:T17"
       },
       "appraisal": {
-        "canAppraise": true,
-        "effectCount": 2
+        "canAppraise": false,
+        "effectCount": 0
       }
     },
     {
@@ -362,8 +387,8 @@
         "range": "A18:T18"
       },
       "appraisal": {
-        "canAppraise": true,
-        "effectCount": 2
+        "canAppraise": false,
+        "effectCount": 0
       }
     },
     {
@@ -711,8 +736,8 @@
         "range": "A34:T34"
       },
       "appraisal": {
-        "canAppraise": true,
-        "effectCount": 3
+        "canAppraise": false,
+        "effectCount": 0
       }
     },
     {
@@ -754,8 +779,8 @@
         "range": "A36:T36"
       },
       "appraisal": {
-        "canAppraise": true,
-        "effectCount": 3
+        "canAppraise": false,
+        "effectCount": 0
       }
     },
     {
@@ -776,7 +801,7 @@
       },
       "appraisal": {
         "canAppraise": true,
-        "effectCount": 3
+        "effectCount": 2
       }
     },
     {
@@ -796,8 +821,8 @@
         "range": "A38:T38"
       },
       "appraisal": {
-        "canAppraise": true,
-        "effectCount": 2
+        "canAppraise": false,
+        "effectCount": 0
       }
     },
     {
@@ -840,13 +865,14 @@
         "range": "A40:T40"
       },
       "appraisal": {
-        "canAppraise": true,
-        "effectCount": 2
+        "canAppraise": false,
+        "effectCount": 0
       }
     }
   ],
   "notes": [
-    "各有鑑定下拉式選單的飾品部位，依 accessory-special-effects.json 的可選列數設定 appraisal.canAppraise 與 appraisal.effectCount；目前上衣、臉中、臉下、手臂、項鍊各 3 條，戒指 1、2 各 2 條。",
-    "飾品鑑定輸入位置由 accessory-special-effects.json 綁定至對應部位；未有對應選單的部位仍保留 null，不推定為可鑑定或不可鑑定。"
+    "飾品鑑定是否可用依裝備名稱判斷：臉上與耳環皆不可鑑定；臉下僅亞特瑪臉下、戒指 A 僅鬥士憤怒戒指、手臂僅亞特瑪手臂、戒指 B 僅超越鬥士的技術戒指可鑑定。",
+    "項鍊僅亞特瑪項鍊與堅毅的鬥士項鍊可鑑定；亞特瑪項鍊沿用三條原效果，堅毅的鬥士項鍊使用兩條戒指專用效果。其餘列入規則的裝備均設定為不可鑑定。",
+    "各部位鑑定輸入位置及效果數值由 accessory-special-effects.json 維護。"
   ]
 }

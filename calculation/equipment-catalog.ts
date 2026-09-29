@@ -14,6 +14,10 @@ export interface EquipmentCatalogItem {
   name: string;
   slotId: string;
   active: boolean;
+  /** Player-facing explanation shown when this item is selected. */
+  description?: string;
+  /** Maintainer-only formula notes; never shown in the UI. */
+  developerNote?: string;
   stats?: Readonly<Record<string, number>>;
   effects?: readonly unknown[];
   appraisal?: EquipmentAppraisalMetadata;

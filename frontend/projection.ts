@@ -78,6 +78,7 @@ export function projectAttributes(data: GameData, state: LoadoutState) {
     }
   }
   const accessoryAppraisalSelections: Record<string, string> = {};
+  const accessoryAppraisalEquipment: Record<string, string> = {};
   for (const group of data.accessoryEffects.groups) {
     const mapping = data.mapping.selections.find(entry => entry.selectionCell === group.selectionCell);
     const itemName = text(group.selectionCell);
@@ -90,11 +91,12 @@ export function projectAttributes(data: GameData, state: LoadoutState) {
         throw new RangeError(`${itemName} 的鑑定條數必須介於 1 與 ${group.inputCells.length} 之間。`);
       }
       for (const cell of group.inputCells.slice(0, appraisal.effectCount)) accessoryAppraisalSelections[cell] = text(cell);
+      accessoryAppraisalEquipment[group.selectionCell] = itemName;
     } else if (appraisal.effectCount !== 0) {
       throw new RangeError(`${itemName} 不可鑑定時，鑑定條數必須設為 0。`);
     }
   }
-  groups.shared.push(...resolveAccessoryEffectOptions(data.accessoryEffects, accessoryAppraisalSelections));
+  groups.shared.push(...resolveAccessoryEffectOptions(data.accessoryEffects, accessoryAppraisalSelections, accessoryAppraisalEquipment));
   const accessoryCells = data.mapping.selections
     .filter(entry => entry.catalogFile.endsWith("accessories.json"))
     .map(entry => entry.selectionCell);

@@ -379,7 +379,27 @@
         }
       ],
       "selectionCell": "Accessory.Necklace",
-      "slotId": "necklace"
+      "slotId": "necklace",
+      "optionsByEquipmentName": {
+        "堅毅的鬥士項鍊": [
+          {
+            "name": "致命一擊+2%",
+            "stats": {
+              "critRatePct": 2
+            }
+          },
+          {
+            "name": "極大化+2%",
+            "stats": {
+              "extremizationPct": 2
+            }
+          },
+          {
+            "name": "無關傷害",
+            "stats": {}
+          }
+        ]
+      }
     },
     {
       "id": "accessory-ring-one-special",

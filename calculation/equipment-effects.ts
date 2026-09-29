@@ -201,6 +201,8 @@ export interface CircuitBoardRule {
   attributeCell: string;
   valueCell: string;
   wearSet: "shared" | "lowerwearA" | "lowerwearB";
+  optionSource: string;
+  attributeOptions: readonly string[];
 }
 
 export interface CircuitBoardRulesDocument {
@@ -269,6 +271,7 @@ export interface AccessoryEffectGroup {
   inputCells: readonly string[];
   source: string;
   options: readonly AccessoryEffectOption[];
+  optionsByEquipmentName?: Readonly<Record<string, readonly AccessoryEffectOption[]>>;
 }
 
 export interface AccessoryEffectDocument {
@@ -644,13 +647,16 @@ export function resolveNamedStatOption(
 export function resolveAccessoryEffectOptions(
   document: AccessoryEffectDocument,
   selections: Readonly<Record<string, string | null | undefined>>,
+  equipmentNames: Readonly<Record<string, string | null | undefined>> = {},
 ): StatContribution[] {
   const result: StatContribution[] = [];
   for (const group of document.groups) {
     for (const cell of group.inputCells) {
       const selectedName = selections[cell];
       if (selectedName == null || selectedName.trim() === "") continue;
-      const option = group.options.find((candidate) => candidate.name === selectedName);
+      const equipmentName = equipmentNames[group.selectionCell];
+      const options = equipmentName ? group.optionsByEquipmentName?.[equipmentName] ?? group.options : group.options;
+      const option = options.find((candidate) => candidate.name === selectedName);
       if (!option) throw new RangeError(`${group.label}「${selectedName}」沒有對應的計算資料。`);
       result.push({ sourceId: `accessory-effect:${group.id}:${cell}`, stats: option.stats });
     }
@@ -667,9 +673,9 @@ export function resolveColorSetEffect(
 ): StatContribution | null {
   if (selectedName == null || selectedName.trim() === "") return null;
   const option = document.options.find((candidate) => candidate.name === selectedName);
-  if (!option) throw new RangeError(`百億套效「${selectedName}」沒有對應的計算資料。`);
+  if (!option) throw new RangeError(`百億/內布隆套效「${selectedName}」沒有對應的計算資料。`);
   if (option.stats) return { sourceId: `color-set:${selectedName}`, stats: option.stats };
-  if (!option.calculatedStat) throw new RangeError(`百億套效「${selectedName}」沒有計算規則。`);
+  if (!option.calculatedStat) throw new RangeError(`百億/內布隆套效「${selectedName}」沒有計算規則。`);
   const formula = option.calculatedStat;
   const rawValue = sourceAttribute === formula.requiredAttribute ? sourceValue ?? 0 : 0;
   if (!Number.isFinite(rawValue)) throw new TypeError(`${formula.sourceValueCell} 必須是有限數值。`);
