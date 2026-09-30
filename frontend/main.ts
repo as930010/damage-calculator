@@ -90,7 +90,36 @@ async function start() {
     { id: 'ring-two', label: '指環 2', icon: 'ring', fixedCells: ['MasterBeast.Ring2.Option1', 'MasterBeast.Ring2.Option2'], stoneCells: ['MasterBeast.Ring2.CustomAttribute', 'MasterBeast.Ring2.CustomValue'], stoneCategory: 'ring', mirrorCells: [['MasterBeast.Ring2.Mirror.1.Attribute', 'MasterBeast.Ring2.Mirror.1.Value'], ['MasterBeast.Ring2.Mirror.2.Attribute', 'MasterBeast.Ring2.Mirror.2.Value'], ['MasterBeast.Ring2.Mirror.3.Attribute', 'MasterBeast.Ring2.Mirror.3.Value']] },
   ];
   const app = document.querySelector<HTMLElement>('#app')!;
-  app.innerHTML = `<section class="workbench"><header class="workspace-heading"><div><span class="eyebrow">EQUIPMENT SIMULATOR</span><h1>1. 填入當前數值<br>2. 設為比較基準<br>3. 填入新數值<br>即可開始進行裝備比較。</h1></div></header><div class="toolbar"><div id="class-picker"></div><label class="toggle"><input id="alternate" type="checkbox">啟用強/排褲切換</label><button id="baseline" type="button">設為比較基準</button><div class="transfer-actions"><button id="import-loadout" type="button">匯入配裝</button><button id="export-loadout" type="button">匯出配裝</button></div><input id="loadout-file" type="file" accept="application/json,.json" hidden><span id="transfer-status" role="status" aria-live="polite"></span><span id="save-status" role="status"></span></div><section class="battle-panel"><div class="panel-heading"><h2>關卡設定</h2></div><div id="battle-settings" class="battle-fields"></div></section><div class="equipment-workspace"><section class="equipment-panel"><div class="panel-heading"><h2>裝備配置</h2><span>點選部位以編輯</span></div><div class="canvas-scroll"><div class="equipment-canvas"><span class="group-label costume-label">連身時裝</span><span class="group-label left-label">左冰</span><span class="group-label inner-label">內裝左四</span><span class="group-label weapon-label">冰武 / 武器</span><span class="group-label right-label">右冰</span><span class="group-label accessory-label">飾品</span><span class="group-label beast-label">聖獸飾品</span><div id="title-input" class="canvas-title-input"></div><div id="slots"></div><div id="beast-accessory-fields" class="beast-accessories-grid gear-beast-slots" aria-label="聖獸飾品配置"></div></div></div><p class="panel-note">左冰不支援混搭，但各部位魔法石仍須獨立設定。擁有強/排褲則褲子的傷害增幅會被平均計算。</p><section class="right-ice-set-area"><div class="beast-accessories-heading"><h3>右冰套效</h3><span>最多選擇 ${data.rightIceSets.maxSelectedSets} 套</span></div><p class="panel-note">選擇要啟用的套裝效果。</p><div id="right-ice-set-selectors" class="right-ice-set-selectors"></div></section><div class="beast-accessories-area"><div class="beast-accessories-heading"><h3>聖獸效果設定</h3><span>頭飾、盔甲、項鍊、指環 1、指環 2</span></div><p class="panel-note">共通顏色與潛力設定；各部位效果請使用裝備配置中的聖獸飾品欄位。</p><div id="master-beast-controls" class="master-beast-controls"></div></div></section><aside id="inspector" class="inspector" aria-label="部位設定"></aside></div><section class="weapon-magic-stone-panel"><div class="panel-heading"><h2>武器魔力石</h2></div><div id="weapon-magic-stone-fields"></div></section><details class="global-source-panel"><summary>其他效果來源設定</summary><p class="panel-note">未列在此處的特殊條件或 Buff／Debuff 尚未納入計算。</p><div id="global-source-fields"></div></details><section class="results-panel"><div class="panel-heading"><h2>目前填寫的屬性</h2><span id="comparison-label"></span></div><p class="panel-note">已填入的屬性彙總，包含內裝、冰裝、武器、關卡與其他效果設定、需要特殊觸發條件的暫時沒有計入。</p><div id="results" aria-live="polite"></div><section class="damage-panel"><div class="panel-heading"><h2>攻擊與最終傷害</h2></div><p class="panel-note">此數值只反映已填寫的內容。</p><div id="damage-result" aria-live="polite"></div></section></section></section>`;
+  app.innerHTML = `<section class="workbench"><header class="workspace-heading"><div><span class="eyebrow">EQUIPMENT SIMULATOR</span><h1>1. 填入當前數值<br>2. 設為比較基準<br>3. 填入新數值<br>即可開始進行裝備比較。</h1></div></header><div class="toolbar"><div id="class-picker"></div><label class="toggle"><input id="alternate" type="checkbox">啟用強/排褲切換</label><div class="toolbar-actions"><button id="baseline" type="button">設為比較基準</button><div class="transfer-actions"><button id="import-loadout" type="button">匯入配裝</button><button id="export-loadout" type="button">匯出配裝</button></div></div><input id="loadout-file" type="file" accept="application/json,.json" hidden><span id="transfer-status" role="status" aria-live="polite"></span><span id="save-status" role="status"></span></div><section class="battle-panel"><div class="panel-heading"><h2>關卡設定</h2></div><div id="battle-settings" class="battle-fields"></div></section><div class="equipment-workspace"><section class="equipment-panel"><div class="panel-heading"><h2>裝備配置</h2><span>點選部位以編輯</span></div><div class="canvas-scroll"><div class="equipment-canvas"><span class="group-label costume-label">連身時裝</span><span class="group-label left-label">左冰</span><span class="group-label inner-label">內裝左四</span><span class="group-label weapon-label">冰武 / 武器</span><span class="group-label right-label">右冰</span><span class="group-label accessory-label">飾品</span><span class="group-label beast-label">聖獸飾品</span><div id="title-input" class="canvas-title-input"></div><div id="slots"></div><div id="beast-accessory-fields" class="beast-accessories-grid gear-beast-slots" aria-label="聖獸飾品配置"></div></div></div><p class="panel-note">左冰不支援混搭，但各部位魔法石仍須獨立設定。擁有強/排褲則褲子的傷害增幅會被平均計算。</p><section class="right-ice-set-area"><div class="beast-accessories-heading"><h3>右冰套效</h3><span>最多選擇 ${data.rightIceSets.maxSelectedSets} 套</span></div><p class="panel-note">選擇要啟用的套裝效果。</p><div id="right-ice-set-selectors" class="right-ice-set-selectors"></div></section><div class="beast-accessories-area"><div class="beast-accessories-heading"><h3>聖獸效果設定</h3><span>頭飾、盔甲、項鍊、指環 1、指環 2</span></div><p class="panel-note">共通顏色與潛力設定；各部位效果請使用裝備配置中的聖獸飾品欄位。</p><div id="master-beast-controls" class="master-beast-controls"></div></div></section><div id="inspector-backdrop" class="inspector-backdrop" aria-hidden="true"></div><aside id="inspector" class="inspector" aria-label="部位設定"></aside></div><section class="weapon-magic-stone-panel"><div class="panel-heading"><h2>武器魔力石</h2></div><div id="weapon-magic-stone-fields"></div></section><details class="global-source-panel"><summary>其他效果來源設定</summary><p class="panel-note">未列在此處的特殊條件或 Buff／Debuff 尚未納入計算。</p><div id="global-source-fields"></div></details><section class="results-panel"><div class="panel-heading"><h2>目前填寫的屬性</h2><span id="comparison-label"></span></div><p class="panel-note">已填入的屬性彙總，包含內裝、冰裝、武器、關卡與其他效果設定、需要特殊觸發條件的暫時沒有計入。</p><div id="results" aria-live="polite"></div><section class="damage-panel"><div class="panel-heading"><h2>攻擊與最終傷害</h2></div><p class="panel-note">此數值只反映已填寫的內容。</p><div id="damage-result" aria-live="polite"></div></section></section></section>`;
+  const inspectorPanel = document.querySelector<HTMLElement>('#inspector')!;
+  const inspectorBackdrop = document.querySelector<HTMLElement>('#inspector-backdrop')!;
+  const mobileInspectorQuery = window.matchMedia('(max-width: 700px)');
+  const closeMobileInspector = () => {
+    document.body.classList.remove('mobile-inspector-open');
+    inspectorPanel.removeAttribute('aria-modal');
+    inspectorPanel.removeAttribute('role');
+    inspectorBackdrop.hidden = true;
+    const trigger = selectedBeastSlotId
+      ? [...document.querySelectorAll<HTMLElement>('#beast-accessory-fields [data-beast-slot-id]')].find(button => button.dataset.beastSlotId === selectedBeastSlotId)
+      : [...document.querySelectorAll<HTMLElement>('#slots [data-slot-id]')].find(button => button.dataset.slotId === selected.id);
+    trigger?.focus();
+  };
+  const openMobileInspector = () => {
+    if (!mobileInspectorQuery.matches) return;
+    document.body.classList.add('mobile-inspector-open');
+    inspectorPanel.setAttribute('role', 'dialog');
+    inspectorPanel.setAttribute('aria-modal', 'true');
+    inspectorBackdrop.hidden = false;
+    inspectorPanel.querySelector<HTMLButtonElement>('.inspector-close')?.focus();
+  };
+  inspectorBackdrop.addEventListener('click', closeMobileInspector);
+  inspectorPanel.addEventListener('click', event => {
+    if (event.target instanceof Element && event.target.closest('.inspector-close')) closeMobileInspector();
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && document.body.classList.contains('mobile-inspector-open')) closeMobileInspector();
+  });
+  mobileInspectorQuery.addEventListener('change', event => { if (!event.matches && document.body.classList.contains('mobile-inspector-open')) closeMobileInspector(); });
   if (sampleMode) {
     app.querySelector('.workspace-heading')!.insertAdjacentHTML('afterend', '<p class="sample-banner">已載入驗算範例。這個分頁的調整不會覆蓋你原本儲存在瀏覽器的配裝。</p>');
     app.querySelector('.results-panel')!.insertAdjacentHTML('beforeend', '<section id="sheet-parity" class="sheet-parity" aria-live="polite"></section>');
@@ -414,7 +443,7 @@ async function start() {
     const root = document.querySelector<HTMLElement>('#beast-accessory-fields')!;
     root.replaceChildren();
     for (const slot of beastAccessorySlots) {
-      const button = document.createElement('button'); button.type = 'button'; button.className = `beast-accessory-slot beast-accessory-slot-${slot.id}`;
+      const button = document.createElement('button'); button.type = 'button'; button.className = `beast-accessory-slot beast-accessory-slot-${slot.id}`; button.dataset.beastSlotId = slot.id;
       const cells = [...(slot.fixedCells ?? []), ...(slot.stoneCells ?? []), ...slot.mirrorCells.flat()];
       const hasValue = cells.some(cell => val(cell) !== '');
       button.classList.toggle('configured', hasValue);
@@ -424,14 +453,14 @@ async function start() {
       button.innerHTML = `${icon(slot.icon)}<span>${h(slot.label)}</span>${hasValue ? '<i></i>' : ''}`;
       button.addEventListener('click', () => {
         selectedBeastSlotId = slot.id;
-        renderBeastAccessories(); renderInspector();
+        renderBeastAccessories(); renderInspector(); openMobileInspector();
       });
       root.append(button);
     }
   }
   function renderBeastInspector(panel: HTMLElement) {
     const slot = beastAccessorySlots.find(candidate => candidate.id === selectedBeastSlotId)!;
-    panel.innerHTML = `<div class="inspector-title beast-inspector-title"><span class="beast-inspector-icon">${icon(slot.icon)}</span><div><small>聖獸飾品</small><h2>${h(slot.label)}</h2></div></div>`;
+    panel.innerHTML = `<div class="inspector-title beast-inspector-title"><span class="beast-inspector-icon">${icon(slot.icon)}</span><div><small>聖獸飾品</small><h2>${h(slot.label)}</h2></div><button class="inspector-close" type="button" aria-label="關閉部位設定">×</button></div>`;
     const fixed = section(panel, '固定效果', true);
     if (slot.fixedCells) slot.fixedCells.forEach((cell, index) => field(
       fixed,
@@ -469,7 +498,7 @@ async function start() {
     const container = document.querySelector('#slots')!; container.replaceChildren();
     for (const slot of data.layout.slots) {
       const group = data.layout.groups.find(group => group.id === slot.group)!;
-      const button = document.createElement('button'); button.type = 'button'; button.className = 'gear-slot';
+      const button = document.createElement('button'); button.type = 'button'; button.className = 'gear-slot'; button.dataset.slotId = slot.id;
       button.style.cssText = `left:${slot.x}%;top:${slot.y}%;--group-color:${group.color}`;
       const configured = slot.selectionCell ? val(slot.selectionCell) : slot.weapon ? val('Weapon.ENHC') : slot.innerwearId ? val(data.innerwear.slots.find(s => s.id === slot.innerwearId)!.enhancementCell) : '';
       button.classList.toggle('configured', !!configured); button.classList.toggle('selected', selected.id === slot.id);
@@ -477,14 +506,14 @@ async function start() {
       button.setAttribute('aria-label', `${group.name} ${slot.label}：${configured || '未設定'}`); button.setAttribute('aria-pressed', String(selected.id === slot.id));
       button.title = `${group.name} ${slot.label}${configured ? '\n' + configured : ''}`;
       button.innerHTML = `<span>${h(slot.label)}</span>${configured ? '<i></i>' : ''}`;
-      button.addEventListener('click', () => { selected = slot; selectedBeastSlotId = null; renderSlots(); renderBeastAccessories(); renderInspector(); }); container.append(button);
+      button.addEventListener('click', () => { selected = slot; selectedBeastSlotId = null; renderSlots(); renderBeastAccessories(); renderInspector(); openMobileInspector(); }); container.append(button);
     }
   }
   function renderInspector() {
     const panel = document.querySelector<HTMLElement>('#inspector')!;
     if (selectedBeastSlotId) { renderBeastInspector(panel); return; }
     const group = data.layout.groups.find(group => group.id === selected.group)!;
-    panel.innerHTML = `<div class="inspector-title" style="--group-color:${group.color}">${icon(selected.icon)}<div><small>${h(group.name)}</small><h2>${h(selected.label)}</h2></div></div>`;
+    panel.innerHTML = `<div class="inspector-title" style="--group-color:${group.color}">${icon(selected.icon)}<div><small>${h(group.name)}</small><h2>${h(selected.label)}</h2></div><button class="inspector-close" type="button" aria-label="關閉部位設定">×</button></div>`;
     if (selected.enabledBy && !state.lowerwearAlternativeEnabled) { panel.insertAdjacentHTML('beforeend', '<p class="panel-note">請先啟用上方「強/排褲切換」。設定會保留於裝置，停用時不參與計算。</p>'); return; }
     if (selected.selectionCell) {
       const selectionCell = selected.selectionCell;
