@@ -12,19 +12,22 @@ function getAppRoot(): HTMLElement {
 }
 const app = getAppRoot();
 
+type TeamKey = "single" | "first" | "second";
+
 let catalog: GameCatalog;
 let mode: TeamMode = "single";
 let membersByTeam: Record<string, string[]> = { single: [], first: [], second: [] };
 let optionsByTeam: Record<string, Record<string, boolean | number>> = { single: {}, first: {}, second: {} };
 let bossReductions: Partial<Record<TeamMode, number>> = {};
+let optionDisclosureOpen: Partial<Record<TeamKey, boolean>> = {};
 
-type TeamKey = "single" | "first" | "second";
 interface SavedSimulatorState {
   version: 1;
   mode: TeamMode;
   membersByTeam: Partial<Record<TeamKey, string[]>>;
   optionsByTeam: Partial<Record<TeamKey, Record<string, boolean | number>>>;
   bossReductions: Partial<Record<TeamMode, number>>;
+  optionDisclosureOpen: Partial<Record<TeamKey, boolean>>;
 }
 
 const STORAGE_KEY = "buff-team-simulator.state.v1";
@@ -37,6 +40,10 @@ function restoreSavedState(): void {
     if (!saved || saved.version !== 1) return;
 
     if (saved.mode === "single" || saved.mode === "challenge") mode = saved.mode;
+    for (const team of ["single", "first", "second"] as const) {
+      const isOpen = saved.optionDisclosureOpen?.[team];
+      if (typeof isOpen === "boolean") optionDisclosureOpen[team] = isOpen;
+    }
 
     for (const team of ["single", "first", "second"] as const) {
       const memberCount = team === "single" ? 6 : 4;
@@ -51,7 +58,10 @@ function restoreSavedState(): void {
       for (const option of catalog.loadoutOptions) {
         const value = savedOptions[option.id];
         if (option.userInput?.kind === "percentage") {
-          if (typeof value === "number" && Number.isFinite(value) && value >= 0) optionsByTeam[team][option.id] = value;
+          if (typeof value === "number" && Number.isFinite(value) && value >= 0) {
+            const defaultValue = catalog.parameters[option.userInput.parameter] * 100;
+            optionsByTeam[team][option.id] = Math.abs(value - defaultValue) < 1e-7 ? Number(defaultValue.toFixed(6)) : value;
+          }
         } else if (option.presentation !== "background" && typeof value === "boolean") {
           optionsByTeam[team][option.id] = value;
         }
@@ -70,7 +80,7 @@ function restoreSavedState(): void {
 }
 
 function persistSavedState(): void {
-  const saved: SavedSimulatorState = { version: 1, mode, membersByTeam, optionsByTeam, bossReductions };
+  const saved: SavedSimulatorState = { version: 1, mode, membersByTeam, optionsByTeam, bossReductions, optionDisclosureOpen };
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
   } catch {
@@ -160,7 +170,7 @@ function optionPanel(team: string): string {
   const backgroundOptions = catalog.loadoutOptions.filter((option) => option.presentation === "background");
   const valueEditors = valueOptions.map((option) => {
     const parameterName = option.userInput!.parameter;
-    const value = optionsByTeam[team]?.[option.id] ?? catalog.parameters[parameterName] * 100;
+    const value = optionsByTeam[team]?.[option.id] ?? Number((catalog.parameters[parameterName] * 100).toFixed(6));
     return `<label class="option-editor"><span class="option-editor-heading"><strong>${escapeHtml(option.label)}</strong><small>${escapeHtml(option.userInput!.helpText)}</small></span><span class="option-editor-input"><input type="number" min="0" step="0.1" inputmode="decimal" data-option-value="${escapeHtml(option.id)}" data-team="${team}" value="${Number(value)}" aria-label="${escapeHtml(option.label)}百分比"><span>%</span></span></label>`;
   }).join("");
   const toggles = toggleOptions.map((option) => {
@@ -208,13 +218,13 @@ function updateSkillReference(): void {
     : `<p class="skill-empty">沒有符合的技能。</p>`;
 }
 
-function teamPanel(team: string, title: string, memberCount: number): string {
+function teamPanel(team: TeamKey, title: string, memberCount: number): string {
   const routeLabel = team === "single" ? "" : `<span class="eyebrow">ROUTE ${team === "first" ? "01" : "02"}</span>`;
   const bossControlMarkup = team === "single" ? bossControl() : "";
   return `<section class="panel team-panel">
     <div class="panel-heading"><div>${routeLabel}<h2>${title}</h2></div>${bossControlMarkup}</div>
     <div class="member-grid">${Array.from({ length: memberCount }, (_, index) => `<label class="member-slot"><span class="slot-index">${String(index + 1).padStart(2, "0")}</span><input data-member data-team="${team}" list="class-list" autocomplete="off" value="${escapeHtml(membersByTeam[team]?.[index] ?? "")}" placeholder="輸入代碼" aria-label="${title}隊員 ${index + 1}"></label>`).join("")}</div>
-    <details class="option-disclosure"><summary>配置效果</summary>${optionPanel(team)}</details>
+    <details class="option-disclosure" data-team="${team}" ${optionDisclosureOpen[team] ? "open" : ""}><summary>配置效果</summary>${optionPanel(team)}</details>
   </section>`;
 }
 
@@ -232,6 +242,13 @@ function shell(): void {
   <datalist id="class-list">${catalog.classes.filter((record) => record.enabled).map((record) => `<option value="${escapeHtml(record.code)}">${escapeHtml(record.name)}</option>`).join("")}</datalist>
   <section id="results" aria-live="polite"></section>
   ${skillReferencePanel()}`;
+  app.querySelectorAll<HTMLDetailsElement>(".option-disclosure").forEach((disclosure) => disclosure.addEventListener("toggle", () => {
+    const team = disclosure.dataset.team as TeamKey | undefined;
+    if (team) {
+      optionDisclosureOpen[team] = disclosure.open;
+      persistSavedState();
+    }
+  }));
   app.querySelectorAll<HTMLButtonElement>("[data-mode]").forEach((button) => button.addEventListener("click", () => {
     saveCurrentInputs();
     mode = button.dataset.mode as TeamMode;
@@ -376,7 +393,9 @@ async function start(): Promise<void> {
   catalog = await loadGameCatalog(new URL("data/", document.baseURI));
   for (const team of ["single", "first", "second"]) {
     optionsByTeam[team] = Object.fromEntries(catalog.loadoutOptions.map((option) => {
-      if (option.userInput?.kind === "percentage") return [option.id, catalog.parameters[option.userInput.parameter] * 100];
+      if (option.userInput?.kind === "percentage") {
+        return [option.id, Number((catalog.parameters[option.userInput.parameter] * 100).toFixed(6))];
+      }
       return [option.id, option.defaultSelected];
     }));
     membersByTeam[team] = Array(team === "single" ? 6 : 4).fill("");
