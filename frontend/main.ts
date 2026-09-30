@@ -561,7 +561,6 @@ async function start() {
       const slot = data.innerwear.slots.find(slot => slot.id === selected.innerwearId)!;
       field(panel, '強化', slot.enhancementCell, options(Object.keys(data.innerwear.enhancementStats).map(level => `Lv.${level}`)));
       field(panel, '鍛造', slot.forgingCell, options(Object.keys(data.innerwear.forgingAttack)));
-      panel.insertAdjacentHTML('beforeend', '<p class="panel-note">鍛造達到門檻才套用對應效果，未達門檻為 0。</p>');
     }
     if (selected.weapon) {
       field(panel, '武器強化', 'Weapon.ENHC', options(Object.keys(data.attack.weaponEnhancementFactors).map(level => `Lv.${level}`)));
