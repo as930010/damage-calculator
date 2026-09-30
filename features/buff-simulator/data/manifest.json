@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "dataVersion": "0.3.0",
+  "sourceSpreadsheet": "https://docs.google.com/spreadsheets/d/1UQFRQhqYEiKI8T_Ilx4DE9r-oaBV1WsUksBxo1ckHtY/edit",
+  "sourceWorkbookTitle": "襲擊排團輔助工具 8/13Ver",
+  "importedAt": "2026-09-30",
+  "coverage": {
+    "single": "單隊用表!C11:R70",
+    "challenge": "挑戰(雙隊)模式用表!C19:S78",
+    "classCount": 60,
+    "profileCount": 120,
+    "loadoutOptionCount": 10,
+    "skillReferenceRoleCount": 60,
+    "skillReferenceEntryCount": 254,
+    "skillIconCount": 254,
+    "skillReferenceSource": "全角色BUFF參照表!A1:Z131"
+  },
+  "knownLimitations": [
+    "技能效果參照僅作說明，不參與效果矩陣計算；各技能可能受轉職或被動連動影響。",
+    "兩種模式保留 Excel 各自的效果矩陣與口徑；挑戰同場跨隊去重依已確認的共享效果規則處理。",
+    "矩陣總增益為 Excel 的估算分數；網頁總傷害倍率依各項效果分階段計算，兩者用途不同。",
+    "來源挑戰同場 Q17:S17 分級公式目前讀取錯誤範圍；Web 按去重後的八名成員效果彙總，詳見 docs/development-notes.md。"
+  ]
+}

@@ -118,5 +118,12 @@ for (const file of ["styles.css", "polish.css"]) {
   const source = await readFile(join(root, "frontend", file), "utf8");
   await writeFile(join(output, "frontend", file), minifyCss(source));
 }
+const simulatorBuild = spawnSync(process.execPath, [join(root, "features", "buff-simulator", "scripts", "build.mjs")], {
+  cwd: root,
+  stdio: "inherit",
+});
+if (simulatorBuild.error) throw simulatorBuild.error;
+if (simulatorBuild.status !== 0) process.exit(simulatorBuild.status ?? 1);
+await cp(join(root, "features", "buff-simulator", "dist"), join(output, "buff-simulator"), { recursive: true });
 await writeFile(join(output, ".nojekyll"), "");
 console.log("Built static site in dist/. Run npm run preview to open it locally.");

@@ -1,0 +1,16 @@
+[
+  { "key": "buff", "label": "Buff增幅", "unit": "ratio", "group": "damage", "aggregation": "multiply", "sortOrder": 0 },
+  { "key": "debuff", "label": "Debuff增幅", "unit": "ratio", "group": "damage", "aggregation": "multiply", "sortOrder": 1 },
+  { "key": "defenseBreak", "label": "破防", "unit": "ratio", "group": "damage", "aggregation": "remaining-product", "sortOrder": 2 },
+  { "key": "shield", "label": "護盾", "unit": "ratio", "group": "defense", "aggregation": "remaining-product", "sortOrder": 3 },
+  { "key": "attackReduction", "label": "降攻", "unit": "ratio", "group": "defense", "aggregation": "multiply", "sortOrder": 4 },
+  { "key": "cooldownAcceleration", "label": "冷卻加速", "unit": "extra-seconds-per-second", "group": "utility", "aggregation": "sum", "sortOrder": 5 },
+  { "key": "cooldownReductionSeconds", "label": "減少冷卻", "unit": "seconds", "group": "utility", "aggregation": "sum", "sortOrder": 6 },
+  { "key": "resistanceReduction", "label": "降抗", "unit": "resistance-points", "group": "utility", "aggregation": "sum", "sortOrder": 7 },
+  { "key": "mpRecoveryPerSecond", "label": "每秒回魔", "unit": "ratio", "group": "utility", "aggregation": "multiply", "sortOrder": 8 },
+  { "key": "actionSpeedMultiplicative", "label": "乘算動速", "unit": "ratio", "group": "utility", "aggregation": "capped-multiply", "sortOrder": 9 },
+  { "key": "actionSpeedDiminishing", "label": "遞減動速", "unit": "ratio", "group": "utility", "aggregation": "multiply", "sortOrder": 10 },
+  { "key": "roarBlock", "label": "扛吼／擋傷", "unit": "count", "group": "utility", "aggregation": "rank", "sortOrder": 11 },
+  { "key": "debuffCleanse", "label": "消火／解Debuff", "unit": "count", "group": "utility", "aggregation": "rank", "sortOrder": 12 },
+  { "key": "superArmor", "label": "霸體", "unit": "count", "group": "utility", "aggregation": "rank", "sortOrder": 13 }
+]

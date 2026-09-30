@@ -74,3 +74,7 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
 @media(max-width:360px) {
   .workflow-steps li{font-size:10px}
 }
+
+.buff-simulator-link{display:inline-flex;align-items:center;min-height:34px;padding:0 12px;border:1px solid var(--border-control);border-radius:999px;color:var(--text-heading);font-size:12px;text-decoration:none;white-space:nowrap;transition:background .15s,border-color .15s}
+.buff-simulator-link:hover{background:var(--control-hover);border-color:var(--accent-border)}
+@media(max-width:600px){.top-meta{display:flex;align-items:center;gap:8px}.buff-simulator-link{min-height:32px;padding-inline:9px;font-size:11px}}

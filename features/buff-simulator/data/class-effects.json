@@ -1,0 +1,1781 @@
+[
+  {
+    "classId": "ke",
+    "code": "KE",
+    "mode": "single",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.2,
+      "shield": 0.2,
+      "attackReduction": -0.12,
+      "superArmor": 1
+    },
+    "estimatedDamageScore": 0.38472042146034036,
+    "sourceRange": "'單隊用表'!C11:R11"
+  },
+  {
+    "classId": "rm",
+    "code": "RM",
+    "mode": "single",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.2,
+      "resistanceReduction": 220
+    },
+    "estimatedDamageScore": 0.38472042146034036,
+    "sourceRange": "'單隊用表'!C12:R12"
+  },
+  {
+    "classId": "im",
+    "code": "IM",
+    "mode": "single",
+    "effects": {
+      "debuff": 0.2
+    },
+    "estimatedDamageScore": 0.19999999999999996,
+    "sourceRange": "'單隊用表'!C13:R13"
+  },
+  {
+    "classId": "ge",
+    "code": "GE",
+    "mode": "single",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.2,
+      "shield": 0.08,
+      "resistanceReduction": 130
+    },
+    "estimatedDamageScore": 0.38472042146034036,
+    "sourceRange": "'單隊用表'!C14:R14"
+  },
+  {
+    "classId": "as",
+    "code": "AS",
+    "mode": "single",
+    "effects": {
+      "buff": 0.2
+    },
+    "estimatedDamageScore": 0.19999999999999996,
+    "sourceRange": "'單隊用表'!C15:R15"
+  },
+  {
+    "classId": "oz",
+    "code": "OZ",
+    "mode": "single",
+    "effects": {
+      "buff": 0.12,
+      "defenseBreak": 0.2,
+      "attackReduction": 0.2,
+      "resistanceReduction": 195,
+      "mpRecoveryPerSecond": 0.08571428571428572,
+      "actionSpeedMultiplicative": 0.1
+    },
+    "estimatedDamageScore": 0.38472042146034036,
+    "sourceRange": "'單隊用表'!C16:R16"
+  },
+  {
+    "classId": "mm",
+    "code": "MM",
+    "mode": "single",
+    "effects": {
+      "buff": 0.12,
+      "defenseBreak": 0.20999999999999996
+    },
+    "estimatedDamageScore": 0.40128058155559,
+    "sourceRange": "'單隊用表'!C17:R17"
+  },
+  {
+    "classId": "la",
+    "code": "LA",
+    "mode": "single",
+    "effects": {
+      "buff": 0.12837981914893626,
+      "debuff": 0.05,
+      "defenseBreak": 0.1,
+      "shield": 0.31999999999999995,
+      "mpRecoveryPerSecond": 0.02222222222,
+      "actionSpeedMultiplicative": 0.05,
+      "superArmor": 1
+    },
+    "estimatedDamageScore": 0.3100185502697217,
+    "sourceRange": "'單隊用表'!C18:R18"
+  },
+  {
+    "classId": "an",
+    "code": "AN",
+    "mode": "single",
+    "effects": {
+      "buff": 0.12,
+      "defenseBreak": 0.195,
+      "mpRecoveryPerSecond": 0.06875,
+      "actionSpeedMultiplicative": 0.15
+    },
+    "estimatedDamageScore": 0.37658625863528594,
+    "sourceRange": "'單隊用表'!C19:R19"
+  },
+  {
+    "classId": "dab",
+    "code": "DaB",
+    "mode": "single",
+    "effects": {
+      "debuff": 0.2100000000000002,
+      "mpRecoveryPerSecond": 0.01875
+    },
+    "estimatedDamageScore": 0.2100000000000002,
+    "sourceRange": "'單隊用表'!C20:R20"
+  },
+  {
+    "classId": "tw",
+    "code": "TW",
+    "mode": "single",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.2,
+      "shield": 0.2,
+      "mpRecoveryPerSecond": 0.01875,
+      "roarBlock": 1
+    },
+    "estimatedDamageScore": 0.38472042146034036,
+    "sourceRange": "'單隊用表'!C21:R21"
+  },
+  {
+    "classId": "pr",
+    "code": "PR",
+    "mode": "single",
+    "effects": {
+      "buff": 0.2225722727,
+      "defenseBreak": 0.1,
+      "shield": 0.15039999999999998,
+      "mpRecoveryPerSecond": 0.041477272727272724,
+      "actionSpeedMultiplicative": 0.1,
+      "debuffCleanse": 1,
+      "superArmor": 1
+    },
+    "estimatedDamageScore": 0.3517842377,
+    "sourceRange": "'單隊用表'!C22:R22"
+  },
+  {
+    "classId": "fb",
+    "code": "FB",
+    "mode": "single",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.195
+    },
+    "estimatedDamageScore": 0.37658625863528594,
+    "sourceRange": "'單隊用表'!C23:R23"
+  },
+  {
+    "classId": "rh",
+    "code": "RH",
+    "mode": "single",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.2,
+      "attackReduction": 0.225,
+      "resistanceReduction": 150
+    },
+    "estimatedDamageScore": 0.38472042146034036,
+    "sourceRange": "'單隊用表'!C24:R24"
+  },
+  {
+    "classId": "ni",
+    "code": "NI",
+    "mode": "single",
+    "effects": {
+      "buff": 0.1,
+      "debuff": 0.12,
+      "shield": 0.04500000000000004,
+      "resistanceReduction": 150,
+      "mpRecoveryPerSecond": 0.03636363636363636
+    },
+    "estimatedDamageScore": 0.2320000000000002,
+    "sourceRange": "'單隊用表'!C25:R25"
+  },
+  {
+    "classId": "re",
+    "code": "RE",
+    "mode": "single",
+    "effects": {
+      "buff": 0.15,
+      "debuff": 0.1928816,
+      "defenseBreak": 0.1,
+      "resistanceReduction": 150,
+      "actionSpeedMultiplicative": 0.1
+    },
+    "estimatedDamageScore": 0.5167989388471601,
+    "sourceRange": "'單隊用表'!C26:R26"
+  },
+  {
+    "classId": "cu",
+    "code": "CU",
+    "mode": "single",
+    "effects": {
+      "debuff": 0.12000000000000001,
+      "defenseBreak": 0.2,
+      "shield": 0.3
+    },
+    "estimatedDamageScore": 0.38472042146034036,
+    "sourceRange": "'單隊用表'!C27:R27"
+  },
+  {
+    "classId": "ce",
+    "code": "CE",
+    "mode": "single",
+    "effects": {
+      "buff": 0.12,
+      "debuff": 0.12,
+      "shield": 0.2,
+      "resistanceReduction": 150,
+      "debuffCleanse": 1,
+      "superArmor": 2
+    },
+    "estimatedDamageScore": 0.2544000000000002,
+    "sourceRange": "'單隊用表'!C28:R28"
+  },
+  {
+    "classId": "cs",
+    "code": "CS",
+    "mode": "single",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.2
+    },
+    "estimatedDamageScore": 0.38472042146034036,
+    "sourceRange": "'單隊用表'!C29:R29"
+  },
+  {
+    "classId": "ca",
+    "code": "CA",
+    "mode": "single",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.2,
+      "roarBlock": 1,
+      "debuffCleanse": 1
+    },
+    "estimatedDamageScore": 0.38472042146034036,
+    "sourceRange": "'單隊用表'!C30:R30"
+  },
+  {
+    "classId": "cc",
+    "code": "CC",
+    "mode": "single",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.19999999999999996,
+      "shield": 0.5,
+      "attackReduction": 0.2,
+      "actionSpeedMultiplicative": 0.08,
+      "roarBlock": 1,
+      "debuffCleanse": 1
+    },
+    "estimatedDamageScore": 0.38472042146034036,
+    "sourceRange": "'單隊用表'!C31:R31"
+  },
+  {
+    "classId": "fp",
+    "code": "FP",
+    "mode": "single",
+    "effects": {
+      "buff": 0.2,
+      "actionSpeedMultiplicative": 0.18
+    },
+    "estimatedDamageScore": 0.19999999999999996,
+    "sourceRange": "'單隊用表'!C32:R32"
+  },
+  {
+    "classId": "cet",
+    "code": "CeT",
+    "mode": "single",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.2,
+      "shield": 0.2,
+      "mpRecoveryPerSecond": 0.0109,
+      "superArmor": 3
+    },
+    "estimatedDamageScore": 0.38472042146034036,
+    "sourceRange": "'單隊用表'!C33:R33"
+  },
+  {
+    "classId": "dia",
+    "code": "DiA",
+    "mode": "single",
+    "effects": {
+      "buff": 0.2544000000000002,
+      "defenseBreak": 0.15,
+      "shield": 0.19999999999999996,
+      "cooldownAcceleration": 0.2,
+      "resistanceReduction": 150,
+      "mpRecoveryPerSecond": 0.2121212121,
+      "actionSpeedMultiplicative": 0.1,
+      "debuffCleanse": 3,
+      "superArmor": 3
+    },
+    "estimatedDamageScore": 0.4643588177068909,
+    "sourceRange": "'單隊用表'!C34:R34"
+  },
+  {
+    "classId": "vi",
+    "code": "VI",
+    "mode": "single",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.354,
+      "resistanceReduction": 150,
+      "actionSpeedMultiplicative": 0.1
+    },
+    "estimatedDamageScore": 0.6928025035991348,
+    "sourceRange": "'單隊用表'!C35:R35"
+  },
+  {
+    "classId": "br",
+    "code": "BR",
+    "mode": "single",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.1925
+    },
+    "estimatedDamageScore": 0.3725549087177107,
+    "sourceRange": "'單隊用表'!C36:R36"
+  },
+  {
+    "classId": "sh",
+    "code": "SH",
+    "mode": "single",
+    "effects": {
+      "buff": 0.06,
+      "debuff": 0.07,
+      "defenseBreak": 0.1925
+    },
+    "estimatedDamageScore": 0.3899569441675246,
+    "sourceRange": "'單隊用表'!C37:R37"
+  },
+  {
+    "classId": "su",
+    "code": "SU",
+    "mode": "single",
+    "effects": {
+      "buff": 0.2544000000000002,
+      "defenseBreak": 0.15,
+      "shield": 0.2799999999999999,
+      "cooldownAcceleration": 0.2,
+      "resistanceReduction": 150,
+      "mpRecoveryPerSecond": 0.21939393939393925,
+      "actionSpeedMultiplicative": 0.1,
+      "debuffCleanse": 3,
+      "superArmor": 3
+    },
+    "estimatedDamageScore": 0.4643588177068909,
+    "sourceRange": "'單隊用表'!C38:R38"
+  },
+  {
+    "classId": "es",
+    "code": "ES",
+    "mode": "single",
+    "effects": {
+      "buff": 0.1,
+      "debuff": 0.08,
+      "defenseBreak": 0.2,
+      "shield": 0.15,
+      "attackReduction": -0.1,
+      "resistanceReduction": 100,
+      "actionSpeedDiminishing": 0.03,
+      "debuffCleanse": 3
+    },
+    "estimatedDamageScore": 0.4687927327632897,
+    "sourceRange": "'單隊用表'!C39:R39"
+  },
+  {
+    "classId": "fl",
+    "code": "FL",
+    "mode": "single",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.2
+    },
+    "estimatedDamageScore": 0.38472042146034036,
+    "sourceRange": "'單隊用表'!C40:R40"
+  },
+  {
+    "classId": "bq",
+    "code": "BQ",
+    "mode": "single",
+    "effects": {
+      "debuff": 0.2,
+      "attackReduction": 0.4,
+      "resistanceReduction": 500
+    },
+    "estimatedDamageScore": 0.19999999999999996,
+    "sourceRange": "'單隊用表'!C41:R41"
+  },
+  {
+    "classId": "ad",
+    "code": "AD",
+    "mode": "single",
+    "effects": {
+      "buff": 0.101,
+      "debuff": 0.07,
+      "defenseBreak": 0.2,
+      "shield": 0.2,
+      "actionSpeedMultiplicative": 0.1,
+      "debuffCleanse": 1
+    },
+    "estimatedDamageScore": 0.45651570259802043,
+    "sourceRange": "'單隊用表'!C42:R42"
+  },
+  {
+    "classId": "db",
+    "code": "DB",
+    "mode": "single",
+    "effects": {
+      "debuff": 0.2,
+      "actionSpeedDiminishing": 0.2
+    },
+    "estimatedDamageScore": 0.19999999999999996,
+    "sourceRange": "'單隊用表'!C43:R43"
+  },
+  {
+    "classId": "dn",
+    "code": "DN",
+    "mode": "single",
+    "effects": {
+      "buff": 0.15345404255319162,
+      "debuff": 0.0507,
+      "defenseBreak": 0.1
+    },
+    "estimatedDamageScore": 0.34002180036961716,
+    "sourceRange": "'單隊用表'!C44:R44"
+  },
+  {
+    "classId": "mp",
+    "code": "MP",
+    "mode": "single",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.196
+    },
+    "estimatedDamageScore": 0.37820543710019594,
+    "sourceRange": "'單隊用表'!C45:R45"
+  },
+  {
+    "classId": "om",
+    "code": "OM",
+    "mode": "single",
+    "effects": {
+      "buff": 0.2544000000000002,
+      "defenseBreak": 0.15,
+      "shield": 0.24,
+      "attackReduction": 0.2,
+      "cooldownAcceleration": 0.2,
+      "resistanceReduction": 150,
+      "mpRecoveryPerSecond": 0.2,
+      "actionSpeedMultiplicative": 0.1,
+      "debuffCleanse": 3,
+      "superArmor": 3.0
+    },
+    "estimatedDamageScore": 0.4643588177068909,
+    "sourceRange": "'單隊用表'!C46:R46"
+  },
+  {
+    "classId": "ct",
+    "code": "CT",
+    "mode": "single",
+    "effects": {
+      "debuff": 0.20960000000000023,
+      "attackReduction": 0.1,
+      "cooldownAcceleration": 0.3
+    },
+    "estimatedDamageScore": 0.20960000000000023,
+    "sourceRange": "'單隊用表'!C47:R47"
+  },
+  {
+    "classId": "in",
+    "code": "IN",
+    "mode": "single",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.2
+    },
+    "estimatedDamageScore": 0.38472042146034036,
+    "sourceRange": "'單隊用表'!C48:R48"
+  },
+  {
+    "classId": "da",
+    "code": "DA",
+    "mode": "single",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.19999999999999996
+    },
+    "estimatedDamageScore": 0.38472042146034036,
+    "sourceRange": "'單隊用表'!C49:R49"
+  },
+  {
+    "classId": "de",
+    "code": "DE",
+    "mode": "single",
+    "effects": {
+      "buff": 0.2544000000000002,
+      "defenseBreak": 0.15,
+      "shield": 0.2,
+      "cooldownAcceleration": 0.2,
+      "resistanceReduction": 150,
+      "mpRecoveryPerSecond": 0.2,
+      "actionSpeedMultiplicative": 0.1,
+      "roarBlock": 2,
+      "debuffCleanse": 3,
+      "superArmor": 3.0
+    },
+    "estimatedDamageScore": 0.4643588177068909,
+    "sourceRange": "'單隊用表'!C50:R50"
+  },
+  {
+    "classId": "tb",
+    "code": "TB",
+    "mode": "single",
+    "effects": {
+      "buff": 0.1,
+      "debuff": 0.08,
+      "defenseBreak": 0.1,
+      "resistanceReduction": 100
+    },
+    "estimatedDamageScore": 0.3135580694756852,
+    "sourceRange": "'單隊用表'!C51:R51"
+  },
+  {
+    "classId": "bma",
+    "code": "BMa",
+    "mode": "single",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.19999999999999996
+    },
+    "estimatedDamageScore": 0.38472042146034036,
+    "sourceRange": "'單隊用表'!C52:R52"
+  },
+  {
+    "classId": "mn",
+    "code": "MN",
+    "mode": "single",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.2,
+      "resistanceReduction": 120
+    },
+    "estimatedDamageScore": 0.38472042146034036,
+    "sourceRange": "'單隊用表'!C53:R53"
+  },
+  {
+    "classId": "po",
+    "code": "PO",
+    "mode": "single",
+    "effects": {
+      "buff": 0.08,
+      "debuff": 0.08,
+      "defenseBreak": 0.2,
+      "shield": 0.03,
+      "superArmor": 1
+    },
+    "estimatedDamageScore": 0.4420874103494117,
+    "sourceRange": "'單隊用表'!C54:R54"
+  },
+  {
+    "classId": "ri",
+    "code": "RI",
+    "mode": "single",
+    "effects": {
+      "buff": 0.2,
+      "mpRecoveryPerSecond": 0.0263
+    },
+    "estimatedDamageScore": 0.19999999999999996,
+    "sourceRange": "'單隊用表'!C55:R55"
+  },
+  {
+    "classId": "bl",
+    "code": "BL",
+    "mode": "single",
+    "effects": {
+      "buff": 0.2544000000000002,
+      "defenseBreak": 0.15,
+      "shield": 0.2799999999999999,
+      "cooldownAcceleration": 0.2,
+      "resistanceReduction": 150,
+      "mpRecoveryPerSecond": 0.203030303,
+      "actionSpeedMultiplicative": 0.1,
+      "debuffCleanse": 3,
+      "superArmor": 3.0
+    },
+    "estimatedDamageScore": 0.4643588177068909,
+    "sourceRange": "'單隊用表'!C56:R56"
+  },
+  {
+    "classId": "he",
+    "code": "HE",
+    "mode": "single",
+    "effects": {
+      "buff": 0.1123404255319147,
+      "defenseBreak": 0.2,
+      "resistanceReduction": 100
+    },
+    "estimatedDamageScore": 0.3752504489731492,
+    "sourceRange": "'單隊用表'!C57:R57"
+  },
+  {
+    "classId": "bi",
+    "code": "BI",
+    "mode": "single",
+    "effects": {
+      "buff": 0.13190000000000013,
+      "defenseBreak": 0.2,
+      "attackReduction": 0.13,
+      "mpRecoveryPerSecond": 0.1
+    },
+    "estimatedDamageScore": 0.39943307593835664,
+    "sourceRange": "'單隊用表'!C58:R58"
+  },
+  {
+    "classId": "ew",
+    "code": "EW",
+    "mode": "single",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.2,
+      "resistanceReduction": 100,
+      "mpRecoveryPerSecond": 0.0062499999999999995,
+      "debuffCleanse": 1
+    },
+    "estimatedDamageScore": 0.38472042146034036,
+    "sourceRange": "'單隊用表'!C59:R59"
+  },
+  {
+    "classId": "rs",
+    "code": "RS",
+    "mode": "single",
+    "effects": {
+      "buff": 0.2544000000000002,
+      "defenseBreak": 0.15,
+      "shield": 0.2,
+      "attackReduction": 0.15,
+      "cooldownAcceleration": 0.2,
+      "cooldownReductionSeconds": 1,
+      "resistanceReduction": 150,
+      "mpRecoveryPerSecond": 0.2,
+      "actionSpeedMultiplicative": 0.1,
+      "debuffCleanse": 3,
+      "superArmor": 3.0
+    },
+    "estimatedDamageScore": 0.4643588177068909,
+    "sourceRange": "'單隊用表'!C60:R60"
+  },
+  {
+    "classId": "nl",
+    "code": "NL",
+    "mode": "single",
+    "effects": {
+      "buff": 0.2,
+      "defenseBreak": 0.1
+    },
+    "estimatedDamageScore": 0.3268263328037222,
+    "sourceRange": "'單隊用表'!C61:R61"
+  },
+  {
+    "classId": "tp",
+    "code": "TP",
+    "mode": "single",
+    "effects": {
+      "debuff": 0.2
+    },
+    "estimatedDamageScore": 0.19999999999999996,
+    "sourceRange": "'單隊用表'!C62:R62"
+  },
+  {
+    "classId": "li",
+    "code": "LI",
+    "mode": "single",
+    "effects": {
+      "buff": 0.029090909090909056,
+      "debuff": 0.18,
+      "defenseBreak": 0.07
+    },
+    "estimatedDamageScore": 0.3014047374928257,
+    "sourceRange": "'單隊用表'!C63:R63"
+  },
+  {
+    "classId": "cel",
+    "code": "CeL",
+    "mode": "single",
+    "effects": {
+      "buff": 0.1806666667,
+      "debuff": 0.04,
+      "defenseBreak": 0.15,
+      "shield": 0.25,
+      "mpRecoveryPerSecond": 0.07,
+      "roarBlock": 2,
+      "debuffCleanse": 3
+    },
+    "estimatedDamageScore": 0.4334155213,
+    "sourceRange": "'單隊用表'!C64:R64"
+  },
+  {
+    "classId": "np",
+    "code": "NP",
+    "mode": "single",
+    "effects": {
+      "buff": 0.2544000000000002,
+      "defenseBreak": 0.15,
+      "shield": 0.19999999999999996,
+      "cooldownAcceleration": 0.2,
+      "resistanceReduction": 150,
+      "mpRecoveryPerSecond": 1.06,
+      "actionSpeedMultiplicative": 0.1,
+      "debuffCleanse": 3,
+      "superArmor": 3.0
+    },
+    "estimatedDamageScore": 0.4643588177068909,
+    "sourceRange": "'單隊用表'!C65:R65"
+  },
+  {
+    "classId": "mo",
+    "code": "MO",
+    "mode": "single",
+    "effects": {
+      "buff": 0.2,
+      "resistanceReduction": 100
+    },
+    "estimatedDamageScore": 0.19999999999999996,
+    "sourceRange": "'單隊用表'!C66:R66"
+  },
+  {
+    "classId": "gb",
+    "code": "GB",
+    "mode": "single",
+    "effects": {
+      "buff": 0.2,
+      "resistanceReduction": 100
+    },
+    "estimatedDamageScore": 0.19999999999999996,
+    "sourceRange": "'單隊用表'!C67:R67"
+  },
+  {
+    "classId": "av",
+    "code": "AV",
+    "mode": "single",
+    "effects": {
+      "buff": 0.2544000000000002,
+      "defenseBreak": 0.15,
+      "shield": 0.2619999999999999,
+      "cooldownAcceleration": 0.2,
+      "resistanceReduction": 150,
+      "mpRecoveryPerSecond": 0.2,
+      "actionSpeedMultiplicative": 0.1,
+      "debuffCleanse": 3,
+      "superArmor": 3.0
+    },
+    "estimatedDamageScore": 0.4643588177068909,
+    "sourceRange": "'單隊用表'!C68:R68"
+  },
+  {
+    "classId": "ac",
+    "code": "AC",
+    "mode": "single",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.2,
+      "debuffCleanse": 3
+    },
+    "estimatedDamageScore": 0.38472042146034036,
+    "sourceRange": "'單隊用表'!C69:R69"
+  },
+  {
+    "classId": "mi",
+    "code": "MI",
+    "mode": "single",
+    "effects": {
+      "debuff": 0.125,
+      "defenseBreak": 0.2,
+      "resistanceReduction": 125
+    },
+    "estimatedDamageScore": 0.39090220905614537,
+    "sourceRange": "'單隊用表'!C70:R70"
+  },
+  {
+    "classId": "ke",
+    "code": "KE",
+    "mode": "challenge",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.2,
+      "shield": 0.2,
+      "attackReduction": -0.12,
+      "superArmor": 1
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.23765439738607408
+    },
+    "estimatedDamageScore": 0.34671008722908114,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C19:S19"
+  },
+  {
+    "classId": "rm",
+    "code": "RM",
+    "mode": "challenge",
+    "effects": {
+      "buff": 0.1200000000000001,
+      "defenseBreak": 0.2,
+      "resistanceReduction": 220
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.23765439738607408
+    },
+    "estimatedDamageScore": 0.34671008722908114,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C20:S20"
+  },
+  {
+    "classId": "im",
+    "code": "IM",
+    "mode": "challenge",
+    "effects": {
+      "debuff": 0.2
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0
+    },
+    "estimatedDamageScore": 0.19999999999999996,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C21:S21"
+  },
+  {
+    "classId": "ge",
+    "code": "GE",
+    "mode": "challenge",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.2,
+      "shield": 0.08,
+      "resistanceReduction": 130
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.23765439738607408
+    },
+    "estimatedDamageScore": 0.34671008722908114,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C22:S22"
+  },
+  {
+    "classId": "as",
+    "code": "AS",
+    "mode": "challenge",
+    "effects": {
+      "buff": 0.2
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0
+    },
+    "estimatedDamageScore": 0.19999999999999996,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C23:S23"
+  },
+  {
+    "classId": "oz",
+    "code": "OZ",
+    "mode": "challenge",
+    "effects": {
+      "buff": 0.12,
+      "defenseBreak": 0.2,
+      "attackReduction": 0.2,
+      "resistanceReduction": 195,
+      "mpRecoveryPerSecond": 0.08571428571428572,
+      "actionSpeedMultiplicative": 0.1
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.23765439738607408
+    },
+    "estimatedDamageScore": 0.34671008722908114,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C24:S24"
+  },
+  {
+    "classId": "mm",
+    "code": "MM",
+    "mode": "challenge",
+    "effects": {
+      "buff": 0.12,
+      "defenseBreak": 0.20999999999999996
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.2525379550313822
+    },
+    "estimatedDamageScore": 0.36047948106053673,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C25:S25"
+  },
+  {
+    "classId": "la",
+    "code": "LA",
+    "mode": "challenge",
+    "effects": {
+      "buff": 0.1847988101063831,
+      "defenseBreak": 0.1,
+      "shield": 0.31999999999999995,
+      "mpRecoveryPerSecond": 0.02222222222,
+      "actionSpeedMultiplicative": 0.05,
+      "superArmor": 1
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.10620692706777746
+    },
+    "estimatedDamageScore": 0.2936911533853055,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C26:S26"
+  },
+  {
+    "classId": "an",
+    "code": "AN",
+    "mode": "challenge",
+    "effects": {
+      "buff": 0.12,
+      "defenseBreak": 0.195,
+      "mpRecoveryPerSecond": 0.06875,
+      "actionSpeedMultiplicative": 0.15
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.23034447799867253
+    },
+    "estimatedDamageScore": 0.3399293839363797,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C27:S27"
+  },
+  {
+    "classId": "dab",
+    "code": "DaB",
+    "mode": "challenge",
+    "effects": {
+      "debuff": 0.2100000000000002
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0
+    },
+    "estimatedDamageScore": 0.2100000000000002,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C28:S28"
+  },
+  {
+    "classId": "tw",
+    "code": "TW",
+    "mode": "challenge",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.2,
+      "shield": 0.2,
+      "mpRecoveryPerSecond": 0.01875,
+      "roarBlock": 1
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.23765439738607408
+    },
+    "estimatedDamageScore": 0.34671008722908114,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C29:S29"
+  },
+  {
+    "classId": "pr",
+    "code": "PR",
+    "mode": "challenge",
+    "effects": {
+      "buff": 0.2225722727,
+      "defenseBreak": 0.1,
+      "shield": 0.15039999999999998,
+      "mpRecoveryPerSecond": 0.041477272727272724,
+      "actionSpeedMultiplicative": 0.1,
+      "debuffCleanse": 2,
+      "superArmor": 1
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.10620692706777746
+    },
+    "estimatedDamageScore": 0.3349362948,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C30:S30"
+  },
+  {
+    "classId": "fb",
+    "code": "FB",
+    "mode": "challenge",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.195
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.23034447799867253
+    },
+    "estimatedDamageScore": 0.3399293839363797,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C31:S31"
+  },
+  {
+    "classId": "rh",
+    "code": "RH",
+    "mode": "challenge",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.2,
+      "attackReduction": 0.225,
+      "resistanceReduction": 150
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.23765439738607408
+    },
+    "estimatedDamageScore": 0.34671008722908114,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C32:S32"
+  },
+  {
+    "classId": "ni",
+    "code": "NI",
+    "mode": "challenge",
+    "effects": {
+      "buff": 0.1,
+      "debuff": 0.12,
+      "shield": 0.04500000000000004,
+      "resistanceReduction": 150,
+      "mpRecoveryPerSecond": 0.03636363636363636
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0
+    },
+    "estimatedDamageScore": 0.2320000000000002,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C33:S33"
+  },
+  {
+    "classId": "re",
+    "code": "RE",
+    "mode": "challenge",
+    "effects": {
+      "buff": 0.15,
+      "debuff": 0.1928816,
+      "defenseBreak": 0.1,
+      "resistanceReduction": 150,
+      "actionSpeedMultiplicative": 0.1
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.10620692706777746
+    },
+    "estimatedDamageScore": 0.4978943376387879,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C34:S34"
+  },
+  {
+    "classId": "cu",
+    "code": "CU",
+    "mode": "challenge",
+    "effects": {
+      "debuff": 0.12000000000000001,
+      "defenseBreak": 0.2,
+      "shield": 0.3
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.23765439738607408
+    },
+    "estimatedDamageScore": 0.34671008722908114,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C35:S35"
+  },
+  {
+    "classId": "ce",
+    "code": "CE",
+    "mode": "challenge",
+    "effects": {
+      "buff": 0.12,
+      "debuff": 0.12,
+      "shield": 0.2,
+      "resistanceReduction": 150,
+      "debuffCleanse": 1,
+      "superArmor": 2
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0
+    },
+    "estimatedDamageScore": 0.2544000000000002,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C36:S36"
+  },
+  {
+    "classId": "cs",
+    "code": "CS",
+    "mode": "challenge",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.2
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.23765439738607408
+    },
+    "estimatedDamageScore": 0.34671008722908114,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C37:S37"
+  },
+  {
+    "classId": "ca",
+    "code": "CA",
+    "mode": "challenge",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.2,
+      "roarBlock": 1,
+      "debuffCleanse": 1
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.23765439738607408
+    },
+    "estimatedDamageScore": 0.34671008722908114,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C38:S38"
+  },
+  {
+    "classId": "cc",
+    "code": "CC",
+    "mode": "challenge",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.19999999999999996,
+      "shield": 0.5,
+      "attackReduction": 0.2,
+      "actionSpeedMultiplicative": 0.08,
+      "roarBlock": 1,
+      "debuffCleanse": 1
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.23765439738607386
+    },
+    "estimatedDamageScore": 0.34671008722908114,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C39:S39"
+  },
+  {
+    "classId": "fp",
+    "code": "FP",
+    "mode": "challenge",
+    "effects": {
+      "buff": 0.2,
+      "actionSpeedMultiplicative": 0.18
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0
+    },
+    "estimatedDamageScore": 0.19999999999999996,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C40:S40"
+  },
+  {
+    "classId": "cet",
+    "code": "CeT",
+    "mode": "challenge",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.2,
+      "shield": 0.2,
+      "mpRecoveryPerSecond": 0.0109,
+      "superArmor": 3
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.23765439738607408
+    },
+    "estimatedDamageScore": 0.34671008722908114,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C41:S41"
+  },
+  {
+    "classId": "dia",
+    "code": "DiA",
+    "mode": "challenge",
+    "effects": {
+      "buff": 0.2544000000000002,
+      "defenseBreak": 0.15,
+      "shield": 0.19999999999999996,
+      "cooldownAcceleration": 0.2,
+      "resistanceReduction": 150,
+      "mpRecoveryPerSecond": 0.2121212121,
+      "actionSpeedMultiplicative": 0.1,
+      "debuffCleanse": 3,
+      "superArmor": 3
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.1682447706443455
+    },
+    "estimatedDamageScore": 0.4356636394528275,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C42:S42"
+  },
+  {
+    "classId": "vi",
+    "code": "VI",
+    "mode": "challenge",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.354,
+      "resistanceReduction": 150,
+      "actionSpeedMultiplicative": 0.1
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.5148655269020423
+    },
+    "estimatedDamageScore": 0.5953694510779148,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C43:S43"
+  },
+  {
+    "classId": "br",
+    "code": "BR",
+    "mode": "challenge",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.1925
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.22672180372267126
+    },
+    "estimatedDamageScore": 0.33656457368818327,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C44:S44"
+  },
+  {
+    "classId": "sh",
+    "code": "SH",
+    "mode": "challenge",
+    "effects": {
+      "buff": 0.06,
+      "debuff": 0.07,
+      "defenseBreak": 0.1925
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.22672180372267126
+    },
+    "estimatedDamageScore": 0.353510303104587,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C45:S45"
+  },
+  {
+    "classId": "su",
+    "code": "SU",
+    "mode": "challenge",
+    "effects": {
+      "buff": 0.2544000000000002,
+      "defenseBreak": 0.15,
+      "shield": 0.2799999999999999,
+      "cooldownAcceleration": 0.2,
+      "resistanceReduction": 150,
+      "mpRecoveryPerSecond": 0.21939393939393925,
+      "actionSpeedMultiplicative": 0.1,
+      "debuffCleanse": 3,
+      "superArmor": 3
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.1682447706443455
+    },
+    "estimatedDamageScore": 0.4356636394528275,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C46:S46"
+  },
+  {
+    "classId": "es",
+    "code": "ES",
+    "mode": "challenge",
+    "effects": {
+      "buff": 0.1,
+      "debuff": 0.08,
+      "defenseBreak": 0.2,
+      "shield": 0.15,
+      "attackReduction": -0.1,
+      "resistanceReduction": 100,
+      "actionSpeedDiminishing": 0.03,
+      "debuffCleanse": 3
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.23765439738607408
+    },
+    "estimatedDamageScore": 0.4284746282394183,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C47:S47"
+  },
+  {
+    "classId": "fl",
+    "code": "FL",
+    "mode": "challenge",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.2
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.23765439738607408
+    },
+    "estimatedDamageScore": 0.34671008722908114,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C48:S48"
+  },
+  {
+    "classId": "bq",
+    "code": "BQ",
+    "mode": "challenge",
+    "effects": {
+      "debuff": 0.2,
+      "attackReduction": 0.4,
+      "resistanceReduction": 500
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0
+    },
+    "estimatedDamageScore": 0.19999999999999996,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C49:S49"
+  },
+  {
+    "classId": "ad",
+    "code": "AD",
+    "mode": "challenge",
+    "effects": {
+      "buff": 0.101,
+      "debuff": 0.07,
+      "defenseBreak": 0.2,
+      "shield": 0.2,
+      "actionSpeedMultiplicative": 0.1,
+      "debuffCleanse": 1
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.23765439738607408
+    },
+    "estimatedDamageScore": 0.41653460041246726,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C50:S50"
+  },
+  {
+    "classId": "db",
+    "code": "DB",
+    "mode": "challenge",
+    "effects": {
+      "debuff": 0.2,
+      "actionSpeedDiminishing": 0.2
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0
+    },
+    "estimatedDamageScore": 0.19999999999999996,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C51:S51"
+  },
+  {
+    "classId": "dn",
+    "code": "DN",
+    "mode": "challenge",
+    "effects": {
+      "buff": 0.15345404255319162,
+      "debuff": 0.0507,
+      "defenseBreak": 0.1
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.10620692706777746
+    },
+    "estimatedDamageScore": 0.3233204584199936,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C52:S52"
+  },
+  {
+    "classId": "mp",
+    "code": "MP",
+    "mode": "challenge",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.196
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.23179954581087148
+    },
+    "estimatedDamageScore": 0.34128005653949733,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C53:S53"
+  },
+  {
+    "classId": "om",
+    "code": "OM",
+    "mode": "challenge",
+    "effects": {
+      "buff": 0.2544000000000002,
+      "defenseBreak": 0.15,
+      "shield": 0.24,
+      "attackReduction": 0.2,
+      "cooldownAcceleration": 0.2,
+      "resistanceReduction": 150,
+      "mpRecoveryPerSecond": 0.2,
+      "actionSpeedMultiplicative": 0.1,
+      "debuffCleanse": 3,
+      "superArmor": 3.0
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.1682447706443455
+    },
+    "estimatedDamageScore": 0.4356636394528275,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C54:S54"
+  },
+  {
+    "classId": "ct",
+    "code": "CT",
+    "mode": "challenge",
+    "effects": {
+      "debuff": 0.20960000000000023,
+      "attackReduction": 0.1,
+      "cooldownAcceleration": 0.3
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0
+    },
+    "estimatedDamageScore": 0.20960000000000023,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C55:S55"
+  },
+  {
+    "classId": "in",
+    "code": "IN",
+    "mode": "challenge",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.2
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.23765439738607408
+    },
+    "estimatedDamageScore": 0.34671008722908114,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C56:S56"
+  },
+  {
+    "classId": "da",
+    "code": "DA",
+    "mode": "challenge",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.19999999999999996
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.23765439738607386
+    },
+    "estimatedDamageScore": 0.34671008722908114,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C57:S57"
+  },
+  {
+    "classId": "de",
+    "code": "DE",
+    "mode": "challenge",
+    "effects": {
+      "buff": 0.2544000000000002,
+      "defenseBreak": 0.15,
+      "shield": 0.2,
+      "cooldownAcceleration": 0.2,
+      "resistanceReduction": 150,
+      "mpRecoveryPerSecond": 0.2,
+      "actionSpeedMultiplicative": 0.1,
+      "roarBlock": 2,
+      "debuffCleanse": 3,
+      "superArmor": 3.0
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.1682447706443455
+    },
+    "estimatedDamageScore": 0.4356636394528275,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C58:S58"
+  },
+  {
+    "classId": "tb",
+    "code": "TB",
+    "mode": "challenge",
+    "effects": {
+      "buff": 0.1,
+      "debuff": 0.08,
+      "defenseBreak": 0.1,
+      "resistanceReduction": 100
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.10620692706777746
+    },
+    "estimatedDamageScore": 0.2971865578458375,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C59:S59"
+  },
+  {
+    "classId": "bma",
+    "code": "BMa",
+    "mode": "challenge",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.19999999999999996
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.23765439738607386
+    },
+    "estimatedDamageScore": 0.34671008722908114,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C60:S60"
+  },
+  {
+    "classId": "mn",
+    "code": "MN",
+    "mode": "challenge",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.2,
+      "resistanceReduction": 120
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.23765439738607408
+    },
+    "estimatedDamageScore": 0.34671008722908114,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C61:S61"
+  },
+  {
+    "classId": "po",
+    "code": "PO",
+    "mode": "challenge",
+    "effects": {
+      "buff": 0.08,
+      "debuff": 0.08,
+      "defenseBreak": 0.2,
+      "shield": 0.03,
+      "superArmor": 1
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.23765439738607408
+    },
+    "estimatedDamageScore": 0.40250236227142877,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C62:S62"
+  },
+  {
+    "classId": "ri",
+    "code": "RI",
+    "mode": "challenge",
+    "effects": {
+      "buff": 0.2,
+      "mpRecoveryPerSecond": 0.0263
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0
+    },
+    "estimatedDamageScore": 0.19999999999999996,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C63:S63"
+  },
+  {
+    "classId": "bl",
+    "code": "BL",
+    "mode": "challenge",
+    "effects": {
+      "buff": 0.2544000000000002,
+      "defenseBreak": 0.15,
+      "shield": 0.2799999999999999,
+      "cooldownAcceleration": 0.2,
+      "resistanceReduction": 150,
+      "mpRecoveryPerSecond": 0.203030303,
+      "debuffCleanse": 3,
+      "superArmor": 3.0
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.1682447706443455
+    },
+    "estimatedDamageScore": 0.4356636394528275,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C64:S64"
+  },
+  {
+    "classId": "he",
+    "code": "HE",
+    "mode": "challenge",
+    "effects": {
+      "buff": 0.1123404255319147,
+      "defenseBreak": 0.2,
+      "resistanceReduction": 100
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.23765439738607408
+    },
+    "estimatedDamageScore": 0.3375000638361767,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C65:S65"
+  },
+  {
+    "classId": "bi",
+    "code": "BI",
+    "mode": "challenge",
+    "effects": {
+      "buff": 0.13190000000000013,
+      "defenseBreak": 0.2,
+      "attackReduction": 0.13,
+      "mpRecoveryPerSecond": 0.1
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.23765439738607408
+    },
+    "estimatedDamageScore": 0.36101888190589015,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C66:S66"
+  },
+  {
+    "classId": "ew",
+    "code": "EW",
+    "mode": "challenge",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.2,
+      "resistanceReduction": 100,
+      "mpRecoveryPerSecond": 0.0062499999999999995,
+      "debuffCleanse": 1
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.23765439738607408
+    },
+    "estimatedDamageScore": 0.34671008722908114,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C67:S67"
+  },
+  {
+    "classId": "rs",
+    "code": "RS",
+    "mode": "challenge",
+    "effects": {
+      "buff": 0.2544000000000002,
+      "defenseBreak": 0.15,
+      "shield": 0.2,
+      "attackReduction": 0.15,
+      "cooldownAcceleration": 0.2,
+      "cooldownReductionSeconds": 1,
+      "resistanceReduction": 150,
+      "mpRecoveryPerSecond": 0.2,
+      "actionSpeedMultiplicative": 0.1,
+      "debuffCleanse": 3,
+      "superArmor": 3.0
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.1682447706443455
+    },
+    "estimatedDamageScore": 0.4356636394528275,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C68:S68"
+  },
+  {
+    "classId": "nl",
+    "code": "NL",
+    "mode": "challenge",
+    "effects": {
+      "buff": 0.2,
+      "defenseBreak": 0.1
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.10620692706777746
+    },
+    "estimatedDamageScore": 0.31028945236953254,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C69:S69"
+  },
+  {
+    "classId": "tp",
+    "code": "TP",
+    "mode": "challenge",
+    "effects": {
+      "debuff": 0.2
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0
+    },
+    "estimatedDamageScore": 0.19999999999999996,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C70:S70"
+  },
+  {
+    "classId": "li",
+    "code": "LI",
+    "mode": "challenge",
+    "effects": {
+      "buff": 0.029090909090909056,
+      "debuff": 0.18,
+      "defenseBreak": 0.07
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.07204921134699771
+    },
+    "estimatedDamageScore": 0.2903553676022699,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C71:S71"
+  },
+  {
+    "classId": "cel",
+    "code": "CeL",
+    "mode": "challenge",
+    "effects": {
+      "buff": 0.1806666667,
+      "debuff": 0.04,
+      "defenseBreak": 0.15,
+      "shield": 0.25,
+      "mpRecoveryPerSecond": 0.07,
+      "roarBlock": 2,
+      "debuffCleanse": 3
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.1682447706443455
+    },
+    "estimatedDamageScore": 0.4053266995,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C72:S72"
+  },
+  {
+    "classId": "np",
+    "code": "NP",
+    "mode": "challenge",
+    "effects": {
+      "buff": 0.2544000000000002,
+      "defenseBreak": 0.15,
+      "shield": 0.19999999999999996,
+      "cooldownAcceleration": 0.2,
+      "resistanceReduction": 150,
+      "mpRecoveryPerSecond": 0.2,
+      "actionSpeedMultiplicative": 0.1,
+      "debuffCleanse": 3,
+      "superArmor": 3.0
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.1682447706443455
+    },
+    "estimatedDamageScore": 0.4356636394528275,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C73:S73"
+  },
+  {
+    "classId": "mo",
+    "code": "MO",
+    "mode": "challenge",
+    "effects": {
+      "buff": 0.2,
+      "resistanceReduction": 100
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0
+    },
+    "estimatedDamageScore": 0.19999999999999996,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C74:S74"
+  },
+  {
+    "classId": "gb",
+    "code": "GB",
+    "mode": "challenge",
+    "effects": {
+      "buff": 0.2,
+      "resistanceReduction": 100
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0
+    },
+    "estimatedDamageScore": 0.19999999999999996,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C75:S75"
+  },
+  {
+    "classId": "av",
+    "code": "AV",
+    "mode": "challenge",
+    "effects": {
+      "buff": 0.2544000000000002,
+      "defenseBreak": 0.15,
+      "shield": 0.2619999999999999,
+      "cooldownAcceleration": 0.2,
+      "resistanceReduction": 150,
+      "mpRecoveryPerSecond": 0.2,
+      "actionSpeedMultiplicative": 0.1,
+      "debuffCleanse": 3,
+      "superArmor": 3.0
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.1682447706443455
+    },
+    "estimatedDamageScore": 0.4356636394528275,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C76:S76"
+  },
+  {
+    "classId": "ac",
+    "code": "AC",
+    "mode": "challenge",
+    "effects": {
+      "debuff": 0.12,
+      "defenseBreak": 0.2,
+      "debuffCleanse": 3
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.23765439738607408
+    },
+    "estimatedDamageScore": 0.34671008722908114,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C77:S77"
+  },
+  {
+    "classId": "mi",
+    "code": "MI",
+    "mode": "challenge",
+    "effects": {
+      "debuff": 0.125,
+      "defenseBreak": 0.2,
+      "resistanceReduction": 125
+    },
+    "workbookDerived": {
+      "defenseBreakDamageIncrease": 0.23765439738607408
+    },
+    "estimatedDamageScore": 0.35272218583278225,
+    "sourceRange": "'挑戰(雙隊)模式用表'!C78:S78"
+  }
+]

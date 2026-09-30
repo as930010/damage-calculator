@@ -1,0 +1,96 @@
+[
+  {
+    "id": "movement-speed-shoes",
+    "label": "動速鞋",
+    "scope": "per-team",
+    "defaultSelected": true,
+    "userInput": { "kind": "percentage", "parameter": "movementSpeedShoePercent", "helpText": "直接套用效果值" },
+    "sourceSummaryCells": { "single": "單隊用表!C9", "challengeFirstTeam": "挑戰(雙隊)模式用表!C8", "challengeSecondTeam": "挑戰(雙隊)模式用表!C15" },
+    "sourceRange": "單隊用表!D73；挑戰(雙隊)模式用表!D80:D82",
+    "effects": { "actionSpeedMultiplicative": { "kind": "scaled-parameter", "parameter": "movementSpeedShoePercent", "factor": 1 } }
+  },
+  {
+    "id": "skill-damage-gloves",
+    "label": "技傷手",
+    "scope": "per-team",
+    "defaultSelected": true,
+    "userInput": { "kind": "percentage", "parameter": "skillDamageGlovePercent", "helpText": "裝備值，效果計入 80%" },
+    "sourceSummaryCells": { "single": "單隊用表!E9", "challengeFirstTeam": "挑戰(雙隊)模式用表!E8", "challengeSecondTeam": "挑戰(雙隊)模式用表!E15" },
+    "sourceRange": "單隊用表!E73；挑戰(雙隊)模式用表!E80:E82",
+    "effects": { "buff": { "kind": "scaled-parameter", "parameter": "skillDamageGlovePercent", "factor": 0.8 } }
+  },
+  {
+    "id": "green-beast",
+    "label": "聖獸－綠",
+    "scope": "per-team",
+    "defaultSelected": true,
+    "sourceSummaryCells": { "single": "單隊用表!G9", "challengeFirstTeam": "挑戰(雙隊)模式用表!G8", "challengeSecondTeam": "挑戰(雙隊)模式用表!G15" },
+    "sourceRange": "單隊用表!F73；挑戰(雙隊)模式用表!F80:F82",
+    "effects": { "buff": { "kind": "fixed", "value": 0.04 } }
+  },
+  {
+    "id": "hundred-billion-green-set-effect",
+    "label": "百億綠套效",
+    "scope": "per-team",
+    "defaultSelected": true,
+    "sourceRange": "單隊用表!G73；挑戰(雙隊)模式用表!F80:F82",
+    "effects": { "buff": { "kind": "fixed", "value": 0.1 } }
+  },
+  {
+    "id": "hundred-billion-red-top-critical-damage",
+    "label": "百億紅套上衣／爆上",
+    "scope": "per-team",
+    "defaultSelected": true,
+    "sourceRange": "單隊用表!H73；挑戰(雙隊)模式用表!H80:H82",
+    "effects": { "buff": { "kind": "relative-parameter-increase", "parameter": "criticalDamagePercent", "additiveIncrease": 0.15 } }
+  },
+  {
+    "id": "steel-wall-defense-break",
+    "label": "鋼鐵城牆（破防）",
+    "scope": "per-team",
+    "defaultSelected": true,
+    "sourceSummaryCells": { "single": "單隊用表!I9", "challengeFirstTeam": "挑戰(雙隊)模式用表!I8", "challengeSecondTeam": "挑戰(雙隊)模式用表!I15" },
+    "sourceRange": "單隊用表!D75；挑戰(雙隊)模式用表!D84:D86",
+    "effects": { "defenseBreak": { "kind": "fixed", "value": 0.48 } }
+  },
+  {
+    "id": "wind-ball-defense-break",
+    "label": "風球（破防）",
+    "scope": "per-team",
+    "defaultSelected": true,
+    "sourceSummaryCells": { "single": "單隊用表!Q9", "challengeFirstTeam": "挑戰(雙隊)模式用表!Q8", "challengeSecondTeam": "挑戰(雙隊)模式用表!Q15" },
+    "sourceRange": "單隊用表!E75；挑戰(雙隊)模式用表!E84:E86",
+    "effects": { "defenseBreak": { "kind": "fixed", "value": 0.5 } }
+  },
+  {
+    "id": "incense-defense-break",
+    "label": "香爐（破防）",
+    "scope": "per-team",
+    "defaultSelected": true,
+    "presentation": "background",
+    "sourceSummaryCells": { "single": "單隊用表!K9", "challengeFirstTeam": "挑戰(雙隊)模式用表!K8", "challengeSecondTeam": "挑戰(雙隊)模式用表!K15" },
+    "sourceRange": "單隊用表!F75；挑戰(雙隊)模式用表!F84:F86",
+    "effects": { "defenseBreak": { "kind": "fixed", "value": 0.15 } }
+  },
+  {
+    "id": "dark-ghost-badge-resistance",
+    "label": "暗鬼徽章",
+    "scope": "per-team",
+    "defaultSelected": true,
+    "presentation": "background",
+    "sourceSummaryCells": { "single": "單隊用表!M9", "challengeFirstTeam": "挑戰(雙隊)模式用表!M8", "challengeSecondTeam": "挑戰(雙隊)模式用表!M15" },
+    "sourceRange": "單隊用表!D77:E77；挑戰(雙隊)模式用表!D88:E90",
+    "effects": { "resistanceReduction": { "kind": "fixed", "value": 250 } },
+    "note": "兩個工作表降抗欄（150+100）由同一個摘要狀態觸發；作為常見背景來源預設納入。"
+  },
+  {
+    "id": "ice-crystal-resistance",
+    "label": "冰晶露（降抗）",
+    "scope": "per-team",
+    "defaultSelected": true,
+    "presentation": "background",
+    "sourceSummaryCells": { "single": "單隊用表!O9", "challengeFirstTeam": "挑戰(雙隊)模式用表!O8", "challengeSecondTeam": "挑戰(雙隊)模式用表!O15" },
+    "sourceRange": "單隊用表!F77；挑戰(雙隊)模式用表!F88:F90",
+    "effects": { "resistanceReduction": { "kind": "fixed", "value": 150 } }
+  }
+]

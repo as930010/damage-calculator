@@ -1,0 +1,2788 @@
+{
+  "schemaVersion": 1,
+  "sourceSpreadsheetId": "1UQFRQhqYEiKI8T_Ilx4DE9r-oaBV1WsUksBxo1ckHtY",
+  "sourceSheet": "全角色BUFF參照表",
+  "purpose": "技能效果說明參照，不參與任何數值計算。",
+  "notes": [
+    {
+      "text": "使用技能時除去我方的DeBUFF，並使其變為霸體狀態（此列文字無對應技能名稱，保留作表格註記）",
+      "sourceRange": "'全角色BUFF參照表'!A1"
+    },
+    {
+      "text": "(查閱特定角色Buff)\r\n技能效果說明：",
+      "sourceRange": "'全角色BUFF參照表'!B2"
+    }
+  ],
+  "roles": [
+    {
+      "code": "KE",
+      "skills": [
+        {
+          "name": "防禦破壞(原版)",
+          "category": "DeBuff",
+          "description": "敵方防禦 -12%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C3:D4"
+          ],
+          "icon": "skill-icons/KE-01.png"
+        },
+        {
+          "name": "防禦破壞(轉換)",
+          "category": "DeBuff",
+          "description": "10.5秒間\n敵方防禦 -20%，\n但會使其攻擊 +12%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E3:F4"
+          ],
+          "icon": "skill-icons/KE-02.png"
+        },
+        {
+          "name": "霸體[鎧]",
+          "category": "Buff",
+          "description": "12秒間\n我方所受傷害 -20%\n獲得霸體狀態",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G3:H4"
+          ],
+          "icon": "skill-icons/KE-03.png"
+        },
+        {
+          "name": "十字陣列",
+          "category": "DeBuff",
+          "description": "10秒間\n敵方所受傷害 +12% \n持續10秒",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!I3:J4"
+          ],
+          "icon": "skill-icons/KE-04.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A3:Z4"
+      ]
+    },
+    {
+      "code": "RM",
+      "skills": [
+        {
+          "name": "魔力鎖鏈(被動)",
+          "category": "DeBuff",
+          "description": "敵方防禦 -20%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C5:D6"
+          ],
+          "icon": "skill-icons/RM-01.png"
+        },
+        {
+          "name": "火鳳昇華(原版)",
+          "category": "Buff",
+          "description": "15秒間\n我方移動/跳躍速度 +10%\n每秒恢復1.5MP",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E5:F6"
+          ],
+          "icon": "skill-icons/RM-02.png"
+        },
+        {
+          "name": "月神之刃(轉換)",
+          "category": "DeBuff、降抗",
+          "description": "7秒間\n所有屬性抗性 -80",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G5:H6"
+          ],
+          "icon": "skill-icons/RM-03.png"
+        },
+        {
+          "name": "符文領域",
+          "category": "Buff+DeBuff",
+          "description": "10秒間\n領域中敵方獲得「符文刻印」Debuff，\n領域中我方攻擊「符文刻印」敵方時\n造成傷害 +12%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!I5:J6"
+          ],
+          "icon": "skill-icons/RM-04.png"
+        },
+        {
+          "name": "結界破壞",
+          "category": "DeBuff、降抗",
+          "description": "5秒間\n所有屬性抗性 -80",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!K5:L6"
+          ],
+          "icon": "skill-icons/RM-05.png"
+        },
+        {
+          "name": "魔力的脈動(被動)",
+          "category": "DeBuff、降抗",
+          "description": "狂野之風、風之痕、裂刃風暴\n技能打擊敵方\n10秒間所有屬性抗性 -30\n(最多3層90,發動間隔3秒)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!M5:N6"
+          ],
+          "icon": "skill-icons/RM-06.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A5:Z6"
+      ]
+    },
+    {
+      "code": "IM",
+      "skills": [
+        {
+          "name": "[轉換]無限追逐者",
+          "category": "Buff",
+          "description": "10秒間\n我方移動速度 +30%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C7:D8"
+          ],
+          "icon": "skill-icons/IM-01.png"
+        },
+        {
+          "name": "戰鬥達人(被動)",
+          "category": "DeBuff",
+          "description": "受康沃爾攻擊時附加DeBuff\n10秒間\n所受傷害 +20%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E7:F8"
+          ],
+          "icon": "skill-icons/IM-02.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A7:Z8"
+      ]
+    },
+    {
+      "code": "GE",
+      "skills": [
+        {
+          "name": "主宰",
+          "category": "DeBuff、降抗",
+          "description": "領域中\n敵方所有屬性抗性 -130",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C9:D10"
+          ],
+          "icon": "skill-icons/GE-01.png"
+        },
+        {
+          "name": "神之裂",
+          "category": "DeBuff",
+          "description": "10秒間\n敵方所受傷害 +12%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E9:F10"
+          ],
+          "icon": "skill-icons/GE-02.png"
+        },
+        {
+          "name": "渴望",
+          "category": "DeBuff",
+          "description": "覺醒中於破壞劍道(紅)\n使用「強烈的」技能時\n敵方防禦 -15%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G9:H10"
+          ],
+          "icon": "skill-icons/GE-03.png"
+        },
+        {
+          "name": "命運",
+          "category": "DeBuff",
+          "description": "強化「渴望」效果\n變為敵方防禦 -20%\n[艾爾共鳴-艾爾的光榮] - 所受傷害減少效果會適用於我方",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!I9:J10"
+          ],
+          "icon": "skill-icons/GE-04.png"
+        },
+        {
+          "name": "解放意志:聖殿騎士",
+          "category": "Buff",
+          "description": "覺醒中於活力劍道(藍)\n使用「超越的」技能時\n我方所受傷害 -8%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!K9:L10"
+          ],
+          "icon": "skill-icons/GE-05.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A9:Z10"
+      ]
+    },
+    {
+      "code": "AS",
+      "skills": [
+        {
+          "name": "智慧紋章",
+          "category": "Buff",
+          "description": "攻擊 +20%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C11:D12"
+          ],
+          "icon": "skill-icons/AS-01.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A11:Z12"
+      ]
+    },
+    {
+      "code": "OZ",
+      "skills": [
+        {
+          "name": "加速紋章",
+          "category": "Buff",
+          "description": "攻擊 +12%\n所有速度 +10%\n(動作速度為乘算)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C13:D14"
+          ],
+          "icon": "skill-icons/OZ-01.png"
+        },
+        {
+          "name": "惡靈轟炸",
+          "category": "DeBuff",
+          "description": "敵方攻擊 -20%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E13:F14"
+          ],
+          "icon": "skill-icons/OZ-02.png"
+        },
+        {
+          "name": "闇黑安古勒",
+          "category": "DeBuff",
+          "description": "敵方防禦 -20%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G13:H14"
+          ],
+          "icon": "skill-icons/OZ-03.png"
+        },
+        {
+          "name": "幻影氣息",
+          "category": "DeBuff、降抗",
+          "description": "敵方所有屬性抗性-195",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!I13:J14"
+          ],
+          "icon": "skill-icons/OZ-04.png"
+        },
+        {
+          "name": "暗絲網",
+          "category": "Buff",
+          "description": "我方每秒恢復10%MP",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!K13:L14"
+          ],
+          "icon": "skill-icons/OZ-05.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A13:Z14"
+      ]
+    },
+    {
+      "code": "MM",
+      "skills": [
+        {
+          "name": "力量紋章",
+          "category": "Buff",
+          "description": "物理攻擊 +12%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C15:D16"
+          ],
+          "icon": "skill-icons/MM-01.png"
+        },
+        {
+          "name": "解放意志(被動)",
+          "category": "DeBuff",
+          "description": "魔杖/特殊主動技能攻擊\n10秒間\n敵方防禦 -7%\n(最大3重疊21%)\n(再發動冷卻時間1秒)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E15:F16"
+          ],
+          "icon": "skill-icons/MM-02.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A15:Z16"
+      ]
+    },
+    {
+      "code": "LA",
+      "skills": [
+        {
+          "name": "填充紋章",
+          "category": "Buff",
+          "description": "我方最大HP +15%\n我方最大MP +50",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C17:D18"
+          ],
+          "icon": "skill-icons/LA-01.png"
+        },
+        {
+          "name": "本源",
+          "category": "Buff",
+          "description": "亞埃爾：屬性發動率 +3%\n瑪堤爾：防禦無視 +5%\n梅爾斯：所有速度 +5%\n(動作速度為乘算)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E17:F18"
+          ],
+          "icon": "skill-icons/LA-02.png"
+        },
+        {
+          "name": "豐沛礦物",
+          "category": "Buff",
+          "description": "我方移動/跳躍速度 +20%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G17:H18"
+          ],
+          "icon": "skill-icons/LA-03.png"
+        },
+        {
+          "name": "神秘燒瓶",
+          "category": "Buff",
+          "description": "白色：致命傷害 +5%\n藍色：每秒MP恢復量 +15\n黃色：霸體狀態\n(致命傷害為基礎乘算)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!I17:J18"
+          ],
+          "icon": "skill-icons/LA-04.png"
+        },
+        {
+          "name": "調和",
+          "category": "Buff+Debuff",
+          "description": "對中毒狀態敵方傷害 +5%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!K17:L18"
+          ],
+          "icon": "skill-icons/LA-05.png"
+        },
+        {
+          "name": "精煉",
+          "category": "Debuff",
+          "description": "敵方防禦 -10%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!M17:N18"
+          ],
+          "icon": "skill-icons/LA-06.png"
+        },
+        {
+          "name": "有機層",
+          "category": "Buff",
+          "description": "領域中我方所受傷害 -20%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!O17:P18"
+          ],
+          "icon": "skill-icons/LA-07.png"
+        },
+        {
+          "name": "賢者之石",
+          "category": "Buff",
+          "description": "獲得所有阿爾克效果時\n60秒間\n我方攻擊 +5%\n8秒間\n快捷鍵冷卻變更為15秒",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!Q17:R18"
+          ],
+          "icon": "skill-icons/LA-08.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A17:Z18"
+      ]
+    },
+    {
+      "code": "AN",
+      "skills": [
+        {
+          "name": "風暴之箭",
+          "category": "Buff",
+          "description": "每秒恢復HP/MP 5%\n總共恢復3次",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C19:D20"
+          ],
+          "icon": "skill-icons/AN-01.png"
+        },
+        {
+          "name": "女神庇護",
+          "category": "Buff",
+          "description": "我方攻擊 +12%\n所有速度 +15%\nMP每秒恢復5%\n(動作速度為乘算)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E19:F20"
+          ],
+          "icon": "skill-icons/AN-02.png"
+        },
+        {
+          "name": "回踢",
+          "category": "DeBuff",
+          "description": "10秒間\n敵方防禦 -19.5%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G19:H20"
+          ],
+          "icon": "skill-icons/AN-03.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A19:Z20"
+      ]
+    },
+    {
+      "code": "DaB",
+      "skills": [
+        {
+          "name": "風暴之箭",
+          "category": "Buff",
+          "description": "每秒恢復HP/MP 5%\n總共恢復3次",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C21:D22"
+          ],
+          "icon": "skill-icons/DaB-01.png"
+        },
+        {
+          "name": "烙印射擊",
+          "category": "DeBuff",
+          "description": "敵方在10秒間\n所受傷害 +5%\n所受致命傷害 +10%\n※無法與烙印的痕跡共存，無法覆蓋烙印的痕跡。",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E21:F22"
+          ],
+          "icon": "skill-icons/DaB-02.png"
+        },
+        {
+          "name": "烙印的痕跡(被動)",
+          "category": "DeBuff",
+          "description": "施展三次箭矢技能後\n敵方10秒間(冷卻3秒)\n所受傷害 +10%\n所受致命傷害 +10%\n※無法與烙印射擊共存，必定覆蓋烙印射擊。",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G21:H22"
+          ],
+          "icon": "skill-icons/DaB-03.png"
+        },
+        {
+          "name": "亂殺快感(被動)",
+          "category": "Buff",
+          "description": "箭雨MP回收率 +100%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!I21:J22"
+          ],
+          "icon": "skill-icons/DaB-04.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A21:Z22"
+      ]
+    },
+    {
+      "code": "TW",
+      "skills": [
+        {
+          "name": "風暴之箭",
+          "category": "Buff",
+          "description": "每秒恢復HP/MP 5%\n總共恢復3次",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C23:D24"
+          ],
+          "icon": "skill-icons/TW-01.png"
+        },
+        {
+          "name": "召魂曲",
+          "category": "DeBuff",
+          "description": "煙幕持續20秒\n我方所受傷害 -20%\n敵方防禦 -20%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E23:F24"
+          ],
+          "icon": "skill-icons/TW-02.png"
+        },
+        {
+          "name": "誘捕箭魂-病菌",
+          "category": "DeBuff",
+          "description": "毒霧內敵方所受傷害 +12%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G23:H24"
+          ],
+          "icon": "skill-icons/TW-03.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A23:Z24"
+      ]
+    },
+    {
+      "code": "PR",
+      "skills": [
+        {
+          "name": "風暴之箭",
+          "category": "Buff",
+          "description": "每秒恢復HP/MP 5%\n總共恢復3次",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C25:D26"
+          ],
+          "icon": "skill-icons/PR-01.png"
+        },
+        {
+          "name": "識讀",
+          "category": "DeBuff",
+          "description": "30秒間\n敵方防禦 -10%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E25:F26"
+          ],
+          "icon": "skill-icons/PR-02.png"
+        },
+        {
+          "name": "聆聽",
+          "category": "Buff",
+          "description": "[蘊含水之氣息的細語]\n恢復 50 MP\n[蘊含風之氣息的細語]\n恢復20%特殊資源\n低機率發動[精靈的細語]\n同時獲得兩種效果",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G25:H26"
+          ],
+          "icon": "skill-icons/PR-03.png"
+        },
+        {
+          "name": "勇氣的讚歌",
+          "category": "Buff",
+          "description": "30秒間\n我方攻擊 +5%\n所受Boss傷害 -15%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!I25:J26"
+          ],
+          "icon": "skill-icons/PR-04.png"
+        },
+        {
+          "name": "調音",
+          "category": "解除狀態",
+          "description": "移除我方Debuff",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!K25:L26"
+          ],
+          "icon": "skill-icons/PR-05.png"
+        },
+        {
+          "name": "反覆無常的祝福",
+          "category": "Buff",
+          "description": "隨機發動下述其中1個效果\n我方使用特殊主動技能時攻擊力 +1% (最大5重疊)\n使用特殊主動技能時恢復10%最大MP\n覺醒狀態時最大MP +40",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!M25:N26"
+          ],
+          "icon": "skill-icons/PR-06.png"
+        },
+        {
+          "name": "解放意志:織語者",
+          "category": "Buff",
+          "description": "觸發識讀效果時，\n對所有敵方傷害 +2%\n(最大5重疊)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!O25:P26"
+          ],
+          "icon": "skill-icons/PR-07.png"
+        },
+        {
+          "name": "強音",
+          "category": "Buff",
+          "description": "我方獲得5秒霸體",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!Q25:R26"
+          ],
+          "icon": "skill-icons/PR-08.png"
+        },
+        {
+          "name": "真心誠意",
+          "category": "Buff、解除狀態",
+          "description": "20秒間我方防禦 +15%\n賦予保護膜 10%\n攻擊 +7%\n移除我方一個Debuff",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!S25:T26"
+          ],
+          "icon": "skill-icons/PR-09.png"
+        },
+        {
+          "name": "心眼",
+          "category": "Buff",
+          "description": "[反覆無常的祝福]\n會同時發動2個效果",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!U25:V26"
+          ],
+          "icon": "skill-icons/PR-10.png"
+        },
+        {
+          "name": "[轉換]滂沱之箭",
+          "category": "Buff",
+          "description": "我方動作速度 +10%\n(動作速度為乘算)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!W25:X26"
+          ],
+          "icon": "skill-icons/PR-11.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A25:Z26"
+      ]
+    },
+    {
+      "code": "FB",
+      "skills": [
+        {
+          "name": "防具破壞",
+          "category": "DeBuff",
+          "description": "7秒間\n敵方防禦 -19.5%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C27:D28"
+          ],
+          "icon": "skill-icons/FB-01.png"
+        },
+        {
+          "name": "必勝戰略",
+          "category": "DeBuff",
+          "description": "覺醒中\n以超越的技能攻擊的敵方\n10秒間\n所受傷害 +12%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E27:F28"
+          ],
+          "icon": "skill-icons/FB-02.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A27:Z28"
+      ]
+    },
+    {
+      "code": "RH",
+      "skills": [
+        {
+          "name": "武器摧毀",
+          "category": "DeBuff",
+          "description": "7秒間敵方攻擊 -22.5%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C29:D30"
+          ],
+          "icon": "skill-icons/RH-01.png"
+        },
+        {
+          "name": "核子爆破(轉換)",
+          "category": "DeBuff、降抗",
+          "description": "10秒間\n敵方防禦 -20%\n受致命攻擊傷害 +12%\n所有屬性抗性 -150",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E29:F30"
+          ],
+          "icon": "skill-icons/RH-02.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A29:Z30"
+      ]
+    },
+    {
+      "code": "NI",
+      "skills": [
+        {
+          "name": "焰爆克勞德-火瀑",
+          "category": "DeBuff",
+          "description": "敵方所受傷害 +12%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C31:D32"
+          ],
+          "icon": "skill-icons/NI-01.png"
+        },
+        {
+          "name": "實戰的代價(被動)",
+          "category": "Buff",
+          "description": "過熱達最大重疊時\n我方MP恢復100\n(發動後5秒冷卻)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E31:F32"
+          ],
+          "icon": "skill-icons/NI-02.png"
+        },
+        {
+          "name": "傭兵生存法則(被動)",
+          "category": "Buff",
+          "description": "HP未滿75%時\n我方全體攻擊、防禦+10%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G31:H32"
+          ],
+          "icon": "skill-icons/NI-03.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A31:Z32"
+      ]
+    },
+    {
+      "code": "RE",
+      "skills": [
+        {
+          "name": "禁令",
+          "category": "DeBuff、降抗",
+          "description": "根據種子成長階段，\n15秒間\n敵方所有屬性抗性降低\n1階段：-90\n2階段：-120\n3階段：-150",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C33:D34"
+          ],
+          "icon": "skill-icons/RE-01.png"
+        },
+        {
+          "name": "靈魂破壞",
+          "category": "DeBuff",
+          "description": "敵方受致命攻擊傷害 +6%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E33:F34"
+          ],
+          "icon": "skill-icons/RE-02.png"
+        },
+        {
+          "name": "發芽",
+          "category": "DeBuff",
+          "description": "根據種子成長階段，\n敵方所受傷害 +\n1階段：4%\n2階段：6%\n3階段：8%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G33:H34"
+          ],
+          "icon": "skill-icons/RE-03.png"
+        },
+        {
+          "name": "侵蝕(被動)",
+          "category": "DeBuff",
+          "description": "防禦 -2%(最大5重疊)\n(敵方HP低於50%時一次疊兩層)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!I33:J34"
+          ],
+          "icon": "skill-icons/RE-04.png"
+        },
+        {
+          "name": "死亡尖叫",
+          "category": "Buff",
+          "description": "根據種子成長階段\n我方受BOSS攻擊的傷害減少\n1階段：5%\n2階段：10%\n3階段：15%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!K33:L34"
+          ],
+          "icon": "skill-icons/RE-05.png"
+        },
+        {
+          "name": "地下墓穴",
+          "category": "Buff",
+          "description": "根據種子成長階段，\n吸收亡者之魂時 +技傷\n1階：M1 +3%(最大5重疊)\n2階：M12 +3%(最大5重疊)\n3階：M123 +3%(最大5重疊)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!M33:N34"
+          ],
+          "icon": "skill-icons/RE-06.png"
+        },
+        {
+          "name": "抹殺(被動)",
+          "category": "Buff",
+          "description": "吸收靈魂痕跡：\n所有速度 +10%\n吸收濃厚靈魂痕跡：\n套用吸收靈魂痕跡效果，\n打擊/被擊MP恢復量1.5倍",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!O33:P34"
+          ],
+          "icon": "skill-icons/RE-07.png"
+        },
+        {
+          "name": "解放意志:死神武者",
+          "category": "Buff、Debuff",
+          "description": "對體力50%以下敵方傷害 +8%\n對體力10%以下敵方傷害+10%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!Q33:R34"
+          ],
+          "icon": "skill-icons/RE-08.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A33:Z34"
+      ]
+    },
+    {
+      "code": "CU",
+      "skills": [
+        {
+          "name": "精神集中",
+          "category": "(被動)",
+          "description": "使用特殊動技能命中時，\n10秒間\n敵方防禦 -20%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C35:D36"
+          ],
+          "icon": "skill-icons/CU-01.png"
+        },
+        {
+          "name": "女神護盾",
+          "category": "Buff",
+          "description": "護盾內我方所受傷害 -30%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E35:F36"
+          ],
+          "icon": "skill-icons/CU-02.png"
+        },
+        {
+          "name": "戰略密碼:破壞",
+          "category": "Debuff",
+          "description": "覺醒中以納斯德槍技能攻擊\n15秒間\n敵方所受傷害 +10%\n體力低於50%以下敵方 +14%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G35:H36"
+          ],
+          "icon": "skill-icons/CU-03.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A35:Z36"
+      ]
+    },
+    {
+      "code": "CE",
+      "skills": [
+        {
+          "name": "女王的守護",
+          "category": "(被動)",
+          "description": "以「女皇的召喚」攻擊時，\n10秒間\n敵方所受傷害+ 12%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C37:D38"
+          ],
+          "icon": "skill-icons/CE-01.png"
+        },
+        {
+          "name": "戰略密碼:軸碎(被動)Buff",
+          "category": "",
+          "description": "僕人附加Buff\n10秒間\n特殊主動技能傷害 +12%\n所受物理傷害 -20%\n180秒間\n超技能傷害 +30%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E37:F38"
+          ],
+          "icon": "skill-icons/CE-02.png"
+        },
+        {
+          "name": "領悟巔峰",
+          "category": "Debuff、降抗",
+          "description": "敵方所有屬性抗性 -150",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G37:H38"
+          ],
+          "icon": "skill-icons/CE-03.png"
+        },
+        {
+          "name": "女王屏障",
+          "category": "Buff、解除狀態",
+          "description": "移除我方Debuff\n獲得霸體狀態",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!I37:J38"
+          ],
+          "icon": "skill-icons/CE-04.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A37:Z38"
+      ]
+    },
+    {
+      "code": "CS",
+      "skills": [
+        {
+          "name": "離子漩束",
+          "category": "DeBuff",
+          "description": "15秒間\n敵方防禦 -20%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C39:D40"
+          ],
+          "icon": "skill-icons/CS-01.png"
+        },
+        {
+          "name": "進化",
+          "category": "(被動)",
+          "description": "覺醒後30秒內\n被「力場技能」攻擊的敵方\n10秒間\n所受致命傷害 +10%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E39:F40"
+          ],
+          "icon": "skill-icons/CS-02.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A39:Z40"
+      ]
+    },
+    {
+      "code": "CA",
+      "skills": [
+        {
+          "name": "白箱",
+          "category": "解除狀態",
+          "description": "移除我方Debuff",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C41:D42"
+          ],
+          "icon": "skill-icons/CA-01.png"
+        },
+        {
+          "name": "淨化",
+          "category": "Buff",
+          "description": "根據負面代碼階段\n在一瞬間我方所受傷害 -50/70/99.9%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E41:F42"
+          ],
+          "icon": "skill-icons/CA-02.png"
+        },
+        {
+          "name": "解放意志:Code:Failess(被動)",
+          "category": "DeBuff",
+          "description": "5秒間\n敵方防禦 -20%\n10秒間\n敵方所受傷害 +12%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G41:H42"
+          ],
+          "icon": "skill-icons/CA-03.png"
+        },
+        {
+          "name": "星期五",
+          "category": "Buff",
+          "description": "持續時間內死亡時\n對我方賦予\n15秒間\n傷害 +30%\n所受傷害 +20%效果",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!I41:J42"
+          ],
+          "icon": "skill-icons/CA-04.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A41:Z42"
+      ]
+    },
+    {
+      "code": "CC",
+      "skills": [
+        {
+          "name": "炸裂狼嚎(轉換)",
+          "category": "DeBuff",
+          "description": "4秒間\n敵方所受傷害 +6%\n(無法與無限混亂重複，無限混亂無條件覆蓋炸裂狼嚎)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C43:D44"
+          ],
+          "icon": "skill-icons/CC-01.png"
+        },
+        {
+          "name": "無限混亂",
+          "category": "DeBuff",
+          "description": "8秒間\n敵方所受傷害 +12%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E43:F44"
+          ],
+          "icon": "skill-icons/CC-02.png"
+        },
+        {
+          "name": "鐵之咆嘯",
+          "category": "DeBuff、解除狀態",
+          "description": "解除我方Debuff",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G43:H44"
+          ],
+          "icon": "skill-icons/CC-03.png"
+        },
+        {
+          "name": "御守光護盾",
+          "category": "Buff",
+          "description": "11.5秒間\n製造等同施放者最大HP33%的護盾\n並吸收50%所受傷害",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!I43:J44"
+          ],
+          "icon": "skill-icons/CC-04.png"
+        },
+        {
+          "name": "守護者之姿(被動)",
+          "category": "DeBuff",
+          "description": "無限混亂、卡歐波加的痛楚、\n鐵之咆嘯、急速衛士攻擊時\n20秒間\n敵方 -10%攻擊、 -10%防禦\n(最大2重疊)\n(20%攻擊 / 20%防禦)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!K43:L44"
+          ],
+          "icon": "skill-icons/CC-05.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A43:Z44"
+      ]
+    },
+    {
+      "code": "FP",
+      "skills": [
+        {
+          "name": "綜合神槍",
+          "category": "Buff",
+          "description": "30秒間\n我方攻擊 +20%\n動作速度 +18%\n(動作速度為乘算)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C45:D46"
+          ],
+          "icon": "skill-icons/FP-01.png"
+        },
+        {
+          "name": "[轉換]綜合神槍",
+          "category": "Buff",
+          "description": "30秒間\n我方攻擊 +20%\n致命一擊 +10%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E45:F46"
+          ],
+          "icon": "skill-icons/FP-02.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A45:Z46"
+      ]
+    },
+    {
+      "code": "CeT",
+      "skills": [
+        {
+          "name": "致命彈",
+          "category": "DeBuff",
+          "description": "15秒間\n敵方防禦 - 20%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C47:D48"
+          ],
+          "icon": "skill-icons/CeT-01.png"
+        },
+        {
+          "name": "重力磁場",
+          "category": "DeBuff",
+          "description": "10秒間\n敵方所受傷害 +12%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E47:F48"
+          ],
+          "icon": "skill-icons/CeT-02.png"
+        },
+        {
+          "name": "機動領域",
+          "category": "Buff",
+          "description": "20秒間\n領域中我方\n所受傷害 -20%\n每秒恢復 6 MP\n獲得霸體狀態",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G47:H48"
+          ],
+          "icon": "skill-icons/CeT-03.png"
+        },
+        {
+          "name": "機動領域(轉換)",
+          "category": "Buff",
+          "description": "領域中我方\n給予BOSS/中BOSS傷害 +12%\n所受傷害 -40%\n每秒恢復 6 MP\n獲得霸體狀態",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!I47:J48"
+          ],
+          "icon": "skill-icons/CeT-04.png"
+        },
+        {
+          "name": "將級指令",
+          "category": "Buff",
+          "description": "15秒間\n發動支援砲擊\n造成觸發此攻擊的13%傷害",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!K47:L48"
+          ],
+          "icon": "skill-icons/CeT-05.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A47:Z48"
+      ]
+    },
+    {
+      "code": "DiA",
+      "skills": [
+        {
+          "name": "無懼庇護",
+          "category": "Buff",
+          "description": "8秒間\n選定一位友軍替其承受傷害\n轉移40%傷害\n雙方獲得霸體狀態\nDiA自身所受傷害 -30%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C49:D50"
+          ],
+          "icon": "skill-icons/DiA-01.png"
+        },
+        {
+          "name": "聖杯洗禮",
+          "category": "Buff",
+          "description": "5秒間\n我方每秒恢復HP/MP 20%\n每0.5秒會根據每10w戰力恢復0.075%HP",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E49:F50"
+          ],
+          "icon": "skill-icons/DiA-02.png"
+        },
+        {
+          "name": "守護羽翼",
+          "category": "Buff",
+          "description": "60秒間\n所有速度 +10%\n(動作速度為乘算)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G49:H50"
+          ],
+          "icon": "skill-icons/DiA-03.png"
+        },
+        {
+          "name": "榮耀贈與",
+          "category": "DeBuff、降抗",
+          "description": "敵方\n防禦 -15%\n所有屬性抗性 -150",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!I49:J50"
+          ],
+          "icon": "skill-icons/DiA-04.png"
+        },
+        {
+          "name": "先驅者的祈禱",
+          "category": "Buff",
+          "description": "發動時恢復我方MP 5\n獲得「耀眼的正義」後變更為10",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!K49:L50"
+          ],
+          "icon": "skill-icons/DiA-05.png"
+        },
+        {
+          "name": "慈愛聖光",
+          "category": "Buff、解除狀態",
+          "description": "8秒間\n移除我方Debuff並免疫\n60秒間\n冷卻加速1.2倍",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!M49:N50"
+          ],
+          "icon": "skill-icons/DiA-06.png"
+        },
+        {
+          "name": "先驅者的驕傲",
+          "category": "Buff",
+          "description": "所有技能傷害 +12%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!O49:P50"
+          ],
+          "icon": "skill-icons/DiA-07.png"
+        },
+        {
+          "name": "神諭",
+          "category": "Buff",
+          "description": "我方攻擊 +12%\n所受傷害 -20%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!Q49:R50"
+          ],
+          "icon": "skill-icons/DiA-08.png"
+        },
+        {
+          "name": "超越的啟示",
+          "category": "Buff",
+          "description": "使用神諭時\n我方獲得霸體狀態",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!S49:T50"
+          ],
+          "icon": "skill-icons/DiA-09.png"
+        },
+        {
+          "name": "神風聖域(三階以上)",
+          "category": "Buff",
+          "description": "15秒間\n我方不消耗特殊資源",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!U49:V50"
+          ],
+          "icon": "skill-icons/DiA-10.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A49:Z50"
+      ]
+    },
+    {
+      "code": "VI",
+      "skills": [
+        {
+          "name": "猛虎擊",
+          "category": "Buff",
+          "description": "30秒間我方\n給予BOSS/中BOSS除外的敵方的傷害 +10%\n動作速度 +10%\n(動作速度為乘算)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C51:D52"
+          ],
+          "icon": "skill-icons/VI-01.png"
+        },
+        {
+          "name": "鐮花",
+          "category": "DeBuff、降抗",
+          "description": "敵方20秒間 -150抗性",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E51:F52"
+          ],
+          "icon": "skill-icons/VI-02.png"
+        },
+        {
+          "name": "制壓:定",
+          "category": "DeBuff",
+          "description": "8秒間敵方防禦 -15%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G51:H52"
+          ],
+          "icon": "skill-icons/VI-03.png"
+        },
+        {
+          "name": "猛虎4式:怒濤",
+          "category": "DeBuff",
+          "description": "每打擊33%機率使敵方5秒間防禦 -33%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!I51:J52"
+          ],
+          "icon": "skill-icons/VI-04.png"
+        },
+        {
+          "name": "槍術的極致(被動)",
+          "category": "DeBuff",
+          "description": "指令/主動技能/特殊主動技能打擊時\n敵方5秒間防禦 -5%\n所受傷害 +12%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!K51:L52"
+          ],
+          "icon": "skill-icons/VI-05.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A51:Z52"
+      ]
+    },
+    {
+      "code": "BR",
+      "skills": [
+        {
+          "name": "制壓:氣",
+          "category": "DeBuff",
+          "description": "8秒間敵方防禦-15%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C53:D54"
+          ],
+          "icon": "skill-icons/BR-01.png"
+        },
+        {
+          "name": "氣力擴散(被動)",
+          "category": "DeBuff",
+          "description": "受羅剎奧義攻擊敵方\n30秒間\n防禦 -5%\n所受傷害 +12%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E53:F54"
+          ],
+          "icon": "skill-icons/BR-02.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A53:Z54"
+      ]
+    },
+    {
+      "code": "SH",
+      "skills": [
+        {
+          "name": "制壓:鬼",
+          "category": "DeBuff",
+          "description": "8秒間敵方防禦 -15%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C55:D56"
+          ],
+          "icon": "skill-icons/SH-01.png"
+        },
+        {
+          "name": "術式:降靈",
+          "category": "Buff",
+          "description": "我方技能傷害 +5%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E55:F56"
+          ],
+          "icon": "skill-icons/SH-02.png"
+        },
+        {
+          "name": "術式:降靈(轉換)",
+          "category": "Buff",
+          "description": "我方強烈、超越技能傷害 +6%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G55:H56"
+          ],
+          "icon": "skill-icons/SH-03.png"
+        },
+        {
+          "name": "狐狸歌",
+          "category": "DeBuff",
+          "description": "5秒間觸碰敵方物理防禦 -5%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!I55:J56"
+          ],
+          "icon": "skill-icons/SH-04.png"
+        },
+        {
+          "name": "釋放魔力(被動)",
+          "category": "DeBuff",
+          "description": "8秒間\n受影子技能攻擊敵方\n所受傷害 +7%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!K55:L56"
+          ],
+          "icon": "skill-icons/SH-05.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A55:Z56"
+      ]
+    },
+    {
+      "code": "SU",
+      "skills": [
+        {
+          "name": "天狗星",
+          "category": "Buff",
+          "description": "我方攻擊+12%\n冷卻加速1.2倍",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C57:D58"
+          ],
+          "icon": "skill-icons/SU-01.png"
+        },
+        {
+          "name": "陰德陽報",
+          "category": "Buff",
+          "description": "使用[支援-活]技能時，\n我方恢復一定量MP\n強韌：4\n強烈：8\n超越：12",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E57:F58"
+          ],
+          "icon": "skill-icons/SU-02.png"
+        },
+        {
+          "name": "[轉換]制壓:搗",
+          "category": "DeBuff",
+          "description": "15秒間我方所有速度 +10%\n(動作速度為乘算)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G57:H58"
+          ],
+          "icon": "skill-icons/SU-03.png"
+        },
+        {
+          "name": "玄天4式:幕",
+          "category": "Buff",
+          "description": "我方所受傷害-20%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!I57:J58"
+          ],
+          "icon": "skill-icons/SU-04.png"
+        },
+        {
+          "name": "聖火",
+          "category": "Buff",
+          "description": "5秒間\n我方每秒恢復HP/MP 20%\n每0.5秒會根據每10w戰力恢復0.075%HP",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!K57:L58"
+          ],
+          "icon": "skill-icons/SU-05.png"
+        },
+        {
+          "name": "[轉換]隱形",
+          "category": "Buff、解除狀態",
+          "description": "8秒間\n移除我方Debuff並免疫\n30秒間\n獲得霸體狀態",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!M57:N58"
+          ],
+          "icon": "skill-icons/SU-06.png"
+        },
+        {
+          "name": "合一",
+          "category": "Buff",
+          "description": "60秒間\n我方技能傷害 +12%\n根據重疊數×0.2%降低MP消耗\n(最大30重疊)\n柔和：1、強韌：2\n強烈：3、超越：4",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!O57:P58"
+          ],
+          "icon": "skill-icons/SU-07.png"
+        },
+        {
+          "name": "濃化",
+          "category": "Buff",
+          "description": "施展玄天奧義時附加30秒間\n我方最大HP +10%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!Q57:R58"
+          ],
+          "icon": "skill-icons/SU-08.png"
+        },
+        {
+          "name": "號哭聲",
+          "category": "DeBuff、降抗",
+          "description": "敵方防禦 -15%\n所有屬性抗性 -150",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!S57:T58"
+          ],
+          "icon": "skill-icons/SU-09.png"
+        },
+        {
+          "name": "大師技能 (3/4階段)",
+          "category": "Buff",
+          "description": "15秒間\n每秒恢復20%特殊資源",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!U57:V58"
+          ],
+          "icon": "skill-icons/SU-10.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A57:Z58"
+      ]
+    },
+    {
+      "code": "ES",
+      "skills": [
+        {
+          "name": "挑釁",
+          "category": "DeBuff",
+          "description": "9秒間\n敵方所受傷害 +8%\n但攻擊 +10%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C59:D60"
+          ],
+          "icon": "skill-icons/ES-01.png"
+        },
+        {
+          "name": "挑釁(轉換)",
+          "category": "DeBuff",
+          "description": "6秒間\n敵方所受傷害 +8%\n但攻擊 +10%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E59:F60"
+          ],
+          "icon": "skill-icons/ES-02.png"
+        },
+        {
+          "name": "戰鬥序曲",
+          "category": "Buff、解除狀態",
+          "description": "12秒間\n我方指令/所有技能傷害 +5%\n移除我方Debuff並免疫",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G59:H60"
+          ],
+          "icon": "skill-icons/ES-03.png"
+        },
+        {
+          "name": "戰鬥序曲(轉換)",
+          "category": "Buff",
+          "description": "36秒間\n我方特殊主動技能傷害 +5%\n所受傷害 -15%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!I59:J60"
+          ],
+          "icon": "skill-icons/ES-04.png"
+        },
+        {
+          "name": "力量中斷",
+          "category": "DeBuff、降抗",
+          "description": "敵方8秒間 -60 抗性\n防禦 -12%\n(無法與億倍爆裂重複，億倍爆裂無條件覆蓋力量中斷)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!K59:L60"
+          ],
+          "icon": "skill-icons/ES-05.png"
+        },
+        {
+          "name": "騎士團長的威嚴",
+          "category": "(被動)、Buff",
+          "description": "提升隊員致命一擊/極大化/動作速度/額外傷害\n根據隊員數量 +1%(最大3重疊3%)\n(動作速度為加算)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!M59:N60"
+          ],
+          "icon": "skill-icons/ES-06.png"
+        },
+        {
+          "name": "億倍爆裂",
+          "category": "DeBuff、降抗",
+          "description": "10秒間\n敵方防禦 -20%\n所有屬性抗性 -100",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!O59:P60"
+          ],
+          "icon": "skill-icons/ES-07.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A59:Z60"
+      ]
+    },
+    {
+      "code": "FL",
+      "skills": [
+        {
+          "name": "火焰的烙印(被動)",
+          "category": "DeBuff",
+          "description": "指令/主動技能攻擊時\n10秒間\n敵方防禦 -10%\n(最大2重疊20%)\n(再發動冷卻時間0.5秒)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C61:D62"
+          ],
+          "icon": "skill-icons/FL-01.png"
+        },
+        {
+          "name": "炎帝",
+          "category": "DeBuff",
+          "description": "疾風狀態下使用「火海刺殺」\n10秒間\n敵方所受傷害 +12%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E61:F62"
+          ],
+          "icon": "skill-icons/FL-02.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A61:Z62"
+      ]
+    },
+    {
+      "code": "BQ",
+      "skills": [
+        {
+          "name": "闇黑附魔",
+          "category": "DeBuff",
+          "description": "約8秒間\n敵方攻擊 -2%\n(最大20重疊40%)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C63:D64"
+          ],
+          "icon": "skill-icons/BQ-01.png"
+        },
+        {
+          "name": "血疊",
+          "category": "DeBuff、降抗",
+          "description": "血疊降抗值為\n(1-0.6^N)x(500-敵方闇抗)x1.5\nN=血之劍氣擊中次數",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E63:F64"
+          ],
+          "icon": "skill-icons/BQ-02.png"
+        },
+        {
+          "name": "渴望",
+          "category": "DeBuff",
+          "description": "覺醒中以血擊技能擊中\n10秒間敵方\n所受致命傷害增加\n-敵方HP 100%~76%時 +10%\n-敵方HP 75%~51%時 +20%\n-敵方HP 50%~0%時 +25%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G63:H64"
+          ],
+          "icon": "skill-icons/BQ-03.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A63:Z64"
+      ]
+    },
+    {
+      "code": "AD",
+      "skills": [
+        {
+          "name": "空間斬",
+          "category": "DeBuff",
+          "description": "覺醒中於疾風劍道下使用\n敵方所受傷害 +7%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C65:D66"
+          ],
+          "icon": "skill-icons/AD-01.png"
+        },
+        {
+          "name": "自覺",
+          "category": "Buff",
+          "description": "12秒間\n我方無視防禦 +5%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E65:F66"
+          ],
+          "icon": "skill-icons/AD-02.png"
+        },
+        {
+          "name": "肅清斬除",
+          "category": "DeBuff",
+          "description": "覺醒中於殲滅狀態下使用\n敵方防禦 -20%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G65:H66"
+          ],
+          "icon": "skill-icons/AD-03.png"
+        },
+        {
+          "name": "不屈的信仰",
+          "category": "Buff",
+          "description": "覺醒中於疾風狀態下使用時\n我方所受傷害 -20%\n持有Buff的我方\n體力低於30%時\n恢復100%血量(冷卻30秒)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!I65:J66"
+          ],
+          "icon": "skill-icons/AD-04.png"
+        },
+        {
+          "name": "潛在意識",
+          "category": "Buff",
+          "description": "我方每次受到DeBuff時累積\n[潛在意識]\n達20層時20秒間\n我方防禦 +20%\n(5秒內相同的DeBuff無法重疊)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!K65:L66"
+          ],
+          "icon": "skill-icons/AD-05.png"
+        },
+        {
+          "name": "上下顛倒",
+          "category": "Buff、解除狀態",
+          "description": "覺醒中於殲滅狀態下使用\n移除一個Debuff\n其餘其餘Debuff時間 -20%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!M65:N66"
+          ],
+          "icon": "skill-icons/AD-06.png"
+        },
+        {
+          "name": "開拓者",
+          "category": "Buff",
+          "description": "敵方體力100%~51%時\n動作速度 +10%\n敵方體力50%~31%時\n動作速度、攻擊 +10%\n敵方體力低於30%時\n動作速度、攻擊 +10%\n給予Boss/中Boss傷害 +10%\n(動作速度為乘算)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!O65:P66"
+          ],
+          "icon": "skill-icons/AD-07.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A65:Z66"
+      ]
+    },
+    {
+      "code": "DB",
+      "skills": [
+        {
+          "name": "靈心暴風",
+          "category": "Buff",
+          "description": "所有速度 +20%\n(動作速度為加算)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C67:D68"
+          ],
+          "icon": "skill-icons/DB-01.png"
+        },
+        {
+          "name": "[轉換]EMP衝擊",
+          "category": "Buff、DeBuff",
+          "description": "10秒間\n敵方所受致命傷害 +20%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E67:F68"
+          ],
+          "icon": "skill-icons/DB-02.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A67:Z68"
+      ]
+    },
+    {
+      "code": "DN",
+      "skills": [
+        {
+          "name": "設置-智能啟動",
+          "category": "DeBuff",
+          "description": "敵方14.5秒間防禦 -10%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C69:D70"
+          ],
+          "icon": "skill-icons/DN-01.png"
+        },
+        {
+          "name": "設置-零度發電機",
+          "category": "DeBuff",
+          "description": "15秒間\n敵方所受傷害 +5.07%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E69:F70"
+          ],
+          "icon": "skill-icons/DN-02.png"
+        },
+        {
+          "name": "原野力量",
+          "category": "Buff",
+          "description": "我方\n物理攻擊 +11.5%\n所受傷害 -13.8%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G69:H70"
+          ],
+          "icon": "skill-icons/DN-03.png"
+        },
+        {
+          "name": "原野力量(轉換)",
+          "category": "Buff",
+          "description": "我方\n物理攻擊、致命傷害 +9.2%\n覺醒回復速度 +34.5%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!I69:J70"
+          ],
+          "icon": "skill-icons/DN-04.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A69:Z70"
+      ]
+    },
+    {
+      "code": "MP",
+      "skills": [
+        {
+          "name": "時間紋章",
+          "category": "時紋",
+          "description": "我方6秒間獲得時間紋章效果\n(時間紋章效果再發動冷卻45秒)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C71:D72"
+          ],
+          "icon": "skill-icons/MP-01.png"
+        },
+        {
+          "name": "精神崩壞",
+          "category": "DeBuff",
+          "description": "7.8秒間魔法攻擊 -28%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E71:F72"
+          ],
+          "icon": "skill-icons/MP-02.png"
+        },
+        {
+          "name": "[轉換]精神崩壞",
+          "category": "DeBuff",
+          "description": "12秒間魔法防禦 -19.6%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G71:H72"
+          ],
+          "icon": "skill-icons/MP-03.png"
+        },
+        {
+          "name": "月夜狂想曲",
+          "category": "DeBuff",
+          "description": "24秒間\n每秒重疊DeBUFF\n敵方所受傷害 +12%\n且打擊時根據重疊數給予傷害\n重疊1次：675%\n重疊2次：1002%\n重疊3次：1406%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!I71:J72"
+          ],
+          "icon": "skill-icons/MP-04.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A71:Z72"
+      ]
+    },
+    {
+      "code": "OM",
+      "skills": [
+        {
+          "name": "診療",
+          "category": "DeBuff",
+          "description": "60秒間\n敵方攻擊-20%\n所有屬性抗性 -150",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C73:D74"
+          ],
+          "icon": "skill-icons/OM-01.png"
+        },
+        {
+          "name": "治療",
+          "category": "Buff",
+          "description": "5秒間\n我方每秒恢復HP/MP 20%、特殊資源20%\n每0.5秒會根據每10w戰力恢復0.075%HP\n[過度醫療]",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E73:F74"
+          ],
+          "icon": "skill-icons/OM-02.png"
+        },
+        {
+          "name": "PCA",
+          "category": "Buff",
+          "description": "60秒間\n我方所受傷害 -20%\n所有技能傷害 +12%\n冷卻加速1.2倍\n30秒間獲得霸體狀態",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G73:H74"
+          ],
+          "icon": "skill-icons/OM-03.png"
+        },
+        {
+          "name": "排毒",
+          "category": "Buff",
+          "description": "60秒間\n我方攻擊力 +12%、\n敵方防禦力 -15%\n[過度醫療]",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!I73:J74"
+          ],
+          "icon": "skill-icons/OM-04.png"
+        },
+        {
+          "name": "免疫",
+          "category": "解除狀態",
+          "description": "8秒間移除我方Debuff並免疫\n60秒間我方動作速度 +10%\n(動作速度為乘算)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!K73:L74"
+          ],
+          "icon": "skill-icons/OM-05.png"
+        },
+        {
+          "name": "大範圍診療",
+          "category": "Buff",
+          "description": "120秒間\n隊友超技能、大師技能冷卻加速1.2倍\n[過度醫療]",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!M73:N74"
+          ],
+          "icon": "skill-icons/OM-06.png"
+        },
+        {
+          "name": "電車倫理實驗",
+          "category": "Buff",
+          "description": "選擇一名隊友\n120秒間其特殊主動技能MP消耗量 -20%\n[過度醫療]",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!O73:P74"
+          ],
+          "icon": "skill-icons/OM-07.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A73:Z74"
+      ]
+    },
+    {
+      "code": "CT",
+      "skills": [
+        {
+          "name": "恐懼入侵(被動)",
+          "category": "DeBuff",
+          "description": "敵方攻擊 -2%\n(最大5重疊 10%)\n(再發動冷卻時間1秒)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C75:D76"
+          ],
+          "icon": "skill-icons/CT-01.png"
+        },
+        {
+          "name": "至高懲戒",
+          "category": "DeBuff",
+          "description": "3秒間\n敵方所受傷害 +12%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E75:F76"
+          ],
+          "icon": "skill-icons/CT-02.png"
+        },
+        {
+          "name": "空遺",
+          "category": "Debuff",
+          "description": "15秒間\n敵方所受致命傷害 +8%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G75:H76"
+          ],
+          "icon": "skill-icons/CT-03.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A75:Z76"
+      ]
+    },
+    {
+      "code": "IN",
+      "skills": [
+        {
+          "name": "影喚",
+          "category": "DeBuff",
+          "description": "觸碰影子的敵方\n13秒間防禦 -20%\n影子持續8秒",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C77:D78"
+          ],
+          "icon": "skill-icons/IN-01.png"
+        },
+        {
+          "name": "暗影箭",
+          "category": "",
+          "description": "15秒間\n敵方所受致命傷害 +12%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E77:F78"
+          ],
+          "icon": "skill-icons/IN-02.png"
+        },
+        {
+          "name": "靈魂烙印",
+          "category": "Buff",
+          "description": "對周邊我方1人施加Buff\n以敵方的武器屬性進行攻擊\n每攻擊5次會使用1次強化攻擊\n施展打擊：137%\n靈魂體：145%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G77:H78"
+          ],
+          "icon": "skill-icons/IN-03.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A77:Z78"
+      ]
+    },
+    {
+      "code": "DA",
+      "skills": [
+        {
+          "name": "地獄之子",
+          "category": "DeBuff",
+          "description": "10秒間\n敵方防禦 -20%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C79:D80"
+          ],
+          "icon": "skill-icons/DA-01.png"
+        },
+        {
+          "name": "黯濃漿血",
+          "category": "DeBuff",
+          "description": "10秒間\n敵方所受傷害 +12%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E79:F80"
+          ],
+          "icon": "skill-icons/DA-02.png"
+        },
+        {
+          "name": "超然存在",
+          "category": "(殘酷突襲)、DeBuff",
+          "description": "19.5秒間\n敵方防禦 - 20%\n(無法與地獄之子重疊)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G79:H80"
+          ],
+          "icon": "skill-icons/DA-03.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A79:Z80"
+      ]
+    },
+    {
+      "code": "DE",
+      "skills": [
+        {
+          "name": "無情本我",
+          "category": "Buff、DeBuff、降抗",
+          "description": "60秒間\n我方所有技能傷害 +12%\n所有速度 +10%\n(動作速度為乘算)\n敵方所有屬性抗性 -150",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C81:D82"
+          ],
+          "icon": "skill-icons/DE-01.png"
+        },
+        {
+          "name": "深淵分裂",
+          "category": "Buff",
+          "description": "60秒間\n我方所受傷害 -20%\n所有技能消耗MP -1%，此效果會根據消耗連攜條數量每格 +0.5%\n(最大10重疊5%)\n30秒間獲得霸體狀態",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E81:F82"
+          ],
+          "icon": "skill-icons/DE-02.png"
+        },
+        {
+          "name": "無形體",
+          "category": "Buff",
+          "description": "60秒間\n我方攻擊 +12%\n技能冷卻加速1.2倍",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G81:H82"
+          ],
+          "icon": "skill-icons/DE-03.png"
+        },
+        {
+          "name": "地獄之手",
+          "category": "DeBuff",
+          "description": "60秒間\n敵方防禦 -15%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!I81:J82"
+          ],
+          "icon": "skill-icons/DE-04.png"
+        },
+        {
+          "name": "君主權威",
+          "category": "Buff、解除狀態",
+          "description": "5秒間我方每秒恢復HP/MP 20%\n每0.5秒會根據每10w戰力恢復0.075%HP\n最大HP +5%，此效果會根據消耗連攜條數量每格 +0.5%\n(最大10重疊5%)\n8秒間移除我方Debuff並免疫",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!K81:L82"
+          ],
+          "icon": "skill-icons/DE-05.png"
+        },
+        {
+          "name": "永恆深淵魔君",
+          "category": "(全階段皆可)、時紋",
+          "description": "30秒間獲得時間紋章效果(時間紋章效果再發動冷卻50秒)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!M81:N82"
+          ],
+          "icon": "skill-icons/DE-06.png"
+        },
+        {
+          "name": "死亡本能(被動)",
+          "category": "",
+          "description": "連攜條相關效果 +10%\n※已計入左方Buff效果內",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!O81:P82"
+          ],
+          "icon": "skill-icons/DE-07.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A81:Z82"
+      ]
+    },
+    {
+      "code": "TB",
+      "skills": [
+        {
+          "name": "解放意志(被動)",
+          "category": "Buff",
+          "description": "過熱時\n我方攻擊 +10%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C83:D84"
+          ],
+          "icon": "skill-icons/TB-01.png"
+        },
+        {
+          "name": "重武器特化(被動)",
+          "category": "DeBuff",
+          "description": "受雷射技能攻擊敵方80%機率\n20秒間\n所受傷害 +8%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E83:F84"
+          ],
+          "icon": "skill-icons/TB-02.png"
+        },
+        {
+          "name": "飛鷹雷達",
+          "category": "DeBuff、降抗",
+          "description": "10秒間\n敵方防禦-10%\n所有屬性抗性 -100",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G83:H84"
+          ],
+          "icon": "skill-icons/TB-03.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A83:Z84"
+      ]
+    },
+    {
+      "code": "BMa",
+      "skills": [
+        {
+          "name": "靈魂之刃(被動)",
+          "category": "DeBuff",
+          "description": "使用鎖鏈左輪手槍/槍刃技能\n攻擊出血狀態的敵方時\n10秒間\n敵方防禦 -20%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C85:D86"
+          ],
+          "icon": "skill-icons/BMa-01.png"
+        },
+        {
+          "name": "探索標誌(被動)",
+          "category": "DeBuff",
+          "description": "敵方所受致命傷害 +12%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E85:F86"
+          ],
+          "icon": "skill-icons/BMa-02.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A85:Z86"
+      ]
+    },
+    {
+      "code": "MN",
+      "skills": [
+        {
+          "name": "榴彈強化",
+          "category": "DeBuff",
+          "description": "受到2種手榴彈攻擊後\n15秒間\n敵方防禦 -20%\n所受傷害 +12%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C87:D88"
+          ],
+          "icon": "skill-icons/MN-01.png"
+        },
+        {
+          "name": "練擊(轉換)",
+          "category": "DeBuff、降抗",
+          "description": "敵方所有屬性抗性 -120",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E87:F88"
+          ],
+          "icon": "skill-icons/MN-02.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A87:Z88"
+      ]
+    },
+    {
+      "code": "PO",
+      "skills": [
+        {
+          "name": "磁場護槍手",
+          "category": "Buff",
+          "description": "我方攻擊 +8%\n所受傷害 -10%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C89:D90"
+          ],
+          "icon": "skill-icons/PO-01.png"
+        },
+        {
+          "name": "裝甲暴風雨",
+          "category": "Buff",
+          "description": "5秒間\n我方獲得霸體狀態",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E89:F90"
+          ],
+          "icon": "skill-icons/PO-02.png"
+        },
+        {
+          "name": "機器控制",
+          "category": "DeBuff",
+          "description": "受自動手槍攻擊\n2秒間\n敵方防禦 -20%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G89:H90"
+          ],
+          "icon": "skill-icons/PO-03.png"
+        },
+        {
+          "name": "G-1日冕(轉換)",
+          "category": "DeBuff",
+          "description": "20秒間\n敵方所受傷害 +8%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!I89:J90"
+          ],
+          "icon": "skill-icons/PO-04.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A89:Z90"
+      ]
+    },
+    {
+      "code": "RI",
+      "skills": [
+        {
+          "name": "神喚降臨",
+          "category": "Buff",
+          "description": "32.5秒間\n我方攻擊 +20%\n最大MP +60",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C91:D92"
+          ],
+          "icon": "skill-icons/RI-01.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A91:Z92"
+      ]
+    },
+    {
+      "code": "BL",
+      "skills": [
+        {
+          "name": "花陣 (黃 / 純淨)",
+          "category": "Buff、解除狀態",
+          "description": "5秒間\n我方每秒恢復HP/MP 20%\n每0.5秒會根據每10w戰力恢復0.075%HP\n8秒間移除我方Debuff並免疫",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C93:D94"
+          ],
+          "icon": "skill-icons/BL-01.png"
+        },
+        {
+          "name": "旋氣之曲",
+          "category": "Buff",
+          "description": "60秒間\n我方所受傷害 -20%\n賦予施放者最大HP10%的保護膜\n恢復周圍我軍 5MP\n30秒間獲得霸體狀態",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E93:F94"
+          ],
+          "icon": "skill-icons/BL-02.png"
+        },
+        {
+          "name": "靈槍牽引",
+          "category": "Debuff、降抗",
+          "description": "60秒間\n敵方所有屬性抗性 -150",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G93:H94"
+          ],
+          "icon": "skill-icons/BL-03.png"
+        },
+        {
+          "name": "狂越連爆(轉換)",
+          "category": "Buff",
+          "description": "60秒間\n我方技能傷害 +12%\n技能冷卻加速1.2倍\n敵方防禦 -15%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!I93:J94"
+          ],
+          "icon": "skill-icons/BL-04.png"
+        },
+        {
+          "name": "善良的影響力",
+          "category": "(被動)、Buff",
+          "description": "60秒間\n消耗神之鎖時我方獲得\n紅色/勇氣：攻擊 +12%\n黃色/意志：MP回收率 +40%\n藍色/純淨：所有速度 +10%\n隊員能力值+5%\n(動作速度為乘算)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!K93:L94"
+          ],
+          "icon": "skill-icons/BL-05.png"
+        },
+        {
+          "name": "大師技能 (3/4階段)",
+          "category": "Buff",
+          "description": "15秒間\n每秒恢復20%特殊資源",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!M93:N94"
+          ],
+          "icon": "skill-icons/BL-06.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A93:Z94"
+      ]
+    },
+    {
+      "code": "HE",
+      "skills": [
+        {
+          "name": "靈魂支配",
+          "category": "DeBuff",
+          "description": "13秒間\n敵方防禦 -20%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C95:D96"
+          ],
+          "icon": "skill-icons/HE-01.png"
+        },
+        {
+          "name": "混沌的禁戒(被動)",
+          "category": "DeBuff、降抗",
+          "description": "使用赫尼爾技能時產生結界\n10秒間\n我方致命傷害 +16%\n敵方所有屬性抗性 -100\n※致命傷害為乘算",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E95:F96"
+          ],
+          "icon": "skill-icons/HE-02.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A95:Z96"
+      ]
+    },
+    {
+      "code": "BI",
+      "skills": [
+        {
+          "name": "虔誠祈禱",
+          "category": "Buff",
+          "description": "特殊主動技能消耗MP -10%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C97:D98"
+          ],
+          "icon": "skill-icons/BI-01.png"
+        },
+        {
+          "name": "庇佑",
+          "category": "Buff、DeBuff",
+          "description": "10秒間\n我方攻擊 +7.8%\n敵方攻擊 -13%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E97:F98"
+          ],
+          "icon": "skill-icons/BI-02.png"
+        },
+        {
+          "name": "咆哮",
+          "category": "DeBuff",
+          "description": "敵方20秒間防禦 -20%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G97:H98"
+          ],
+          "icon": "skill-icons/BI-03.png"
+        },
+        {
+          "name": "奪取",
+          "category": "Buff",
+          "description": "15秒間我方技能傷害 +5%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!I97:J98"
+          ],
+          "icon": "skill-icons/BI-04.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A97:Z98"
+      ]
+    },
+    {
+      "code": "EW",
+      "skills": [
+        {
+          "name": "蝶之夜",
+          "category": "解除狀態",
+          "description": "移除我方隨機2位隊員的2種DeBUFF",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C99:D100"
+          ],
+          "icon": "skill-icons/EW-01.png"
+        },
+        {
+          "name": "萬能迷鏡",
+          "category": "DeBuff",
+          "description": "15秒間\n敵方所受傷害 +12%\n防禦 -20%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E99:F100"
+          ],
+          "icon": "skill-icons/EW-02.png"
+        },
+        {
+          "name": "解放的意志(被動)",
+          "category": "DeBuff、降抗",
+          "description": "施展覺醒動作打擊敵方\n所有屬性抗性 -100",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G99:H100"
+          ],
+          "icon": "skill-icons/EW-03.png"
+        },
+        {
+          "name": "實力菈比(被動)",
+          "category": "Buff",
+          "description": "指令打擊時產生恢復玉\n我方接觸時恢復HP/MP 15%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!I99:J100"
+          ],
+          "icon": "skill-icons/EW-04.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A99:Z100"
+      ]
+    },
+    {
+      "code": "RS",
+      "skills": [
+        {
+          "name": "咕嚕咕嚕",
+          "category": "DeBuff、降抗",
+          "description": "60秒間\n敵方所有屬性 -150 抗性\n防禦 -15%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C101:D102"
+          ],
+          "icon": "skill-icons/RS-01.png"
+        },
+        {
+          "name": "你與我(特殊行動)",
+          "category": "Buff",
+          "description": "40秒間\n我方MP回收率 +50%\n冷卻30秒",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E101:F102"
+          ],
+          "icon": "skill-icons/RS-02.png"
+        },
+        {
+          "name": "銀河",
+          "category": "DeBuff",
+          "description": "60秒間\n敵方攻擊 -15%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G101:H102"
+          ],
+          "icon": "skill-icons/RS-03.png"
+        },
+        {
+          "name": "陣雨",
+          "category": "Buff",
+          "description": "5秒間\n我方每秒恢復HP/MP 20%\n每0.5秒會根據每10w戰力恢復0.075%HP",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!I101:J102"
+          ],
+          "icon": "skill-icons/RS-04.png"
+        },
+        {
+          "name": "折射",
+          "category": "Buff、解除狀態",
+          "description": "60秒間\n我方所受傷害 -20%\n冷卻加速1.2倍\n30秒間獲得霸體狀態\n8秒間移除我方Debuff並免疫",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!K101:L102"
+          ],
+          "icon": "skill-icons/RS-05.png"
+        },
+        {
+          "name": "陣風揚起",
+          "category": "Buff",
+          "description": "60秒間\n我方\n攻擊 +12%\n所有技傷 +12%\n所有速度 +10%\n(動作速度為乘算)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!M101:N102"
+          ],
+          "icon": "skill-icons/RS-06.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A101:Z102"
+      ]
+    },
+    {
+      "code": "NL",
+      "skills": [
+        {
+          "name": "波扣~",
+          "category": "Buff",
+          "description": "登場時60秒間\n我方受BOSS攻擊傷害 -10%\n※Boss傷害減少與面板相加",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C103:D104"
+          ],
+          "icon": "skill-icons/NL-01.png"
+        },
+        {
+          "name": "巫奇~",
+          "category": "Buff",
+          "description": "登場時60秒間\n我方攻擊 +20%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E103:F104"
+          ],
+          "icon": "skill-icons/NL-02.png"
+        },
+        {
+          "name": "鏡子屏障",
+          "category": "DeBuff",
+          "description": "25秒間\n敵方防禦 -10%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G103:H104"
+          ],
+          "icon": "skill-icons/NL-03.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A103:Z104"
+      ]
+    },
+    {
+      "code": "TP",
+      "skills": [
+        {
+          "name": "大吼大叫",
+          "category": "",
+          "description": "我方3秒間\n超技能冷卻加速 1.8倍",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C105:D106"
+          ],
+          "icon": "skill-icons/TP-01.png"
+        },
+        {
+          "name": "黃鶯哨子",
+          "category": "",
+          "description": "12秒間\n敵方所受傷害 +20%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E105:F106"
+          ],
+          "icon": "skill-icons/TP-02.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A105:Z106"
+      ]
+    },
+    {
+      "code": "LI",
+      "skills": [
+        {
+          "name": "隱蜃擊",
+          "category": "DeBuff",
+          "description": "10秒間\n敵方防禦 -7%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C107:D108"
+          ],
+          "icon": "skill-icons/LI-01.png"
+        },
+        {
+          "name": "極夜(被動)",
+          "category": "Buff",
+          "description": "發動時\n我方對BOSS/中BOSS傷害 +8%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E107:F108"
+          ],
+          "icon": "skill-icons/LI-02.png"
+        },
+        {
+          "name": "陌生凌晨(被動)",
+          "category": "DeBuff",
+          "description": "覺醒中有黑曜月芒狀態時\n15秒間敵方所受致命傷害 +4%\n(最大3重疊)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G107:H108"
+          ],
+          "icon": "skill-icons/LI-03.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A107:Z108"
+      ]
+    },
+    {
+      "code": "CeL",
+      "skills": [
+        {
+          "name": "天宮圖 (被動)",
+          "category": "Buff",
+          "description": "得到水瓶標誌時\n15秒間魔法攻擊 +1%\n(最大7重疊)\n二轉獲得「宇宙之痕」後可達最大10重疊",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C109:D110"
+          ],
+          "icon": "skill-icons/CeL-01.png"
+        },
+        {
+          "name": "星雲之骰",
+          "category": "Buff、DeBuff",
+          "description": "敵方防禦 -15%\n所受致命傷害 +4%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E109:F110"
+          ],
+          "icon": "skill-icons/CeL-02.png"
+        },
+        {
+          "name": "無限軌跡(被動)",
+          "category": "Buff",
+          "description": "得到獅子標誌時防禦、最大HP +1% (最大40重疊)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G109:H110"
+          ],
+          "icon": "skill-icons/CeL-03.png"
+        },
+        {
+          "name": "黃道之柱",
+          "category": "解除狀態",
+          "description": "解除我方Debuff",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!I109:J110"
+          ],
+          "icon": "skill-icons/CeL-04.png"
+        },
+        {
+          "name": "星辰預言",
+          "category": "Buff",
+          "description": "我方\n藍：10秒間傷害 +6%\n黃：8秒間每秒恢復特殊資源 20%\n白：15秒間傷害 +6%\n　　且不消耗特殊資源",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!K109:L110"
+          ],
+          "icon": "skill-icons/CeL-05.png"
+        },
+        {
+          "name": "天體航行者(被動)",
+          "category": "Buff",
+          "description": "施展占星術技能時生成領域\n一瞬間我方所受傷害 -80%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!M109:N110"
+          ],
+          "icon": "skill-icons/CeL-06.png"
+        },
+        {
+          "name": "日月星靈",
+          "category": "Buff",
+          "description": "可使本命占星必定為未知效果、星辰預言必定為高峰效果",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!O109:P110"
+          ],
+          "icon": "skill-icons/CeL-07.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A109:Z110"
+      ]
+    },
+    {
+      "code": "NP",
+      "skills": [
+        {
+          "name": "冷月墬",
+          "category": "DeBuff",
+          "description": "60秒間\n對象防禦 -15%\n所有屬性抗性 -150",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C111:D112"
+          ],
+          "icon": "skill-icons/NP-01.png"
+        },
+        {
+          "name": "冷月之怒",
+          "category": "Buff",
+          "description": "碰觸到月長石的我方\n20秒間\n覺醒恢復速度 +20%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E111:F112"
+          ],
+          "icon": "skill-icons/NP-02.png"
+        },
+        {
+          "name": "月光宣判",
+          "category": "Buff",
+          "description": "碰觸到光柱的我方\n60秒間\n技能傷害 +12%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G111:H112"
+          ],
+          "icon": "skill-icons/NP-03.png"
+        },
+        {
+          "name": "月之祈願",
+          "category": "Buff",
+          "description": "5秒間\n我方每秒恢復HP/MP 20%\n每0.5秒會根據每10w戰力恢復0.075%HP",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!I111:J112"
+          ],
+          "icon": "skill-icons/NP-04.png"
+        },
+        {
+          "name": "白星殞",
+          "category": "Buff",
+          "description": "60秒間\n我方冷卻加速1.2倍",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!K111:L112"
+          ],
+          "icon": "skill-icons/NP-05.png"
+        },
+        {
+          "name": "蠶鯨庇護",
+          "category": "Buff、解除狀態",
+          "description": "60秒間範圍內我方\n所受傷害 -20%\n所有速度 +10%\n(動作速度為乘算)\n8秒間移除我方Debuff並免疫\n30秒間獲得霸體狀態",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!M111:N112"
+          ],
+          "icon": "skill-icons/NP-06.png"
+        },
+        {
+          "name": "救援(特殊行動)",
+          "category": "Buff",
+          "description": "滿月覺醒中\n可使用特殊行動\n恢復我方所有覺醒珠與特殊資源\n冷卻30秒",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!O111:P112"
+          ],
+          "icon": "skill-icons/NP-07.png"
+        },
+        {
+          "name": "暴風大洋(被動)",
+          "category": "Buff",
+          "description": "施放3次告解技能時60秒間我方攻擊 +12%\n施放3次安息技能時60秒間我方防禦 +20%、MP回收率 +40%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!Q111:R112"
+          ],
+          "icon": "skill-icons/NP-08.png"
+        },
+        {
+          "name": "淨月禮讚",
+          "category": "(全階段皆可)、時紋",
+          "description": "5秒間超技能/大師技能冷卻時間加速1.5倍\n30秒間獲得時間紋章效果(時間紋章效果再發動冷卻50秒)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!S111:T112"
+          ],
+          "icon": "skill-icons/NP-09.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A111:Z112"
+      ]
+    },
+    {
+      "code": "MO",
+      "skills": [
+        {
+          "name": "紅月覺醒",
+          "category": "DeBuff",
+          "description": "敵方10秒內抗性 -10\n(最大10重疊)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C113:D114"
+          ],
+          "icon": "skill-icons/MO-01.png"
+        },
+        {
+          "name": "永劫迷霧",
+          "category": "Buff",
+          "description": "赤月覺醒狀態下\n15秒間\n我方攻擊 +20%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E113:F114"
+          ],
+          "icon": "skill-icons/MO-02.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A113:Z114"
+      ]
+    },
+    {
+      "code": "GB",
+      "skills": [
+        {
+          "name": "爆發軔勁",
+          "category": "Buff",
+          "description": "26秒間\n我方攻擊 +10%\n消耗2個寶石時 +20%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C115:D116"
+          ],
+          "icon": "skill-icons/GB-01.png"
+        },
+        {
+          "name": "守護力量",
+          "category": "Buff",
+          "description": "6.5秒間我方所受傷害 -20%\n消耗13寶石時額外獲得每秒恢復20%特殊資源效果",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E115:F116"
+          ],
+          "icon": "skill-icons/GB-02.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A115:Z116"
+      ]
+    },
+    {
+      "code": "AV",
+      "skills": [
+        {
+          "name": "黃金誓約",
+          "category": "Buff",
+          "description": "跟我簽下契約\n成為魔法少女吧",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C117:D118"
+          ],
+          "icon": "skill-icons/AV-01.png"
+        },
+        {
+          "name": "沙塵風暴",
+          "category": "Buff",
+          "description": "60秒間\n我方攻擊 +12%\n所受傷害 -20%\n30秒間獲得霸體狀態\n施展者、誓約者致命一擊機率+5%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E117:F118"
+          ],
+          "icon": "skill-icons/AV-02.png"
+        },
+        {
+          "name": "合理的選擇",
+          "category": "Buff",
+          "description": "我方\n特殊主動技能傷害 +12%\n所有速度 +10%\n(動作速度為乘算)\n冷卻加速1.2倍",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G117:H118"
+          ],
+          "icon": "skill-icons/AV-03.png"
+        },
+        {
+          "name": "適當的代價",
+          "category": "Buff",
+          "description": "擊殺怪物時隊員獲得[酬勞]\n(一般10/中BOSS30/BOSS50)\n每層酬勞使技能消耗MP -0.2%\n100層時酬勞消失，給予\n施展者、誓約者[收款與餘裕]\n最大MP +12 (最大5重疊60)\n其餘隊員獲得[適當的代價]\n(此效果為防禦力 +20%)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!I117:J118"
+          ],
+          "icon": "skill-icons/AV-04.png"
+        },
+        {
+          "name": "奇蹟之光",
+          "category": "Buff、解除狀態",
+          "description": "5秒間\n我方每秒恢復HP/MP 20%\n每0.5秒會根據每10w戰力恢復0.075%HP\n8秒間移除我方Debuff並免疫",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!K117:L118"
+          ],
+          "icon": "skill-icons/AV-05.png"
+        },
+        {
+          "name": "地平線",
+          "category": "Buff、DeBuff",
+          "description": "60秒間\n敵方防禦 -15%\n所有屬性抗性 -150",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!M117:N118"
+          ],
+          "icon": "skill-icons/AV-06.png"
+        },
+        {
+          "name": "奢華祈願",
+          "category": "Buff",
+          "description": "範圍內我方特定特殊資源恢復\n施展者、誓約者極大化 +5%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!O117:P118"
+          ],
+          "icon": "skill-icons/AV-07.png"
+        },
+        {
+          "name": "雅盧",
+          "category": "時紋",
+          "description": "30秒間獲得時間紋章效果(時間紋章效果再發動冷卻50秒)",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!Q117:R118"
+          ],
+          "icon": "skill-icons/AV-08.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A117:Z118"
+      ]
+    },
+    {
+      "code": "AC",
+      "skills": [
+        {
+          "name": "學名：波利布司",
+          "category": "DeBuff",
+          "description": "敵方防禦 -20%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!C119:D120"
+          ],
+          "icon": "skill-icons/AC-01.png"
+        },
+        {
+          "name": "學名：史汀雷伊",
+          "category": "Debuff",
+          "description": "敵方所受傷害 +12%",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E119:F120"
+          ],
+          "icon": "skill-icons/AC-02.png"
+        },
+        {
+          "name": "突出",
+          "category": "解除狀態",
+          "description": "解除我方DeBuff\n並免疫8秒。",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G119:H120"
+          ],
+          "icon": "skill-icons/AC-03.png"
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A119:Z120"
+      ]
+    },
+    {
+      "code": "MI",
+      "skills": [
+        {
+          "name": "迷人的展開",
+          "category": "Debuff",
+          "description": "敵方防禦 -20%",
+          "icon": "skill-icons/MI-01.png",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!E1:F2",
+            "'全角色BUFF參照表'!C121:D122"
+          ]
+        },
+        {
+          "name": "扯鈴",
+          "category": "降抗",
+          "description": "敵方10秒內抗性 -100+[骰子]\n\n\n※100+(骰子2+骰子5) =125",
+          "icon": "skill-icons/MI-02.png",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!G1:H2",
+            "'全角色BUFF參照表'!E121:F122"
+          ]
+        },
+        {
+          "name": "國王勒菲斯",
+          "category": "Debuff",
+          "description": "10秒間\n敵方所受致命傷害 +[骰子]*0.5\n(骰子2+骰子5)* 0.5 = 12.5%",
+          "icon": "skill-icons/MI-03.png",
+          "sourceRanges": [
+            "'全角色BUFF參照表'!I1:J2",
+            "'全角色BUFF參照表'!G121:H122"
+          ]
+        }
+      ],
+      "sourceRanges": [
+        "'全角色BUFF參照表'!A1:Z2",
+        "'全角色BUFF參照表'!A121:Z122"
+      ]
+    }
+  ]
+}
