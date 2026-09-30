@@ -667,7 +667,7 @@ async function start() {
     const attackKey = currentClass?.attackType === 'physical' ? 'physicalAttack' : 'magicalAttack';
     const baselineAttackKey = baselineClass?.attackType === 'physical' ? 'physicalAttack' : 'magicalAttack';
     const visibleStats = Object.entries(current.stats)
-      .filter(([key, stat]) => !['physicalAttack', 'magicalAttack', 'critRatePct', 'extremizationPct'].includes(key) && (stat.finalTotal !== 0 || (before?.stats[key]?.finalTotal ?? 0) !== 0 || key === 'superAdaptabilityPct' || (key === 'critDamagePct' && critDamageSupplement(currentDamage) !== 0)))
+      .filter(([key]) => !['physicalAttack', 'magicalAttack', 'critRatePct', 'extremizationPct', 'strongerPct', 'heatPct'].includes(key))
       .map(([key, stat]) => ({ key, stat, previousStat: before?.stats[key] }));
     const superAdaptabilityIndex = visibleStats.findIndex(entry => entry.key === 'superAdaptabilityPct');
     if (superAdaptabilityIndex >= 0) {
@@ -676,7 +676,7 @@ async function start() {
       visibleStats.splice(adaptabilityIndex < 0 ? visibleStats.length : adaptabilityIndex + 1, 0, superAdaptability);
     }
     const attackStat = current.stats[attackKey];
-    if (attackStat && (attackStat.finalTotal !== 0 || (before?.stats[baselineAttackKey]?.finalTotal ?? 0) !== 0)) {
+    if (attackStat) {
       visibleStats.unshift({ key: 'attackPower', stat: attackStat, previousStat: before?.stats[baselineAttackKey] });
     }
     const percentFormat = (value: number) => new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 3 }).format(value);
