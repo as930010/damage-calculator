@@ -110,3 +110,28 @@ body{font-size:15px;line-height:1.55}
   .field{font-size:12px}
   .field input{font-size:13px}
 }
+
+/* Requested readability and responsive layout refinements. */
+.weapon-magic-stone-color.weapon-magic-stone-red{border-color:#b97878}
+.weapon-magic-stone-color.weapon-magic-stone-blue{border-color:#718fb8}
+.weapon-magic-stone-color.weapon-magic-stone-yellow{border-color:#b9a36c}
+[data-theme="light"] .weapon-magic-stone-color.weapon-magic-stone-red{border-color:#d59a9a}
+[data-theme="light"] .weapon-magic-stone-color.weapon-magic-stone-blue{border-color:#94b2db}
+[data-theme="light"] .weapon-magic-stone-color.weapon-magic-stone-yellow{border-color:#d7c17f}
+
+.stat-list{align-items:start}
+.stat summary::after{content:"⌄";flex:none;margin-left:4px;color:var(--text-soft);font-size:13px;line-height:1;transition:transform .15s ease}
+.stat[open] summary::after{transform:rotate(180deg)}
+
+.gear-beast-slots .beast-accessory-slot-ring-one{left:calc(53% - clamp(70px, 6vw, 76px))}
+.gear-beast-slots .beast-accessory-slot-ring-two{left:53%}
+
+.toolbar .transfer-actions{order:10;margin-left:auto}
+.toolbar #transfer-status,.toolbar #save-status{order:5}
+.toolbar #save-status{margin-left:0}
+@media(max-width:1000px){
+  .toolbar #baseline{margin-left:auto}
+  .toolbar .transfer-actions{flex-basis:100%;justify-content:flex-end;margin-left:0}
+}
+
+@media(max-width:600px){.gear-beast-slots .beast-accessory-slot{width:60px;height:60px}}
