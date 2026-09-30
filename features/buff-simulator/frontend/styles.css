@@ -925,5 +925,16 @@ details:not(.skill-reference)[open] > summary::before { transform: rotate(45deg)
   .option-editor-input input { width: 8.4em; min-width: 8.4em; text-align: left; }
 }
 
+.configuration-heading { justify-content: space-between; gap: 16px; }
+.configuration-heading .boss-control { flex: 0 1 260px; }
+@media (max-width: 700px) {
+  .configuration-heading .boss-control { flex: none; flex-direction: row; align-items: center; gap: 8px; font-size: 11px; }
+  .configuration-heading .boss-control .percent-input { width: 112px; }
+}
+@media (max-width: 390px) {
+  .configuration-heading .boss-control { max-width: none; }
+  .configuration-heading .boss-control .percent-input { width: 94px; }
+  .configuration-heading .boss-control .percent-input input { padding-inline: 5px; font-size: 13px; }
+}
 .simulator-back-link{margin-left:auto;color:var(--text-muted);font-size:12px;text-decoration:none}.simulator-back-link:hover{color:var(--text-main)}
 @media(max-width:600px){.simulator-back-link{font-size:11px}}

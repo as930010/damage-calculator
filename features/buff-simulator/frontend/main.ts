@@ -16,7 +16,7 @@ let catalog: GameCatalog;
 let mode: TeamMode = "single";
 let membersByTeam: Record<string, string[]> = { single: [], first: [], second: [] };
 let optionsByTeam: Record<string, Record<string, boolean | number>> = { single: {}, first: {}, second: {} };
-let bossReduction: number | undefined;
+let bossReductions: Partial<Record<TeamMode, number>> = {};
 
 function uniqueSupportCodes(): string[] {
   return catalog.classes.filter((record) => record.uniquenessGroup === "green-control").map((record) => record.code);
@@ -87,6 +87,13 @@ function emptyRosterNote(): string {
     ? '<p class="roster-note" role="status">尚未選擇職業；以下結果仍包含目前啟用的配置效果。</p>'
     : "";
 }
+function bossControl(): string {
+  const defaultValue = mode === "single"
+    ? catalog.parameters.bossDamageReduction
+    : catalog.parameters.challengeBreakCoefficient;
+  const value = bossReductions[mode] ?? defaultValue;
+  return '<label class="boss-control"><span>Boss 減傷率</span><span class="percent-input"><input id="boss-reduction" type="number" min="0" max="99.99" step="0.01" value="' + (value * 100).toFixed(2) + '" inputmode="decimal" aria-label="Boss 減傷率"><span>%</span></span></label>';
+}
 function optionPanel(team: string): string {
   const valueOptions = catalog.loadoutOptions.filter((option) => option.userInput?.kind === "percentage");
   const toggleOptions = catalog.loadoutOptions.filter((option) => !option.userInput && option.presentation !== "background");
@@ -143,9 +150,9 @@ function updateSkillReference(): void {
 
 function teamPanel(team: string, title: string, memberCount: number): string {
   const routeLabel = team === "single" ? "" : `<span class="eyebrow">ROUTE ${team === "first" ? "01" : "02"}</span>`;
-  const bossControl = team === "single" ? `<label class="boss-control"><span>Boss 減傷率</span><span class="percent-input"><input id="boss-reduction" type="number" min="0" max="99.99" step="0.01" value="${((bossReduction ?? catalog.parameters.bossDamageReduction) * 100).toFixed(2)}" inputmode="decimal" aria-label="Boss 減傷率"><span>%</span></span></label>` : "";
+  const bossControlMarkup = team === "single" ? bossControl() : "";
   return `<section class="panel team-panel">
-    <div class="panel-heading"><div>${routeLabel}<h2>${title}</h2></div>${bossControl}</div>
+    <div class="panel-heading"><div>${routeLabel}<h2>${title}</h2></div>${bossControlMarkup}</div>
     <div class="member-grid">${Array.from({ length: memberCount }, (_, index) => `<label class="member-slot"><span class="slot-index">${String(index + 1).padStart(2, "0")}</span><input data-member data-team="${team}" list="class-list" autocomplete="off" value="${escapeHtml(membersByTeam[team]?.[index] ?? "")}" placeholder="輸入代碼" aria-label="${title}隊員 ${index + 1}"></label>`).join("")}</div>
     <details class="option-disclosure"><summary>配置效果</summary>${optionPanel(team)}</details>
   </section>`;
@@ -160,7 +167,7 @@ function shell(): void {
       </div>
     </div>
   </section>
-  <div class="section-label"><strong>隊伍配置</strong></div>
+  <div class="section-label configuration-heading"><strong>隊伍配置</strong>${mode === "challenge" ? bossControl() : ""}</div>
   ${mode === "single" ? `<div class="workspace single-workspace">${teamPanel("single", "單隊配置", 6)}</div>` : `<div class="workspace challenge-workspace">${teamPanel("first", "第一隊", 4)}${teamPanel("second", "第二隊", 4)}</div>`}
   <datalist id="class-list">${catalog.classes.filter((record) => record.enabled).map((record) => `<option value="${escapeHtml(record.code)}">${escapeHtml(record.name)}</option>`).join("")}</datalist>
   <section id="results" aria-live="polite"></section>
@@ -186,7 +193,8 @@ function saveCurrentInputs(): void {
     };
   }
   const bossInput = app.querySelector<HTMLInputElement>("#boss-reduction");
-  if (bossInput && Number.isFinite(Number(bossInput.value))) bossReduction = Number(bossInput.value) / 100;
+  const value = Number(bossInput?.value) / 100;
+  if (bossInput && Number.isFinite(value) && value >= 0 && value < 1) bossReductions[mode] = value;
 }
 
 function metric(label: string, value: string, emphasis = false): string {
@@ -280,10 +288,16 @@ function updateResults(): void {
     return;
   }
 
+  const bossInput = app.querySelector<HTMLInputElement>("#boss-reduction");
+  const bossDamageReduction = Number(bossInput?.value ?? catalog.parameters.challengeBreakCoefficient * 100) / 100;
+  if (!(bossDamageReduction >= 0 && bossDamageReduction < 1)) {
+    results.innerHTML = '<p class="validation-note">Boss 減傷率請輸入 0%（含）至 100%（不含）。</p>';
+    return;
+  }
   const challenge = calculateChallenge({
     firstTeam: { members: membersFor("first"), options: optionsFor("first") },
     secondTeam: { members: membersFor("second"), options: optionsFor("second") },
-    defense: { challengeBreakCoefficient: catalog.parameters.challengeBreakCoefficient },
+    defense: { challengeBreakCoefficient: bossDamageReduction },
     uniqueClassCodes: uniqueSupportCodes(),
     actionSpeedCap: catalog.parameters.actionSpeedCap,
   });
