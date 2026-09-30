@@ -18,6 +18,66 @@ let membersByTeam: Record<string, string[]> = { single: [], first: [], second: [
 let optionsByTeam: Record<string, Record<string, boolean | number>> = { single: {}, first: {}, second: {} };
 let bossReductions: Partial<Record<TeamMode, number>> = {};
 
+type TeamKey = "single" | "first" | "second";
+interface SavedSimulatorState {
+  version: 1;
+  mode: TeamMode;
+  membersByTeam: Partial<Record<TeamKey, string[]>>;
+  optionsByTeam: Partial<Record<TeamKey, Record<string, boolean | number>>>;
+  bossReductions: Partial<Record<TeamMode, number>>;
+}
+
+const STORAGE_KEY = "buff-team-simulator.state.v1";
+
+function restoreSavedState(): void {
+  try {
+    const savedText = window.localStorage.getItem(STORAGE_KEY);
+    if (!savedText) return;
+    const saved = JSON.parse(savedText) as Partial<SavedSimulatorState>;
+    if (!saved || saved.version !== 1) return;
+
+    if (saved.mode === "single" || saved.mode === "challenge") mode = saved.mode;
+
+    for (const team of ["single", "first", "second"] as const) {
+      const memberCount = team === "single" ? 6 : 4;
+      const savedMembers = saved.membersByTeam?.[team];
+      if (Array.isArray(savedMembers)) {
+        membersByTeam[team] = Array.from({ length: memberCount }, (_, index) =>
+          typeof savedMembers[index] === "string" ? savedMembers[index].slice(0, 120) : membersByTeam[team]?.[index] ?? "");
+      }
+
+      const savedOptions = saved.optionsByTeam?.[team];
+      if (!savedOptions || typeof savedOptions !== "object") continue;
+      for (const option of catalog.loadoutOptions) {
+        const value = savedOptions[option.id];
+        if (option.userInput?.kind === "percentage") {
+          if (typeof value === "number" && Number.isFinite(value) && value >= 0) optionsByTeam[team][option.id] = value;
+        } else if (option.presentation !== "background" && typeof value === "boolean") {
+          optionsByTeam[team][option.id] = value;
+        }
+      }
+    }
+
+    for (const savedMode of ["single", "challenge"] as const) {
+      const value = saved.bossReductions?.[savedMode];
+      if (typeof value === "number" && Number.isFinite(value) && value >= 0 && value < 1) {
+        bossReductions[savedMode] = value;
+      }
+    }
+  } catch {
+    // Storage may be disabled or contain invalid JSON; keep the default simulator state.
+  }
+}
+
+function persistSavedState(): void {
+  const saved: SavedSimulatorState = { version: 1, mode, membersByTeam, optionsByTeam, bossReductions };
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+  } catch {
+    // The simulator remains usable when browser storage is unavailable or full.
+  }
+}
+
 function uniqueSupportCodes(): string[] {
   return catalog.classes.filter((record) => record.uniquenessGroup === "green-control").map((record) => record.code);
 }
@@ -175,10 +235,18 @@ function shell(): void {
   app.querySelectorAll<HTMLButtonElement>("[data-mode]").forEach((button) => button.addEventListener("click", () => {
     saveCurrentInputs();
     mode = button.dataset.mode as TeamMode;
+    persistSavedState();
     shell();
     updateResults();
   }));
-  app.oninput = () => { updateResults(); updateSkillReference(); };
+  const syncInputs = () => {
+    saveCurrentInputs();
+    persistSavedState();
+    updateResults();
+    updateSkillReference();
+  };
+  app.oninput = syncInputs;
+  app.onchange = syncInputs;
   updateResults();
   updateSkillReference();
 }
@@ -313,6 +381,7 @@ async function start(): Promise<void> {
     }));
     membersByTeam[team] = Array(team === "single" ? 6 : 4).fill("");
   }
+  restoreSavedState();
   shell();
 }
 
