@@ -46,5 +46,6 @@ const buildRevision = revisionResult.status === 0 ? `${revisionResult.stdout.tri
 const indexHtml = (await readFile(join(root, "index.html"), "utf8")).replaceAll("__BUILD_REVISION__", buildRevision);
 await writeFile(join(output, "index.html"), indexHtml);
 await cp(join(root, "frontend", "styles.css"), join(output, "frontend", "styles.css"));
+await cp(join(root, "frontend", "polish.css"), join(output, "frontend", "polish.css"));
 await writeFile(join(output, ".nojekyll"), "");
 console.log("Built static site in dist/. Run npm run preview to open it locally.");
