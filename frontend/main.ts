@@ -539,23 +539,19 @@ async function start() {
           description.textContent = selectedItem.description;
           panel.append(description);
         }
-        if (selectedItem?.appraisal?.canAppraise === false) {
+        const cannotAppraise = selectedItem?.appraisal?.canAppraise === false;
+        if (cannotAppraise) {
           panel.insertAdjacentHTML('beforeend', '<p class="panel-note">此飾品不可鑑定。</p>');
-        } else if (selectedItem && !appraisalGroup) {
-          panel.insertAdjacentHTML('beforeend', '<p class="panel-note">目前沒有設定此飾品部位的鑑定效果欄位；即使資料目錄填入可鑑定狀態，這裡仍不會顯示或計算鑑定效果。</p>');
-        }
-        if (appraisalGroup && selectedItem) {
+        } else if (appraisalGroup && selectedItem) {
           const appraisal = selectedItem.appraisal;
           if (!appraisal || appraisal.canAppraise === null || appraisal.effectCount === null) {
             panel.insertAdjacentHTML('beforeend', '<p class="panel-note">此飾品的「是否可鑑定」與「鑑定效果條數」尚未設定；未確認前不會套用鑑定效果。更新 <code>data/equipment/accessories.json</code> 後即可啟用。</p>');
-          } else if (!appraisal.canAppraise) {
-            panel.insertAdjacentHTML('beforeend', '<p class="panel-note">此飾品不可鑑定。</p>');
-          } else if (Number.isInteger(appraisal.effectCount) && appraisal.effectCount > 0 && appraisal.effectCount <= appraisalGroup.inputCells.length) {
+          } else if (appraisal.canAppraise && Number.isInteger(appraisal.effectCount) && appraisal.effectCount > 0 && appraisal.effectCount <= appraisalGroup.inputCells.length) {
             const appraisalArea = section(panel, '飾品鑑定', true);
             const itemOptions = appraisalGroup.optionsByEquipmentName?.[selectedItem.name] ?? appraisalGroup.options;
             const choices: PickerOption[] = itemOptions.map((option: AccessoryEffectOption) => ({ value: option.name, label: option.name }));
             appraisalGroup.inputCells.slice(0, appraisal.effectCount).forEach((cell, index) => field(appraisalArea, `鑑定效果 ${index + 1}`, cell, choices));
-          } else {
+          } else if (appraisal.canAppraise) {
             panel.insertAdjacentHTML('beforeend', '<p class="input-warning">此飾品的鑑定效果條數資料不正確，請檢查裝備 JSON。</p>');
           }
         }

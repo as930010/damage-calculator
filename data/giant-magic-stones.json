@@ -14,6 +14,20 @@
   ],
   "options": [
     {
+      "id": "giant-stone-6",
+      "name": "攻擊力+5%",
+      "stats": {
+        "doubleAttackPct": 5
+      }
+    },
+    {
+      "id": "giant-stone-7",
+      "name": "攻擊力等級+6",
+      "stats": {
+        "attackLevel": 6
+      }
+    },
+    {
       "id": "giant-stone-2",
       "name": "攻擊力+5.5%",
       "stats": {
@@ -55,20 +69,6 @@
       "source": {
         "sheet": "係數區",
         "cell": "W5"
-      }
-    },
-    {
-      "id": "giant-stone-6",
-      "name": "攻擊力+5%",
-      "stats": {
-        "doubleAttackPct": 5
-      }
-    },
-    {
-      "id": "giant-stone-7",
-      "name": "攻擊力等級+6",
-      "stats": {
-        "attackLevel": 6
       }
     }
   ],
