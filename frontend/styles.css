@@ -171,3 +171,4 @@ body{font-size:15px;line-height:1.55}
 @media(max-width:700px){
   .mobile-inspector-open #inspector{inset:max(10px,4dvh) 8px calc(68px + env(safe-area-inset-bottom));height:auto;max-height:none}
 }
+.conditional-damage-pair{display:contents}.conditional-damage-pair .conditional-stat{display:flex;align-items:center;gap:10px}.conditional-damage-pair .conditional-stat p{margin:0;color:var(--text-label);font-size:12px}.conditional-damage-pair .conditional-stat strong{margin-left:auto;font-size:16px;font-variant-numeric:tabular-nums;white-space:nowrap}

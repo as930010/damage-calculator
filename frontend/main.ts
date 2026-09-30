@@ -195,8 +195,11 @@ async function start() {
     if (sourceId.startsWith('circuit-board:')) {
       const slotId = sourceId.slice('circuit-board:'.length);
       const slot = data.circuits.inputs.find(entry => entry.slot === slotId);
+      const slotNames: Record<string, string> = { upper: '上衣電路板', lowerwear: '下衣電路板', lowerwearAlternative: '強/排褲電路板', gloves: '手套電路板', shoes: '鞋子電路板' };
+      if (slotNames[slotId]) return slotNames[slotId];
       return slot ? `電路板 ${slotId}：${String(state.values[slot.attributeCell] ?? '')} ${fmt(Number(state.values[slot.valueCell] ?? 0) * 100)}%` : `電路板來源待確認（${sourceId}）`;
     }
+    if (sourceId === '立繪、覺醒:Effect.PortraitAwakening') return '立繪、覺醒';
     if (sourceId.startsWith('color-set:')) return `百億套效：${sourceId.slice('color-set:'.length)}`;
     if (sourceId.startsWith('master-beast:')) {
       const [, part, detail] = sourceId.split(':');
@@ -261,11 +264,17 @@ async function start() {
     if (sourceId.startsWith('environment:')) return `場地：${String(state.values['Effect.Environment'] ?? '')}`;
     if (sourceId.startsWith('peak-option:')) return `巔峰選項：${String(state.values['Peak.Option'] ?? '')}`;
     if (sourceId.startsWith('pet:')) return `寵物：${String(state.values['Pet.Passive'] ?? '')}`;
+    if (sourceId === '標誌:Effect.Emblem') return '標誌';
     const binaryEffect = data.otherEffects.binaryEffects.find(entry => entry.name === sourceId);
     if (binaryEffect) return `${binaryEffect.name}：${String(state.values[binaryEffect.selectorCell] ?? '')}`;
     if (sourceId.startsWith('guild-fountain-')) {
       return '公會噴泉';
     }
+    if (sourceId === 'lowerwear-crit-rate-enhancement') return '下衣強化階段+2';
+    if (sourceId === 'shoes-extremization-enhancement') return '鞋子強化階段+2';
+    if (sourceId === 'master-beast:armor-spirit-stone-set:S77') return '聖獸精靈石(黃)';
+    const classPassiveSource = sourceId.match(/^([^:]+):(critRate|extremization):(crit|ext)-\d+$/);
+    if (classPassiveSource && data.classCombatEffects.classes[classPassiveSource[1]]) return classPassiveSource[1] + '自身技能';
     return `來源名稱待確認（${sourceId}）`;
   }
   function calculationIssue(error: unknown): string {
@@ -674,7 +683,12 @@ async function start() {
     const combatRateCards = currentCombatRates
       ? `<div class="combat-rate-pair"><div class="stat"><p>實戰致命一擊機率</p><strong>${fmt(currentCombatRates.critRate.finalRate * 100)}%</strong>${probabilityCapWarning(currentCombatRates.critRate.valueBeforeUpperCap)}</div><div class="stat"><p>實戰極大化</p><strong>${fmt(currentCombatRates.extremization.finalRate * 100)}%</strong>${probabilityCapWarning(currentCombatRates.extremization.valueBeforeUpperCap)}</div></div>`
       : `<div class="combat-rate-pair"><div class="stat"><p>實戰致命一擊機率</p><strong>待補輸入</strong><small class="input-hint">${h(calculationIssue(damageCalculationError))}</small></div><div class="stat"><p>實戰極大化</p><strong>待補輸入</strong><small class="input-hint">${h(calculationIssue(damageCalculationError))}</small></div></div>`;
-    const conditionalDamageCards = `<div class="conditional-damage-pair"><div class="stat"><p>強者（Boss 體力 &gt; 50%）</p><strong>${fmt(current.conditionalDamage.strongerPct)}%</strong></div><div class="stat"><p>排熱（Boss 體力 ≤ 50%）</p><strong>${fmt(current.conditionalDamage.heatPct)}%</strong></div></div>`;
+    const conditionalDamageCards = `<div class="conditional-damage-pair"><div class="stat conditional-stat"><p>強者（Boss 體力 &gt; 50%）</p><strong>${fmt(current.conditionalDamage.strongerPct)}%</strong></div><div class="stat conditional-stat"><p>排熱（Boss 體力 ≤ 50%）</p><strong>${fmt(current.conditionalDamage.heatPct)}%</strong></div></div>`;
+    const multiplicativeEffectCard = currentDamage
+      ? `<details class="stat"><summary><span>乘算效果</span><strong>×${fmt(currentDamage.result.generalMultiplicativeDamage.value)}</strong></summary><div class="stat-details">${currentDamage.result.generalMultiplicativeDamage.factors.length
+        ? currentDamage.result.generalMultiplicativeDamage.factors.map(effect => `<p class="stat-source-row"><span>${h(sourceLabel(effect.sourceId))}</span><strong>×${fmt(effect.factor)}</strong></p>`).join('')
+        : '<p class="stat-source-empty">目前沒有額外乘算來源</p>'}<p class="stat-average">乘算效果總倍率 ×${fmt(currentDamage.result.generalMultiplicativeDamage.value)}</p></div></details>`
+      : `<div class="stat"><p>乘算效果</p><strong>待補輸入</strong><small class="input-hint">${h(calculationIssue(damageCalculationError))}</small></div>`;
     const innerwearOrder = new Map(data.innerwear.slots.map((slot, index) => [`innerwear:${slot.id}`, index]));
     target.innerHTML = `<div class="stat-list">${visibleStats.map(({ key, stat, previousStat }) => {
       const meta = data.attributes.attributes.find(entry => entry.key === key);
@@ -700,7 +714,7 @@ async function start() {
       const sharedDetails = commonSources.length ? `<p class="stat-detail-heading">共同來源</p>${sourceRows(commonSources, isPercent)}` : '';
       const lowerwearBDetails = state.lowerwearAlternativeEnabled && stat.lowerwearBSources.length ? `<p class="stat-detail-heading">強/排褲來源</p>${sourceRows(stat.lowerwearBSources, isPercent)}` : '';
       return `<details class="stat"><summary><span>${h(shownName)}</span><strong>${fmt(stat.finalTotal)}${isPercent ? '%' : ''}</strong>${attributeCapWarning}${delta === null ? '' : `<small class="${delta > 0 ? 'positive' : delta < 0 ? 'negative' : ''}">${deltaText}</small>`}</summary><div class="stat-details">${sharedDetails}${lowerwearBDetails}<p class="stat-average">${lowerwearAverageLabel} ${fmt(stat.lowerwearAverage)}${isPercent ? '%' : ''}</p>${comparison}</div></details>`;
-    }).join('')}${conditionalDamageCards}${combatRateCards}</div>`;
+    }).join('')}${conditionalDamageCards}${multiplicativeEffectCard}${combatRateCards}</div>`;
       const damageTarget = document.querySelector('#damage-result')!;
       try {
         if (!currentDamage) throw damageCalculationError;
