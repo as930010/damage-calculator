@@ -12,6 +12,75 @@ const packagePath = require.resolve("typescript/package.json");
 const compilerPackage = JSON.parse(await readFile(packagePath, "utf8"));
 const compilerPath = resolve(dirname(packagePath), compilerPackage.bin.tsc);
 
+function minifyCss(source) {
+  let output = "";
+  let quote = "";
+  let inComment = false;
+  let pendingSpace = false;
+
+  for (let index = 0; index < source.length; index += 1) {
+    const character = source[index];
+    const next = source[index + 1] ?? "";
+
+    if (inComment) {
+      output += character;
+      if (character === "*" && next === "/") {
+        output += next;
+        index += 1;
+        inComment = false;
+      }
+      continue;
+    }
+
+    if (quote) {
+      output += character;
+      if (character === "\\" && next) {
+        output += next;
+        index += 1;
+      } else if (character === quote) {
+        quote = "";
+      }
+      continue;
+    }
+
+    if (character === "/" && next === "*") {
+      if (pendingSpace && output && !/[{};]/.test(output.at(-1))) output += " ";
+      pendingSpace = false;
+      output += "/*";
+      index += 1;
+      inComment = true;
+      continue;
+    }
+
+    if (character === "\\" && next) {
+      if (pendingSpace && output && !/[{};]/.test(output.at(-1))) output += " ";
+      pendingSpace = false;
+      output += character + next;
+      index += 1;
+      continue;
+    }
+
+    if (character === "\"" || character === "'") {
+      if (pendingSpace && output && !/[{};]/.test(output.at(-1)) && !/[{};]/.test(character)) output += " ";
+      pendingSpace = false;
+      quote = character;
+      output += character;
+      continue;
+    }
+
+    if (/\s/.test(character)) {
+      pendingSpace = true;
+      continue;
+    }
+
+    if (pendingSpace && output && !/[{};]/.test(output.at(-1)) && !/[{};]/.test(character)) output += " ";
+    pendingSpace = false;
+    output += character;
+  }
+
+  return output.trim();
+}
+
 // Remove only the generated dist directory inside this project.
 if (dirname(output) !== root || output !== join(root, "dist")) {
   throw new Error("Invalid build output directory.");
@@ -45,7 +114,9 @@ const revisionResult = spawnSync("git", ["rev-parse", "--short", "HEAD"], { cwd:
 const buildRevision = revisionResult.status === 0 ? `${revisionResult.stdout.trim()}-${dataRevision}` : `build-${Date.now()}-${dataRevision}`;
 const indexHtml = (await readFile(join(root, "index.html"), "utf8")).replaceAll("__BUILD_REVISION__", buildRevision);
 await writeFile(join(output, "index.html"), indexHtml);
-await cp(join(root, "frontend", "styles.css"), join(output, "frontend", "styles.css"));
-await cp(join(root, "frontend", "polish.css"), join(output, "frontend", "polish.css"));
+for (const file of ["styles.css", "polish.css"]) {
+  const source = await readFile(join(root, "frontend", file), "utf8");
+  await writeFile(join(output, "frontend", file), minifyCss(source));
+}
 await writeFile(join(output, ".nojekyll"), "");
 console.log("Built static site in dist/. Run npm run preview to open it locally.");

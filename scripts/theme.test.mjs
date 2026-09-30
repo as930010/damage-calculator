@@ -57,9 +57,9 @@ test("theme remains usable when browser storage is unavailable", () => {
 
 test("light palette defines readable light surfaces while preserving the dark default tokens", async () => {
   const css = await readFile(join(root, "frontend/styles.css"), "utf8");
-  assert.match(css, /:root\{color-scheme:dark;--page-bg:#15171c;--text-main:#e5e8ee/u);
-  assert.match(css, /:root\[data-theme="light"\]\{color-scheme:light;--page-bg:#f4f6fa/u);
-  assert.match(css, /--panel:#fff;--panel-alt:#f8f9fa/u);
+  assert.match(css, /:root\{\s*color-scheme:dark;\s*--page-bg:#15171c;\s*--text-main:#e5e8ee/u);
+  assert.match(css, /:root\[data-theme="light"\]\{\s*color-scheme:light;\s*--page-bg:#f4f6fa/u);
+  assert.match(css, /--panel:#fff;\s*--panel-alt:#f8f9fa/u);
   assert.match(css, /--text-heading:#26364c/u);
   assert.match(css, /\.theme-toggle\{/u);
 });
