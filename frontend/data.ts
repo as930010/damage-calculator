@@ -27,6 +27,7 @@ export interface GameData {
   attributes: { attributes: AttributeMetadata[] };
   parameters: {
     characterBase: Record<string, number>;
+    characterBaseByClass?: Readonly<Record<string, Readonly<Record<string, number>>>>;
     fixedEffects: StatContribution[];
     conditionalEffects: { sourceId: string; selectorCell: string; selectorValue: string; stats: Readonly<Record<string, number>> }[];
     optionalEffects: { sourceId: string; stateKey: "petSkillAttackEnabled"; defaultEnabled: boolean; stats: Readonly<Record<string, number>> }[];

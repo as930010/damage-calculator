@@ -73,3 +73,10 @@ test('爆擊與極大化超過 100% 時僅以 100% 實戰機率計算', async ()
   assert.equal(actual.critRate.finalRate, 1);
   assert.equal(actual.extremization.finalRate, 1);
 });
+
+test('使用者確認的致命傷害被動依職業套用', async () => {
+  const document = await readJson('class-damage-passives.json');
+  for (const classId of ['AN', 'DaB', 'TW', 'PR']) assert.equal(document.critDamagePctByClass[classId], 30, classId);
+  for (const classId of ['CT', 'IN', 'DA', 'DE']) assert.equal(document.critDamagePctByClass[classId], 23, classId);
+  assert.equal(document.critDamagePctByClass.KE, 0);
+});

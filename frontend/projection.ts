@@ -12,6 +12,7 @@ import type { LoadoutState } from "./state.ts";
 /** UI state to supported stat sources; game arithmetic remains in calculation/. */
 export function projectAttributes(data: GameData, state: LoadoutState) {
   const values = state.values;
+  const characterBaseStats = { ...data.parameters.characterBase, ...data.parameters.characterBaseByClass?.[state.Job] };
   const text = (key: string) => String(values[key] ?? "");
   const number = (key: string) => values[key] === undefined || values[key] === "" ? undefined : Number(values[key]);
   const equipment = resolveSimulatorEquipmentContributions(data.mapping, data.catalogs, {
@@ -28,7 +29,7 @@ export function projectAttributes(data: GameData, state: LoadoutState) {
       .map(({ sourceId, stats }) => ({ sourceId, stats })),
   ];
   const groups: Record<"shared" | "lowerwearA" | "lowerwearB", StatContribution[]> = {
-    shared: [{ sourceId: "character-base", stats: data.parameters.characterBase }, ...data.parameters.fixedEffects, ...configuredEffects, ...equipment.shared, ...inner.shared],
+    shared: [{ sourceId: "character-base", stats: characterBaseStats }, ...data.parameters.fixedEffects, ...configuredEffects, ...equipment.shared, ...inner.shared],
     lowerwearA: [...equipment.lowerwearA, ...inner.lowerwearA], lowerwearB: [...equipment.lowerwearB, ...inner.lowerwearB],
   };
   for (const entry of resolveArmorAppraisals(data.appraisals, {
@@ -214,7 +215,7 @@ export function projectDamage(data: GameData, state: LoadoutState) {
     classId: job.id, attackType: job.attackType,
     attributeRules: data.attributes.attributes.filter(entry => entry.active && entry.aggregation === "sum")
       .map(entry => ({ key: entry.key, aggregation: "sum" as const, cap: entry.cap })),
-    characterBaseStats: data.parameters.characterBase,
+    characterBaseStats: { ...data.parameters.characterBase, ...data.parameters.characterBaseByClass?.[job.id] },
     sources: attributes.calculationSources,
     attackParameters: data.attack,
     weaponEnhancementLevel: weaponLevel,
@@ -225,8 +226,8 @@ export function projectDamage(data: GameData, state: LoadoutState) {
     targetCritPenaltyPct: rateInputs.targetCritPenaltyPct,
     stageAdaptabilityPenaltyPct: percentage("Stage.Adapt"),
     enemyDefensePct: percentage("Stage.BossDEF"),
-    critDamageProductBasePct: data.parameters.critDamageProductBasePct,
-    critDamageProductBaselinePctToSubtract: data.parameters.critDamageProductBaselinePctToSubtract,
+    critDamageProductBasePct: data.parameters.characterBaseByClass?.[job.id]?.critDamagePct === undefined ? data.parameters.critDamageProductBasePct : data.parameters.characterBaseByClass[job.id].critDamagePct - 100,
+    critDamageProductBaselinePctToSubtract: data.parameters.characterBaseByClass?.[job.id]?.critDamagePct ?? data.parameters.critDamageProductBaselinePctToSubtract,
   });
   return { attributes: result.attributes, result };
 }

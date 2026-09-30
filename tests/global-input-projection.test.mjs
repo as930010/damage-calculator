@@ -193,3 +193,19 @@ test('百億套效紅藍固定值與綠色依內裝手電路的超越技傷計�
   assert.equal(greenWithoutCircuit / base, 1.1);
   assert.ok(Math.abs(greenWithCircuit / base - 1.144) < 1e-12);
 });
+test('RM 致命傷害基底採 180%，乘算後扣除同一個 180% 基準', async () => {
+  const data = await loadData();
+  const values = {
+    "Weapon.ENHC": 'Lv.8',
+    "Left.Armor.Upper.ENHC": 'Lv.8', "Left.Armor.Bottom.ENHC": 'Lv.8',
+    "Left.Armor.Gloves.ENHC": 'Lv.8', "Left.Armor.Shoes.ENHC": 'Lv.8',
+    "Left.Armor.Upper.FORGE": 0, "Left.Armor.Bottom.FORGE": 0,
+    "Left.Armor.Gloves.FORGE": 0, "Left.Armor.Shoes.FORGE": 0,
+  };
+  const result = projectDamage(data, { schemaVersion: 2, Job: 'RM', values, lowerwearAlternativeEnabled: false }).result;
+  const baseFactor = result.multiplicativeCritDamage.factors.find(effect => effect.sourceId === 'character-base:crit-damage-product')?.factor;
+  assert.equal(result.attributes.stats.critDamagePct.sharedSources.find(source => source.sourceId === 'character-base')?.valuePct, 180);
+  assert.equal(baseFactor, 1.8);
+  assert.equal(result.multiplicativeCritDamage.baselinePct, 180);
+  assert.ok(Math.abs(result.multiplicativeCritDamage.value - 0.18) < 1e-12);
+});

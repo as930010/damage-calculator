@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { calculateAttack, resolveAttackParameters } from '../dist/calculation/attack.js';
 import { calculateFinalDamage } from '../dist/calculation/final-damage.js';
+import { calculateProductStat } from '../dist/calculation/multiplicative.js';
 
 const data = async name => JSON.parse(await readFile(new URL(`../data/${name}`, import.meta.url), 'utf8'));
 
@@ -35,4 +36,13 @@ test('B163 對倍率、關卡懲罰及 150% 暴傷基準逐因子保留計算', 
   assert.equal(damage.finalDamage, expected);
   assert.equal(damage.conditionalFactor, 1 / ((0.5 / 1.1) + (0.5 / 1.2)));
   assert.notEqual(damage.conditionalFactor, (1.1 + 1.2) / 2);
+});
+
+test('150% 基底乘上暴上 +10% 後的乘算暴傷增幅為 15 個百分點', () => {
+  const result = calculateProductStat([
+    { sourceId: 'sheet:計算機!T101', valuePct: 10 },
+    { sourceId: 'character-base:crit-damage-product', valuePct: 50 },
+  ], 150);
+  assert.ok(Math.abs(result.value - 0.15) < 1e-12);
+  assert.ok(Math.abs(result.value * 100 - 15) < 1e-10);
 });

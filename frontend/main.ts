@@ -648,16 +648,21 @@ async function start() {
       try { if (baseline) before = projectAttributes(data, baseline); } catch { /* Old data cannot hide current results. */ }
     document.querySelector('#comparison-label')!.textContent = before ? '與已儲存配置比較' : baseline ? '比較基準已不適用目前資料，請重新設定' : '可儲存目前配置作為比較基準';
       let currentDamage: ReturnType<typeof projectDamage> | null = null;
+      let baselineDamage: ReturnType<typeof projectDamage> | null = null;
       let damageCalculationError: unknown;
       try { currentDamage = projectDamage(data, state); } catch (error) { damageCalculationError = error; }
+      try { if (baseline) baselineDamage = projectDamage(data, baseline); } catch { /* Keep current attributes visible if the saved build is stale. */ }
       let currentCombatRates: ReturnType<typeof projectCombatRates> | null = null;
       try { currentCombatRates = projectCombatRates(data, state); } catch { /* Show other attributes even if rate inputs are incomplete. */ }
     const currentClass = data.classes.classes.find(entry => entry.id === state.Job);
     const baselineClass = baseline ? data.classes.classes.find(entry => entry.id === baseline?.Job) : undefined;
+    const critDamageSupplement = (damage: ReturnType<typeof projectDamage> | null) => damage
+      ? damage.result.classCritDamagePassivePct + damage.result.multiplicativeCritDamage.value * 100
+      : 0;
     const attackKey = currentClass?.attackType === 'physical' ? 'physicalAttack' : 'magicalAttack';
     const baselineAttackKey = baselineClass?.attackType === 'physical' ? 'physicalAttack' : 'magicalAttack';
     const visibleStats = Object.entries(current.stats)
-      .filter(([key, stat]) => !['physicalAttack', 'magicalAttack', 'critRatePct', 'extremizationPct'].includes(key) && (stat.finalTotal !== 0 || (before?.stats[key]?.finalTotal ?? 0) !== 0 || key === 'superAdaptabilityPct'))
+      .filter(([key, stat]) => !['physicalAttack', 'magicalAttack', 'critRatePct', 'extremizationPct'].includes(key) && (stat.finalTotal !== 0 || (before?.stats[key]?.finalTotal ?? 0) !== 0 || key === 'superAdaptabilityPct' || (key === 'critDamagePct' && critDamageSupplement(currentDamage) !== 0)))
       .map(([key, stat]) => ({ key, stat, previousStat: before?.stats[key] }));
     const superAdaptabilityIndex = visibleStats.findIndex(entry => entry.key === 'superAdaptabilityPct');
     if (superAdaptabilityIndex >= 0) {
@@ -693,9 +698,13 @@ async function start() {
     target.innerHTML = `<div class="stat-list">${visibleStats.map(({ key, stat, previousStat }) => {
       const meta = data.attributes.attributes.find(entry => entry.key === key);
       const isPercent = meta?.unit === 'percent';
-      const previous = previousStat?.finalTotal ?? 0;
-      const delta = before ? stat.finalTotal - previous : null;
-      const comparison = delta === null ? '' : `<p>基準 ${fmt(previous)}${isPercent ? '%' : ''} → 目前 ${fmt(stat.finalTotal)}${isPercent ? '%' : ''}；相對變化 ${previous === 0 ? '—（基準為 0）' : `${percentFormat(delta / previous * 100)}%`}</p>`;
+      const isCritDamage = key === 'critDamagePct';
+      const currentSupplement = isCritDamage ? critDamageSupplement(currentDamage) : 0;
+      const previousSupplement = isCritDamage ? critDamageSupplement(baselineDamage) : 0;
+      const displayTotal = stat.finalTotal + currentSupplement;
+      const previous = (previousStat?.finalTotal ?? 0) + previousSupplement;
+      const delta = before && (!isCritDamage || (currentDamage && baselineDamage)) ? displayTotal - previous : null;
+      const comparison = delta === null ? '' : `<p>基準 ${fmt(previous)}${isPercent ? '%' : ''} → 目前 ${fmt(displayTotal)}${isPercent ? '%' : ''}；相對變化 ${previous === 0 ? '—（基準為 0）' : `${percentFormat(delta / previous * 100)}%`}</p>`;
       const deltaText = delta === null ? '' : `${delta > 0 ? '+' : ''}${isPercent ? percentFormat(delta) : fmt(delta)}${isPercent ? '%' : ''}`;
       const shownName = key === 'attackPower' ? '攻擊力' : meta?.name ?? key;
       const attributeOverflow = stat.cap === undefined ? null : capOverflowPercentage(stat.totalBeforeCap, stat.cap);
@@ -703,6 +712,7 @@ async function start() {
         ? ''
         : `<small class="cap-overflow" role="status">超出上限 ${fmt(attributeOverflow)}%</small>`;
       const lowerwearAverageLabel = state.lowerwearAlternativeEnabled ? '下衣+強/排褲平均' : '下衣配置';
+      const lowerwearAverage = stat.lowerwearAverage + currentSupplement;
       const allCommonSources = [...stat.sharedSources, ...stat.lowerwearASources];
       const firstInnerwearIndex = allCommonSources.findIndex(source => innerwearOrder.has(source.sourceId));
       const innerwearSources = allCommonSources
@@ -711,9 +721,19 @@ async function start() {
       const commonSources = allCommonSources.filter(source => !innerwearOrder.has(source.sourceId));
       if (firstInnerwearIndex >= 0) commonSources.splice(Math.min(firstInnerwearIndex, commonSources.length), 0, ...innerwearSources);
       else commonSources.push(...innerwearSources);
-      const sharedDetails = commonSources.length ? `<p class="stat-detail-heading">共同來源</p>${sourceRows(commonSources, isPercent)}` : '';
+      const passiveSourceRow = isCritDamage && currentDamage && currentDamage.result.classCritDamagePassivePct > 0
+        ? `<p class="stat-source-row"><span>${h(currentClass?.id ?? state.Job)}自身技能</span><strong>+${fmt(currentDamage.result.classCritDamagePassivePct)}%</strong></p>`
+        : '';
+      const sharedDetails = commonSources.length || passiveSourceRow
+        ? `<p class="stat-detail-heading">共同來源</p>${sourceRows(commonSources, isPercent)}${passiveSourceRow}`
+        : '';
+      const critDamageBaseFactor = currentDamage?.result.multiplicativeCritDamage.factors.find(effect => effect.sourceId === 'character-base:crit-damage-product')?.factor ?? 1.5;
+      const critDamageBaselinePct = currentDamage?.result.multiplicativeCritDamage.baselinePct ?? 150;
+      const critDamageDetails = isCritDamage && currentDamage
+        ? `<p class="stat-detail-heading">乘算來源</p><p class="stat-source-row"><span>乘算暴傷增幅（角色基底 ${fmt(critDamageBaseFactor * 100)}% 扣除 ${fmt(critDamageBaselinePct)}% 基準後）</span><strong>+${fmt(currentDamage.result.multiplicativeCritDamage.value * 100)}%</strong></p>${currentDamage.result.multiplicativeCritDamage.factors.filter(effect => effect.sourceId !== 'character-base:crit-damage-product').map(effect => `<p class="stat-source-row"><span>${h(sourceLabel(effect.sourceId))}</span><strong>×${fmt(effect.factor)}</strong></p>`).join('')}`
+        : '';
       const lowerwearBDetails = state.lowerwearAlternativeEnabled && stat.lowerwearBSources.length ? `<p class="stat-detail-heading">強/排褲來源</p>${sourceRows(stat.lowerwearBSources, isPercent)}` : '';
-      return `<details class="stat"><summary><span>${h(shownName)}</span><strong>${fmt(stat.finalTotal)}${isPercent ? '%' : ''}</strong>${attributeCapWarning}${delta === null ? '' : `<small class="${delta > 0 ? 'positive' : delta < 0 ? 'negative' : ''}">${deltaText}</small>`}</summary><div class="stat-details">${sharedDetails}${lowerwearBDetails}<p class="stat-average">${lowerwearAverageLabel} ${fmt(stat.lowerwearAverage)}${isPercent ? '%' : ''}</p>${comparison}</div></details>`;
+      return `<details class="stat"><summary><span>${h(shownName)}</span><strong>${fmt(displayTotal)}${isPercent ? '%' : ''}</strong>${attributeCapWarning}${delta === null ? '' : `<small class="${delta > 0 ? 'positive' : delta < 0 ? 'negative' : ''}">${deltaText}</small>`}</summary><div class="stat-details">${sharedDetails}${critDamageDetails}${lowerwearBDetails}<p class="stat-average">${lowerwearAverageLabel} ${fmt(lowerwearAverage)}${isPercent ? '%' : ''}</p>${comparison}</div></details>`;
     }).join('')}${conditionalDamageCards}${multiplicativeEffectCard}${combatRateCards}</div>`;
       const damageTarget = document.querySelector('#damage-result')!;
       try {
@@ -743,8 +763,11 @@ async function start() {
           }
         }
         const rateSources = (effects: typeof result.combatRates.critRate.multipliers) => effects.map(effect => `${sourceLabel(effect.sourceId)} ×${fmt(effect.factor)}`).join(' · ') || '無';
-        const critDamageSources = result.multiplicativeCritDamage.factors.map(effect => `${sourceLabel(effect.sourceId)} ${fmt(effect.valuePct)}%`).join('、') || '無';
-        damageTarget.innerHTML = `<div class="damage-summary"><div><span>最小攻擊力</span><strong>${fmt(result.attack.lowerDamage)}</strong></div><div><span>最大攻擊力</span><strong>${fmt(result.attack.upperDamage)}</strong></div><div class="final-damage"><span>最終傷害</span><strong>${finalDamageFormat(result.finalDamage.finalDamage)}</strong></div></div>${damageRatioHtml}${comparisonHtml}<details class="formula-detail"><summary>展開傷害計算明細</summary><p>致命傷害被動：${fmt(result.classCritDamagePassivePct)}%　乘算暴傷：${fmt(result.multiplicativeCritDamage.value)}%</p><p>乘算暴傷來源：${h(critDamageSources)}</p><p>爆擊乘算來源：${h(rateSources(result.combatRates.critRate.multipliers))}</p><p>極大乘算來源：${h(rateSources(result.combatRates.extremization.multipliers))}</p><p>乘算傷害：${fmt(result.generalMultiplicativeDamage.value)} 倍　強者／排熱因子：${fmt(result.finalDamage.conditionalFactor)}</p><p>適應力因子：${fmt(result.finalDamage.adaptationFactor)}　防禦因子：${fmt(result.finalDamage.defenseFactor)}</p></details>`;
+        const critDamageBaseFactor = result.multiplicativeCritDamage.factors.find(effect => effect.sourceId === 'character-base:crit-damage-product')?.factor ?? 1.5;
+        const critDamageFactors = result.multiplicativeCritDamage.factors.filter(effect => effect.sourceId !== 'character-base:crit-damage-product');
+        const critDamageMultiplier = critDamageFactors.map(effect => `×${fmt(effect.factor)}（${sourceLabel(effect.sourceId)}）`).join('、') || '無額外來源';
+        const critDamageCalculation = `角色基底 ${fmt(critDamageBaseFactor * 100)}%（×${fmt(critDamageBaseFactor)}）${critDamageFactors.map(effect => ` ×${fmt(effect.factor)}`).join('')} − ${fmt(result.multiplicativeCritDamage.baselinePct)}% 基準 = +${fmt(result.multiplicativeCritDamage.value * 100)}%`;
+        damageTarget.innerHTML = `<div class="damage-summary"><div><span>最小攻擊力</span><strong>${fmt(result.attack.lowerDamage)}</strong></div><div><span>最大攻擊力</span><strong>${fmt(result.attack.upperDamage)}</strong></div><div class="final-damage"><span>最終傷害</span><strong>${finalDamageFormat(result.finalDamage.finalDamage)}</strong></div></div>${damageRatioHtml}${comparisonHtml}<details class="formula-detail"><summary>展開傷害計算明細</summary><p>致命傷害被動：${fmt(result.classCritDamagePassivePct)}%　乘算暴傷增幅：+${fmt(result.multiplicativeCritDamage.value * 100)}%</p><p>乘算暴傷計算：${h(critDamageCalculation)}</p><p>乘算暴傷來源：${h(critDamageMultiplier)}</p><p>爆擊乘算來源：${h(rateSources(result.combatRates.critRate.multipliers))}</p><p>極大乘算來源：${h(rateSources(result.combatRates.extremization.multipliers))}</p><p>乘算傷害：${fmt(result.generalMultiplicativeDamage.value)} 倍　強者／排熱因子：${fmt(result.finalDamage.conditionalFactor)}</p><p>適應力因子：${fmt(result.finalDamage.adaptationFactor)}　防禦因子：${fmt(result.finalDamage.defenseFactor)}</p></details>`;
       } catch (error) {
         damageTarget.innerHTML = `<p class="input-warning">尚未計算：${h(calculationIssue(error))}請完成後再試。</p>`;
       }
