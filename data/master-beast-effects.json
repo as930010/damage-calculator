@@ -376,6 +376,12 @@
       "source": "係數區!AB11:AC11 -> 計算機!G70:G71"
     },
     {
+      "id": "master-beast-head-unrelated-damage",
+      "category": "head",
+      "name": "無關傷害",
+      "stats": {}
+    },
+    {
       "id": "master-beast-ring-crit-damage-2",
       "category": "ring",
       "name": "致命傷害+2%",
@@ -419,6 +425,12 @@
         "adaptabilityPct": 1
       },
       "source": "係數區!AD6:AE6 -> 計算機!Q72:Q75"
+    },
+    {
+      "id": "master-beast-ring-unrelated-damage",
+      "category": "ring",
+      "name": "無關傷害",
+      "stats": {}
     }
   ],
   "customAttributeOptions": {

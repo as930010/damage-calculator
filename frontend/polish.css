@@ -78,3 +78,71 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
 .buff-simulator-link{display:inline-flex;align-items:center;min-height:34px;padding:0 12px;border:1px solid var(--border-control);border-radius:999px;color:var(--text-heading);font-size:12px;text-decoration:none;white-space:nowrap;transition:background .15s,border-color .15s}
 .buff-simulator-link:hover{background:var(--control-hover);border-color:var(--accent-border)}
 @media(max-width:600px){.top-meta{display:flex;align-items:center;gap:8px}.buff-simulator-link{min-height:32px;padding-inline:9px;font-size:11px}}
+/* Compact the opening and surface the damage comparison beside the equipment build. */
+.workbench{padding-top:clamp(12px,2.5vw,34px)}
+.workspace-heading{padding-block:clamp(16px,2.6vw,30px)}
+.workflow-steps{margin-top:15px}
+.equipment-damage-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:12px 20px 0}
+.equipment-damage-card{display:flex;min-width:0;min-height:68px;flex-direction:column;justify-content:center;gap:7px;padding:11px 14px;border:1px solid #344153;border-radius:11px;background:linear-gradient(145deg,#19212b,#151c25)}
+.equipment-damage-card span{color:#aab8cb;font-size:11px}
+.equipment-damage-card strong{overflow-wrap:anywhere;color:#f2f5fb;font-size:18px;font-variant-numeric:tabular-nums}
+.equipment-damage-gain strong{color:#9fc8ff}
+@media(max-width:700px){
+  .workbench{padding-top:12px}
+  .workspace-heading{padding:16px}
+  .workflow-steps{margin-top:12px}
+  .workflow-steps li{min-height:56px}
+  .equipment-damage-summary{grid-template-columns:minmax(0,1fr);gap:7px;padding:10px 14px 0}
+  .equipment-damage-card{min-height:48px;flex-direction:row;align-items:center;justify-content:space-between;gap:12px;padding:9px 12px}
+  .equipment-damage-card strong{font-size:16px;text-align:right}
+}
+
+/* Follow-up preview refinements. */
+.canvas-title-input{width:min(32%,210px);left:calc(19% - 62.5px)}
+.canvas-title-input .field{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:8px}
+.canvas-title-input .field label{margin:0;white-space:nowrap}
+.canvas-title-input .picker-control{min-width:0}
+.stat summary::after{align-self:center;transition:none}
+
+.equipment-damage-gain strong.gain-positive{color:#7FE0B6}
+.equipment-damage-gain strong.gain-negative{color:#FF9EAA}
+
+/* Center the final damage comparison and keep its relative change easy to scan. */
+.damage-ratio{justify-content:center;align-items:center;flex-wrap:wrap;gap:4px 10px;margin:0 22px 14px;padding:12px 18px;border:1px solid var(--border-strong);border-radius:11px;background:var(--surface);text-align:center}
+.damage-ratio>span{color:var(--text-muted)}
+.damage-ratio>strong{color:var(--accent);font-size:18px}
+.damage-ratio>small{color:var(--text-muted);font-size:12px;font-weight:600}
+.damage-ratio-positive>strong,.damage-ratio .positive{color:#7FE0B6}
+.damage-ratio-negative>strong,.damage-ratio .negative{color:#FF9EAA}
+.stat summary::-webkit-details-marker{display:none}
+.stat summary::marker{content:""}
+.stat summary::after{display:grid;place-items:center;align-self:stretch;flex:0 0 14px;min-height:24px;line-height:1;transform-origin:center}
+@media(max-width:600px){.damage-ratio{margin-inline:12px;padding:10px 12px}}
+/* Give the four comparison values equal space and use a font-independent chevron. */
+.damage-ratio{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:stretch;gap:8px}
+.damage-ratio>span,.damage-ratio>strong{display:flex;min-width:0;min-height:48px;align-items:center;justify-content:center;padding:8px 10px;border:1px solid var(--border-dim);border-radius:8px;background:var(--panel-alt);text-align:center;overflow-wrap:anywhere}
+.damage-ratio>span{font-size:14px}
+.damage-ratio>strong{font-size:19px}
+.damage-ratio-negative>strong,.damage-ratio-negative>strong.negative{color:#FF9EAA}
+.damage-ratio-positive>strong,.damage-ratio-positive>strong.positive{color:#7FE0B6}
+.stat summary{align-items:center}
+.stat summary::after{content:"";display:block;box-sizing:border-box;width:8px;height:8px;min-height:0;flex:0 0 8px;align-self:center;border:0;border-right:1.5px solid var(--text-soft);border-bottom:1.5px solid var(--text-soft);transform:rotate(45deg) translate(-1px,-1px);margin:0 2px 2px 5px}
+.stat[open] summary::after{transform:rotate(225deg) translate(-1px,-1px)}
+.conditional-stat summary{min-height:24px}
+.conditional-damage-pair .conditional-stat{display:block}
+@media(max-width:600px){.damage-ratio{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.damage-ratio>span,.damage-ratio>strong{min-height:44px;padding:7px 8px}.damage-ratio>span{font-size:13px}.damage-ratio>strong{font-size:17px}}
+
+/* Keep the comparison as one continuous strip instead of four nested cards. */
+.damage-ratio{gap:0;padding:10px 12px}
+.damage-ratio>span,.damage-ratio>strong{box-sizing:border-box;min-height:48px;padding:8px 12px;border:0;border-radius:0;background:transparent}
+.damage-ratio>:nth-child(3){border-left:1px solid var(--border-dim)}
+@media(max-width:600px){.damage-ratio{gap:0}.damage-ratio>span,.damage-ratio>strong{min-height:44px;padding:7px 8px}.damage-ratio>:nth-child(n+3){border-top:1px solid var(--border-dim)}.damage-ratio>:nth-child(3){border-left:0}}
+/* Pair each comparison label with its value inside one continuous summary card. */
+.damage-ratio{grid-template-columns:repeat(2,minmax(0,1fr));gap:0;padding:10px 12px}
+.damage-ratio-group{display:flex;min-width:0;min-height:48px;align-items:center;justify-content:center;gap:12px;padding:8px 14px}
+.damage-ratio-group>span{color:var(--text-muted);font-size:14px;text-align:right}
+.damage-ratio-group>strong{font-size:19px;text-align:left}
+.damage-ratio-negative .damage-ratio-group>strong,.damage-ratio-negative .damage-ratio-group>strong.negative{color:#FF9EAA}
+.damage-ratio-positive .damage-ratio-group>strong,.damage-ratio-positive .damage-ratio-group>strong.positive{color:#7FE0B6}
+.damage-ratio>:nth-child(2){border-left:1px solid var(--border-dim)}
+@media(max-width:600px){.damage-ratio{grid-template-columns:minmax(0,1fr)}.damage-ratio-group{min-height:44px;padding:7px 8px}.damage-ratio-group>span{font-size:13px}.damage-ratio-group>strong{font-size:17px}.damage-ratio>:nth-child(2){border-top:1px solid var(--border-dim);border-left:0}}
