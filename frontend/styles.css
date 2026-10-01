@@ -136,7 +136,7 @@ footer{font-size:11px; color:#727d8d; text-align:center; padding:28px; border-to
   .toolbar #baseline{margin-left:auto} .toolbar .transfer-actions{flex-basis:100%; justify-content:flex-end; margin-left:0}
 }
 @media(max-width:600px) {
-  .gear-beast-slots .beast-accessory-slot{width:60px; height:60px}
+  .gear-beast-slots .beast-accessory-slot{width:60px; height:60px} /* Beast slots are 5px wider than regular gear slots on phones; preserve the ring pair edge gap. */ .gear-beast-slots .beast-accessory-slot-ring-one{left:calc(var(--beast-ring-one-x) - 5px)}
 }
 .toolbar-actions{display:contents} .inspector-close,.inspector-backdrop{display:none}
 @media(max-width:700px) {
