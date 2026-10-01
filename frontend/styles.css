@@ -25,10 +25,7 @@ button{padding:10px 15px} h1,h2,p{margin:0} h1{font-size:27px; letter-spacing:.0
 .stat strong{margin-left:auto; font-variant-numeric:tabular-nums; font-size:16px} .stat p{font-size:11px; color:#8e9aac; margin-top:10px} .input-hint{display:block; margin-top:8px; color:var(--warning); line-height:1.6} .positive{color:var(--positive)} .negative{color:var(--negative)} .input-warning,.error-card{color:#e7bf86; padding:22px; font-size:14px}
 footer{font-size:11px; color:#727d8d; text-align:center; padding:28px; border-top:1px solid var(--border-dim)} a{color:#9fb5f5}
 /* 6. Responsive layout rules */
-@media(min-width:1450px) {
-  .equipment-canvas{height:690px}
-}
-@media(max-width:1100px) {
+@media(max-width:1240px) {
   .equipment-workspace{grid-template-columns:minmax(0,1fr)} .inspector{min-height:0} .workbench{padding:22px} .equipment-canvas{height:650px} .stat-list{grid-template-columns:repeat(2,minmax(0,1fr))} .inspector .field{max-width:540px}
 }
 @media(max-width:600px) {
@@ -124,7 +121,7 @@ footer{font-size:11px; color:#727d8d; text-align:center; padding:28px; border-to
 @media(max-width:600px) {
   .developer-info{flex:1; min-width:0; white-space:normal; overflow-wrap:anywhere; margin-right:8px}
 }
-.beast-label{left:52%; top:25%; color:#c095ee} .gear-beast-slots{position:absolute; inset:0; z-index:4; display:block; padding:0; pointer-events:none} .gear-beast-slots .beast-accessory-slot{position:absolute; width:55px; height:59px; transform:translate(-50%,-50%); pointer-events:auto} .gear-beast-slots .beast-accessory-slot-headwear{left:53%; top:35%} .gear-beast-slots .beast-accessory-slot-armor{left:53%; top:46%} .gear-beast-slots .beast-accessory-slot-necklace{left:53%; top:57%} .gear-beast-slots .beast-accessory-slot-ring-one{left:45%; top:68%} .gear-beast-slots .beast-accessory-slot-ring-two{left:53%; top:68%} .left-label{top:22%} .inner-label{left:18%} .beast-label{left:53%}
+.beast-label{left:52%; top:25%; color:#c095ee} .gear-beast-slots{position:absolute; inset:0; z-index:4; display:block; padding:0; pointer-events:none} .gear-beast-slots .beast-accessory-slot{position:absolute; width:55px; height:59px; transform:translate(-50%,-50%); pointer-events:auto} .gear-beast-slots .beast-accessory-slot-headwear{left:53%; top:35%} .gear-beast-slots .beast-accessory-slot-armor{left:53%; top:46%} .gear-beast-slots .beast-accessory-slot-necklace{left:53%; top:57%} .gear-beast-slots .beast-accessory-slot-ring-one{left:46%; top:68%} .gear-beast-slots .beast-accessory-slot-ring-two{left:55%; top:68%} .left-label{top:22%} .inner-label{left:18%} .beast-label{left:53%}
 /* UX polish preview: strengthen hierarchy and make dense controls easier to scan. */
 :root{--space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-5:24px} body{font-size:15px; line-height:1.55} .topbar{height:auto; min-height:68px; padding-block:10px} .developer-info{font-size:12px; line-height:1.45; gap:3px} .brand small{font-size:11px} .top-meta{font-size:12px} .panel-heading{padding:18px 22px} .panel-heading>span,.beast-accessories-heading span{font-size:12px}
 .panel-note{font-size:13px; line-height:1.6; padding:15px 22px} .inspector .panel-note{font-size:12px} .group-label{font-size:12px; letter-spacing:.04em} .gear-slot span,.beast-accessory-slot span{font-size:11px} .field{font-size:13px; line-height:1.45} .field input{min-height:44px; font-size:14px; padding:11px 13px} .picker-list button{font-size:14px} .picker-list small{font-size:12px}
@@ -134,7 +131,7 @@ footer{font-size:11px; color:#727d8d; text-align:center; padding:28px; border-to
 }
 /* Requested readability and responsive layout refinements. */
 .weapon-magic-stone-color.weapon-magic-stone-red{border-color:#b97878} .weapon-magic-stone-color.weapon-magic-stone-blue{border-color:#718fb8} .weapon-magic-stone-color.weapon-magic-stone-yellow{border-color:#b9a36c}
-.gear-beast-slots .beast-accessory-slot-ring-two{left:53%} .toolbar .transfer-actions{order:10; margin-left:auto} .toolbar #transfer-status,.toolbar #save-status{order:5} .toolbar #save-status{margin-left:0}
+.toolbar .transfer-actions{order:10; margin-left:auto} .toolbar #transfer-status,.toolbar #save-status{order:5} .toolbar #save-status{margin-left:0}
 @media(max-width:1000px) {
   .toolbar #baseline{margin-left:auto} .toolbar .transfer-actions{flex-basis:100%; justify-content:flex-end; margin-left:0}
 }
