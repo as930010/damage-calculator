@@ -2,18 +2,19 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { projectAttributes, projectDamage } from '../dist/frontend/projection.js';
+import { resolveInnerwearSources } from '../dist/calculation/innerwear.js';
 import { resolveMasterBeastEffects, resolveRightIceSetEffects } from '../dist/calculation/equipment-effects.js';
 
 const readJson = async path => JSON.parse(await readFile(new URL(`../data/${path}`, import.meta.url), 'utf8'));
 
 async function loadData() {
-  const [layout, classes, attributes, parameters, manifest, mapping, attack, innerwear, appraisals, chips,
+  const [layout, classes, attributes, parameters, manifest, mapping, attack, innerwear, nephronArmor, appraisals, chips,
     chipSlots, circuits, transformations, growth, weaponAppraisals, weaponGrades, giantStones, accessoryEffects, classCombatEffects,
     classDamagePassives, combatRateSources, simulatorInputs, rightIceSets, resonance, raidSets, atma,
     masterBeast, spiritRecord, otherEffects, pets, colorSetEffects] = await Promise.all([
     readJson('equipment-layout.json'), readJson('classes.json'), readJson('attributes.json'), readJson('parameters.json'),
     readJson('manifest.json'), readJson('simulator-equipment-mapping.json'), readJson('attack-parameters.json'),
-    readJson('innerwear-rules.json'), readJson('armor-appraisals.json'), readJson('equipment/chips.json'),
+    readJson('innerwear-rules.json'), readJson('nephron-armor-rules.json'), readJson('armor-appraisals.json'), readJson('equipment/chips.json'),
     readJson('chip-slots.json'), readJson('circuit-board-rules.json'), readJson('weapon-transformations.json'),
     readJson('weapon-growth.json'), readJson('weapon-appraisals.json'), readJson('weapon-grade-options.json'), readJson('giant-magic-stones.json'),
     readJson('accessory-special-effects.json'),
@@ -24,7 +25,7 @@ async function loadData() {
   ]);
   const catalogFiles = [...new Set([...mapping.selections.map(entry => entry.catalogFile), mapping.magicStoneSelections.catalogFile])];
   const catalogs = Object.fromEntries(await Promise.all(catalogFiles.map(async file => [file, await readJson(file)])));
-  return { layout, classes, attributes, parameters, manifest, mapping, attack, innerwear, appraisals, chips, chipSlots,
+  return { layout, classes, attributes, parameters, manifest, mapping, attack, innerwear, nephronArmor, appraisals, chips, chipSlots,
     circuits, transformations, growth, weaponAppraisals, weaponGrades, giantStones, accessoryEffects, classCombatEffects, classDamagePassives,
     combatRateSources, simulatorInputs, rightIceSets, resonance, raidSets, atma, masterBeast, spiritRecord,
     otherEffects, pets, colorSetEffects, catalogs };
@@ -251,4 +252,76 @@ test('RM 致命傷害基底採 180%，乘算後扣除同一個 180% 基準', asy
   assert.equal(baseFactor, 1.8);
   assert.equal(result.multiplicativeCritDamage.baselinePct, 180);
   assert.ok(Math.abs(result.multiplicativeCritDamage.value - 0.18) < 1e-12);
+});
+
+test('Nephron selects independent armor types, fifth magic stone, conversion, and magazine in the computed source groups', async () => {
+  const data = await loadData();
+  const upper = data.innerwear.slots.find(entry => entry.id === 'upper');
+  const lower = data.innerwear.slots.find(entry => entry.id === 'lowerwear');
+  const innerwearLayout = data.layout.slots.filter(entry => entry.innerwearId);
+  const stoneCell = data.layout.slots.find(entry => entry.innerwearId === 'upper').stoneCells[4];
+  const stone = data.catalogs['equipment/magic-stones.json'].items.find(entry => entry.active && entry.name === '狩獵 B傷');
+  const transform = data.nephronArmor.transformations.find(entry => entry.id === 'enhancement-double-attack');
+  const fields = data.nephronArmor.fields.find(entry => entry.slotId === 'upper');
+  const values = {
+    [upper.typeCell]: '內布隆', [lower.typeCell]: '百億', [upper.enhancementCell]: 'Lv.10', [upper.forgingCell]: 21,
+    [fields.transformFields[0].attributeCell]: transform.name,
+    [fields.transformFields[0].valueCell]: String(transform.tierValuesPct[9] / 100),
+    [fields.magazineCell]: '戰鬥彈匣Type - I', [fields.magazineLevelCell]: 'Lv.3',
+    [stoneCell]: stone.targetApplications.armor.sourceName,
+  };
+  const state = { schemaVersion: 3, Job: 'KE', values, lowerwearAlternativeEnabled: false };
+  const projected = projectAttributes(data, state);
+  const upperSource = projected.calculationSources.shared.find(entry => entry.sourceId === 'innerwear:upper');
+  assert.ok(upperSource);
+  assert.equal(upperSource.stats.bossDamagePct, 5);
+  assert.equal(upperSource.stats.multiplicativeDamagePct, 12);
+  assert.equal(upperSource.stats.physicalAttack - resolveInnerwearSources(data.innerwear, data.attack, 'KE', { ...values, [upper.forgingCell]: 0 }, false).shared.find(entry => entry.sourceId === 'innerwear:upper').stats.physicalAttack, 2500);
+  assert.deepEqual(projected.calculationSources.shared.find(entry => entry.sourceId === 'nephron-transform:upper:1').stats, { doubleAttackPct: 2 });
+  assert.deepEqual(projected.calculationSources.shared.find(entry => entry.sourceId === 'nephron-magazine:upper:combat-type-i:Lv.3').stats, { bleedDamagePct: 1.5 });
+  assert.deepEqual(projected.calculationSources.shared.find(entry => entry.sourceId === `simulator:${stoneCell}`).stats, { bossDamagePct: 2.5 });
+  assert.equal(data.innerwear.slots.filter(entry => entry.typeCell).length, 5);
+  assert.equal(new Set(data.innerwear.slots.map(entry => entry.typeCell)).size, 5);
+  for (const layoutSlot of innerwearLayout) assert.equal(layoutSlot.stoneCells.length, 5, layoutSlot.innerwearId);
+  assert.equal(values[upper.typeCell], '內布隆');
+  assert.equal(values[lower.typeCell], '百億');
+});
+
+test('mixed Nephron and Billion keep shared innerwear bonuses, set effects, circuits, and chips', async () => {
+  const data = await loadData();
+  const values = { 'Weapon.ENHC': 'Lv.8', 'Left.Armor.SetColor': '紅' };
+  const byId = Object.fromEntries(data.innerwear.slots.map(slot => [slot.id, slot]));
+  for (const [id, type] of [['upper', '內布隆'], ['lowerwear', '百億'], ['gloves', '內布隆'], ['shoes', '百億']]) {
+    const slot = byId[id];
+    values[slot.typeCell] = type;
+    values[slot.enhancementCell] = 'Lv.11';
+    values[slot.forgingCell] = id === 'upper' ? 21 : 0;
+  }
+  const upperCircuit = data.circuits.inputs.find(entry => entry.slot === 'upper');
+  values[upperCircuit.attributeCell] = '流血%';
+  values[upperCircuit.valueCell] = 0.01;
+  const upperChip = data.chipSlots.slots.find(entry => entry.id === 'upper');
+  const bleedChip = data.chips.chips.find(entry => entry.name === '流血%');
+  values[upperChip.attributeCell] = bleedChip.name;
+  values[upperChip.tuningCell] = '+5';
+
+  const state = { schemaVersion: 3, Job: 'KE', values, lowerwearAlternativeEnabled: false };
+  const projection = projectAttributes(data, state);
+  const shared = projection.calculationSources.shared;
+  assert.deepEqual(shared.find(entry => entry.sourceId === 'sheet:計算機!Q37').stats, { adaptabilityPct: 2 });
+  assert.deepEqual(shared.find(entry => entry.sourceId === 'sheet:計算機!T101').stats, { multiplicativeCritDamagePct: 10 });
+  assert.deepEqual(shared.find(entry => entry.sourceId === 'color-set:紅').stats, { multiplicativeDamagePct: 20 });
+  assert.deepEqual(shared.find(entry => entry.sourceId === 'circuit-board:upper').stats, { bleedDamagePct: 1 });
+  assert.deepEqual(shared.find(entry => entry.sourceId === 'chip:upper').stats, { bleedDamagePct: 3.5 });
+
+  const damage = projectDamage(data, state).result;
+  assert.equal(damage.generalMultiplicativeDamage.factors.find(entry => entry.sourceId === 'innerwear:upper').valuePct, 13);
+  assert.equal(damage.combatRates.critRate.multipliers.find(entry => entry.sourceId === 'lowerwear-crit-rate-enhancement').valuePct, 13);
+  assert.equal(damage.attributes.stats.allSkillDamagePct.sharedSources.find(entry => entry.sourceId === 'innerwear:gloves').valuePct, 55);
+  assert.equal(damage.combatRates.extremization.multipliers.find(entry => entry.sourceId === 'shoes-extremization-enhancement').valuePct, 13);
+
+  for (const [color, expected] of [['紅', 20], ['藍', 8]]) {
+    const colored = projectAttributes(data, { ...state, values: { ...values, 'Left.Armor.SetColor': color } });
+    assert.equal(colored.calculationSources.shared.find(entry => entry.sourceId === 'color-set:' + color).stats.multiplicativeDamagePct, expected);
+  }
 });

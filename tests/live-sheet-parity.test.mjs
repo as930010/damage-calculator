@@ -10,7 +10,7 @@ async function loadData() {
   const files = {
     layout: 'equipment-layout.json', classes: 'classes.json', attributes: 'attributes.json', parameters: 'parameters.json',
     manifest: 'manifest.json', mapping: 'simulator-equipment-mapping.json', attack: 'attack-parameters.json',
-    innerwear: 'innerwear-rules.json', appraisals: 'armor-appraisals.json', chips: 'equipment/chips.json',
+    innerwear: 'innerwear-rules.json', nephronArmor: 'nephron-armor-rules.json', appraisals: 'armor-appraisals.json', chips: 'equipment/chips.json',
     chipSlots: 'chip-slots.json', circuits: 'circuit-board-rules.json', transformations: 'weapon-transformations.json',
     growth: 'weapon-growth.json', weaponAppraisals: 'weapon-appraisals.json', weaponGrades: 'weapon-grade-options.json',
     giantStones: 'giant-magic-stones.json', accessoryEffects: 'accessory-special-effects.json',

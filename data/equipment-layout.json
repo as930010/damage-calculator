@@ -128,7 +128,8 @@
         "Left.Armor.Upper.MagicStone.1",
         "Left.Armor.Upper.MagicStone.2",
         "Left.Armor.Upper.MagicStone.3",
-        "Left.Armor.Upper.MagicStone.4"
+        "Left.Armor.Upper.MagicStone.4",
+        "Left.Armor.Upper.MagicStone.5"
       ]
     },
     {
@@ -143,7 +144,8 @@
         "Left.Armor.Bottom.MagicStone.1",
         "Left.Armor.Bottom.MagicStone.2",
         "Left.Armor.Bottom.MagicStone.3",
-        "Left.Armor.Bottom.MagicStone.4"
+        "Left.Armor.Bottom.MagicStone.4",
+        "Left.Armor.Bottom.MagicStone.5"
       ]
     },
     {
@@ -158,7 +160,8 @@
         "Left.Armor.Gloves.MagicStone.1",
         "Left.Armor.Gloves.MagicStone.2",
         "Left.Armor.Gloves.MagicStone.3",
-        "Left.Armor.Gloves.MagicStone.4"
+        "Left.Armor.Gloves.MagicStone.4",
+        "Left.Armor.Gloves.MagicStone.5"
       ]
     },
     {
@@ -173,7 +176,8 @@
         "Left.Armor.Shoes.MagicStone.1",
         "Left.Armor.Shoes.MagicStone.2",
         "Left.Armor.Shoes.MagicStone.3",
-        "Left.Armor.Shoes.MagicStone.4"
+        "Left.Armor.Shoes.MagicStone.4",
+        "Left.Armor.Shoes.MagicStone.5"
       ]
     },
     {
@@ -188,7 +192,8 @@
         "Left.Armor.SwitchBottom.MagicStone.1",
         "Left.Armor.SwitchBottom.MagicStone.2",
         "Left.Armor.SwitchBottom.MagicStone.3",
-        "Left.Armor.SwitchBottom.MagicStone.4"
+        "Left.Armor.SwitchBottom.MagicStone.4",
+        "Left.Armor.SwitchBottom.MagicStone.5"
       ],
       "enabledBy": "Lowerwear.Alternative.Enabled"
     },

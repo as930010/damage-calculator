@@ -52,6 +52,7 @@ const requiredFields = {
   "data/equipment/right-ice.json": ["schemaVersion", "items"],
   "data/giant-magic-stones.json": ["schemaVersion", "selectorCells", "effectOutputRows", "options"],
   "data/innerwear-rules.json": ["schemaVersion", "baseLevel", "slots", "enhancementStats", "forgingAttack", "forgingBonuses"],
+  "data/nephron-armor-rules.json": ["schemaVersion", "dataUpdatedAt", "transformations", "magazines", "levelLabels", "fields", "notes"],
   "data/manifest.json": ["schemaVersion", "dataUpdatedAt", "displayDate", "source"],
   "data/master-beast-effects.json": ["schemaVersion", "armorSpiritStoneSetEffect", "spiritStoneColorSelector", "options", "customAttributeOptions"],
   "data/other-effect-options.json": ["schemaVersion", "consumables", "environments", "titles", "guildFountain", "binaryEffects", "peakOptions"],

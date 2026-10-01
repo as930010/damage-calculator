@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "dataUpdatedAt": "2026-09-25",
+  "dataUpdatedAt": "2026-10-02",
   "sourceSheets": [
     "裝備模擬區",
     "係數區",
@@ -437,7 +437,7 @@
     "head": [
       "致命一擊",
       "極大化",
-      "其他"
+      "無關傷害"
     ],
     "necklace": [
       "超越技傷%",

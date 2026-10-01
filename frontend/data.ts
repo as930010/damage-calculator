@@ -1,6 +1,7 @@
 import type { AttributeRule, AttackParametersDocument, StatContribution } from "../calculation/types.ts";
 import type { EquipmentCatalogDocument, SimulatorEquipmentMappingDocument } from "../calculation/equipment-catalog.ts";
 import type { InnerwearRulesDocument } from "../calculation/innerwear.ts";
+import type { NephronArmorRulesDocument } from "../calculation/nephron-armor.ts";
 import type { ChipSlotsDocument } from "../calculation/simulator-sources.ts";
 import type { WeaponTransformationDocument } from "../calculation/weapon-transformations.ts";
 import type { ClassCombatEffectsDocument, ClassDamagePassivesDocument } from "../calculation/types.ts";
@@ -40,6 +41,7 @@ export interface GameData {
   catalogs: Record<string, EquipmentCatalogDocument>;
   attack: AttackParametersDocument;
   innerwear: InnerwearRulesDocument;
+  nephronArmor: NephronArmorRulesDocument;
   appraisals: Omit<ArmorAppraisalDocument, "slots"> & { slots: (ArmorAppraisalDocument["slots"][number] & { inputCells: string[] })[] };
   chips: ChipCatalogDocument;
   chipSlots: ChipSlotsDocument;
@@ -86,6 +88,7 @@ export const GAME_DATA_FILES = {
   mapping: "simulator-equipment-mapping.json",
   attack: "attack-parameters.json",
   innerwear: "innerwear-rules.json",
+  nephronArmor: "nephron-armor-rules.json",
   appraisals: "armor-appraisals.json",
   chips: "equipment/chips.json",
   chipSlots: "chip-slots.json",

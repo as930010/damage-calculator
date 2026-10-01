@@ -18,6 +18,12 @@ async function start() {
   const state: LoadoutState = sampleMode
     ? await readJson<LoadoutState>(`examples/${sampleId}.json`)
     : readState(data.classes.classes.find(entry => entry.active)?.id ?? 'DaB');
+  const migrateLegacyHeadStoneLabel = (target: LoadoutState) => {
+    if (target.values['MasterBeast.Head.CustomAttribute'] !== '其他') return false;
+    target.values['MasterBeast.Head.CustomAttribute'] = '無關傷害';
+    return true;
+  };
+  const startupLegacyHeadStoneLabelMigrated = migrateLegacyHeadStoneLabel(state);
   const clearInvalidAccessoryAppraisals = (target: LoadoutState) => {
     const clearedCells: string[] = [];
     for (const group of data.accessoryEffects.groups) {
@@ -55,7 +61,27 @@ async function start() {
     return clearedCells;
   };
   const startupDuplicateTransformationCells = clearDuplicateTransformationChoices(state);
-  if ((startupDuplicateTransformationCells.length || startupInvalidAccessoryAppraisalCells.length) && !sampleMode) saveState(state);
+  const clearDuplicateNephronMagazines = (target: LoadoutState) => {
+    const seen = new Set<string>();
+    const clearedCells: string[] = [];
+    for (const field of data.nephronArmor.fields) {
+      if (field.enabledBy && !target.lowerwearAlternativeEnabled) continue;
+      const armor = data.innerwear.slots.find(entry => entry.id === field.slotId);
+      if (!armor || target.values[armor.typeCell] !== '內布隆') continue;
+      const name = String(target.values[field.magazineCell] ?? '');
+      const level = String(target.values[field.magazineLevelCell] ?? '');
+      if (!name && !level) continue;
+      const magazine = data.nephronArmor.magazines.find(entry => entry.name === name);
+      const key = magazine ? magazine.id + '::' + level : '';
+      if (!magazine || !data.nephronArmor.levelLabels.includes(level) || seen.has(key)) {
+        delete target.values[field.magazineCell]; delete target.values[field.magazineLevelCell];
+        clearedCells.push(field.magazineCell, field.magazineLevelCell);
+      } else seen.add(key);
+    }
+    return clearedCells;
+  };
+  const startupDuplicateNephronMagazineCells = clearDuplicateNephronMagazines(state);
+  if ((startupLegacyHeadStoneLabelMigrated || startupDuplicateTransformationCells.length || startupInvalidAccessoryAppraisalCells.length || startupDuplicateNephronMagazineCells.length) && !sampleMode) saveState(state);
   const weaponMagicStoneCells = data.weaponGrades.colorGroups.flatMap(group => group.selectorCells);
   const applyWeaponMagicStonePreset = (grade: string, overwrite = false) => {
     if (!grade) return;
@@ -71,7 +97,13 @@ async function start() {
   const sheetReference = sampleMode
     ? await readJson<SheetParityReference>(`examples/${sampleId}-expected.json`)
     : null;
-  let baseline = sampleMode ? null : readBaseline(), selected = data.layout.slots.find(slot => slot.weapon)!;
+  let baseline = sampleMode ? null : readBaseline();
+  if (baseline) {
+    const migratedBaseline = migrateLegacyHeadStoneLabel(baseline);
+    const clearedBaselineMagazines = clearDuplicateNephronMagazines(baseline);
+    if (migratedBaseline || clearedBaselineMagazines.length) saveState(baseline, true);
+  }
+  let selected = data.layout.slots.find(slot => slot.weapon)!;
   type BeastAccessorySlotId = 'headwear' | 'armor' | 'necklace' | 'ring-one' | 'ring-two';
   type BeastManualCategory = keyof typeof data.masterBeast.customAttributeOptions;
   let selectedBeastSlotId: BeastAccessorySlotId | null = null;
@@ -175,6 +207,22 @@ async function start() {
       }
       if (slot) return `${slot.label}：${selected}`;
       return `裝備選擇（${cell}）${selected ? `：${selected}` : ''}`;
+    }
+    if (sourceId.startsWith('nephron-transform:')) {
+      const [, slotId, line] = sourceId.split(':');
+      const field = data.nephronArmor.fields.find(entry => entry.slotId === slotId);
+      const index = Number(line) - 1;
+      const attributeCell = field && index >= 0 ? field.transformFields[index]?.attributeCell : undefined;
+      const attribute = attributeCell ? String(state.values[attributeCell] ?? '') : '';
+      const partNames: Record<string, string> = { Upper: '上衣', Lowerwear: '下衣', LowerwearAlternative: '強/排褲', Gloves: '手套', Shoes: '鞋子' };
+      return '內布隆' + (partNames[field?.part ?? ''] ?? field?.part ?? '') + '變換：' + attribute;
+    }
+    if (sourceId.startsWith('nephron-magazine:')) {
+      const [, slotId, magazineId, level] = sourceId.split(':');
+      const field = data.nephronArmor.fields.find(entry => entry.slotId === slotId);
+      const magazine = data.nephronArmor.magazines.find(entry => entry.id === magazineId);
+      const partNames: Record<string, string> = { Upper: '上衣', Lowerwear: '下衣', LowerwearAlternative: '強/排褲', Gloves: '手套', Shoes: '鞋子' };
+      return '內布隆' + (partNames[field?.part ?? ''] ?? field?.part ?? '') + '彈匣：' + (magazine?.name ?? magazineId) + ' ' + level;
     }
     if (sourceId.startsWith('innerwear:')) {
       const slot = data.innerwear.slots.find(entry => entry.id === sourceId.slice('innerwear:'.length));
@@ -295,9 +343,14 @@ async function start() {
       `<p class="stat-source-row"><span>${h(label)}</span><strong>${fmt(total)}${isPercent ? '%' : ''}</strong></p>`,
     ).join('');
   };
-  const field = (parent: HTMLElement, label: string, cell: string, choices: readonly PickerOption[], redraw = false, disabled = false) => {
+  const field = (parent: HTMLElement, label: string, cell: string, choices: readonly PickerOption[], redraw = false, disabled = false, disabledHint = '請先選擇屬性') => {
     const picker = createPicker(label, choices, val(cell), value => {
       state.values[cell] = value;
+      for (const armor of data.nephronArmor.fields) {
+        const transform = armor.transformFields.find(entry => entry.attributeCell === cell);
+        if (transform) delete state.values[transform.valueCell];
+        if (armor.magazineCell === cell) delete state.values[armor.magazineLevelCell];
+      }
       if (data.accessoryEffects.groups.some(group => group.selectionCell === cell)) {
         const cleared = clearInvalidAccessoryAppraisals(state);
         if (cleared.length) {
@@ -315,9 +368,9 @@ async function start() {
     if (disabled) {
       picker.classList.add('field-disabled');
       picker.setAttribute('aria-disabled', 'true');
-      picker.title = '請先選擇屬性';
+      picker.title = disabledHint;
       const input = picker.querySelector<HTMLInputElement>('input');
-      if (input) { input.disabled = true; input.placeholder = '請先選擇屬性'; }
+      if (input) { input.disabled = true; input.placeholder = disabledHint; }
     }
     parent.append(picker);
   };
@@ -548,7 +601,14 @@ async function start() {
     const panel = document.querySelector<HTMLElement>('#inspector')!;
     if (selectedBeastSlotId) { renderBeastInspector(panel); return; }
     const group = data.layout.groups.find(group => group.id === selected.group)!;
-    panel.innerHTML = `<div class="inspector-title" style="--group-color:${group.color}">${icon(selected.icon)}<div><small>${h(group.name)}</small><h2>${h(selected.label)}</h2></div><button class="inspector-close" type="button" aria-label="關閉部位設定">×</button></div>`;
+    const innerwearSlot = selected.innerwearId ? data.innerwear.slots.find(slot => slot.id === selected.innerwearId) : undefined;
+    const innerwearType = innerwearSlot && val(innerwearSlot.typeCell) === "內布隆" ? "內布隆" : "百億";
+    const typeSwitch = innerwearSlot ? `<div class="innerwear-type-switch" role="group" aria-label="內裝防具類型"><button type="button" data-innerwear-type="百億" aria-pressed="${innerwearType === "百億"}">百億</button><button type="button" data-innerwear-type="內布隆" aria-pressed="${innerwearType === "內布隆"}">內布隆</button></div>` : "";
+    panel.innerHTML = `<div class="inspector-title" style="--group-color:${group.color}">${icon(selected.icon)}<div class="inspector-title-copy"><small>${h(group.name)}</small><h2>${h(selected.label)}</h2></div>${typeSwitch}<button class="inspector-close" type="button" aria-label="關閉部位設定">×</button></div>`;
+    if (innerwearSlot) panel.querySelectorAll<HTMLButtonElement>("[data-innerwear-type]").forEach(button => button.addEventListener("click", () => {
+      state.values[innerwearSlot.typeCell] = button.dataset.innerwearType!;
+      update(); renderSlots(); renderInspector();
+    }));
     if (selected.enabledBy && !state.lowerwearAlternativeEnabled) { panel.insertAdjacentHTML('beforeend', '<p class="panel-note">請先啟用上方「強/排褲切換」。設定會保留於裝置，停用時不參與計算。</p>'); return; }
     if (selected.selectionCell) {
       const selectionCell = selected.selectionCell;
@@ -585,8 +645,61 @@ async function start() {
     }
     if (selected.innerwearId) {
       const slot = data.innerwear.slots.find(slot => slot.id === selected.innerwearId)!;
-      field(panel, '強化', slot.enhancementCell, options(Object.keys(data.innerwear.enhancementStats).map(level => `Lv.${level}`)));
+      field(panel, '強化', slot.enhancementCell, options(Object.keys(data.innerwear.enhancementStats).map(level => 'Lv.' + level)));
       field(panel, '鍛造', slot.forgingCell, options(Object.keys(data.innerwear.forgingAttack)));
+      if (innerwearType === '內布隆') {
+        const nephronField = data.nephronArmor.fields.find(entry => entry.slotId === slot.id)!;
+        const transformationArea = section(panel, '屬性變換', true);
+        const transformationGrid = attributeValueGrid(transformationArea, 'nephron-transformation-grid');
+        nephronField.transformFields.forEach((transform, index) => {
+          const selectedName = val(transform.attributeCell);
+          const attribute = data.nephronArmor.transformations.find(entry => entry.name === selectedName);
+          field(transformationGrid, '變換 ' + (index + 1) + ' 屬性', transform.attributeCell,
+            data.nephronArmor.transformations.map(entry => ({ value: entry.name, label: entry.name.replace('（依強化等級）', '(×強化)') })), true);
+          const tiers = attribute?.tierValuesPct ?? [];
+          field(transformationGrid, '變換 ' + (index + 1) + ' 數值（%）', transform.valueCell,
+            tiers.map(value => ({ value: String(value / 100), label: value + '%' })),
+            true, !selectedName || !tiers.length,
+            selectedName === '無關傷害' ? '此屬性無需數值' : '請先選擇屬性');
+        });
+
+        const magazineArea = section(panel, '彈匣', true);
+        const magazineGrid = attributeValueGrid(magazineArea, 'nephron-magazine-grid');
+        const activeNephronFields = data.nephronArmor.fields.filter(entry => {
+          if (entry.enabledBy && !state.lowerwearAlternativeEnabled) return false;
+          const armor = data.innerwear.slots.find(candidate => candidate.id === entry.slotId);
+          return !!armor && val(armor.typeCell) === '內布隆';
+        });
+        const otherSelections = activeNephronFields.filter(entry => entry.slotId !== nephronField.slotId)
+          .map(entry => ({ name: val(entry.magazineCell), level: val(entry.magazineLevelCell) }))
+          .filter(entry => entry.name && entry.level);
+        const selectedMagazine = val(nephronField.magazineCell);
+        const selectedMagazineLevel = val(nephronField.magazineLevelCell);
+        const magazineChoices = data.nephronArmor.magazines
+          .filter(magazine => !otherSelections.some(entry => entry.name === magazine.name
+            && entry.level === selectedMagazineLevel) || magazine.name === selectedMagazine)
+          .map(magazine => magazine.name);
+        field(magazineGrid, '彈匣種類', nephronField.magazineCell, options(magazineChoices), true);
+        const currentMagazine = data.nephronArmor.magazines.find(entry => entry.name === selectedMagazine);
+        const availableLevels = data.nephronArmor.levelLabels.filter(level =>
+          !otherSelections.some(entry => entry.name === selectedMagazine && entry.level === level)
+          || level === selectedMagazineLevel);
+        const magazineLevelChoices = availableLevels.map(level => {
+          const levelIndex = Number(level.match(/[0-9]+/)?.[0]) - 1;
+          const amount = currentMagazine?.levelValuesPct[levelIndex];
+          return { value: level, label: level, detail: amount === undefined ? undefined : '數值：' + amount + '%' };
+        });
+        field(magazineGrid, '彈匣等級', nephronField.magazineLevelCell,
+          magazineLevelChoices, true, !selectedMagazine, '請先選擇彈匣');
+        if (currentMagazine?.otherEffects?.length) {
+          const note = document.createElement('p'); note.className = 'panel-note';
+          note.textContent = currentMagazine.otherEffects.join('；'); magazineArea.append(note);
+        }
+        if (selectedMagazine && selectedMagazineLevel && otherSelections.some(entry =>
+          entry.name === selectedMagazine && entry.level === selectedMagazineLevel)) {
+          magazineArea.insertAdjacentHTML('beforeend', '<p class="input-warning">相同種類與等級的彈匣不可重複裝備。</p>');
+        }
+      }
     }
     if (selected.weapon) {
       field(panel, '武器強化', 'Weapon.ENHC', options(Object.keys(data.attack.weaponEnhancementFactors).map(level => `Lv.${level}`)));
@@ -594,15 +707,18 @@ async function start() {
     }
     if (selected.stoneCells?.length) {
       const area = section(panel, '魔法石', true);
-      for (const [index, cell] of selected.stoneCells.entries()) {
+      const visibleStoneCells = innerwearSlot && innerwearType === "百億" ? selected.stoneCells.slice(0, 4) : selected.stoneCells;
+      for (const [index, cell] of visibleStoneCells.entries()) {
         const mapping = data.mapping.magicStoneSelections.inputGroups.find(entry => entry.selectionCell === cell)!;
         const items = data.catalogs[data.mapping.magicStoneSelections.catalogFile].items.filter(item => item.active);
         field(area, `魔法石 ${index + 1}`, cell, items.map(item => ({ value: getEquipmentOptionName(item, mapping.application), label: getEquipmentOptionName(item, mapping.application), detail: summary(item.targetApplications?.[mapping.application]?.stats ?? item.stats ?? {}) })));
       }
     }
     if (selected.innerwearId) {
-      const appraisal = data.appraisals.slots.find(slot => slot.id === selected.innerwearId)!;
-      const area = section(panel, '鑑定'); appraisal.inputCells.forEach((cell, i) => field(area, `鑑定 ${i + 1}`, cell, data.appraisals.options.map(option => ({ value: option.name, label: option.name }))));
+      if (innerwearType !== "內布隆") {
+        const appraisal = data.appraisals.slots.find(slot => slot.id === selected.innerwearId)!;
+        const area = section(panel, '鑑定'); appraisal.inputCells.forEach((cell, i) => field(area, `鑑定 ${i + 1}`, cell, data.appraisals.options.map(option => ({ value: option.name, label: option.name }))));
+      }
       const circuit = data.circuits.inputs.find(slot => slot.slot === selected.innerwearId)!;
       const board = section(panel, '電路板');
       const boardGrid = attributeValueGrid(board);

@@ -100,6 +100,8 @@ export type {
 } from "./equipment-effects.ts";
 export { resolveWeaponTransformation, resolveWeaponTransformationsFromCells } from "./weapon-transformations.ts";
 export { resolveInnerwearSources } from "./innerwear.ts";
+export { resolveNephronArmorSources } from "./nephron-armor.ts";
+export type { NephronArmorInput, NephronArmorRulesDocument, NephronTransformationInput } from "./nephron-armor.ts";
 export type { InnerwearRulesDocument, InnerwearSlot } from "./innerwear.ts";
 export type {
   WeaponTransformationDocument,

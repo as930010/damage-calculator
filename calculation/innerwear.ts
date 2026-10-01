@@ -4,6 +4,7 @@ import type { SimulatorEquipmentContributionGroups } from "./equipment-catalog.t
 export interface InnerwearSlot {
   id: string;
   name: string;
+  typeCell: string;
   enhancementCell: string;
   forgingCell: string;
   attackType: "physical" | "magical";
@@ -28,6 +29,11 @@ export interface InnerwearRulesDocument {
     otherwise: number | "sheetError";
   }[];
   extraAdaptability: { forgingEquals: number; value: number };
+  nephron: {
+    forgingAttack: Readonly<Record<string, number>>;
+    enhancementStats: Readonly<Record<string, Readonly<Record<string, number>>>>;
+    forgingMilestones: readonly { minimum: number; stats: Readonly<Record<string, number>> }[];
+  };
 }
 
 /** C/D/E/H/I/K/Q38:42 plus gloves' enhancement contribution in L41. */
@@ -52,10 +58,11 @@ export function resolveInnerwearSources(
       throw new RangeError(`請填完整${slot.name}的強化與鍛造等級。`);
     }
     const level = Number(String(enhancement).match(/\d+/)?.[0]);
+    const nephron = String(values[slot.typeCell] ?? "百億") === "內布隆";
     const factor = attackParameters.weaponEnhancementFactors[String(level)];
-    const enhanceStats = rules.enhancementStats[String(level)];
     const forgeLevel = Number(forging);
-    const forgeAttack = rules.forgingAttack[String(forgeLevel)];
+    const enhanceStats = (nephron ? rules.nephron.enhancementStats : rules.enhancementStats)[String(level)];
+    const forgeAttack = (nephron ? rules.nephron.forgingAttack : rules.forgingAttack)[String(forgeLevel)];
     if (!Number.isInteger(level) || factor === undefined || !enhanceStats || !Number.isInteger(forgeLevel) || forgeAttack === undefined) {
       throw new RangeError(`${slot.name}的強化或鍛造等級不在資料範圍內。`);
     }
@@ -67,14 +74,21 @@ export function resolveInnerwearSources(
       ...enhanceStats,
       [slot.attackType === "physical" ? "physicalAttack" : "magicalAttack"]: Math.floor(raw) * factor + forgeAttack,
     };
-    for (const bonus of rules.forgingBonuses) {
-      const value = bonus.steps.find((step) => forgeLevel >= step.minimum)?.value ?? bonus.otherwise;
-      if (value === "sheetError") {
-        throw new RangeError(`${slot.name}鍛造 ${forgeLevel}：原試算表的 IFS 未定義此等級的效果，需確認後才能計算。`);
+    if (nephron) {
+      for (const milestone of rules.nephron.forgingMilestones) {
+        if (forgeLevel < milestone.minimum) continue;
+        for (const [key, value] of Object.entries(milestone.stats)) stats[key] = (stats[key] ?? 0) + value;
       }
-      stats[bonus.statKey] = value;
+    } else {
+      for (const bonus of rules.forgingBonuses) {
+        const value = bonus.steps.find((step) => forgeLevel >= step.minimum)?.value ?? bonus.otherwise;
+        if (value === "sheetError") {
+          throw new RangeError(`${slot.name}鍛造 ${forgeLevel}：原試算表的 IFS 未定義此等級的效果，需確認後才能計算。`);
+        }
+        stats[bonus.statKey] = value;
+      }
+      if (forgeLevel === rules.extraAdaptability.forgingEquals) stats.adaptabilityPct += rules.extraAdaptability.value;
     }
-    if (forgeLevel === rules.extraAdaptability.forgingEquals) stats.adaptabilityPct += rules.extraAdaptability.value;
     if (slot.allSkillDamagePerEnhancement !== undefined) stats.allSkillDamagePct = level * slot.allSkillDamagePerEnhancement;
     if (slot.multiplicativeDamageEnhancementBonusPct !== undefined) {
       stats.multiplicativeDamagePct = level + slot.multiplicativeDamageEnhancementBonusPct;

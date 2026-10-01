@@ -13,7 +13,8 @@
       "attackType": "physical",
       "attackFraction": 0.03,
       "wearSet": "shared",
-      "multiplicativeDamageEnhancementBonusPct": 2
+      "multiplicativeDamageEnhancementBonusPct": 2,
+      "typeCell": "Innerwear.Upper.Type"
     },
     {
       "id": "lowerwear",
@@ -22,7 +23,8 @@
       "forgingCell": "Left.Armor.Bottom.FORGE",
       "attackType": "magical",
       "attackFraction": 0.05,
-      "wearSet": "lowerwearA"
+      "wearSet": "lowerwearA",
+      "typeCell": "Innerwear.Lowerwear.Type"
     },
     {
       "id": "lowerwearAlternative",
@@ -32,7 +34,8 @@
       "attackType": "magical",
       "attackFraction": 0.05,
       "wearSet": "lowerwearB",
-      "enabledBy": "Lowerwear.Alternative.Enabled"
+      "enabledBy": "Lowerwear.Alternative.Enabled",
+      "typeCell": "Innerwear.LowerwearAlternative.Type"
     },
     {
       "id": "gloves",
@@ -42,7 +45,8 @@
       "attackType": "physical",
       "attackFraction": 0.05,
       "wearSet": "shared",
-      "allSkillDamagePerEnhancement": 5
+      "allSkillDamagePerEnhancement": 5,
+      "typeCell": "Innerwear.Gloves.Type"
     },
     {
       "id": "shoes",
@@ -51,7 +55,8 @@
       "forgingCell": "Left.Armor.Shoes.FORGE",
       "attackType": "magical",
       "attackFraction": 0.03,
-      "wearSet": "shared"
+      "wearSet": "shared",
+      "typeCell": "Innerwear.Shoes.Type"
     }
   ],
   "enhancementStats": {
@@ -151,5 +156,94 @@
   "extraAdaptability": {
     "forgingEquals": 21,
     "value": 2
+  },
+  "nephron": {
+    "forgingAttack": {
+      "0": 0,
+      "1": 119,
+      "2": 238,
+      "3": 357,
+      "4": 476,
+      "5": 595,
+      "6": 714,
+      "7": 833,
+      "8": 952,
+      "9": 1071,
+      "10": 1190,
+      "11": 1309,
+      "12": 1428,
+      "13": 1547,
+      "14": 1666,
+      "15": 1785,
+      "16": 1904,
+      "17": 2023,
+      "18": 2142,
+      "19": 2261,
+      "20": 2380,
+      "21": 2500
+    },
+    "enhancementStats": {
+      "8": {},
+      "9": {},
+      "10": {
+        "bossDamagePct": 5
+      },
+      "11": {
+        "bossDamagePct": 5,
+        "superAdaptabilityPct": 2
+      },
+      "12": {
+        "bossDamagePct": 5,
+        "superAdaptabilityPct": 2
+      },
+      "13": {
+        "bossDamagePct": 5,
+        "superAdaptabilityPct": 2
+      }
+    },
+    "forgingMilestones": [
+      {
+        "minimum": 3,
+        "stats": {
+          "critDamagePct": 3
+        }
+      },
+      {
+        "minimum": 6,
+        "stats": {
+          "transcendenceSkillDamagePct": 3
+        }
+      },
+      {
+        "minimum": 9,
+        "stats": {
+          "doubleAttackPct": 3
+        }
+      },
+      {
+        "minimum": 12,
+        "stats": {
+          "transcendenceSkillDamagePct": 3
+        }
+      },
+      {
+        "minimum": 15,
+        "stats": {
+          "adaptabilityPct": 2
+        }
+      },
+      {
+        "minimum": 18,
+        "stats": {
+          "transcendenceSkillDamagePct": 4
+        }
+      },
+      {
+        "minimum": 21,
+        "stats": {
+          "superAdaptabilityPct": 0.5
+        }
+      }
+    ]
   }
 }

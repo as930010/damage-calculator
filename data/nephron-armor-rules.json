@@ -1,0 +1,498 @@
+{
+  "schemaVersion": 1,
+  "dataUpdatedAt": "2026-10-02",
+  "source": "Nephron innerwear rules supplied by user",
+  "transformations": [
+    {
+      "id": "enhancement-double-attack",
+      "name": "雙攻%（依強化等級）",
+      "statKey": "doubleAttackPct",
+      "tierValuesPct": [
+        0.02,
+        0.04,
+        0.06,
+        0.08,
+        0.1,
+        0.12,
+        0.14,
+        0.16,
+        0.18,
+        0.2
+      ],
+      "multipliesByEnhancementLevel": true
+    },
+    {
+      "id": "enhancement-crit-damage",
+      "name": "致命傷害%（依強化等級）",
+      "statKey": "critDamagePct",
+      "tierValuesPct": [
+        0.02,
+        0.04,
+        0.06,
+        0.08,
+        0.1,
+        0.12,
+        0.14,
+        0.16,
+        0.18,
+        0.2
+      ],
+      "multipliesByEnhancementLevel": true
+    },
+    {
+      "id": "enhancement-all-skill",
+      "name": "所有技能傷害%（依強化等級）",
+      "statKey": "allSkillDamagePct",
+      "tierValuesPct": [
+        0.02,
+        0.04,
+        0.06,
+        0.08,
+        0.1,
+        0.12,
+        0.14,
+        0.16,
+        0.18,
+        0.2
+      ],
+      "multipliesByEnhancementLevel": true
+    },
+    {
+      "id": "bleed-damage",
+      "name": "流血%",
+      "statKey": "bleedDamagePct",
+      "tierValuesPct": [
+        0.1,
+        0.2,
+        0.3,
+        0.4,
+        0.5,
+        0.6,
+        0.7,
+        0.8,
+        0.9,
+        1
+      ],
+      "multipliesByEnhancementLevel": false
+    },
+    {
+      "id": "double-attack",
+      "name": "雙攻%",
+      "statKey": "doubleAttackPct",
+      "tierValuesPct": [
+        0.1,
+        0.2,
+        0.3,
+        0.4,
+        0.5,
+        0.6,
+        0.7,
+        0.8,
+        0.9,
+        1
+      ],
+      "multipliesByEnhancementLevel": false
+    },
+    {
+      "id": "full-health-kill",
+      "name": "100%血殺%",
+      "statKey": "fullHealthKillDamagePct",
+      "tierValuesPct": [
+        0.1,
+        0.2,
+        0.3,
+        0.4,
+        0.5,
+        0.6,
+        0.7,
+        0.8,
+        0.9,
+        1
+      ],
+      "multipliesByEnhancementLevel": false
+    },
+    {
+      "id": "polarization",
+      "name": "兩極化%",
+      "statKey": "polarizationPct",
+      "tierValuesPct": [
+        0.1,
+        0.2,
+        0.3,
+        0.4,
+        0.5,
+        0.6,
+        0.7,
+        0.8,
+        0.9,
+        1
+      ],
+      "multipliesByEnhancementLevel": false
+    },
+    {
+      "id": "crit-damage",
+      "name": "致命傷害%",
+      "statKey": "critDamagePct",
+      "tierValuesPct": [
+        0.1,
+        0.2,
+        0.3,
+        0.4,
+        0.5,
+        0.6,
+        0.7,
+        0.8,
+        0.9,
+        1
+      ],
+      "multipliesByEnhancementLevel": false
+    },
+    {
+      "id": "boss-damage",
+      "name": "Boss傷害%",
+      "statKey": "bossDamagePct",
+      "tierValuesPct": [
+        0.1,
+        0.2,
+        0.3,
+        0.4,
+        0.5,
+        0.6,
+        0.7,
+        0.8,
+        0.9,
+        1
+      ],
+      "multipliesByEnhancementLevel": false
+    },
+    {
+      "id": "transcendence-skill-damage",
+      "name": "超越技傷%",
+      "statKey": "transcendenceSkillDamagePct",
+      "tierValuesPct": [
+        0.1,
+        0.2,
+        0.3,
+        0.4,
+        0.5,
+        0.6,
+        0.7,
+        0.8,
+        0.9,
+        1
+      ],
+      "multipliesByEnhancementLevel": false
+    },
+    {
+      "id": "all-skill-damage",
+      "name": "所有技能傷害%",
+      "statKey": "allSkillDamagePct",
+      "tierValuesPct": [
+        0.1,
+        0.2,
+        0.3,
+        0.4,
+        0.5,
+        0.6,
+        0.7,
+        0.8,
+        0.9,
+        1
+      ],
+      "multipliesByEnhancementLevel": false
+    },
+    {
+      "id": "defense-ignore",
+      "name": "無視防禦%",
+      "statKey": "defenseIgnorePct",
+      "tierValuesPct": [
+        0.1,
+        0.2,
+        0.3,
+        0.4,
+        0.5,
+        0.6,
+        0.7,
+        0.8,
+        0.9,
+        1
+      ],
+      "multipliesByEnhancementLevel": false
+    },
+    {
+      "id": "crit-rate",
+      "name": "致命一擊機率%",
+      "statKey": "critRatePct",
+      "tierValuesPct": [
+        0.3,
+        0.4,
+        0.5,
+        0.6,
+        0.7,
+        0.8,
+        0.9,
+        1,
+        1.1,
+        1.2
+      ],
+      "multipliesByEnhancementLevel": false
+    },
+    {
+      "id": "extremization",
+      "name": "極大化%",
+      "statKey": "extremizationPct",
+      "tierValuesPct": [
+        0.3,
+        0.4,
+        0.5,
+        0.6,
+        0.7,
+        0.8,
+        0.9,
+        1,
+        1.1,
+        1.2
+      ],
+      "multipliesByEnhancementLevel": false
+    },
+    {
+      "id": "unrelated-damage",
+      "name": "無關傷害",
+      "tierValuesPct": [],
+      "multipliesByEnhancementLevel": false
+    }
+  ],
+  "magazines": [
+    {
+      "id": "super-extreme-slow",
+      "name": "超級彈匣[極度緩慢]",
+      "statKey": "allSkillDamagePct",
+      "levelValuesPct": [
+        0.5,
+        1,
+        1.5,
+        2,
+        2.5,
+        3
+      ],
+      "otherEffects": [
+        "使用石頭蘋果或巨人石頭蘋果時，受到的傷害降低0.5%～3%",
+        "使用疾風蘋果或疾風仙女座蘋果時，動作速度增加0.5%～3%"
+      ]
+    },
+    {
+      "id": "super-booster",
+      "name": "超級彈匣[推進器]",
+      "baseStats": {
+        "polarizationPct": -10
+      },
+      "levelStatKey": "superAdaptabilityPct",
+      "levelValuesPct": [
+        0.5,
+        1,
+        1.5,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "id": "combat-type-i",
+      "name": "戰鬥彈匣Type - I",
+      "statKey": "bleedDamagePct",
+      "levelValuesPct": [
+        0.5,
+        1,
+        1.5,
+        2,
+        2.5,
+        3
+      ]
+    },
+    {
+      "id": "combat-type-ii",
+      "name": "戰鬥彈匣Type - II",
+      "statKey": "allSkillDamagePct",
+      "levelValuesPct": [
+        0.5,
+        1,
+        1.5,
+        2,
+        2.5,
+        3
+      ]
+    },
+    {
+      "id": "combat-type-iii",
+      "name": "戰鬥彈匣Type - III",
+      "statKey": "transcendenceSkillDamagePct",
+      "levelValuesPct": [
+        0.5,
+        1,
+        1.5,
+        2,
+        2.5,
+        3
+      ]
+    },
+    {
+      "id": "combat-type-iv",
+      "name": "戰鬥彈匣Type - IV",
+      "statKey": "critDamagePct",
+      "levelValuesPct": [
+        0.5,
+        1,
+        1.5,
+        2,
+        2.5,
+        3
+      ]
+    },
+    {
+      "id": "combat-type-v",
+      "name": "戰鬥彈匣Type - V",
+      "statKey": "bossDamagePct",
+      "levelValuesPct": [
+        0.5,
+        1,
+        1.5,
+        2,
+        2.5,
+        3
+      ]
+    },
+    {
+      "id": "classic-type-i",
+      "name": "經典彈匣Type - I",
+      "statKey": "polarizationPct",
+      "levelValuesPct": [
+        0.5,
+        1,
+        1.5,
+        2,
+        2.5,
+        3
+      ]
+    }
+  ],
+  "levelLabels": [
+    "Lv.1",
+    "Lv.2",
+    "Lv.3",
+    "Lv.4",
+    "Lv.5",
+    "Lv.6"
+  ],
+  "fields": [
+    {
+      "part": "Upper",
+      "transformFields": [
+        {
+          "attributeCell": "Innerwear.Upper.Transform.1.Attribute",
+          "valueCell": "Innerwear.Upper.Transform.1.Value"
+        },
+        {
+          "attributeCell": "Innerwear.Upper.Transform.2.Attribute",
+          "valueCell": "Innerwear.Upper.Transform.2.Value"
+        },
+        {
+          "attributeCell": "Innerwear.Upper.Transform.3.Attribute",
+          "valueCell": "Innerwear.Upper.Transform.3.Value"
+        }
+      ],
+      "magazineCell": "Innerwear.Upper.Magazine.Type",
+      "magazineLevelCell": "Innerwear.Upper.Magazine.Level",
+      "wearSet": "shared",
+      "slotId": "upper"
+    },
+    {
+      "part": "Lowerwear",
+      "transformFields": [
+        {
+          "attributeCell": "Innerwear.Lowerwear.Transform.1.Attribute",
+          "valueCell": "Innerwear.Lowerwear.Transform.1.Value"
+        },
+        {
+          "attributeCell": "Innerwear.Lowerwear.Transform.2.Attribute",
+          "valueCell": "Innerwear.Lowerwear.Transform.2.Value"
+        },
+        {
+          "attributeCell": "Innerwear.Lowerwear.Transform.3.Attribute",
+          "valueCell": "Innerwear.Lowerwear.Transform.3.Value"
+        }
+      ],
+      "magazineCell": "Innerwear.Lowerwear.Magazine.Type",
+      "magazineLevelCell": "Innerwear.Lowerwear.Magazine.Level",
+      "wearSet": "lowerwearA",
+      "slotId": "lowerwear"
+    },
+    {
+      "part": "LowerwearAlternative",
+      "transformFields": [
+        {
+          "attributeCell": "Innerwear.LowerwearAlternative.Transform.1.Attribute",
+          "valueCell": "Innerwear.LowerwearAlternative.Transform.1.Value"
+        },
+        {
+          "attributeCell": "Innerwear.LowerwearAlternative.Transform.2.Attribute",
+          "valueCell": "Innerwear.LowerwearAlternative.Transform.2.Value"
+        },
+        {
+          "attributeCell": "Innerwear.LowerwearAlternative.Transform.3.Attribute",
+          "valueCell": "Innerwear.LowerwearAlternative.Transform.3.Value"
+        }
+      ],
+      "magazineCell": "Innerwear.LowerwearAlternative.Magazine.Type",
+      "magazineLevelCell": "Innerwear.LowerwearAlternative.Magazine.Level",
+      "wearSet": "lowerwearB",
+      "enabledBy": "Lowerwear.Alternative.Enabled",
+      "slotId": "lowerwearAlternative"
+    },
+    {
+      "part": "Gloves",
+      "transformFields": [
+        {
+          "attributeCell": "Innerwear.Gloves.Transform.1.Attribute",
+          "valueCell": "Innerwear.Gloves.Transform.1.Value"
+        },
+        {
+          "attributeCell": "Innerwear.Gloves.Transform.2.Attribute",
+          "valueCell": "Innerwear.Gloves.Transform.2.Value"
+        },
+        {
+          "attributeCell": "Innerwear.Gloves.Transform.3.Attribute",
+          "valueCell": "Innerwear.Gloves.Transform.3.Value"
+        }
+      ],
+      "magazineCell": "Innerwear.Gloves.Magazine.Type",
+      "magazineLevelCell": "Innerwear.Gloves.Magazine.Level",
+      "wearSet": "shared",
+      "slotId": "gloves"
+    },
+    {
+      "part": "Shoes",
+      "transformFields": [
+        {
+          "attributeCell": "Innerwear.Shoes.Transform.1.Attribute",
+          "valueCell": "Innerwear.Shoes.Transform.1.Value"
+        },
+        {
+          "attributeCell": "Innerwear.Shoes.Transform.2.Attribute",
+          "valueCell": "Innerwear.Shoes.Transform.2.Value"
+        },
+        {
+          "attributeCell": "Innerwear.Shoes.Transform.3.Attribute",
+          "valueCell": "Innerwear.Shoes.Transform.3.Value"
+        }
+      ],
+      "magazineCell": "Innerwear.Shoes.Magazine.Type",
+      "magazineLevelCell": "Innerwear.Shoes.Magazine.Level",
+      "wearSet": "shared",
+      "slotId": "shoes"
+    }
+  ],
+  "notes": [
+    "每件防具各有三條變換屬性；前三種效果為防具強化等級乘上所選百分比檔位，其餘依所選檔位直接加算。",
+    "每件防具可裝一個彈匣；同種類同等級不可重複裝備。極度緩慢的技能傷害增幅常駐套用，減傷與動速不屬於此傷害計算器輸出。"
+  ]
+}

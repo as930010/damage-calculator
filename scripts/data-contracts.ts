@@ -2,6 +2,7 @@ import type { AccessoryEffectDocument, ArmorAppraisalDocument, AtmaEffectDocumen
 import type { EquipmentCatalogDocument, SimulatorEquipmentMappingDocument } from '../calculation/equipment-catalog.ts';
 import type { ClassCombatEffectsDocument, ClassDamagePassivesDocument, AttackParametersDocument } from '../calculation/types.ts';
 import type { InnerwearRulesDocument } from '../calculation/innerwear.ts';
+import type { NephronArmorRulesDocument } from '../calculation/nephron-armor.ts';
 import type { ChipSlotsDocument } from '../calculation/simulator-sources.ts';
 import type { CombatRateSourceRulesDocument } from '../calculation/combat-rate-sources.ts';
 import type { WeaponTransformationDocument } from '../calculation/weapon-transformations.ts';
@@ -21,6 +22,7 @@ import atma from '../data/atma-effects.json';
 import circuitBoard from '../data/circuit-board-rules.json';
 import colorSet from '../data/color-set-effects.json';
 import innerwear from '../data/innerwear-rules.json';
+import nephronArmor from '../data/nephron-armor-rules.json';
 import masterBeast from '../data/master-beast-effects.json';
 import raidSets from '../data/raid-set-effects.json';
 import resonance from '../data/resonance-effects.json';
@@ -65,6 +67,7 @@ const _atma: Widen<AtmaEffectDocument> = atma;
 const _circuitBoard: Widen<CircuitBoardRulesDocument> = circuitBoard;
 const _colorSet: Widen<ColorSetEffectDocument> = colorSet;
 const _innerwear: Widen<InnerwearRulesDocument> = innerwear;
+const _nephronArmor: Widen<NephronArmorRulesDocument> = nephronArmor;
 const _masterBeast: Widen<MasterBeastEffectDocument> = masterBeast;
 const _raidSets: Widen<RaidSetEffectDocument> = raidSets;
 const _resonance: Widen<ResonanceEffectDocument> = resonance;
@@ -93,6 +96,6 @@ const _pets: Widen<{ schemaVersion: number; options: readonly NamedStatOption[] 
 
 export type DataContractsAreChecked = typeof _equipmentCatalogs | typeof _equipmentMapping | typeof _attack
   | typeof _classCombat | typeof _classDamage | typeof _appraisals | typeof _accessoryEffects | typeof _atma
-  | typeof _circuitBoard | typeof _colorSet | typeof _innerwear | typeof _masterBeast | typeof _raidSets
+  | typeof _circuitBoard | typeof _colorSet | typeof _innerwear | typeof _nephronArmor | typeof _masterBeast | typeof _raidSets
   | typeof _resonance | typeof _rightIceSets | typeof _spiritRecord | typeof _weaponGrowth
   | typeof _weaponTransformations | typeof _chipCatalog | typeof _chipSlots | typeof _combatRateSources;

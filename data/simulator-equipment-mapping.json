@@ -401,6 +401,38 @@
         "selectionCell": "Ice.Weapon.MagicStone.2",
         "application": "weapon",
         "calculationRow": 137
+      },
+      {
+        "selectionCell": "Left.Armor.Upper.MagicStone.5",
+        "application": "armor",
+        "calculationRow": 138,
+        "enabledBy": "Nephron.Innerwear.Upper"
+      },
+      {
+        "selectionCell": "Left.Armor.Bottom.MagicStone.5",
+        "application": "armor",
+        "calculationRow": 139,
+        "enabledBy": "Nephron.Innerwear.Lowerwear",
+        "configuration": "lowerwearA"
+      },
+      {
+        "selectionCell": "Left.Armor.SwitchBottom.MagicStone.5",
+        "application": "armor",
+        "calculationRow": 140,
+        "enabledBy": "Nephron.Innerwear.LowerwearAlternative",
+        "configuration": "lowerwearB"
+      },
+      {
+        "selectionCell": "Left.Armor.Gloves.MagicStone.5",
+        "application": "armor",
+        "calculationRow": 141,
+        "enabledBy": "Nephron.Innerwear.Gloves"
+      },
+      {
+        "selectionCell": "Left.Armor.Shoes.MagicStone.5",
+        "application": "armor",
+        "calculationRow": 142,
+        "enabledBy": "Nephron.Innerwear.Shoes"
       }
     ]
   },

@@ -7,7 +7,7 @@ import { findValidationCatalog } from './sheet-validation.ts';
 type TransferData = Pick<GameData,
   | 'classes' | 'mapping' | 'catalogs' | 'simulatorInputs' | 'manifest' | 'masterBeast'
   | 'layout' | 'attack' | 'innerwear' | 'appraisals' | 'chips' | 'chipSlots' | 'circuits'
-  | 'transformations' | 'growth' | 'weaponAppraisals' | 'weaponGrades' | 'giantStones'
+  | 'transformations' | 'growth' | 'weaponAppraisals' | 'weaponGrades' | 'giantStones' | 'nephronArmor'
   | 'colorSetEffects' | 'spiritRecord' | 'otherEffects' | 'pets' | 'rightIceSets'
 >;
 type JsonRecord = Record<string, unknown>;
@@ -51,6 +51,19 @@ function customOptions(data: TransferData, cell: string, values: Record<string, 
   for (const entry of data.otherEffects.guildFountain) if (entry.selectorCell === address) return entry.options.map(option => option.name);
   if (data.colorSetEffects.selectorCell && data.colorSetEffects.selectorCell === address) return data.colorSetEffects.options.map(option => option.name);
   if (data.spiritRecord.classSelectors.selectorCells.some(cell => cell === address)) return data.spiritRecord.classSelectors.classes.map(entry => entry.classCode);
+  for (const slot of data.innerwear.slots) if (slot.typeCell === address) return ["百億", "內布隆"];
+  for (const field of data.nephronArmor.fields) {
+    for (const transform of field.transformFields) {
+      if (transform.attributeCell === address) return data.nephronArmor.transformations.map(option => option.name);
+      if (transform.valueCell === address) {
+        const attribute = values[transform.attributeCell];
+        const option = data.nephronArmor.transformations.find(entry => entry.name === attribute);
+        return option?.tierValuesPct.map(value => value / 100) ?? [];
+      }
+    }
+    if (field.magazineCell === address) return data.nephronArmor.magazines.map(option => option.name);
+    if (field.magazineLevelCell === address) return data.nephronArmor.levelLabels;
+  }
   for (const slot of data.layout.slots) {
     if (slot.innerwearId) {
       const innerwear = data.innerwear.slots.find(entry => entry.id === slot.innerwearId);
@@ -237,6 +250,27 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
   const color = candidate.masterBeastSpiritStoneColor;
   const lowerwearAlternativeEnabled = typeof candidate.lowerwearAlternativeEnabled === 'boolean'
     ? candidate.lowerwearAlternativeEnabled : false;
+  const usedNephronMagazines = new Set<string>();
+  for (const field of data.nephronArmor.fields) {
+    if (field.enabledBy && !lowerwearAlternativeEnabled) continue;
+    const armor = data.innerwear.slots.find(entry => entry.id === field.slotId);
+    if (!armor || values[armor.typeCell] !== '內布隆') continue;
+    const magazineName = values[field.magazineCell];
+    const magazineLevel = values[field.magazineLevelCell];
+    if (magazineName === undefined && magazineLevel === undefined) continue;
+    const magazine = typeof magazineName === 'string'
+      ? data.nephronArmor.magazines.find(entry => entry.name === magazineName) : undefined;
+    if (!magazine || typeof magazineLevel !== 'string' || !data.nephronArmor.levelLabels.includes(magazineLevel)) {
+      delete values[field.magazineCell]; delete values[field.magazineLevelCell];
+      clearedFields.push(field.magazineCell, field.magazineLevelCell);
+      continue;
+    }
+    const key = magazine.id + '::' + magazineLevel;
+    if (usedNephronMagazines.has(key)) {
+      delete values[field.magazineCell]; delete values[field.magazineLevelCell];
+      clearedFields.push(field.magazineCell, field.magazineLevelCell);
+    } else usedNephronMagazines.add(key);
+  }
   const masterBeastSpiritStoneColor = color === '黃' || color === '綠' || color === '' ? color : fallbackColor;
   const petSkillAttackEnabled = typeof candidate.petSkillAttackEnabled === 'boolean' ? candidate.petSkillAttackEnabled : true;
   if (typeof candidate.lowerwearAlternativeEnabled !== 'boolean') clearedFields.push('強／排褲切換');

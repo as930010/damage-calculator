@@ -1,6 +1,7 @@
 import { aggregateCharacterAttributes, prepareCharacterAttributeInput } from "../calculation/attribute-aggregation.ts";
 import { resolveSimulatorEquipmentContributions } from "../calculation/equipment-catalog.ts";
 import { resolveInnerwearSources } from "../calculation/innerwear.ts";
+import { resolveNephronArmorSources } from "../calculation/nephron-armor.ts";
 import { resolveWeaponTransformationsFromCells } from "../calculation/weapon-transformations.ts";
 import { resolveAccessoryEffectOptions, resolveArmorAppraisals, resolveAtmaSetEffects, resolveChipContribution, resolveCircuitBoardEffects, resolveColorSetEffect, resolveMasterBeastEffects, resolveNamedStatOption, resolveRaidSetEffects, resolveResonanceEffects, resolveRightIceSetEffects, resolveSpiritRecordEffects, resolveSpiritRecordSelections, resolveWeaponGrowth } from "../calculation/equipment-effects.ts";
 import { calculateWeaponBaseAttack, resolveAttackParameters } from "../calculation/attack.ts";
@@ -17,7 +18,14 @@ export function projectAttributes(data: GameData, state: LoadoutState) {
   const number = (key: string) => values[key] === undefined || values[key] === "" ? undefined : Number(values[key]);
   const equipment = resolveSimulatorEquipmentContributions(data.mapping, data.catalogs, {
     selectedItems: Object.fromEntries(Object.entries(values).map(([fieldId, value]) => [fieldId, String(value)])),
-    enabledValues: { "Lowerwear.Alternative.Enabled": state.lowerwearAlternativeEnabled },
+    enabledValues: {
+      "Lowerwear.Alternative.Enabled": state.lowerwearAlternativeEnabled,
+      "Nephron.Innerwear.Upper": text("Innerwear.Upper.Type") === "內布隆",
+      "Nephron.Innerwear.Lowerwear": text("Innerwear.Lowerwear.Type") === "內布隆",
+      "Nephron.Innerwear.LowerwearAlternative": state.lowerwearAlternativeEnabled && text("Innerwear.LowerwearAlternative.Type") === "內布隆",
+      "Nephron.Innerwear.Gloves": text("Innerwear.Gloves.Type") === "內布隆",
+      "Nephron.Innerwear.Shoes": text("Innerwear.Shoes.Type") === "內布隆",
+    },
   });
   const inner = resolveInnerwearSources(data.innerwear, data.attack, state.Job, values, state.lowerwearAlternativeEnabled);
   const configuredEffects: StatContribution[] = [
@@ -32,8 +40,38 @@ export function projectAttributes(data: GameData, state: LoadoutState) {
     shared: [{ sourceId: "character-base", stats: characterBaseStats }, ...data.parameters.fixedEffects, ...configuredEffects, ...equipment.shared, ...inner.shared],
     lowerwearA: [...equipment.lowerwearA, ...inner.lowerwearA], lowerwearB: [...equipment.lowerwearB, ...inner.lowerwearB],
   };
+  const nephronSelections = data.nephronArmor.fields.flatMap((field) => {
+    if (field.enabledBy && !state.lowerwearAlternativeEnabled) return [];
+    const slot = data.innerwear.slots.find((entry) => entry.id === field.slotId);
+    if (!slot || text(slot.typeCell) !== "內布隆") return [];
+    const active = [slot.enhancementCell, slot.forgingCell, field.magazineCell, field.magazineLevelCell,
+      ...field.transformFields.flatMap(({ attributeCell, valueCell }) => [attributeCell, valueCell])]
+      .some((cell) => values[cell] !== undefined && values[cell] !== "");
+    if (!active) return [];
+    return [{
+      field,
+      selection: {
+        slotId: field.slotId,
+        enhancement: values[slot.enhancementCell],
+        transformations: field.transformFields.map(({ attributeCell, valueCell }) => ({
+          attribute: text(attributeCell), value: number(valueCell),
+        })),
+        magazine: text(field.magazineCell),
+        magazineLevel: values[field.magazineLevelCell],
+      },
+    }];
+  });
+  const nephronWearSetBySlot = new Map<string, "shared" | "lowerwearA" | "lowerwearB">(nephronSelections.map(({ field }) => [field.slotId, field.wearSet] as const));
+  for (const contribution of resolveNephronArmorSources(data.nephronArmor, nephronSelections.map(({ selection }) => selection))) {
+    const slotId = contribution.sourceId.split(":")[1];
+    const wearSet = nephronWearSetBySlot.get(slotId);
+    if (wearSet) groups[wearSet].push(contribution);
+  }
   for (const entry of resolveArmorAppraisals(data.appraisals, {
-    optionsBySlot: Object.fromEntries(data.appraisals.slots.map((slot) => [slot.id, slot.inputCells.map(text)])),
+    optionsBySlot: Object.fromEntries(data.appraisals.slots.map((slot) => [
+      slot.id, text(`Innerwear.${slot.id === "lowerwearAlternative" ? "LowerwearAlternative" : slot.id === "lowerwear" ? "Lowerwear" : slot.id === "upper" ? "Upper" : slot.id === "gloves" ? "Gloves" : "Shoes"}.Type`) === "內布隆"
+        ? [] : slot.inputCells.map(text),
+    ])),
     enabledInputs: { "Lowerwear.Alternative.Enabled": state.lowerwearAlternativeEnabled },
   })) groups[entry.wearSet].push(...entry.contributions);
   for (const slot of data.chipSlots.slots) {
