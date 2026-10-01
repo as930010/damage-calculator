@@ -30,7 +30,7 @@ async function loadData() {
   return data;
 }
 
-test('線上試算表範例的三套右冰套效選擇可逐項重現計算機輸出', async () => {
+test('線上試算表範例仍重現未受上衣乘算加成影響的輸出', async () => {
   const [data, sample, expected] = await Promise.all([
     loadData(),
     readJson('examples/live-sheet-2026-09-28.json'),
@@ -39,7 +39,9 @@ test('線上試算表範例的三套右冰套效選擇可逐項重現計算機�
   const result = projectDamage(data, sample).result;
   const rows = compareSheetParity(result, expected);
   assert.equal(rows.length, 31);
-  assert.deepEqual(rows.filter(row => !row.matches).map(row => row.cell), []);
+  assert.deepEqual(rows.filter(row => !row.matches).map(row => row.cell), ['S1', 'B163']);
+  const multiplier = rows.find(row => row.cell === 'S1');
+  assert.ok(Math.abs(multiplier.actual / multiplier.expected - 1.13) < 1e-12);
   assert.deepEqual(['Right.Ice.SetEffect.1', 'Right.Ice.SetEffect.2', 'Right.Ice.SetEffect.3'].map(fieldId => sample.values[fieldId]), ['幽潮吞源', '日冕．灼耀花仙', '猛虎奇談']);
 
   const bleed = rows.find(row => row.cell === 'M1');
@@ -49,7 +51,7 @@ test('線上試算表範例的三套右冰套效選擇可逐項重現計算機�
   assert.equal(bleed.delta, 0);
   assert.equal(damage.expected, expected.b163RecomputedFromFormula);
   assert.notEqual(damage.expected, expected.cells.B163);
-  assert.ok(Math.abs(damage.actual - damage.expected) < 1e-6);
+  assert.ok(Math.abs(damage.actual / damage.expected - 1.13) < 1e-12);
   const weaponStoneSources = projectAttributes(data, sample).calculationSources.shared.filter(source => source.sourceId.startsWith('weapon-magic-stone:'));
   const level = weaponStoneSources.reduce((sum, source) => sum + (source.stats.attackLevel ?? 0), 0);
   const doubleAttack = weaponStoneSources.reduce((sum, source) => sum + (source.stats.doubleAttackPct ?? 0), 0);

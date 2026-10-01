@@ -12,7 +12,8 @@
       "forgingCell": "Left.Armor.Upper.FORGE",
       "attackType": "physical",
       "attackFraction": 0.03,
-      "wearSet": "shared"
+      "wearSet": "shared",
+      "multiplicativeDamageEnhancementBonusPct": 2
     },
     {
       "id": "lowerwear",

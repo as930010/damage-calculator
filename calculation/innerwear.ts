@@ -11,6 +11,7 @@ export interface InnerwearSlot {
   wearSet: "shared" | "lowerwearA" | "lowerwearB";
   enabledBy?: string;
   allSkillDamagePerEnhancement?: number;
+  multiplicativeDamageEnhancementBonusPct?: number;
 }
 
 export interface InnerwearRulesDocument {
@@ -75,6 +76,9 @@ export function resolveInnerwearSources(
     }
     if (forgeLevel === rules.extraAdaptability.forgingEquals) stats.adaptabilityPct += rules.extraAdaptability.value;
     if (slot.allSkillDamagePerEnhancement !== undefined) stats.allSkillDamagePct = level * slot.allSkillDamagePerEnhancement;
+    if (slot.multiplicativeDamageEnhancementBonusPct !== undefined) {
+      stats.multiplicativeDamagePct = level + slot.multiplicativeDamageEnhancementBonusPct;
+    }
     groups[slot.wearSet].push({ sourceId: `innerwear:${slot.id}`, stats });
   }
   return { ...groups, lowerwearAlternativeEnabled };

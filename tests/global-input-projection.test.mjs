@@ -55,6 +55,49 @@ test('巨型魔力石新增選項會分別增加雙攻%與攻擊力等級', asyn
   }
 });
 
+test('內裝左四件強化 Lv.8 至 Lv.13 的四種效果正確套用', async () => {
+  const data = await loadData();
+  for (const [level, expectedDamagePct, expectedCritPct, expectedSkillDamagePct, expectedExtremizationPct] of [
+    [8, 10, 10, 40, 10],
+    [9, 11, 11, 45, 11],
+    [10, 12, 12, 50, 12],
+    [11, 13, 13, 55, 13],
+    [12, 14, 14, 60, 14],
+    [13, 15, 15, 65, 15],
+  ]) {
+    const values = {
+      'Weapon.ENHC': 'Lv.8',
+      'Left.Armor.Upper.ENHC': 'Lv.' + level,
+      'Left.Armor.Bottom.ENHC': 'Lv.' + level,
+      'Left.Armor.Gloves.ENHC': 'Lv.' + level,
+      'Left.Armor.Shoes.ENHC': 'Lv.' + level,
+      'Left.Armor.Upper.FORGE': 0,
+      'Left.Armor.Bottom.FORGE': 0,
+      'Left.Armor.Gloves.FORGE': 0,
+      'Left.Armor.Shoes.FORGE': 0,
+    };
+    const result = projectDamage(data, {
+      schemaVersion: 2, Job: 'KE', values, lowerwearAlternativeEnabled: false,
+    }).result;
+    const upper = result.generalMultiplicativeDamage.factors.find(effect => effect.sourceId === 'innerwear:upper');
+    const lowerwearCrit = result.combatRates.critRate.multipliers.find(effect => effect.sourceId === 'lowerwear-crit-rate-enhancement');
+    const gloveSkillDamage = result.attributes.stats.allSkillDamagePct.sharedSources.find(source => source.sourceId === 'innerwear:gloves');
+    const shoeExtremization = result.combatRates.extremization.multipliers.find(effect => effect.sourceId === 'shoes-extremization-enhancement');
+
+    assert.ok(upper, 'missing upper damage multiplier at Lv.' + level);
+    assert.equal(upper.valuePct, expectedDamagePct, 'upper damage bonus at Lv.' + level);
+    assert.equal(upper.factor, 1 + expectedDamagePct / 100, 'upper damage factor at Lv.' + level);
+    assert.ok(lowerwearCrit, 'missing lowerwear crit multiplier at Lv.' + level);
+    assert.equal(lowerwearCrit.valuePct, expectedCritPct, 'lowerwear crit bonus at Lv.' + level);
+    assert.equal(lowerwearCrit.factor, 1 + expectedCritPct / 100, 'lowerwear crit factor at Lv.' + level);
+    assert.ok(gloveSkillDamage, 'missing glove skill-damage source at Lv.' + level);
+    assert.equal(gloveSkillDamage.valuePct, expectedSkillDamagePct, 'glove skill damage at Lv.' + level);
+    assert.ok(shoeExtremization, 'missing shoe extremization multiplier at Lv.' + level);
+    assert.equal(shoeExtremization.valuePct, expectedExtremizationPct, 'shoe extremization bonus at Lv.' + level);
+    assert.equal(shoeExtremization.factor, 1 + expectedExtremizationPct / 100, 'shoe extremization factor at Lv.' + level);
+  }
+});
+
 test('JSON 選擇的全域來源進入角色彙總與 B163 傷害流程', async () => {
   const data = await loadData();
   const baseValues = { "Weapon.ENHC": 'Lv.8', "Left.Armor.Upper.ENHC": 'Lv.8', "Left.Armor.Bottom.ENHC": 'Lv.8', "Left.Armor.Gloves.ENHC": 'Lv.8', "Left.Armor.Shoes.ENHC": 'Lv.8', "Left.Armor.Upper.FORGE": 0, "Left.Armor.Bottom.FORGE": 0, "Left.Armor.Gloves.FORGE": 0, "Left.Armor.Shoes.FORGE": 0 };
@@ -73,8 +116,8 @@ test('JSON 選擇的全域來源進入角色彙總與 B163 傷害流程', async 
   const withoutBinaryEffects = projectDamage(data, { schemaVersion: 2, Job: 'KE', values: { ...values, "Effect.Emblem": '沒有', "Effect.PortraitAwakening": '沒有' }, lowerwearAlternativeEnabled: false }).result;
   const withoutSpiritRecords = projectDamage(data, { schemaVersion: 2, Job: 'KE', values: { ...values, "SpiritRecord.Class.1": '', "SpiritRecord.Class.2": '', "SpiritRecord.Class.3": '' }, lowerwearAlternativeEnabled: false }).result;
 
-  assert.equal(base.generalMultiplicativeDamage.value, 1.04);
-  assert.equal(withEffects.generalMultiplicativeDamage.value, 1.3);
+  assert.ok(Math.abs(base.generalMultiplicativeDamage.value - 1.144) < 1e-12);
+  assert.ok(Math.abs(withEffects.generalMultiplicativeDamage.value - 1.43) < 1e-12);
   assert.equal(withEffects.attributes.stats.superAdaptabilityPct.finalTotal - withoutBinaryEffects.attributes.stats.superAdaptabilityPct.finalTotal, 3);
   assert.equal(withEffects.attributes.stats.transcendenceSkillDamagePct.finalTotal - withoutBinaryEffects.attributes.stats.transcendenceSkillDamagePct.finalTotal, 5);
   assert.equal(withEffects.multiplicativeCritDamage.value, withoutBinaryEffects.multiplicativeCritDamage.value);
