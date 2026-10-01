@@ -9,10 +9,8 @@ import { createPicker, type PickerOption } from './picker.ts';
 import { icon } from './icons.ts';
 import { capOverflowPercentage } from './cap-warnings.ts';
 import { findValidationCatalog } from './sheet-validation.ts';
-import { initializeThemeToggle } from './theme.ts';
 
 async function start() {
-  initializeThemeToggle(document.querySelector<HTMLButtonElement>('#theme-toggle')!, document.documentElement);
   const data = await loadGameData();
   const sampleId = new URLSearchParams(location.search).get('sample');
   if (sampleId !== null && !/^[a-z0-9-]+$/.test(sampleId)) throw new RangeError('驗算範例名稱無效。');

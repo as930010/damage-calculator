@@ -36,7 +36,6 @@ jobs:
       - run: pnpm run test:field-ids
       - run: pnpm run test:data-loading
       - run: pnpm run test:sheet-validation
-      - run: pnpm run test:theme
       - run: pnpm run test:core
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

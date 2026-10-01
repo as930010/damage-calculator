@@ -9,7 +9,6 @@
     "test:field-ids": "node --test scripts/field-ids.test.mjs",
     "test:data-loading": "node --test scripts/game-data-bundle.test.mjs",
     "test:sheet-validation": "node --test scripts/sheet-validation.test.mjs",
-    "test:theme": "node --test scripts/theme.test.mjs",
     "test:core": "node --test tests/attack-calculation.test.mjs tests/cap-warnings.test.mjs tests/class-passive-validation.test.mjs tests/confirmed-corrections.test.mjs tests/global-input-projection.test.mjs tests/live-sheet-parity.test.mjs tests/right-ice-set-validation.test.mjs",
     "build": "node scripts/build.mjs",
     "preview": "node scripts/preview.mjs"
