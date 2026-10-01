@@ -158,3 +158,5 @@ footer{font-size:11px; color:#727d8d; text-align:center; padding:28px; border-to
 .conditional-damage-pair{display:contents} .conditional-damage-pair .conditional-stat{display:flex; align-items:center; gap:10px} .conditional-damage-pair .conditional-stat p{margin:0; color:var(--text-label); font-size:12px} .conditional-damage-pair .conditional-stat strong{margin-left:auto; font-size:16px; font-variant-numeric:tabular-nums; white-space:nowrap}
 
 .attribute-value-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px} .attribute-value-grid .field{min-width:0; margin:0; font-size:10px} .attribute-value-grid input{min-height:34px; padding:6px; font-size:10px}
+
+.field-disabled{opacity:.58} .field-disabled input:disabled{cursor:not-allowed}

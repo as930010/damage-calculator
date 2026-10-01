@@ -295,8 +295,8 @@ async function start() {
       `<p class="stat-source-row"><span>${h(label)}</span><strong>${fmt(total)}${isPercent ? '%' : ''}</strong></p>`,
     ).join('');
   };
-  const field = (parent: HTMLElement, label: string, cell: string, choices: readonly PickerOption[], redraw = false) => {
-    parent.append(createPicker(label, choices, val(cell), value => {
+  const field = (parent: HTMLElement, label: string, cell: string, choices: readonly PickerOption[], redraw = false, disabled = false) => {
+    const picker = createPicker(label, choices, val(cell), value => {
       state.values[cell] = value;
       if (data.accessoryEffects.groups.some(group => group.selectionCell === cell)) {
         const cleared = clearInvalidAccessoryAppraisals(state);
@@ -311,7 +311,15 @@ async function start() {
         renderInspector();
         document.querySelectorAll<HTMLDetailsElement>('#inspector details').forEach(node => { node.open = opened.includes(node.querySelector('summary')!.textContent); });
       }
-    }));
+    });
+    if (disabled) {
+      picker.classList.add('field-disabled');
+      picker.setAttribute('aria-disabled', 'true');
+      picker.title = '請先選擇屬性';
+      const input = picker.querySelector<HTMLInputElement>('input');
+      if (input) { input.disabled = true; input.placeholder = '請先選擇屬性'; }
+    }
+    parent.append(picker);
   };
   function renderRightIceSetSelectors() {
     const root = document.querySelector<HTMLElement>('#right-ice-set-selectors');
@@ -341,11 +349,12 @@ async function start() {
       root.append(warning);
     }
   }
-  const numeric = (parent: HTMLElement, label: string, cell: string, percentage = true, constraints?: { min: number; max: number; step: number }) => {
+  const numeric = (parent: HTMLElement, label: string, cell: string, percentage = true, constraints?: { min: number; max: number; step: number }, disabled = false) => {
     const wrapper = document.createElement('label'); wrapper.className = 'field'; wrapper.textContent = label;
-    const input = document.createElement('input'); input.type = 'number'; input.step = 'any'; input.placeholder = '請填寫數值';
+    const input = document.createElement('input'); input.type = 'number'; input.step = 'any'; input.placeholder = disabled ? '請先選擇屬性' : '請填寫數值';
     if (constraints) { input.min = String(constraints.min); input.max = String(constraints.max); input.step = String(constraints.step); }
     input.value = val(cell) === '' ? '' : String(Number(val(cell)) * (percentage ? 100 : 1));
+    if (disabled) { input.disabled = true; wrapper.classList.add('field-disabled'); wrapper.setAttribute('aria-disabled', 'true'); wrapper.title = '請先選擇屬性'; }
     input.addEventListener('input', () => { if (!input.validity.valid) return; state.values[cell] = input.value === '' ? '' : Number(input.value) / (percentage ? 100 : 1); update(); });
     wrapper.append(input); parent.append(wrapper);
   };
@@ -499,8 +508,8 @@ async function start() {
     if (slot.stoneCells && slot.stoneCategory) {
       const [attributeCell, valueCell] = slot.stoneCells;
       const stoneGrid = attributeValueGrid(stone);
-      field(stoneGrid, '精靈石屬性', attributeCell, options(data.masterBeast.customAttributeOptions[slot.stoneCategory]));
-      field(stoneGrid, '精靈石數值（%）', valueCell, validationChoices(valueCell, true));
+      field(stoneGrid, '精靈石屬性', attributeCell, options(data.masterBeast.customAttributeOptions[slot.stoneCategory]), true);
+      field(stoneGrid, '精靈石數值（%）', valueCell, validationChoices(valueCell, true), false, val(attributeCell) === '');
     } else {
       stone.insertAdjacentHTML('beforeend', `<p class="panel-note beast-mapping-note">盔甲精靈石的個別屬性不影響傷害，無需設定。精靈石套裝增幅 ${fmt(data.masterBeast.armorSpiritStoneSetEffect.multiplicativeDamagePct)}% 已預設套用。</p>`);
     }
@@ -597,14 +606,14 @@ async function start() {
       const circuit = data.circuits.inputs.find(slot => slot.slot === selected.innerwearId)!;
       const board = section(panel, '電路板');
       const boardGrid = attributeValueGrid(board);
-      field(boardGrid, '電路板項目', circuit.attributeCell, options(circuit.attributeOptions));
-      numeric(boardGrid, '電路板數值（%）', circuit.valueCell);
+      field(boardGrid, '電路板項目', circuit.attributeCell, options(circuit.attributeOptions), true);
+      numeric(boardGrid, '電路板數值（%）', circuit.valueCell, true, undefined, val(circuit.attributeCell) === '');
       const chip = data.chipSlots.slots.find(slot => slot.id === selected.innerwearId)!;
       const chipArea = section(panel, '芯片與芯片調校');
       const chipGrid = attributeValueGrid(chipArea);
       field(chipGrid, '芯片屬性', chip.attributeCell, options(data.chips.chips.map(entry => entry.name)), true);
       const chosen = data.chips.chips.find(entry => entry.name === val(chip.attributeCell));
-      field(chipGrid, '芯片調校等級', chip.tuningCell, options(chosen?.tuningLevels.map(level => level.level) ?? []));
+      field(chipGrid, '芯片調校等級', chip.tuningCell, options(chosen?.tuningLevels.map(level => level.level) ?? []), false, val(chip.attributeCell) === '');
     }
     if (selected.weapon) {
       const appraisal = section(panel, '武器鑑定'); Object.values(data.weaponAppraisals.groups).forEach((group, i) => field(appraisal, `鑑定 ${i + 1}`, group.selectorCell, group.options.map(option => ({ value: option.name, label: option.name }))));
