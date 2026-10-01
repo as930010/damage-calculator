@@ -35,6 +35,8 @@
       "active": true,
       "dataUpdatedAt": "2026-09-25",
       "stats": {
+        "physicalAttack": 25.0,
+        "magicalAttack": 25.0,
         "critRatePct": 3.0,
         "polarizationPct": 3.0
       },
