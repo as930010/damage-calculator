@@ -51,7 +51,7 @@ footer{font-size:11px; color:#727d8d; text-align:center; padding:28px; border-to
 .canvas-title-input{position:absolute; left:19%; top:15%; transform:translateY(-50%); z-index:8; width:min(22%,150px); padding:8px 9px; border:1px solid #424b5b; border-radius:9px; background:#1d222bdc; backdrop-filter:blur(6px)} .canvas-title-input .field{margin:0; gap:5px; font-size:10px; color:#cad2df} .canvas-title-input input{min-height:34px; padding:7px 8px; font-size:11px}
 .canvas-title-input .picker-list{z-index:40} .beast-accessories-grid{display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:12px; align-items:start; padding:0 18px 20px} .beast-accessory-card{min-width:0; padding:14px 12px; border:1px solid var(--border-strong); border-radius:10px; background:var(--surface)} .beast-accessory-card h3{margin:0 0 14px; color:var(--text-strong); font-size:13px}
 .beast-accessory-controls .field{min-width:0; margin-bottom:12px; font-size:11px} .beast-accessory-controls .field input{min-height:38px; padding:9px; font-size:11px} .beast-accessory-controls .picker-list{z-index:30} .beast-mirror-details{border-top:1px solid var(--border-strong); padding-top:10px} .beast-mirror-details>summary{margin-bottom:12px; color:var(--text-muted); cursor:pointer; font-size:11px}
-.beast-mirror-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; max-height:480px; overflow-y:auto; padding-right:4px} .beast-mirror-grid .field{min-width:0; margin:0; font-size:10px} .beast-mirror-grid input{min-height:34px; padding:6px; font-size:10px}
+.beast-mirror-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; max-height:480px; overflow-y:auto; padding-right:4px} .beast-mirror-grid .field{min-width:0; margin:0; font-size:12px} .beast-mirror-grid input{min-height:34px; padding:6px; font-size:12px}
 @media(max-width:1100px) {
   .beast-accessories-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
@@ -61,8 +61,8 @@ footer{font-size:11px; color:#727d8d; text-align:center; padding:28px; border-to
 @media(max-width:480px) {
   .beast-accessories-grid{grid-template-columns:1fr} .beast-mirror-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
-.canvas-title-input{left:calc(19% - 27.5px)} .beast-accessories-area{margin-top:14px; border-top:1px solid var(--border)} .beast-accessories-heading{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px 22px 12px} .beast-accessories-heading h3{margin:0; color:var(--text-heading); font-size:14px} .beast-accessories-heading span{font-size:11px; color:var(--text-soft)}
-.right-ice-set-area{border-top:1px solid var(--border); padding:8px 0 4px} .right-ice-set-selectors{display:grid; grid-template-columns:repeat(3,minmax(160px,1fr)); gap:14px; padding:0 22px 12px} .right-ice-set-selectors .field{margin:0} .right-ice-selection-warning{grid-column:1/-1; margin:0; padding:8px 0} .right-ice-set-area>.panel-note,.beast-accessories-area>.panel-note{padding-top:0}
+.canvas-title-input{left:calc(19% - 27.5px)} .beast-accessories-area{margin-top:14px; border-top:1px solid var(--border)} .beast-accessories-heading{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 22px 8px} .beast-accessories-heading h3{margin:0; color:var(--text-heading); font-size:14px} .beast-accessories-heading span{font-size:11px; color:var(--text-soft)}
+.right-ice-set-area{border-top:1px solid var(--border); padding:8px 0 4px} .right-ice-set-selectors{display:grid; grid-template-columns:repeat(3,minmax(160px,1fr)); gap:14px; padding:0 22px 12px} .right-ice-set-selectors .field{margin:0} .right-ice-selection-warning{grid-column:1/-1; margin:0; padding:8px 0} .right-ice-set-area>.panel-note,.beast-accessories-area>.panel-note{padding-top:0; padding-bottom:8px}
 @media(max-width:600px) {
   .right-ice-set-selectors{grid-template-columns:1fr; padding:0 17px 12px}
 }
@@ -88,7 +88,6 @@ footer{font-size:11px; color:#727d8d; text-align:center; padding:28px; border-to
   .damage-comparison{padding:0 14px 14px} .damage-comparison-note{margin:0 14px 14px}
 }
 .master-beast-color-selector{padding:0 22px 14px; max-width:360px} .master-beast-color-selector .field{margin:0} .master-beast-controls{padding:0 22px 14px} .master-beast-control-inputs{display:grid; grid-template-columns:repeat(2,minmax(180px,1fr)); gap:12px 16px; max-width:740px} .master-beast-control-inputs .field{margin:0}
-.master-beast-source-notes{margin-top:10px; padding:12px 14px; border:1px solid var(--border); border-radius:9px; background:var(--surface); color:var(--text-muted); font-size:12px; line-height:1.6} .master-beast-source-notes p{margin:0 0 4px} .master-beast-source-notes p:last-child{margin-bottom:0} .master-beast-source-notes strong{color:#d8dfeb}
 @media(max-width:560px) {
   .master-beast-control-inputs{grid-template-columns:1fr}
 }
@@ -101,7 +100,7 @@ footer{font-size:11px; color:#727d8d; text-align:center; padding:28px; border-to
   .combat-rate-pair{grid-column:span 1; grid-template-columns:1fr} .conditional-damage-pair{grid-column:span 1; grid-template-columns:1fr} .damage-ratio{padding:0 14px 14px}
 }
 #transfer-status{color:var(--text-status); font-size:12px} #export-loadout,#import-loadout{font-size:13px}
-.weapon-magic-stone-panel{margin-top:20px; border:1px solid var(--border); border-radius:12px; background:var(--panel-alt)} .weapon-magic-stone-panel>.panel-heading{padding:17px 20px} .weapon-magic-stone-grid{display:grid; grid-template-columns:repeat(4,minmax(150px,1fr)); gap:12px 15px; padding:16px 20px} .weapon-magic-stone-grid .field{margin:0}
+.weapon-magic-stone-grid{display:grid; grid-template-columns:repeat(4,minmax(150px,1fr)); gap:12px 15px; padding:16px 20px} .weapon-magic-stone-grid .field{margin:0}
 .weapon-magic-stone-colors{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; padding:0 20px 20px} .weapon-magic-stone-color{min-width:0; padding:14px; border:1px solid var(--border); border-radius:9px; background:var(--panel)} .weapon-magic-stone-color h3{margin:0 0 12px; color:var(--text-heading); font-size:13px} .weapon-magic-stone-slots{display:grid; grid-template-columns:1fr; gap:8px}
 .weapon-magic-stone-slots .field{display:grid; grid-template-columns:26px minmax(0,1fr); align-items:center; gap:8px; margin:0} .weapon-magic-stone-slots .field>label{margin:0; color:var(--text-muted); font-size:11px} .weapon-magic-stone-slots .picker-control input{min-height:35px; padding:7px 30px 7px 9px; font-size:12px}
 @media(max-width:1000px) {
@@ -121,7 +120,7 @@ footer{font-size:11px; color:#727d8d; text-align:center; padding:28px; border-to
 @media(max-width:600px) {
   .developer-info{flex:1; min-width:0; white-space:normal; overflow-wrap:anywhere; margin-right:8px}
 }
-.beast-label{left:var(--beast-accessory-center-x); top:25%; color:#c095ee} .gear-beast-slots{position:absolute; inset:0; z-index:4; display:block; padding:0; pointer-events:none} .gear-beast-slots .beast-accessory-slot{position:absolute; width:55px; height:59px; transform:translate(-50%,-50%); pointer-events:auto} .gear-beast-slots .beast-accessory-slot-headwear{left:var(--beast-accessory-center-x); top:35%} .gear-beast-slots .beast-accessory-slot-armor{left:var(--beast-accessory-center-x); top:46%} .gear-beast-slots .beast-accessory-slot-necklace{left:var(--beast-accessory-center-x); top:57%} .gear-beast-slots .beast-accessory-slot-ring-one{left:var(--beast-ring-one-x); top:68%} .gear-beast-slots .beast-accessory-slot-ring-two{left:var(--beast-ring-two-x); top:68%} .left-label{top:22%} .inner-label{left:18%} .beast-label{left:var(--beast-accessory-center-x)}
+.beast-label{left:var(--beast-accessory-center-x); top:25%; color:#c095ee} .gear-beast-slots{position:absolute; inset:0; z-index:4; display:block; padding:0; pointer-events:none} .gear-beast-slots .beast-accessory-slot{position:absolute; width:55px; height:59px; transform:translate(-50%,-50%); pointer-events:auto} .gear-beast-slots .beast-accessory-slot-headwear{left:var(--beast-accessory-center-x); top:35%} .gear-beast-slots .beast-accessory-slot-armor{left:var(--beast-accessory-center-x); top:46%} .gear-beast-slots .beast-accessory-slot-necklace{left:var(--beast-accessory-center-x); top:57%} .gear-beast-slots .beast-accessory-slot-ring-one{left:calc(var(--beast-ring-one-x) - 1px); top:68%} .gear-beast-slots .beast-accessory-slot-ring-two{left:var(--beast-ring-two-x); top:68%} .left-label{top:22%} .inner-label{left:calc(18% - 1px)} .beast-label{left:var(--beast-accessory-center-x)}
 /* UX polish preview: strengthen hierarchy and make dense controls easier to scan. */
 :root{--space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-5:24px} body{font-size:15px; line-height:1.55} .topbar{height:auto; min-height:68px; padding-block:10px} .developer-info{font-size:12px; line-height:1.45; gap:3px} .brand small{font-size:11px} .top-meta{font-size:12px} .panel-heading{padding:18px 22px} .panel-heading>span,.beast-accessories-heading span{font-size:12px}
 .panel-note{font-size:13px; line-height:1.6; padding:15px 22px} .inspector .panel-note{font-size:12px} .group-label{font-size:12px; letter-spacing:.04em} .gear-slot span,.beast-accessory-slot span{font-size:11px} .field{font-size:13px; line-height:1.45} .field input{min-height:44px; font-size:14px; padding:11px 13px} .picker-list button{font-size:14px} .picker-list small{font-size:12px}
@@ -136,9 +135,9 @@ footer{font-size:11px; color:#727d8d; text-align:center; padding:28px; border-to
   .toolbar #baseline{margin-left:auto} .toolbar .transfer-actions{flex-basis:100%; justify-content:flex-end; margin-left:0}
 }
 @media(max-width:600px) {
-  .gear-beast-slots .beast-accessory-slot{width:60px; height:60px} /* Beast slots are 5px wider than regular gear slots on phones; preserve the ring pair edge gap. */ .gear-beast-slots .beast-accessory-slot-ring-one{left:calc(var(--beast-ring-one-x) - 5px)}
+  .gear-beast-slots .beast-accessory-slot{width:60px; height:60px} /* Beast slots are 5px wider than regular gear slots on phones; preserve the ring pair edge gap. */ .gear-beast-slots .beast-accessory-slot-ring-one{left:calc(var(--beast-ring-one-x) - 6px)}
 }
-.toolbar-actions{display:contents} .inspector-close,.inspector-backdrop{display:none}
+.gear-slot[data-slot-id="inner-lowerwearAlternative"]{transform:translate(calc(-50% + 1px),-50%)} .toolbar-actions{display:contents} .inspector-close,.inspector-backdrop{display:none}
 @media(max-width:700px) {
   .workbench{padding-bottom:calc(96px + env(safe-area-inset-bottom))} .toolbar-actions{position:fixed; inset:auto 0 0; z-index:130; display:flex; align-items:center; gap:8px; padding:10px 12px calc(10px + env(safe-area-inset-bottom)); border-top:1px solid var(--border-strong); background:color-mix(in srgb,var(--panel) 94%,transparent); box-shadow:0 -8px 24px #0005; backdrop-filter:blur(12px)}
   .toolbar #baseline{flex:1; min-width:0; margin-left:0; padding-inline:8px; min-height:44px; white-space:nowrap; font-size:12px} .toolbar .transfer-actions{display:flex; flex:1.5; flex-basis:auto; min-width:0; margin-left:0; gap:8px} .toolbar .transfer-actions button{flex:1; min-width:0; min-height:44px; padding-inline:6px; white-space:nowrap; font-size:12px} #inspector{display:none}
@@ -157,6 +156,10 @@ footer{font-size:11px; color:#727d8d; text-align:center; padding:28px; border-to
 }
 .conditional-damage-pair{display:contents} .conditional-damage-pair .conditional-stat{display:flex; align-items:center; gap:10px} .conditional-damage-pair .conditional-stat p{margin:0; color:var(--text-label); font-size:12px} .conditional-damage-pair .conditional-stat strong{margin-left:auto; font-size:16px; font-variant-numeric:tabular-nums; white-space:nowrap}
 
-.attribute-value-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px} .attribute-value-grid .field{min-width:0; margin:0; font-size:10px} .attribute-value-grid input{min-height:34px; padding:6px; font-size:10px}
+.attribute-value-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px} .attribute-value-grid .field{min-width:0; margin:0; font-size:12px} .attribute-value-grid input{min-height:34px; padding:6px; font-size:12px}
 
 .field-disabled{opacity:.58} .field-disabled input:disabled{cursor:not-allowed}
+
+
+
+.beast-mirror-grid{max-height:none; overflow:visible} .beast-mirror-grid .picker-list{max-height:min(420px,calc(100dvh - 96px))}
