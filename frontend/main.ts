@@ -447,6 +447,18 @@ async function start() {
   }
   function renderBeastAccessories() {
     const root = document.querySelector<HTMLElement>('#beast-accessory-fields')!;
+    const rightIceEarring = data.layout.slots.find(slot => slot.selectionCell === 'Right.Ice.Earring');
+    const rightIceNecklace = data.layout.slots.find(slot => slot.selectionCell === 'Right.Ice.Necklace');
+    if (rightIceEarring && rightIceNecklace) {
+      const columnStep = rightIceNecklace.x - rightIceEarring.x;
+      const ringOneX = rightIceEarring.x - columnStep * 2;
+      const ringTwoX = rightIceEarring.x - columnStep;
+      const beastCenterX = (ringOneX + ringTwoX) / 2;
+      const canvas = root.closest<HTMLElement>('.equipment-canvas')!;
+      canvas.style.setProperty('--beast-accessory-center-x', `${beastCenterX}%`);
+      canvas.style.setProperty('--beast-ring-one-x', `${ringOneX}%`);
+      canvas.style.setProperty('--beast-ring-two-x', `${ringTwoX}%`);
+    }
     root.replaceChildren();
     for (const slot of beastAccessorySlots) {
       const button = document.createElement('button'); button.type = 'button'; button.className = `beast-accessory-slot beast-accessory-slot-${slot.id}`; button.dataset.beastSlotId = slot.id;
