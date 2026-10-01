@@ -449,15 +449,17 @@ async function start() {
     const root = document.querySelector<HTMLElement>('#beast-accessory-fields')!;
     const rightIceEarring = data.layout.slots.find(slot => slot.selectionCell === 'Right.Ice.Earring');
     const rightIceNecklace = data.layout.slots.find(slot => slot.selectionCell === 'Right.Ice.Necklace');
-    if (rightIceEarring && rightIceNecklace) {
-      const columnStep = rightIceNecklace.x - rightIceEarring.x;
-      const ringOneX = rightIceEarring.x - columnStep * 2;
-      const ringTwoX = rightIceEarring.x - columnStep;
-      const beastCenterX = (ringOneX + ringTwoX) / 2;
+    const accessoryRingOne = data.layout.slots.find(slot => slot.selectionCell === 'Accessory.Ring1');
+    const accessoryRingTwo = data.layout.slots.find(slot => slot.selectionCell === 'Accessory.Ring2');
+    if (rightIceEarring && rightIceNecklace && accessoryRingOne && accessoryRingTwo) {
+      const rightIceColumnStep = rightIceNecklace.x - rightIceEarring.x;
+      const beastCenterX = rightIceEarring.x - rightIceColumnStep * 1.5;
+      const beastRingStep = accessoryRingTwo.x - accessoryRingOne.x;
+      const ringOneX = beastCenterX - beastRingStep;
       const canvas = root.closest<HTMLElement>('.equipment-canvas')!;
       canvas.style.setProperty('--beast-accessory-center-x', `${beastCenterX}%`);
       canvas.style.setProperty('--beast-ring-one-x', `${ringOneX}%`);
-      canvas.style.setProperty('--beast-ring-two-x', `${ringTwoX}%`);
+      canvas.style.setProperty('--beast-ring-two-x', `${beastCenterX}%`);
     }
     root.replaceChildren();
     for (const slot of beastAccessorySlots) {
