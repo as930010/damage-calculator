@@ -353,6 +353,11 @@ async function start() {
     const details = document.createElement('details'); details.className = 'editor-section'; details.open = open;
     const title = document.createElement('summary'); title.textContent = label; details.append(title); parent.append(details); return details;
   };
+  const attributeValueGrid = (parent: HTMLElement, extraClass = '') => {
+    const grid = document.createElement('div'); grid.className = extraClass ? 'attribute-value-grid ' + extraClass : 'attribute-value-grid';
+    parent.append(grid);
+    return grid;
+  };
   function renderGlobalInputs() {
     const root = document.querySelector<HTMLElement>('#global-source-fields')!;
     root.replaceChildren();
@@ -493,15 +498,16 @@ async function start() {
     const stone = section(panel, '精靈石', true);
     if (slot.stoneCells && slot.stoneCategory) {
       const [attributeCell, valueCell] = slot.stoneCells;
-      field(stone, '精靈石屬性', attributeCell, options(data.masterBeast.customAttributeOptions[slot.stoneCategory]));
-      field(stone, '精靈石數值（%）', valueCell, validationChoices(valueCell, true));
+      const stoneGrid = attributeValueGrid(stone);
+      field(stoneGrid, '精靈石屬性', attributeCell, options(data.masterBeast.customAttributeOptions[slot.stoneCategory]));
+      field(stoneGrid, '精靈石數值（%）', valueCell, validationChoices(valueCell, true));
     } else {
       stone.insertAdjacentHTML('beforeend', `<p class="panel-note beast-mapping-note">盔甲精靈石的個別屬性不影響傷害，無需設定。精靈石套裝增幅 ${fmt(data.masterBeast.armorSpiritStoneSetEffect.multiplicativeDamagePct)}% 已預設套用。</p>`);
     }
 
     const mirrorArea = section(panel, '迷鏡效果', true);
     mirrorArea.classList.add('beast-mirror-section');
-    const mirrorGrid = document.createElement('div'); mirrorGrid.className = 'beast-mirror-grid'; mirrorArea.append(mirrorGrid);
+    const mirrorGrid = attributeValueGrid(mirrorArea, 'beast-mirror-grid');
     slot.mirrorCells.forEach(([attributeCell, valueCell], index) => {
       field(mirrorGrid, `迷鏡效果 ${index + 1} 屬性`, attributeCell, options(data.masterBeast.customAttributeOptions.mirror), true);
       const valueRule = data.masterBeast.mirrorValueRules.byAttribute[val(attributeCell)] ?? data.masterBeast.mirrorValueRules.default;
@@ -589,12 +595,16 @@ async function start() {
       const appraisal = data.appraisals.slots.find(slot => slot.id === selected.innerwearId)!;
       const area = section(panel, '鑑定'); appraisal.inputCells.forEach((cell, i) => field(area, `鑑定 ${i + 1}`, cell, data.appraisals.options.map(option => ({ value: option.name, label: option.name }))));
       const circuit = data.circuits.inputs.find(slot => slot.slot === selected.innerwearId)!;
-      const board = section(panel, '電路板'); field(board, '電路板項目', circuit.attributeCell, options(circuit.attributeOptions)); numeric(board, '電路板數值（%）', circuit.valueCell);
+      const board = section(panel, '電路板');
+      const boardGrid = attributeValueGrid(board);
+      field(boardGrid, '電路板項目', circuit.attributeCell, options(circuit.attributeOptions));
+      numeric(boardGrid, '電路板數值（%）', circuit.valueCell);
       const chip = data.chipSlots.slots.find(slot => slot.id === selected.innerwearId)!;
       const chipArea = section(panel, '芯片與芯片調校');
-      field(chipArea, '芯片屬性', chip.attributeCell, options(data.chips.chips.map(entry => entry.name)), true);
+      const chipGrid = attributeValueGrid(chipArea);
+      field(chipGrid, '芯片屬性', chip.attributeCell, options(data.chips.chips.map(entry => entry.name)), true);
       const chosen = data.chips.chips.find(entry => entry.name === val(chip.attributeCell));
-      field(chipArea, '芯片調校等級', chip.tuningCell, options(chosen?.tuningLevels.map(level => level.level) ?? []));
+      field(chipGrid, '芯片調校等級', chip.tuningCell, options(chosen?.tuningLevels.map(level => level.level) ?? []));
     }
     if (selected.weapon) {
       const appraisal = section(panel, '武器鑑定'); Object.values(data.weaponAppraisals.groups).forEach((group, i) => field(appraisal, `鑑定 ${i + 1}`, group.selectorCell, group.options.map(option => ({ value: option.name, label: option.name }))));
