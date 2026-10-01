@@ -309,6 +309,8 @@ test('mixed Nephron and Billion keep shared innerwear bonuses, set effects, circ
   const projection = projectAttributes(data, state);
   const shared = projection.calculationSources.shared;
   assert.deepEqual(shared.find(entry => entry.sourceId === 'sheet:計算機!Q37').stats, { adaptabilityPct: 2 });
+  assert.equal(shared.find(entry => entry.sourceId === 'innerwear:upper').stats.adaptabilityPct, 4);
+  assert.equal(shared.find(entry => entry.sourceId === 'innerwear:gloves').stats.adaptabilityPct, 2);
   assert.deepEqual(shared.find(entry => entry.sourceId === 'sheet:計算機!T101').stats, { multiplicativeCritDamagePct: 10 });
   assert.deepEqual(shared.find(entry => entry.sourceId === 'color-set:紅').stats, { multiplicativeDamagePct: 20 });
   assert.deepEqual(shared.find(entry => entry.sourceId === 'circuit-board:upper').stats, { bleedDamagePct: 1 });

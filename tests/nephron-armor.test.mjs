@@ -30,9 +30,9 @@ test('Nephron forge attack table and cumulative milestone bonuses match the supp
     const groups = resolveInnerwearSources(innerwear, attack, 'KE', values, false);
     const source = groups.shared.find(entry => entry.sourceId === 'innerwear:upper');
     assert.ok(source, `forge ${forge}: upper source missing`);
-    const expectedStats = { bossDamagePct: 5, superAdaptabilityPct: 2, ...expected };
+    const expectedStats = { ...expected, bossDamagePct: 5, superAdaptabilityPct: expected.superAdaptabilityPct ?? 2, adaptabilityPct: 2 + (expected.adaptabilityPct ?? 0) };
     for (const [key, value] of Object.entries(expectedStats)) assert.equal(source.stats[key], value, `forge ${forge}: ${key}`);
-    for (const key of ['critDamagePct','transcendenceSkillDamagePct','doubleAttackPct','adaptabilityPct']) {
+    for (const key of ['critDamagePct','transcendenceSkillDamagePct','doubleAttackPct']) {
       if (!(key in expected)) assert.equal(source.stats[key] ?? 0, 0, `forge ${forge}: unexpected ${key}`);
     }
   }
@@ -186,4 +186,20 @@ test('duplicate magazines compare normalized levels, including numeric aliases',
     { slotId: 'upper', enhancement: 'Lv.10', transformations: [{},{},{}], magazine: '戰鬥彈匣Type - I', magazineLevel: 'Lv.1' },
     { slotId: 'gloves', enhancement: 'Lv.10', transformations: [{},{},{}], magazine: '戰鬥彈匣Type - I', magazineLevel: 1 },
   ]), /不可重複/);
+});
+
+
+test('Nephron armor intrinsic adaptability +2 applies to every slot and supported enhancement level', () => {
+  for (const slot of innerwear.slots) {
+    for (let level = 8; level <= 13; level += 1) {
+      const groups = resolveInnerwearSources(innerwear, attack, 'KE', {
+        [slot.typeCell]: '內布隆',
+        [slot.enhancementCell]: 'Lv.' + level,
+        [slot.forgingCell]: 0,
+      }, true);
+      const source = [...groups.shared, ...groups.lowerwearA, ...groups.lowerwearB]
+        .find(entry => entry.sourceId === 'innerwear:' + slot.id);
+      assert.equal(source.stats.adaptabilityPct, 2, slot.id + ' Lv.' + level);
+    }
+  }
 });

@@ -158,6 +158,9 @@
     "value": 2
   },
   "nephron": {
+    "baseStats": {
+      "adaptabilityPct": 2
+    },
     "forgingAttack": {
       "0": 0,
       "1": 119,

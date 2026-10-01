@@ -30,6 +30,7 @@ export interface InnerwearRulesDocument {
   }[];
   extraAdaptability: { forgingEquals: number; value: number };
   nephron: {
+    baseStats: Readonly<Record<string, number>>;
     forgingAttack: Readonly<Record<string, number>>;
     enhancementStats: Readonly<Record<string, Readonly<Record<string, number>>>>;
     forgingMilestones: readonly { minimum: number; stats: Readonly<Record<string, number>> }[];
@@ -71,6 +72,7 @@ export function resolveInnerwearSources(
       + slot.attackFraction * (0.15 * coefficient - 0.0225 * rules.baselineCoefficient)
       * (rules.baseLevel + rules.itemLevelBonus) + 0.5;
     const stats: Record<string, number> = {
+      ...(nephron ? rules.nephron.baseStats : {}),
       ...enhanceStats,
       [slot.attackType === "physical" ? "physicalAttack" : "magicalAttack"]: Math.floor(raw) * factor + forgeAttack,
     };
