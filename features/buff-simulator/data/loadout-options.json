@@ -46,16 +46,17 @@
   },
   {
     "id": "steel-wall-defense-break",
-    "label": "鋼鐵城牆（破防）",
+    "label": "鋼鐵城牆",
     "scope": "per-team",
     "defaultSelected": true,
     "sourceSummaryCells": { "single": "單隊用表!I9", "challengeFirstTeam": "挑戰(雙隊)模式用表!I8", "challengeSecondTeam": "挑戰(雙隊)模式用表!I15" },
     "sourceRange": "單隊用表!D75；挑戰(雙隊)模式用表!D84:D86",
-    "effects": { "defenseBreak": { "kind": "fixed", "value": 0.48 } }
+    "effects": { "defenseBreak": { "kind": "fixed", "value": 0.48 }, "resistanceReduction": { "kind": "fixed", "value": 150 } },
+    "note": "另包含可選的 19-4 稱號 150 點降抗，與鋼鐵城牆勾選狀態連動。"
   },
   {
     "id": "wind-ball-defense-break",
-    "label": "風球（破防）",
+    "label": "風球",
     "scope": "per-team",
     "defaultSelected": true,
     "sourceSummaryCells": { "single": "單隊用表!Q9", "challengeFirstTeam": "挑戰(雙隊)模式用表!Q8", "challengeSecondTeam": "挑戰(雙隊)模式用表!Q15" },
@@ -80,8 +81,8 @@
     "presentation": "background",
     "sourceSummaryCells": { "single": "單隊用表!M9", "challengeFirstTeam": "挑戰(雙隊)模式用表!M8", "challengeSecondTeam": "挑戰(雙隊)模式用表!M15" },
     "sourceRange": "單隊用表!D77:E77；挑戰(雙隊)模式用表!D88:E90",
-    "effects": { "resistanceReduction": { "kind": "fixed", "value": 250 } },
-    "note": "兩個工作表降抗欄（150+100）由同一個摘要狀態觸發；作為常見背景來源預設納入。"
+    "effects": { "resistanceReduction": { "kind": "fixed", "value": 100 } },
+    "note": "暗鬼徽章提供 100 點降抗；冰晶露另提供 150 點，兩者皆預設納入。"
   },
   {
     "id": "ice-crystal-resistance",
