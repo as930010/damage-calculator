@@ -62,7 +62,8 @@
       "id": "location-2",
       "name": "小屋",
       "stats": {
-        "critRatePct": 5
+        "critRatePct": 5,
+        "extremizationPct": 5
       },
       "source": {
         "sheet": "係數區",
@@ -74,6 +75,7 @@
       "name": "強化小屋",
       "stats": {
         "critRatePct": 5,
+        "extremizationPct": 5,
         "bossDamagePct": 2
       },
       "source": {

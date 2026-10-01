@@ -137,8 +137,11 @@ export function calculateAttack(
   });
   const c53 = weaponBase.physicalAttack;
   const d53 = weaponBase.magicalAttack;
-  // Both B157/B158 branches reference D53 in the current Google Sheets formula.
-  const selectedAttackCoefficient = d53;
+  // The attack range follows the active attack type: physical uses C53 and
+  // magical uses D53. Using D53 for physical classes understates the upper
+  // bound (and overstates the lower bound) for classes with a stronger
+  // physical coefficient.
+  const selectedAttackCoefficient = input.attackType === "physical" ? c53 : d53;
 
   const attackPower = floorMath(
     selectedAttack * doubleAttackFactor * skillTypeAttackFactor,
