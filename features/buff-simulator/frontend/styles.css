@@ -1079,10 +1079,10 @@ details:not(.skill-reference)[open] > summary::before { transform: rotate(45deg)
 /* Mirror the current Damage Calculator header geometry and typography. */
 .topbar {
   position: relative;
-  width: calc(100% + 2 * clamp(18px, 4vw, 56px));
+  width: 100vw;
   height: auto;
   min-height: 87px;
-  margin: 0 0 0 calc(-1 * clamp(18px, 4vw, 56px));
+  margin: 0 0 0 calc(50% - 50vw);
   padding: 12px clamp(18px, 4vw, 58px);
   border: 0;
   border-bottom: 1px solid rgb(120 145 180 / 18%);
