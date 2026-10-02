@@ -137,3 +137,41 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
   .topbar>.top-meta{grid-column:1; grid-row:3; justify-self:end; align-self:start; margin:0}
   .canvas-title-input{left:110px; width:190px}
 }
+
+/* Keep credits and release notes available without adding visual weight to the main workflow. */
+.site-credits-notes{width:min(calc(100% - clamp(32px,6.8vw,96px)),1344px);max-width:1344px;margin:0 auto 4px;border:1px solid rgb(119 139 165 / 16%);border-radius:12px;background:rgb(23 29 38 / 52%);color:var(--text-soft)}
+.site-credits-notes>summary{display:flex;align-items:center;gap:8px;min-height:42px;padding:10px 16px;color:#9eafc4;font-size:12px;font-weight:600;cursor:pointer;list-style:none}
+.site-credits-notes>summary::-webkit-details-marker{display:none}
+.site-credits-notes>summary::before{content:"＋";color:#8093ad;font-size:13px}
+.site-credits-notes[open]>summary::before{content:"−"}
+.site-credits-content{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;padding:15px 17px 18px;border-top:1px solid rgb(119 139 165 / 16%)}
+.site-credits-block h2{margin:0 0 10px;color:var(--text-muted);font-size:12px;font-weight:650}
+.site-credits-block{min-width:0;text-align:center}
+.site-credits-block:first-child h2{text-align:center}
+.site-credits-block:first-child .site-thanks-list,.site-credits-block:first-child .site-thanks-note{text-align:left}
+.site-credits-block:first-child{padding-right:24px}
+.site-credits-block+.site-credits-block{padding-left:24px;border-left:1px solid rgb(119 139 165 / 22%)}
+.site-credits-block p{color:#93a1b4;font-size:11px;line-height:1.7}
+.site-credits-block p+p{margin-top:5px}
+.site-thanks-list{display:grid;gap:6px;margin:0;padding:0;list-style:none}
+.site-thanks-list li{display:flex;justify-content:flex-start;flex-wrap:wrap;gap:2px 7px;align-items:baseline;text-align:left;color:#93a1b4;font-size:11px;line-height:1.65}
+.site-thanks-list strong{color:#c6d4e8;font-weight:650}
+.site-credits-block .site-thanks-note{margin-top:9px;color:#8d9caf;font-size:10px;line-height:1.65}
+.site-release-list{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.site-release-list li{display:grid;grid-template-columns:1fr;gap:3px;align-items:start;text-align:center;color:#95a4b8;font-size:11px;line-height:1.6}.site-release-list li>div{display:flex;justify-content:center;flex-wrap:wrap;gap:3px 8px;align-items:baseline;min-width:0;text-align:left}
+.site-release-list time{color:#8191a8;font-size:10px;white-space:nowrap;text-align:center}
+.site-release-list strong{color:#c6d4e8;font-size:11px;font-weight:650;white-space:nowrap}
+.site-release-list p{min-width:0;margin:0;color:#93a1b4;font-size:11px;text-align:left}
+@media(max-width:700px){.site-credits-notes{width:calc(100% - 24px);border-radius:11px}.site-credits-notes>summary{min-height:40px;padding:9px 12px}.site-credits-notes{max-width:none}.site-credits-content{grid-template-columns:1fr;gap:0;padding:13px 13px 15px}.site-credits-block:first-child{padding:0 0 14px}.site-credits-block+.site-credits-block{padding:14px 0 0;border-left:0;border-top:1px solid rgb(119 139 165 / 22%)}.site-release-list li{grid-template-columns:1fr;gap:3px}}
+
+.calculation-inspection-panel{margin:0 22px 18px;border:1px solid rgb(122 146 176 / 22%);border-radius:10px;background:rgb(20 27 36 / 42%)}
+.calculation-inspection-panel>summary{padding:13px 15px;color:#b9c4d6;font-size:12px;cursor:pointer;list-style:none}
+.calculation-inspection-panel>summary::-webkit-details-marker{display:none}
+.calculation-inspection-panel>summary::before{content:"＋";margin-right:8px;color:#8093ad}
+.calculation-inspection-panel[open]>summary::before{content:"−"}
+.calculation-inspection-content{border-top:1px solid rgb(122 146 176 / 18%)}
+.calculation-inspection-panel .sheet-parity{margin:0;padding:15px 18px;border-top:0}
+.calculation-inspection-panel .formula-detail{margin:0 18px 16px;border-top:1px solid rgb(122 146 176 / 18%);padding:13px 0}
+@media(max-width:700px){.calculation-inspection-panel{margin:0 12px 16px}.calculation-inspection-panel .sheet-parity{padding:14px 12px}.calculation-inspection-panel .formula-detail{margin-inline:12px}}
+@media(min-width:701px) and (max-width:1240px){.site-credits-notes{width:min(calc(100% - clamp(32px,6vw,56px)),1384px);max-width:1384px}}
+@media(min-width:701px){.workbench{padding-bottom:20px}}
