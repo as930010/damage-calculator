@@ -81,7 +81,7 @@ test('職業致命傷害被動依使用者指定加算值與覆寫值保存', as
     KE: 8, IM: 20, GE: 20, MM: 27, AN: 50, TW: 30, PR: 48, FB: 20, RH: 20, NI: 10,
     RE: 20, CU: 20, CS: 15, CA: 20, FP: 10, VI: 15, BR: 20, SH: 20, SU: 25, ES: 16,
     FL: 15, BQ: 15, AD: 20, DB: 42, DN: 15, MP: 15, OM: 10, CT: 46, IN: 48, DA: 35,
-    TB: 10, BMa: 10, PO: 20, RI: 20, BL: 25, BI: 27, EW: 15, RS: 20, NL: 15, TP: 20,
+    TB: 10, BMa: 10, MN: 15, PO: 20, RI: 20, BL: 25, BI: 27, EW: 15, RS: 20, NL: 15, TP: 20,
     LI: 20, CEL: 20, NP: 25, MO: 15, GB: 20, AV: 25, AC: 26, MI: 24
   };
   const preserved = { DaB: 30, DE: 23 };
@@ -97,10 +97,10 @@ test('Boss 傷害被動只保留明確提供的增幅', async () => {
   assert.deepEqual(Object.keys(document.bossDamagePctByClass).sort(), classesDocument.classes.map(entry => entry.id).sort());
 });
 
-test('LA、HE 與 EW 的乘算爆傷為獨立乘積來源', async () => {
+test('LA、HE、EW、TB、BMa、MN、PO 的乘算爆傷為獨立乘積來源', async () => {
   const document = await readJson('class-damage-passives.json');
   const classesDocument = await readJson('classes.json');
-  const expected = { LA: [5], HE: [28], EW: [20] };
+  const expected = { LA: [5], HE: [28], EW: [20], TB: [10], BMa: [10], MN: [10], PO: [10] };
   for (const [classId, values] of Object.entries(document.multiplicativeCritDamagePctByClass)) assert.deepEqual(values, expected[classId] ?? [], classId);
   assert.deepEqual(Object.keys(document.multiplicativeCritDamagePctByClass).sort(), classesDocument.classes.map(entry => entry.id).sort());
 });
