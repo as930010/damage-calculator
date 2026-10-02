@@ -228,7 +228,8 @@ body::before {
   pointer-events: none;
 }
 
-.app-shell { max-width: 1440px; padding-inline: clamp(18px, 4vw, 56px); }
+.app-shell { width: 100%; max-width: none; margin: 0; padding: 0 0 42px; }
+.layout { width: min(100%, 1440px); margin-inline: auto; padding-inline: clamp(18px, 4vw, 56px); }
 .topbar { height: 72px; border-color: rgba(165, 205, 198, .15); }
 .brand { gap: 13px; }
 .brand-mark {
@@ -1081,10 +1082,10 @@ details:not(.skill-reference)[open] > summary::before { transform: rotate(45deg)
   position: relative;
   display: flex;
   align-items: center;
-  width: 100vw;
+  width: 100%;
   height: auto;
   min-height: 72px;
-  margin: 0 0 0 calc(50% - 50vw);
+  margin: 0;
   padding: 12px clamp(18px, 4vw, 58px);
   border: 0;
   border-bottom: 1px solid rgb(120 145 180 / 18%);
@@ -1122,3 +1123,6 @@ details:not(.skill-reference)[open] > summary::before { transform: rotate(45deg)
   .top-meta { gap: 8px; }
   .buff-simulator-link { min-height: 32px; padding-inline: 9px; font-size: 11px; }
 }
+
+@media (max-width: 700px) { .app-shell { padding-inline: 0; } .layout { padding-inline: 16px; } }
+@media (max-width: 440px) { .app-shell { padding-inline: 0; } .layout { padding-inline: 12px; } }
