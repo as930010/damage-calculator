@@ -38,6 +38,22 @@ test('Nephron forge attack table and cumulative milestone bonuses match the supp
   }
 });
 
+test('Nephron transformation attributes cannot repeat within one armor item, but can repeat across items', () => {
+  const repeated = { attribute: '雙攻%（依強化等級）', value: 0.002 };
+  const empty = { attribute: '', value: undefined };
+  const selection = (slotId, transformations) => ({
+    slotId, enhancement: 'Lv.10', magazine: '', magazineLevel: '', transformations,
+  });
+  assert.throws(() => resolveNephronArmorSources(armor, [
+    selection('upper', [repeated, repeated, empty]),
+  ]), /變換屬性不可重複/);
+  const contributions = resolveNephronArmorSources(armor, [
+    selection('upper', [repeated, empty, empty]),
+    selection('gloves', [repeated, empty, empty]),
+  ]);
+  assert.equal(contributions.filter(source => source.sourceId.startsWith('nephron-transform:')).length, 2);
+});
+
 test('all Nephron transformations expose ten exact tiers and first three scale by enhancement level', () => {
   const expected = [
     [0.02,0.04,0.06,0.08,0.10,0.12,0.14,0.16,0.18,0.20],

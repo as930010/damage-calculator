@@ -61,6 +61,23 @@ async function start() {
     return clearedCells;
   };
   const startupDuplicateTransformationCells = clearDuplicateTransformationChoices(state);
+  const clearDuplicateNephronTransformationChoices = (target: LoadoutState) => {
+    const clearedCells: string[] = [];
+    for (const field of data.nephronArmor.fields) {
+      const seen = new Set<string>();
+      for (const transform of field.transformFields) {
+        const choice = String(target.values[transform.attributeCell] ?? '');
+        if (!choice) continue;
+        if (seen.has(choice)) {
+          delete target.values[transform.attributeCell];
+          delete target.values[transform.valueCell];
+          clearedCells.push(transform.attributeCell, transform.valueCell);
+        } else seen.add(choice);
+      }
+    }
+    return clearedCells;
+  };
+  const startupDuplicateNephronTransformationCells = clearDuplicateNephronTransformationChoices(state);
   const clearDuplicateNephronMagazines = (target: LoadoutState) => {
     const seen = new Set<string>();
     const clearedCells: string[] = [];
@@ -81,7 +98,7 @@ async function start() {
     return clearedCells;
   };
   const startupDuplicateNephronMagazineCells = clearDuplicateNephronMagazines(state);
-  if ((startupLegacyHeadStoneLabelMigrated || startupDuplicateTransformationCells.length || startupInvalidAccessoryAppraisalCells.length || startupDuplicateNephronMagazineCells.length) && !sampleMode) saveState(state);
+  if ((startupLegacyHeadStoneLabelMigrated || startupDuplicateTransformationCells.length || startupDuplicateNephronTransformationCells.length || startupInvalidAccessoryAppraisalCells.length || startupDuplicateNephronMagazineCells.length) && !sampleMode) saveState(state);
   const weaponMagicStoneCells = data.weaponGrades.colorGroups.flatMap(group => group.selectorCells);
   const applyWeaponMagicStonePreset = (grade: string, overwrite = false) => {
     if (!grade) return;
@@ -101,7 +118,8 @@ async function start() {
   if (baseline) {
     const migratedBaseline = migrateLegacyHeadStoneLabel(baseline);
     const clearedBaselineMagazines = clearDuplicateNephronMagazines(baseline);
-    if (migratedBaseline || clearedBaselineMagazines.length) saveState(baseline, true);
+    const clearedBaselineTransformations = clearDuplicateNephronTransformationChoices(baseline);
+    if (migratedBaseline || clearedBaselineMagazines.length || clearedBaselineTransformations.length) saveState(baseline, true);
   }
   let selected = data.layout.slots.find(slot => slot.weapon)!;
   type BeastAccessorySlotId = 'headwear' | 'armor' | 'necklace' | 'ring-one' | 'ring-two';
@@ -655,8 +673,14 @@ async function start() {
         nephronField.transformFields.forEach((transform, index) => {
           const selectedName = val(transform.attributeCell);
           const attribute = data.nephronArmor.transformations.find(entry => entry.name === selectedName);
+          const selectedElsewhere = new Set(nephronField.transformFields
+            .filter(other => other.attributeCell !== transform.attributeCell)
+            .map(other => val(other.attributeCell))
+            .filter(Boolean));
+          const availableAttributes = data.nephronArmor.transformations
+            .filter(entry => !selectedElsewhere.has(entry.name));
           field(transformationGrid, '變換 ' + (index + 1) + ' 屬性', transform.attributeCell,
-            data.nephronArmor.transformations.map(entry => ({ value: entry.name, label: entry.name.replace('（依強化等級）', '(×強化)') })), true);
+            availableAttributes.map(entry => ({ value: entry.name, label: entry.name.replace('（依強化等級）', '(×強化)') })), true);
           const tiers = attribute?.tierValuesPct ?? [];
           field(transformationGrid, '變換 ' + (index + 1) + ' 數值（%）', transform.valueCell,
             tiers.map(value => ({ value: String(value / 100), label: value + '%' })),
@@ -960,12 +984,13 @@ async function start() {
       const imported = parseLoadoutJson(await file.text(), state, data);
       Object.assign(state, imported.state);
       const duplicateTransformationCells = clearDuplicateTransformationChoices(state);
+      const duplicateNephronTransformationCells = clearDuplicateNephronTransformationChoices(state);
       applyWeaponMagicStonePreset(String(state.values[data.weaponGrades.selectorCell] ?? ''));
       renderClassPicker();
       toggle.checked = state.lowerwearAlternativeEnabled;
       update();
       renderInspector(); renderTitleInput(); renderGlobalInputs(); renderWeaponMagicStones(); renderRightIceSetSelectors();
-      const clearedFields = [...new Set([...imported.clearedFields, ...duplicateTransformationCells])];
+      const clearedFields = [...new Set([...imported.clearedFields, ...duplicateTransformationCells, ...duplicateNephronTransformationCells])];
       const partial = clearedFields.length ? `；${clearedFields.length} 個無法對應或重複的欄位已留空（${clearedFields.slice(0, 5).join('、')}${clearedFields.length > 5 ? '…' : ''}）` : '';
       document.querySelector<HTMLElement>('#transfer-status')!.textContent = `${sampleMode ? '配裝已匯入；範例模式不會儲存到此裝置' : '配裝已匯入並儲存於此裝置'}${partial}。`;
     } catch (error) {

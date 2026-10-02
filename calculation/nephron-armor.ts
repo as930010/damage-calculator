@@ -79,6 +79,7 @@ export function resolveNephronArmorSources(
     slotIds.add(selection.slotId);
     if (selection.transformations.length !== 3) throw new RangeError(selection.slotId + " must have exactly three transformation lines.");
     const level = enhancementNumber(selection.enhancement, selection.slotId);
+    const usedTransformations = new Set<string>();
     selection.transformations.forEach((entry, index) => {
       const name = String(entry.attribute ?? "").trim();
       const rawValue = entry.value;
@@ -86,6 +87,8 @@ export function resolveNephronArmorSources(
       if (!name) throw new RangeError(selection.slotId + " 變換 " + (index + 1) + " 請先選擇屬性。");
       const option = document.transformations.find((candidate) => candidate.name === name);
       if (!option) throw new RangeError("未知的內布隆變換屬性：" + name);
+      if (usedTransformations.has(name)) throw new RangeError("同一件內布隆防具的變換屬性不可重複。");
+      usedTransformations.add(name);
       if (!option.statKey) return;
       if (rawValue == null) throw new RangeError(selection.slotId + " 變換 " + (index + 1) + " 請填寫數值檔位。");
       if (typeof rawValue !== "number" || !Number.isFinite(rawValue)) throw new TypeError("內布隆變換數值須為有限數字。");
