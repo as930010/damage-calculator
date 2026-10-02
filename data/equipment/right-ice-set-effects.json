@@ -8,7 +8,7 @@
   "maxSelectedSets": 3,
   "notes": [
     "T 欄門檻公式轉為所需件數條件；W 欄統計已選右冰部位的各套裝件數。",
-    "只計算使用者在裝備模擬區 B27:B29 選取的套裝；再依已裝備件數套用效果。同一套裝只套用目前件數所符合的最高階效果，最多可選三套。"
+    "只計算使用者在裝備模擬區 B27:B29 選取的套裝；再依已裝備件數套用效果。同一套裝只套用目前件數所符合的最高階效果，該階資料須包含仍適用的低階套效，最多可選三套。"
   ],
   "effects": [
     {
@@ -82,6 +82,7 @@
       },
       "active": true,
       "stats": {
+        "bleedDamagePct": 10,
         "fullHealthKillDamagePct": 10
       },
       "condition": {
@@ -123,6 +124,8 @@
       },
       "active": true,
       "stats": {
+        "polarizationPct": 3,
+        "bleedDamagePct": 3,
         "transcendenceSkillDamagePct": 4,
         "strongerPct": 10,
         "heatPct": 10

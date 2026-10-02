@@ -29,6 +29,29 @@ test('每套右冰的 0～4 件門檻各自對應目前試算表的 exactly／at
   }
 });
 
+test('右冰高階套效保留幻影面紗與真理假面的低階加成', async () => {
+  const document = await readJson('equipment/right-ice-set-effects.json');
+  const cases = [
+    ['幻影面紗', { bleedDamagePct: 10, fullHealthKillDamagePct: 10 }],
+    ['真理假面', {
+      polarizationPct: 3,
+      bleedDamagePct: 3,
+      transcendenceSkillDamagePct: 4,
+      strongerPct: 10,
+      heatPct: 10,
+    }],
+  ];
+
+  for (const [setName, expectedStats] of cases) {
+    const [actual] = resolveRightIceSetEffects(
+      document,
+      Array.from({ length: 3 }, () => setName),
+      [setName],
+    );
+    assert.deepEqual(actual?.stats, expectedStats, setName + ' 3 件');
+  }
+});
+
 test('七套候選右冰隨機配置在六個部位、選取 1～3 套時只套用已選套效與符合件數的最高階效果', async () => {
   const document = await readJson('equipment/right-ice-set-effects.json');
   const setNames = [...new Set(document.effects.map(effect => effect.setName))].slice(0, 7);
