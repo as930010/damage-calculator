@@ -272,7 +272,7 @@ async function start() {
     const atma = data.atma.rules.find(entry => entry.id === sourceId);
     const atmaNames: Record<string, string> = {
       'atma-wood-crit-rate': '草木亞特瑪致命一擊',
-      'atma-water-fire-multiplicative-damage': '流水／火焰亞特瑪乘算傷害',
+      'atma-water-fire-multiplicative-damage': '流水 / 火焰亞特瑪套效',
       'atma-wood-multiplicative-crit-damage': '草木亞特瑪乘算致命傷害',
     };
     if (atma) return atmaNames[atma.id] ?? `亞特瑪來源待確認（${atma.id}）`;
@@ -317,7 +317,7 @@ async function start() {
     }
     if (sourceId === 'lowerwear-crit-rate-enhancement') return '下衣強化階段+2';
     if (sourceId === 'shoes-extremization-enhancement') return '鞋子強化階段+2';
-    if (sourceId === 'master-beast:armor-spirit-stone-set:S77') return '聖獸精靈石(黃)';
+    if (sourceId === 'master-beast:armor-spirit-stone-set:S77') return '聖獸精靈石套效';
     const classPassiveSource = sourceId.match(/^([^:]+):(critRate|extremization):(crit|ext)-\d+$/);
     if (classPassiveSource && data.classCombatEffects.classes[classPassiveSource[1]]) return classPassiveSource[1] + '自身技能';
     return `來源名稱待確認（${sourceId}）`;

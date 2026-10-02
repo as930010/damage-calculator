@@ -158,7 +158,7 @@ test('武器等級、飾品倍率與聖獸指環選項依各自公式映射', as
   assert.equal(result.attributes.stats.adaptabilityPct.finalTotal - baseline.attributes.stats.adaptabilityPct.finalTotal, 2);
 });
 
-test('大師聖獸固定效果、精靈石乘算與五種潛力來源分開處理', async () => {
+test('大師聖獸固定效果、各顏色的精靈石套效與五種潛力來源分開處理', async () => {
   const data = await loadData();
   const baseValues = { "Weapon.ENHC": 'Lv.8', "Left.Armor.Upper.ENHC": 'Lv.8', "Left.Armor.Bottom.ENHC": 'Lv.8', "Left.Armor.Gloves.ENHC": 'Lv.8', "Left.Armor.Shoes.ENHC": 'Lv.8', "Left.Armor.Upper.FORGE": 0, "Left.Armor.Bottom.FORGE": 0, "Left.Armor.Gloves.FORGE": 0, "Left.Armor.Shoes.FORGE": 0 };
   const selectedPotential = { ...baseValues, "MasterBeast.OverallPotential": 'Boss傷害+15%' };
@@ -175,6 +175,9 @@ test('大師聖獸固定效果、精靈石乘算與五種潛力來源分開處�
     masterBeastSpiritStoneColor: '',
   }).result;
 
+  const setStoneFactor = result => result.generalMultiplicativeDamage.factors.find(effect => effect.sourceId === data.masterBeast.armorSpiritStoneSetEffect.id)?.factor;
+  assert.equal(setStoneFactor(yellow), 1.04);
+  assert.equal(setStoneFactor(green), 1.04);
   assert.equal(yellow.attributes.stats.doubleAttackPct.finalTotal - green.attributes.stats.doubleAttackPct.finalTotal, 0);
   assert.equal(yellow.attributes.stats.doubleAttackPct.sharedSources.find(source => source.sourceId === 'sheet:計算機!E76').valuePct, 3);
   assert.equal(yellow.attributes.stats.bossDamagePct.finalTotal - green.attributes.stats.bossDamagePct.finalTotal, 0);
