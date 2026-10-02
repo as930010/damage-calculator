@@ -178,6 +178,9 @@ export interface ClassDamagePassivesDocument {
   source: string;
   /** Missing class keys are unconfigured, never assumed to be 0%. */
   critDamagePctByClass: Readonly<Record<string, number>>;
+  bossDamagePctByClass: Readonly<Record<string, number>>;
+  /** Each entry is an independent product source; duplicate percentages remain distinct effects. */
+  multiplicativeCritDamagePctByClass: Readonly<Record<string, readonly number[]>>;
 }
 
 export interface ProductStatEffect {

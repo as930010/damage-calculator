@@ -7,6 +7,7 @@ import { resolveAccessoryEffectOptions, resolveArmorAppraisals, resolveAtmaSetEf
 import { calculateWeaponBaseAttack, resolveAttackParameters } from "../calculation/attack.ts";
 import type { AttributeRule, StatContribution } from "../calculation/types.ts";
 import { calculateLoadout, calculateLoadoutCombatRates } from "../calculation/loadout-engine.ts";
+import { resolveClassDamagePassiveContributions } from "../calculation/class-damage-passives.ts";
 import type { GameData } from "./data.ts";
 import type { LoadoutState } from "./state.ts";
 
@@ -37,7 +38,11 @@ export function projectAttributes(data: GameData, state: LoadoutState) {
       .map(({ sourceId, stats }) => ({ sourceId, stats })),
   ];
   const groups: Record<"shared" | "lowerwearA" | "lowerwearB", StatContribution[]> = {
-    shared: [{ sourceId: "character-base", stats: characterBaseStats }, ...data.parameters.fixedEffects, ...configuredEffects, ...equipment.shared, ...inner.shared],
+    shared: [
+      { sourceId: "character-base", stats: characterBaseStats },
+      ...resolveClassDamagePassiveContributions(data.classDamagePassives, state.Job),
+      ...data.parameters.fixedEffects, ...configuredEffects, ...equipment.shared, ...inner.shared,
+    ],
     lowerwearA: [...equipment.lowerwearA, ...inner.lowerwearA], lowerwearB: [...equipment.lowerwearB, ...inner.lowerwearB],
   };
   const nephronSelections = data.nephronArmor.fields.flatMap((field) => {

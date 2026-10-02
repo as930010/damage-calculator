@@ -330,3 +330,114 @@ test('mixed Nephron and Billion keep shared innerwear bonuses, set effects, circ
     assert.equal(colored.calculationSources.shared.find(entry => entry.sourceId === 'color-set:' + color).stats.multiplicativeDamagePct, expected);
   }
 });
+
+test('職業加算爆傷、乘算爆傷與 Boss 傷害按獨立公式投影', async () => {
+  const data = await loadData();
+  const values = {
+    'Weapon.ENHC': 'Lv.8',
+    'Left.Armor.Upper.ENHC': 'Lv.8', 'Left.Armor.Bottom.ENHC': 'Lv.8',
+    'Left.Armor.Gloves.ENHC': 'Lv.8', 'Left.Armor.Shoes.ENHC': 'Lv.8',
+    'Left.Armor.Upper.FORGE': 0, 'Left.Armor.Bottom.FORGE': 0,
+    'Left.Armor.Gloves.FORGE': 0, 'Left.Armor.Shoes.FORGE': 0
+  };
+  const stateFor = Job => ({ schemaVersion: 3, Job, values, lowerwearAlternativeEnabled: false });
+  const ke = projectDamage(data, stateFor('KE')).result;
+  const im = projectDamage(data, stateFor('IM')).result;
+  assert.equal(ke.classCritDamagePassivePct, 8);
+  assert.equal(im.classCritDamagePassivePct, 20);
+  assert.equal(im.attributes.stats.bossDamagePct.finalTotal - ke.attributes.stats.bossDamagePct.finalTotal, 20);
+  assert.equal(im.finalDamage.damageFactors.bossDamage, 1 + im.attributes.stats.bossDamagePct.finalTotal / 100);
+
+  const withoutImBossPassive = { ...data, classDamagePassives: { ...data.classDamagePassives, bossDamagePctByClass: { ...data.classDamagePassives.bossDamagePctByClass, IM: 0 } } };
+  const imWithoutBoss = projectDamage(withoutImBossPassive, stateFor('IM')).result;
+  assert.ok(Math.abs(im.finalDamage.damageFactors.bossDamage - imWithoutBoss.finalDamage.damageFactors.bossDamage - 0.2) < 1e-12);
+
+  const noKeCritPassive = { ...data, classDamagePassives: { ...data.classDamagePassives, critDamagePctByClass: { ...data.classDamagePassives.critDamagePctByClass, KE: 0 } } };
+  const keWithoutPassive = projectDamage(noKeCritPassive, stateFor('KE')).result;
+  assert.ok(Math.abs(ke.finalDamage.critFactor - keWithoutPassive.finalDamage.critFactor - ke.combatRates.critRate.finalRate * 0.08) < 1e-12);
+
+  for (const [classId, expectedValues] of [['LA', [5]], ['HE', [28]], ['EW', [20]]]) {
+    const result = projectDamage(data, stateFor(classId)).result;
+    const prefix = 'class-passive:' + classId + ':multiplicative-crit-damage:';
+    const sources = result.multiplicativeCritDamage.factors.filter(effect => effect.sourceId.startsWith(prefix));
+    assert.deepEqual(sources.map(effect => effect.valuePct), expectedValues, classId);
+    if (classId === 'EW') assert.equal(result.classCritDamagePassivePct, 15);
+    const expectedProduct = result.multiplicativeCritDamage.factors.reduce((product, effect) => product * (1 + effect.valuePct / 100), 1);
+    assert.equal(result.multiplicativeCritDamage.productBeforeBaseline, expectedProduct, classId);
+    assert.ok(Math.abs(result.multiplicativeCritDamage.value - (expectedProduct - result.multiplicativeCritDamage.baselinePct / 100)) < 1e-12, classId);
+  }
+
+  const rm = projectDamage(data, stateFor('RM')).result;
+  assert.equal(rm.classCritDamagePassivePct, 0);
+  assert.equal(rm.attributes.stats.critDamagePct.sharedSources.find(source => source.sourceId === 'character-base').valuePct, 180);
+  assert.equal(rm.multiplicativeCritDamage.baselinePct, 180);
+});
+
+test('隨機抽樣十個職業在多裝備傷害環境下交叉驗算', async () => {
+  const data = await loadData();
+  const classSample = ['CS', 'MO', 'AD', 'SU', 'DB', 'PO', 'MM', 'RE', 'VI', 'CU'];
+  assert.equal(classSample.length, 10);
+  for (const classId of classSample) assert.ok(data.classes.classes.some(entry => entry.id === classId), classId);
+
+  const baseValues = {
+    'Weapon.ENHC': 'Lv.8',
+    'Left.Armor.Upper.ENHC': 'Lv.8', 'Left.Armor.Bottom.ENHC': 'Lv.8',
+    'Left.Armor.Gloves.ENHC': 'Lv.8', 'Left.Armor.Shoes.ENHC': 'Lv.8',
+    'Left.Armor.Upper.FORGE': 0, 'Left.Armor.Bottom.FORGE': 0,
+    'Left.Armor.Gloves.FORGE': 0, 'Left.Armor.Shoes.FORGE': 0
+  };
+  const atLevel13 = values => {
+    for (const key of ['Upper', 'Bottom', 'Gloves', 'Shoes']) values['Left.Armor.' + key + '.ENHC'] = 'Lv.13';
+    return values;
+  };
+  const critStone = data.weaponGrades.colorGroups.find(group => group.id === 'yellow').options.find(option => option.id === 'yellow-crit-damage-1-5').name;
+  const strongerCritStone = data.weaponGrades.colorGroups.find(group => group.id === 'yellow').options.find(option => option.id === 'yellow-crit-damage-1-7').name;
+  const scenarios = [
+    { id: 'baseline', values: { ...baseValues }, bossGain: 0, critGain: 0 },
+    {
+      id: 'boss-equipment',
+      values: { ...atLevel13({ ...baseValues }), 'Weapon.Transform.1.Stat': 'Boss傷害%', 'Weapon.Transform.1.Value': 0.08, 'Stage.BossDEF': 25, 'Stage.CritRatePenalty': 7 },
+      bossGain: 28, critGain: 0
+    },
+    {
+      id: 'crit-equipment-and-boss-environment',
+      values: { ...baseValues, 'Weapon.Transform.1.Stat': '致命傷害%', 'Weapon.Transform.1.Value': 0.12, 'Weapon.MagicStone.Yellow.1': critStone, 'Peak.Option': '精神挑戰者', 'Stage.BossDEF': 35, 'Stage.CritRatePenalty': 12 },
+      bossGain: 45, critGain: 13.5
+    },
+    {
+      id: 'mixed-equipment',
+      values: { ...atLevel13({ ...baseValues }), 'Weapon.Transform.1.Stat': 'Boss傷害%', 'Weapon.Transform.1.Value': 0.06, 'Weapon.Transform.2.Stat': '致命傷害%', 'Weapon.Transform.2.Value': 0.09, 'Weapon.MagicStone.Yellow.1': strongerCritStone, 'Peak.Option': '嗜肉骨斷', 'Stage.BossDEF': 71.92, 'Stage.CritRatePenalty': 30 },
+      bossGain: 106, critGain: 10.7
+    }
+  ];
+  const close = (actual, expected, label) => assert.ok(Math.abs(actual - expected) <= 1e-11 * Math.max(1, Math.abs(expected)), label + ': ' + actual + ' != ' + expected);
+  let checkedCases = 0;
+
+  for (const classId of classSample) {
+    const results = new Map();
+    for (const scenario of scenarios) {
+      const result = projectDamage(data, { schemaVersion: 3, Job: classId, values: scenario.values, lowerwearAlternativeEnabled: false }).result;
+      results.set(scenario.id, result);
+      const bossPct = result.attributes.stats.bossDamagePct.finalTotal;
+      close(result.finalDamage.damageFactors.bossDamage, 1 + bossPct / 100, classId + '/' + scenario.id + ' Boss factor');
+      const critRate = result.combatRates.critRate.finalRate;
+      const critPct = result.attributes.stats.critDamagePct.finalTotal;
+      const expectedCritFactor = critRate * (critPct / 100 + result.classCritDamagePassivePct / 100 + result.multiplicativeCritDamage.value) + (1 - critRate);
+      close(result.finalDamage.critFactor, expectedCritFactor, classId + '/' + scenario.id + ' critical factor');
+      const product = result.multiplicativeCritDamage.factors.reduce((value, factor) => value * (1 + factor.valuePct / 100), 1);
+      close(result.multiplicativeCritDamage.productBeforeBaseline, product, classId + '/' + scenario.id + ' multiplier product');
+      close(result.multiplicativeCritDamage.value, product - result.multiplicativeCritDamage.baselinePct / 100, classId + '/' + scenario.id + ' multiplier baseline');
+      const damageFactors = Object.values(result.finalDamage.damageFactors).reduce((value, factor) => value * factor, 1);
+      const recomputedDamage = result.finalDamage.extremizedBase * result.finalDamage.critFactor * damageFactors * result.finalDamage.conditionalFactor * result.generalMultiplicativeDamage.value * result.finalDamage.adaptationFactor * result.finalDamage.defenseFactor;
+      close(result.finalDamage.finalDamage, recomputedDamage, classId + '/' + scenario.id + ' final damage');
+      checkedCases += 1;
+    }
+    const baseline = results.get('baseline');
+    for (const scenario of scenarios.slice(1)) {
+      const result = results.get(scenario.id);
+      close(result.attributes.stats.bossDamagePct.finalTotal - baseline.attributes.stats.bossDamagePct.finalTotal, scenario.bossGain, classId + '/' + scenario.id + ' additive Boss gear');
+      close(result.attributes.stats.critDamagePct.finalTotal - baseline.attributes.stats.critDamagePct.finalTotal, scenario.critGain, classId + '/' + scenario.id + ' additive critical gear');
+    }
+  }
+  assert.equal(checkedCases, 40);
+});

@@ -38,7 +38,7 @@ const requiredFields = {
   "data/chip-slots.json": ["schemaVersion", "slots"],
   "data/circuit-board-rules.json": ["schemaVersion", "statKeyBySheetName", "inputs"],
   "data/class-combat-effects.json": ["schemaVersion", "methods", "classes"],
-  "data/class-damage-passives.json": ["schemaVersion", "critDamagePctByClass"],
+  "data/class-damage-passives.json": ["schemaVersion", "critDamagePctByClass", "bossDamagePctByClass", "multiplicativeCritDamagePctByClass"],
   "data/classes.json": ["schemaVersion", "classes"],
   "data/color-set-effects.json": ["schemaVersion", "selectorCell", "options"],
   "data/combat-rate-source-rules.json": ["schemaVersion", "sources"],
@@ -144,6 +144,34 @@ for (const classId of classIds) {
       : file === "data/class-combat-effects.json" ? document?.classes
         : document?.critDamagePctByClass;
     if (!section || !(classId in section)) errors.push(`${file}: 缺少職業 ${classId} 的資料。`);
+  }
+}
+
+const classDamagePassives = documents.get("data/class-damage-passives.json");
+if (classDamagePassives) {
+  for (const field of ["critDamagePctByClass", "bossDamagePctByClass"]) {
+    const section = classDamagePassives[field];
+    if (!section || typeof section !== "object" || Array.isArray(section)) {
+      errors.push("data/class-damage-passives.json: " + field + " 必須是物件。");
+      continue;
+    }
+    for (const classId of classIds) if (!(classId in section)) errors.push("data/class-damage-passives.json: " + field + " 缺少職業 " + classId + "。");
+    for (const [classId, value] of Object.entries(section)) {
+      if (!classIds.has(classId)) errors.push("data/class-damage-passives.json: " + field + " 包含未知職業 " + classId + "。");
+      if (typeof value !== "number" || !Number.isFinite(value)) errors.push("data/class-damage-passives.json: " + field + "." + classId + " 必須是有限數字。");
+    }
+  }
+  const multiplicative = classDamagePassives.multiplicativeCritDamagePctByClass;
+  if (!multiplicative || typeof multiplicative !== "object" || Array.isArray(multiplicative)) {
+    errors.push("data/class-damage-passives.json: multiplicativeCritDamagePctByClass 必須是物件。");
+  } else {
+    for (const classId of classIds) if (!(classId in multiplicative)) errors.push("data/class-damage-passives.json: multiplicativeCritDamagePctByClass 缺少職業 " + classId + "。");
+    for (const [classId, values] of Object.entries(multiplicative)) {
+      if (!classIds.has(classId)) errors.push("data/class-damage-passives.json: multiplicativeCritDamagePctByClass 包含未知職業 " + classId + "。");
+      if (!Array.isArray(values) || values.some(value => typeof value !== "number" || !Number.isFinite(value))) {
+        errors.push("data/class-damage-passives.json: multiplicativeCritDamagePctByClass." + classId + " 必須是有限數值陣列。");
+      }
+    }
   }
 }
 

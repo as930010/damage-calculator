@@ -178,6 +178,11 @@ async function start() {
     if (sourceId === 'character-base') return '角色基礎係數';
     if (sourceId === 'character-base:crit-damage-product') return '角色原始乘算爆傷基準';
     if (sourceId === 'weapon-base-attack:C53:D53') return '武器基礎攻擊力';
+    if (sourceId.startsWith('class-passive:')) {
+      const [, classId, kind] = sourceId.split(':');
+      if (kind === 'boss-damage') return classId + '自身技能';
+      if (kind === 'multiplicative-crit-damage') return classId + '自身技能（乘算爆傷）';
+    }
     if (sourceId.startsWith('sheet:計算機!')) {
       const cell = sourceId.slice('sheet:計算機!'.length);
       if (Object.values(data.masterBeast.overallPotentialSourceCells).includes(cell)) return '聖獸潛力';
