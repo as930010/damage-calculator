@@ -1,10 +1,5 @@
 {
   "schemaVersion": 1,
-  "dataUpdatedAt": "2026-09-25",
-  "source": {
-    "workbook": "Google Sheets live export",
-    "sheet": "飾品資料庫"
-  },
   "items": [
     {
       "id": "accessories-55f06471666f",
@@ -13,15 +8,10 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "allSkillDamagePct": 18
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A2:T2"
-      },
       "appraisal": {
         "canAppraise": null,
         "effectCount": null
@@ -34,15 +24,10 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "allSkillDamagePct": 15
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A3:T3"
-      },
       "appraisal": {
         "canAppraise": null,
         "effectCount": null
@@ -55,15 +40,10 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "allSkillDamagePct": 10
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A4:T4"
-      },
       "appraisal": {
         "canAppraise": null,
         "effectCount": null
@@ -76,16 +56,11 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "adaptabilityPct": 2,
         "multiplicativeDamagePct": 10.25
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A5:T5"
-      },
       "appraisal": {
         "canAppraise": false,
         "effectCount": 0
@@ -98,16 +73,11 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "adaptabilityPct": 2,
         "multiplicativeDamagePct": 5
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A6:T6"
-      },
       "appraisal": {
         "canAppraise": false,
         "effectCount": 0
@@ -120,16 +90,11 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "doubleAttackPct": -5,
         "multiplicativeDamagePct": 10
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A7:T7"
-      },
       "appraisal": {
         "canAppraise": false,
         "effectCount": 0
@@ -142,7 +107,6 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-29",
       "description": "使用特殊主動技能時，增加所有技能傷害+4%(最大3重疊、再發動等待時間為5秒)；重疊至上限時變更為持續300秒的Buff，增加12%所有技能傷害、3%攻擊力。",
       "developerNote": "以310秒週期平均換算乘算效果：=(4%*(5/310))+(8%*(5/310))+((1+12%)*(1+3%)-1)*(300/310)=15.0580645161291%。前5秒為4% Buff，接續5秒為8% Buff，之後300秒為12%所有技能傷害與3%攻擊力的獨立乘算；不可併入面板 allSkillDamagePct 或 doubleAttackPct。",
       "stats": {
@@ -151,10 +115,6 @@
         "multiplicativeDamagePct": 15.0580645161291
       },
       "effects": [],
-      "source": {
-        "sheet": "使用者提供",
-        "range": "人工新增"
-      },
       "appraisal": {
         "canAppraise": false,
         "effectCount": 0
@@ -167,13 +127,8 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {},
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A8:T8"
-      },
       "appraisal": {
         "canAppraise": true,
         "effectCount": 3
@@ -186,13 +141,8 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {},
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A9:T9"
-      },
       "appraisal": {
         "canAppraise": true,
         "effectCount": 3
@@ -205,16 +155,11 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "adaptabilityPct": 3,
         "multiplicativeDamagePct": 6
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A10:T10"
-      },
       "appraisal": {
         "canAppraise": false,
         "effectCount": 0
@@ -227,16 +172,11 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "adaptabilityPct": 2,
         "multiplicativeDamagePct": 5
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A11:T11"
-      },
       "appraisal": {
         "canAppraise": false,
         "effectCount": 0
@@ -249,16 +189,11 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "adaptabilityPct": 2,
         "defenseIgnorePct": 5
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A12:T12"
-      },
       "appraisal": {
         "canAppraise": false,
         "effectCount": 0
@@ -271,16 +206,11 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "critDamagePct": 3,
         "adaptabilityPct": 2
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A13:T13"
-      },
       "appraisal": {
         "canAppraise": false,
         "effectCount": 0
@@ -293,16 +223,11 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "critDamagePct": 3,
         "adaptabilityPct": 2
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A14:T14"
-      },
       "appraisal": {
         "canAppraise": false,
         "effectCount": 0
@@ -315,13 +240,8 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {},
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A15:T15"
-      },
       "appraisal": {
         "canAppraise": false,
         "effectCount": 0
@@ -334,16 +254,11 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "doubleAttackPct": 0.5,
         "critRatePct": 1
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A16:T16"
-      },
       "appraisal": {
         "canAppraise": true,
         "effectCount": 2
@@ -356,15 +271,10 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "multiplicativeDamagePct": 3
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A17:T17"
-      },
       "appraisal": {
         "canAppraise": false,
         "effectCount": 0
@@ -377,15 +287,10 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "multiplicativeDamagePct": 4
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A18:T18"
-      },
       "appraisal": {
         "canAppraise": false,
         "effectCount": 0
@@ -398,16 +303,11 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "critDamagePct": 5,
         "adaptabilityPct": 3
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A19:T19"
-      },
       "appraisal": {
         "canAppraise": null,
         "effectCount": null
@@ -420,16 +320,11 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "extremizationPct": 10,
         "adaptabilityPct": 2
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A20:T20"
-      },
       "appraisal": {
         "canAppraise": null,
         "effectCount": null
@@ -442,15 +337,10 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "adaptabilityPct": 3
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A21:T21"
-      },
       "appraisal": {
         "canAppraise": null,
         "effectCount": null
@@ -463,15 +353,10 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "adaptabilityPct": 5
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A22:T22"
-      },
       "appraisal": {
         "canAppraise": null,
         "effectCount": null
@@ -484,16 +369,11 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "critDamagePct": 3,
         "adaptabilityPct": 2
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A23:T23"
-      },
       "appraisal": {
         "canAppraise": null,
         "effectCount": null
@@ -506,15 +386,10 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "critDamagePct": 5
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A24:T24"
-      },
       "appraisal": {
         "canAppraise": null,
         "effectCount": null
@@ -527,15 +402,10 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "allSkillDamagePct": 1
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A25:T25"
-      },
       "appraisal": {
         "canAppraise": null,
         "effectCount": null
@@ -548,17 +418,12 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "bleedDamagePct": 6,
         "fullHealthKillDamagePct": 10,
         "adaptabilityPct": 3
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A26:T26"
-      },
       "appraisal": {
         "canAppraise": true,
         "effectCount": 3
@@ -571,17 +436,12 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "bleedDamagePct": 5,
         "fullHealthKillDamagePct": 10,
         "adaptabilityPct": 2
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A27:T27"
-      },
       "appraisal": {
         "canAppraise": true,
         "effectCount": 3
@@ -594,17 +454,12 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "bleedDamagePct": 4,
         "fullHealthKillDamagePct": 10,
         "adaptabilityPct": 2
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A28:T28"
-      },
       "appraisal": {
         "canAppraise": true,
         "effectCount": 3
@@ -617,17 +472,12 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "bleedDamagePct": 3,
         "fullHealthKillDamagePct": 10,
         "adaptabilityPct": 2
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A29:T29"
-      },
       "appraisal": {
         "canAppraise": true,
         "effectCount": 3
@@ -640,17 +490,12 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "bleedDamagePct": 2,
         "fullHealthKillDamagePct": 10,
         "adaptabilityPct": 2
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A30:T30"
-      },
       "appraisal": {
         "canAppraise": true,
         "effectCount": 3
@@ -663,15 +508,10 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "allSkillDamagePct": 5
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A31:T31"
-      },
       "appraisal": {
         "canAppraise": null,
         "effectCount": null
@@ -684,16 +524,11 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "critRatePct": 10,
         "adaptabilityPct": 2
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A32:T32"
-      },
       "appraisal": {
         "canAppraise": null,
         "effectCount": null
@@ -706,13 +541,8 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {},
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A33:T33"
-      },
       "appraisal": {
         "canAppraise": true,
         "effectCount": 3
@@ -725,16 +555,11 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "polarizationPct": 1,
         "adaptabilityPct": 2
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A34:T34"
-      },
       "appraisal": {
         "canAppraise": false,
         "effectCount": 0
@@ -747,13 +572,8 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {},
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A35:T35"
-      },
       "appraisal": {
         "canAppraise": true,
         "effectCount": 3
@@ -766,7 +586,6 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "physicalAttack": 25,
         "magicalAttack": 25,
@@ -774,10 +593,6 @@
         "critRatePct": 1.5
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A36:T36"
-      },
       "appraisal": {
         "canAppraise": false,
         "effectCount": 0
@@ -790,15 +605,10 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "critRatePct": 1
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A37:T37"
-      },
       "appraisal": {
         "canAppraise": true,
         "effectCount": 2
@@ -811,15 +621,10 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "transcendenceSkillDamagePct": 20
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A38:T38"
-      },
       "appraisal": {
         "canAppraise": false,
         "effectCount": 0
@@ -832,17 +637,12 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "doubleAttackPct": 0.5,
         "critRatePct": 1,
         "transcendenceSkillDamagePct": 20
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A39:T39"
-      },
       "appraisal": {
         "canAppraise": true,
         "effectCount": 2
@@ -855,15 +655,10 @@
       "typeId": "accessories",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "transcendenceSkillDamagePct": 20
       },
       "effects": [],
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A40:T40"
-      },
       "appraisal": {
         "canAppraise": false,
         "effectCount": 0

@@ -1,19 +1,9 @@
 {
   "schemaVersion": 1,
-  "source": {
-    "workbook": "Google Sheets current export",
-    "sheet": "裝備模擬區",
-    "extractedAt": "2026-09-26",
-    "purpose": "原始資料驗證規則；保留輸入格到選項來源範圍的對照，不代表計算效果映射已完成"
-  },
   "note": "同一選項來源由多個輸入格共用一份 catalog；輸入格透過 catalogId 連結，避免重複維護。",
   "catalogs": [
     {
       "id": "option-catalog-f86b43489660",
-      "source": {
-        "sheet": "係數區",
-        "range": "AL2:AL17"
-      },
       "options": [
         {
           "cell": "AL2",
@@ -83,10 +73,6 @@
     },
     {
       "id": "option-catalog-88ecb3d3a560",
-      "source": {
-        "sheet": "係數區",
-        "range": "AF2:AF10"
-      },
       "options": [
         {
           "cell": "AF2",
@@ -128,10 +114,6 @@
     },
     {
       "id": "option-catalog-a6df72b366dd",
-      "source": {
-        "sheet": "右冰資料庫",
-        "range": "A42:A45"
-      },
       "options": [
         {
           "cell": "A42",
@@ -153,10 +135,6 @@
     },
     {
       "id": "option-catalog-7d1f8d30c649",
-      "source": {
-        "sheet": "係數區",
-        "range": "AD13:AD18"
-      },
       "options": [
         {
           "cell": "AD13",
@@ -186,10 +164,6 @@
     },
     {
       "id": "option-catalog-3a417dd00eea",
-      "source": {
-        "sheet": "右冰資料庫",
-        "range": "A2:A13"
-      },
       "options": [
         {
           "cell": "A2",
@@ -243,10 +217,6 @@
     },
     {
       "id": "option-catalog-21e473c1c44f",
-      "source": {
-        "sheet": "係數區",
-        "range": "AB13:AB15"
-      },
       "options": [
         {
           "cell": "AB13",
@@ -264,9 +234,6 @@
     },
     {
       "id": "option-catalog-6fa7e8aa123a",
-      "source": {
-        "literalList": true
-      },
       "options": [
         {
           "value": "雙攻% × 強化"
@@ -308,10 +275,6 @@
     },
     {
       "id": "option-catalog-0bc187fbcda5",
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A5:A7"
-      },
       "options": [
         {
           "cell": "A5",
@@ -329,10 +292,6 @@
     },
     {
       "id": "option-catalog-c914793cc91d",
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A33:A34"
-      },
       "options": [
         {
           "cell": "A33",
@@ -346,10 +305,6 @@
     },
     {
       "id": "option-catalog-b8a66ebdd002",
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A35:A37"
-      },
       "options": [
         {
           "cell": "A35",
@@ -367,10 +322,6 @@
     },
     {
       "id": "option-catalog-5ed6c4802af7",
-      "source": {
-        "sheet": "係數區",
-        "range": "Y2:Y5"
-      },
       "options": [
         {
           "cell": "Y2",
@@ -392,10 +343,6 @@
     },
     {
       "id": "option-catalog-3ffd3537063b",
-      "source": {
-        "sheet": "右冰資料庫",
-        "range": "A46:A53"
-      },
       "options": [
         {
           "cell": "A46",
@@ -433,10 +380,6 @@
     },
     {
       "id": "option-catalog-eb9040276ce5",
-      "source": {
-        "sheet": "係數區",
-        "range": "AC13:AC22"
-      },
       "options": [
         {
           "cell": "AC13",
@@ -482,10 +425,6 @@
     },
     {
       "id": "option-catalog-a71dcb0f0e70",
-      "source": {
-        "sheet": "係數區",
-        "range": "AU2:AU6"
-      },
       "options": [
         {
           "cell": "AU2",
@@ -511,9 +450,6 @@
     },
     {
       "id": "option-catalog-1bf0bfe45d3e",
-      "source": {
-        "literalList": true
-      },
       "options": [
         {
           "value": "有"
@@ -525,10 +461,6 @@
     },
     {
       "id": "option-catalog-ca5d8d24cebc",
-      "source": {
-        "sheet": "右冰資料庫",
-        "range": "A18:A24"
-      },
       "options": [
         {
           "cell": "A18",
@@ -562,9 +494,6 @@
     },
     {
       "id": "option-catalog-a2c610f4bfac",
-      "source": {
-        "literalList": true
-      },
       "options": [
         {
           "value": "嗜肉骨斷"
@@ -576,10 +505,6 @@
     },
     {
       "id": "option-catalog-24917966f1aa",
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A2:A4"
-      },
       "options": [
         {
           "cell": "A2",
@@ -597,10 +522,6 @@
     },
     {
       "id": "option-catalog-8e5b542aec9d",
-      "source": {
-        "sheet": "連身時裝資料庫",
-        "range": "A2:A8"
-      },
       "options": [
         {
           "cell": "A2",
@@ -634,10 +555,6 @@
     },
     {
       "id": "option-catalog-414d108fd752",
-      "source": {
-        "sheet": "係數區",
-        "range": "AB2:AB11"
-      },
       "options": [
         {
           "cell": "AB2",
@@ -686,10 +603,6 @@
     },
     {
       "id": "option-catalog-629929671064",
-      "source": {
-        "sheet": "右冰資料庫",
-        "range": "A31:A35"
-      },
       "options": [
         {
           "cell": "A31",
@@ -715,10 +628,6 @@
     },
     {
       "id": "option-catalog-717ee30befef",
-      "source": {
-        "sheet": "係數區",
-        "range": "AE13:AE22"
-      },
       "options": [
         {
           "cell": "AE13",
@@ -764,10 +673,6 @@
     },
     {
       "id": "option-catalog-1ffd50e6c0ac",
-      "source": {
-        "sheet": "係數區",
-        "range": "N2:N4"
-      },
       "options": [
         {
           "cell": "N2",
@@ -785,10 +690,6 @@
     },
     {
       "id": "option-catalog-d3b938610e58",
-      "source": {
-        "sheet": "係數區",
-        "range": "AF13:AF14"
-      },
       "options": [
         {
           "cell": "AF13",
@@ -802,10 +703,6 @@
     },
     {
       "id": "option-catalog-f7853015a33f",
-      "source": {
-        "sheet": "係數區",
-        "range": "W2:W5"
-      },
       "options": [
         {
           "cell": "W2",
@@ -827,10 +724,6 @@
     },
     {
       "id": "option-catalog-9bd94655596d",
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A19:A25"
-      },
       "options": [
         {
           "cell": "A19",
@@ -864,10 +757,6 @@
     },
     {
       "id": "option-catalog-8c8ef2e12ca3",
-      "source": {
-        "sheet": "係數區",
-        "range": "AY2:AY5"
-      },
       "options": [
         {
           "cell": "AY2",
@@ -889,10 +778,6 @@
     },
     {
       "id": "option-catalog-ef87b39302a9",
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A9:A12"
-      },
       "options": [
         {
           "cell": "A9",
@@ -914,10 +799,6 @@
     },
     {
       "id": "option-catalog-a7da0a6a7424",
-      "source": {
-        "sheet": "係數區",
-        "range": "P2:P8"
-      },
       "options": [
         {
           "cell": "P2",
@@ -951,10 +832,6 @@
     },
     {
       "id": "option-catalog-8d928a8b48c0",
-      "source": {
-        "sheet": "右冰資料庫",
-        "range": "A14:A17"
-      },
       "options": [
         {
           "cell": "A14",
@@ -976,10 +853,6 @@
     },
     {
       "id": "option-catalog-77524e534e9f",
-      "source": {
-        "sheet": "魔法石資料庫",
-        "range": "A9:A15"
-      },
       "options": [
         {
           "cell": "A9",
@@ -1013,10 +886,6 @@
     },
     {
       "id": "option-catalog-16acddec81de",
-      "source": {
-        "sheet": "右冰資料庫",
-        "range": "A61:A65"
-      },
       "options": [
         {
           "cell": "A61",
@@ -1042,10 +911,6 @@
     },
     {
       "id": "option-catalog-c4c9d626d9e6",
-      "source": {
-        "sheet": "係數區",
-        "range": "AZ2:AZ7"
-      },
       "options": [
         {
           "cell": "AZ2",
@@ -1075,10 +940,6 @@
     },
     {
       "id": "option-catalog-ff7fcde60871",
-      "source": {
-        "sheet": "係數區",
-        "range": "AP2:AP13"
-      },
       "options": [
         {
           "cell": "AP2",
@@ -1132,10 +993,6 @@
     },
     {
       "id": "option-catalog-0fcc9c3dc7e6",
-      "source": {
-        "sheet": "右冰資料庫",
-        "range": "A54:A60"
-      },
       "options": [
         {
           "cell": "A54",
@@ -1169,10 +1026,6 @@
     },
     {
       "id": "option-catalog-64b257d9bcf4",
-      "source": {
-        "sheet": "係數區",
-        "range": "AG2:AG9"
-      },
       "options": [
         {
           "cell": "AG2",
@@ -1210,10 +1063,6 @@
     },
     {
       "id": "option-catalog-91e87fc4ab46",
-      "source": {
-        "sheet": "係數區",
-        "range": "AN2:AN22"
-      },
       "options": [
         {
           "cell": "AN2",
@@ -1303,10 +1152,6 @@
     },
     {
       "id": "option-catalog-5309e5d65e7e",
-      "source": {
-        "sheet": "右冰資料庫",
-        "range": "A25:A30"
-      },
       "options": [
         {
           "cell": "A25",
@@ -1336,10 +1181,6 @@
     },
     {
       "id": "option-catalog-fca3ffaecf1f",
-      "source": {
-        "sheet": "右冰套效資料庫",
-        "range": "V2:V23"
-      },
       "options": [
         {
           "cell": "V2",
@@ -1433,10 +1274,6 @@
     },
     {
       "id": "option-catalog-83d51421effa",
-      "source": {
-        "sheet": "係數區",
-        "range": "BB2:BB5"
-      },
       "options": [
         {
           "cell": "BB2",
@@ -1458,10 +1295,6 @@
     },
     {
       "id": "option-catalog-9063ccca31d6",
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A15:A18"
-      },
       "options": [
         {
           "cell": "A15",
@@ -1483,10 +1316,6 @@
     },
     {
       "id": "option-catalog-987fecd02ec8",
-      "source": {
-        "sheet": "係數區",
-        "range": "AW2:AW6"
-      },
       "options": [
         {
           "cell": "AW2",
@@ -1512,10 +1341,6 @@
     },
     {
       "id": "option-catalog-e68237ce7fa2",
-      "source": {
-        "sheet": "係數區",
-        "range": "Z2:Z29"
-      },
       "options": [
         {
           "cell": "Z2",
@@ -1633,10 +1458,6 @@
     },
     {
       "id": "option-catalog-491562dd1e9d",
-      "source": {
-        "sheet": "係數區",
-        "range": "AV2:AV4"
-      },
       "options": [
         {
           "cell": "AV2",
@@ -1654,10 +1475,6 @@
     },
     {
       "id": "option-catalog-76b3d1d0fc12",
-      "source": {
-        "sheet": "係數區",
-        "range": "I2:I23"
-      },
       "options": [
         {
           "cell": "I2",
@@ -1751,10 +1568,6 @@
     },
     {
       "id": "option-catalog-1a18d703db93",
-      "source": {
-        "sheet": "係數區",
-        "range": "L2:L5"
-      },
       "options": [
         {
           "cell": "L2",
@@ -1776,10 +1589,6 @@
     },
     {
       "id": "option-catalog-5f2425328fda",
-      "source": {
-        "sheet": "右冰資料庫",
-        "range": "A66:A69"
-      },
       "options": [
         {
           "cell": "A66",
@@ -1801,10 +1610,6 @@
     },
     {
       "id": "option-catalog-fdda7268ce18",
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A8:A8"
-      },
       "options": [
         {
           "cell": "A8",
@@ -1814,10 +1619,6 @@
     },
     {
       "id": "option-catalog-23122e89a169",
-      "source": {
-        "sheet": "係數區",
-        "range": "Q2:Q7"
-      },
       "options": [
         {
           "cell": "Q2",
@@ -1847,10 +1648,6 @@
     },
     {
       "id": "option-catalog-bb28ed8d39bf",
-      "source": {
-        "sheet": "係數區",
-        "range": "AG13:AG22"
-      },
       "options": [
         {
           "cell": "AG13",
@@ -1896,10 +1693,6 @@
     },
     {
       "id": "option-catalog-aecebaae726a",
-      "source": {
-        "sheet": "係數區",
-        "range": "V2:V3"
-      },
       "options": [
         {
           "cell": "V2",
@@ -1913,10 +1706,6 @@
     },
     {
       "id": "option-catalog-a292118b7fc4",
-      "source": {
-        "sheet": "係數區",
-        "range": "U2:U11"
-      },
       "options": [
         {
           "cell": "U2",
@@ -1962,10 +1751,6 @@
     },
     {
       "id": "option-catalog-41bf529ba1aa",
-      "source": {
-        "sheet": "係數區",
-        "range": "BC2:BC5"
-      },
       "options": [
         {
           "cell": "BC2",
@@ -1987,10 +1772,6 @@
     },
     {
       "id": "option-catalog-b033738d4d5c",
-      "source": {
-        "sheet": "右冰資料庫",
-        "range": "A70:A74"
-      },
       "options": [
         {
           "cell": "A70",
@@ -2016,10 +1797,6 @@
     },
     {
       "id": "option-catalog-5f3d8028fef2",
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A31:A32"
-      },
       "options": [
         {
           "cell": "A31",
@@ -2033,10 +1810,6 @@
     },
     {
       "id": "option-catalog-801126ce1802",
-      "source": {
-        "sheet": "係數區",
-        "range": "O2:O3"
-      },
       "options": [
         {
           "cell": "O2",
@@ -2050,10 +1823,6 @@
     },
     {
       "id": "option-catalog-9240a234397a",
-      "source": {
-        "sheet": "係數區",
-        "range": "BA2:BA7"
-      },
       "options": [
         {
           "cell": "BA2",
@@ -2083,10 +1852,6 @@
     },
     {
       "id": "option-catalog-be2a52193a9b",
-      "source": {
-        "sheet": "係數區",
-        "range": "A2:A61"
-      },
       "options": [
         {
           "cell": "A2",
@@ -2332,10 +2097,6 @@
     },
     {
       "id": "option-catalog-0f9c5b87ae49",
-      "source": {
-        "sheet": "係數區",
-        "range": "X2:X4"
-      },
       "options": [
         {
           "cell": "X2",
@@ -2353,9 +2114,6 @@
     },
     {
       "id": "option-catalog-bc1e5293ab87",
-      "source": {
-        "literalList": true
-      },
       "options": [
         {
           "value": "紅"
@@ -2370,10 +2128,6 @@
     },
     {
       "id": "option-catalog-409337b9f603",
-      "source": {
-        "sheet": "係數區",
-        "range": "AJ2:AJ12"
-      },
       "options": [
         {
           "cell": "AJ2",
@@ -2423,10 +2177,6 @@
     },
     {
       "id": "option-catalog-cd482ba318a5",
-      "source": {
-        "sheet": "係數區",
-        "range": "AI2:AI3"
-      },
       "options": [
         {
           "cell": "AI2",
@@ -2440,10 +2190,6 @@
     },
     {
       "id": "option-catalog-e4896ad96468",
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A13:A14"
-      },
       "options": [
         {
           "cell": "A13",
@@ -2457,10 +2203,6 @@
     },
     {
       "id": "option-catalog-0d3104cf336b",
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A26:A30"
-      },
       "options": [
         {
           "cell": "A26",
@@ -2486,10 +2228,6 @@
     },
     {
       "id": "option-catalog-8ada2b66ee97",
-      "source": {
-        "sheet": "飾品資料庫",
-        "range": "A38:A40"
-      },
       "options": [
         {
           "cell": "A38",
@@ -2507,10 +2245,6 @@
     },
     {
       "id": "option-catalog-cf6fdd30db2b",
-      "source": {
-        "sheet": "左冰資料庫",
-        "range": "A2:A10"
-      },
       "options": [
         {
           "cell": "A2",
@@ -2552,10 +2286,6 @@
     },
     {
       "id": "option-catalog-51dd8e26eb4d",
-      "source": {
-        "sheet": "係數區",
-        "range": "AD2:AD6"
-      },
       "options": [
         {
           "cell": "AD2",
@@ -2584,10 +2314,6 @@
     },
     {
       "id": "option-catalog-d864c66e78f5",
-      "source": {
-        "sheet": "係數區",
-        "range": "G2:G7"
-      },
       "options": [
         {
           "cell": "G2",
@@ -2617,10 +2343,6 @@
     },
     {
       "id": "option-catalog-6bb70c5676bf",
-      "source": {
-        "sheet": "係數區",
-        "range": "K2:K8"
-      },
       "options": [
         {
           "cell": "K2",
@@ -2654,10 +2376,6 @@
     },
     {
       "id": "option-catalog-f6f2627f2c0f",
-      "source": {
-        "sheet": "係數區",
-        "range": "M2:M6"
-      },
       "options": [
         {
           "cell": "M2",
@@ -2683,10 +2401,6 @@
     },
     {
       "id": "option-catalog-2f1611a1937d",
-      "source": {
-        "sheet": "係數區",
-        "range": "T2:T11"
-      },
       "options": [
         {
           "cell": "T2",
@@ -2732,10 +2446,6 @@
     },
     {
       "id": "option-catalog-fe60831365cd",
-      "source": {
-        "sheet": "右冰資料庫",
-        "range": "A36:A41"
-      },
       "options": [
         {
           "cell": "A36",
@@ -2765,10 +2475,6 @@
     },
     {
       "id": "option-catalog-ac629c6b86cb",
-      "source": {
-        "sheet": "魔法石資料庫",
-        "range": "A2:A8"
-      },
       "options": [
         {
           "cell": "A2",

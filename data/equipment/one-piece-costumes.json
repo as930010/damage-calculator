@@ -1,10 +1,5 @@
 {
   "schemaVersion": 1,
-  "dataUpdatedAt": "2026-09-25",
-  "source": {
-    "workbook": "Google Sheets live export",
-    "sheet": "連身時裝資料庫"
-  },
   "items": [
     {
       "id": "one-piece-costumes-c0ad27783ebb",
@@ -13,18 +8,13 @@
       "typeId": "one-piece-costumes",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "physicalAttack": 25.0,
         "magicalAttack": 25.0,
         "extremizationPct": 3.0,
         "adaptabilityPct": 3.0
       },
-      "effects": [],
-      "source": {
-        "sheet": "連身時裝資料庫",
-        "range": "A2:S2"
-      }
+      "effects": []
     },
     {
       "id": "one-piece-costumes-cc80e4b42591",
@@ -33,18 +23,13 @@
       "typeId": "one-piece-costumes",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "physicalAttack": 25.0,
         "magicalAttack": 25.0,
         "critRatePct": 3.0,
         "polarizationPct": 3.0
       },
-      "effects": [],
-      "source": {
-        "sheet": "連身時裝資料庫",
-        "range": "A3:S3"
-      }
+      "effects": []
     },
     {
       "id": "one-piece-costumes-80f4924cb34b",
@@ -53,18 +38,13 @@
       "typeId": "one-piece-costumes",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "physicalAttack": 25.0,
         "magicalAttack": 25.0,
         "extremizationPct": 3.0,
         "bleedDamagePct": 2.0
       },
-      "effects": [],
-      "source": {
-        "sheet": "連身時裝資料庫",
-        "range": "A4:S4"
-      }
+      "effects": []
     },
     {
       "id": "one-piece-costumes-1ea57b09512d",
@@ -73,18 +53,13 @@
       "typeId": "one-piece-costumes",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "physicalAttack": 20.0,
         "magicalAttack": 20.0,
         "extremizationPct": 3.0,
         "allSkillDamagePct": 2.0
       },
-      "effects": [],
-      "source": {
-        "sheet": "連身時裝資料庫",
-        "range": "A5:S5"
-      }
+      "effects": []
     },
     {
       "id": "one-piece-costumes-8ea6657956e0",
@@ -93,18 +68,13 @@
       "typeId": "one-piece-costumes",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "physicalAttack": 20.0,
         "magicalAttack": 20.0,
         "critRatePct": 3.0,
         "allSkillDamagePct": 2.0
       },
-      "effects": [],
-      "source": {
-        "sheet": "連身時裝資料庫",
-        "range": "A6:S6"
-      }
+      "effects": []
     },
     {
       "id": "one-piece-costumes-5f39f7831987",
@@ -113,18 +83,13 @@
       "typeId": "one-piece-costumes",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "physicalAttack": 20.0,
         "magicalAttack": 20.0,
         "doubleAttackPct": 1.0,
         "critRatePct": 1.0
       },
-      "effects": [],
-      "source": {
-        "sheet": "連身時裝資料庫",
-        "range": "A7:S7"
-      }
+      "effects": []
     },
     {
       "id": "one-piece-costumes-d5243fda69e6",
@@ -133,17 +98,12 @@
       "typeId": "one-piece-costumes",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "stats": {
         "physicalAttack": 40.0,
         "magicalAttack": 40.0,
         "allSkillDamagePct": 1.0
       },
-      "effects": [],
-      "source": {
-        "sheet": "連身時裝資料庫",
-        "range": "A8:S8"
-      }
+      "effects": []
     }
   ]
 }

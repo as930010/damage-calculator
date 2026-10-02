@@ -76,7 +76,7 @@ export interface GameData {
     binaryEffects: { selectorCell: string; name: string; options: NamedStatOption[]; source: string }[];
   };
   pets: { options: NamedStatOption[] };
-  simulatorInputs: { catalogs: { id: string; source?: { sheet?: string; range?: string }; options: { value: string | number }[] }[]; inputs: { simulatorCells: string; inputType: string; catalogId: string }[] };
+  simulatorInputs: { catalogs: { id: string; options: { value: string | number }[] }[]; inputs: { simulatorCells: string; inputType: string; catalogId: string }[] };
 }
 
 export const GAME_DATA_FILES = {

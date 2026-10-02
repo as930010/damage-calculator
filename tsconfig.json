@@ -6,6 +6,8 @@
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "rewriteRelativeImportExtensions": true,
     "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "noEmit": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true

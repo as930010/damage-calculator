@@ -1,4 +1,4 @@
-import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { cp, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -95,7 +95,10 @@ if (compilation.error) throw compilation.error;
 if (compilation.status !== 0) process.exit(compilation.status ?? 1);
 
 await mkdir(join(output, "frontend"), { recursive: true });
-await cp(join(root, "data"), join(output, "data"), { recursive: true });
+await mkdir(join(output, "data", "examples"), { recursive: true });
+for (const file of await readdir(join(root, "data", "examples"))) {
+  if (file.endsWith(".json")) await cp(join(root, "data", "examples", file), join(output, "data", "examples", file));
+}
 const { GAME_DATA_FILES } = await import(pathToFileURL(join(output, "frontend", "data.js")).href);
 const bundledData = Object.fromEntries(await Promise.all(Object.entries(GAME_DATA_FILES).map(async ([key, file]) => [
   key,

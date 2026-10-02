@@ -567,12 +567,12 @@ async function start() {
     const mirrorArea = section(panel, '迷鏡效果', true);
     mirrorArea.classList.add('beast-mirror-section');
     const mirrorGrid = attributeValueGrid(mirrorArea, 'beast-mirror-grid');
-    slot.mirrorCells.forEach(([attributeCell, valueCell], index) => {
-      field(mirrorGrid, `迷鏡效果屬性`, attributeCell, options(data.masterBeast.customAttributeOptions.mirror), true);
+    slot.mirrorCells.forEach(([attributeCell, valueCell]) => {
+      field(mirrorGrid, '迷鏡效果屬性', attributeCell, options(data.masterBeast.customAttributeOptions.mirror), true);
       const valueRule = data.masterBeast.mirrorValueRules.byAttribute[val(attributeCell)] ?? data.masterBeast.mirrorValueRules.default;
       numeric(
         mirrorGrid,
-        `迷鏡效果數值（%）`,
+        '迷鏡效果數值（%）',
         valueCell,
         true,
         { min: valueRule.minPct, max: valueRule.maxPct, step: valueRule.stepPct },

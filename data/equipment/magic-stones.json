@@ -1,11 +1,5 @@
 {
   "schemaVersion": 1,
-  "dataUpdatedAt": "2026-09-25",
-  "source": {
-    "workbook": "Google Sheets live export",
-    "sheet": "魔法石資料庫",
-    "notes": "Rows 2–8 are armor application values; rows 9–15 are weapon application values. Paired entries are one selectable stone with scope-specific values."
-  },
   "items": [
     {
       "id": "magic-stone-hunting-boss-damage",
@@ -14,7 +8,6 @@
       "typeId": "magicStone",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "effects": [],
       "stats": {},
       "targetApplications": {
@@ -30,13 +23,6 @@
             "bossDamagePct": 5
           }
         }
-      },
-      "source": {
-        "sheet": "魔法石資料庫",
-        "ranges": [
-          "A2:S2",
-          "A9:S9"
-        ]
       }
     },
     {
@@ -46,7 +32,6 @@
       "typeId": "magicStone",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "effects": [],
       "stats": {},
       "targetApplications": {
@@ -62,13 +47,6 @@
             "critRatePct": 12
           }
         }
-      },
-      "source": {
-        "sheet": "魔法石資料庫",
-        "ranges": [
-          "A3:S3",
-          "A10:S10"
-        ]
       }
     },
     {
@@ -78,7 +56,6 @@
       "typeId": "magicStone",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "effects": [],
       "stats": {},
       "targetApplications": {
@@ -94,13 +71,6 @@
             "extremizationPct": 12
           }
         }
-      },
-      "source": {
-        "sheet": "魔法石資料庫",
-        "ranges": [
-          "A4:S4",
-          "A11:S11"
-        ]
       }
     },
     {
@@ -110,7 +80,6 @@
       "typeId": "magicStone",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "effects": [],
       "stats": {},
       "targetApplications": {
@@ -126,13 +95,6 @@
             "bossDamagePct": 6
           }
         }
-      },
-      "source": {
-        "sheet": "魔法石資料庫",
-        "ranges": [
-          "A5:S5",
-          "A12:S12"
-        ]
       }
     },
     {
@@ -142,7 +104,6 @@
       "typeId": "magicStone",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "effects": [],
       "stats": {},
       "targetApplications": {
@@ -158,13 +119,6 @@
             "allSkillDamagePct": 4
           }
         }
-      },
-      "source": {
-        "sheet": "魔法石資料庫",
-        "ranges": [
-          "A6:S6",
-          "A13:S13"
-        ]
       }
     },
     {
@@ -174,7 +128,6 @@
       "typeId": "magicStone",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "effects": [],
       "stats": {},
       "targetApplications": {
@@ -190,13 +143,6 @@
             "transcendenceSkillDamagePct": 5
           }
         }
-      },
-      "source": {
-        "sheet": "魔法石資料庫",
-        "ranges": [
-          "A7:S7",
-          "A14:S14"
-        ]
       }
     },
     {
@@ -206,7 +152,6 @@
       "typeId": "magicStone",
       "level": null,
       "active": true,
-      "dataUpdatedAt": "2026-09-25",
       "effects": [],
       "stats": {},
       "targetApplications": {
@@ -218,13 +163,6 @@
           "sourceName": "無關傷害",
           "stats": {}
         }
-      },
-      "source": {
-        "sheet": "魔法石資料庫",
-        "ranges": [
-          "A8:S8",
-          "A15:S15"
-        ]
       }
     }
   ]
