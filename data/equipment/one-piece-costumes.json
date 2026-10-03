@@ -39,6 +39,8 @@
       "level": null,
       "active": true,
       "stats": {
+        "physicalAttack": 30.0,
+        "magicalAttack": 30.0,
         "critRatePct": 5.0,
         "extremizationPct": 5.0,
         "allSkillDamagePct": 4.0
