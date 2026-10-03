@@ -32,6 +32,20 @@
       "effects": []
     },
     {
+      "id": "one-piece-costumes-growth-transparent",
+      "name": "成長強化透明時裝",
+      "slotId": "one-piece-costumes",
+      "typeId": "one-piece-costumes",
+      "level": null,
+      "active": true,
+      "stats": {
+        "critRatePct": 5.0,
+        "extremizationPct": 5.0,
+        "allSkillDamagePct": 4.0
+      },
+      "effects": []
+    },
+    {
       "id": "one-piece-costumes-80f4924cb34b",
       "name": "貝斯馬共存節",
       "slotId": "one-piece-costumes",

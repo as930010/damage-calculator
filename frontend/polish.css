@@ -80,7 +80,7 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
 }
 
 /* Follow-up preview refinements. */
-.canvas-title-input{width:min(32%,210px);left:calc(19% - 62.5px)}
+.canvas-title-input{width:min(32%,210px);left:max(82px,calc(19% - 62.5px))}
 .canvas-title-input .field{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:8px}
 .canvas-title-input .field label{margin:0;white-space:nowrap}
 .canvas-title-input .picker-control{min-width:0}
