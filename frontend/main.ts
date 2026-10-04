@@ -490,9 +490,10 @@ async function start() {
   function renderGlobalInputs() {
     const root = document.querySelector<HTMLElement>('#global-source-fields')!;
     root.replaceChildren();
-    const group = (label: string) => {
+    const group = (label: string, noteText?: string) => {
       const container = document.createElement('section'); container.className = 'global-input-group';
       const heading = document.createElement('h3'); heading.textContent = label; container.append(heading);
+      if (noteText) { const note = document.createElement('p'); note.className = 'global-input-note'; note.textContent = noteText; container.append(note); }
       const grid = document.createElement('div'); grid.className = 'global-input-grid'; container.append(grid); root.append(container); return grid;
     };
     const pick = (container: HTMLElement, label: string, cell: string, entries: readonly { name: string }[]) =>
@@ -517,7 +518,7 @@ async function start() {
     const atma = group('亞特瑪');
     field(atma, '亞特瑪屬性', 'Atma.Element', options(['火焰', '流水', '草木']));
     field(atma, '亞特瑪顏色', 'Atma.Color', options(['藍色', '綠色', '紫色', '米色']));
-    const resonance = group('共鳴輸入');
+    const resonance = group('共鳴輸入', '輸入已分配的共鳴點，例如適應力點滿應該填100而非7。');
     for (const effect of data.resonance.effects) numeric(resonance, effect.name, effect.inputCell, false);
     const spirit = group('賦靈錄');
     const spiritClassOptions = options(data.spiritRecord.classSelectors.classes.map(entry => entry.classCode));
