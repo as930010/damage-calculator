@@ -4,11 +4,15 @@ import { loadGameData, readJson, escapeHtml as h, formatNumber as fmt } from './
 import { readState, readBaseline, saveState, type LoadoutState } from './state.ts';
 import { parseLoadoutJson, serializeLoadout } from './loadout-transfer.ts';
 import { projectAttributes, projectCombatRates, projectDamage } from './projection.ts';
-import { compareSheetParity, type SheetParityReference } from './sheet-parity.ts';
+import { compareLoadoutResults } from './sheet-parity.ts';
 import { createPicker, type PickerOption } from './picker.ts';
+import { GLOVE_CIRCUIT_ROWS_FIELD, readGloveCircuitRows, serializeGloveCircuitRows, gloveCircuitRowsTotal } from './circuit-board-rows.ts';
 import { icon } from './icons.ts';
 import { capOverflowPercentage } from './cap-warnings.ts';
 import { findValidationCatalog } from './sheet-validation.ts';
+import { preventScientificNotation } from './numeric-input.ts';
+import { resolveClassCode, sanitizeClassCode } from './class-code.ts';
+import { resolveUnsignedInteger, sanitizeUnsignedInteger } from './direct-input.ts';
 
 async function start() {
   const data = await loadGameData();
@@ -111,9 +115,6 @@ async function start() {
     }
   };
   applyWeaponMagicStonePreset(String(state.values[data.weaponGrades.selectorCell] ?? ''));
-  const sheetReference = sampleMode
-    ? await readJson<SheetParityReference>(`examples/${sampleId}-expected.json`)
-    : null;
   let baseline = sampleMode ? null : readBaseline();
   if (baseline) {
     const migratedBaseline = migrateLegacyHeadStoneLabel(baseline);
@@ -137,7 +138,7 @@ async function start() {
     { id: 'ring-two', label: '指環 2', icon: 'ring', fixedCells: ['MasterBeast.Ring2.Option1', 'MasterBeast.Ring2.Option2'], stoneCells: ['MasterBeast.Ring2.CustomAttribute', 'MasterBeast.Ring2.CustomValue'], stoneCategory: 'ring', mirrorCells: [['MasterBeast.Ring2.Mirror.1.Attribute', 'MasterBeast.Ring2.Mirror.1.Value'], ['MasterBeast.Ring2.Mirror.2.Attribute', 'MasterBeast.Ring2.Mirror.2.Value'], ['MasterBeast.Ring2.Mirror.3.Attribute', 'MasterBeast.Ring2.Mirror.3.Value']] },
   ];
   const app = document.querySelector<HTMLElement>('#app')!;
-  app.innerHTML = `<section class="workbench"><header class="workspace-heading"><div class="workspace-intro"><span class="eyebrow">EQUIPMENT SIMULATOR</span><h1>裝備傷害比較</h1><p class="workspace-summary">填入當前數值並設為比較基準，再調整配裝查看傷害差異。</p><ol class="workflow-steps" aria-label="比較流程"><li><span>01</span><span>填入當前數值</span></li><li><span>02</span><span>設為比較基準</span></li><li><span>03</span><span>填入新數值</span></li></ol></div></header><div class="toolbar"><div id="class-picker"></div><label class="toggle"><input id="alternate" type="checkbox">啟用強/排褲切換</label><div class="toolbar-actions"><button id="baseline" type="button">設為比較基準</button><div class="transfer-actions"><button id="import-loadout" type="button">匯入配裝</button><button id="export-loadout" type="button">匯出配裝</button></div></div><input id="loadout-file" type="file" accept="application/json,.json" hidden><span id="transfer-status" role="status" aria-live="polite"></span><span id="save-status" role="status"></span></div><section class="battle-panel"><div class="panel-heading"><h2>關卡設定</h2></div><div id="battle-settings" class="battle-fields"></div></section><div class="equipment-workspace"><section class="equipment-panel"><div class="panel-heading"><h2>裝備配置</h2><span>點選部位以編輯</span></div><div id="equipment-damage-summary" class="equipment-damage-summary" aria-live="polite"></div><div class="canvas-scroll"><div class="equipment-canvas"><span class="group-label costume-label">連身時裝</span><span class="group-label left-label">左冰</span><span class="group-label inner-label">內裝左四</span><span class="group-label weapon-label">冰武 / 武器</span><span class="group-label right-label">右冰</span><span class="group-label accessory-label">飾品</span><span class="group-label beast-label">聖獸飾品</span><div id="title-input" class="canvas-title-input"></div><div id="slots"></div><div id="beast-accessory-fields" class="beast-accessories-grid gear-beast-slots" aria-label="聖獸飾品配置"></div></div></div><p class="panel-note">左冰不支援混搭，但各部位魔法石仍須獨立設定。擁有強/排褲則褲子的傷害增幅會被平均計算。</p><section class="right-ice-set-area"><div class="beast-accessories-heading"><h3>右冰套效</h3><span>最多選擇 ${data.rightIceSets.maxSelectedSets} 套</span></div><p class="panel-note">選擇要啟用的套裝效果。</p><div id="right-ice-set-selectors" class="right-ice-set-selectors"></div></section><div class="beast-accessories-area"><div class="beast-accessories-heading"><h3>聖獸效果設定</h3><span>頭飾、盔甲、項鍊、指環 1、指環 2</span></div><p class="panel-note">共通顏色與潛力設定；各部位效果請使用裝備配置中的聖獸飾品欄位。</p><div id="master-beast-controls" class="master-beast-controls"></div></div></section><div id="inspector-backdrop" class="inspector-backdrop" aria-hidden="true"></div><aside id="inspector" class="inspector" aria-label="部位設定"></aside></div><details class="global-source-panel weapon-magic-stone-panel"><summary>武器魔力石</summary><div id="weapon-magic-stone-fields"></div></details><details class="global-source-panel"><summary>其他效果來源設定</summary><p class="panel-note">未列在此處的特殊條件或 Buff／Debuff 尚未納入計算。</p><div id="global-source-fields"></div></details><section class="results-panel"><div class="panel-heading"><h2>目前填寫的屬性</h2><span id="comparison-label"></span></div><p class="panel-note">已填入的屬性彙總，包含內裝、冰裝、武器、關卡與其他效果設定、需要特殊觸發條件的暫時沒有計入。</p><div id="results" aria-live="polite"></div><section class="damage-panel"><div class="panel-heading"><h2>攻擊與最終傷害</h2></div><p class="panel-note">此數值只反映已填寫的內容。</p><div id="damage-result" aria-live="polite"></div><details class="calculation-inspection-panel"><summary>計算結果驗算</summary><div class="calculation-inspection-content"><div id="sheet-parity" class="sheet-parity" aria-live="polite"><p>目前配裝尚未載入驗算參考值。<a href="?sample=live-sheet-2026-09-28">開啟公開驗算範例</a>。</p></div><div id="calculation-details"></div></div></details></section></section></section>`;
+  app.innerHTML = `<section class="workbench"><header class="workspace-heading"><div class="workspace-intro"><span class="eyebrow">EQUIPMENT SIMULATOR</span><h1>裝備傷害比較</h1><p class="workspace-summary">填入當前數值並設為比較基準，再調整配裝查看傷害差異。</p><ol class="workflow-steps" aria-label="比較流程"><li><span>01</span><span>填入當前數值</span></li><li><span>02</span><span>設為比較基準</span></li><li><span>03</span><span>填入新數值</span></li></ol></div></header><div class="toolbar"><div id="class-picker"></div><label class="toggle"><input id="alternate" type="checkbox">啟用強/排褲切換</label><div class="toolbar-actions"><button id="baseline" type="button">設為比較基準</button><div class="transfer-actions"><button id="import-loadout" type="button">匯入配裝</button><button id="export-loadout" type="button">匯出配裝</button></div></div><input id="loadout-file" type="file" accept="application/json,.json" hidden><span id="transfer-status" role="status" aria-live="polite"></span><span id="save-status" role="status"></span></div><section class="battle-panel"><div class="panel-heading"><h2>關卡設定</h2></div><div id="battle-settings" class="battle-fields"></div></section><div class="equipment-workspace"><section class="equipment-panel"><div class="panel-heading"><h2>裝備配置</h2><span>點選部位以編輯</span></div><div id="equipment-damage-summary" class="equipment-damage-summary" aria-live="polite"></div><div class="canvas-scroll"><div class="equipment-canvas"><span class="group-label costume-label">連身時裝</span><span class="group-label left-label">左冰</span><span class="group-label inner-label">內裝左四</span><span class="group-label weapon-label">冰武 / 武器</span><span class="group-label right-label">右冰</span><span class="group-label accessory-label">飾品</span><span class="group-label beast-label">聖獸飾品</span><div id="title-input" class="canvas-title-input"></div><div id="slots"></div><div id="beast-accessory-fields" class="beast-accessories-grid gear-beast-slots" aria-label="聖獸飾品配置"></div></div></div><p class="panel-note">左冰不支援混搭，但各部位魔法石仍須獨立設定。擁有強/排褲則褲子的傷害增幅會被平均計算。</p><section class="right-ice-set-area"><div class="beast-accessories-heading"><h3>右冰套效</h3><span>最多選擇 ${data.rightIceSets.maxSelectedSets} 套</span></div><p class="panel-note">選擇要啟用的套裝效果。</p><div id="right-ice-set-selectors" class="right-ice-set-selectors"></div></section><div class="beast-accessories-area"><div class="beast-accessories-heading"><h3>聖獸效果設定</h3><span>頭飾、盔甲、項鍊、指環 1、指環 2</span></div><p class="panel-note">共通顏色與潛力設定；各部位效果請使用裝備配置中的聖獸飾品欄位。</p><div id="master-beast-controls" class="master-beast-controls"></div></div></section><div id="inspector-backdrop" class="inspector-backdrop" aria-hidden="true"></div><aside id="inspector" class="inspector" aria-label="部位設定"></aside></div><details class="global-source-panel weapon-magic-stone-panel"><summary>武器魔力石</summary><div id="weapon-magic-stone-fields"></div></details><details class="global-source-panel"><summary>其他效果來源設定</summary><p class="panel-note">未列在此處的特殊條件或 Buff／Debuff 尚未納入計算。</p><div id="global-source-fields"></div></details><section class="results-panel"><div class="panel-heading"><h2>目前填寫的屬性</h2><span id="comparison-label"></span></div><p class="panel-note">已填入的屬性彙總，包含內裝、冰裝、武器、關卡與其他效果設定、需要特殊觸發條件的暫時沒有計入。</p><div id="results" aria-live="polite"></div><section class="damage-panel"><div class="panel-heading"><h2>攻擊與最終傷害</h2></div><p class="panel-note">此數值只反映已填寫的內容。</p><div id="damage-result" aria-live="polite"></div><details class="calculation-inspection-panel"><summary>計算結果驗算</summary><div class="calculation-inspection-content"><div id="sheet-parity" class="sheet-parity" aria-live="polite"><p>先點選「設為比較基準」保存目前配置，表格就會比較基準與目前配裝。</p></div><div id="calculation-details"></div></div></details></section></section></section>`;
   const inspectorPanel = document.querySelector<HTMLElement>('#inspector')!;
   const inspectorBackdrop = document.querySelector<HTMLElement>('#inspector-backdrop')!;
   const mobileInspectorQuery = window.matchMedia('(max-width: 700px)');
@@ -181,6 +182,41 @@ async function start() {
   const val = (fieldId: string) => String(state.values[fieldId] ?? '');
   const summary = (stats: Readonly<Record<string, number>>) => Object.entries(stats).filter(([, value]) => value !== 0).map(([key, value]) => `${data.attributes.attributes.find(a => a.key === key)?.name ?? key} ${fmt(value)}`).join(' · ');
   const options = (names: readonly string[]): PickerOption[] => names.map(name => ({ value: name, label: name }));
+  const lowerwearConditionalCircuitConflict = (): string | null => {
+    if (!state.lowerwearAlternativeEnabled) return null;
+    const lowerwear = data.circuits.inputs.find(slot => slot.slot === "lowerwear");
+    const alternative = data.circuits.inputs.find(slot => slot.slot === "lowerwearAlternative");
+    if (!lowerwear || !alternative) return null;
+    const selected = val(lowerwear.attributeCell);
+    return selected === val(alternative.attributeCell) && (selected === "強者%" || selected === "排熱%") ? selected : null;
+  };
+  const circuitAttributeOptions = (slot: (typeof data.circuits.inputs)[number]) => {
+    if (!state.lowerwearAlternativeEnabled || (slot.slot !== "lowerwear" && slot.slot !== "lowerwearAlternative")) return options(slot.attributeOptions);
+    const peerSlot = slot.slot === "lowerwear" ? "lowerwearAlternative" : "lowerwear";
+    const peer = data.circuits.inputs.find(entry => entry.slot === peerSlot);
+    const peerAttribute = peer ? val(peer.attributeCell) : "";
+    const names = peerAttribute === "強者%" || peerAttribute === "排熱%"
+      ? slot.attributeOptions.filter(name => name !== peerAttribute)
+      : slot.attributeOptions;
+    return options(names);
+  };
+  const lowerwearConditionalChipConflict = (): string | null => {
+    if (!state.lowerwearAlternativeEnabled) return null;
+    const lowerwear = data.chipSlots.slots.find(slot => slot.id === "lowerwear");
+    const alternative = data.chipSlots.slots.find(slot => slot.id === "lowerwearAlternative");
+    if (!lowerwear || !alternative) return null;
+    const selected = val(lowerwear.attributeCell);
+    return selected === val(alternative.attributeCell) && (selected === "強者%" || selected === "排熱%") ? selected : null;
+  };
+  const chipAttributeOptions = (slot: (typeof data.chipSlots.slots)[number]) => {
+    const chipNames = data.chips.chips.map(entry => entry.name);
+    if (!state.lowerwearAlternativeEnabled || (slot.id !== "lowerwear" && slot.id !== "lowerwearAlternative")) return options(chipNames);
+    const peerId = slot.id === "lowerwear" ? "lowerwearAlternative" : "lowerwear";
+    const peer = data.chipSlots.slots.find(entry => entry.id === peerId);
+    const peerAttribute = peer ? val(peer.attributeCell) : "";
+    const blocked = peerAttribute === "強者%" || peerAttribute === "排熱%";
+    return options(blocked ? chipNames.filter(name => name !== peerAttribute) : chipNames);
+  };
   const validationChoices = (cell: string, percentLabel = false): PickerOption[] => {
     const catalog = findValidationCatalog(data.simulatorInputs.inputs, data.simulatorInputs.catalogs, cell);
     return (catalog?.options ?? []).map(option => {
@@ -199,7 +235,11 @@ async function start() {
     if (sourceId.startsWith('class-passive:')) {
       const [, classId, kind] = sourceId.split(':');
       if (kind === 'boss-damage') return classId + '自身技能';
-      if (kind === 'multiplicative-crit-damage') return classId + '自身技能（乘算爆傷）';
+      if (kind === 'multiplicative-crit-damage') {
+        if (['TB', 'BMa', 'MN', 'PO'].includes(classId)) return classId + ' 爆發模式';
+        if (['CT', 'IN', 'DA', 'DE'].includes(classId)) return classId + ' 懲戒紋章';
+        return classId + '自身技能（乘算爆傷）';
+      }
     }
     if (sourceId.startsWith('sheet:計算機!')) {
       const cell = sourceId.slice('sheet:計算機!'.length);
@@ -260,10 +300,14 @@ async function start() {
       return slot ? `${slotNames[slot.id] ?? slot.id}芯片：${String(state.values[slot.attributeCell] ?? '')}（調校 ${String(state.values[slot.tuningCell] ?? '')}）` : `芯片調校來源待確認（${sourceId}）`;
     }
     if (sourceId.startsWith('circuit-board:')) {
-      const slotId = sourceId.slice('circuit-board:'.length);
+      const [slotId, rowNumber] = sourceId.slice('circuit-board:'.length).split(':');
       const slot = data.circuits.inputs.find(entry => entry.slot === slotId);
+      if (slotId === 'gloves' && rowNumber && slot) {
+        const row = readGloveCircuitRows(state.values, slot.attributeCell, slot.valueCell)[Number(rowNumber) - 1];
+        if (row) return '手套電路板第 ' + rowNumber + ' 列：' + row.attribute + ' ' + fmt((row.percentageValue ?? 0) * 100) + '%';
+      }
       const slotNames: Record<string, string> = { upper: '上衣電路板', lowerwear: '下衣電路板', lowerwearAlternative: '強/排褲電路板', gloves: '手套電路板', shoes: '鞋子電路板' };
-      if (slotNames[slotId]) return slotNames[slotId];
+      if (slotNames[slotId] && !rowNumber) return slotNames[slotId];
       return slot ? `電路板 ${slotId}：${String(state.values[slot.attributeCell] ?? '')} ${fmt(Number(state.values[slot.valueCell] ?? 0) * 100)}%` : `電路板來源待確認（${sourceId}）`;
     }
     if (sourceId === '立繪、覺醒:Effect.PortraitAwakening') return '立繪、覺醒';
@@ -427,6 +471,7 @@ async function start() {
   const numeric = (parent: HTMLElement, label: string, cell: string, percentage = true, constraints?: { min: number; max: number; step: number }, disabled = false) => {
     const wrapper = document.createElement('label'); wrapper.className = 'field'; wrapper.textContent = label;
     const input = document.createElement('input'); input.type = 'number'; input.step = 'any'; input.placeholder = disabled ? '請先選擇屬性' : '請填寫數值';
+    preventScientificNotation(input);
     if (constraints) { input.min = String(constraints.min); input.max = String(constraints.max); input.step = String(constraints.step); }
     input.value = val(cell) === '' ? '' : String(Number(val(cell)) * (percentage ? 100 : 1));
     if (disabled) { input.disabled = true; wrapper.classList.add('field-disabled'); wrapper.setAttribute('aria-disabled', 'true'); wrapper.title = '請先選擇屬性'; }
@@ -746,35 +791,178 @@ async function start() {
       }
       const circuit = data.circuits.inputs.find(slot => slot.slot === selected.innerwearId)!;
       const board = section(panel, '電路板');
-      const boardGrid = attributeValueGrid(board);
-      field(boardGrid, '電路板項目', circuit.attributeCell, options(circuit.attributeOptions), true);
-      numeric(boardGrid, '電路板數值（%）', circuit.valueCell, true, undefined, val(circuit.attributeCell) === '');
+      if (circuit.slot !== 'gloves') {
+        const boardGrid = attributeValueGrid(board);
+        field(boardGrid, '電路板項目', circuit.attributeCell, circuitAttributeOptions(circuit), true);
+        numeric(boardGrid, '電路板數值（%）', circuit.valueCell, true, undefined, val(circuit.attributeCell) === '');
+      } else {
+        const note = document.createElement('p');
+        note.className = 'panel-note circuit-board-limit-note';
+        note.textContent = '可依需求新增或移除項目列；所有列的數值總和上限為 18.0%。';
+        const rowList = document.createElement('div');
+        rowList.className = 'circuit-board-rows';
+        const totalStatus = document.createElement('p');
+        totalStatus.className = 'circuit-board-total';
+        totalStatus.setAttribute('aria-live', 'polite');
+        const actions = document.createElement('div');
+        actions.className = 'circuit-board-actions';
+        const addRowButton = document.createElement('button');
+        addRowButton.type = 'button';
+        addRowButton.className = 'circuit-board-add';
+        addRowButton.textContent = '新增電路板列';
+        actions.append(addRowButton);
+        board.append(note, rowList, totalStatus, actions);
+
+        const readRows = () => readGloveCircuitRows(state.values, circuit.attributeCell, circuit.valueCell);
+        const storeRows = (rows: ReturnType<typeof readRows>) => {
+          state.values[GLOVE_CIRCUIT_ROWS_FIELD] = serializeGloveCircuitRows(rows);
+        };
+        const refreshTotal = (rows: ReturnType<typeof readRows>) => {
+          const totalPct = gloveCircuitRowsTotal(rows) * 100;
+          if (totalPct > 18 + 1e-9) {
+            totalStatus.textContent = '目前總和 ' + fmt(totalPct) + '%，已超過 18.0% 上限。';
+            totalStatus.classList.add('input-warning');
+          } else {
+            totalStatus.textContent = '目前總和：' + fmt(totalPct) + '% / 18.0%';
+            totalStatus.classList.remove('input-warning');
+          }
+          [...rowList.querySelectorAll<HTMLInputElement>('input[type="number"]')].forEach((input, index) => {
+            const otherTotalPct = rows.reduce((total, row, rowIndex) => total + (rowIndex === index ? 0 : (row.percentageValue ?? 0) * 100), 0);
+            input.max = String(Math.max(0, 18 - otherTotalPct));
+          });
+        };
+        const renderCircuitRows = () => {
+          const rows = readRows();
+          rowList.replaceChildren();
+          rows.forEach((row, index) => {
+            const rowElement = document.createElement('div');
+            rowElement.className = 'circuit-board-row';
+            const picker = createPicker('電路板項目 ' + (index + 1), options(circuit.attributeOptions), row.attribute, value => {
+              rows[index] = { ...rows[index], attribute: value, percentageValue: value ? rows[index].percentageValue : null };
+              storeRows(rows);
+              update();
+              renderCircuitRows();
+            });
+            rowElement.append(picker);
+
+            const valueField = document.createElement('label');
+            valueField.className = 'field circuit-board-value';
+            valueField.append(document.createTextNode('電路板數值 ' + (index + 1) + '（%）'));
+            const input = document.createElement('input');
+            input.type = 'number';
+            preventScientificNotation(input);
+            input.min = '0';
+            input.step = 'any';
+            input.placeholder = row.attribute ? '請填寫數值' : '請先選擇屬性';
+            input.value = row.percentageValue === null ? '' : String(row.percentageValue * 100);
+            input.disabled = !row.attribute;
+            valueField.append(input);
+            rowElement.append(valueField);
+
+            const removeButton = document.createElement('button');
+            removeButton.type = 'button';
+            removeButton.className = 'circuit-board-remove';
+            removeButton.textContent = '移除';
+            removeButton.setAttribute('aria-label', '移除第 ' + (index + 1) + ' 列電路板');
+            removeButton.disabled = rows.length === 1;
+            removeButton.title = rows.length === 1 ? '至少保留一列' : '移除此列';
+            removeButton.addEventListener('click', () => {
+              rows.splice(index, 1);
+              storeRows(rows);
+              update();
+              renderCircuitRows();
+              addRowButton.focus();
+            });
+            rowElement.append(removeButton);
+            rowList.append(rowElement);
+
+            input.addEventListener('input', () => {
+              const percentageValue = input.value === '' ? null : Number(input.value) / 100;
+              if (percentageValue !== null && (!Number.isFinite(percentageValue) || percentageValue < 0)) {
+                input.setCustomValidity('數值不得小於 0。');
+                totalStatus.textContent = '電路板數值不得小於 0%。';
+                totalStatus.classList.add('input-warning');
+                return;
+              }
+              const candidateRows = rows.map((entry, rowIndex) => rowIndex === index ? { ...entry, percentageValue } : entry);
+              const totalPct = gloveCircuitRowsTotal(candidateRows) * 100;
+              if (totalPct > 18 + 1e-9) {
+                input.setCustomValidity('所有列的總和不可超過 18.0%。');
+                totalStatus.textContent = '總和將達 ' + fmt(totalPct) + '%，不可超過 18.0%。';
+                totalStatus.classList.add('input-warning');
+                return;
+              }
+              input.setCustomValidity('');
+              rows[index] = { ...rows[index], percentageValue };
+              storeRows(rows);
+              update();
+              refreshTotal(rows);
+            });
+          });
+          refreshTotal(rows);
+        };
+        addRowButton.addEventListener('click', () => {
+          const rows = readRows();
+          rows.push({ attribute: '', percentageValue: null });
+          storeRows(rows);
+          update();
+          renderCircuitRows();
+          rowList.lastElementChild?.querySelector<HTMLInputElement>('input')?.focus();
+        });
+        renderCircuitRows();
+      }
+      const conditionalCircuitConflict = lowerwearConditionalCircuitConflict();
+      if (conditionalCircuitConflict && (circuit.slot === "lowerwear" || circuit.slot === "lowerwearAlternative")) {
+        const warning = document.createElement("p");
+        warning.className = "input-warning";
+        warning.textContent = "下衣與強/排褲不可同時選擇「" + conditionalCircuitConflict + "」。請讓兩套配置分別使用「強者%」與「排熱%」，以符合 Boss 體力切換條件。";
+        board.append(warning);
+      }
       const chip = data.chipSlots.slots.find(slot => slot.id === selected.innerwearId)!;
       const chipArea = section(panel, '芯片與芯片調校');
       const chipGrid = attributeValueGrid(chipArea);
-      field(chipGrid, '芯片屬性', chip.attributeCell, options(data.chips.chips.map(entry => entry.name)), true);
+      field(chipGrid, '芯片屬性', chip.attributeCell, chipAttributeOptions(chip), true);
       const chosen = data.chips.chips.find(entry => entry.name === val(chip.attributeCell));
       field(chipGrid, '芯片調校等級', chip.tuningCell, options(chosen?.tuningLevels.map(level => level.level) ?? []), false, val(chip.attributeCell) === '');
+      const conditionalChipConflict = lowerwearConditionalChipConflict();
+      if (conditionalChipConflict && (chip.id === "lowerwear" || chip.id === "lowerwearAlternative")) {
+        const warning = document.createElement("p");
+        warning.className = "input-warning";
+        warning.textContent = "下衣與強/排褲不可同時使用「" + conditionalChipConflict + "」芯片。請讓兩套配置分別使用「強者%」與「排熱%」，以符合 Boss 體力切換條件。";
+        chipArea.append(warning);
+      }
     }
     if (selected.weapon) {
       const appraisal = section(panel, '武器鑑定'); Object.values(data.weaponAppraisals.groups).forEach((group, i) => field(appraisal, `鑑定 ${i + 1}`, group.selectorCell, group.options.map(option => ({ value: option.name, label: option.name }))));
       const transform = section(panel, '武器變換');
+      const transformationGrid = attributeValueGrid(transform, 'weapon-transformation-grid');
       data.transformations.slots.forEach((slot, i) => {
         const selectedElsewhere = new Set(data.transformations.slots
           .filter(other => other.choiceCell !== slot.choiceCell)
           .map(other => val(other.choiceCell))
           .filter(Boolean));
         const availableOptions = data.transformations.options.filter(option => !selectedElsewhere.has(option));
-        field(transform, `變換 ${i + 1}`, slot.choiceCell, options(availableOptions), true);
+        field(transformationGrid, `變換 ${i + 1}`, slot.choiceCell, options(availableOptions), true);
         const percentage = data.transformations.rules.find(rule => rule.choice === val(slot.choiceCell))?.valueMultiplier !== 1;
-        numeric(transform, `變換 ${i + 1} 數值${percentage ? '（%）' : '（等級）'}`, slot.valueCell, percentage);
+        numeric(transformationGrid, `變換 ${i + 1} 數值${percentage ? '（%）' : '（等級）'}`, slot.valueCell, percentage);
       });
     }
   }
-  function renderSheetParity(result: ReturnType<typeof projectDamage>['result']) {
-    if (!sheetReference) return;
-    const rows = compareSheetParity(result, sheetReference);
-    const mismatches = rows.filter(row => !row.matches);
+  function renderSheetParity(
+    currentResult: ReturnType<typeof projectDamage>['result'] | undefined,
+    baselineResult: ReturnType<typeof projectDamage>['result'] | undefined,
+  ) {
+    const target = document.querySelector<HTMLElement>('#sheet-parity')!;
+    if (!currentResult) {
+      target.innerHTML = '<p>目前配裝的輸入尚未完成或無法計算，修正後即可與比較基準對照。</p>';
+      return;
+    }
+    if (!baselineResult) {
+      target.innerHTML = `<p>${baseline ? '已設定的比較基準目前無法計算，請重新設定基準。' : '先點選「設為比較基準」保存目前配置，表格就會比較基準與目前配裝。'}</p>`;
+      return;
+    }
+    const rows = compareLoadoutResults(currentResult, baselineResult);
+
     const precise = (value: number) => new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 10 }).format(value);
     const visiblePrecise = (value: number) => new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 3 }).format(value);
     const displayParityValue = (row: typeof rows[number], value: number) => {
@@ -789,30 +977,27 @@ async function start() {
     const activeAttackType = data.classes.classes.find(entry => entry.id === state.Job)?.attackType;
     const relevantAttackCell = activeAttackType === 'physical' ? 'C1' : 'D1';
     const relevantWeaponBaseCell = activeAttackType === 'physical' ? 'C53' : 'D53';
-    const table = (items: typeof rows) => `<div class="sheet-parity-scroll"><table><thead><tr><th>項目</th><th>原配置</th><th>新配置</th><th>差異</th></tr></thead><tbody>${items.filter(row => !['C1', 'D1'].includes(row.cell) || row.cell === relevantAttackCell).filter(row => !['C53', 'D53'].includes(row.cell) || row.cell === relevantWeaponBaseCell).map(row => {
-      const label = ['C1', 'D1'].includes(row.cell) ? '攻擊力' : ['C53', 'D53'].includes(row.cell) ? '武器基礎攻擊力' : row.label;
+    const visibleRows = rows.filter(row =>
+      (!['C1', 'D1'].includes(row.cell) || row.cell === relevantAttackCell)
+      && (!['C53', 'D53'].includes(row.cell) || row.cell === relevantWeaponBaseCell),
+    );
+    const mismatches = visibleRows.filter(row => !row.matches);
+    const table = (items: typeof rows) => `<div class="sheet-parity-scroll"><table><thead><tr><th>項目</th><th>基準配置</th><th>目前配置</th><th>差異</th></tr></thead><tbody>${items.map(row => {
+      const label = row.cell === 'B157' ? '最小攻擊力' : row.cell === 'B158' ? '最大攻擊力' : row.label;
       const rowClass = row.matches ? '' : `sheet-parity-difference ${row.delta > 0 ? 'sheet-parity-positive' : row.delta < 0 ? 'sheet-parity-negative' : ''}`;
       return `<tr class="${rowClass}"><th scope="row">${h(label)}</th><td>${displayParityValue(row, row.expected)}</td><td>${displayParityValue(row, row.actual)}</td><td class="${row.delta > 0 ? 'positive' : row.delta < 0 ? 'negative' : ''}">${displayParityDelta(row)}</td></tr>`;
     }).join('')}</tbody></table></div>`;
-    const bleed = rows.find(row => row.cell === 'M1');
-    const damage = rows.find(row => row.cell === 'B163');
-    const damageWithoutBleedDifference = bleed && damage
-      ? damage.actual * (1 + bleed.expected / 100) / (1 + bleed.actual / 100)
-      : NaN;
-    const knownRightIceDifference = mismatches.length === 2
-      && bleed?.matches === false && Math.abs(bleed.delta - 5) < 1e-9
-      && damage?.matches === false
-      && Math.abs(damageWithoutBleedDifference - damage.expected) < 1e-6;
-    document.querySelector('#sheet-parity')!.innerHTML = `<p>依未格式化數值比對 ${rows.length} 項：${rows.length - mismatches.length} 項相同、${mismatches.length} 項不同。最終傷害參考值依來源公式與原始數值重算，避免顯示精度影響比較。</p>${mismatches.length ? table(mismatches) : ''}${knownRightIceDifference ? '<p>目前差異可由流血 +5% 解釋。網站依選中的套裝及右冰實際件數計算套效；請核對所選套裝與參考配置。</p>' : ''}<details><summary>查看適用的比較值（${rows.length} 項已驗算）</summary>${table(rows)}</details>`;
+    const differences = mismatches.length ? table(mismatches) : '<p>目前配置與比較基準的計算值相同。</p>';
+    document.querySelector('#sheet-parity')!.innerHTML = `<p>依比較基準與目前配裝的未格式化數值比對 ${visibleRows.length} 項：${visibleRows.length - mismatches.length} 項相同、${mismatches.length} 項不同。</p>${differences}<details><summary>查看全部比較值（${visibleRows.length} 項）</summary>${table(visibleRows)}</details>`;
   }
   function renderResults() {
-    if (sheetReference) document.querySelector('#sheet-parity')!.replaceChildren();
     const target = document.querySelector('#results')!;
       let currentDamage: ReturnType<typeof projectDamage> | null = null;
       let baselineDamage: ReturnType<typeof projectDamage> | null = null;
       let damageCalculationError: unknown;
       try { currentDamage = projectDamage(data, state); } catch (error) { damageCalculationError = error; }
       try { if (baseline) baselineDamage = projectDamage(data, baseline); } catch { /* Keep current attributes visible if the saved build is stale. */ }
+      if (!currentDamage) renderSheetParity(undefined, baselineDamage?.result);
       const equipmentDamageSummary = document.querySelector<HTMLElement>('#equipment-damage-summary')!;
       const baselineFinalDamage = baselineDamage?.result.finalDamage.finalDamage;
       const currentFinalDamage = currentDamage?.result.finalDamage.finalDamage;
@@ -852,6 +1037,7 @@ async function start() {
       visibleStats.unshift({ key: 'attackPower', stat: attackStat, previousStat: before?.stats[baselineAttackKey] });
     }
     const percentFormat = (value: number) => new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 3 }).format(value);
+    const signedDelta = (value: number, format: (value: number) => string, suffix = '') => { const magnitude = format(Math.abs(value)); return magnitude === format(0) ? '' : (value > 0 ? '+' : '−') + magnitude + suffix; };
     const finalDamageFormat = (value: number) => {
       const parts = new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 3 }).formatToParts(value);
       const integer = parts.filter(part => part.type !== 'decimal' && part.type !== 'fraction').map(part => part.value).join('');
@@ -865,11 +1051,24 @@ async function start() {
     const combatRateCards = currentCombatRates
       ? `<div class="combat-rate-pair"><div class="stat"><p>實戰致命一擊機率</p><strong>${fmt(currentCombatRates.critRate.finalRate * 100)}%</strong>${probabilityCapWarning(currentCombatRates.critRate.valueBeforeUpperCap)}</div><div class="stat"><p>實戰極大化</p><strong>${fmt(currentCombatRates.extremization.finalRate * 100)}%</strong>${probabilityCapWarning(currentCombatRates.extremization.valueBeforeUpperCap)}</div></div>`
       : `<div class="combat-rate-pair"><div class="stat"><p>實戰致命一擊機率</p><strong>待補輸入</strong><small class="input-hint">${h(calculationIssue(damageCalculationError))}</small></div><div class="stat"><p>實戰極大化</p><strong>待補輸入</strong><small class="input-hint">${h(calculationIssue(damageCalculationError))}</small></div></div>`;
-    const conditionalDamageCard = (label: string, valuePct: number, sources: readonly { sourceId: string; valuePct: number }[]) =>
-      '<details class="stat conditional-stat"><summary><span>' + h(label) + '</span><strong>' + fmt(valuePct) + '%</strong></summary><div class="stat-details"><p class="stat-detail-heading">來源</p>' + (sourceRows(sources, true) || '<p class="stat-source-empty">目前沒有此條件的額外來源</p>') + '<p class="stat-average">來源合計 ' + fmt(valuePct) + '%</p></div></details>';
-    const conditionalDamageCards = '<div class="conditional-damage-pair">' + conditionalDamageCard('強者（Boss 體力 > 50%）', current.conditionalDamage.strongerPct, current.conditionalDamage.strongerSources) + conditionalDamageCard('排熱（Boss 體力 ≤ 50%）', current.conditionalDamage.heatPct, current.conditionalDamage.heatSources) + '</div>';
+    const conditionalDamageCard = (label: string, valuePct: number, sources: readonly { sourceId: string; valuePct: number }[], previousValuePct: number | undefined) => {
+      const delta = previousValuePct === undefined ? null : valuePct - previousValuePct;
+      const deltaText = delta === null ? '' : signedDelta(delta, percentFormat, '%');
+      const deltaClass = delta === null || delta === 0 ? '' : delta > 0 ? 'positive' : 'negative';
+      const deltaBadge = deltaText ? '<small class="' + deltaClass + '">' + deltaText + '</small>' : '';
+      return '<details class="stat conditional-stat"><summary><span>' + h(label) + '</span><strong>' + fmt(valuePct) + '%</strong>' + deltaBadge + '</summary><div class="stat-details"><p class="stat-detail-heading">來源</p>' + (sourceRows(sources, true) || '<p class="stat-source-empty">目前沒有此條件的額外來源</p>') + '<p class="stat-average">來源合計 ' + fmt(valuePct) + '%</p></div></details>';
+    };
+    const baselineConditionalDamage = baselineDamage?.result.attributes.conditionalDamage;
+    const conditionalDamageCards = '<div class="conditional-damage-pair">' + conditionalDamageCard('強者（Boss 體力 > 50%）', current.conditionalDamage.strongerPct, current.conditionalDamage.strongerSources, baselineConditionalDamage?.strongerPct) + conditionalDamageCard('排熱（Boss 體力 ≤ 50%）', current.conditionalDamage.heatPct, current.conditionalDamage.heatSources, baselineConditionalDamage?.heatPct) + '</div>';
+    const multiplicativeDeltaValue = currentDamage && baselineDamage
+      ? currentDamage.result.generalMultiplicativeDamage.value - baselineDamage.result.generalMultiplicativeDamage.value
+      : null;
+    const multiplicativeDeltaText = multiplicativeDeltaValue === null ? '' : signedDelta(multiplicativeDeltaValue, fmt, '×');
+    const multiplicativeDeltaBadge = multiplicativeDeltaText
+      ? '<small class="' + (multiplicativeDeltaValue! > 0 ? 'positive' : 'negative') + '">' + multiplicativeDeltaText + '</small>'
+      : '';
     const multiplicativeEffectCard = currentDamage
-      ? `<details class="stat"><summary><span>乘算效果</span><strong>×${fmt(currentDamage.result.generalMultiplicativeDamage.value)}</strong></summary><div class="stat-details">${currentDamage.result.generalMultiplicativeDamage.factors.length
+      ? `<details class="stat"><summary><span>乘算效果</span><strong>×${fmt(currentDamage.result.generalMultiplicativeDamage.value)}</strong>${multiplicativeDeltaBadge}</summary><div class="stat-details">${currentDamage.result.generalMultiplicativeDamage.factors.length
         ? currentDamage.result.generalMultiplicativeDamage.factors.map(effect => `<p class="stat-source-row"><span>${h(sourceLabel(effect.sourceId))}</span><strong>×${fmt(effect.factor)}</strong></p>`).join('')
         : '<p class="stat-source-empty">目前沒有額外乘算來源</p>'}<p class="stat-average">乘算效果總倍率 ×${fmt(currentDamage.result.generalMultiplicativeDamage.value)}</p></div></details>`
       : `<div class="stat"><p>乘算效果</p><strong>待補輸入</strong><small class="input-hint">${h(calculationIssue(damageCalculationError))}</small></div>`;
@@ -883,8 +1082,10 @@ async function start() {
       const displayTotal = stat.finalTotal + currentSupplement;
       const previous = (previousStat?.finalTotal ?? 0) + previousSupplement;
       const delta = before && (!isCritDamage || (currentDamage && baselineDamage)) ? displayTotal - previous : null;
-      const comparison = delta === null ? '' : `<p>基準 ${fmt(previous)}${isPercent ? '%' : ''} → 目前 ${fmt(displayTotal)}${isPercent ? '%' : ''}；相對變化 ${previous === 0 ? '—（基準為 0）' : `${percentFormat(delta / previous * 100)}%`}</p>`;
-      const deltaText = delta === null ? '' : `${delta > 0 ? '+' : ''}${isPercent ? percentFormat(delta) : fmt(delta)}${isPercent ? '%' : ''}`;
+      const deltaText = delta === null ? '' : signedDelta(delta, isPercent ? percentFormat : fmt, isPercent ? '%' : '');
+      const relativeDeltaText = delta === null || previous === 0 ? '' : signedDelta(delta / previous * 100, percentFormat, '%');
+      const comparison = delta === null ? '' : !deltaText ? '<p>與基準配置相同。</p>' : '<p>基準 ' + fmt(previous) + (isPercent ? '%' : '') + ' → 目前 ' + fmt(displayTotal) + (isPercent ? '%' : '') + '；差異 ' + deltaText + (relativeDeltaText ? '；相對變化 ' + relativeDeltaText : '') + '</p>';
+      const deltaBadge = deltaText ? '<small class="' + (delta !== null && delta > 0 ? 'positive' : 'negative') + '">' + deltaText + '</small>' : '';
       const shownName = key === 'attackPower' ? '攻擊力' : meta?.name ?? key;
       const attributeOverflow = stat.cap === undefined ? null : capOverflowPercentage(stat.totalBeforeCap, stat.cap);
       const attributeCapWarning = attributeOverflow === null
@@ -912,13 +1113,13 @@ async function start() {
         ? `<p class="stat-detail-heading">乘算來源</p><p class="stat-source-row"><span>乘算暴傷增幅（角色基底 ${fmt(critDamageBaseFactor * 100)}% 扣除 ${fmt(critDamageBaselinePct)}% 基準後）</span><strong>+${fmt(currentDamage.result.multiplicativeCritDamage.value * 100)}%</strong></p>${currentDamage.result.multiplicativeCritDamage.factors.filter(effect => effect.sourceId !== 'character-base:crit-damage-product').map(effect => `<p class="stat-source-row"><span>${h(sourceLabel(effect.sourceId))}</span><strong>×${fmt(effect.factor)}</strong></p>`).join('')}`
         : '';
       const lowerwearBDetails = state.lowerwearAlternativeEnabled && stat.lowerwearBSources.length ? `<p class="stat-detail-heading">強/排褲來源</p>${sourceRows(stat.lowerwearBSources, isPercent)}` : '';
-      return `<details class="stat"><summary><span>${h(shownName)}</span><strong>${fmt(displayTotal)}${isPercent ? '%' : ''}</strong>${attributeCapWarning}${delta === null ? '' : `<small class="${delta > 0 ? 'positive' : delta < 0 ? 'negative' : ''}">${deltaText}</small>`}</summary><div class="stat-details">${sharedDetails}${critDamageDetails}${lowerwearBDetails}<p class="stat-average">${lowerwearAverageLabel} ${fmt(lowerwearAverage)}${isPercent ? '%' : ''}</p>${comparison}</div></details>`;
+      return `<details class="stat"><summary><span>${h(shownName)}</span><strong>${fmt(displayTotal)}${isPercent ? '%' : ''}</strong>${attributeCapWarning}${deltaBadge}</summary><div class="stat-details">${sharedDetails}${critDamageDetails}${lowerwearBDetails}<p class="stat-average">${lowerwearAverageLabel} ${fmt(lowerwearAverage)}${isPercent ? '%' : ''}</p>${comparison}</div></details>`;
     }).join('')}${conditionalDamageCards}${multiplicativeEffectCard}${combatRateCards}</div>`;
       const damageTarget = document.querySelector('#damage-result')!;
       try {
         if (!currentDamage) throw damageCalculationError;
         const { result } = currentDamage;
-        renderSheetParity(result);
+        renderSheetParity(result, baselineDamage?.result);
         let damageRatioHtml = '';
         if (baseline && before) {
           let damageRatio: number | null = null;
@@ -954,13 +1155,42 @@ async function start() {
       document.querySelector('#calculation-details')!.replaceChildren();
     }
   }
-  const renderClassPicker = () => document.querySelector('#class-picker')!.replaceChildren(createPicker('職業', data.classes.classes.filter(entry => entry.active).map(entry => ({ value: entry.id, label: entry.name })), state.Job, value => { state.Job = value; update(); }));
+  const renderClassPicker = () => {
+    const root = document.querySelector<HTMLElement>('#class-picker')!;
+    const activeClasses = data.classes.classes.filter(entry => entry.active);
+    const classCodes = activeClasses.map(entry => entry.id);
+    const error = document.createElement('span');
+    error.className = 'input-hint class-picker-error';
+    error.hidden = true;
+    error.setAttribute('role', 'alert');
+    const picker = createPicker('職業', activeClasses.map(entry => ({ value: entry.id, label: entry.name })), state.Job, value => { state.Job = value; error.textContent = ''; error.hidden = true; update(); }, {
+      sanitize: sanitizeClassCode,
+      resolve: value => resolveClassCode(value, classCodes),
+      onInvalid: value => { error.textContent = value ? '查無此職業代碼，請確認後再按 Enter。' : '請輸入職業代碼。'; error.hidden = false; },
+      onInput: () => { error.textContent = ''; error.hidden = true; },
+      allowCharacter: character => /^[A-Za-z]$/.test(character),
+    });
+    const input = picker.querySelector<HTMLInputElement>('input');
+    if (input) input.placeholder = '輸入職業代碼（例如 DaB）';
+    root.replaceChildren(picker, error);
+  };
   renderClassPicker();
   const toggle = document.querySelector<HTMLInputElement>('#alternate')!; toggle.checked = state.lowerwearAlternativeEnabled;
   const battle = document.querySelector<HTMLElement>('#battle-settings')!;
   for (const [fieldId, label] of [['Stage.Adapt','關卡適應力'],['Stage.CritRatePenalty','關卡扣致命'],['Stage.BossDEF','Boss防禦']] as const) {
     const catalog = findValidationCatalog(data.simulatorInputs.inputs, data.simulatorInputs.catalogs, fieldId);
-    field(battle, label, fieldId, options((catalog?.options ?? []).map(option => String(option.value))));
+    const error = document.createElement('span');
+    error.className = 'input-hint class-picker-error';
+    error.hidden = true;
+    error.setAttribute('role', 'alert');
+    const picker = createPicker(label, options((catalog?.options ?? []).map(option => String(option.value))), val(fieldId), value => { state.values[fieldId] = value; error.textContent = ''; error.hidden = true; update(); }, {
+      sanitize: sanitizeUnsignedInteger,
+      resolve: resolveUnsignedInteger,
+      onInvalid: () => { error.textContent = '請輸入純數字（非負整數），或從選項中選擇。'; error.hidden = false; },
+      onInput: () => { error.textContent = ''; error.hidden = true; },
+      allowCharacter: character => /^[0-9]$/.test(character),
+    });
+    battle.append(picker, error);
   }
   toggle.addEventListener('change', () => { state.lowerwearAlternativeEnabled = toggle.checked; update(); renderInspector(); });
   document.querySelector('#baseline')!.addEventListener('click', () => { try { projectAttributes(data, state); baseline = structuredClone(state); const stored = sampleMode ? false : saveState(baseline, true); renderResults(); document.querySelector('#save-status')!.textContent = stored ? '比較基準已儲存' : '比較基準僅保留至關閉頁面'; } catch { renderResults(); } });

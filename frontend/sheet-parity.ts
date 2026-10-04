@@ -11,7 +11,7 @@ export interface SheetParityRow {
   label: string;
   expected: number;
   actual: number;
-  /** Website result minus the spreadsheet reference. */
+  /** Actual value minus the expected reference value. */
   delta: number;
   matches: boolean;
 }
@@ -69,6 +69,22 @@ export function compareSheetParity(
     if (!Number.isFinite(actual)) throw new RangeError(`網站 ${cell} 產生無效數值。`);
     const delta = actual - expected;
     // A few ULPs allow different summation order without hiding a real formula gap.
+    const tolerance = Math.max(1e-12, 32 * Number.EPSILON * Math.max(1, Math.abs(actual), Math.abs(expected)));
+    return { cell, label, expected, actual, delta, matches: Math.abs(delta) <= tolerance };
+  });
+}
+
+/** Compare a live configuration against the user's saved baseline using the same engine fields. */
+export function compareLoadoutResults(
+  currentResult: LoadoutCalculationResult,
+  baselineResult: LoadoutCalculationResult,
+): SheetParityRow[] {
+  return comparedCells.map(([cell, label, read]) => {
+    const expected = read(baselineResult);
+    const actual = read(currentResult);
+    if (!Number.isFinite(expected)) throw new RangeError(`基準配置 ${cell} 缺少有效數值。`);
+    if (!Number.isFinite(actual)) throw new RangeError(`目前配置 ${cell} 產生無效數值。`);
+    const delta = actual - expected;
     const tolerance = Math.max(1e-12, 32 * Number.EPSILON * Math.max(1, Math.abs(actual), Math.abs(expected)));
     return { cell, label, expected, actual, delta, matches: Math.abs(delta) <= tolerance };
   });

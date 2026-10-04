@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "source": "User-confirmed class passives. Additive critical damage, Boss damage, and independent multiplicative critical-damage effects are stored separately. RM keeps its existing 180% character base in parameters.json; existing DaB and DE passive values are preserved.",
+  "source": "User-confirmed class passives. Additive critical damage, Boss damage, and independent multiplicative critical-damage effects are stored separately. RM keeps its existing 180% character base in parameters.json; DaB keeps its existing passive; CT, IN, DA, and DE each shift 23 points from additive to multiplicative critical damage.",
   "critDamagePctByClass": {
     "KE": 8,
     "RM": 0,
@@ -38,10 +38,10 @@
     "DN": 15,
     "MP": 15,
     "OM": 10,
-    "CT": 46,
-    "IN": 48,
-    "DA": 35,
-    "DE": 23,
+    "CT": 23,
+    "IN": 25,
+    "DA": 12,
+    "DE": 0,
     "TB": 10,
     "BMa": 10,
     "MN": 15,
@@ -164,10 +164,18 @@
     "DN": [],
     "MP": [],
     "OM": [],
-    "CT": [],
-    "IN": [],
-    "DA": [],
-    "DE": [],
+    "CT": [
+      23
+    ],
+    "IN": [
+      23
+    ],
+    "DA": [
+      23
+    ],
+    "DE": [
+      23
+    ],
     "TB": [
       10
     ],

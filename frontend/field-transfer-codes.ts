@@ -292,5 +292,6 @@ export const FIELD_ID_TO_CODE: Readonly<Record<string, number>> = Object.freeze(
   "Innerwear.Gloves.Magazine.Type": 290,
   "Innerwear.Gloves.Magazine.Level": 291,
   "Innerwear.Shoes.Magazine.Type": 292,
-  "Innerwear.Shoes.Magazine.Level": 293
+  "Innerwear.Shoes.Magazine.Level": 293,
+  "Left.Armor.Gloves.Circuit.Rows": 294
 });

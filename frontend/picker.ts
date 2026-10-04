@@ -6,6 +6,22 @@ let mobilePickerSearchToggle: HTMLButtonElement | null = null;
 let mobilePickerSearch: HTMLInputElement | null = null;
 let mobilePickerList: HTMLElement | null = null;
 let mobilePickerReturnTarget: HTMLElement | null = null;
+type OutsideCommitPicker = { root: HTMLElement; commitOrClose: () => void };
+const outsideCommitPickers = new Set<OutsideCommitPicker>();
+let outsideCommitListenerInstalled = false;
+
+function registerOutsidePointerCommit(picker: OutsideCommitPicker) {
+  if (!outsideCommitListenerInstalled) {
+    document.addEventListener("pointerdown", event => {
+      for (const entry of outsideCommitPickers) {
+        if (!entry.root.isConnected) { outsideCommitPickers.delete(entry); continue; }
+        if (!entry.root.contains(event.target as Node | null)) entry.commitOrClose();
+      }
+    }, true);
+    outsideCommitListenerInstalled = true;
+  }
+  outsideCommitPickers.add(picker);
+}
 
 function getMobilePickerDialog() {
   if (mobilePickerDialog) return mobilePickerDialog;
@@ -34,7 +50,8 @@ function getMobilePickerDialog() {
 }
 
 /** Only explicit selections are saved; desktop typing filters the list. */
-export function createPicker(label: string, options: readonly PickerOption[], value: string, onChange: (value: string) => void): HTMLElement {
+export interface PickerDirectEntry { sanitize: (value: string) => string; resolve: (value: string) => string | null; onInvalid: (value: string) => void; onInput?: () => void; allowCharacter?: (character: string) => boolean }
+export function createPicker(label: string, options: readonly PickerOption[], value: string, onChange: (value: string) => void, directEntry?: PickerDirectEntry): HTMLElement {
   const root = document.createElement('div'); root.className = 'picker field';
   const displayValue = (selected: string) => options.find(option => option.value === selected)?.label ?? selected;
   const caption = document.createElement('label'); caption.textContent = label;
@@ -47,11 +64,23 @@ export function createPicker(label: string, options: readonly PickerOption[], va
   const clear = document.createElement('button'); clear.type = 'button'; clear.className = 'picker-clear'; clear.textContent = '×'; clear.title = '清除目前選擇'; clear.setAttribute('aria-label', `清除${label}`); clear.hidden = value === '';
   input.setAttribute('aria-controls', list.id);
   let matches: PickerOption[] = [], index = -1, committed = value;
+  let directEntryDirty = false;
   const mobileQuery = window.matchMedia('(max-width: 700px)');
   const close = () => { list.hidden = true; input.setAttribute('aria-expanded', 'false'); input.removeAttribute('aria-activedescendant'); input.value = displayValue(committed); clear.hidden = committed === ''; };
-  const commit = (option: PickerOption) => { committed = option.value; close(); onChange(option.value); };
+  const commit = (option: PickerOption) => { directEntryDirty = false; committed = option.value; close(); onChange(option.value); };
+  const commitDirectEntry = () => {
+    if (!directEntry) return;
+    if (!directEntryDirty) { close(); return; }
+    const typedValue = input.value;
+    const resolved = directEntry.resolve(typedValue);
+    const option = resolved ? options.find(entry => entry.value === resolved) ?? { value: resolved, label: resolved } : undefined;
+    directEntryDirty = false;
+    if (option) commit(option);
+    else { directEntry.onInvalid(typedValue); close(); }
+  };
+  if (directEntry) registerOutsidePointerCommit({ root, commitOrClose: commitDirectEntry });
   const draw = (query: string) => {
-    matches = options.filter(option => option.label.toLocaleLowerCase().includes(query.toLocaleLowerCase()));
+    matches = options.filter(option => (option.label + (directEntry ? ' ' + option.value : '')).toLocaleLowerCase().includes(query.toLocaleLowerCase()));
     index = -1; list.replaceChildren(); list.hidden = false; input.setAttribute('aria-expanded', 'true');
     for (const [i, option] of matches.entries()) {
       const row = document.createElement('button'); row.type = 'button'; row.role = 'option'; row.id = `${list.id}-${i}`; row.tabIndex = -1;
@@ -91,27 +120,31 @@ export function createPicker(label: string, options: readonly PickerOption[], va
     };
     if (!dialog.open) dialog.showModal();
   };
-  input.addEventListener('pointerdown', () => { input.readOnly = mobileQuery.matches; });
+  input.addEventListener('pointerdown', () => { input.readOnly = mobileQuery.matches && !directEntry; });
   input.addEventListener('focus', () => {
-    if (mobileQuery.matches) { input.readOnly = true; return; }
+    directEntryDirty = false;
+    if (mobileQuery.matches && !directEntry) { input.readOnly = true; return; }
     input.readOnly = false; input.select(); draw('');
   });
   input.addEventListener('click', () => {
-    if (mobileQuery.matches) { input.readOnly = true; openMobilePicker(); }
+    if (mobileQuery.matches && !directEntry) { input.readOnly = true; openMobilePicker(); }
   });
-  input.addEventListener('input', () => { if (!mobileQuery.matches) draw(input.value); });
-  root.addEventListener('focusout', event => { if (!root.contains(event.relatedTarget as Node | null)) close(); });
+  input.addEventListener('keydown', event => { if (directEntry?.allowCharacter && event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey && !directEntry.allowCharacter(event.key)) event.preventDefault(); });
+  input.addEventListener('beforeinput', event => { const data = (event as InputEvent).data; if (directEntry?.allowCharacter && data && [...data].some(character => !directEntry.allowCharacter!(character))) event.preventDefault(); });
+  input.addEventListener('paste', event => { const text = (event as ClipboardEvent).clipboardData?.getData('text') ?? ''; if (directEntry?.allowCharacter && [...text].some(character => !directEntry.allowCharacter!(character))) event.preventDefault(); });
+  input.addEventListener('input', () => { if (directEntry) { directEntryDirty = true; const sanitized = directEntry.sanitize(input.value); if (sanitized !== input.value) input.value = sanitized; directEntry.onInput?.(); } if (!mobileQuery.matches || directEntry) draw(input.value); });
+  root.addEventListener('focusout', event => { if (!root.contains(event.relatedTarget as Node | null)) { if (directEntry && directEntryDirty) commitDirectEntry(); else close(); } });
   input.addEventListener('keydown', event => {
-    if (mobileQuery.matches && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); openMobilePicker(); return; }
+    if (mobileQuery.matches && !directEntry && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); openMobilePicker(); return; }
     if (event.key === 'Escape') { close(); return; }
     if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
       event.preventDefault(); if (list.hidden) draw(''); if (!matches.length) return;
       index = (index + (event.key === 'ArrowDown' ? 1 : -1) + matches.length) % matches.length;
       [...list.children].forEach((node, i) => node.setAttribute('aria-selected', String(i === index)));
       input.setAttribute('aria-activedescendant', `${list.id}-${index}`); list.children[index]?.scrollIntoView({ block: 'nearest' });
-    } else if (event.key === 'Enter' && !list.hidden && index >= 0) { event.preventDefault(); commit(matches[index]); }
+    } else if (event.key === 'Enter' && !list.hidden && index >= 0) { event.preventDefault(); commit(matches[index]); } else if (event.key === 'Enter' && directEntry) { event.preventDefault(); commitDirectEntry(); }
   });
   clear.addEventListener('mousedown', event => event.preventDefault());
-  clear.addEventListener('click', () => { committed = ''; input.value = ''; close(); onChange(''); });
+  clear.addEventListener('click', () => { directEntryDirty = false; committed = ''; input.value = ''; close(); onChange(''); });
   control.append(input, list, clear); root.append(caption, control); return root;
 }

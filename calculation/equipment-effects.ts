@@ -215,6 +215,7 @@ export interface CircuitBoardInputValue {
   attribute: string | null | undefined;
   percentageValue: number | null | undefined;
 }
+export type CircuitBoardInputSelection = CircuitBoardInputValue | readonly CircuitBoardInputValue[];
 
 export interface CircuitBoardContribution {
   slot: string;
@@ -579,26 +580,31 @@ export function resolveSpiritRecordEffects(
 /** Map free-text circuit-board attributes and decimal percentages to Calc row 43:47. */
 export function resolveCircuitBoardEffects(
   document: CircuitBoardRulesDocument,
-  inputValues: Readonly<Record<string, CircuitBoardInputValue>>,
+  inputValues: Readonly<Record<string, CircuitBoardInputSelection>>,
 ): CircuitBoardContribution[] {
-  return document.inputs.map((rule) => {
+  return document.inputs.flatMap((rule) => {
     const input = inputValues[rule.slot];
-    if (!input || input.attribute == null || input.attribute.trim() === "" || input.percentageValue == null) {
-      return { slot: rule.slot, wearSet: rule.wearSet, contribution: null };
-    }
-    if (!Number.isFinite(input.percentageValue)) {
-      throw new TypeError(rule.slot + " circuit-board percentage must be finite.");
-    }
-    const key = document.statKeyBySheetName[input.attribute];
-    if (!key) return { slot: rule.slot, wearSet: rule.wearSet, contribution: null };
-    return {
-      slot: rule.slot,
-      wearSet: rule.wearSet,
-      contribution: {
-        sourceId: "circuit-board:" + rule.slot,
-        stats: { [key]: input.percentageValue * 100 },
-      },
-    };
+    const multiple = Array.isArray(input);
+    const selections: readonly CircuitBoardInputValue[] = multiple ? input : input ? [input] : [];
+    if (selections.length === 0) return [{ slot: rule.slot, wearSet: rule.wearSet, contribution: null }];
+    return selections.map((selection, index) => {
+      if (selection.attribute == null || selection.attribute.trim() === "" || selection.percentageValue == null) {
+        return { slot: rule.slot, wearSet: rule.wearSet, contribution: null };
+      }
+      if (!Number.isFinite(selection.percentageValue)) {
+        throw new TypeError(rule.slot + " circuit-board percentage must be finite.");
+      }
+      const key = document.statKeyBySheetName[selection.attribute];
+      if (!key) return { slot: rule.slot, wearSet: rule.wearSet, contribution: null };
+      return {
+        slot: rule.slot,
+        wearSet: rule.wearSet,
+        contribution: {
+          sourceId: multiple ? "circuit-board:" + rule.slot + ":" + (index + 1) : "circuit-board:" + rule.slot,
+          stats: { [key]: selection.percentageValue * 100 },
+        },
+      };
+    });
   });
 }
 

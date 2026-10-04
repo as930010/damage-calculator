@@ -367,6 +367,16 @@ test('職業加算爆傷、乘算爆傷與 Boss 傷害按獨立公式投影', as
     assert.ok(Math.abs(result.multiplicativeCritDamage.value - (expectedProduct - result.multiplicativeCritDamage.baselinePct / 100)) < 1e-12, classId);
   }
 
+  for (const [classId, additive, multiplicative] of [['CT', 23, 23], ['IN', 25, 23], ['DA', 12, 23], ['DE', 0, 23]]) {
+    const result = projectDamage(data, stateFor(classId)).result;
+    assert.equal(result.classCritDamagePassivePct, additive, classId + ' additive crit damage');
+    const prefix = 'class-passive:' + classId + ':multiplicative-crit-damage:';
+    const sources = result.multiplicativeCritDamage.factors.filter(effect => effect.sourceId.startsWith(prefix));
+    assert.deepEqual(sources.map(effect => effect.valuePct), [multiplicative], classId + ' multiplicative crit damage');
+    const expectedProduct = result.multiplicativeCritDamage.factors.reduce((product, effect) => product * (1 + effect.valuePct / 100), 1);
+    assert.equal(result.multiplicativeCritDamage.productBeforeBaseline, expectedProduct, classId + ' multiplier product');
+  }
+
   const rm = projectDamage(data, stateFor('RM')).result;
   assert.equal(rm.classCritDamagePassivePct, 0);
   assert.equal(rm.attributes.stats.critDamagePct.sharedSources.find(source => source.sourceId === 'character-base').valuePct, 180);
@@ -440,4 +450,53 @@ test('隨機抽樣十個職業在多裝備傷害環境下交叉驗算', async ()
     }
   }
   assert.equal(checkedCases, 40);
+});
+test('強/排褲不可將相同條件電路板效果重複計入，強者與排熱分開時公式正確', async () => {
+  const data = await loadData();
+  const lowerwear = data.circuits.inputs.find(entry => entry.slot === 'lowerwear');
+  const alternative = data.circuits.inputs.find(entry => entry.slot === 'lowerwearAlternative');
+  const values = {
+    'Weapon.ENHC': 'Lv.8',
+    'Left.Armor.Upper.ENHC': 'Lv.8', 'Left.Armor.Bottom.ENHC': 'Lv.8',
+    'Left.Armor.Gloves.ENHC': 'Lv.8', 'Left.Armor.Shoes.ENHC': 'Lv.8',
+    'Left.Armor.Upper.FORGE': 0, 'Left.Armor.Bottom.FORGE': 0,
+    'Left.Armor.Gloves.FORGE': 0, 'Left.Armor.Shoes.FORGE': 0,
+    [lowerwear.attributeCell]: '強者%', [lowerwear.valueCell]: 0.05,
+    [alternative.attributeCell]: '強者%', [alternative.valueCell]: 0.03,
+  };
+  const invalidState = { schemaVersion: 3, Job: 'KE', values, lowerwearAlternativeEnabled: true };
+  assert.throws(() => projectAttributes(data, invalidState), /不可同時使用「強者%」/);
+
+  const validValues = { ...values, [alternative.attributeCell]: '排熱%' };
+  const validState = { ...invalidState, values: validValues };
+  const projected = projectDamage(data, validState).result;
+  assert.ok(projected.attributes.conditionalDamage.strongerSources.some(source => source.sourceId === 'circuit-board:lowerwear' && source.valuePct === 5));
+  assert.ok(projected.attributes.conditionalDamage.heatSources.some(source => source.sourceId === 'circuit-board:lowerwearAlternative' && source.valuePct === 3));
+  const expectedConditionalFactor = 1 / (
+    0.5 / (1 + projected.attributes.conditionalDamage.strongerPct / 100)
+    + 0.5 / (1 + projected.attributes.conditionalDamage.heatPct / 100)
+  );
+  assert.ok(Math.abs(projected.finalDamage.conditionalFactor - expectedConditionalFactor) < 1e-12);
+
+  const chipSlots = Object.fromEntries(data.chipSlots.slots.map(slot => [slot.id, slot]));
+  const chipValues = { ...validValues };
+  for (const slot of data.chipSlots.slots) {
+    const attribute = slot.id === 'lowerwearAlternative' ? '排熱%' : '強者%';
+    chipValues[slot.attributeCell] = attribute;
+    chipValues[slot.tuningCell] = '+5';
+  }
+  const chipState = { ...validState, values: chipValues };
+  const chipProjected = projectDamage(data, chipState).result;
+  for (const slotId of ['upper', 'gloves', 'shoes']) {
+    assert.ok(chipProjected.attributes.conditionalDamage.strongerSources.some(source => source.sourceId === 'chip:' + slotId), slotId + ' may reuse 強者% chip');
+  }
+  assert.ok(chipProjected.attributes.conditionalDamage.heatSources.some(source => source.sourceId === 'chip:lowerwearAlternative'));
+  const expectedChipFactor = 1 / (
+    0.5 / (1 + chipProjected.attributes.conditionalDamage.strongerPct / 100)
+    + 0.5 / (1 + chipProjected.attributes.conditionalDamage.heatPct / 100)
+  );
+  assert.ok(Math.abs(chipProjected.finalDamage.conditionalFactor - expectedChipFactor) < 1e-12);
+
+  const invalidChipValues = { ...chipValues, [chipSlots.lowerwearAlternative.attributeCell]: '強者%' };
+  assert.throws(() => projectAttributes(data, { ...validState, values: invalidChipValues }), /下衣與強\/排褲不可同時使用.*芯片/);
 });
