@@ -111,7 +111,7 @@ test('JSON 選擇的全域來源進入角色彙總與 B163 傷害流程', async 
     "GuildFountain.Stage2": '致命一擊+3%', "GuildFountain.Stage3": '雙攻+0.6%', "GuildFountain.Stage4": '強者+3%', "Resonance.AllATK.Points": 1, "Resonance.TranscendenceSkillDMG.Points": 10, "Resonance.Polarization.Points": 10, "Resonance.BossDMG.Points": 10, "Resonance.Adapt.Points": 10,
     "MasterBeast.Head.Option1": '致命一擊8%', "MasterBeast.Head.Option2": '極大化8%', "MasterBeast.Head.CustomAttribute": '致命一擊', "MasterBeast.Head.CustomValue": 5, "MasterBeast.Necklace.CustomAttribute": '超越技傷%', "MasterBeast.Necklace.CustomValue": 5,
     "MasterBeast.Ring1.CustomAttribute": '雙攻%', "MasterBeast.Ring1.CustomValue": 1.5, "MasterBeast.Ring2.CustomAttribute": '無視防禦%', "MasterBeast.Ring2.CustomValue": 2, "MasterBeast.Head.Mirror.1.Attribute": '所有技能傷害%', "MasterBeast.Head.Mirror.1.Value": 0.01,
-    "SpiritRecord.Class.1": 'KE', "SpiritRecord.Class.2": 'KE', "SpiritRecord.Class.3": 'KE',
+    "SpiritRecord.Class.1": 'KE', "SpiritRecord.Class.2": 'RM', "SpiritRecord.Class.3": 'IM',
   };
   const withEffects = projectDamage(data, { schemaVersion: 2, Job: 'KE', values, lowerwearAlternativeEnabled: false }).result;
   const withoutBinaryEffects = projectDamage(data, { schemaVersion: 2, Job: 'KE', values: { ...values, "Effect.Emblem": '沒有', "Effect.PortraitAwakening": '沒有' }, lowerwearAlternativeEnabled: false }).result;

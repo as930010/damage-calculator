@@ -188,10 +188,14 @@ export function resolveSpiritRecordSelections(
   if (selectedClassCodes.length > document.classSelectors.selectorCells.length) {
     throw new RangeError(`賦靈錄最多接受 ${document.classSelectors.selectorCells.length} 個職業選擇。`);
   }
+  const selectedCodes = new Set<string>();
   return selectedClassCodes.flatMap((classCode) => {
     if (classCode == null || classCode.trim() === "") return [];
     const entry = document.classSelectors.classes.find((candidate) => candidate.classCode.toLocaleLowerCase() === classCode.toLocaleLowerCase());
     if (!entry) throw new RangeError(`賦靈錄找不到職業「${classCode}」的支線與特性資料。`);
+    const normalizedCode = entry.classCode.toLocaleLowerCase();
+    if (selectedCodes.has(normalizedCode)) throw new RangeError(`賦靈錄不可重複選擇職業「${entry.classCode}」。`);
+    selectedCodes.add(normalizedCode);
     return [entry.branch, ...entry.traits];
   });
 }
@@ -407,10 +411,12 @@ export function resolveResonanceEffects(
 ): StatContribution[] {
   return document.effects.flatMap((effect) => {
     const rawValue = inputValues[effect.inputCell];
-    if (rawValue === undefined || rawValue === 0) return [];
+    if (rawValue === undefined) return [];
     if (!Number.isFinite(rawValue) || !Number.isFinite(effect.multiplier)) {
       throw new TypeError(`${effect.inputCell} resonance input and multiplier must be finite.`);
     }
+    if (rawValue < 0) throw new RangeError(`${effect.inputCell} 共鳴點數不可為負數。`);
+    if (rawValue === 0) return [];
     const stats = Object.fromEntries(
       Object.entries(effect.stats).map(([key, scalar]) => {
         requireNonEmpty(key, "statKey");

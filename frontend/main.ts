@@ -468,14 +468,24 @@ async function start() {
       root.append(warning);
     }
   }
-  const numeric = (parent: HTMLElement, label: string, cell: string, percentage = true, constraints?: { min: number; max: number; step: number }, disabled = false) => {
+  const numeric = (parent: HTMLElement, label: string, cell: string, percentage = true, constraints?: { min?: number; max?: number; step?: number | 'any' }, disabled = false) => {
     const wrapper = document.createElement('label'); wrapper.className = 'field'; wrapper.textContent = label;
     const input = document.createElement('input'); input.type = 'number'; input.step = 'any'; input.placeholder = disabled ? '請先選擇屬性' : '請填寫數值';
     preventScientificNotation(input);
-    if (constraints) { input.min = String(constraints.min); input.max = String(constraints.max); input.step = String(constraints.step); }
+    if (constraints?.min !== undefined) input.min = String(constraints.min);
+    if (constraints?.max !== undefined) input.max = String(constraints.max);
+    if (constraints?.step !== undefined) input.step = String(constraints.step);
     input.value = val(cell) === '' ? '' : String(Number(val(cell)) * (percentage ? 100 : 1));
     if (disabled) { input.disabled = true; wrapper.classList.add('field-disabled'); wrapper.setAttribute('aria-disabled', 'true'); wrapper.title = '請先選擇屬性'; }
-    input.addEventListener('input', () => { if (!input.validity.valid) return; state.values[cell] = input.value === '' ? '' : Number(input.value) / (percentage ? 100 : 1); update(); });
+    input.addEventListener('input', () => {
+      if (input.value !== '' && constraints?.min !== undefined && Number(input.value) < constraints.min) {
+        input.value = val(cell) === '' ? '' : String(Number(val(cell)) * (percentage ? 100 : 1));
+        return;
+      }
+      if (!input.validity.valid) return;
+      state.values[cell] = input.value === '' ? '' : Number(input.value) / (percentage ? 100 : 1);
+      update();
+    });
     wrapper.append(input); parent.append(wrapper);
   };
   const section = (parent: HTMLElement, label: string, open = false) => {
@@ -519,10 +529,48 @@ async function start() {
     field(atma, '亞特瑪屬性', 'Atma.Element', options(['火焰', '流水', '草木']));
     field(atma, '亞特瑪顏色', 'Atma.Color', options(['藍色', '綠色', '紫色', '米色']));
     const resonance = group('共鳴輸入', '輸入已分配的共鳴點，例如適應力點滿應該填100而非7。');
-    for (const effect of data.resonance.effects) numeric(resonance, effect.name, effect.inputCell, false);
+    for (const effect of data.resonance.effects) numeric(resonance, effect.name, effect.inputCell, false, { min: 0, step: 'any' });
     const spirit = group('賦靈錄');
-    const spiritClassOptions = options(data.spiritRecord.classSelectors.classes.map(entry => entry.classCode));
-    data.spiritRecord.classSelectors.selectorCells.forEach((cell, index) => field(spirit, `職業 ${index + 1}`, cell, spiritClassOptions));
+    const spiritClassCodes = data.spiritRecord.classSelectors.classes.map(entry => entry.classCode);
+    const selectedSpiritClassCodes = data.spiritRecord.classSelectors.selectorCells.map(val);
+    data.spiritRecord.classSelectors.selectorCells.forEach((cell, index) => {
+      const selectedElsewhere = selectedSpiritClassCodes.filter((_, otherIndex) => otherIndex !== index && selectedSpiritClassCodes[otherIndex] !== '');
+      const usedElsewhere = new Set(selectedElsewhere.map(code => resolveClassCode(code, spiritClassCodes)?.toLocaleLowerCase()).filter((code): code is string => Boolean(code)));
+      const currentCode = resolveClassCode(selectedSpiritClassCodes[index], spiritClassCodes);
+      const choices = spiritClassCodes
+        .filter(code => !usedElsewhere.has(code.toLocaleLowerCase()) || code === currentCode)
+        .map(code => ({ value: code, label: code }));
+      const error = document.createElement('span');
+      error.className = 'input-hint class-picker-error';
+      error.setAttribute('role', 'alert');
+      const currentIsDuplicate = Boolean(currentCode && usedElsewhere.has(currentCode.toLocaleLowerCase()));
+      error.textContent = currentIsDuplicate ? '職業「' + currentCode + '」已在其他欄位選擇。' : '';
+      error.hidden = !currentIsDuplicate;
+      const picker = createPicker('職業 ' + (index + 1), choices, val(cell), value => {
+        state.values[cell] = value;
+        update();
+        renderGlobalInputs();
+      }, {
+        sanitize: sanitizeClassCode,
+        resolve: value => {
+          const resolved = resolveClassCode(value, spiritClassCodes);
+          return resolved && !selectedElsewhere.some(code => resolveClassCode(code, spiritClassCodes)?.toLocaleLowerCase() === resolved.toLocaleLowerCase()) ? resolved : null;
+        },
+        onInvalid: value => {
+          const resolved = resolveClassCode(value, spiritClassCodes);
+          error.textContent = resolved && usedElsewhere.has(resolved.toLocaleLowerCase())
+            ? '職業「' + resolved + '」已在其他欄位選擇。'
+            : value ? '查無此職業代碼，請確認後再按 Enter。' : '請輸入職業代碼。';
+          error.hidden = false;
+        },
+        onInput: () => { error.textContent = ''; error.hidden = true; },
+        allowCharacter: character => /^[A-Za-z]$/.test(character),
+      });
+      const wrapper = document.createElement('div');
+      wrapper.className = 'spirit-record-class-field';
+      wrapper.append(picker, error);
+      spirit.append(wrapper);
+    });
     const fountain = group('公會噴泉');
     for (const stage of data.otherEffects.guildFountain) pick(fountain, `${stage.stage}階`, stage.selectorCell, stage.options);
   }
