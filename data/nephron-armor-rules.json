@@ -184,6 +184,24 @@
       "multipliesByEnhancementLevel": false
     },
     {
+      "id": "strong-skill-damage",
+      "name": "強烈技傷%",
+      "statKey": "strongSkillDamagePct",
+      "tierValuesPct": [
+        0.1,
+        0.2,
+        0.3,
+        0.4,
+        0.5,
+        0.6,
+        0.7,
+        0.8,
+        0.9,
+        1
+      ],
+      "multipliesByEnhancementLevel": false
+    },
+    {
       "id": "all-skill-damage",
       "name": "所有技能傷害%",
       "statKey": "allSkillDamagePct",
@@ -335,6 +353,9 @@
       "id": "combat-type-iii",
       "name": "戰鬥彈匣Type - III",
       "statKey": "transcendenceSkillDamagePct",
+      "additionalLevelStatKeys": [
+        "strongSkillDamagePct"
+      ],
       "levelValuesPct": [
         0.5,
         1,
@@ -344,6 +365,7 @@
         3
       ],
       "otherEffects": [
+        "強烈技傷%",
         "超越技傷%"
       ]
     },

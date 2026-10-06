@@ -9,7 +9,7 @@ import type { AttributeRule, StatContribution } from "../calculation/types.ts";
 import { calculateLoadout, calculateLoadoutCombatRates } from "../calculation/loadout-engine.ts";
 import { resolveClassDamagePassiveContributions } from "../calculation/class-damage-passives.ts";
 import type { GameData } from "./data.ts";
-import type { LoadoutState } from "./state.ts";
+import { DEFAULT_TRANSCENDENCE_SKILL_DAMAGE_SHARE_PCT, normalizePortraitAwakeningSplit, type LoadoutState } from "./state.ts";
 import { readGloveCircuitRows, validateGloveCircuitRows } from "./circuit-board-rows.ts";
 
 /** UI state to supported stat sources; game arithmetic remains in calculation/. */
@@ -186,7 +186,7 @@ export function projectAttributes(data: GameData, state: LoadoutState) {
   const rightIceCells = data.mapping.selections.filter(entry => entry.catalogFile.endsWith("right-ice.json")).map(entry => entry.selectionCell);
   groups.shared.push(
     ...resolveRightIceSetEffects(data.rightIceSets, rightIceCells.map(text), data.rightIceSets.selectionCells.map(text)),
-    ...resolveResonanceEffects(data.resonance, Object.fromEntries(data.resonance.effects.map(effect => [effect.inputCell, number(effect.inputCell) ?? 0]))),
+      ...resolveResonanceEffects(data.resonance, Object.fromEntries(data.resonance.effects.map(effect => [effect.inputCell, values[effect.inputCell]]))),
     ...resolveRaidSetEffects(data.raidSets, accessoryCells.map(text)),
   );
   const atmaPieces = accessoryCells.map(text).filter(name => name.includes("亞特瑪")).length;
@@ -220,6 +220,36 @@ export function projectAttributes(data: GameData, state: LoadoutState) {
   addNamedOption(data.otherEffects.peakOptions, "Peak.Option", "peak-option");
   addNamedOption(data.pets.options, "Pet.Passive", "pet");
   for (const effect of data.otherEffects.binaryEffects) addNamedOption(effect.options, effect.selectorCell, effect.name);
+  const portraitAwakening = data.otherEffects.portraitAwakening;
+  const rawStrong = values[portraitAwakening.strongCell];
+  const rawTranscendence = values[portraitAwakening.transcendenceCell];
+  const hasStrong = rawStrong !== undefined && rawStrong !== '';
+  const hasTranscendence = rawTranscendence !== undefined && rawTranscendence !== '';
+  if (hasStrong || hasTranscendence) {
+    const readPortraitValue = (raw: string | number | undefined, label: string): number | undefined => {
+      if (raw === undefined || raw === '') return undefined;
+      const value = typeof raw === 'number' ? raw : /^\d+$/.test(raw.trim()) ? Number(raw) : Number.NaN;
+      if (!Number.isInteger(value) || value < 0 || value > portraitAwakening.maxPct) {
+        throw new RangeError(`立繪、覺醒的${label}必須是 ${portraitAwakening.minPct}–${portraitAwakening.maxPct} 的正整數；0% 僅作為自動補足結果。`);
+      }
+      return value;
+    };
+    const strongValue = readPortraitValue(rawStrong, "強烈技傷");
+    const transcendenceValue = readPortraitValue(rawTranscendence, "超越技傷");
+    if (strongValue !== undefined && transcendenceValue !== undefined
+      && strongValue + transcendenceValue !== portraitAwakening.maxTotalPct) {
+      throw new RangeError(`立繪、覺醒的強烈技傷與超越技傷合計必須為 ${portraitAwakening.maxTotalPct}%。`);
+    }
+    const split = normalizePortraitAwakeningSplit(strongValue, transcendenceValue, portraitAwakening.maxTotalPct);
+    const portraitSkillValues = [
+      { statKey: portraitAwakening.strongStatKey, value: split.strongSkillDamagePct },
+      { statKey: portraitAwakening.transcendenceStatKey, value: split.transcendenceSkillDamagePct },
+    ];
+    groups.shared.push({
+      sourceId: `立繪、覺醒:${portraitAwakening.legacySelectorCell}`,
+      stats: Object.fromEntries(portraitSkillValues.filter(entry => entry.value > 0).map(entry => [entry.statKey, entry.value])),
+    });
+  }
   for (const stage of data.otherEffects.guildFountain) addNamedOption(stage.options, stage.selectorCell, `guild-fountain-${stage.stage}`);
   if (!state.lowerwearAlternativeEnabled) groups.lowerwearB = [];
   const rules: AttributeRule[] = data.attributes.attributes.filter((entry) => entry.active && entry.aggregation === "sum")
@@ -308,6 +338,7 @@ export function projectDamage(data: GameData, state: LoadoutState) {
     targetCritPenaltyPct: rateInputs.targetCritPenaltyPct,
     stageAdaptabilityPenaltyPct: percentage("Stage.Adapt"),
     enemyDefensePct: percentage("Stage.BossDEF"),
+    transcendenceSkillDamageSharePct: state.transcendenceSkillDamageSharePct ?? DEFAULT_TRANSCENDENCE_SKILL_DAMAGE_SHARE_PCT,
     critDamageProductBasePct: data.parameters.characterBaseByClass?.[job.id]?.critDamagePct === undefined ? data.parameters.critDamageProductBasePct : data.parameters.characterBaseByClass[job.id].critDamagePct - 100,
     critDamageProductBaselinePctToSubtract: data.parameters.characterBaseByClass?.[job.id]?.critDamagePct ?? data.parameters.critDamageProductBaselinePctToSubtract,
   });

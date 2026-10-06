@@ -51,6 +51,9 @@ test('線上試算表範例仍重現未受上衣乘算加成影響的輸出', as
   assert.equal(bleed.delta, 0);
   assert.equal(damage.expected, expected.b163RecomputedFromFormula);
   assert.notEqual(damage.expected, expected.cells.B163);
+  assert.equal(result.attributes.stats.strongSkillDamagePct.finalTotal, 94);
+  assert.equal(result.finalDamage.skillDamageWeighting.transcendenceSharePct, 100);
+  assert.equal(result.finalDamage.skillDamageWeighting.strongSharePct, 0);
   assert.ok(Math.abs(damage.actual / damage.expected - 1.13) < 1e-12);
   const weaponStoneSources = projectAttributes(data, sample).calculationSources.shared.filter(source => source.sourceId.startsWith('weapon-magic-stone:'));
   const level = weaponStoneSources.reduce((sum, source) => sum + (source.stats.attackLevel ?? 0), 0);

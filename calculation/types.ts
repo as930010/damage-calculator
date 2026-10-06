@@ -211,6 +211,9 @@ export interface FinalDamageInput {
   bossDamagePct: number;
   polarizationPct: number;
   transcendenceSkillDamagePct: number;
+  strongSkillDamagePct: number;
+  /** Share assigned to transcendence skills; strong skills receive the remainder. */
+  transcendenceSkillDamageSharePct: number;
   allSkillDamagePct: number;
   bleedDamagePct: number;
   fullHealthKillDamagePct: number;
@@ -229,6 +232,13 @@ export interface FinalDamageResult {
   extremizedBase: number;
   critFactor: number;
   damageFactors: Readonly<Record<string, number>>;
+  skillDamageWeighting: {
+    transcendenceSharePct: number;
+    strongSharePct: number;
+    transcendenceFactor: number;
+    strongFactor: number;
+    combinedFactor: number;
+  };
   conditionalFactor: number;
   adaptationFactor: number;
   defenseFactor: number;

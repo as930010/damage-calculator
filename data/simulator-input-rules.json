@@ -60,6 +60,7 @@
     "attributeValueSources": {
       "default": "係數區!R2:R7",
       "special": [
+        "強烈技傷%",
         "超越技傷%",
         "Boss傷害%"
       ],
@@ -92,6 +93,7 @@
       ]
     },
     "specialStats": [
+      "強烈技傷%",
       "超越技傷%",
       "Boss傷害%"
     ],

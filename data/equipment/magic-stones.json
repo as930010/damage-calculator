@@ -122,6 +122,30 @@
       }
     },
     {
+      "id": "magic-stone-atma-strong-skill-damage-25-5",
+      "name": "亞特瑪強烈技傷 2.5/5%",
+      "slotId": "magicStone",
+      "typeId": "magicStone",
+      "level": null,
+      "active": true,
+      "effects": [],
+      "stats": {},
+      "targetApplications": {
+        "armor": {
+          "sourceName": "亞特瑪2.5%強烈",
+          "stats": {
+            "strongSkillDamagePct": 2.5
+          }
+        },
+        "weapon": {
+          "sourceName": "亞特瑪5%強烈",
+          "stats": {
+            "strongSkillDamagePct": 5
+          }
+        }
+      }
+    },
+    {
       "id": "magic-stone-atma-transcendence-skill-damage",
       "name": "亞特瑪超越技傷",
       "slotId": "magicStone",
@@ -141,6 +165,32 @@
           "sourceName": "亞特瑪5%超越",
           "stats": {
             "transcendenceSkillDamagePct": 5
+          }
+        }
+      }
+    },
+    {
+      "id": "magic-stone-atma-strong-transcendence-skill-damage-2-4",
+      "name": "亞特瑪強烈/超越技傷 2/4%",
+      "slotId": "magicStone",
+      "typeId": "magicStone",
+      "level": null,
+      "active": true,
+      "effects": [],
+      "stats": {},
+      "targetApplications": {
+        "armor": {
+          "sourceName": "亞特瑪2%強烈/超越",
+          "stats": {
+            "strongSkillDamagePct": 2,
+            "transcendenceSkillDamagePct": 2
+          }
+        },
+        "weapon": {
+          "sourceName": "亞特瑪4%強烈/超越",
+          "stats": {
+            "strongSkillDamagePct": 4,
+            "transcendenceSkillDamagePct": 4
           }
         }
       }

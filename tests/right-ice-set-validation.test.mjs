@@ -32,24 +32,50 @@ test('每套右冰的 0～4 件門檻各自對應目前試算表的 exactly／at
 test('右冰高階套效保留幻影面紗與真理假面的低階加成', async () => {
   const document = await readJson('equipment/right-ice-set-effects.json');
   const cases = [
-    ['幻影面紗', { bleedDamagePct: 10, fullHealthKillDamagePct: 10 }],
-    ['真理假面', {
+    ['幻影面紗', 3, { bleedDamagePct: 10, fullHealthKillDamagePct: 10 }],
+    ['真理假面', 3, {
       polarizationPct: 3,
       bleedDamagePct: 3,
       transcendenceSkillDamagePct: 4,
+      strongSkillDamagePct: 4,
       strongerPct: 10,
       heatPct: 10,
     }],
+    ['猛虎奇談', 2, {
+      polarizationPct: 4,
+      transcendenceSkillDamagePct: 4,
+      strongSkillDamagePct: 4,
+    }],
+    ['猛虎奇談', 3, {
+      polarizationPct: 4,
+      transcendenceSkillDamagePct: 4,
+      strongSkillDamagePct: 4,
+      fullHealthKillDamagePct: 6,
+    }],
   ];
 
-  for (const [setName, expectedStats] of cases) {
+  for (const [setName, count, expectedStats] of cases) {
     const [actual] = resolveRightIceSetEffects(
       document,
-      Array.from({ length: 3 }, () => setName),
+      Array.from({ length: count }, () => setName),
       [setName],
     );
-    assert.deepEqual(actual?.stats, expectedStats, setName + ' 3 件');
+    assert.deepEqual(actual?.stats, expectedStats, setName + ' ' + count + ' 件');
   }
+});
+
+test('右冰所有原有超越技傷套效都同步提供相同百分比的強烈技傷，幻影面紗戒指也同步', async () => {
+  const sets = await readJson('equipment/right-ice-set-effects.json');
+  const transcendenceEffects = sets.effects.filter(effect => effect.active && effect.stats.transcendenceSkillDamagePct !== undefined);
+  assert.equal(transcendenceEffects.length, 3);
+  for (const effect of transcendenceEffects) {
+    assert.equal(effect.stats.strongSkillDamagePct, effect.stats.transcendenceSkillDamagePct, effect.name);
+  }
+
+  const equipment = await readJson('equipment/right-ice.json');
+  const veilRing = equipment.items.find(item => item.name === '幻影面紗' && item.slotId === 'ring');
+  assert.ok(veilRing);
+  assert.equal(veilRing.stats.strongSkillDamagePct, veilRing.stats.transcendenceSkillDamagePct);
 });
 
 test('七套候選右冰隨機配置在六個部位、選取 1～3 套時只套用已選套效與符合件數的最高階效果', async () => {

@@ -1,4 +1,5 @@
 import type { StatContribution } from "./types.ts";
+import { isResonanceInputCell, parseResonancePoints } from "./resonance-input.ts";
 
 export interface RightIceSetEffect {
   id: string;
@@ -211,7 +212,7 @@ export interface CircuitBoardRule {
 
 export interface CircuitBoardRulesDocument {
   schemaVersion: 1;
-  statKeyBySheetName: Readonly<Record<string, string>>;
+  statKeyBySheetName: Readonly<Record<string, string | readonly string[]>>;
   inputs: readonly CircuitBoardRule[];
 }
 
@@ -407,21 +408,25 @@ export function resolveWeaponGrowth(
 /** Resolve the five spreadsheet resonance selectors and their exact multipliers. */
 export function resolveResonanceEffects(
   document: ResonanceEffectDocument,
-  inputValues: Readonly<Record<string, number>>,
+    inputValues: Readonly<Record<string, unknown>>,
 ): StatContribution[] {
   return document.effects.flatMap((effect) => {
+      if (!isResonanceInputCell(effect.inputCell)) {
+        throw new RangeError(`${effect.id} 使用了未設定上限的共鳴欄位：${effect.inputCell}`);
+      }
     const rawValue = inputValues[effect.inputCell];
-    if (rawValue === undefined) return [];
-    if (!Number.isFinite(rawValue) || !Number.isFinite(effect.multiplier)) {
+      if (rawValue === undefined || rawValue === null || rawValue === "") return [];
+      if ((typeof rawValue === "number" && !Number.isFinite(rawValue)) || !Number.isFinite(effect.multiplier)) {
       throw new TypeError(`${effect.inputCell} resonance input and multiplier must be finite.`);
     }
-    if (rawValue < 0) throw new RangeError(`${effect.inputCell} 共鳴點數不可為負數。`);
-    if (rawValue === 0) return [];
+      const points = parseResonancePoints(effect.inputCell, rawValue);
+      if (points === null) throw new RangeError(`${effect.inputCell} 共鳴點數必須是範圍內的非負整數。`);
+      if (points === 0) return [];
     const stats = Object.fromEntries(
       Object.entries(effect.stats).map(([key, scalar]) => {
         requireNonEmpty(key, "statKey");
         if (!Number.isFinite(scalar)) throw new TypeError(`${effect.id}.${key} must be finite.`);
-        return [key, rawValue * effect.multiplier * scalar];
+          return [key, points * effect.multiplier * scalar];
       }),
     );
     return [{ sourceId: effect.id, stats }];
@@ -600,14 +605,15 @@ export function resolveCircuitBoardEffects(
       if (!Number.isFinite(selection.percentageValue)) {
         throw new TypeError(rule.slot + " circuit-board percentage must be finite.");
       }
-      const key = document.statKeyBySheetName[selection.attribute];
-      if (!key) return { slot: rule.slot, wearSet: rule.wearSet, contribution: null };
+      const mappedStatKeys = document.statKeyBySheetName[selection.attribute];
+      if (!mappedStatKeys) return { slot: rule.slot, wearSet: rule.wearSet, contribution: null };
+      const statKeys = Array.isArray(mappedStatKeys) ? mappedStatKeys : [mappedStatKeys];
       return {
         slot: rule.slot,
         wearSet: rule.wearSet,
         contribution: {
           sourceId: multiple ? "circuit-board:" + rule.slot + ":" + (index + 1) : "circuit-board:" + rule.slot,
-          stats: { [key]: selection.percentageValue * 100 },
+          stats: Object.fromEntries(statKeys.map(key => [key, selection.percentageValue! * 100])),
         },
       };
     });

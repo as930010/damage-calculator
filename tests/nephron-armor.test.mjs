@@ -10,6 +10,23 @@ const [armor, innerwear, attack] = await Promise.all([
 ]);
 const statsFor = sourceList => Object.assign({}, ...sourceList.map(source => source.stats));
 
+test('百億內裝鍛造的強烈技傷與超越技傷門檻、數值相同', () => {
+  const transcendence = innerwear.forgingBonuses.find(entry => entry.statKey === 'transcendenceSkillDamagePct');
+  const strong = innerwear.forgingBonuses.find(entry => entry.statKey === 'strongSkillDamagePct');
+  assert.ok(transcendence);
+  assert.ok(strong);
+  assert.deepEqual(strong.steps, transcendence.steps);
+  const slot = innerwear.slots.find(entry => entry.id === 'upper');
+  for (const [forge, expected] of [[0, 0], [6, 3], [12, 6], [18, 10]]) {
+    const groups = resolveInnerwearSources(innerwear, attack, 'KE', {
+      [slot.typeCell]: '百億', [slot.enhancementCell]: 'Lv.8', [slot.forgingCell]: forge,
+    }, false);
+    const source = groups.shared.find(entry => entry.sourceId === 'innerwear:upper');
+    assert.equal(source.stats.strongSkillDamagePct, expected, 'strong forge ' + forge);
+    assert.equal(source.stats.transcendenceSkillDamagePct, expected, 'transcendence forge ' + forge);
+  }
+});
+
 test('Nephron forge attack table and cumulative milestone bonuses match the supplied values', () => {
   assert.deepEqual(Object.values( innerwear.nephron.forgingAttack), [
     0,119,238,357,476,595,714,833,952,1071,1190,1309,1428,1547,1666,1785,1904,2023,2142,2261,2380,2500,
@@ -18,13 +35,13 @@ test('Nephron forge attack table and cumulative milestone bonuses match the supp
   assert.deepEqual(innerwear.nephron.enhancementStats['11'], { bossDamagePct: 5, superAdaptabilityPct: 2 });
   const slot = innerwear.slots.find(entry => entry.id === 'upper');
   for (const [forge, expected] of [
-    [2, {}], [3, { critDamagePct: 3 }], [6, { critDamagePct: 3, transcendenceSkillDamagePct: 3 }],
-    [9, { critDamagePct: 3, transcendenceSkillDamagePct: 3, doubleAttackPct: 3 }],
-    [12, { critDamagePct: 3, transcendenceSkillDamagePct: 6, doubleAttackPct: 3 }],
-    [15, { critDamagePct: 3, transcendenceSkillDamagePct: 6, doubleAttackPct: 3, adaptabilityPct: 2 }],
-    [18, { critDamagePct: 3, transcendenceSkillDamagePct: 10, doubleAttackPct: 3, adaptabilityPct: 2 }],
-    [19, { critDamagePct: 3, transcendenceSkillDamagePct: 10, doubleAttackPct: 3, adaptabilityPct: 2 }],
-    [21, { critDamagePct: 3, transcendenceSkillDamagePct: 10, doubleAttackPct: 3, adaptabilityPct: 2, superAdaptabilityPct: 2.5 }],
+    [2, {}], [3, { critDamagePct: 3 }], [6, { critDamagePct: 3, transcendenceSkillDamagePct: 3, strongSkillDamagePct: 3 }],
+    [9, { critDamagePct: 3, transcendenceSkillDamagePct: 3, strongSkillDamagePct: 3, doubleAttackPct: 3 }],
+    [12, { critDamagePct: 3, transcendenceSkillDamagePct: 6, strongSkillDamagePct: 6, doubleAttackPct: 3 }],
+    [15, { critDamagePct: 3, transcendenceSkillDamagePct: 6, strongSkillDamagePct: 6, doubleAttackPct: 3, adaptabilityPct: 2 }],
+    [18, { critDamagePct: 3, transcendenceSkillDamagePct: 10, strongSkillDamagePct: 10, doubleAttackPct: 3, adaptabilityPct: 2 }],
+    [19, { critDamagePct: 3, transcendenceSkillDamagePct: 10, strongSkillDamagePct: 10, doubleAttackPct: 3, adaptabilityPct: 2 }],
+    [21, { critDamagePct: 3, transcendenceSkillDamagePct: 10, strongSkillDamagePct: 10, doubleAttackPct: 3, adaptabilityPct: 2, superAdaptabilityPct: 2.5 }],
   ]) {
     const values = { [slot.typeCell]: '內布隆', [slot.enhancementCell]: 'Lv.11', [slot.forgingCell]: forge };
     const groups = resolveInnerwearSources(innerwear, attack, 'KE', values, false);
@@ -32,7 +49,7 @@ test('Nephron forge attack table and cumulative milestone bonuses match the supp
     assert.ok(source, `forge ${forge}: upper source missing`);
     const expectedStats = { ...expected, bossDamagePct: 5, superAdaptabilityPct: expected.superAdaptabilityPct ?? 2, adaptabilityPct: 2 + (expected.adaptabilityPct ?? 0) };
     for (const [key, value] of Object.entries(expectedStats)) assert.equal(source.stats[key], value, `forge ${forge}: ${key}`);
-    for (const key of ['critDamagePct','transcendenceSkillDamagePct','doubleAttackPct']) {
+    for (const key of ['critDamagePct','transcendenceSkillDamagePct','strongSkillDamagePct','doubleAttackPct']) {
       if (!(key in expected)) assert.equal(source.stats[key] ?? 0, 0, `forge ${forge}: unexpected ${key}`);
     }
   }
@@ -60,7 +77,7 @@ test('all Nephron transformations expose ten exact tiers and first three scale b
     [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1],
     [0.3,0.4,0.5,0.6,0.7,0.8,0.9,1,1.1,1.2],
   ];
-  assert.equal(armor.transformations.length, 15);
+  assert.equal(armor.transformations.length, 16);
   for (const option of armor.transformations) {
     if (option.name === '無關傷害') {
       assert.deepEqual(option.tierValuesPct, []);
@@ -137,6 +154,16 @@ test('all transformation tiers map to the stated stat, and only the first three 
     transformations: [{ attribute: '無關傷害' }, { attribute: '', value: undefined }, { attribute: '', value: undefined }],
   }]);
   assert.deepEqual(statsFor(unrelated), {});
+
+  const bothSkillTypes = resolveNephronArmorSources(armor, [{
+    slotId: 'upper', enhancement: 'Lv.10', magazine: '', magazineLevel: '',
+    transformations: [
+      { attribute: '強烈技傷%', value: 0.01 },
+      { attribute: '超越技傷%', value: 0.01 },
+      { attribute: '', value: undefined },
+    ],
+  }]);
+  assert.deepEqual(statsFor(bothSkillTypes), { strongSkillDamagePct: 1, transcendenceSkillDamagePct: 1 });
 });
 
 test('every Nephron magazine level resolves to its mapped stat and duplicate rule', () => {
@@ -149,6 +176,9 @@ test('every Nephron magazine level resolves to its mapped stat and duplicate rul
       const expected = { ...(magazine.baseStats ?? {}) };
       const statKey = magazine.levelStatKey ?? magazine.statKey;
       if (statKey) expected[statKey] = (expected[statKey] ?? 0) + value;
+      for (const additionalStatKey of magazine.additionalLevelStatKeys ?? []) {
+        expected[additionalStatKey] = (expected[additionalStatKey] ?? 0) + value;
+      }
       assert.deepEqual(statsFor(sources), expected, magazine.name + ' Lv.' + (index + 1));
     }
   }

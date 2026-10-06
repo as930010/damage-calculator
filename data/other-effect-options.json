@@ -705,27 +705,18 @@
         }
       ],
       "source": "計算機!W91=IF(B89=\"有\",3,0)"
-    },
-    {
-      "selectorCell": "Effect.PortraitAwakening",
-      "name": "立繪、覺醒",
-      "options": [
-        {
-          "id": "illustration-present",
-          "name": "有",
-          "stats": {
-            "transcendenceSkillDamagePct": 5
-          }
-        },
-        {
-          "id": "illustration-absent",
-          "name": "沒有",
-          "stats": {}
-        }
-      ],
-      "source": "計算機!K92=IF(B90=\"有\",5,0)"
     }
   ],
+  "portraitAwakening": {
+    "legacySelectorCell": "Effect.PortraitAwakening",
+    "strongCell": "Effect.PortraitAwakening.StrongSkillDamagePct",
+    "transcendenceCell": "Effect.PortraitAwakening.TranscendenceSkillDamagePct",
+    "strongStatKey": "strongSkillDamagePct",
+    "transcendenceStatKey": "transcendenceSkillDamagePct",
+    "minPct": 1,
+    "maxPct": 5,
+    "maxTotalPct": 5
+  },
   "notes": [
     "屬性映射依計算機 F82/S82、F83/I83、S84/W84、F86:U88 的實際輸出欄位轉換。",
     "適應靈藥依使用者確認的計算機 Q82 公式套用適應力 +3。巔峰選項依計算機 I36、V36 公式，分別提供 Boss傷害% 與技能類雙攻%。"

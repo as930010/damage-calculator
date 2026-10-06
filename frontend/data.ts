@@ -74,6 +74,10 @@ export interface GameData {
     guildFountain: { stage: number; selectorCell: string; options: NamedStatOption[] }[];
     peakOptions: NamedStatOption[];
     binaryEffects: { selectorCell: string; name: string; options: NamedStatOption[]; source: string }[];
+    portraitAwakening: {
+      legacySelectorCell: string; strongCell: string; transcendenceCell: string;
+      strongStatKey: string; transcendenceStatKey: string; minPct: number; maxPct: number; maxTotalPct: number;
+    };
   };
   pets: { options: NamedStatOption[] };
   simulatorInputs: { catalogs: { id: string; options: { value: string | number }[] }[]; inputs: { simulatorCells: string; inputType: string; catalogId: string }[] };

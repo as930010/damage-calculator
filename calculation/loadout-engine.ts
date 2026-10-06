@@ -44,6 +44,8 @@ export interface LoadoutCalculationInput {
   targetCritPenaltyPct: number;
   stageAdaptabilityPenaltyPct: number;
   enemyDefensePct: number;
+  /** Percent of skill damage assigned to transcendence; the strong share is its complement. */
+  transcendenceSkillDamageSharePct?: number;
   critDamageProductBasePct: number;
   critDamageProductBaselinePctToSubtract: number;
 }
@@ -194,6 +196,8 @@ export function calculateLoadout(input: LoadoutCalculationInput): LoadoutCalcula
     bossDamagePct: statTotal(attributes, "bossDamagePct"),
     polarizationPct: statTotal(attributes, "polarizationPct"),
     transcendenceSkillDamagePct: statTotal(attributes, "transcendenceSkillDamagePct"),
+    strongSkillDamagePct: statTotal(attributes, "strongSkillDamagePct"),
+    transcendenceSkillDamageSharePct: input.transcendenceSkillDamageSharePct ?? 100,
     allSkillDamagePct: statTotal(attributes, "allSkillDamagePct"),
     bleedDamagePct: statTotal(attributes, "bleedDamagePct"),
     fullHealthKillDamagePct: statTotal(attributes, "fullHealthKillDamagePct"),

@@ -30,7 +30,8 @@
       "inputCell": "Resonance.TranscendenceSkillDMG.Points",
       "multiplier": 0.35,
       "stats": {
-        "transcendenceSkillDamagePct": 1
+        "transcendenceSkillDamagePct": 1,
+        "strongSkillDamagePct": 1
       },
       "sourceCells": [
         "計算機!K66"

@@ -12,6 +12,7 @@ export interface NephronMagazineOption {
   id: string;
   name: string;
   statKey?: string;
+  additionalLevelStatKeys?: readonly string[];
   levelStatKey?: string;
   baseStats?: Readonly<Record<string, number>>;
   levelValuesPct: readonly number[];
@@ -116,6 +117,9 @@ export function resolveNephronArmorSources(
     const stats: Record<string, number> = { ...(magazine.baseStats ?? {}) };
     const statKey = magazine.levelStatKey ?? magazine.statKey;
     if (statKey) stats[statKey] = (stats[statKey] ?? 0) + levelValue;
+    for (const additionalStatKey of magazine.additionalLevelStatKeys ?? []) {
+      stats[additionalStatKey] = (stats[additionalStatKey] ?? 0) + levelValue;
+    }
     result.push({ sourceId: "nephron-magazine:" + selection.slotId + ":" + magazine.id + ":Lv." + (magazineLevelIndexValue + 1), stats });
   }
   return result;

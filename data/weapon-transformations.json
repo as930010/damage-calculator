@@ -23,6 +23,7 @@
     "致命傷害%",
     "Boss傷害%",
     "兩極化%",
+    "強烈技傷%",
     "超越技傷%",
     "技能傷害%",
     "流血%",
@@ -93,6 +94,11 @@
     {
       "choice": "兩極化%",
       "statKey": "polarizationPct",
+      "valueMultiplier": 100
+    },
+    {
+      "choice": "強烈技傷%",
+      "statKey": "strongSkillDamagePct",
       "valueMultiplier": 100
     },
     {

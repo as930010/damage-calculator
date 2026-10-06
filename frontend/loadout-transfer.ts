@@ -1,7 +1,8 @@
 import { getEquipmentOptionName, type EquipmentCatalogItem, type SimulatorEquipmentSelectionMapping } from '../calculation/equipment-catalog.ts';
+import { isResonanceInputCell, parseResonancePoints } from '../calculation/resonance-input.ts';
 import type { GameData } from './data.ts';
 import { codeForFieldId, fieldIdForCode, isFieldId } from './field-ids.ts';
-import type { LoadoutState } from './state.ts';
+import { normalizePortraitAwakeningSplit, normalizeTranscendenceSkillDamageShare, type LoadoutState } from './state.ts';
 import { findValidationCatalog } from './sheet-validation.ts';
 
 type TransferData = Pick<GameData,
@@ -151,9 +152,31 @@ export function serializeLoadout(state: LoadoutState, data: TransferData): { jso
   const mappings = equipmentMappings(data);
   const values: Record<string, string | number> = {};
   const omittedFields: string[] = [];
-  const fieldValues = state.values;
+  const fieldValues = { ...state.values };
+  const portrait = data.otherEffects.portraitAwakening;
+  const portraitCells = [portrait.strongCell, portrait.transcendenceCell];
+  const hasPortraitValues = portraitCells.some(cell => fieldValues[cell] !== undefined && fieldValues[cell] !== '');
+  const invalidPortraitCells = new Set(portraitCells.filter(cell => {
+    const raw = fieldValues[cell];
+    if (raw === undefined || raw === '') return false;
+    const value = typeof raw === 'number' ? raw : typeof raw === 'string' && /^\d+$/.test(raw.trim()) ? Number(raw) : Number.NaN;
+    return !Number.isInteger(value) || value < 0 || value > portrait.maxPct;
+  }));
+  if (hasPortraitValues && invalidPortraitCells.size === 0) {
+    const split = normalizePortraitAwakeningSplit(
+      fieldValues[portrait.strongCell],
+      fieldValues[portrait.transcendenceCell],
+      portrait.maxTotalPct,
+    );
+    fieldValues[portrait.strongCell] = split.strongSkillDamagePct;
+    fieldValues[portrait.transcendenceCell] = split.transcendenceSkillDamagePct;
+  }
 
   for (const [key, value] of Object.entries(fieldValues)) {
+    if (invalidPortraitCells.has(key)) {
+      omittedFields.push(key);
+      continue;
+    }
     const fieldId = isFieldId(key) ? key : undefined;
     const fieldCode = fieldId ? codeForFieldId(fieldId) : undefined;
     if (!fieldId || !fieldCode || !isValidPrimitive(value)) {
@@ -161,6 +184,13 @@ export function serializeLoadout(state: LoadoutState, data: TransferData): { jso
       continue;
     }
     if (typeof value === 'string' && value.trim() === '') continue;
+
+      if (isResonanceInputCell(fieldId)) {
+        const points = parseResonancePoints(fieldId, value);
+        if (points === null) { omittedFields.push(fieldId); continue; }
+        values[String(fieldCode)] = points;
+        continue;
+      }
 
     const mapping = mappings.get(fieldId);
     if (mapping) {
@@ -189,6 +219,7 @@ export function serializeLoadout(state: LoadoutState, data: TransferData): { jso
     lowerwearAlternativeEnabled: state.lowerwearAlternativeEnabled,
     masterBeastSpiritStoneColor: state.masterBeastSpiritStoneColor,
     petSkillAttackEnabled: state.petSkillAttackEnabled,
+    transcendenceSkillDamageSharePct: normalizeTranscendenceSkillDamageShare(state.transcendenceSkillDamageSharePct),
   };
   return { json: `${JSON.stringify(payload)}\n`, omittedFields };
 }
@@ -216,7 +247,12 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
   const optionValuesById: Record<string, string | number> = {};
   for (const [code, value] of Object.entries(rawValues)) {
     const fieldId = fieldIdForCode(code);
-    if (fieldId && isValidPrimitive(value)) optionValuesById[fieldId] = value;
+      if (fieldId && isValidPrimitive(value)) {
+        if (isResonanceInputCell(fieldId)) {
+          const points = parseResonancePoints(fieldId, value);
+          if (points !== null) optionValuesById[fieldId] = points;
+        } else optionValuesById[fieldId] = value;
+      }
   }
   const optionValues = optionValuesById;
   if (isRecord(rawValues)) {
@@ -228,12 +264,52 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
       }
       if (mappings.has(fieldId)) continue;
       if (typeof value === 'string' && value.trim() === '') continue;
+        if (isResonanceInputCell(fieldId)) {
+          const points = parseResonancePoints(fieldId, value);
+          if (points === null) clearedFields.push(fieldId);
+          else values[fieldId] = points;
+          continue;
+        }
       const choices = cellOptions(data, fieldId, optionValues);
       if (choices) {
         if (choices.some(option => String(option) === String(value))) values[fieldId] = value;
         else clearedFields.push(fieldId);
       } else values[fieldId] = value;
     }
+  }
+
+  const portrait = data.otherEffects.portraitAwakening;
+  const portraitCells = [portrait.strongCell, portrait.transcendenceCell];
+  for (const cell of portraitCells) {
+    const value = values[cell];
+    if (value === undefined || value === '') continue;
+    const parsed = typeof value === 'number' ? value : typeof value === 'string' && /^\d+$/.test(value.trim()) ? Number(value) : Number.NaN;
+    if (!Number.isInteger(parsed) || parsed < 0 || parsed > portrait.maxPct) {
+      delete values[cell];
+      clearedFields.push(cell);
+    } else values[cell] = parsed;
+  }
+  const hasPortraitValues = portraitCells.some(cell => values[cell] !== undefined && values[cell] !== '');
+  if (hasPortraitValues) {
+    const strongValue = values[portrait.strongCell];
+    const transcendenceValue = values[portrait.transcendenceCell];
+    if (strongValue !== undefined && strongValue !== '' && transcendenceValue !== undefined && transcendenceValue !== ''
+      && Number(strongValue) + Number(transcendenceValue) !== portrait.maxTotalPct) {
+      const split = normalizePortraitAwakeningSplit(strongValue, transcendenceValue, portrait.maxTotalPct);
+      if (Number(strongValue) !== split.strongSkillDamagePct) clearedFields.push(portrait.strongCell);
+      if (Number(transcendenceValue) !== split.transcendenceSkillDamagePct) clearedFields.push(portrait.transcendenceCell);
+      values[portrait.strongCell] = split.strongSkillDamagePct;
+      values[portrait.transcendenceCell] = split.transcendenceSkillDamagePct;
+    } else if (strongValue === undefined || strongValue === '' || transcendenceValue === undefined || transcendenceValue === '') {
+      const split = normalizePortraitAwakeningSplit(strongValue, transcendenceValue, portrait.maxTotalPct);
+      values[portrait.strongCell] = split.strongSkillDamagePct;
+      values[portrait.transcendenceCell] = split.transcendenceSkillDamagePct;
+    }
+  }
+
+  const gloveCircuit = data.circuits.inputs.find(entry => entry.slot === 'gloves');
+  if (gloveCircuit && values[gloveCircuit.attributeCell] === '超越技傷%') {
+    values[gloveCircuit.attributeCell] = '單技傷%';
   }
 
   for (const [cell, mapping] of mappings) {
@@ -250,6 +326,10 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
   const color = candidate.masterBeastSpiritStoneColor;
   const lowerwearAlternativeEnabled = typeof candidate.lowerwearAlternativeEnabled === 'boolean'
     ? candidate.lowerwearAlternativeEnabled : false;
+  const transcendenceSkillDamageSharePct = normalizeTranscendenceSkillDamageShare(candidate.transcendenceSkillDamageSharePct);
+  if (candidate.transcendenceSkillDamageSharePct !== undefined && transcendenceSkillDamageSharePct !== candidate.transcendenceSkillDamageSharePct) {
+    clearedFields.push('技傷占比');
+  }
   const usedNephronMagazines = new Set<string>();
   for (const field of data.nephronArmor.fields) {
     if (field.enabledBy && !lowerwearAlternativeEnabled) continue;
@@ -286,6 +366,7 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
       lowerwearAlternativeEnabled,
       masterBeastSpiritStoneColor,
       petSkillAttackEnabled,
+      transcendenceSkillDamageSharePct,
     },
     clearedFields: uniqueCleared,
   };

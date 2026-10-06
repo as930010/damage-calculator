@@ -1,7 +1,7 @@
 import { getEquipmentOptionName } from '../calculation/equipment-catalog.ts';
 import { type AccessoryEffectOption } from '../calculation/equipment-effects.ts';
 import { loadGameData, readJson, escapeHtml as h, formatNumber as fmt } from './data.ts';
-import { readState, readBaseline, saveState, type LoadoutState } from './state.ts';
+import { readState, readBaseline, saveState, normalizeTranscendenceSkillDamageShare, normalizePortraitAwakeningSplit, parseTranscendenceSkillDamageShareInput, type LoadoutState } from './state.ts';
 import { parseLoadoutJson, serializeLoadout } from './loadout-transfer.ts';
 import { projectAttributes, projectCombatRates, projectDamage } from './projection.ts';
 import { compareLoadoutResults } from './sheet-parity.ts';
@@ -22,12 +22,47 @@ async function start() {
   const state: LoadoutState = sampleMode
     ? await readJson<LoadoutState>(`examples/${sampleId}.json`)
     : readState(data.classes.classes.find(entry => entry.active)?.id ?? 'DaB');
+  state.transcendenceSkillDamageSharePct = normalizeTranscendenceSkillDamageShare(state.transcendenceSkillDamageSharePct);
   const migrateLegacyHeadStoneLabel = (target: LoadoutState) => {
     if (target.values['MasterBeast.Head.CustomAttribute'] !== '其他') return false;
     target.values['MasterBeast.Head.CustomAttribute'] = '無關傷害';
     return true;
   };
+  const migrateLegacyGloveCircuitSkillDamage = (target: LoadoutState) => {
+    const gloveCircuit = data.circuits.inputs.find(entry => entry.slot === 'gloves');
+    if (!gloveCircuit || target.values[gloveCircuit.attributeCell] !== '超越技傷%') return false;
+    target.values[gloveCircuit.attributeCell] = '單技傷%';
+    return true;
+  };
+  const migrateLegacyPortraitAwakening = (target: LoadoutState) => {
+    const portrait = data.otherEffects.portraitAwakening;
+    const legacyValue = target.values[portrait.legacySelectorCell];
+    if (legacyValue === undefined) return false;
+    if (legacyValue === '有'
+      && target.values[portrait.strongCell] === undefined
+      && target.values[portrait.transcendenceCell] === undefined) {
+      target.values[portrait.transcendenceCell] = portrait.maxTotalPct;
+    }
+    delete target.values[portrait.legacySelectorCell];
+    return true;
+  };
+  const normalizePortraitAwakeningValues = (target: LoadoutState) => {
+    const portrait = data.otherEffects.portraitAwakening;
+    const split = normalizePortraitAwakeningSplit(
+      target.values[portrait.strongCell],
+      target.values[portrait.transcendenceCell],
+      portrait.maxTotalPct,
+    );
+    const changed = target.values[portrait.strongCell] !== split.strongSkillDamagePct
+      || target.values[portrait.transcendenceCell] !== split.transcendenceSkillDamagePct;
+    target.values[portrait.strongCell] = split.strongSkillDamagePct;
+    target.values[portrait.transcendenceCell] = split.transcendenceSkillDamagePct;
+    return changed;
+  };
   const startupLegacyHeadStoneLabelMigrated = migrateLegacyHeadStoneLabel(state);
+  const startupLegacyGloveCircuitMigrated = migrateLegacyGloveCircuitSkillDamage(state);
+  const startupLegacyPortraitAwakeningMigrated = migrateLegacyPortraitAwakening(state);
+  const startupPortraitAwakeningNormalized = normalizePortraitAwakeningValues(state);
   const clearInvalidAccessoryAppraisals = (target: LoadoutState) => {
     const clearedCells: string[] = [];
     for (const group of data.accessoryEffects.groups) {
@@ -102,7 +137,7 @@ async function start() {
     return clearedCells;
   };
   const startupDuplicateNephronMagazineCells = clearDuplicateNephronMagazines(state);
-  if ((startupLegacyHeadStoneLabelMigrated || startupDuplicateTransformationCells.length || startupDuplicateNephronTransformationCells.length || startupInvalidAccessoryAppraisalCells.length || startupDuplicateNephronMagazineCells.length) && !sampleMode) saveState(state);
+  if ((startupLegacyHeadStoneLabelMigrated || startupLegacyGloveCircuitMigrated || startupLegacyPortraitAwakeningMigrated || startupPortraitAwakeningNormalized || startupDuplicateTransformationCells.length || startupDuplicateNephronTransformationCells.length || startupInvalidAccessoryAppraisalCells.length || startupDuplicateNephronMagazineCells.length) && !sampleMode) saveState(state);
   const weaponMagicStoneCells = data.weaponGrades.colorGroups.flatMap(group => group.selectorCells);
   const applyWeaponMagicStonePreset = (grade: string, overwrite = false) => {
     if (!grade) return;
@@ -118,9 +153,12 @@ async function start() {
   let baseline = sampleMode ? null : readBaseline();
   if (baseline) {
     const migratedBaseline = migrateLegacyHeadStoneLabel(baseline);
+    const migratedBaselineGloveCircuit = migrateLegacyGloveCircuitSkillDamage(baseline);
+    const migratedBaselinePortraitAwakening = migrateLegacyPortraitAwakening(baseline);
+    const normalizedBaselinePortraitAwakening = normalizePortraitAwakeningValues(baseline);
     const clearedBaselineMagazines = clearDuplicateNephronMagazines(baseline);
     const clearedBaselineTransformations = clearDuplicateNephronTransformationChoices(baseline);
-    if (migratedBaseline || clearedBaselineMagazines.length || clearedBaselineTransformations.length) saveState(baseline, true);
+    if (migratedBaseline || migratedBaselineGloveCircuit || migratedBaselinePortraitAwakening || normalizedBaselinePortraitAwakening || clearedBaselineMagazines.length || clearedBaselineTransformations.length) saveState(baseline, true);
   }
   let selected = data.layout.slots.find(slot => slot.weapon)!;
   type BeastAccessorySlotId = 'headwear' | 'armor' | 'necklace' | 'ring-one' | 'ring-two';
@@ -139,6 +177,124 @@ async function start() {
   ];
   const app = document.querySelector<HTMLElement>('#app')!;
   app.innerHTML = `<section class="workbench"><header class="workspace-heading"><div class="workspace-intro"><span class="eyebrow">EQUIPMENT SIMULATOR</span><h1>裝備傷害比較</h1><p class="workspace-summary">填入當前數值並設為比較基準，再調整配裝查看傷害差異。</p><ol class="workflow-steps" aria-label="比較流程"><li><span>01</span><span>填入當前數值</span></li><li><span>02</span><span>設為比較基準</span></li><li><span>03</span><span>填入新數值</span></li></ol></div></header><div class="toolbar"><div id="class-picker"></div><label class="toggle"><input id="alternate" type="checkbox">啟用強/排褲切換</label><div class="toolbar-actions"><button id="baseline" type="button">設為比較基準</button><div class="transfer-actions"><button id="import-loadout" type="button">匯入配裝</button><button id="export-loadout" type="button">匯出配裝</button></div></div><input id="loadout-file" type="file" accept="application/json,.json" hidden><span id="transfer-status" role="status" aria-live="polite"></span><span id="save-status" role="status"></span></div><section class="battle-panel"><div class="panel-heading"><h2>關卡設定</h2></div><div id="battle-settings" class="battle-fields"></div></section><div class="equipment-workspace"><section class="equipment-panel"><div class="panel-heading"><h2>裝備配置</h2><span>點選部位以編輯</span></div><div id="equipment-damage-summary" class="equipment-damage-summary" aria-live="polite"></div><div class="canvas-scroll"><div class="equipment-canvas"><span class="group-label costume-label">連身時裝</span><span class="group-label left-label">左冰</span><span class="group-label inner-label">內裝左四</span><span class="group-label weapon-label">冰武 / 武器</span><span class="group-label right-label">右冰</span><span class="group-label accessory-label">飾品</span><span class="group-label beast-label">聖獸飾品</span><div id="title-input" class="canvas-title-input"></div><div id="slots"></div><div id="beast-accessory-fields" class="beast-accessories-grid gear-beast-slots" aria-label="聖獸飾品配置"></div></div></div><p class="panel-note">左冰不支援混搭，但各部位魔法石仍須獨立設定。擁有強/排褲則褲子的傷害增幅會被平均計算。</p><section class="right-ice-set-area"><div class="beast-accessories-heading"><h3>右冰套效</h3><span>最多選擇 ${data.rightIceSets.maxSelectedSets} 套</span></div><p class="panel-note">選擇要啟用的套裝效果。</p><div id="right-ice-set-selectors" class="right-ice-set-selectors"></div></section><div class="beast-accessories-area"><div class="beast-accessories-heading"><h3>聖獸效果設定</h3><span>頭飾、盔甲、項鍊、指環 1、指環 2</span></div><p class="panel-note">共通顏色與潛力設定；各部位效果請使用裝備配置中的聖獸飾品欄位。</p><div id="master-beast-controls" class="master-beast-controls"></div></div></section><div id="inspector-backdrop" class="inspector-backdrop" aria-hidden="true"></div><aside id="inspector" class="inspector" aria-label="部位設定"></aside></div><details class="global-source-panel weapon-magic-stone-panel"><summary>武器魔力石</summary><div id="weapon-magic-stone-fields"></div></details><details class="global-source-panel"><summary>其他效果來源設定</summary><p class="panel-note">未列在此處的特殊條件或 Buff／Debuff 尚未納入計算。</p><div id="global-source-fields"></div></details><section class="results-panel"><div class="panel-heading"><h2>目前填寫的屬性</h2><span id="comparison-label"></span></div><p class="panel-note">已填入的屬性彙總，包含內裝、冰裝、武器、關卡與其他效果設定、需要特殊觸發條件的暫時沒有計入。</p><div id="results" aria-live="polite"></div><section class="damage-panel"><div class="panel-heading"><h2>攻擊與最終傷害</h2></div><p class="panel-note">此數值只反映已填寫的內容。</p><div id="damage-result" aria-live="polite"></div><details class="calculation-inspection-panel"><summary>計算結果驗算</summary><div class="calculation-inspection-content"><div id="sheet-parity" class="sheet-parity" aria-live="polite"><p>先點選「設為比較基準」保存目前配置，表格就會比較基準與目前配裝。</p></div><div id="calculation-details"></div></div></details></section></section></section>`;
+  const classPickerRoot = app.querySelector<HTMLElement>('#class-picker')!;
+  const classSettings = document.createElement('div');
+  classSettings.className = 'class-settings';
+  classPickerRoot.before(classSettings);
+  classSettings.append(classPickerRoot);
+  const skillShareControl = document.createElement('div');
+  skillShareControl.className = 'skill-damage-share-control';
+  const skillShareHeading = document.createElement('div');
+  skillShareHeading.className = 'skill-damage-share-heading';
+  const skillShareLabel = document.createElement('label');
+          skillShareLabel.htmlFor = 'transcendence-skill-share-number';
+  skillShareLabel.textContent = '超越技傷占比';
+  const skillShareOutput = document.createElement('output');
+  skillShareOutput.id = 'skill-damage-share-output';
+  skillShareOutput.setAttribute('aria-live', 'polite');
+  skillShareHeading.append(skillShareLabel, skillShareOutput);
+  const skillShareInputs = document.createElement('div');
+  skillShareInputs.className = 'skill-damage-share-inputs';
+  const skillShareNumberWrap = document.createElement('div');
+  skillShareNumberWrap.className = 'skill-damage-share-number-wrap';
+  const skillShareNumberInput = document.createElement('input');
+  skillShareNumberInput.id = 'transcendence-skill-share-number';
+  skillShareNumberInput.type = 'text';
+  skillShareNumberInput.inputMode = 'decimal';
+  skillShareNumberInput.autocomplete = 'off';
+  skillShareNumberInput.spellcheck = false;
+  skillShareNumberInput.maxLength = 6;
+  skillShareNumberInput.pattern = '(?:0|[1-9]\\d{0,2})(?:\\.\\d{0,2})?';
+  skillShareNumberInput.setAttribute('aria-label', '超越技傷占比百分比');
+  skillShareNumberInput.setAttribute('aria-describedby', 'skill-damage-share-note');
+  skillShareNumberInput.title = '只接受 0–100 的數字，最多兩位小數。';
+  const skillSharePercent = document.createElement('span');
+  skillSharePercent.textContent = '%';
+  skillShareNumberWrap.append(skillShareNumberInput, skillSharePercent);
+          skillShareInputs.append(skillShareNumberWrap);
+  const skillShareNote = document.createElement('small');
+  skillShareNote.id = 'skill-damage-share-note';
+          skillShareNote.textContent = '強烈技傷占比會自動補足至 100%。';
+  skillShareControl.append(skillShareHeading, skillShareInputs, skillShareNote);
+  classSettings.append(skillShareControl);
+  const renderSkillDamageShare = (syncNumberInput = true) => {
+    const share = normalizeTranscendenceSkillDamageShare(state.transcendenceSkillDamageSharePct);
+    state.transcendenceSkillDamageSharePct = share;
+    skillShareOutput.textContent = `超越 ${share}% · 強烈 ${Math.round((100 - share) * 100) / 100}%`;
+    if (syncNumberInput) skillShareNumberInput.value = String(share);
+  };
+  const setSkillShareInputInvalid = (invalid: boolean) => {
+    skillShareNumberInput.setAttribute('aria-invalid', invalid ? 'true' : 'false');
+    skillShareNumberWrap.classList.toggle('is-invalid', invalid);
+  };
+  const parseSkillShareInput = parseTranscendenceSkillDamageShareInput;
+  const isSkillShareDraftValid = (raw: string) => raw === '' || parseSkillShareInput(raw) !== null;
+  const isSkillShareInsertionValid = (inserted: string) => {
+    const start = skillShareNumberInput.selectionStart ?? skillShareNumberInput.value.length;
+    const end = skillShareNumberInput.selectionEnd ?? start;
+    const nextValue = skillShareNumberInput.value.slice(0, start) + inserted + skillShareNumberInput.value.slice(end);
+    return nextValue.length <= skillShareNumberInput.maxLength && isSkillShareDraftValid(nextValue);
+  };
+  skillShareNumberInput.addEventListener('focus', () => skillShareNumberInput.select());
+  skillShareNumberInput.addEventListener('input', () => {
+    const raw = skillShareNumberInput.value;
+    if (raw === '') {
+      setSkillShareInputInvalid(false);
+      return;
+    }
+    const value = parseSkillShareInput(raw);
+    if (value === null) {
+      setSkillShareInputInvalid(true);
+      renderSkillDamageShare();
+      return;
+    }
+    setSkillShareInputInvalid(false);
+    state.transcendenceSkillDamageSharePct = normalizeTranscendenceSkillDamageShare(value);
+    renderSkillDamageShare(false);
+    update();
+  });
+  const commitSkillShareNumberInput = () => {
+    const value = parseSkillShareInput(skillShareNumberInput.value);
+    if (value === null) {
+      setSkillShareInputInvalid(true);
+      renderSkillDamageShare();
+      setSkillShareInputInvalid(false);
+      return;
+    }
+    setSkillShareInputInvalid(false);
+    state.transcendenceSkillDamageSharePct = normalizeTranscendenceSkillDamageShare(value);
+    renderSkillDamageShare();
+    update();
+  };
+  skillShareNumberInput.addEventListener('blur', commitSkillShareNumberInput);
+  skillShareNumberInput.addEventListener('keydown', event => {
+    if (!event.ctrlKey && !event.metaKey && !event.altKey && event.key.length === 1
+      && !isSkillShareInsertionValid(event.key)) {
+      event.preventDefault();
+      setSkillShareInputInvalid(true);
+      return;
+    }
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      skillShareNumberInput.blur();
+    }
+  });
+  skillShareNumberInput.addEventListener('beforeinput', event => {
+    const inputEvent = event as InputEvent;
+    if (inputEvent.inputType.startsWith('insert') && inputEvent.data !== null
+      && !isSkillShareInsertionValid(inputEvent.data)) {
+      event.preventDefault();
+      setSkillShareInputInvalid(true);
+    }
+  });
+  skillShareNumberInput.addEventListener('paste', event => {
+    const pasted = event.clipboardData?.getData('text') ?? '';
+    if (!isSkillShareInsertionValid(pasted)) {
+      event.preventDefault();
+      setSkillShareInputInvalid(true);
+    }
+  });
+  renderSkillDamageShare();
   const inspectorPanel = document.querySelector<HTMLElement>('#inspector')!;
   const inspectorBackdrop = document.querySelector<HTMLElement>('#inspector-backdrop')!;
   const mobileInspectorQuery = window.matchMedia('(max-width: 700px)');
@@ -468,24 +624,89 @@ async function start() {
       root.append(warning);
     }
   }
-  const numeric = (parent: HTMLElement, label: string, cell: string, percentage = true, constraints?: { min?: number; max?: number; step?: number | 'any' }, disabled = false) => {
+          const numeric = (parent: HTMLElement, label: string, cell: string, percentage = true, constraints?: { min?: number; max?: number; step?: number | 'any'; integer?: boolean }, disabled = false) => {
     const wrapper = document.createElement('label'); wrapper.className = 'field'; wrapper.textContent = label;
-    const input = document.createElement('input'); input.type = 'number'; input.step = 'any'; input.placeholder = disabled ? '請先選擇屬性' : '請填寫數值';
-    preventScientificNotation(input);
+            const integer = constraints?.integer === true;
+            const input = document.createElement('input'); input.type = integer ? 'text' : 'number'; input.step = integer ? '1' : 'any'; input.placeholder = disabled ? '請先選擇屬性' : '請填寫數值';
+            if (integer) {
+              const maximum = constraints?.max ?? 999;
+              input.inputMode = 'numeric'; input.pattern = '[0-9]*'; input.maxLength = String(maximum).length;
+              input.autocomplete = 'off'; input.spellcheck = false;
+              input.title = `只接受 ${constraints?.min ?? 0}–${maximum} 的整數。`;
+            } else {
+              preventScientificNotation(input);
+            }
     if (constraints?.min !== undefined) input.min = String(constraints.min);
     if (constraints?.max !== undefined) input.max = String(constraints.max);
     if (constraints?.step !== undefined) input.step = String(constraints.step);
     input.value = val(cell) === '' ? '' : String(Number(val(cell)) * (percentage ? 100 : 1));
     if (disabled) { input.disabled = true; wrapper.classList.add('field-disabled'); wrapper.setAttribute('aria-disabled', 'true'); wrapper.title = '請先選擇屬性'; }
-    input.addEventListener('input', () => {
-      if (input.value !== '' && constraints?.min !== undefined && Number(input.value) < constraints.min) {
-        input.value = val(cell) === '' ? '' : String(Number(val(cell)) * (percentage ? 100 : 1));
-        return;
-      }
-      if (!input.validity.valid) return;
-      state.values[cell] = input.value === '' ? '' : Number(input.value) / (percentage ? 100 : 1);
-      update();
-    });
+            if (integer) {
+              const minimum = constraints?.min ?? 0;
+              const maximum = constraints?.max ?? 999;
+              const isValidInteger = (value: string) => value === '' || /^\d+$/.test(value) && Number(value) >= minimum && Number(value) <= maximum;
+              const isValidInsertion = (inserted: string) => {
+                const start = input.selectionStart ?? input.value.length;
+                const end = input.selectionEnd ?? start;
+                const nextValue = input.value.slice(0, start) + inserted + input.value.slice(end);
+                return nextValue.length <= input.maxLength && isValidInteger(nextValue);
+              };
+              let lastValidValue = input.value;
+              input.addEventListener('focus', () => input.select());
+              input.addEventListener('keydown', event => {
+                if (!event.ctrlKey && !event.metaKey && !event.altKey && event.key.length === 1 && !isValidInsertion(event.key)) {
+                  event.preventDefault();
+                  input.setAttribute('aria-invalid', 'true');
+                }
+              });
+              input.addEventListener('beforeinput', event => {
+                const inputEvent = event as InputEvent;
+                if (inputEvent.inputType.startsWith('insert') && inputEvent.data !== null && !isValidInsertion(inputEvent.data)) {
+                  event.preventDefault();
+                  input.setAttribute('aria-invalid', 'true');
+                }
+              });
+              input.addEventListener('paste', event => {
+                const pasted = event.clipboardData?.getData('text') ?? '';
+                if (!isValidInsertion(pasted)) {
+                  event.preventDefault();
+                  input.setAttribute('aria-invalid', 'true');
+                }
+              });
+              input.addEventListener('drop', event => {
+                const dropped = event.dataTransfer?.getData('text') ?? '';
+                if (!isValidInsertion(dropped)) {
+                  event.preventDefault();
+                  input.setAttribute('aria-invalid', 'true');
+                }
+              });
+              input.addEventListener('input', () => {
+                if (!isValidInteger(input.value)) {
+                  input.value = lastValidValue;
+                  input.setAttribute('aria-invalid', 'true');
+                  return;
+                }
+                input.setAttribute('aria-invalid', 'false');
+                if (input.value === '') return;
+                lastValidValue = input.value;
+                state.values[cell] = Number(input.value);
+                update();
+              });
+              input.addEventListener('blur', () => {
+                if (input.value === '') input.value = lastValidValue;
+                input.setAttribute('aria-invalid', 'false');
+              });
+            } else {
+              input.addEventListener('input', () => {
+                if (input.value !== '' && constraints?.min !== undefined && Number(input.value) < constraints.min) {
+                  input.value = val(cell) === '' ? '' : String(Number(val(cell)) * (percentage ? 100 : 1));
+                  return;
+                }
+                if (!input.validity.valid) return;
+                state.values[cell] = input.value === '' ? '' : Number(input.value) / (percentage ? 100 : 1);
+                update();
+              });
+            }
     wrapper.append(input); parent.append(wrapper);
   };
   const section = (parent: HTMLElement, label: string, open = false) => {
@@ -524,12 +745,117 @@ async function start() {
     petSkillToggle.append(petSkillCheckbox, petSkillLabel);
     general.append(petSkillToggle);
     for (const effect of data.otherEffects.binaryEffects) pick(general, effect.name, effect.selectorCell, effect.options);
+    const portrait = data.otherEffects.portraitAwakening;
+    const portraitSection = document.createElement('section');
+    portraitSection.className = 'portrait-awakening-fields';
+    const portraitHeading = document.createElement('h4');
+    portraitHeading.textContent = '立繪、覺醒';
+    const portraitNote = document.createElement('p');
+    portraitNote.className = 'global-input-note';
+    portraitNote.textContent = '輸入任一欄 1–5%，另一欄會自動補足，兩項合計固定為 5%。';
+    const portraitGrid = document.createElement('div');
+    portraitGrid.className = 'portrait-awakening-grid';
+    const portraitInputs = new Map<string, HTMLInputElement>();
+    const portraitErrors = new Map<string, HTMLElement>();
+    const portraitFields = [
+      { cell: portrait.strongCell, otherCell: portrait.transcendenceCell, label: '強烈技傷%' },
+      { cell: portrait.transcendenceCell, otherCell: portrait.strongCell, label: '超越技傷%' },
+    ] as const;
+    for (const entry of portraitFields) {
+      const wrapper = document.createElement('label');
+      wrapper.className = 'field';
+      wrapper.append(document.createTextNode(entry.label));
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.inputMode = 'numeric';
+      input.pattern = `[${portrait.minPct}-${portrait.maxPct}]`;
+      input.maxLength = 1;
+      input.placeholder = '';
+      input.value = String(state.values[entry.cell] ?? 0);
+      input.setAttribute('aria-label', `立繪、覺醒${entry.label}`);
+      input.title = `只接受 ${portrait.minPct}–${portrait.maxPct} 的正整數；另一欄會自動補足至 ${portrait.maxTotalPct}%。`;
+      const error = document.createElement('small');
+      error.className = 'portrait-awakening-error';
+      error.setAttribute('role', 'alert');
+      error.hidden = true;
+      portraitInputs.set(entry.cell, input);
+      portraitErrors.set(entry.cell, error);
+      const isManualValue = (raw: string) => /^\d$/.test(raw)
+        && Number(raw) >= portrait.minPct && Number(raw) <= portrait.maxPct;
+      const showError = (message: string) => {
+        input.setAttribute('aria-invalid', 'true');
+        error.textContent = message;
+        error.hidden = false;
+      };
+      const clearError = () => {
+        input.setAttribute('aria-invalid', 'false');
+        error.textContent = '';
+        error.hidden = true;
+      };
+      const invalidEntryMessage = `只能輸入 ${portrait.minPct}–${portrait.maxPct} 的正整數。`;
+      input.addEventListener('focus', () => input.select());
+      input.addEventListener('keydown', event => {
+        if (event.ctrlKey || event.metaKey || event.altKey || event.key.length !== 1) return;
+        if (!isManualValue(event.key)) {
+          event.preventDefault();
+          showError(invalidEntryMessage);
+        }
+      });
+      input.addEventListener('beforeinput', event => {
+        const inputEvent = event as InputEvent;
+        if (inputEvent.inputType.startsWith('insert') && inputEvent.data !== null && !isManualValue(inputEvent.data)) {
+          event.preventDefault();
+          showError(invalidEntryMessage);
+        }
+      });
+      input.addEventListener('paste', event => {
+        const pasted = event.clipboardData?.getData('text') ?? '';
+        if (!isManualValue(pasted)) {
+          event.preventDefault();
+          showError(invalidEntryMessage);
+        }
+      });
+      input.addEventListener('input', () => {
+        const raw = input.value;
+        if (!isManualValue(raw)) {
+          input.value = String(state.values[entry.cell] ?? 0);
+          showError(invalidEntryMessage);
+          return;
+        }
+        const value = Number(raw);
+        const otherValue = portrait.maxTotalPct - value;
+        state.values[entry.cell] = value;
+        state.values[entry.otherCell] = otherValue;
+        for (const field of portraitFields) {
+          const fieldInput = portraitInputs.get(field.cell);
+          if (fieldInput) fieldInput.value = String(state.values[field.cell] ?? 0);
+          fieldInput?.setAttribute('aria-invalid', 'false');
+          const fieldError = portraitErrors.get(field.cell);
+          if (fieldError) {
+            fieldError.textContent = '';
+            fieldError.hidden = true;
+          }
+        }
+        update();
+      });
+      input.addEventListener('blur', () => {
+        input.value = String(state.values[entry.cell] ?? 0);
+        clearError();
+      });
+      wrapper.append(input, error);
+      portraitGrid.append(wrapper);
+    }
+    portraitSection.append(portraitHeading, portraitNote, portraitGrid);
+    general.append(portraitSection);
     field(general, '百億/內布隆套效', data.colorSetEffects.selectorCell, options(data.colorSetEffects.options.map(option => option.name)));
     const atma = group('亞特瑪');
     field(atma, '亞特瑪屬性', 'Atma.Element', options(['火焰', '流水', '草木']));
     field(atma, '亞特瑪顏色', 'Atma.Color', options(['藍色', '綠色', '紫色', '米色']));
-    const resonance = group('共鳴輸入', '輸入已分配的共鳴點，例如適應力點滿應該填100而非7。');
-    for (const effect of data.resonance.effects) numeric(resonance, effect.name, effect.inputCell, false, { min: 0, step: 'any' });
+            const resonance = group('共鳴輸入', '輸入已分配的共鳴點，例如適應力點滿應該填100而非7。');
+            const resonanceLimits: Record<string, number> = { 雙攻: 999, 技傷: 100, 適應: 100, 兩極: 50, B傷: 50 };
+            for (const effect of data.resonance.effects) {
+              numeric(resonance, effect.name, effect.inputCell, false, { min: 0, max: resonanceLimits[effect.name] ?? 999, step: 1, integer: true });
+            }
     const spirit = group('賦靈錄');
     const spiritClassCodes = data.spiritRecord.classSelectors.classes.map(entry => entry.classCode);
     const selectedSpiritClassCodes = data.spiritRecord.classSelectors.selectorCells.map(val);
@@ -1190,9 +1516,11 @@ async function start() {
         const critDamageMultiplier = critDamageFactors.map(effect => `×${fmt(effect.factor)}（${sourceLabel(effect.sourceId)}）`).join('、') || '無額外來源';
         const critDamageCalculation = `角色基底 ${fmt(critDamageBaseFactor * 100)}%（×${fmt(critDamageBaseFactor)}）${critDamageFactors.map(effect => ` ×${fmt(effect.factor)}`).join('')} − ${fmt(result.multiplicativeCritDamage.baselinePct)}% 基準 = +${fmt(result.multiplicativeCritDamage.value * 100)}%`;
         damageTarget.innerHTML = `<div class="damage-summary"><div><span>最小攻擊力</span><strong>${fmt(result.attack.lowerDamage)}</strong></div><div><span>最大攻擊力</span><strong>${fmt(result.attack.upperDamage)}</strong></div><div class="final-damage"><span>最終傷害</span><strong>${finalDamageFormat(result.finalDamage.finalDamage)}</strong></div></div>${damageRatioHtml}`;
+        const skillWeighting = result.finalDamage.skillDamageWeighting;
+        const skillWeightingText = `超越 ${fmt(skillWeighting.transcendenceSharePct)}% ×${fmt(skillWeighting.transcendenceFactor)} + 強烈 ${fmt(skillWeighting.strongSharePct)}% ×${fmt(skillWeighting.strongFactor)} = ×${fmt(skillWeighting.combinedFactor)}`;
         const calculationDetailsTarget = document.querySelector<HTMLElement>("#calculation-details")!;
         const formulaWasOpen = calculationDetailsTarget.querySelector<HTMLDetailsElement>(".formula-detail")?.open ?? false;
-        calculationDetailsTarget.innerHTML = `<details class="formula-detail"${formulaWasOpen ? ' open' : ''}><summary>展開傷害計算明細</summary><p>致命傷害被動：${fmt(result.classCritDamagePassivePct)}%　乘算暴傷增幅：+${fmt(result.multiplicativeCritDamage.value * 100)}%</p><p>乘算暴傷計算：${h(critDamageCalculation)}</p><p>乘算暴傷來源：${h(critDamageMultiplier)}</p><p>爆擊乘算來源：${h(rateSources(result.combatRates.critRate.multipliers))}</p><p>極大乘算來源：${h(rateSources(result.combatRates.extremization.multipliers))}</p><p>乘算傷害：${fmt(result.generalMultiplicativeDamage.value)} 倍　強者／排熱因子：${fmt(result.finalDamage.conditionalFactor)}</p><p>適應力因子：${fmt(result.finalDamage.adaptationFactor)}　防禦因子：${fmt(result.finalDamage.defenseFactor)}</p></details>`;
+        calculationDetailsTarget.innerHTML = `<details class="formula-detail"${formulaWasOpen ? ' open' : ''}><summary>展開傷害計算明細</summary><p>強烈／超越技傷加權：${h(skillWeightingText)}</p><p>致命傷害被動：${fmt(result.classCritDamagePassivePct)}%　乘算暴傷增幅：+${fmt(result.multiplicativeCritDamage.value * 100)}%</p><p>乘算暴傷計算：${h(critDamageCalculation)}</p><p>乘算暴傷來源：${h(critDamageMultiplier)}</p><p>爆擊乘算來源：${h(rateSources(result.combatRates.critRate.multipliers))}</p><p>極大乘算來源：${h(rateSources(result.combatRates.extremization.multipliers))}</p><p>乘算傷害：${fmt(result.generalMultiplicativeDamage.value)} 倍　強者／排熱因子：${fmt(result.finalDamage.conditionalFactor)}</p><p>適應力因子：${fmt(result.finalDamage.adaptationFactor)}　防禦因子：${fmt(result.finalDamage.defenseFactor)}</p></details>`;
       } catch (error) {
         damageTarget.innerHTML = `<p class="input-warning">尚未計算：${h(calculationIssue(error))}請完成後再試。</p>`;
         document.querySelector('#calculation-details')!.replaceChildren();
@@ -1224,6 +1552,7 @@ async function start() {
     root.replaceChildren(picker, error);
   };
   renderClassPicker();
+  renderSkillDamageShare();
   const toggle = document.querySelector<HTMLInputElement>('#alternate')!; toggle.checked = state.lowerwearAlternativeEnabled;
   const battle = document.querySelector<HTMLElement>('#battle-settings')!;
   for (const [fieldId, label] of [['Stage.Adapt','關卡適應力'],['Stage.CritRatePenalty','關卡扣致命'],['Stage.BossDEF','Boss防禦']] as const) {
@@ -1262,6 +1591,9 @@ async function start() {
     try {
       const imported = parseLoadoutJson(await file.text(), state, data);
       Object.assign(state, imported.state);
+      migrateLegacyPortraitAwakening(state);
+      normalizePortraitAwakeningValues(state);
+      renderSkillDamageShare();
       const duplicateTransformationCells = clearDuplicateTransformationChoices(state);
       const duplicateNephronTransformationCells = clearDuplicateNephronTransformationChoices(state);
       applyWeaponMagicStonePreset(String(state.values[data.weaponGrades.selectorCell] ?? ''));

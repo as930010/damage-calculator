@@ -1008,6 +1008,7 @@
         "physicalAttack": 50.0,
         "magicalAttack": 50.0,
         "transcendenceSkillDamagePct": 3.0,
+        "strongSkillDamagePct": 3.0,
         "fullHealthKillDamagePct": 3.0
       },
       "effects": []

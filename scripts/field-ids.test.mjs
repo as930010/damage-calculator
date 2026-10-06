@@ -9,9 +9,9 @@ import { readState, saveState } from "../dist/frontend/state.js";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const sample = JSON.parse(await readFile(join(root, "data/examples/live-sheet-2026-09-28.json"), "utf8"));
 
-test("the confirmed sample stores all 216 inputs using semantic IDs and compact codes", () => {
+test("the confirmed sample stores all 217 inputs using semantic IDs and compact codes", () => {
   const fields = Object.keys(sample.values);
-  assert.equal(fields.length, 216);
+  assert.equal(fields.length, 217);
   assert.ok(fields.every(isFieldId));
   assert.equal(Object.keys(FIELD_ID_TO_CODE).length, Object.keys(CODE_TO_FIELD_ID).length);
   for (const fieldId of fields) {

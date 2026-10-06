@@ -12,6 +12,7 @@
     "bossDamagePct": 5,
     "polarizationPct": 1.2,
     "transcendenceSkillDamagePct": 3,
+    "strongSkillDamagePct": 3,
     "allSkillDamagePct": 1,
     "adaptabilityPct": 1,
     "defenseIgnorePct": 1.2

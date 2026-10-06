@@ -440,6 +440,7 @@
       "無關傷害"
     ],
     "necklace": [
+      "強烈技傷%",
       "超越技傷%",
       "其他"
     ],
@@ -456,6 +457,7 @@
       "兩極化%",
       "致命傷害%",
       "Boss傷害%",
+      "強烈技傷%",
       "超越技傷%",
       "所有技能傷害%",
       "致命一擊%",
@@ -501,6 +503,7 @@
     "兩極化%": "polarizationPct",
     "致命傷害%": "critDamagePct",
     "Boss傷害%": "bossDamagePct",
+    "強烈技傷%": "strongSkillDamagePct",
     "超越技傷%": "transcendenceSkillDamagePct",
     "所有技能傷害%": "allSkillDamagePct"
   },
@@ -513,7 +516,7 @@
     {
       "input": "裝備模擬區!M33:M34",
       "calculation": "計算機!K81",
-      "rule": "超越技傷%選項將輸入數值直接寫入超越技傷%；其他不產生效果。"
+      "rule": "強烈技傷%或超越技傷%選項會將輸入數值直接寫入對應屬性；其他不產生效果。"
     },
     {
       "input": "裝備模擬區!M36:M40",

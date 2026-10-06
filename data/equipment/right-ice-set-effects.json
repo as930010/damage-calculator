@@ -127,6 +127,7 @@
         "polarizationPct": 3,
         "bleedDamagePct": 3,
         "transcendenceSkillDamagePct": 4,
+        "strongSkillDamagePct": 4,
         "strongerPct": 10,
         "heatPct": 10
       },
@@ -324,7 +325,8 @@
       "active": true,
       "stats": {
         "polarizationPct": 4,
-        "transcendenceSkillDamagePct": 4
+        "transcendenceSkillDamagePct": 4,
+        "strongSkillDamagePct": 4
       },
       "condition": {
         "type": "rightIcePieceCount",
@@ -346,6 +348,7 @@
       "stats": {
         "polarizationPct": 4,
         "transcendenceSkillDamagePct": 4,
+        "strongSkillDamagePct": 4,
         "fullHealthKillDamagePct": 6
       },
       "condition": {

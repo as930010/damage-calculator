@@ -175,3 +175,24 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
 @media(max-width:700px){.calculation-inspection-panel{margin:0 12px 16px}.calculation-inspection-panel .sheet-parity{padding:14px 12px}.calculation-inspection-panel .formula-detail{margin-inline:12px}}
 @media(min-width:701px) and (max-width:1240px){.site-credits-notes{width:min(calc(100% - clamp(32px,6vw,56px)),1384px);max-width:1384px}}
 @media(min-width:701px){.workbench{padding-bottom:20px}}
+
+.toolbar .class-settings{display:grid;gap:8px;width:min(245px,27vw);min-width:190px;flex:0 0 auto}
+.toolbar .class-settings #class-picker{width:100%}
+.skill-damage-share-control{display:grid;gap:4px;padding:7px 10px;border:1px solid rgb(117 139 171 / 18%);border-radius:10px;background:rgb(15 21 29 / 48%)}
+.skill-damage-share-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#aab8cb;font-size:10px}
+.skill-damage-share-heading label{cursor:pointer}
+.skill-damage-share-heading output{color:#d5e3f7;font-size:10px;white-space:nowrap}
+.skill-damage-share-inputs{display:grid;grid-template-columns:minmax(0,128px);align-items:center;gap:8px}
+.skill-damage-share-number-wrap{display:flex;align-items:center;gap:4px;padding:0 7px;border:1px solid #39485d;border-radius:7px;background:#151c25;color:#aab8cb}
+.skill-damage-share-number-wrap input{width:100%;min-width:0;min-height:27px;padding:3px 0;border:0;outline:0;background:transparent;color:#e2ecfa;text-align:right;font-family:inherit;font-size:11px;font-weight:600}
+.skill-damage-share-number-wrap:focus-within{border-color:#8caedb;box-shadow:0 0 0 2px rgb(140 174 219 / 18%)}
+.skill-damage-share-control small{color:#8798af;font-size:9px;line-height:1.2}
+.skill-damage-share-number-wrap.is-invalid{border-color:#ff9c8a;box-shadow:0 0 0 2px rgb(255 156 138 / 16%)}
+.portrait-awakening-fields{grid-column:1/-1;display:grid;gap:6px;padding:10px;border:1px solid rgb(117 139 171 / 18%);border-radius:9px;background:rgb(15 21 29 / 30%)}
+.portrait-awakening-fields h4{margin:0;color:#cad8eb;font-size:11px;font-weight:600}
+.portrait-awakening-fields .global-input-note{margin:0}
+.portrait-awakening-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;max-width:50%}
+.portrait-awakening-error{color:#ff9c8a;font-size:9px;line-height:1.25}
+@media(max-width:520px){.portrait-awakening-grid{grid-template-columns:repeat(2,minmax(0,1fr));max-width:100%}}
+@media(max-width:700px){.toolbar .class-settings{width:100%;max-width:300px;min-width:0;flex-basis:100%}}
+@media(max-width:380px){.toolbar .class-settings{max-width:none}}

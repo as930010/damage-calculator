@@ -615,6 +615,22 @@
       }
     },
     {
+      "id": "accessories-strong-technical-ring",
+      "name": "強烈的技術戒指",
+      "slotId": "ringB",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "stats": {
+        "strongSkillDamagePct": 20
+      },
+      "effects": [],
+      "appraisal": {
+        "canAppraise": false,
+        "effectCount": 0
+      }
+    },
+    {
       "id": "accessories-decc7e3a2bd6",
       "name": "超越的技術戒指",
       "slotId": "ringB",
@@ -628,6 +644,24 @@
       "appraisal": {
         "canAppraise": false,
         "effectCount": 0
+      }
+    },
+    {
+      "id": "accessories-strong-warrior-technical-ring",
+      "name": "強烈鬥士的技術戒指",
+      "slotId": "ringB",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "stats": {
+        "doubleAttackPct": 0.5,
+        "critRatePct": 1,
+        "strongSkillDamagePct": 20
+      },
+      "effects": [],
+      "appraisal": {
+        "canAppraise": true,
+        "effectCount": 2
       }
     },
     {
@@ -656,7 +690,8 @@
       "level": null,
       "active": true,
       "stats": {
-        "transcendenceSkillDamagePct": 20
+        "transcendenceSkillDamagePct": 20,
+        "strongSkillDamagePct": 20
       },
       "effects": [],
       "appraisal": {
@@ -666,7 +701,7 @@
     }
   ],
   "notes": [
-    "飾品鑑定是否可用依裝備名稱判斷：臉上與耳環皆不可鑑定；臉下僅亞特瑪臉下、戒指 A 僅鬥士憤怒戒指、手臂僅亞特瑪手臂、戒指 B 僅超越鬥士的技術戒指可鑑定。",
+    "飾品鑑定是否可用依裝備名稱判斷：臉上與耳環皆不可鑑定；臉下僅亞特瑪臉下、戒指 A 僅鬥士憤怒戒指、手臂僅亞特瑪手臂、戒指 B 僅超越鬥士與強烈鬥士的技術戒指可鑑定。",
     "項鍊僅亞特瑪項鍊與堅毅的鬥士項鍊可鑑定；亞特瑪項鍊沿用三條原效果，堅毅的鬥士項鍊使用兩條戒指專用效果。其餘列入規則的裝備均設定為不可鑑定。",
     "各部位鑑定輸入位置及效果數值由 accessory-special-effects.json 維護。"
   ]

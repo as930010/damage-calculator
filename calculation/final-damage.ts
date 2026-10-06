@@ -12,7 +12,7 @@ function ratio(pct: number): number {
   return pct / 100;
 }
 
-/** Implements the confirmed Google Sheets 計算機!B163 formula and preserves its order. */
+/** Implements the B163 damage chain, weighting the two skill-damage multipliers by the selected share. */
 export function calculateFinalDamage(input: FinalDamageInput): FinalDamageResult {
   requireFiniteInputs(input);
 
@@ -27,10 +27,20 @@ export function calculateFinalDamage(input: FinalDamageInput): FinalDamageResult
         ratio(input.classCritDamagePassivePct) +
         input.multiplicativeCritDamageOffset) +
     (1 - input.critRate);
+  const transcendenceSharePct = input.transcendenceSkillDamageSharePct ?? 100;
+  if (!Number.isFinite(transcendenceSharePct) || transcendenceSharePct < 0 || transcendenceSharePct > 100) {
+    throw new RangeError("Transcendence skill damage share must be between 0 and 100.");
+  }
+  const strongSharePct = 100 - transcendenceSharePct;
+  const transcendenceFactor = 1 + ratio(input.transcendenceSkillDamagePct);
+  const strongFactor = 1 + ratio(input.strongSkillDamagePct);
+  const combinedSkillDamageFactor =
+    transcendenceFactor * ratio(transcendenceSharePct) +
+    strongFactor * ratio(strongSharePct);
   const damageFactors = {
     bossDamage: 1 + ratio(input.bossDamagePct),
     polarization: 1 + ratio(input.polarizationPct),
-    transcendenceSkillDamage: 1 + ratio(input.transcendenceSkillDamagePct),
+    skillDamage: combinedSkillDamageFactor,
     allSkillDamage: 1 + ratio(input.allSkillDamagePct),
     bleedDamage: 1 + ratio(input.bleedDamagePct),
     fullHealthKillDamage: 1 + ratio(input.fullHealthKillDamagePct),
@@ -63,7 +73,7 @@ export function calculateFinalDamage(input: FinalDamageInput): FinalDamageResult
     critFactor *
     damageFactors.bossDamage *
     damageFactors.polarization *
-    damageFactors.transcendenceSkillDamage *
+    damageFactors.skillDamage *
     damageFactors.allSkillDamage *
     damageFactors.bleedDamage *
     damageFactors.fullHealthKillDamage *
@@ -80,6 +90,13 @@ export function calculateFinalDamage(input: FinalDamageInput): FinalDamageResult
     extremizedBase,
     critFactor,
     damageFactors,
+    skillDamageWeighting: {
+      transcendenceSharePct,
+      strongSharePct,
+      transcendenceFactor,
+      strongFactor,
+      combinedFactor: combinedSkillDamageFactor,
+    },
     conditionalFactor,
     adaptationFactor,
     defenseFactor,

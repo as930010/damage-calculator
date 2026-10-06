@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { projectAttributes, projectDamage } from '../dist/frontend/projection.js';
+import { normalizePortraitAwakeningSplit } from '../dist/frontend/state.js';
 import { resolveInnerwearSources } from '../dist/calculation/innerwear.js';
 import { resolveMasterBeastEffects, resolveRightIceSetEffects } from '../dist/calculation/equipment-effects.js';
 
@@ -105,7 +106,7 @@ test('JSON 選擇的全域來源進入角色彙總與 B163 傷害流程', async 
   const base = projectDamage(data, { schemaVersion: 2, Job: 'KE', values: baseValues, lowerwearAlternativeEnabled: false }).result;
   const values = {
     ...baseValues,
-    "Effect.Title": 'Dogma', "Effect.Emblem": '有', "Effect.Consumable": '適應靈藥', "Effect.Environment": '集合地', "Peak.Option": '精神挑戰者', "Effect.PortraitAwakening": '有', "Pet.Passive": '致命一擊+4%', "MasterBeast.OverallPotential": 'Boss傷害+1%',
+    "Effect.Title": 'Dogma', "Effect.Emblem": '有', "Effect.Consumable": '適應靈藥', "Effect.Environment": '集合地', "Peak.Option": '精神挑戰者', "Effect.PortraitAwakening.TranscendenceSkillDamagePct": 5, "Pet.Passive": '致命一擊+4%', "MasterBeast.OverallPotential": 'Boss傷害+1%',
     "Ice.Weapon.Set": '騎士團', "Right.Ice.WeaponAccessory": '騎士團', "Right.Ice.FaceTop": '騎士團',
     "Accessory.FaceMiddle": '亞特瑪臉中', "Accessory.FaceBottom": '亞特瑪臉下', "Accessory.Arm": '亞特瑪手臂', "Accessory.Necklace": '亞特瑪項鍊', "Atma.Element": '草木', "Atma.Color": '米色',
     "GuildFountain.Stage2": '致命一擊+3%', "GuildFountain.Stage3": '雙攻+0.6%', "GuildFountain.Stage4": '強者+3%', "Resonance.AllATK.Points": 1, "Resonance.TranscendenceSkillDMG.Points": 10, "Resonance.Polarization.Points": 10, "Resonance.BossDMG.Points": 10, "Resonance.Adapt.Points": 10,
@@ -114,7 +115,7 @@ test('JSON 選擇的全域來源進入角色彙總與 B163 傷害流程', async 
     "SpiritRecord.Class.1": 'KE', "SpiritRecord.Class.2": 'AS', "SpiritRecord.Class.3": 'AN',
   };
   const withEffects = projectDamage(data, { schemaVersion: 2, Job: 'KE', values, lowerwearAlternativeEnabled: false }).result;
-  const withoutBinaryEffects = projectDamage(data, { schemaVersion: 2, Job: 'KE', values: { ...values, "Effect.Emblem": '沒有', "Effect.PortraitAwakening": '沒有' }, lowerwearAlternativeEnabled: false }).result;
+  const withoutBinaryEffects = projectDamage(data, { schemaVersion: 2, Job: 'KE', values: { ...values, "Effect.Emblem": '沒有', "Effect.PortraitAwakening.TranscendenceSkillDamagePct": '' }, lowerwearAlternativeEnabled: false }).result;
   const withoutSpiritRecords = projectDamage(data, { schemaVersion: 2, Job: 'KE', values: { ...values, "SpiritRecord.Class.1": '', "SpiritRecord.Class.2": '', "SpiritRecord.Class.3": '' }, lowerwearAlternativeEnabled: false }).result;
 
   assert.ok(Math.abs(base.generalMultiplicativeDamage.value - 1.144) < 1e-12);
@@ -132,6 +133,233 @@ test('JSON 選擇的全域來源進入角色彙總與 B163 傷害流程', async 
   assert.ok(withEffects.attributes.conditionalDamage.strongerPct > base.attributes.conditionalDamage.strongerPct);
   assert.ok(withEffects.multiplicativeCritDamage.value > base.multiplicativeCritDamage.value);
   assert.ok(withEffects.finalDamage.finalDamage > base.finalDamage.finalDamage);
+});
+
+test('立繪、覺醒輸入任一技傷比例後會互補至5%，並套用至正確屬性', async () => {
+  const data = await loadData();
+  const loadout = {
+    schemaVersion: 3, Job: 'KE', lowerwearAlternativeEnabled: false, transcendenceSkillDamageSharePct: 40,
+    values: {
+      'Weapon.ENHC': 'Lv.8',
+      'Left.Armor.Upper.ENHC': 'Lv.8', 'Left.Armor.Bottom.ENHC': 'Lv.8',
+      'Left.Armor.Gloves.ENHC': 'Lv.8', 'Left.Armor.Shoes.ENHC': 'Lv.8',
+      'Left.Armor.Upper.FORGE': 0, 'Left.Armor.Bottom.FORGE': 0,
+      'Left.Armor.Gloves.FORGE': 0, 'Left.Armor.Shoes.FORGE': 0,
+    },
+  };
+  const baseline = projectDamage(data, loadout).result;
+  const values = {
+    ...loadout.values,
+    [data.otherEffects.portraitAwakening.strongCell]: 2,
+    [data.otherEffects.portraitAwakening.transcendenceCell]: 3,
+  };
+  const result = projectDamage(data, { ...loadout, values }).result;
+  const expectedStrong = baseline.attributes.stats.strongSkillDamagePct.finalTotal + 2;
+  const expectedTranscendence = baseline.attributes.stats.transcendenceSkillDamagePct.finalTotal + 3;
+  const expectedFactor = (1 + expectedTranscendence / 100) * 0.4 + (1 + expectedStrong / 100) * 0.6;
+
+  assert.equal(result.attributes.stats.strongSkillDamagePct.finalTotal, expectedStrong);
+  assert.equal(result.attributes.stats.transcendenceSkillDamagePct.finalTotal, expectedTranscendence);
+  assert.ok(Math.abs(result.finalDamage.skillDamageWeighting.combinedFactor - expectedFactor) < 1e-12);
+  const singleInput = projectDamage(data, { ...loadout, values: {
+    ...loadout.values,
+    [data.otherEffects.portraitAwakening.strongCell]: 3,
+  } }).result;
+  assert.equal(singleInput.attributes.stats.strongSkillDamagePct.finalTotal, baseline.attributes.stats.strongSkillDamagePct.finalTotal + 3);
+  assert.equal(singleInput.attributes.stats.transcendenceSkillDamagePct.finalTotal, baseline.attributes.stats.transcendenceSkillDamagePct.finalTotal + 2);
+  assert.throws(() => projectAttributes(data, { ...loadout, values: {
+    ...loadout.values,
+    [data.otherEffects.portraitAwakening.strongCell]: 2,
+    [data.otherEffects.portraitAwakening.transcendenceCell]: 4,
+  } }), /合計必須為 5/);
+  assert.throws(() => projectAttributes(data, { ...loadout, values: {
+    ...loadout.values,
+    [data.otherEffects.portraitAwakening.strongCell]: 1.5,
+  } }), /正整數/);
+});
+
+test('立繪、覺醒比例載入時預設超越5%，並依單欄輸入互補', () => {
+  assert.deepEqual(normalizePortraitAwakeningSplit(undefined, undefined), {
+    strongSkillDamagePct: 0, transcendenceSkillDamagePct: 5,
+  });
+  assert.deepEqual(normalizePortraitAwakeningSplit(3, undefined), {
+    strongSkillDamagePct: 3, transcendenceSkillDamagePct: 2,
+  });
+  assert.deepEqual(normalizePortraitAwakeningSplit(undefined, 4), {
+    strongSkillDamagePct: 1, transcendenceSkillDamagePct: 4,
+  });
+  assert.deepEqual(normalizePortraitAwakeningSplit(0, 5), {
+    strongSkillDamagePct: 0, transcendenceSkillDamagePct: 5,
+  });
+});
+
+test('亞特瑪新增的強烈與強烈/超越魔法石選項依防具、武器套用正確屬性', async () => {
+  const data = await loadData();
+  const magicStones = data.catalogs['equipment/magic-stones.json'].items;
+  for (const removedId of [
+    'magic-stone-atma-transcendence-skill-damage-2-4',
+    'magic-stone-atma-strong-skill-damage-2-4',
+    'magic-stone-atma-strong-transcendence-skill-damage-15-3',
+  ]) {
+    assert.equal(magicStones.some(entry => entry.id === removedId), false, removedId + ' must be removed');
+  }
+  const atmaNames = magicStones.filter(entry => entry.id.startsWith('magic-stone-atma-')).map(entry => entry.name);
+  assert.ok(atmaNames.indexOf('亞特瑪強烈技傷 2.5/5%') < atmaNames.indexOf('亞特瑪超越技傷'));
+  const baseValues = {
+    'Weapon.ENHC': 'Lv.8',
+    'Left.Armor.Upper.ENHC': 'Lv.8', 'Left.Armor.Bottom.ENHC': 'Lv.8',
+    'Left.Armor.Gloves.ENHC': 'Lv.8', 'Left.Armor.Shoes.ENHC': 'Lv.8',
+    'Left.Armor.Upper.FORGE': 0, 'Left.Armor.Bottom.FORGE': 0,
+    'Left.Armor.Gloves.FORGE': 0, 'Left.Armor.Shoes.FORGE': 0,
+  };
+  const baseline = projectDamage(data, {
+    schemaVersion: 2,
+    Job: 'KE',
+    values: { ...baseValues, 'Costume.MagicStone': '', 'Weapon.MagicStone.1': '' },
+    lowerwearAlternativeEnabled: false,
+  }).result;
+  const cases = [
+    { itemId: 'magic-stone-atma-transcendence-skill-damage', armor: [2.5, 0], weapon: [5, 0] },
+    { itemId: 'magic-stone-atma-strong-skill-damage-25-5', armor: [0, 2.5], weapon: [0, 5] },
+    { itemId: 'magic-stone-atma-strong-transcendence-skill-damage-2-4', armor: [2, 2], weapon: [4, 4] },
+  ];
+
+  for (const { itemId, armor, weapon } of cases) {
+    const item = data.catalogs['equipment/magic-stones.json'].items.find(entry => entry.id === itemId);
+    assert.ok(item, itemId + ' must exist in the active magic-stone catalog');
+    const result = projectDamage(data, {
+      schemaVersion: 2,
+      Job: 'KE',
+      values: {
+        ...baseValues,
+        'Costume.MagicStone': item.targetApplications.armor.sourceName,
+        'Weapon.MagicStone.1': item.targetApplications.weapon.sourceName,
+      },
+      lowerwearAlternativeEnabled: false,
+    }).result;
+    const expectedTranscendence = baseline.attributes.stats.transcendenceSkillDamagePct.finalTotal + armor[0] + weapon[0];
+    const expectedStrong = baseline.attributes.stats.strongSkillDamagePct.finalTotal + armor[1] + weapon[1];
+    assert.equal(result.attributes.stats.transcendenceSkillDamagePct.finalTotal, expectedTranscendence, itemId + ' transcendence');
+    assert.equal(result.attributes.stats.strongSkillDamagePct.finalTotal, expectedStrong, itemId + ' strong');
+    assert.equal(result.finalDamage.skillDamageWeighting.transcendenceFactor, 1 + expectedTranscendence / 100, itemId + ' transcendence factor');
+    assert.equal(result.finalDamage.skillDamageWeighting.strongFactor, 1 + expectedStrong / 100, itemId + ' strong factor');
+    assert.equal(result.finalDamage.skillDamageWeighting.combinedFactor, 1 + expectedTranscendence / 100, itemId + ' default 100% transcendence share');
+  }
+});
+
+test('戒指B的強烈技術戒指、通用技術戒指效果與互斥欄位正確', async () => {
+  const data = await loadData();
+  const accessories = data.catalogs['equipment/accessories.json'].items;
+  const byName = name => accessories.find(item => item.name === name);
+  const strongRing = byName('強烈的技術戒指');
+  const transcendentRing = byName('超越的技術戒指');
+  const strongWarriorRing = byName('強烈鬥士的技術戒指');
+  const transcendentWarriorRing = byName('超越鬥士的技術戒指');
+  const technicalRing = byName('技術的戒指');
+
+  assert.ok(strongRing);
+  assert.ok(transcendentRing);
+  assert.ok(strongWarriorRing);
+  assert.ok(transcendentWarriorRing);
+  assert.ok(technicalRing);
+  const ringBNames = accessories.filter(item => item.slotId === 'ringB').map(item => item.name);
+  assert.ok(ringBNames.indexOf('強烈的技術戒指') < ringBNames.indexOf('超越的技術戒指'));
+  assert.ok(ringBNames.indexOf('強烈鬥士的技術戒指') < ringBNames.indexOf('超越鬥士的技術戒指'));
+  assert.deepEqual(strongRing.stats, { strongSkillDamagePct: 20 });
+  assert.deepEqual(strongWarriorRing.stats, {
+    doubleAttackPct: 0.5,
+    critRatePct: 1,
+    strongSkillDamagePct: 20,
+  });
+  assert.equal(strongWarriorRing.appraisal.canAppraise, transcendentWarriorRing.appraisal.canAppraise);
+  assert.equal(strongWarriorRing.appraisal.effectCount, transcendentWarriorRing.appraisal.effectCount);
+  assert.deepEqual(technicalRing.stats, {
+    transcendenceSkillDamagePct: 20,
+    strongSkillDamagePct: 20,
+  });
+
+  const ringBSelections = data.mapping.selections.filter(entry => entry.slotId === 'ringB');
+  assert.deepEqual(ringBSelections.map(entry => entry.selectionCell), ['Accessory.Ring2']);
+  const ringBInput = data.simulatorInputs.inputs.find(entry => entry.simulatorCells.split(/\s+/).includes('Accessory.Ring2'));
+  const ringBOptionCatalog = data.simulatorInputs.catalogs.find(entry => entry.id === ringBInput?.catalogId);
+  assert.ok(ringBOptionCatalog?.options.some(option => option.value === '強烈的技術戒指'));
+  assert.ok(ringBOptionCatalog?.options.some(option => option.value === '強烈鬥士的技術戒指'));
+
+  const baseValues = {
+    'Weapon.ENHC': 'Lv.8',
+    'Left.Armor.Upper.ENHC': 'Lv.8', 'Left.Armor.Bottom.ENHC': 'Lv.8',
+    'Left.Armor.Gloves.ENHC': 'Lv.8', 'Left.Armor.Shoes.ENHC': 'Lv.8',
+    'Left.Armor.Upper.FORGE': 0, 'Left.Armor.Bottom.FORGE': 0,
+    'Left.Armor.Gloves.FORGE': 0, 'Left.Armor.Shoes.FORGE': 0,
+  };
+  const baseline = projectDamage(data, {
+    schemaVersion: 2,
+    Job: 'KE',
+    values: { ...baseValues, 'Accessory.Ring2': '' },
+    lowerwearAlternativeEnabled: false,
+  }).result;
+  for (const [name, item] of [
+    ['強烈的技術戒指', strongRing],
+    ['強烈鬥士的技術戒指', strongWarriorRing],
+    ['技術的戒指', technicalRing],
+  ]) {
+    const result = projectDamage(data, {
+      schemaVersion: 2,
+      Job: 'KE',
+      values: { ...baseValues, 'Accessory.Ring2': name },
+      lowerwearAlternativeEnabled: false,
+    }).result;
+    assert.equal(
+      result.attributes.stats.strongSkillDamagePct.finalTotal - baseline.attributes.stats.strongSkillDamagePct.finalTotal,
+      item.stats.strongSkillDamagePct ?? 0,
+      name + ' strong skill damage',
+    );
+    assert.equal(
+      result.attributes.stats.transcendenceSkillDamagePct.finalTotal - baseline.attributes.stats.transcendenceSkillDamagePct.finalTotal,
+      item.stats.transcendenceSkillDamagePct ?? 0,
+      name + ' transcendence skill damage',
+    );
+  }
+});
+
+test('結果屬性卡片按 Boss、兩極化、所有技能；強烈、超越、流血順序排列', async () => {
+  const data = await loadData();
+  const keys = data.attributes.attributes.map(attribute => attribute.key);
+  const bossIndex = keys.indexOf('bossDamagePct');
+  assert.deepEqual(keys.slice(bossIndex, bossIndex + 6), [
+    'bossDamagePct',
+    'polarizationPct',
+    'allSkillDamagePct',
+    'strongSkillDamagePct',
+    'transcendenceSkillDamagePct',
+    'bleedDamagePct',
+  ]);
+});
+
+test('幻影面紗右冰戒指同步提供相同百分比的超越與強烈技傷', async () => {
+  const data = await loadData();
+  const baseValues = {
+    'Weapon.ENHC': 'Lv.8',
+    'Left.Armor.Upper.ENHC': 'Lv.8', 'Left.Armor.Bottom.ENHC': 'Lv.8',
+    'Left.Armor.Gloves.ENHC': 'Lv.8', 'Left.Armor.Shoes.ENHC': 'Lv.8',
+    'Left.Armor.Upper.FORGE': 0, 'Left.Armor.Bottom.FORGE': 0,
+    'Left.Armor.Gloves.FORGE': 0, 'Left.Armor.Shoes.FORGE': 0,
+  };
+  const baseline = projectDamage(data, {
+    schemaVersion: 2,
+    Job: 'KE',
+    values: baseValues,
+    lowerwearAlternativeEnabled: false,
+  }).result;
+  const result = projectDamage(data, {
+    schemaVersion: 2,
+    Job: 'KE',
+    values: { ...baseValues, 'Right.Ice.Ring': '幻影面紗' },
+    lowerwearAlternativeEnabled: false,
+  }).result;
+
+  assert.equal(result.attributes.stats.transcendenceSkillDamagePct.finalTotal - baseline.attributes.stats.transcendenceSkillDamagePct.finalTotal, 3);
+  assert.equal(result.attributes.stats.strongSkillDamagePct.finalTotal - baseline.attributes.stats.strongSkillDamagePct.finalTotal, 3);
 });
 
 test('武器等級、飾品倍率與聖獸指環選項依各自公式映射', async () => {
@@ -225,20 +453,79 @@ test('未確認鑑定資料的飾品不會套用其鑑定輸入', async () => {
   assert.equal(result.attributes.stats.doubleAttackPct.finalTotal, baseline.attributes.stats.doubleAttackPct.finalTotal);
 });
 
-test('百億套效紅藍固定值與綠色依內裝手電路的超越技傷計算', async () => {
+test('百億套效紅藍固定值與綠色依內裝手套單技傷電路計算', async () => {
   const data = await loadData();
   const baseValues = { "Weapon.ENHC": 'Lv.8', "Left.Armor.Upper.ENHC": 'Lv.8', "Left.Armor.Bottom.ENHC": 'Lv.8', "Left.Armor.Gloves.ENHC": 'Lv.8', "Left.Armor.Shoes.ENHC": 'Lv.8', "Left.Armor.Upper.FORGE": 0, "Left.Armor.Bottom.FORGE": 0, "Left.Armor.Gloves.FORGE": 0, "Left.Armor.Shoes.FORGE": 0 };
   const baseState = { schemaVersion: 2, Job: 'KE', lowerwearAlternativeEnabled: false };
-  const base = projectDamage(data, { ...baseState, values: baseValues }).result.generalMultiplicativeDamage.value;
+  const baseResult = projectDamage(data, { ...baseState, values: baseValues }).result;
+  const base = baseResult.generalMultiplicativeDamage.value;
   const red = projectDamage(data, { ...baseState, values: { ...baseValues, "Left.Armor.SetColor": '紅' } }).result.generalMultiplicativeDamage.value;
   const blue = projectDamage(data, { ...baseState, values: { ...baseValues, "Left.Armor.SetColor": '藍' } }).result.generalMultiplicativeDamage.value;
   const greenWithoutCircuit = projectDamage(data, { ...baseState, values: { ...baseValues, "Left.Armor.SetColor": '綠' } }).result.generalMultiplicativeDamage.value;
-  const greenWithCircuit = projectDamage(data, { ...baseState, values: { ...baseValues, "Left.Armor.SetColor": '綠', "Left.Armor.Gloves.Circuit.Attribute": '超越技傷%', "Left.Armor.Gloves.Circuit.Value": 0.05 } }).result.generalMultiplicativeDamage.value;
+  const greenWithCircuitResult = projectDamage(data, { ...baseState, values: { ...baseValues, "Left.Armor.SetColor": '綠', "Left.Armor.Gloves.Circuit.Attribute": '單技傷%', "Left.Armor.Gloves.Circuit.Value": 0.05 } }).result;
 
   assert.equal(red / base, 1.2);
   assert.equal(blue / base, 1.08);
   assert.equal(greenWithoutCircuit / base, 1.1);
-  assert.ok(Math.abs(greenWithCircuit / base - 1.144) < 1e-12);
+  assert.ok(Math.abs(greenWithCircuitResult.generalMultiplicativeDamage.value / base - 1.144) < 1e-12);
+  assert.equal(greenWithCircuitResult.attributes.stats.strongSkillDamagePct.finalTotal - baseResult.attributes.stats.strongSkillDamagePct.finalTotal, 5);
+  assert.equal(greenWithCircuitResult.attributes.stats.transcendenceSkillDamagePct.finalTotal - baseResult.attributes.stats.transcendenceSkillDamagePct.finalTotal, 5);
+});
+
+test('單技傷電路板、芯片、武器變換、共鳴、聖獸與賦靈錄都映射強烈技傷', async () => {
+  const data = await loadData();
+  const baseValues = {
+    'Weapon.ENHC': 'Lv.8',
+    'Left.Armor.Upper.ENHC': 'Lv.8', 'Left.Armor.Bottom.ENHC': 'Lv.8',
+    'Left.Armor.Gloves.ENHC': 'Lv.8', 'Left.Armor.Shoes.ENHC': 'Lv.8',
+    'Left.Armor.Upper.FORGE': 0, 'Left.Armor.Bottom.FORGE': 0,
+    'Left.Armor.Gloves.FORGE': 0, 'Left.Armor.Shoes.FORGE': 0,
+  };
+  const baseState = { schemaVersion: 3, Job: 'KE', values: baseValues, lowerwearAlternativeEnabled: false };
+  const baseline = projectDamage(data, baseState).result;
+  const skillBoard = data.circuits.inputs.find(entry => entry.slot === 'gloves');
+  assert.deepEqual(skillBoard.attributeOptions[0], '單技傷%');
+  const boardResult = projectDamage(data, { ...baseState, values: {
+    ...baseValues, [skillBoard.attributeCell]: '單技傷%', [skillBoard.valueCell]: 0.05,
+  } }).result;
+  assert.equal(boardResult.attributes.stats.strongSkillDamagePct.finalTotal - baseline.attributes.stats.strongSkillDamagePct.finalTotal, 5);
+  assert.equal(boardResult.attributes.stats.transcendenceSkillDamagePct.finalTotal - baseline.attributes.stats.transcendenceSkillDamagePct.finalTotal, 5);
+
+  const chipSlot = data.chipSlots.slots.find(entry => entry.id === 'upper');
+  const chipResult = projectDamage(data, { ...baseState, values: {
+    ...baseValues, [chipSlot.attributeCell]: '強烈技傷%', [chipSlot.tuningCell]: '+8',
+  } }).result;
+  assert.equal(chipResult.attributes.stats.strongSkillDamagePct.finalTotal - baseline.attributes.stats.strongSkillDamagePct.finalTotal, 9);
+  const strongChip = data.chips.chips.find(entry => entry.name === '強烈技傷%');
+  const transcendenceChip = data.chips.chips.find(entry => entry.name === '超越技傷%');
+  assert.deepEqual(strongChip.tuningLevels, transcendenceChip.tuningLevels);
+  assert.equal(strongChip.valueSourceColumn, transcendenceChip.valueSourceColumn);
+
+  const weaponTransform = data.transformations.slots[0];
+  const weaponResult = projectDamage(data, { ...baseState, values: {
+    ...baseValues, [weaponTransform.choiceCell]: '強烈技傷%', [weaponTransform.valueCell]: 0.05,
+  } }).result;
+  assert.equal(weaponResult.attributes.stats.strongSkillDamagePct.finalTotal - baseline.attributes.stats.strongSkillDamagePct.finalTotal, 5);
+
+  const resonance = data.resonance.effects.find(entry => entry.id === 'resonance-skill-damage');
+  const resonanceResult = projectDamage(data, { ...baseState, values: { ...baseValues, [resonance.inputCell]: 100 } }).result;
+  assert.equal(resonanceResult.attributes.stats.strongSkillDamagePct.finalTotal - baseline.attributes.stats.strongSkillDamagePct.finalTotal, 35);
+  assert.equal(resonanceResult.attributes.stats.transcendenceSkillDamagePct.finalTotal - baseline.attributes.stats.transcendenceSkillDamagePct.finalTotal, 35);
+
+  const beastResult = projectDamage(data, { ...baseState, values: {
+    ...baseValues,
+    'MasterBeast.Necklace.CustomAttribute': '強烈技傷%',
+    'MasterBeast.Necklace.CustomValue': 5,
+    'MasterBeast.Head.Mirror.1.Attribute': '強烈技傷%',
+    'MasterBeast.Head.Mirror.1.Value': 0.007,
+  } }).result;
+  assert.ok(Math.abs(beastResult.attributes.stats.strongSkillDamagePct.finalTotal - baseline.attributes.stats.strongSkillDamagePct.finalTotal - 5.7) < 1e-9);
+  assert.ok(data.masterBeast.customAttributeOptions.necklace.includes('強烈技傷%'));
+  assert.ok(data.masterBeast.customAttributeOptions.mirror.includes('強烈技傷%'));
+
+  const defaultRecord = baseline.attributes.stats.strongSkillDamagePct.sharedSources.find(source => source.sourceId === 'spirit-record:default-maxed');
+  assert.equal(defaultRecord.valuePct, data.spiritRecord.defaultMaxedStats.transcendenceSkillDamagePct);
+  assert.equal(defaultRecord.valuePct, data.spiritRecord.defaultMaxedStats.strongSkillDamagePct);
 });
 test('RM 致命傷害基底採 180%，乘算後扣除同一個 180% 基準', async () => {
   const data = await loadData();

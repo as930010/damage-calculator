@@ -151,6 +151,24 @@
         }
       ],
       "otherwise": 0
+    },
+    {
+      "statKey": "strongSkillDamagePct",
+      "steps": [
+        {
+          "minimum": 18,
+          "value": 10
+        },
+        {
+          "minimum": 12,
+          "value": 6
+        },
+        {
+          "minimum": 6,
+          "value": 3
+        }
+      ],
+      "otherwise": 0
     }
   ],
   "extraAdaptability": {
@@ -214,7 +232,8 @@
       {
         "minimum": 6,
         "stats": {
-          "transcendenceSkillDamagePct": 3
+          "transcendenceSkillDamagePct": 3,
+          "strongSkillDamagePct": 3
         }
       },
       {
@@ -226,7 +245,8 @@
       {
         "minimum": 12,
         "stats": {
-          "transcendenceSkillDamagePct": 3
+          "transcendenceSkillDamagePct": 3,
+          "strongSkillDamagePct": 3
         }
       },
       {
@@ -238,7 +258,8 @@
       {
         "minimum": 18,
         "stats": {
-          "transcendenceSkillDamagePct": 4
+          "transcendenceSkillDamagePct": 4,
+          "strongSkillDamagePct": 4
         }
       },
       {

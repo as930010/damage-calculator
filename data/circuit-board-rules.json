@@ -10,6 +10,10 @@
     "致命傷害%": "critDamagePct",
     "Boss傷害%": "bossDamagePct",
     "兩極化%": "polarizationPct",
+    "單技傷%": [
+      "strongSkillDamagePct",
+      "transcendenceSkillDamagePct"
+    ],
     "超越技傷%": "transcendenceSkillDamagePct",
     "所有技能傷害%": "allSkillDamagePct",
     "流血%": "bleedDamagePct",
@@ -72,7 +76,7 @@
       "wearSet": "shared",
       "optionSource": "係數區!N2:N4",
       "attributeOptions": [
-        "超越技傷%",
+        "單技傷%",
         "Boss傷害%",
         "無關傷害"
       ]

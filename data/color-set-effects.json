@@ -24,7 +24,7 @@
         "outputKey": "multiplicativeDamagePct",
         "sourceAttributeCell": "J31",
         "sourceValueCell": "J32",
-        "requiredAttribute": "超越技傷%",
+        "requiredAttribute": "單技傷%",
         "baseMultiplier": 1.1,
         "inputMultiplier": 0.8,
         "inputValueToPoints": 100

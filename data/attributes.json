@@ -72,16 +72,24 @@
       "active": true
     },
     {
-      "key": "transcendenceSkillDamagePct",
-      "name": "超越技傷%",
+      "key": "allSkillDamagePct",
+      "name": "所有技能傷害%",
       "unit": "percent",
       "calculationScope": "characterTotal",
       "aggregation": "sum",
       "active": true
     },
     {
-      "key": "allSkillDamagePct",
-      "name": "所有技能傷害%",
+      "key": "strongSkillDamagePct",
+      "name": "強烈技傷%",
+      "unit": "percent",
+      "calculationScope": "characterTotal",
+      "aggregation": "sum",
+      "active": true
+    },
+    {
+      "key": "transcendenceSkillDamagePct",
+      "name": "超越技傷%",
       "unit": "percent",
       "calculationScope": "characterTotal",
       "aggregation": "sum",

@@ -3,7 +3,7 @@
   "sourceSheet": "係數區",
   "notes": [
     "芯片屬性與調校數值依使用者確認的 P/Q/R/S 欄對照。",
-    "除超越技傷%、Boss傷害%取芯片調校屬性B（S欄）外，其餘取芯片調校屬性A（R欄）。"
+    "除強烈技傷%、超越技傷%、Boss傷害%取芯片調校屬性B（S欄）外，其餘取芯片調校屬性A（R欄）。"
   ],
   "chips": [
     {
@@ -170,6 +170,21 @@
         }
       ],
       "valueSourceColumn": "R"
+    },
+    {
+      "id": "chip-strongSkillDamagePct",
+      "name": "強烈技傷%",
+      "attributeKey": "strongSkillDamagePct",
+      "unit": "percent",
+      "tuningLevels": [
+        { "level": "+5", "value": 5.0 },
+        { "level": "+6", "value": 6.0 },
+        { "level": "+7", "value": 7.5 },
+        { "level": "+8", "value": 9.0 },
+        { "level": "+9", "value": 11.0 },
+        { "level": "+10", "value": 14.0 }
+      ],
+      "valueSourceColumn": "S"
     },
     {
       "id": "chip-transcendenceSkillDamagePct",
