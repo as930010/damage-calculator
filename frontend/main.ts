@@ -14,6 +14,22 @@ import { preventScientificNotation } from './numeric-input.ts';
 import { resolveClassCode, sanitizeClassCode } from './class-code.ts';
 import { resolveUnsignedInteger, sanitizeUnsignedInteger } from './direct-input.ts';
 
+const ICE_EQUIPMENT_SHORT_NAMES: Record<string, string> = {
+  '幻影面紗': '面紗',
+  '真理假面': '真理',
+  '紫霄花郎': '花郎',
+  '星辰牧者': '星辰',
+  '日冕．灼耀花仙': '日冕',
+  '幽潮吞源': '幽潮',
+  '猛虎奇談': '猛虎',
+  '厄瑞玻斯的哀歌': '哀歌',
+  '薇塔芳塔娜': '薇塔',
+  '深淵的存在': '深淵',
+  '飛龍乘雲': '飛龍',
+  '艾里奧斯守護騎士團': '騎士團',
+  '神秘的埃羅德': '神埃',
+};
+
 async function start() {
   const data = await loadGameData();
   const sampleId = new URLSearchParams(location.search).get('sample');
@@ -595,26 +611,40 @@ async function start() {
     }
     parent.append(picker);
   };
+  function getEquippedRightIceSetCounts() {
+    const counts = new Map<string, number>();
+    for (const selection of data.mapping.selections) {
+      if (!selection.catalogFile.endsWith('right-ice.json')) continue;
+      const setName = val(selection.selectionCell);
+      if (setName) counts.set(setName, (counts.get(setName) ?? 0) + 1);
+    }
+    return counts;
+  }
   function renderRightIceSetSelectors() {
     const root = document.querySelector<HTMLElement>('#right-ice-set-selectors');
     if (!root) return;
     const cells = data.rightIceSets.selectionCells;
-    const allowedNames = [...new Set(validationChoices(cells[0]).map(option => option.value))];
-    const equipped = data.mapping.selections
-      .filter(entry => entry.catalogFile.endsWith('right-ice.json'))
-      .map(entry => val(entry.selectionCell));
+    const availableNames = [...new Set(validationChoices(cells[0]).map(option => option.value))];
+    const allowedNames = [...availableNames.filter(name => name !== '騎士團'), ...availableNames.filter(name => name === '騎士團')];
+    const defaultOrder = new Map(allowedNames.map((name, index) => [name, index]));
+    const equippedCounts = getEquippedRightIceSetCounts();
     const selectedNames = cells.map(val);
     root.replaceChildren();
     cells.forEach((cell, index) => {
       const usedElsewhere = new Set(selectedNames.filter((name, other) => other !== index && name !== ''));
       const choices = allowedNames
         .filter(name => !usedElsewhere.has(name) || name === selectedNames[index])
-        .map(name => ({ value: name, label: name, detail: `目前裝備 ${equipped.filter(item => item === name).length} 件` }));
-      root.append(createPicker(`套效選擇 ${index + 1}`, choices, selectedNames[index], value => {
+        .sort((left, right) => (equippedCounts.get(right) ?? 0) - (equippedCounts.get(left) ?? 0) || defaultOrder.get(left)! - defaultOrder.get(right)!)
+        .map(name => ({ value: name, label: name }));
+      const picker = createPicker(`套效選擇 ${index + 1}`, choices, selectedNames[index], value => {
         state.values[cell] = value;
         update();
         renderRightIceSetSelectors();
-      }));
+      });
+      const selectedName = selectedNames[index];
+      picker.classList.add('right-ice-set-picker', `right-ice-effect-${index + 1}`);
+      picker.classList.toggle('has-selection', !!selectedName);
+      root.append(picker);
     });
     if (new Set(selectedNames.filter(Boolean)).size !== selectedNames.filter(Boolean).length) {
       const warning = document.createElement('p');
@@ -1022,16 +1052,32 @@ async function start() {
   }
   function renderSlots() {
     const container = document.querySelector('#slots')!; container.replaceChildren();
+    const rightIceSetEffectIndexes = new Map<string, number>();
+    data.rightIceSets.selectionCells.forEach((cell, index) => {
+      const setName = val(cell);
+      if (setName && !rightIceSetEffectIndexes.has(setName)) rightIceSetEffectIndexes.set(setName, index + 1);
+    });
     for (const slot of data.layout.slots) {
       const group = data.layout.groups.find(group => group.id === slot.group)!;
       const button = document.createElement('button'); button.type = 'button'; button.className = 'gear-slot'; button.dataset.slotId = slot.id;
       button.style.cssText = `left:${slot.x}%;top:${slot.y}%;--group-color:${group.color}`;
       const configured = slot.selectionCell ? val(slot.selectionCell) : slot.weapon ? val('Weapon.ENHC') : slot.innerwearId ? val(data.innerwear.slots.find(s => s.id === slot.innerwearId)!.enhancementCell) : '';
+      const isAccessory = slot.group === 'accessories';
+      const isIceEquipment = slot.group === 'leftIce' || slot.group === 'rightIce' || slot.group === 'iceWeapon';
+      const selectedItemName = slot.selectionCell && !isAccessory && configured
+        ? isIceEquipment ? ICE_EQUIPMENT_SHORT_NAMES[configured] ?? configured : configured
+        : '';
+      const isRightIceSetSlot = (slot.group === 'rightIce' || slot.group === 'iceWeapon') && !!slot.selectionCell && !!configured;
+      const rightIceEffectIndex = isRightIceSetSlot ? rightIceSetEffectIndexes.get(configured) : undefined;
+      const rightIceSetHint = rightIceEffectIndex ? `；屬於套效 ${rightIceEffectIndex}` : '';
       button.classList.toggle('configured', !!configured); button.classList.toggle('selected', selected.id === slot.id);
       button.classList.toggle('inactive', !!slot.enabledBy && !state.lowerwearAlternativeEnabled);
-      button.setAttribute('aria-label', `${group.name} ${slot.label}：${configured || '未設定'}`); button.setAttribute('aria-pressed', String(selected.id === slot.id));
-      button.title = `${group.name} ${slot.label}${configured ? '\n' + configured : ''}`;
-      button.innerHTML = `<span>${h(slot.label)}</span>${configured ? '<i></i>' : ''}`;
+      button.classList.toggle('right-ice-effect-1', rightIceEffectIndex === 1);
+      button.classList.toggle('right-ice-effect-2', rightIceEffectIndex === 2);
+      button.classList.toggle('right-ice-effect-3', rightIceEffectIndex === 3);
+      button.setAttribute('aria-label', `${group.name} ${slot.label}：${configured || '未設定'}${rightIceSetHint}`); button.setAttribute('aria-pressed', String(selected.id === slot.id));
+      button.title = `${group.name} ${slot.label}${configured ? '\n' + configured : ''}${rightIceSetHint}`;
+      button.innerHTML = `<span class="gear-slot-label">${h(slot.label)}</span>${selectedItemName ? `<span class="gear-slot-item-name">${h(selectedItemName)}</span>` : ''}${configured ? '<i></i>' : ''}`;
       button.addEventListener('click', () => { selected = slot; selectedBeastSlotId = null; renderSlots(); renderBeastAccessories(); renderInspector(); openMobileInspector(); }); container.append(button);
     }
   }
@@ -1051,7 +1097,13 @@ async function start() {
     if (selected.selectionCell) {
       const selectionCell = selected.selectionCell;
       const mapping = data.mapping.selections.find(entry => entry.selectionCell === selectionCell)!;
-      const items = data.catalogs[mapping.catalogFile].items.filter(item => item.active && item.slotId === mapping.slotId);
+      const slotItems = data.catalogs[mapping.catalogFile].items.filter(item => item.active && item.slotId === mapping.slotId);
+      const isRightIceCatalog = mapping.catalogFile.endsWith('right-ice.json');
+      const isMysticSetName = (name: string) => name === '神埃' || name === '神秘的埃羅德';
+      const isKnightSetName = (name: string) => name === '騎士團' || name === '艾里奧斯守護騎士團';
+      const items = isRightIceCatalog
+        ? [...slotItems.filter(item => !isMysticSetName(item.name) && !isKnightSetName(item.name)), ...slotItems.filter(item => isMysticSetName(item.name)), ...slotItems.filter(item => isKnightSetName(item.name))]
+        : slotItems;
       const isAccessory = mapping.catalogFile === 'equipment/accessories.json';
       field(panel, selected.sharedSelection ? '左冰套裝（五部位共用）' : '選擇裝備', selectionCell, items.map(item => ({ value: item.name, label: item.name, detail: summary(item.stats ?? {}) })), isAccessory);
       if (isAccessory) {
