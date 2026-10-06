@@ -106,7 +106,10 @@ export function createPicker(label: string, options: readonly PickerOption[], va
       for (const option of filtered) {
         const row = document.createElement('button'); row.type = 'button'; row.className = 'mobile-picker-option'; row.setAttribute('role', 'option'); row.setAttribute('aria-selected', String(option.value === committed));
         const name = document.createElement('span'); name.textContent = option.label; row.append(name);
-        if (option.detail) { const detail = document.createElement('small'); detail.textContent = option.detail; row.append(detail); }
+        if (option.detail) {
+          const detail = document.createElement('small'); detail.textContent = option.detail; row.append(detail);
+          if (root.classList.contains('right-ice-set-picker')) row.classList.add('right-ice-set-count-option');
+        }
         row.addEventListener('click', () => { committed = option.value; close(); dialog.close(); onChange(option.value); });
         mobilePickerList!.append(row);
       }

@@ -635,7 +635,10 @@ async function start() {
       const choices = allowedNames
         .filter(name => !usedElsewhere.has(name) || name === selectedNames[index])
         .sort((left, right) => (equippedCounts.get(right) ?? 0) - (equippedCounts.get(left) ?? 0) || defaultOrder.get(left)! - defaultOrder.get(right)!)
-        .map(name => ({ value: name, label: name }));
+        .map(name => {
+          const pieceCount = equippedCounts.get(name) ?? 0;
+          return { value: name, label: name, ...(pieceCount > 0 ? { detail: `目前選擇 ${pieceCount} 件` } : {}) };
+        });
       const picker = createPicker(`套效選擇 ${index + 1}`, choices, selectedNames[index], value => {
         state.values[cell] = value;
         update();
