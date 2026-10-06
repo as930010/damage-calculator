@@ -178,12 +178,12 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
 
 .toolbar .class-settings{display:flex;align-items:center;gap:8px;width:auto;min-width:0;flex:0 0 auto}
 .toolbar .class-settings #class-picker{width:230px;flex:0 0 230px}
-.skill-damage-share-control{display:grid;width:202px;flex:0 0 202px;grid-template-columns:40px 90px 54px;align-items:center;justify-content:space-between;gap:0;padding:5px 8px;border:1px solid rgb(117 139 171 / 18%);border-radius:10px;background:rgb(15 21 29 / 48%);color:#aab8cb;font-size:10px;white-space:nowrap}
+.skill-damage-share-control{display:grid;width:202px;flex:0 0 202px;grid-template-columns:max-content 72px 54px;align-items:center;justify-content:space-between;gap:0;padding:5px 8px;border:1px solid rgb(117 139 171 / 18%);border-radius:10px;background:rgb(15 21 29 / 48%);color:#aab8cb;font-size:10px;white-space:nowrap}
 .skill-damage-share-label{white-space:nowrap}
 .skill-damage-share-control output{display:grid;width:54px;grid-template-columns:1fr 5ch auto;align-items:center;justify-self:end;color:#d5e3f7;font-size:10px;text-align:right}
 .skill-damage-share-control output span:first-child{text-align:right}
 .skill-damage-share-complement{width:5ch;text-align:right;font-variant-numeric:tabular-nums}
-.skill-damage-share-number-wrap{display:flex;width:90px;min-width:90px;justify-self:center;box-sizing:border-box;align-items:center;gap:4px;padding:0 6px;border:1px solid #39485d;border-radius:7px;background:#151c25;color:#aab8cb}
+.skill-damage-share-number-wrap{display:flex;width:72px;min-width:72px;justify-self:center;box-sizing:border-box;align-items:center;gap:4px;padding:0 6px;border:1px solid #39485d;border-radius:7px;background:#151c25;color:#aab8cb}
 .skill-damage-share-number-wrap input{width:100%;min-width:0;min-height:27px;padding:3px 0;border:0;outline:0;background:transparent;color:#e2ecfa;text-align:right;font-family:inherit;font-size:11px;font-weight:600}
 .skill-damage-share-number-wrap:focus-within{border-color:#8caedb;box-shadow:none}
 #transcendence-skill-share-number:focus,#transcendence-skill-share-number:focus-visible{outline:0!important;box-shadow:none!important}
