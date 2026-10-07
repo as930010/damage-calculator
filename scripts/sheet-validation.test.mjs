@@ -6,7 +6,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = async path => JSON.parse(await readFile(join(root, path), "utf8"));
-const { findValidationCatalog } = await import(pathToFileURL(join(root, "dist/frontend/sheet-validation.js")));
+const { findValidationCatalog } = await import(pathToFileURL(join(root, "dist/frontend/input-validation.js")));
 const { isFieldId } = await import(pathToFileURL(join(root, "dist/frontend/field-ids.js")));
 const simulatorInputs = await read("data/simulator-input-options.json");
 

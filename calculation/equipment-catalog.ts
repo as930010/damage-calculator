@@ -36,7 +36,6 @@ export interface SimulatorEquipmentSelectionMapping {
   selectionCell: string;
   catalogFile: string;
   slotId: string;
-  calculationRows: readonly number[];
   application?: EquipmentApplication;
   enabledBy?: string;
   configuration?: "shared" | "lowerwearA" | "lowerwearB";
@@ -45,7 +44,6 @@ export interface SimulatorEquipmentSelectionMapping {
 export interface SimulatorMagicStoneSelectionMapping {
   selectionCell: string;
   application: EquipmentApplication;
-  calculationRow: number;
   enabledBy?: string;
   configuration?: "shared" | "lowerwearA" | "lowerwearB";
 }

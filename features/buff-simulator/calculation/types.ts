@@ -27,7 +27,6 @@ export interface ClassRecord {
   sortOrder?: number;
   enabled: boolean;
   uniquenessGroup?: string;
-  sourceRanges: { single: string; challenge: string };
 }
 
 export interface ClassModeProfile {
@@ -36,8 +35,6 @@ export interface ClassModeProfile {
   mode: TeamMode;
   effects: EffectValues;
   estimatedDamageScore: number;
-  sourceRange: string;
-  workbookDerived?: { defenseBreakDamageIncrease: number | null };
 }
 
 export interface EffectTypeDefinition {
@@ -83,9 +80,6 @@ export interface LoadoutOptionDefinition {
     parameter: "movementSpeedShoePercent" | "skillDamageGlovePercent";
     helpText: string;
   };
-  /** Read-only workbook summary cells, not the web UI input controls. */
-  sourceSummaryCells?: { single?: string; challengeFirstTeam?: string; challengeSecondTeam?: string };
-  sourceRange: string;
   effects: Partial<Record<EffectKey, OptionValueSpec>>;
 }
 
@@ -105,10 +99,7 @@ export interface ControlTimeCategory {
 export interface ControlTimeParameters {
   capSeconds: number;
   secondsPerResistancePoint: number;
-  singleResistanceSource: string;
-  challengeSharedResistanceSource: string;
   categories: ControlTimeCategory[];
-  formulaNote: string;
 }
 
 export interface ControlTimeResult {
@@ -123,21 +114,16 @@ export interface SkillReferenceEntry {
   category: string;
   description: string;
   icon?: string;
-  sourceRanges: string[];
 }
 
 export interface ClassSkillReference {
   code: string;
   skills: SkillReferenceEntry[];
-  sourceRanges: string[];
 }
 
 export interface SkillReferenceCatalog {
   schemaVersion: number;
-  sourceSpreadsheetId: string;
-  sourceSheet: string;
   purpose: string;
-  notes: Array<{ text: string; sourceRange: string }>;
   roles: ClassSkillReference[];
 }
 
@@ -153,7 +139,7 @@ export interface TeamCalculationInput {
   members: SelectedMember[];
   options?: SelectedOption[];
   defense: DefenseModel;
-  /** The spreadsheet's unique-support set, stored as data in the eventual class catalog. */
+  /** Shared arena support options are applied once when their IDs match. */
   uniqueClassCodes?: string[];
   actionSpeedCap?: number;
 }

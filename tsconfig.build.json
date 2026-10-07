@@ -3,6 +3,7 @@
   "compilerOptions": {
     "noEmit": false,
     "noEmitOnError": true,
+    "removeComments": true,
     "rootDir": ".",
     "outDir": "dist",
     "sourceMap": false

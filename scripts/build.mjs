@@ -97,7 +97,9 @@ if (compilation.status !== 0) process.exit(compilation.status ?? 1);
 await mkdir(join(output, "frontend"), { recursive: true });
 await mkdir(join(output, "data", "examples"), { recursive: true });
 for (const file of await readdir(join(root, "data", "examples"))) {
-  if (file.endsWith(".json")) await cp(join(root, "data", "examples", file), join(output, "data", "examples", file));
+  if (file.endsWith(".json") && !file.endsWith("-expected.json")) {
+    await cp(join(root, "data", "examples", file), join(output, "data", "examples", file));
+  }
 }
 const { GAME_DATA_FILES } = await import(pathToFileURL(join(output, "frontend", "data.js")).href);
 const bundledData = Object.fromEntries(await Promise.all(Object.entries(GAME_DATA_FILES).map(async ([key, file]) => [
@@ -110,7 +112,49 @@ bundledData.catalogs = Object.fromEntries(await Promise.all(catalogFiles.map(asy
   file,
   JSON.parse(await readFile(join(root, "data", file), "utf8")),
 ])));
-const bundledDataJson = `${JSON.stringify(bundledData)}\n`;
+const sourceCellLabels = {
+  "E76": "fixed-effect:master-beast",
+  "E93": "fixed-effect:pet-skill",
+  "Q37": "fixed-effect:raid-set",
+  "Q53": "fixed-effect:weapon",
+  "Q86": "fixed-effect:title-adaptability",
+  "R86": "fixed-effect:title-defense-ignore",
+  "T101": "fixed-effect:red-upper-crit-damage",
+  "T102": "fixed-effect:maestro-aura",
+  "B77": "combat-rate:yellow-beast-stone",
+  "B103": "combat-rate:lowerwear-enhancement",
+  "B105": "combat-rate:shoes-enhancement",
+};
+for (const [statKey, cell] of Object.entries(bundledData.masterBeast?.overallPotentialSourceCells ?? {})) {
+  sourceCellLabels[cell] = `master-beast-potential:${statKey}`;
+}
+const anonymousSourceIds = new Map();
+const privateMetadataKeys = new Set([
+  "sourceSheet", "sourceSheets", "sourceCell", "notes", "note", "cells", "workbook", "sheet", "sheets",
+  "calculationSheet", "extractedAt", "overallPotentialSourceCells", "dataUpdatedAt", "yellowRateSourceCell",
+  "sourceRanges", "sourceCells", "sourceFormula", "optionSource", "effectOutputCells", "effectOutputRows",
+  "countedInputRange", "countFormulaCell", "pieceCountInput", "elementInput", "colorInput", "inputRules",
+  "selectorRange", "sourceRange", "calculationRow", "calculationRows", "formula",
+]);
+function publicData(value, key = "") {
+  if (privateMetadataKeys.has(key)) return undefined;
+  if (key === "source" && value && typeof value === "object") return undefined;
+  if (key === "source" && typeof value === "string") return "遊戲資料設定";
+  if ((key === "id" || key === "sourceId") && typeof value === "string" && value.startsWith("sheet:計算機!")) {
+    const cell = value.slice("sheet:計算機!".length);
+    if (sourceCellLabels[cell]) return sourceCellLabels[cell];
+    if (!anonymousSourceIds.has(value)) anonymousSourceIds.set(value, `configured-source:${anonymousSourceIds.size + 1}`);
+    return anonymousSourceIds.get(value);
+  }
+  if (Array.isArray(value)) return value.map(item => publicData(item)).filter(item => item !== undefined);
+  if (value && typeof value === "object") {
+    return Object.fromEntries(Object.entries(value)
+      .map(([childKey, child]) => [childKey, publicData(child, childKey)])
+      .filter(([, child]) => child !== undefined));
+  }
+  return value;
+}
+const bundledDataJson = `${JSON.stringify(publicData(bundledData))}\n`;
 await writeFile(join(output, "data", "game-data.json"), bundledDataJson);
 const dataRevision = createHash("sha256").update(bundledDataJson).digest("hex").slice(0, 16);
 const revisionResult = spawnSync("git", ["rev-parse", "--short", "HEAD"], { cwd: root, encoding: "utf8" });

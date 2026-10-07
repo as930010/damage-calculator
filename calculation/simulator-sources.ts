@@ -73,7 +73,6 @@ export interface ChipSlotsDocument {
     id: string;
     attributeCell: string;
     tuningCell: string;
-    calculationRow: number;
     wearSet: "shared" | "lowerwearA" | "lowerwearB";
     enabledBy?: string;
   }[];

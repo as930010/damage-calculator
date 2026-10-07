@@ -9,9 +9,9 @@ import { codeForFieldId, isFieldId } from "../dist/frontend/field-ids.js";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = async (path) => JSON.parse(await readFile(join(root, path), "utf8"));
-const [classes, mapping, simulatorInputs, manifest, masterBeast, layout, attack, innerwear, nephronArmor, appraisals, chips, chipSlots, circuits, transformations, growth, weaponAppraisals, weaponGrades, giantStones, colorSetEffects, spiritRecord, otherEffects, pets, rightIceSets] = await Promise.all([
+const [classes, mapping, simulatorInputs, masterBeast, layout, attack, innerwear, nephronArmor, appraisals, chips, chipSlots, circuits, transformations, growth, weaponAppraisals, weaponGrades, giantStones, colorSetEffects, spiritRecord, otherEffects, pets, rightIceSets] = await Promise.all([
   read("data/classes.json"), read("data/simulator-equipment-mapping.json"),
-  read("data/simulator-input-options.json"), read("data/manifest.json"), read("data/master-beast-effects.json"),
+  read("data/simulator-input-options.json"), read("data/master-beast-effects.json"),
   read("data/equipment-layout.json"), read("data/attack-parameters.json"), read("data/innerwear-rules.json"), read("data/nephron-armor-rules.json"),
   read("data/armor-appraisals.json"), read("data/equipment/chips.json"), read("data/chip-slots.json"),
   read("data/circuit-board-rules.json"), read("data/weapon-transformations.json"), read("data/weapon-growth.json"),
@@ -21,7 +21,7 @@ const [classes, mapping, simulatorInputs, manifest, masterBeast, layout, attack,
 ]);
 const catalogFiles = [...new Set([...mapping.selections.map((item) => item.catalogFile), mapping.magicStoneSelections.catalogFile])];
 const catalogs = Object.fromEntries(await Promise.all(catalogFiles.map(async (file) => [file, await read(`data/${file}`)])));
-const data = { classes, mapping, simulatorInputs, manifest, masterBeast, catalogs, layout, attack, innerwear, nephronArmor, appraisals, chips, chipSlots, circuits, transformations, growth, weaponAppraisals, weaponGrades, giantStones, colorSetEffects, spiritRecord, otherEffects, pets, rightIceSets };
+const data = { classes, mapping, simulatorInputs, masterBeast, catalogs, layout, attack, innerwear, nephronArmor, appraisals, chips, chipSlots, circuits, transformations, growth, weaponAppraisals, weaponGrades, giantStones, colorSetEffects, spiritRecord, otherEffects, pets, rightIceSets };
 const semanticState = (value) => ({
   ...value,
   schemaVersion: 3,
@@ -121,7 +121,7 @@ test("colored weapon magic-stone selections round-trip as compact numeric-code f
 });
 
 test("the complete saved example round-trips and stays smaller than the previous name-based export", async () => {
-  const saved = await read("data/examples/live-sheet-2026-09-28.json");
+  const saved = await read("data/examples/public-example-2026-09-28.json");
   const full = { ...saved, masterBeastSpiritStoneColor: "黃", petSkillAttackEnabled: true };
   const exported = serializeLoadout(full, data);
   const previousFormat = JSON.stringify({

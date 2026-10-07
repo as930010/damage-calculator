@@ -22,7 +22,7 @@ import type {
 const optionEffects = (input: TeamCalculationInput): EffectValues[] =>
   (input.options ?? []).map((option) => option.effects);
 
-/** Keep one arena-wide copy of each option source; when values differ, mirror the workbook's MAX rule. */
+/** Keep one arena-wide copy of each option ID and retain its strongest configured value. */
 function mergeArenaOptionsBySource(options: SelectedOption[]): SelectedOption[] {
   const bySource = new Map<string, SelectedOption>();
   for (const option of options) {

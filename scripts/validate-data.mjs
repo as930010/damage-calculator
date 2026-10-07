@@ -53,7 +53,6 @@ const requiredFields = {
   "data/giant-magic-stones.json": ["schemaVersion", "selectorCells", "effectOutputRows", "options"],
   "data/innerwear-rules.json": ["schemaVersion", "baseLevel", "slots", "enhancementStats", "forgingAttack", "forgingBonuses"],
   "data/nephron-armor-rules.json": ["schemaVersion", "dataUpdatedAt", "transformations", "magazines", "levelLabels", "fields", "notes"],
-  "data/manifest.json": ["schemaVersion", "dataUpdatedAt", "displayDate", "source"],
   "data/master-beast-effects.json": ["schemaVersion", "armorSpiritStoneSetEffect", "spiritStoneColorSelector", "options", "customAttributeOptions"],
   "data/other-effect-options.json": ["schemaVersion", "consumables", "environments", "titles", "guildFountain", "binaryEffects", "peakOptions"],
   "data/parameters.json": ["schemaVersion", "characterBase", "fixedEffects", "optionalEffects", "conditionalEffects"],
@@ -69,8 +68,7 @@ const requiredFields = {
   "data/weapon-grade-options.json": ["schemaVersion", "selectorCell", "options", "colorGroups"],
   "data/weapon-growth.json": ["schemaVersion", "selectorCell", "levels"],
   "data/weapon-transformations.json": ["schemaVersion", "rules", "slots"],
-  "data/examples/live-sheet-2026-09-28.json": ["schemaVersion", "Job", "values", "lowerwearAlternativeEnabled"],
-  "data/examples/live-sheet-2026-09-28-expected.json": ["sourceSheet", "cells", "b163RecomputedFromFormula"],
+  "data/examples/public-example-2026-09-28.json": ["schemaVersion", "Job", "values", "lowerwearAlternativeEnabled"],
 };
 
 for (const [name, fields] of Object.entries(requiredFields)) {

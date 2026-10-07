@@ -36,7 +36,6 @@ export interface GameData {
     critDamageProductBaselinePctToSubtract: number;
     yellowBeastSpiritStoneRatePct: number;
   };
-  manifest: { displayDate: string; dataUpdatedAt: string };
   mapping: SimulatorEquipmentMappingDocument;
   catalogs: Record<string, EquipmentCatalogDocument>;
   attack: AttackParametersDocument;
@@ -88,7 +87,6 @@ export const GAME_DATA_FILES = {
   classes: "classes.json",
   attributes: "attributes.json",
   parameters: "parameters.json",
-  manifest: "manifest.json",
   mapping: "simulator-equipment-mapping.json",
   attack: "attack-parameters.json",
   innerwear: "innerwear-rules.json",

@@ -4,3 +4,6 @@ dist/
 online-current-export.xlsx
 /docs/**/*.md
 /data/examples/README.md
+/data/manifest.json
+/data/examples/live-sheet-2026-09-28-expected.json
+/features/buff-simulator/data/manifest.json

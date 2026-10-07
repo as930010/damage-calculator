@@ -4,12 +4,12 @@ import { loadGameData, readJson, escapeHtml as h, formatNumber as fmt } from './
 import { readState, readBaseline, saveState, normalizeTranscendenceSkillDamageShare, normalizePortraitAwakeningSplit, parseTranscendenceSkillDamageShareInput, type LoadoutState } from './state.ts';
 import { parseLoadoutJson, serializeLoadout } from './loadout-transfer.ts';
 import { projectAttributes, projectCombatRates, projectDamage } from './projection.ts';
-import { compareLoadoutResults } from './sheet-parity.ts';
+import { compareLoadoutResults } from './calculation-comparison.ts';
 import { createPicker, type PickerOption } from './picker.ts';
 import { GLOVE_CIRCUIT_ROWS_FIELD, readGloveCircuitRows, serializeGloveCircuitRows, gloveCircuitRowsTotal } from './circuit-board-rows.ts';
 import { icon } from './icons.ts';
 import { capOverflowPercentage } from './cap-warnings.ts';
-import { findValidationCatalog } from './sheet-validation.ts';
+import { findValidationCatalog } from './input-validation.ts';
 import { preventScientificNotation } from './numeric-input.ts';
 import { resolveClassCode, sanitizeClassCode } from './class-code.ts';
 import { resolveUnsignedInteger, sanitizeUnsignedInteger } from './direct-input.ts';
@@ -192,7 +192,7 @@ async function start() {
     { id: 'ring-two', label: '指環 2', icon: 'ring', fixedCells: ['MasterBeast.Ring2.Option1', 'MasterBeast.Ring2.Option2'], stoneCells: ['MasterBeast.Ring2.CustomAttribute', 'MasterBeast.Ring2.CustomValue'], stoneCategory: 'ring', mirrorCells: [['MasterBeast.Ring2.Mirror.1.Attribute', 'MasterBeast.Ring2.Mirror.1.Value'], ['MasterBeast.Ring2.Mirror.2.Attribute', 'MasterBeast.Ring2.Mirror.2.Value'], ['MasterBeast.Ring2.Mirror.3.Attribute', 'MasterBeast.Ring2.Mirror.3.Value']] },
   ];
   const app = document.querySelector<HTMLElement>('#app')!;
-  app.innerHTML = `<section class="workbench"><header class="workspace-heading"><div class="workspace-intro"><span class="eyebrow">EQUIPMENT SIMULATOR</span><h1>裝備傷害比較</h1><p class="workspace-summary">填入當前數值並設為比較基準，再調整配裝查看傷害差異。</p><ol class="workflow-steps" aria-label="比較流程"><li><span>01</span><span>填入當前數值</span></li><li><span>02</span><span>設為比較基準</span></li><li><span>03</span><span>填入新數值</span></li></ol></div></header><div class="toolbar"><div id="class-picker"></div><label class="toggle"><input id="alternate" type="checkbox">啟用強/排褲切換</label><div class="toolbar-actions"><button id="baseline" type="button">設為比較基準</button><div class="transfer-actions"><button id="import-loadout" type="button">匯入配裝</button><button id="export-loadout" type="button">匯出配裝</button></div></div><input id="loadout-file" type="file" accept="application/json,.json" hidden><span id="transfer-status" role="status" aria-live="polite"></span><span id="save-status" role="status"></span></div><section class="battle-panel"><div class="panel-heading"><h2>關卡設定</h2></div><div id="battle-settings" class="battle-fields"></div></section><div class="equipment-workspace"><section class="equipment-panel"><div class="panel-heading"><h2>裝備配置</h2><span>點選部位以編輯</span></div><div id="equipment-damage-summary" class="equipment-damage-summary" aria-live="polite"></div><div class="canvas-scroll"><div class="equipment-canvas"><span class="group-label costume-label">連身時裝</span><span class="group-label left-label">左冰</span><span class="group-label inner-label">內裝左四</span><span class="group-label weapon-label">冰武 / 武器</span><span class="group-label right-label">右冰</span><span class="group-label accessory-label">飾品</span><span class="group-label beast-label">聖獸飾品</span><div id="title-input" class="canvas-title-input"></div><div id="slots"></div><div id="beast-accessory-fields" class="beast-accessories-grid gear-beast-slots" aria-label="聖獸飾品配置"></div></div></div><p class="panel-note">左冰不支援混搭，但各部位魔法石仍須獨立設定。擁有強/排褲則褲子的傷害增幅會被平均計算。</p><section class="right-ice-set-area"><div class="beast-accessories-heading"><h3>右冰套效</h3><span>最多選擇 ${data.rightIceSets.maxSelectedSets} 套</span></div><p class="panel-note">選擇要啟用的套裝效果。</p><div id="right-ice-set-selectors" class="right-ice-set-selectors"></div></section><div class="beast-accessories-area"><div class="beast-accessories-heading"><h3>聖獸效果設定</h3><span>頭飾、盔甲、項鍊、指環 1、指環 2</span></div><p class="panel-note">共通顏色與潛力設定；各部位效果請使用裝備配置中的聖獸飾品欄位。</p><div id="master-beast-controls" class="master-beast-controls"></div></div></section><div id="inspector-backdrop" class="inspector-backdrop" aria-hidden="true"></div><aside id="inspector" class="inspector" aria-label="部位設定"></aside></div><details class="global-source-panel weapon-magic-stone-panel"><summary>武器魔力石</summary><div id="weapon-magic-stone-fields"></div></details><details class="global-source-panel"><summary>其他效果來源設定</summary><p class="panel-note">未列在此處的特殊條件或 Buff／Debuff 尚未納入計算。</p><div id="global-source-fields"></div></details><section class="results-panel"><div class="panel-heading"><h2>目前填寫的屬性</h2><span id="comparison-label"></span></div><p class="panel-note">已填入的屬性彙總，包含內裝、冰裝、武器、關卡與其他效果設定、需要特殊觸發條件的暫時沒有計入。</p><div id="results" aria-live="polite"></div><section class="damage-panel"><div class="panel-heading"><h2>攻擊與最終傷害</h2></div><p class="panel-note">此數值只反映已填寫的內容。</p><div id="damage-result" aria-live="polite"></div><details class="calculation-inspection-panel"><summary>計算結果驗算</summary><div class="calculation-inspection-content"><div id="sheet-parity" class="sheet-parity" aria-live="polite"><p>先點選「設為比較基準」保存目前配置，表格就會比較基準與目前配裝。</p></div><div id="calculation-details"></div></div></details></section></section></section>`;
+    app.innerHTML = `<section class="workbench"><header class="workspace-heading"><div class="workspace-intro"><span class="eyebrow">EQUIPMENT SIMULATOR</span><h1>裝備傷害比較</h1><p class="workspace-summary">填入當前數值並設為比較基準，再調整配裝查看傷害差異。</p><ol class="workflow-steps" aria-label="比較流程"><li><span>01</span><span>填入當前數值</span></li><li><span>02</span><span>設為比較基準</span></li><li><span>03</span><span>填入新數值</span></li></ol></div></header><div class="toolbar"><div id="class-picker"></div><label class="toggle"><input id="alternate" type="checkbox">啟用強/排褲切換</label><div class="toolbar-actions"><button id="baseline" type="button">設為比較基準</button><div class="transfer-actions"><button id="import-loadout" type="button">匯入配裝</button><button id="export-loadout" type="button">匯出配裝</button></div></div><input id="loadout-file" type="file" accept="application/json,.json" hidden><span id="transfer-status" role="status" aria-live="polite"></span><span id="save-status" role="status"></span></div><section class="battle-panel"><div class="panel-heading"><h2>關卡設定</h2></div><div id="battle-settings" class="battle-fields"></div></section><div class="equipment-workspace"><section class="equipment-panel"><div class="panel-heading"><h2>裝備配置</h2><span>點選部位以編輯</span></div><div id="equipment-damage-summary" class="equipment-damage-summary" aria-live="polite"></div><div class="canvas-scroll"><div class="equipment-canvas"><span class="group-label costume-label">連身時裝</span><span class="group-label left-label">左冰</span><span class="group-label inner-label">內裝左四</span><span class="group-label weapon-label">冰武 / 武器</span><span class="group-label right-label">右冰</span><span class="group-label accessory-label">飾品</span><span class="group-label beast-label">聖獸飾品</span><div id="title-input" class="canvas-title-input"></div><div id="slots"></div><div id="beast-accessory-fields" class="beast-accessories-grid gear-beast-slots" aria-label="聖獸飾品配置"></div></div></div><p class="panel-note">左冰不支援混搭，但各部位魔法石仍須獨立設定。擁有強/排褲則褲子的傷害增幅會被平均計算。</p><section class="right-ice-set-area"><div class="beast-accessories-heading"><h3>右冰套效</h3><span>最多選擇 ${data.rightIceSets.maxSelectedSets} 套</span></div><p class="panel-note">選擇要啟用的套裝效果。</p><div id="right-ice-set-selectors" class="right-ice-set-selectors"></div></section><div class="beast-accessories-area"><div class="beast-accessories-heading"><h3>聖獸效果設定</h3><span>頭飾、盔甲、項鍊、指環 1、指環 2</span></div><p class="panel-note">共通顏色與潛力設定；各部位效果請使用裝備配置中的聖獸飾品欄位。</p><div id="master-beast-controls" class="master-beast-controls"></div></div></section><div id="inspector-backdrop" class="inspector-backdrop" aria-hidden="true"></div><aside id="inspector" class="inspector" aria-label="部位設定"></aside></div><details class="global-source-panel weapon-magic-stone-panel"><summary>武器魔力石</summary><div id="weapon-magic-stone-fields"></div></details><details class="global-source-panel"><summary>其他效果來源設定</summary><p class="panel-note">未列在此處的特殊條件或 Buff／Debuff 尚未納入計算。</p><div id="global-source-fields"></div></details><section class="results-panel"><div class="panel-heading"><h2>目前填寫的屬性</h2><span id="comparison-label"></span></div><p class="panel-note">已填入的屬性彙總，包含內裝、冰裝、武器、關卡與其他效果設定、需要特殊觸發條件的暫時沒有計入。</p><div id="results" aria-live="polite"></div><section class="damage-panel"><div class="panel-heading"><h2>攻擊與最終傷害</h2></div><p class="panel-note">此數值只反映已填寫的內容。</p><div id="damage-result" aria-live="polite"></div><details class="calculation-inspection-panel"><summary>計算結果驗算</summary><div class="calculation-inspection-content"><div id="calculation-comparison" class="calculation-comparison" aria-live="polite"><p>先點選「設為比較基準」保存目前配置，表格就會比較基準與目前配裝。</p></div><div id="calculation-details"></div></div></details></section></section></section>`;
   const classPickerRoot = app.querySelector<HTMLElement>('#class-picker')!;
   const classSettings = document.createElement('div');
   classSettings.className = 'class-settings';
@@ -402,7 +402,23 @@ async function start() {
   function sourceLabel(sourceId: string): string {
     if (sourceId === 'character-base') return '角色基礎係數';
     if (sourceId === 'character-base:crit-damage-product') return '角色原始乘算爆傷基準';
-    if (sourceId === 'weapon-base-attack:C53:D53') return '武器基礎攻擊力';
+    if (sourceId === 'weapon-base-attack') return '武器基礎攻擊力';
+    if (sourceId === 'hunter-instinct') return '獵人的本能';
+    if (sourceId.startsWith('master-beast-potential:')) return '聖獸潛力';
+    const configuredSourceLabels: Readonly<Record<string, string>> = {
+      'fixed-effect:master-beast': '大師聖獸固定效果',
+      'fixed-effect:pet-skill': '寵物被動',
+      'fixed-effect:raid-set': '百億／內布隆套效',
+      'fixed-effect:weapon': '武器',
+      'fixed-effect:title-adaptability': '稱號',
+      'fixed-effect:title-defense-ignore': '稱號',
+      'fixed-effect:red-upper-crit-damage': '百億紅上衣、暴上',
+      'fixed-effect:maestro-aura': 'MAESTRO光環',
+      'combat-rate:yellow-beast-stone': '黃色聖獸精靈石效果',
+      'combat-rate:lowerwear-enhancement': '下衣強化爆擊效果',
+      'combat-rate:shoes-enhancement': '鞋子強化極大效果',
+    };
+    if (configuredSourceLabels[sourceId]) return configuredSourceLabels[sourceId];
     if (sourceId.startsWith('class-passive:')) {
       const [, classId, kind] = sourceId.split(':');
       if (kind === 'boss-damage') return classId + '自身技能';
@@ -411,21 +427,6 @@ async function start() {
         if (['CT', 'IN', 'DA', 'DE'].includes(classId)) return classId + ' 懲戒紋章';
         return classId + '自身技能（乘算爆傷）';
       }
-    }
-    if (sourceId.startsWith('sheet:計算機!')) {
-      const cell = sourceId.slice('sheet:計算機!'.length);
-      if (Object.values(data.masterBeast.overallPotentialSourceCells).includes(cell)) return '聖獸潛力';
-      if (cell === 'E76') return '大師聖獸固定效果';
-      if (cell === 'E93') return '寵物被動';
-      if (cell === 'B77') return '黃色聖獸精靈石效果';
-      if (cell === 'B103') return '下衣強化爆擊效果';
-      if (cell === 'B105') return '鞋子強化極大效果';
-      if (cell === 'Q37') return '百億/內布隆套效';
-      if (cell === 'Q53') return '武器';
-      if (cell === 'Q86' || cell === 'R86') return '稱號';
-      if (cell === 'T101') return '百億紅上衣、暴上';
-      if (cell === 'T102') return 'MAESTRO光環';
-      return '已接入的固定效果';
     }
     if (sourceId.startsWith('simulator:')) {
       const cell = sourceId.slice('simulator:'.length);
@@ -1377,11 +1378,11 @@ async function start() {
       });
     }
   }
-  function renderSheetParity(
+  function renderCalculationComparison(
     currentResult: ReturnType<typeof projectDamage>['result'] | undefined,
     baselineResult: ReturnType<typeof projectDamage>['result'] | undefined,
   ) {
-    const target = document.querySelector<HTMLElement>('#sheet-parity')!;
+    const target = document.querySelector<HTMLElement>('#calculation-comparison')!;
     if (!currentResult) {
       target.innerHTML = '<p>目前配裝的輸入尚未完成或無法計算，修正後即可與比較基準對照。</p>';
       return;
@@ -1394,30 +1395,29 @@ async function start() {
 
     const precise = (value: number) => new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 10 }).format(value);
     const visiblePrecise = (value: number) => new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 3 }).format(value);
-    const displayParityValue = (row: typeof rows[number], value: number) => {
-      if (row.cell === 'B159' || row.cell === 'B160') return `${precise(value * 100)}%`;
-      return row.cell === 'B163' ? visiblePrecise(value) : precise(value);
+    const displayComparisonValue = (row: typeof rows[number], value: number) => {
+      if (row.key === 'critRate' || row.key === 'extremizationRate') return `${precise(value * 100)}%`;
+      return row.key === 'finalDamage' ? visiblePrecise(value) : precise(value);
     };
-    const displayParityDelta = (row: typeof rows[number]) => {
+    const displayComparisonDelta = (row: typeof rows[number]) => {
       const sign = row.delta > 0 ? '+' : '';
-      if (row.cell === 'B159' || row.cell === 'B160') return `${sign}${precise(row.delta * 100)}%`;
-      return `${sign}${row.cell === 'B163' ? visiblePrecise(row.delta) : precise(row.delta)}`;
+      if (row.key === 'critRate' || row.key === 'extremizationRate') return `${sign}${precise(row.delta * 100)}%`;
+      return `${sign}${row.key === 'finalDamage' ? visiblePrecise(row.delta) : precise(row.delta)}`;
     };
     const activeAttackType = data.classes.classes.find(entry => entry.id === state.Job)?.attackType;
-    const relevantAttackCell = activeAttackType === 'physical' ? 'C1' : 'D1';
-    const relevantWeaponBaseCell = activeAttackType === 'physical' ? 'C53' : 'D53';
     const visibleRows = rows.filter(row =>
-      (!['C1', 'D1'].includes(row.cell) || row.cell === relevantAttackCell)
-      && (!['C53', 'D53'].includes(row.cell) || row.cell === relevantWeaponBaseCell),
+      (!['physicalAttack', 'magicalAttack'].includes(row.key)
+        || row.key === (activeAttackType === 'physical' ? 'physicalAttack' : 'magicalAttack'))
+      && (!['weaponPhysicalBase', 'weaponMagicalBase'].includes(row.key)
+        || row.key === (activeAttackType === 'physical' ? 'weaponPhysicalBase' : 'weaponMagicalBase')),
     );
     const mismatches = visibleRows.filter(row => !row.matches);
-    const table = (items: typeof rows) => `<div class="sheet-parity-scroll"><table><thead><tr><th>項目</th><th>基準配置</th><th>目前配置</th><th>差異</th></tr></thead><tbody>${items.map(row => {
-      const label = row.cell === 'B157' ? '最小攻擊力' : row.cell === 'B158' ? '最大攻擊力' : row.label;
-      const rowClass = row.matches ? '' : `sheet-parity-difference ${row.delta > 0 ? 'sheet-parity-positive' : row.delta < 0 ? 'sheet-parity-negative' : ''}`;
-      return `<tr class="${rowClass}"><th scope="row">${h(label)}</th><td>${displayParityValue(row, row.expected)}</td><td>${displayParityValue(row, row.actual)}</td><td class="${row.delta > 0 ? 'positive' : row.delta < 0 ? 'negative' : ''}">${displayParityDelta(row)}</td></tr>`;
+    const table = (items: typeof rows) => `<div class="calculation-comparison-scroll"><table><thead><tr><th>項目</th><th>基準配置</th><th>目前配置</th><th>差異</th></tr></thead><tbody>${items.map(row => {
+      const rowClass = row.matches ? '' : `calculation-comparison-difference ${row.delta > 0 ? 'calculation-comparison-positive' : row.delta < 0 ? 'calculation-comparison-negative' : ''}`;
+      return `<tr class="${rowClass}"><th scope="row">${h(row.label)}</th><td>${displayComparisonValue(row, row.expected)}</td><td>${displayComparisonValue(row, row.actual)}</td><td class="${row.delta > 0 ? 'positive' : row.delta < 0 ? 'negative' : ''}">${displayComparisonDelta(row)}</td></tr>`;
     }).join('')}</tbody></table></div>`;
     const differences = mismatches.length ? table(mismatches) : '<p>目前配置與比較基準的計算值相同。</p>';
-    document.querySelector('#sheet-parity')!.innerHTML = `<p>依比較基準與目前配裝的未格式化數值比對 ${visibleRows.length} 項：${visibleRows.length - mismatches.length} 項相同、${mismatches.length} 項不同。</p>${differences}<details><summary>查看全部比較值（${visibleRows.length} 項）</summary>${table(visibleRows)}</details>`;
+    target.innerHTML = `<p>依比較基準與目前配裝的未格式化數值比對 ${visibleRows.length} 項：${visibleRows.length - mismatches.length} 項相同、${mismatches.length} 項不同。</p>${differences}<details><summary>查看全部比較值（${visibleRows.length} 項）</summary>${table(visibleRows)}</details>`;
   }
   function renderResults() {
     const target = document.querySelector('#results')!;
@@ -1426,7 +1426,7 @@ async function start() {
       let damageCalculationError: unknown;
       try { currentDamage = projectDamage(data, state); } catch (error) { damageCalculationError = error; }
       try { if (baseline) baselineDamage = projectDamage(data, baseline); } catch { /* Keep current attributes visible if the saved build is stale. */ }
-      if (!currentDamage) renderSheetParity(undefined, baselineDamage?.result);
+      if (!currentDamage) renderCalculationComparison(undefined, baselineDamage?.result);
       const equipmentDamageSummary = document.querySelector<HTMLElement>('#equipment-damage-summary')!;
       const baselineFinalDamage = baselineDamage?.result.finalDamage.finalDamage;
       const currentFinalDamage = currentDamage?.result.finalDamage.finalDamage;
@@ -1548,7 +1548,7 @@ async function start() {
       try {
         if (!currentDamage) throw damageCalculationError;
         const { result } = currentDamage;
-        renderSheetParity(result, baselineDamage?.result);
+        renderCalculationComparison(result, baselineDamage?.result);
         let damageRatioHtml = '';
         if (baseline && before) {
           let damageRatio: number | null = null;

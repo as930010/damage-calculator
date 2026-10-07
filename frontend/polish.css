@@ -19,7 +19,7 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
 /* Pass 4 — Improve scanability and make the final result the visual anchor. */
 .results-panel{overflow:clip} .results-panel>.panel-heading,.damage-panel>.panel-heading{background:rgb(18 24 33 / 36%)} .stat-list{gap:12px; padding:4px 22px 24px} .stat{min-width:0; border-color:#334051; border-radius:11px; background:linear-gradient(145deg,#19212b,#151c25); transition:border-color 150ms ease,background-color 150ms ease,box-shadow 150ms ease}
 .stat:hover{border-color:#50647f; box-shadow:0 7px 20px rgb(0 0 0 / 12%)} .stat summary{min-height:24px; gap:8px} .stat summary span{line-height:1.5} .stat strong{font-size:16px; letter-spacing:.015em} .stat[open]{border-color:#607b9f; background:#1b2634} .stat-details{border-top-color:rgb(122 146 176 / 22%)} .stat-source-row{min-height:35px}
-.damage-summary{grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; padding:16px 22px 22px} .damage-summary>div{min-height:88px; justify-content:center; border-radius:11px} .damage-summary .final-damage{background:linear-gradient(130deg,#25354b,#202a3a)} .damage-summary .final-damage strong{letter-spacing:-.025em} .damage-comparison,.sheet-parity{margin-inline:22px}
+.damage-summary{grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; padding:16px 22px 22px} .damage-summary>div{min-height:88px; justify-content:center; border-radius:11px} .damage-summary .final-damage{background:linear-gradient(130deg,#25354b,#202a3a)} .damage-summary .final-damage strong{letter-spacing:-.025em} .damage-comparison,.calculation-comparison{margin-inline:22px}
 .formula-detail{border-color:rgb(122 146 176 / 22%)}
 /* Pass 5 — Keep narrow screens readable and honor reduced-motion preferences. */
 @media(max-width:1240px) {
@@ -29,7 +29,7 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
   .topbar{gap:10px; padding:10px 14px} .brand{flex:none} .developer-info{min-width:0; margin-left:0; overflow-wrap:anywhere} .developer-info>span.developer-support{display:none} .top-meta{margin-left:auto} .workbench{width:100%; padding:18px 12px calc(104px + env(safe-area-inset-bottom))} .workspace-heading{margin-bottom:14px; padding:20px 18px; border-radius:15px} .workspace-heading h1{margin-top:10px; font-size:17px; line-height:1.55}
   .toolbar{gap:8px; margin-bottom:14px; padding:8px} .toolbar #class-picker{width:min(210px,52vw)} .toolbar .toggle{gap:6px; padding-inline:2px; font-size:11px} .battle-panel{margin-bottom:14px} .battle-fields{grid-template-columns:minmax(0,1fr); gap:10px; padding:14px 16px 2px} .battle-fields>*,.battle-fields .field,.battle-fields .picker{width:100%; min-width:0} .panel-heading{min-height:50px; padding:14px 16px}
   .panel-note{padding-inline:16px} .equipment-workspace{gap:14px} .equipment-panel,.results-panel,.weapon-magic-stone-panel,.global-source-panel{border-radius:14px} .equipment-canvas{min-width:660px} .stat-list{grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; padding:2px 12px 16px} .stat{padding:11px 10px} .stat summary{flex-wrap:wrap; gap:5px} .stat strong{font-size:14px}
-  .damage-summary{gap:8px; padding:12px} .damage-summary>div{min-height:76px; padding:11px} .damage-summary .final-damage{grid-column:1/-1} .damage-summary .final-damage strong{font-size:22px} .damage-comparison,.sheet-parity{margin-inline:12px} .mobile-picker-dialog{width:calc(100vw - 12px); height:min(92dvh,900px); max-height:92dvh; border-radius:18px} .mobile-picker-header{padding:14px}
+  .damage-summary{gap:8px; padding:12px} .damage-summary>div{min-height:76px; padding:11px} .damage-summary .final-damage{grid-column:1/-1} .damage-summary .final-damage strong{font-size:22px} .damage-comparison,.calculation-comparison{margin-inline:12px} .mobile-picker-dialog{width:calc(100vw - 12px); height:min(92dvh,900px); max-height:92dvh; border-radius:18px} .mobile-picker-header{padding:14px}
   .toolbar-actions{box-shadow:0 -12px 32px rgb(0 0 0 / 30%)}
 }
 @media(max-width:380px) {
@@ -170,9 +170,9 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
 .calculation-inspection-panel>summary::before{content:"＋";margin-right:8px;color:#8093ad}
 .calculation-inspection-panel[open]>summary::before{content:"−"}
 .calculation-inspection-content{border-top:1px solid rgb(122 146 176 / 18%)}
-.calculation-inspection-panel .sheet-parity{margin:0;padding:15px 18px;border-top:0}
+.calculation-inspection-panel .calculation-comparison{margin:0;padding:15px 18px;border-top:0}
 .calculation-inspection-panel .formula-detail{margin:0 18px 16px;border-top:1px solid rgb(122 146 176 / 18%);padding:13px 0}
-@media(max-width:700px){.calculation-inspection-panel{margin:0 12px 16px}.calculation-inspection-panel .sheet-parity{padding:14px 12px}.calculation-inspection-panel .formula-detail{margin-inline:12px}}
+@media(max-width:700px){.calculation-inspection-panel{margin:0 12px 16px}.calculation-inspection-panel .calculation-comparison{padding:14px 12px}.calculation-inspection-panel .formula-detail{margin-inline:12px}}
 @media(min-width:701px) and (max-width:1240px){.site-credits-notes{width:min(calc(100% - clamp(32px,6vw,56px)),1384px);max-width:1384px}}
 @media(min-width:701px){.workbench{padding-bottom:20px}}
 

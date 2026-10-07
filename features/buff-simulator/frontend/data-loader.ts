@@ -85,7 +85,7 @@ export function parseGameCatalog(payloads: CatalogPayloads): GameCatalog {
   const classCodes = new Set(classes.map((item) => item.code));
   for (const role of skillRoles) {
     if (!classCodes.has(role.code)) throw new TypeError(`Unknown skill-reference class ${role.code}`);
-    if (!Array.isArray(role.skills) || !Array.isArray(role.sourceRanges)) {
+    if (!Array.isArray(role.skills)) {
       throw new TypeError(`Invalid skill-reference entry ${role.code}`);
     }
   }

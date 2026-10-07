@@ -5,7 +5,6 @@ export type CombatRateSourceRule =
       id: string;
       attributes: readonly CombatAttribute[];
       method: "multiplicative";
-      sourceCell: string;
       valueSource: { kind: "parameter"; key: string };
       condition?: { selectionKey: string; equals: string };
     }
@@ -13,7 +12,6 @@ export type CombatRateSourceRule =
       id: string;
       attributes: readonly CombatAttribute[];
       method: "multiplicative";
-      sourceCell: string;
       valueSource: {
         kind: "enhancementText";
         inputCell: string;
@@ -62,7 +60,7 @@ function resolveRuleValue(rule: CombatRateSourceRule, values: CombatRateSourceVa
   return level + rule.valueSource.bonusPct;
 }
 
-/** Resolve B77/B103/B105 multiplicative rate sources from JSON and simulator inputs. */
+/** Resolve multiplicative rate sources from JSON and simulator inputs. */
 export function resolveCombatRateSources(
   document: CombatRateSourceRulesDocument,
   values: CombatRateSourceValues,
@@ -71,9 +69,7 @@ export function resolveCombatRateSources(
   const result: Record<CombatAttribute, PercentEffect[]> = { critRate: [], extremization: [] };
   const ids = new Set<string>();
   for (const rule of document.sources) {
-    if (!rule.id.trim() || !rule.sourceCell.trim()) {
-      throw new TypeError("Combat-rate source id and sourceCell must not be empty.");
-    }
+    if (!rule.id.trim()) throw new TypeError("Combat-rate source id must not be empty.");
     if (ids.has(rule.id)) throw new TypeError("Duplicate combat-rate source id: " + rule.id);
     ids.add(rule.id);
     if (rule.condition && values.selections[rule.condition.selectionKey] !== rule.condition.equals) continue;

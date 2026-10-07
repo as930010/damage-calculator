@@ -141,7 +141,7 @@ export function calculateLoadout(input: LoadoutCalculationInput): LoadoutCalcula
         shared: [
           ...input.sources.shared,
           {
-            sourceId: "weapon-base-attack:C53:D53",
+            sourceId: "weapon-base-attack",
             stats: { physicalAttack: weaponBase.physicalAttack, magicalAttack: weaponBase.magicalAttack },
           },
         ],

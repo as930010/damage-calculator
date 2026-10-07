@@ -107,10 +107,8 @@ export interface MasterBeastEffectDocument {
   spiritStoneColorSelector: {
     defaultColor: "黃" | "綠";
     options: readonly ("黃" | "綠")[];
-    yellowRateSourceCell: string;
     yellowRateValuePct: number;
   };
-  overallPotentialSourceCells: Readonly<Record<string, string>>;
   options: readonly MasterBeastOption[];
   statKeyBySheetName: Readonly<Record<string, string>>;
   customAttributeOptions: {
@@ -173,7 +171,6 @@ export interface SpiritRecordEffectDocument {
   schemaVersion: 1;
   classSelectors: {
     selectorCells: readonly string[];
-    sourceRange: string;
     classes: readonly { classCode: string; branch: string; traits: readonly [string, string] }[];
   };
   defaultMaxedStats: Readonly<Record<string, number>>;
@@ -206,7 +203,6 @@ export interface CircuitBoardRule {
   attributeCell: string;
   valueCell: string;
   wearSet: "shared" | "lowerwearA" | "lowerwearB";
-  optionSource: string;
   attributeOptions: readonly string[];
 }
 
@@ -486,7 +482,7 @@ export function resolveAtmaSetEffects(
   return result;
 }
 
-/** Resolve lookup options and typed values used by the 大師聖獸 rows 70:83. */
+/** Resolve lookup options and typed values used by 大師聖獸 overall potential. */
 export function resolveMasterBeastEffects(
   document: MasterBeastEffectDocument,
   selection: MasterBeastSelection,
@@ -507,9 +503,7 @@ export function resolveMasterBeastEffects(
     const overallOption = document.options.find(candidate => candidate.category === "overall" && candidate.name === selection.overallOption);
     if (!overallOption) throw new RangeError("Unknown 大師聖獸 overall option: " + selection.overallOption);
     for (const [statKey, value] of Object.entries(overallOption.stats)) {
-      const cell = document.overallPotentialSourceCells[statKey];
-      if (!cell) throw new RangeError(`大師聖獸潛力屬性 ${statKey} 尚未設定計算機來源格。`);
-      result.push({ sourceId: `sheet:計算機!${cell}`, stats: { [statKey]: value } });
+      result.push({ sourceId: `master-beast-potential:${statKey}`, stats: { [statKey]: value } });
     }
   }
   (selection.headOptions ?? []).forEach((name, index) => addOption("head", name, "master-beast:head:" + (index + 1)));

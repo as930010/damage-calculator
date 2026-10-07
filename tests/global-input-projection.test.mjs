@@ -9,12 +9,12 @@ import { resolveMasterBeastEffects, resolveRightIceSetEffects } from '../dist/ca
 const readJson = async path => JSON.parse(await readFile(new URL(`../data/${path}`, import.meta.url), 'utf8'));
 
 async function loadData() {
-  const [layout, classes, attributes, parameters, manifest, mapping, attack, innerwear, nephronArmor, appraisals, chips,
+  const [layout, classes, attributes, parameters, mapping, attack, innerwear, nephronArmor, appraisals, chips,
     chipSlots, circuits, transformations, growth, weaponAppraisals, weaponGrades, giantStones, accessoryEffects, classCombatEffects,
     classDamagePassives, combatRateSources, simulatorInputs, rightIceSets, resonance, raidSets, atma,
     masterBeast, spiritRecord, otherEffects, pets, colorSetEffects] = await Promise.all([
     readJson('equipment-layout.json'), readJson('classes.json'), readJson('attributes.json'), readJson('parameters.json'),
-    readJson('manifest.json'), readJson('simulator-equipment-mapping.json'), readJson('attack-parameters.json'),
+    readJson('simulator-equipment-mapping.json'), readJson('attack-parameters.json'),
     readJson('innerwear-rules.json'), readJson('nephron-armor-rules.json'), readJson('armor-appraisals.json'), readJson('equipment/chips.json'),
     readJson('chip-slots.json'), readJson('circuit-board-rules.json'), readJson('weapon-transformations.json'),
     readJson('weapon-growth.json'), readJson('weapon-appraisals.json'), readJson('weapon-grade-options.json'), readJson('giant-magic-stones.json'),
@@ -26,7 +26,7 @@ async function loadData() {
   ]);
   const catalogFiles = [...new Set([...mapping.selections.map(entry => entry.catalogFile), mapping.magicStoneSelections.catalogFile])];
   const catalogs = Object.fromEntries(await Promise.all(catalogFiles.map(async file => [file, await readJson(file)])));
-  return { layout, classes, attributes, parameters, manifest, mapping, attack, innerwear, nephronArmor, appraisals, chips, chipSlots,
+  return { layout, classes, attributes, parameters, mapping, attack, innerwear, nephronArmor, appraisals, chips, chipSlots,
     circuits, transformations, growth, weaponAppraisals, weaponGrades, giantStones, accessoryEffects, classCombatEffects, classDamagePassives,
     combatRateSources, simulatorInputs, rightIceSets, resonance, raidSets, atma, masterBeast, spiritRecord,
     otherEffects, pets, colorSetEffects, catalogs };
@@ -409,7 +409,7 @@ test('大師聖獸固定效果、各顏色的精靈石套效與五種潛力來�
   assert.equal(yellow.attributes.stats.doubleAttackPct.finalTotal - green.attributes.stats.doubleAttackPct.finalTotal, 0);
   assert.equal(yellow.attributes.stats.doubleAttackPct.sharedSources.find(source => source.sourceId === 'sheet:計算機!E76').valuePct, 3);
   assert.equal(yellow.attributes.stats.bossDamagePct.finalTotal - green.attributes.stats.bossDamagePct.finalTotal, 0);
-  assert.equal(yellow.attributes.stats.bossDamagePct.sharedSources.find(source => source.sourceId === 'sheet:計算機!I78').valuePct, 15);
+  assert.equal(yellow.attributes.stats.bossDamagePct.sharedSources.find(source => source.sourceId === 'master-beast-potential:bossDamagePct').valuePct, 15);
   assert.equal(green.attributes.stats.doubleAttackPct.finalTotal, empty.attributes.stats.doubleAttackPct.finalTotal);
   assert.equal(green.attributes.stats.bossDamagePct.finalTotal - empty.attributes.stats.bossDamagePct.finalTotal, 15);
   assert.ok(yellow.combatRates.critRate.multipliers.some(source => source.sourceId === 'sheet:計算機!B77' && source.factor === 1.08));
@@ -417,7 +417,7 @@ test('大師聖獸固定效果、各顏色的精靈石套效與五種潛力來�
   assert.ok(!green.combatRates.critRate.multipliers.some(source => source.sourceId === 'sheet:計算機!B77'));
   assert.ok(!green.combatRates.extremization.multipliers.some(source => source.sourceId === 'sheet:計算機!B77'));
   assert.ok(resolveMasterBeastEffects(data.masterBeast, { overallOption: 'Boss傷害+15%' })
-    .some(source => source.sourceId === 'sheet:計算機!I78' && source.stats.bossDamagePct === 15));
+    .some(source => source.sourceId === 'master-beast-potential:bossDamagePct' && source.stats.bossDamagePct === 15));
 });
 
 test('右冰套效只計算使用者選取的套裝，效果依實際裝備件數判定', async () => {

@@ -3,10 +3,10 @@ import { isResonanceInputCell, parseResonancePoints } from '../calculation/reson
 import type { GameData } from './data.ts';
 import { codeForFieldId, fieldIdForCode, isFieldId } from './field-ids.ts';
 import { normalizePortraitAwakeningSplit, normalizeTranscendenceSkillDamageShare, type LoadoutState } from './state.ts';
-import { findValidationCatalog } from './sheet-validation.ts';
+import { findValidationCatalog } from './input-validation.ts';
 
 type TransferData = Pick<GameData,
-  | 'classes' | 'mapping' | 'catalogs' | 'simulatorInputs' | 'manifest' | 'masterBeast'
+  | 'classes' | 'mapping' | 'catalogs' | 'simulatorInputs' | 'masterBeast'
   | 'layout' | 'attack' | 'innerwear' | 'appraisals' | 'chips' | 'chipSlots' | 'circuits'
   | 'transformations' | 'growth' | 'weaponAppraisals' | 'weaponGrades' | 'giantStones' | 'nephronArmor'
   | 'colorSetEffects' | 'spiritRecord' | 'otherEffects' | 'pets' | 'rightIceSets'
@@ -34,7 +34,7 @@ function inputOption(data: TransferData, cell: string) {
   return catalog ? { catalog, options: catalog.options } : null;
 }
 
-/** Options for controls whose values are not represented in the imported sheet validation table. */
+/** Options for controls that use app-specific catalogs. */
 function customOptions(data: TransferData, cell: string, values: Record<string, unknown>): readonly (string | number)[] | null {
   const address = cell;
   const direct: Record<string, readonly (string | number)[]> = {
@@ -108,8 +108,8 @@ function customOptions(data: TransferData, cell: string, values: Record<string, 
 function cellOptions(data: TransferData, cell: string, values: Record<string, unknown>) {
   const custom = customOptions(data, cell, values);
   if (custom) return custom;
-  const sheet = inputOption(data, cell);
-  return sheet ? sheet.options.map(option => option.value) : null;
+  const catalogMatch = inputOption(data, cell);
+  return catalogMatch ? catalogMatch.options.map(option => option.value) : null;
 }
 
 function equipmentMappings(data: TransferData): Map<string, SimulatorEquipmentSelectionMapping> {
@@ -119,7 +119,6 @@ function equipmentMappings(data: TransferData): Map<string, SimulatorEquipmentSe
       selectionCell: mapping.selectionCell,
       catalogFile: data.mapping.magicStoneSelections.catalogFile,
       slotId: data.mapping.magicStoneSelections.slotId,
-      calculationRows: [mapping.calculationRow],
       application: mapping.application,
       enabledBy: mapping.enabledBy,
       configuration: mapping.configuration,
@@ -213,7 +212,6 @@ export function serializeLoadout(state: LoadoutState, data: TransferData): { jso
   const payload = {
     format: 'damage-calculator-loadout',
     formatVersion: 3,
-    dataUpdatedAt: data.manifest.dataUpdatedAt,
     Job: state.Job,
     values,
     lowerwearAlternativeEnabled: state.lowerwearAlternativeEnabled,

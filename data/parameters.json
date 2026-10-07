@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "dataUpdatedAt": "2026-09-25",
-  "source": "Google Sheets: 計算機!C154, D154, H154, E76, E93, Q37, Q53, Q86, R86, T101, T102, B77 (formerly B76), V87; fixed cells and conditional sources",
+  "dataUpdatedAt": "2026-10-07",
+  "source": "Google Sheets: 計算機!C154, D154, H154, E76, E93, Q37, Q53, Q86, R86, T101, T102, B77 (formerly B76), V87; fixed cells and conditional sources; user-confirmed global effect",
   "characterBase": {
     "physicalAttack": 1202,
     "magicalAttack": 1202,
@@ -48,6 +48,12 @@
       "sourceId": "sheet:計算機!T101",
       "stats": {
         "multiplicativeCritDamagePct": 10
+      }
+    },
+    {
+      "sourceId": "hunter-instinct",
+      "stats": {
+        "bossDamagePct": 2.5
       }
     }
   ],

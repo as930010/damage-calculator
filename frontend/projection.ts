@@ -261,11 +261,11 @@ export function projectAttributes(data: GameData, state: LoadoutState) {
   if (text("Weapon.ENHC")) {
     const params = resolveAttackParameters(data.attack, state.Job, Number(text("Weapon.ENHC").match(/\d+/)?.[0]));
     const stats = calculateWeaponBaseAttack({ ...params, attackLevel: first.stats.attackLevel?.finalTotal ?? 0 });
-    groups.shared.push({ sourceId: "weapon-base-attack:C53:D53", stats });
+    groups.shared.push({ sourceId: "weapon-base-attack", stats });
   }
   const result = aggregate();
   const calculationSources = {
-    shared: groups.shared.filter(source => source.sourceId !== "character-base" && source.sourceId !== "weapon-base-attack:C53:D53"),
+    shared: groups.shared.filter(source => source.sourceId !== "character-base" && source.sourceId !== "weapon-base-attack"),
     lowerwearA: groups.lowerwearA, lowerwearB: groups.lowerwearB,
     lowerwearAlternativeEnabled: state.lowerwearAlternativeEnabled,
   };
@@ -307,7 +307,7 @@ export function projectCombatRates(data: GameData, state: LoadoutState) {
   return calculateLoadoutCombatRates(combatRateInputs(data, state, attributes));
 }
 
-/** Full formula path through B157:B163 using the selected spreadsheet-mapped values. */
+/** Full formula path from the computed attack range through final damage. */
 export function projectDamage(data: GameData, state: LoadoutState) {
   const attributes = projectAttributes(data, state);
   const job = data.classes.classes.find(entry => entry.id === state.Job);

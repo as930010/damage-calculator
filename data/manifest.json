@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "dataUpdatedAt": "2026-10-02",
-  "displayDate": "261002",
-  "source": "Google Sheets live export",
-  "notes": [
-    "Single current game data set; no user-selectable historical version."
-  ]
-}
