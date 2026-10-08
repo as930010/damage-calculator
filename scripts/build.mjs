@@ -161,7 +161,7 @@ const revisionResult = spawnSync("git", ["rev-parse", "--short", "HEAD"], { cwd:
 const buildRevision = revisionResult.status === 0 ? `${revisionResult.stdout.trim()}-${dataRevision}` : `build-${Date.now()}-${dataRevision}`;
 const indexHtml = (await readFile(join(root, "index.html"), "utf8")).replaceAll("__BUILD_REVISION__", buildRevision);
 await writeFile(join(output, "index.html"), indexHtml);
-for (const file of ["styles.css", "polish.css"]) {
+for (const file of ["styles.css", "polish.css", "seasonal-effects.css"]) {
   const source = await readFile(join(root, "frontend", file), "utf8");
   await writeFile(join(output, "frontend", file), minifyCss(source));
 }
