@@ -2,7 +2,7 @@ name: Deploy GitHub Pages
 
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, event/coexistence-moonlight]
   workflow_dispatch:
 
 permissions:
