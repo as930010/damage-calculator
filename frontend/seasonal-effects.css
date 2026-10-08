@@ -3,15 +3,17 @@
 body::before {
   position: fixed;
   z-index: 100;
-  inset: 0;
+  inset: -12vh -12vw;
   pointer-events: none;
   content: "";
   background:
-    radial-gradient(ellipse 125vw 135vh at 0% 0%, rgb(213 230 255 / 18%) 0%, rgb(164 194 238 / 11%) 34%, rgb(125 159 211 / 5%) 62%, transparent 84%),
-    radial-gradient(ellipse 165vw 185vh at 0% 0%, rgb(95 132 190 / 11%) 0%, rgb(72 105 157 / 7%) 42%, transparent 82%);
+    radial-gradient(ellipse 125vw 135vh at 12vw 12vh, rgb(213 230 255 / 18%) 0%, rgb(164 194 238 / 11%) 34%, rgb(125 159 211 / 5%) 62%, transparent 84%),
+    radial-gradient(ellipse 165vw 185vh at 12vw 12vh, rgb(95 132 190 / 11%) 0%, rgb(72 105 157 / 7%) 42%, transparent 82%),
+    repeating-conic-gradient(from 12deg at 12vw 12vh, transparent 0deg 17deg, rgb(211 229 255 / 0%) 18deg, rgb(211 229 255 / 7%) 21deg, rgb(211 229 255 / 0%) 24deg, transparent 26deg 41deg);
   opacity: .04;
-  will-change: opacity;
-  animation: moonlight-breathe 8s ease-in-out infinite;
+  transform-origin: 12vw 12vh;
+  will-change: transform, opacity;
+  animation: moonlight-swing 8s ease-in-out infinite;
 }
 
 body::after {
@@ -33,25 +35,27 @@ body::after {
 .weapon-magic-stone-panel,
 .global-source-panel,
 .results-panel {
-  border-color: rgb(135 166 207 / 30%);
-  box-shadow: 0 0 14px rgb(151 186 237 / 7%), 0 12px 34px rgb(0 0 0 / 11%);
+  border-color: rgb(150 181 226 / 38%);
+  box-shadow: 0 0 16px rgb(160 194 245 / 15%), 0 0 34px rgb(118 157 214 / 9%), 0 12px 34px rgb(0 0 0 / 11%);
 }
 
 .workspace-heading {
-  box-shadow: 0 0 18px rgb(151 186 237 / 9%), 0 18px 48px rgb(0 0 0 / 16%);
+  box-shadow: 0 0 22px rgb(160 194 245 / 18%), 0 0 40px rgb(118 157 214 / 10%), 0 18px 48px rgb(0 0 0 / 16%);
 }
 
 .toolbar {
-  box-shadow: 0 0 12px rgb(151 186 237 / 6%);
+  box-shadow: 0 0 16px rgb(160 194 245 / 14%), 0 0 28px rgb(118 157 214 / 8%);
 }
 
-@keyframes moonlight-breathe {
+@keyframes moonlight-swing {
   0%, 100% {
     opacity: .04;
+    transform: rotate(-2.2deg);
   }
 
   50% {
     opacity: .5;
+    transform: rotate(2.2deg);
   }
 }
 
@@ -69,6 +73,7 @@ body::after {
   body::before {
     opacity: .25;
     will-change: auto;
+    transform: none;
     animation: none;
   }
 
