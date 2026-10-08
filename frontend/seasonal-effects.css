@@ -3,16 +3,15 @@
 body::before {
   position: fixed;
   z-index: 100;
-  inset: -45% -50%;
+  inset: 0;
   pointer-events: none;
   content: "";
   background:
-    radial-gradient(ellipse 94vw 110vh at 50% 28%, rgb(213 230 255 / 19%) 0%, rgb(164 194 238 / 11%) 34%, rgb(125 159 211 / 5%) 62%, transparent 84%),
-    radial-gradient(ellipse 140vw 160vh at 50% 30%, rgb(95 132 190 / 11%) 0%, rgb(72 105 157 / 7%) 42%, transparent 82%);
+    radial-gradient(ellipse 125vw 135vh at 0% 0%, rgb(213 230 255 / 18%) 0%, rgb(164 194 238 / 11%) 34%, rgb(125 159 211 / 5%) 62%, transparent 84%),
+    radial-gradient(ellipse 165vw 185vh at 0% 0%, rgb(95 132 190 / 11%) 0%, rgb(72 105 157 / 7%) 42%, transparent 82%);
   opacity: .04;
-  transform: translate3d(0, -5vh, 0);
-  will-change: transform, opacity;
-  animation: moonlight-sweep 8s ease-in-out infinite;
+  will-change: opacity;
+  animation: moonlight-breathe 8s ease-in-out infinite;
 }
 
 body::after {
@@ -46,15 +45,13 @@ body::after {
   box-shadow: 0 0 12px rgb(151 186 237 / 6%);
 }
 
-@keyframes moonlight-sweep {
+@keyframes moonlight-breathe {
   0%, 100% {
     opacity: .04;
-    transform: translate3d(0, -5vh, 0);
   }
 
   50% {
     opacity: .5;
-    transform: translate3d(-48vw, 37vh, 0);
   }
 }
 
@@ -71,7 +68,6 @@ body::after {
 @media (prefers-reduced-motion: reduce) {
   body::before {
     opacity: .25;
-    transform: translate3d(0, -5vh, 0);
     will-change: auto;
     animation: none;
   }
