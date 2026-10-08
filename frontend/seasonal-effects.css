@@ -24,7 +24,7 @@ body::after {
   content: "";
   background: rgb(0 0 0 / 6%);
   will-change: opacity;
-  animation: moonlight-global-dim 8s ease-in-out infinite;
+  animation: moonlight-global-dim 5s ease-in-out infinite;
 }
 
 .workspace-heading,
