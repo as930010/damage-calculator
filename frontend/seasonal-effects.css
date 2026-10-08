@@ -499,13 +499,16 @@ button:active,.pet-skill-toggle:active{filter:brightness(1.08)}
 .mobile-inspector-open #inspector{border-color:#9c8150;box-shadow:0 18px 52px rgb(0 0 0 / 65%),0 0 32px rgb(146 123 190 / 8%)}
 .mobile-inspector-open #inspector .inspector-title{background:#0d132b}
 
-/* Soft violet canopy light and a warm, low-intensity firelight pool. */
+/* Keep the ambient glow centered and continuous as the viewport widens. */
 body::before{
   --moonlight-sway-start:-.55deg;--moonlight-sway-end:.55deg;
+  --moonlight-bleed:clamp(24px,3vw,80px);
+  inset:calc(var(--moonlight-bleed) * -1);
+  transform-origin:var(--moonlight-bleed) calc(var(--moonlight-bleed) - 24px);
   background:
-    radial-gradient(ellipse min(110vw,1580px) min(120vh,1080px) at 0 -24px,rgb(173 172 229 / 5%) 0%,rgb(143 143 207 / 2.6%) 38%,transparent 76%),
-    radial-gradient(ellipse min(90vw,1100px) min(110vh,1040px) at 100% 100%,rgb(221 144 69 / 4.5%) 0%,rgb(177 106 52 / 2.2%) 46%,transparent 78%),
-    conic-gradient(from 18deg at 0 -24px,transparent 0deg 33deg,rgb(193 188 239 / 0%) 36deg,rgb(193 188 239 / 11%) 41deg,rgb(193 188 239 / 0%) 46deg,transparent 51deg 360deg);
+    radial-gradient(ellipse min(110vw,2600px) min(120vh,1080px) at var(--moonlight-bleed) calc(var(--moonlight-bleed) - 24px),rgb(173 172 229 / 5%) 0%,rgb(143 143 207 / 2.6%) 38%,transparent 76%),
+    radial-gradient(ellipse min(max(1100px,calc(130vw - 720px)),2600px) min(110vh,1040px) at 50% calc(100% - var(--moonlight-bleed)),rgb(221 144 69 / 4.5%) 0%,rgb(177 106 52 / 2.2%) 46%,transparent 78%),
+    conic-gradient(from 18deg at var(--moonlight-bleed) calc(var(--moonlight-bleed) - 24px),transparent 0deg 33deg,rgb(193 188 239 / 0%) 36deg,rgb(193 188 239 / 11%) 41deg,rgb(193 188 239 / 0%) 46deg,transparent 51deg 360deg);
   opacity:.3;
 }
 @media (prefers-reduced-motion:reduce){body::before{opacity:.2}}
@@ -580,8 +583,8 @@ footer::after{
     linear-gradient(-16deg,transparent 36%,#805538 39% 53%,transparent 56%);
 }
 @media (max-width:380px){.workspace-heading::after{display:none}}
-/* Broad, zero-spread shadows keep the campfire and moonlight glow continuous. */
-.workspace-heading,.toolbar,.battle-panel,.damage-panel,.equipment-panel,.inspector,.weapon-magic-stone-panel,.global-source-panel,.results-panel,.site-credits-notes{
+/* Keep one outer halo around the results group; nested damage panels retain only their inset edge. */
+.workspace-heading,.toolbar,.battle-panel,.equipment-panel,.inspector,.weapon-magic-stone-panel,.global-source-panel,.results-panel,.site-credits-notes{
   box-shadow:0 0 112px 0 rgb(232 150 72 / 5%),0 0 210px 0 rgb(150 177 222 / 3%),inset 0 1px 0 rgb(220 215 245 / 5%);
 }
 .mobile-inspector-open #inspector{
