@@ -1,5 +1,66 @@
 /* Coexistence Festival only. Remove this stylesheet link to disable the seasonal effect. */
 
+:root {
+  --page-bg: #090c17;
+  --panel: #11162b;
+  --panel-alt: #101427;
+  --surface: #0e1323;
+  --surface-raised: #1a2038;
+  --control: #141a2f;
+  --control-hover: #202846;
+  --field: #0d1220;
+  --border: #232a43;
+  --border-strong: #303753;
+  --border-mid: #2a314b;
+  --border-row: #202941;
+  --border-control: #36415c;
+  --accent: #d0d5ff;
+  --accent-surface: #1d2744;
+  --accent-border: #788cc9;
+  background:
+    radial-gradient(1px 1px at 6% 15%, rgb(220 226 255 / 64%) 50%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 19% 9%, rgb(227 224 255 / 52%) 48%, transparent 100%),
+    radial-gradient(1px 1px at 31% 24%, rgb(213 222 255 / 46%) 50%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 43% 12%, rgb(255 226 188 / 42%) 48%, transparent 100%),
+    radial-gradient(1px 1px at 68% 17%, rgb(223 226 255 / 52%) 50%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 91% 28%, rgb(215 223 255 / 44%) 48%, transparent 100%),
+    radial-gradient(1px 1px at 83% 68%, rgb(255 226 188 / 36%) 50%, transparent 100%),
+    radial-gradient(1px 1px at 14% 78%, rgb(215 224 255 / 40%) 50%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 57% 88%, rgb(223 226 255 / 43%) 48%, transparent 100%),
+    radial-gradient(1px 1px at 36% 63%, rgb(223 226 255 / 38%) 50%, transparent 100%),
+    radial-gradient(ellipse at 82% -18%, rgb(78 74 148 / 11%), transparent 38rem),
+    var(--page-bg);
+}
+
+body {
+  background: transparent;
+}
+
+.topbar {
+  border-color: rgb(118 130 194 / 22%);
+  background: rgb(10 13 25 / 92%);
+}
+
+.workspace-heading {
+  border-color: rgb(128 143 213 / 34%);
+  background: linear-gradient(112deg, rgb(23 31 58 / 96%), rgb(17 22 43 / 96%) 56%, rgb(27 20 49 / 90%)), var(--panel);
+}
+
+.toolbar {
+  border-color: rgb(121 132 194 / 26%);
+  background: rgb(15 20 38 / 90%);
+}
+
+.battle-panel,
+.damage-panel,
+.equipment-panel,
+.inspector,
+.weapon-magic-stone-panel,
+.global-source-panel,
+.results-panel {
+  background: linear-gradient(145deg, rgb(20 26 49 / 98%), rgb(14 19 37 / 98%));
+}
+
 body::before {
   position: fixed;
   z-index: 100;
