@@ -42,7 +42,7 @@
   background-color:var(--page-bg);
   background-image:
     radial-gradient(ellipse at 78% -8%,rgb(10 15 38 / 10%),transparent 42rem),
-    radial-gradient(ellipse at 50% 112%,rgb(181 102 47 / 12%),transparent 44rem),
+    radial-gradient(ellipse 320px 160px at 50% 100%,rgb(181 102 47 / 4%),transparent 100%),
     radial-gradient(circle at 78px 299px,rgb(235 198 119 / 43%) 0 0.68px,transparent 1.40px),
     radial-gradient(circle at 241px 95px,rgb(160 166 224 / 30%) 0 0.68px,transparent 1.40px),
     radial-gradient(circle at 197px 305px,rgb(160 166 224 / 43%) 0 0.68px,transparent 1.40px),
@@ -515,5 +515,68 @@ body::before{
   .workspace-heading::before{right:4%;width:56vw;height:140px}
   .stat-list{gap:9px}
   .mobile-inspector-open #inspector{border-color:#9c8150}
+}
+/* The source panel and inspector inherit their 65% translucent parent surfaces. */
+.global-source-panel>summary{background-color:transparent}
+.equipment-panel>.panel-heading{background:linear-gradient(90deg,rgb(16 22 48 / 65%),rgb(11 15 34 / 65%))}
+.mobile-inspector-open #inspector .inspector-title{background:rgb(13 19 43 / 65%)}
+.site-credits-notes{
+  border-color:rgb(125 134 183 / 34%);
+  background-color:transparent;
+  background-image:
+    radial-gradient(circle at 3% 18%,rgb(238 185 105 / 20%) 0 .7px,transparent 1.7px),
+    radial-gradient(circle at 97% 78%,rgb(196 216 182 / 15%) 0 .8px,transparent 1.8px),
+    radial-gradient(ellipse 70% 58% at 48% 100%,rgb(181 102 47 / 5%),transparent 100%),
+    linear-gradient(145deg,rgb(10 14 29 / 65%),rgb(7 9 20 / 65%));
+  color:var(--text-muted);
+  box-shadow:0 12px 30px rgb(0 0 0 / 18%),inset 0 1px 0 rgb(220 215 245 / 5%);
+}
+.site-credits-notes>summary{min-height:42px;background:transparent;color:#c6c3d4;letter-spacing:.02em}
+.site-credits-notes>summary::before{color:#b89361}
+.site-credits-content{border-top-color:rgb(164 147 126 / 20%)}
+.site-credits-block+.site-credits-block{border-left-color:rgb(164 147 126 / 20%)}
+.site-credits-block h2{color:#d4ccda}
+.site-credits-block p,.site-thanks-list li,.site-release-list p{color:#b8b5c5}
+.site-thanks-list strong,.site-release-list strong{color:#e7ddc9}
+.site-release-list time{color:#a9a4b3}
+
+/* A small CSS-only campfire anchors the page footer; no particles or animation. */
+footer{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  min-height:156px;
+  padding:18px 24px 96px;
+  border-top-color:rgb(164 129 99 / 24%);
+  background:radial-gradient(ellipse 300px 100px at 50% 100%,rgb(191 104 46 / 9%),transparent 100%);
+}
+footer::before,footer::after{
+  position:absolute;
+  z-index:-1;
+  left:50%;
+  content:"";
+  pointer-events:none;
+  transform:translateX(-50%);
+}
+footer::before{
+  bottom:37px;
+  width:38px;
+  height:56px;
+  clip-path:polygon(49% 0,62% 20%,59% 37%,78% 48%,71% 66%,91% 78%,77% 94%,57% 100%,33% 96%,15% 83%,24% 66%,20% 51%,39% 38%,33% 22%);
+  background:
+    radial-gradient(ellipse at 49% 77%,rgb(255 237 171 / 95%) 0 8%,rgb(255 196 88 / 85%) 22%,transparent 54%),
+    linear-gradient(155deg,#f5bd5f 0%,#df793c 52%,#963f38 100%);
+  filter:drop-shadow(0 0 14px rgb(255 153 66 / 30%));
+  opacity:.78;
+}
+footer::after{
+  bottom:20px;
+  width:78px;
+  height:24px;
+  background:
+    radial-gradient(circle at 21% 22%,rgb(255 202 112 / 58%) 0 1px,transparent 2px),
+    radial-gradient(circle at 77% 14%,rgb(255 186 86 / 45%) 0 1px,transparent 2px),
+    linear-gradient(16deg,transparent 36%,#60412e 39% 53%,transparent 56%),
+    linear-gradient(-16deg,transparent 36%,#805538 39% 53%,transparent 56%);
 }
 @media (max-width:380px){.workspace-heading::after{display:none}}
