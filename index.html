@@ -9,6 +9,13 @@
     <link rel="stylesheet" href="./frontend/styles.css?v=__BUILD_REVISION__" />
     <link rel="stylesheet" href="./frontend/polish.css?v=__BUILD_REVISION__" />
     <link rel="stylesheet" href="./frontend/seasonal-effects.css?v=__BUILD_REVISION__" />
+    <script>
+      (() => {
+        const syncSeasonalAnimation = () => document.documentElement.classList.toggle('seasonal-page-hidden', document.hidden);
+        document.addEventListener('visibilitychange', syncSeasonalAnimation);
+        syncSeasonalAnimation();
+      })();
+    </script>
   </head>
   <body>
     <div class="app-shell">
