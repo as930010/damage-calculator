@@ -377,6 +377,21 @@ body{color:var(--text-main);background:transparent}
     repeating-linear-gradient(113deg,transparent 0 74px,rgb(191 174 225 / 1.2%) 75px,transparent 78px),
     linear-gradient(145deg,rgb(10 16 39 / 65%),rgb(7 11 27 / 65%));
 }
+/* Keep battle and results panels in the same restrained, fire-warmed palette. */
+.battle-panel,.results-panel,.results-panel .damage-panel{
+  background-image:
+    radial-gradient(ellipse 88% 54% at 54% 64%,rgb(196 110 54 / 7%),transparent 76%),
+    radial-gradient(ellipse at 100% 0%,rgb(82 78 151 / 4%),transparent 36rem),
+    radial-gradient(ellipse at 0% 100%,rgb(157 93 47 / 3%) 0%,transparent 34rem),
+    repeating-linear-gradient(113deg,transparent 0 74px,rgb(191 174 225 / 1.2%) 75px,transparent 78px),
+    linear-gradient(145deg,rgb(10 14 29 / 65%),rgb(7 9 20 / 65%));
+}
+.battle-panel .panel-heading,.results-panel .panel-heading{
+  background:linear-gradient(90deg,rgb(15 18 29 / 65%),rgb(11 13 22 / 45%));
+}
+.results-panel .stat,.results-panel .equipment-damage-card,.results-panel .damage-summary>div{
+  background:linear-gradient(145deg,rgb(12 14 24 / 65%),rgb(8 10 18 / 65%));
+}
 .equipment-canvas{
   background-color:transparent;
   background-image:
