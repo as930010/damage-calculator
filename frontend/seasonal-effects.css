@@ -9,21 +9,22 @@ body::before {
   background:
     radial-gradient(ellipse 125vw 135vh at 12vw 12vh, rgb(213 230 255 / 18%) 0%, rgb(164 194 238 / 11%) 34%, rgb(125 159 211 / 5%) 62%, transparent 84%),
     radial-gradient(ellipse 165vw 185vh at 12vw 12vh, rgb(95 132 190 / 11%) 0%, rgb(72 105 157 / 7%) 42%, transparent 82%),
-    repeating-conic-gradient(from 12deg at 12vw 12vh, transparent 0deg 17deg, rgb(211 229 255 / 0%) 18deg, rgb(211 229 255 / 7%) 21deg, rgb(211 229 255 / 0%) 24deg, transparent 26deg 41deg);
-  opacity: .04;
+    conic-gradient(from 10deg at 12vw 12vh, transparent 0deg 15deg, rgb(211 229 255 / 0%) 19deg, rgb(211 229 255 / 6%) 35deg, rgb(211 229 255 / 0%) 53deg, transparent 58deg 360deg);
+  opacity: .44;
   transform-origin: 12vw 12vh;
-  will-change: transform, opacity;
+  will-change: transform;
   animation: moonlight-swing 8s ease-in-out infinite;
 }
 
 body::after {
   position: fixed;
-  z-index: 99;
+  z-index: 101;
   inset: 0;
   pointer-events: none;
   content: "";
-  background: rgb(0 0 0 / 4%);
-  animation: moonlight-dim 8s ease-in-out infinite;
+  background: rgb(0 0 0 / 6%);
+  will-change: opacity;
+  animation: moonlight-global-dim 8s ease-in-out infinite;
 }
 
 .workspace-heading,
@@ -49,17 +50,15 @@ body::after {
 
 @keyframes moonlight-swing {
   0%, 100% {
-    opacity: .04;
     transform: rotate(-2.2deg);
   }
 
   50% {
-    opacity: .5;
     transform: rotate(2.2deg);
   }
 }
 
-@keyframes moonlight-dim {
+@keyframes moonlight-global-dim {
   0%, 100% {
     opacity: 1;
   }
@@ -79,6 +78,7 @@ body::after {
 
   body::after {
     opacity: 0;
+    will-change: auto;
     animation: none;
   }
 }
