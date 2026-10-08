@@ -93,7 +93,7 @@ body::before {
   background:
     radial-gradient(ellipse min(110vw, 1580px) min(120vh, 1080px) at 0 -24px, rgb(220 231 248 / 9%) 0%, rgb(177 197 226 / 4.5%) 38%, rgb(137 163 199 / 1.5%) 70%, transparent 100%),
     radial-gradient(ellipse min(150vw, 1900px) min(155vh, 1360px) at 0 -24px, rgb(131 156 193 / 4%) 0%, rgb(100 124 163 / 2%) 45%, transparent 100%),
-    conic-gradient(from 18deg at 0 -24px, transparent 0deg 28deg, rgb(220 231 248 / 0%) 32deg, rgb(220 231 248 / 8%) 40deg, rgb(220 231 248 / 0%) 48deg, transparent 53deg 360deg);
+    conic-gradient(from 18deg at 0 -24px, transparent 0deg 33deg, rgb(220 231 248 / 0%) 36deg, rgb(220 231 248 / 24%) 41deg, rgb(220 231 248 / 0%) 46deg, transparent 51deg 360deg);
   opacity: .36;
   transform-origin: 0 -24px;
   will-change: transform;
@@ -110,15 +110,15 @@ body::before {
 .global-source-panel,
 .results-panel {
   border-color: rgb(136 155 184 / 29%);
-  box-shadow: 0 0 16px rgb(166 187 215 / 7%), inset 0 1px 0 rgb(218 228 244 / 4%);
+  box-shadow: 0 0 32px 2px rgb(166 187 215 / 8%), 0 0 76px 10px rgb(140 163 195 / 4%), inset 0 1px 0 rgb(218 228 244 / 4%);
 }
 
 .workspace-heading {
-  box-shadow: 0 0 22px rgb(166 187 215 / 8%), inset 0 1px 0 rgb(218 228 244 / 5%);
+  box-shadow: 0 0 44px 2px rgb(166 187 215 / 9%), 0 0 88px 12px rgb(140 163 195 / 4.5%), inset 0 1px 0 rgb(218 228 244 / 5%);
 }
 
 .toolbar {
-  box-shadow: 0 0 16px rgb(166 187 215 / 6%), inset 0 1px 0 rgb(218 228 244 / 4%);
+  box-shadow: 0 0 32px 2px rgb(166 187 215 / 7%), 0 0 76px 10px rgb(140 163 195 / 3.5%), inset 0 1px 0 rgb(218 228 244 / 4%);
 }
 
 @keyframes moonlight-sway {
