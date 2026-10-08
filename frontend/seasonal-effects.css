@@ -2,8 +2,8 @@
 
 :root {
   --page-bg: #080b17;
-  --panel: #111627;
-  --panel-alt: #151b30;
+  --panel: #0A1027;
+  --panel-alt: #0C1430;
   --surface: #0e1425;
   --surface-raised: #202743;
   --control: #181f35;
@@ -16,7 +16,7 @@
   --border-control: var(--violet-control-edge);
   --accent: var(--lantern-gold);
   --accent-surface: #2b2540;
-  --night-indigo: #222743;
+  --night-indigo: #0E1A46;
   --midnight-violet-edge: #535078;
   --violet-control-edge: #4a5574;
   --warm-wood: #9a805e;
@@ -28,7 +28,7 @@
   --text-main: #e6e5ef;
   --text-input: #f1eff8;
   --text-heading: #f5eedc;
-  --text-strong: #e5dcf5;
+  --text-strong: #d5cfe7;
   --text-label: #c5c5dd;
   --text-muted: #aeb3cc;
   --text-soft: #9098b8;
@@ -41,7 +41,7 @@
   accent-color: #c5a6e6;
   background-color:var(--page-bg);
   background-image:
-    radial-gradient(ellipse at 78% -8%,rgb(72 71 132 / 12%),transparent 42rem),
+    radial-gradient(ellipse at 78% -8%,rgb(10 15 38 / 10%),transparent 42rem),
     radial-gradient(ellipse at 50% 112%,rgb(181 102 47 / 12%),transparent 44rem),
     radial-gradient(circle at 78px 299px,rgb(235 198 119 / 43%) 0 0.68px,transparent 1.40px),
     radial-gradient(circle at 241px 95px,rgb(160 166 224 / 30%) 0 0.68px,transparent 1.40px),
@@ -308,7 +308,7 @@ body{color:var(--text-main);background:transparent}
   border-color:rgb(116 126 171 / 27%);
   background:
     radial-gradient(ellipse at 86% 110%,rgb(196 116 57 / 9%),transparent 34rem),
-    linear-gradient(90deg,rgb(8 12 26 / 80%),rgb(13 15 32 / 80%) 58%,rgb(21 17 34 / 80%));
+    linear-gradient(90deg,rgb(7 12 32 / 65%),rgb(10 16 43 / 65%) 58%,rgb(17 14 34 / 65%));
   box-shadow:inset 0 -1px 0 rgb(198 174 228 / 8%);
 }
 .topbar::after{
@@ -319,8 +319,8 @@ body{color:var(--text-main);background:transparent}
   border-color:rgb(139 139 191 / 35%);
   background:
     radial-gradient(ellipse 43% 115% at 83% 116%,rgb(222 136 77 / 16%),transparent 74%),
-    radial-gradient(ellipse 54% 110% at 9% 0%,rgb(82 78 151 / 17%),transparent 76%),
-    linear-gradient(112deg,rgb(13 18 39 / 80%),rgb(13 16 35 / 80%) 55%,rgb(25 19 40 / 80%));
+    radial-gradient(ellipse 54% 110% at 9% 0%,rgb(50 56 111 / 10%),transparent 76%),
+    linear-gradient(112deg,rgb(10 16 39 / 65%),rgb(8 13 31 / 65%) 55%,rgb(22 17 39 / 65%));
   box-shadow:0 18px 48px rgb(0 0 0 / 22%),0 0 46px 3px rgb(140 131 201 / 7%),inset 0 1px 0 rgb(220 215 245 / 7%);
 }
 .workspace-heading::before{
@@ -332,23 +332,23 @@ body{color:var(--text-main);background:transparent}
   background:linear-gradient(180deg,rgb(75 77 139 / 82%),rgb(27 31 69 / 84%));
   clip-path:polygon(50% 0,63% 25%,56% 25%,75% 48%,65% 48%,91% 77%,62% 77%,62% 100%,38% 100%,38% 77%,9% 77%,35% 48%,25% 48%,44% 25%,37% 25%);
 }
-.eyebrow{color:#d7c9e8}
-.eyebrow::before{background:#b9a0df}
+.eyebrow{color:#bdb9d3}
+.eyebrow::before{background:#9a9bc8}
 .workspace-heading h1{color:var(--text-heading);text-shadow:0 1px 18px rgb(5 7 18 / 48%)}
 .workspace-heading .workspace-summary{color:#c6c4dc}
 .canvas-title-input{
   border-color:rgb(143 136 190 / 52%);
-  background:rgb(11 15 34 / 80%);
+  background:rgb(7 12 28 / 65%);
   box-shadow:0 8px 22px rgb(0 0 0 / 18%),inset 0 1px 0 rgb(220 215 245 / 5%);
 }
 .canvas-title-input .field{color:#d1cee6}
-.workflow-steps li{border-color:rgb(145 141 187 / 28%);background:rgb(14 18 39 / 66%);color:#e2deef}
-.workflow-steps li span:first-child{background:rgb(143 126 192 / 23%);color:#dfc8f1}
+.workflow-steps li{border-color:rgb(145 141 187 / 28%);background:rgb(12 20 55 / 65%);color:#e2deef}
+.workflow-steps li span:first-child{background:rgb(143 126 192 / 23%);color:#c5b9de}
 .toolbar{
   border-color:rgb(126 133 183 / 30%);
   background:
     radial-gradient(ellipse at 7% 50%,rgb(184 117 54 / 8%),transparent 45%),
-    linear-gradient(100deg,rgb(10 15 33 / 80%),rgb(14 15 36 / 80%));
+    linear-gradient(100deg,rgb(10 16 39 / 65%),rgb(8 13 31 / 65%));
 }
 .toolbar,.workflow-steps li,.panel-heading,.editor-section,.right-ice-set-area{border-color:rgb(137 139 184 / 32%)}
 .battle-panel,.damage-panel,.equipment-panel,.inspector,.weapon-magic-stone-panel,.global-source-panel,.results-panel{
@@ -358,24 +358,32 @@ body{color:var(--text-main);background:transparent}
     radial-gradient(ellipse at 100% 0%,rgb(82 78 151 / 8%),transparent 36rem),
     radial-gradient(ellipse at 0% 100%,rgb(157 93 47 / 4%) 0%,transparent 34rem),
     repeating-linear-gradient(113deg,transparent 0 74px,rgb(191 174 225 / 1.2%) 75px,transparent 78px),
-    linear-gradient(145deg,rgb(13 17 37 / 80%),rgb(10 14 31 / 80%));
+    linear-gradient(145deg,rgb(10 16 39 / 65%),rgb(7 11 27 / 65%));
   box-shadow:0 14px 36px rgb(0 0 0 / 24%),0 0 40px 3px rgb(119 112 182 / 6%),inset 0 1px 0 rgb(220 215 245 / 6%);
 }
 .damage-panel{border-top:1px solid rgb(145 133 177 / 25%);box-shadow:inset 0 1px 0 rgb(220 215 245 / 5%)}
-.panel-heading{background:linear-gradient(90deg,rgb(30 34 67 / 74%),rgb(22 25 52 / 48%))}
-.panel-heading h2{color:#eee8f6}
-.panel-heading h2::before{background:linear-gradient(180deg,#d8bcf0,#858ac8)}
+.panel-heading{background:linear-gradient(90deg,rgb(16 22 48 / 65%),rgb(11 15 34 / 45%))}
+.panel-heading h2{color:#cac8dc}
+.panel-heading h2::before{background:linear-gradient(180deg,#aaa8d2,#7f89bf)}
 .panel-note{color:#adb3ce}
 .right-ice-set-area,.editor-section{border-color:rgb(146 139 183 / 31%)}
-.right-ice-set-area{background:linear-gradient(110deg,rgb(17 21 43 / 80%),rgb(21 17 37 / 80%))}
+.right-ice-set-area{background:transparent}
+/* Let the campfire ambience span the full equipment panel, including the note and set effects. */
+.equipment-panel{
+  background-image:
+    radial-gradient(ellipse 88% 54% at 54% 64%,rgb(196 110 54 / 11%),transparent 76%),
+    radial-gradient(ellipse at 100% 0%,rgb(82 78 151 / 8%),transparent 36rem),
+    radial-gradient(ellipse at 0% 100%,rgb(157 93 47 / 4%) 0%,transparent 34rem),
+    repeating-linear-gradient(113deg,transparent 0 74px,rgb(191 174 225 / 1.2%) 75px,transparent 78px),
+    linear-gradient(145deg,rgb(10 16 39 / 65%),rgb(7 11 27 / 65%));
+}
 .equipment-canvas{
   background-color:transparent;
   background-image:
     radial-gradient(circle at 11% 22%,rgb(160 166 224 / 11%) 0 .8px,transparent 1.7px),
     radial-gradient(circle at 27% 69%,rgb(238 185 105 / 10%) 0 .9px,transparent 1.9px),
     radial-gradient(circle at 52% 36%,rgb(160 166 224 / 9%) 0 .7px,transparent 1.6px),
-    radial-gradient(circle at 76% 76%,rgb(238 185 105 / 8%) 0 .8px,transparent 1.8px),
-    radial-gradient(ellipse at 65% 94%,rgb(168 88 42 / 8%),transparent 44%);
+    radial-gradient(circle at 76% 76%,rgb(238 185 105 / 8%) 0 .8px,transparent 1.8px);
   background-size:100% 100%;
 }
 .group-label{filter:saturate(.82);text-shadow:0 1px 9px rgb(0 0 0 / 78%)}
@@ -386,21 +394,21 @@ body{color:var(--text-main);background:transparent}
 .inspector-title svg,.inspector-title small{color:color-mix(in srgb,var(--group-color),#a59bda 78%)}
 .gear-slot,.beast-accessory-slot{
   border-color:color-mix(in srgb,var(--group-color),#7776ad 85%);
-  background:linear-gradient(155deg,rgb(29 35 62 / 88%),rgb(19 23 47 / 88%));
+  background:linear-gradient(155deg,rgb(19 26 48 / 80%),rgb(13 18 38 / 80%));
   box-shadow:0 4px 12px rgb(0 0 0 / 23%),inset 0 1px 0 rgb(220 215 245 / 7%);
 }
 .gear-slot span,.beast-accessory-slot span{color:#e7e4f1;text-shadow:0 1px 2px #080b17}
 .gear-slot .gear-slot-item-name{color:#f3e8d4}
-.gear-slot:hover,.beast-accessory-slot:hover{background:linear-gradient(155deg,#41436f,#2a2e59);filter:brightness(1.05)}
+.gear-slot:hover,.beast-accessory-slot:hover{background:linear-gradient(155deg,#303251,#252a45);filter:brightness(1.05)}
 .gear-slot.selected,.beast-accessory-slot.selected{box-shadow:0 0 0 2px color-mix(in srgb,color-mix(in srgb,var(--group-color),#a59bda 85%),transparent 65%),0 5px 15px rgb(0 0 0 / 28%),inset 0 1px 0 rgb(235 226 249 / 11%)}
 .stat,.equipment-damage-card,.damage-summary>div{
   border-color:#414967;
-  background:linear-gradient(145deg,rgb(23 29 53 / 80%),rgb(15 20 41 / 80%));
+  background:linear-gradient(145deg,rgb(11 17 42 / 65%),rgb(7 11 27 / 65%));
   box-shadow:inset 0 1px 0 rgb(220 215 245 / 5%);
 }
 .stat{border-radius:11px;transition:border-color 160ms ease,background-color 160ms ease,box-shadow 160ms ease}
 .stat:hover{border-color:#7374a2;box-shadow:0 6px 18px rgb(0 0 0 / 18%),inset 0 1px 0 rgb(220 215 245 / 6%)}
-.stat[open]{border-color:#a48abb;background:linear-gradient(145deg,rgb(47 41 70 / 86%),rgb(31 35 63 / 86%))}
+.stat[open]{border-color:#a48abb;background:linear-gradient(145deg,rgb(47 41 70 / 65%),rgb(31 35 63 / 65%))}
 .stat-details{border-top-color:rgb(157 145 190 / 28%)}
 .stat-source-row{border-bottom-color:rgb(145 151 192 / 21%)}
 .stat-source-row strong{color:#eee5f5}
@@ -411,7 +419,7 @@ body{color:var(--text-main);background:transparent}
 .equipment-damage-gain strong,.damage-ratio-positive strong,.positive{color:#b4d3ed}
 .equipment-damage-gain strong.gain-positive,.damage-ratio-positive>strong.gain-positive,.damage-ratio .positive,.damage-ratio-group>strong.positive{color:#b4d3ed}
 .damage-ratio-negative strong,.negative{color:#ef9d9f}
-.damage-summary .final-damage{border-color:#9e7845;background:linear-gradient(130deg,#41341e,#29271b)}
+.damage-summary .final-damage{border-color:#9e7845;background:linear-gradient(130deg,rgb(65 52 30 / 65%),rgb(41 39 27 / 65%))}
 .damage-summary .final-damage strong{color:#ffda8d;text-shadow:0 0 18px rgb(236 170 83 / 18%)}
 .damage-ratio,.calculation-inspection-panel,.formula-detail{border-color:rgb(145 143 189 / 33%)}
 .calculation-comparison thead th{background:#292d50;color:#ded9ef}
@@ -438,11 +446,11 @@ button:active,.pet-skill-toggle:active{filter:brightness(1.08)}
 .toggle{color:#d0d0e3}.toggle input{accent-color:#c5a6e6}
 .picker-control>input{border-radius:10px}
 .picker-list{
-  border-color:#71698d;background:#191d38;color:var(--text-main);
+  border-color:#71698d;background:#13172e;color:var(--text-main);
   box-shadow:0 14px 32px rgb(0 0 0 / 48%),inset 0 1px 0 rgb(230 221 247 / 7%);
 }
 .picker-list button{color:#e9e4f3}
-.picker-list button:hover,.picker-list button[aria-selected=true]{background:#343453;color:#f3eafa}
+.picker-list button:hover,.picker-list button[aria-selected=true]{background:#282b48;color:#f3eafa}
 .picker-list button[aria-selected=true]{box-shadow:inset 3px 0 #c5a6e6}
 .picker-list small{color:#b8bdd5}
 .picker-clear:hover{background:#303251;color:#fff0f5}
@@ -455,18 +463,18 @@ button:active,.pet-skill-toggle:active{filter:brightness(1.08)}
 .picker-control .picker-clear:hover{color:#eee8f6}
 .innerwear-type-switch,.mobile-picker-actions{border-color:#5a587c;background:#171b34}
 .innerwear-type-switch button[aria-pressed=true],button[aria-selected=true],[role=tab][aria-selected=true]{border-color:#bd9655;background:linear-gradient(180deg,#453a25,#302d20);color:#ffe5aa}
-.mobile-picker-dialog{border-color:#71698d;background:#11162b;color:var(--text-main);box-shadow:0 24px 72px rgb(0 0 0 / 64%),0 0 42px rgb(161 135 197 / 8%)}
+.mobile-picker-dialog{border-color:#71698d;background:#0d132b;color:var(--text-main);box-shadow:0 24px 72px rgb(0 0 0 / 64%),0 0 42px rgb(161 135 197 / 8%)}
 .mobile-picker-dialog::backdrop{background:rgb(4 6 16 / 84%);backdrop-filter:none}
-.mobile-picker-header{border-bottom-color:#505476;background:linear-gradient(100deg,#1c2344,#25213d)}
+.mobile-picker-header{border-bottom-color:#505476;background:linear-gradient(100deg,#151d38,#1b1a32)}
 .mobile-picker-header h2{color:#f3eafa}
-.mobile-picker-option{border-color:#41496b;background:linear-gradient(145deg,#202746,#171e3b)}
-.mobile-picker-option[aria-selected=true]{border-color:#bc9554;background:#302d42}
+.mobile-picker-option{border-color:#41496b;background:linear-gradient(145deg,#171e38,#11182f)}
+.mobile-picker-option[aria-selected=true]{border-color:#bc9554;background:#25243a}
 .mobile-picker-option span{color:#eee8f4}
 .mobile-picker-option small{color:#b9bfd8}
 .mobile-picker-empty,.input-hint,.input-warning,.circuit-board-total.input-warning{color:var(--lantern-gold)}
 .portrait-awakening-error,.right-ice-selection-warning{color:#f0aa9c}
 .panel-note,.input-hint,.input-warning{text-shadow:0 1px 1px rgb(0 0 0 / 35%)}
-.site-credits-notes{border-color:rgb(131 137 181 / 28%);background:rgb(13 17 35 / 84%);color:#aeb4cf}
+.site-credits-notes{border-color:rgb(131 137 181 / 28%);background:rgb(12 18 44 / 65%);color:#aeb4cf}
 .site-credits-block h2,.site-release-list strong,.site-thanks-list strong{color:#e8def2}
 .site-credits-block p,.site-thanks-list li,.site-release-list p{color:#b1b5cf}
 .buff-simulator-link{border-color:#5a5b7e;background:rgb(17 20 42 / 82%);color:#e6e2f1}
@@ -474,7 +482,7 @@ button:active,.pet-skill-toggle:active{filter:brightness(1.08)}
 .live-dot{background:#b6a3dc;box-shadow:0 0 9px rgb(182 163 220 / 48%)}
 .inspector-backdrop{background:rgb(4 6 16 / 80%);backdrop-filter:none}
 .mobile-inspector-open #inspector{border-color:#9c8150;box-shadow:0 18px 52px rgb(0 0 0 / 65%),0 0 32px rgb(146 123 190 / 8%)}
-.mobile-inspector-open #inspector .inspector-title{background:#11162b}
+.mobile-inspector-open #inspector .inspector-title{background:#0d132b}
 
 /* Soft violet canopy light and a warm, low-intensity firelight pool. */
 body::before{
