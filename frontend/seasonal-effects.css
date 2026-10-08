@@ -50,15 +50,24 @@ body {
 .global-source-panel,
 .results-panel {
   background:
-    radial-gradient(1.4px 1.4px at 4% 14%, rgb(216 226 242 / 42%) 48%, transparent 100%),
+    radial-gradient(.7px .7px at 2% 53%, rgb(216 226 242 / 30%) 48%, transparent 100%),
+    radial-gradient(1px 1px at 4% 14%, rgb(216 226 242 / 42%) 48%, transparent 100%),
+    radial-gradient(1.8px 1.8px at 8% 88%, rgb(216 226 242 / 32%) 46%, transparent 100%),
     radial-gradient(1px 1px at 13% 63%, rgb(224 219 236 / 34%) 50%, transparent 100%),
+    radial-gradient(.7px .7px at 19% 10%, rgb(234 222 201 / 28%) 48%, transparent 100%),
     radial-gradient(1.4px 1.4px at 27% 35%, rgb(216 226 242 / 35%) 48%, transparent 100%),
+    radial-gradient(1px 1px at 33% 72%, rgb(224 219 236 / 29%) 50%, transparent 100%),
     radial-gradient(1px 1px at 39% 82%, rgb(234 222 201 / 32%) 50%, transparent 100%),
+    radial-gradient(2.2px 2.2px at 46% 48%, rgb(216 226 242 / 32%) 42%, transparent 100%),
     radial-gradient(1.4px 1.4px at 52% 18%, rgb(216 226 242 / 37%) 48%, transparent 100%),
+    radial-gradient(.7px .7px at 59% 92%, rgb(234 222 201 / 27%) 48%, transparent 100%),
     radial-gradient(1px 1px at 66% 67%, rgb(224 219 236 / 33%) 50%, transparent 100%),
+    radial-gradient(1.7px 1.7px at 72% 12%, rgb(216 226 242 / 30%) 46%, transparent 100%),
     radial-gradient(1.4px 1.4px at 78% 39%, rgb(216 226 242 / 36%) 48%, transparent 100%),
+    radial-gradient(.7px .7px at 85% 76%, rgb(224 219 236 / 29%) 48%, transparent 100%),
     radial-gradient(1px 1px at 93% 16%, rgb(234 222 201 / 31%) 50%, transparent 100%),
     radial-gradient(1.4px 1.4px at 96% 84%, rgb(216 226 242 / 38%) 48%, transparent 100%),
+    radial-gradient(2px 2px at 99% 52%, rgb(216 226 242 / 29%) 45%, transparent 100%),
     linear-gradient(145deg, rgb(17 22 35 / 70%), rgb(12 16 26 / 70%));
 }
 
@@ -69,16 +78,28 @@ body {
   pointer-events: none;
   content: "";
   background:
+    radial-gradient(.7px .7px at .5% 5%, rgb(225 219 236 / 38%) 48%, transparent 100%),
     radial-gradient(1.5px 1.5px at 1% 13%, rgb(213 222 238 / 58%) 48%, transparent 100%),
-    radial-gradient(1px 1px at 1.8% 28%, rgb(225 219 236 / 48%) 50%, transparent 100%),
+    radial-gradient(1px 1px at 1.8% 21%, rgb(225 219 236 / 48%) 50%, transparent 100%),
+    radial-gradient(2.2px 2.2px at .7% 28%, rgb(213 222 238 / 40%) 44%, transparent 100%),
+    radial-gradient(1px 1px at 1.6% 36%, rgb(235 222 197 / 38%) 48%, transparent 100%),
     radial-gradient(1.5px 1.5px at .8% 45%, rgb(213 222 238 / 52%) 48%, transparent 100%),
+    radial-gradient(.7px .7px at 2% 52%, rgb(225 219 236 / 36%) 48%, transparent 100%),
     radial-gradient(1px 1px at 1.7% 63%, rgb(235 222 197 / 44%) 50%, transparent 100%),
+    radial-gradient(1.8px 1.8px at .6% 71%, rgb(213 222 238 / 42%) 46%, transparent 100%),
     radial-gradient(1.5px 1.5px at .9% 82%, rgb(213 222 238 / 50%) 48%, transparent 100%),
+    radial-gradient(1px 1px at 1.8% 94%, rgb(225 219 236 / 42%) 50%, transparent 100%),
+    radial-gradient(1px 1px at 99% 8%, rgb(218 225 240 / 42%) 50%, transparent 100%),
     radial-gradient(1px 1px at 99% 19%, rgb(218 225 240 / 52%) 50%, transparent 100%),
+    radial-gradient(2.2px 2.2px at 98.2% 27%, rgb(230 222 239 / 38%) 44%, transparent 100%),
     radial-gradient(1.5px 1.5px at 98.2% 36%, rgb(230 222 239 / 47%) 48%, transparent 100%),
+    radial-gradient(.7px .7px at 99.4% 45%, rgb(235 222 197 / 36%) 48%, transparent 100%),
     radial-gradient(1px 1px at 99.1% 54%, rgb(235 222 197 / 42%) 50%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 98.3% 63%, rgb(213 222 238 / 45%) 48%, transparent 100%),
     radial-gradient(1.5px 1.5px at 98.3% 73%, rgb(213 222 238 / 54%) 48%, transparent 100%),
-    radial-gradient(1px 1px at 99% 91%, rgb(225 219 236 / 46%) 50%, transparent 100%);
+    radial-gradient(2px 2px at 99.4% 82%, rgb(225 219 236 / 38%) 45%, transparent 100%),
+    radial-gradient(1px 1px at 99% 91%, rgb(225 219 236 / 46%) 50%, transparent 100%),
+    radial-gradient(.7px .7px at 98.2% 98%, rgb(213 222 238 / 34%) 48%, transparent 100%);
   opacity: .78;
 }
 
