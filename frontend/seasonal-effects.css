@@ -49,7 +49,17 @@ body {
 .weapon-magic-stone-panel,
 .global-source-panel,
 .results-panel {
-  background: linear-gradient(145deg, rgb(17 22 35 / 98%), rgb(12 16 26 / 98%));
+  background:
+    radial-gradient(1.4px 1.4px at 4% 14%, rgb(216 226 242 / 42%) 48%, transparent 100%),
+    radial-gradient(1px 1px at 13% 63%, rgb(224 219 236 / 34%) 50%, transparent 100%),
+    radial-gradient(1.4px 1.4px at 27% 35%, rgb(216 226 242 / 35%) 48%, transparent 100%),
+    radial-gradient(1px 1px at 39% 82%, rgb(234 222 201 / 32%) 50%, transparent 100%),
+    radial-gradient(1.4px 1.4px at 52% 18%, rgb(216 226 242 / 37%) 48%, transparent 100%),
+    radial-gradient(1px 1px at 66% 67%, rgb(224 219 236 / 33%) 50%, transparent 100%),
+    radial-gradient(1.4px 1.4px at 78% 39%, rgb(216 226 242 / 36%) 48%, transparent 100%),
+    radial-gradient(1px 1px at 93% 16%, rgb(234 222 201 / 31%) 50%, transparent 100%),
+    radial-gradient(1.4px 1.4px at 96% 84%, rgb(216 226 242 / 38%) 48%, transparent 100%),
+    linear-gradient(145deg, rgb(17 22 35 / 70%), rgb(12 16 26 / 70%));
 }
 
 .app-shell::before {
