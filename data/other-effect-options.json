@@ -96,6 +96,14 @@
       }
     },
     {
+      "id": "location-coexistence-festival",
+      "name": "共存節",
+      "stats": {
+        "multiplicativeDamagePct": 5,
+        "adaptabilityPct": 3
+      }
+    },
+    {
       "id": "location-5",
       "name": "其他",
       "stats": {},
