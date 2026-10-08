@@ -1,34 +1,25 @@
 /* Coexistence Festival only. Remove this stylesheet link to disable the seasonal effect. */
 
 :root {
-  --page-bg: #090c17;
-  --panel: #11162b;
-  --panel-alt: #101427;
-  --surface: #0e1323;
-  --surface-raised: #1a2038;
-  --control: #141a2f;
-  --control-hover: #202846;
-  --field: #0d1220;
-  --border: #232a43;
-  --border-strong: #303753;
-  --border-mid: #2a314b;
-  --border-row: #202941;
-  --border-control: #36415c;
-  --accent: #d0d5ff;
-  --accent-surface: #1d2744;
-  --accent-border: #788cc9;
+  --page-bg: #070910;
+  --panel: #10131f;
+  --panel-alt: #0e111b;
+  --surface: #0c1019;
+  --surface-raised: #181c2a;
+  --control: #111621;
+  --control-hover: #1b2130;
+  --field: #0a0e17;
+  --border: #202531;
+  --border-strong: #2b3140;
+  --border-mid: #252c39;
+  --border-row: #1c232f;
+  --border-control: #303948;
+  --accent: #d0d5e5;
+  --accent-surface: #1a2231;
+  --accent-border: #71829b;
   background:
-    radial-gradient(1px 1px at 6% 15%, rgb(220 226 255 / 64%) 50%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 19% 9%, rgb(227 224 255 / 52%) 48%, transparent 100%),
-    radial-gradient(1px 1px at 31% 24%, rgb(213 222 255 / 46%) 50%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 43% 12%, rgb(255 226 188 / 42%) 48%, transparent 100%),
-    radial-gradient(1px 1px at 68% 17%, rgb(223 226 255 / 52%) 50%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 91% 28%, rgb(215 223 255 / 44%) 48%, transparent 100%),
-    radial-gradient(1px 1px at 83% 68%, rgb(255 226 188 / 36%) 50%, transparent 100%),
-    radial-gradient(1px 1px at 14% 78%, rgb(215 224 255 / 40%) 50%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 57% 88%, rgb(223 226 255 / 43%) 48%, transparent 100%),
-    radial-gradient(1px 1px at 36% 63%, rgb(223 226 255 / 38%) 50%, transparent 100%),
-    radial-gradient(ellipse at 82% -18%, rgb(78 74 148 / 11%), transparent 38rem),
+    radial-gradient(ellipse at 82% -18%, rgb(87 82 133 / 6%), transparent 38rem),
+    radial-gradient(ellipse at 0% 0%, rgb(89 112 143 / 4%), transparent 34rem),
     var(--page-bg);
 }
 
@@ -37,18 +28,18 @@ body {
 }
 
 .topbar {
-  border-color: rgb(118 130 194 / 22%);
-  background: rgb(10 13 25 / 92%);
+  border-color: rgb(112 124 150 / 17%);
+  background: rgb(9 11 17 / 94%);
 }
 
 .workspace-heading {
-  border-color: rgb(128 143 213 / 34%);
-  background: linear-gradient(112deg, rgb(23 31 58 / 96%), rgb(17 22 43 / 96%) 56%, rgb(27 20 49 / 90%)), var(--panel);
+  border-color: rgb(130 145 174 / 27%);
+  background: linear-gradient(112deg, rgb(20 27 43 / 96%), rgb(15 19 31 / 96%) 56%, rgb(24 21 35 / 90%)), var(--panel);
 }
 
 .toolbar {
-  border-color: rgb(121 132 194 / 26%);
-  background: rgb(15 20 38 / 90%);
+  border-color: rgb(117 130 155 / 20%);
+  background: rgb(13 17 27 / 92%);
 }
 
 .battle-panel,
@@ -58,7 +49,27 @@ body {
 .weapon-magic-stone-panel,
 .global-source-panel,
 .results-panel {
-  background: linear-gradient(145deg, rgb(20 26 49 / 98%), rgb(14 19 37 / 98%));
+  background: linear-gradient(145deg, rgb(17 22 35 / 98%), rgb(12 16 26 / 98%));
+}
+
+.app-shell::before {
+  position: fixed;
+  z-index: 98;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  background:
+    radial-gradient(1.5px 1.5px at 1% 13%, rgb(213 222 238 / 58%) 48%, transparent 100%),
+    radial-gradient(1px 1px at 1.8% 28%, rgb(225 219 236 / 48%) 50%, transparent 100%),
+    radial-gradient(1.5px 1.5px at .8% 45%, rgb(213 222 238 / 52%) 48%, transparent 100%),
+    radial-gradient(1px 1px at 1.7% 63%, rgb(235 222 197 / 44%) 50%, transparent 100%),
+    radial-gradient(1.5px 1.5px at .9% 82%, rgb(213 222 238 / 50%) 48%, transparent 100%),
+    radial-gradient(1px 1px at 99% 19%, rgb(218 225 240 / 52%) 50%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 98.2% 36%, rgb(230 222 239 / 47%) 48%, transparent 100%),
+    radial-gradient(1px 1px at 99.1% 54%, rgb(235 222 197 / 42%) 50%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 98.3% 73%, rgb(213 222 238 / 54%) 48%, transparent 100%),
+    radial-gradient(1px 1px at 99% 91%, rgb(225 219 236 / 46%) 50%, transparent 100%);
+  opacity: .78;
 }
 
 body::before {
@@ -68,11 +79,11 @@ body::before {
   pointer-events: none;
   content: "";
   background:
-    radial-gradient(ellipse 125vw 135vh at 12vw 12vh, rgb(213 230 255 / 18%) 0%, rgb(164 194 238 / 11%) 34%, rgb(125 159 211 / 5%) 62%, transparent 84%),
-    radial-gradient(ellipse 165vw 185vh at 12vw 12vh, rgb(95 132 190 / 11%) 0%, rgb(72 105 157 / 7%) 42%, transparent 82%),
-    conic-gradient(from 10deg at 12vw 12vh, transparent 0deg 15deg, rgb(211 229 255 / 0%) 19deg, rgb(211 229 255 / 6%) 35deg, rgb(211 229 255 / 0%) 53deg, transparent 58deg 360deg);
-  opacity: .44;
-  transform-origin: 12vw 12vh;
+    radial-gradient(ellipse 125vw 135vh at 8vw 8vh, rgb(220 231 248 / 14%) 0%, rgb(177 197 226 / 8%) 34%, rgb(137 163 199 / 3.5%) 62%, transparent 84%),
+    radial-gradient(ellipse 165vw 185vh at 8vw 8vh, rgb(131 156 193 / 7%) 0%, rgb(100 124 163 / 4%) 42%, transparent 82%),
+    conic-gradient(from 18deg at 8vw 8vh, transparent 0deg 25deg, rgb(220 231 248 / 0%) 30deg, rgb(220 231 248 / 12%) 42deg, rgb(220 231 248 / 0%) 56deg, transparent 61deg 360deg);
+  opacity: .52;
+  transform-origin: 8vw 8vh;
   will-change: transform;
   animation: moonlight-swing 8s ease-in-out infinite;
 }
@@ -97,16 +108,16 @@ body::after {
 .weapon-magic-stone-panel,
 .global-source-panel,
 .results-panel {
-  border-color: rgb(150 181 226 / 38%);
-  box-shadow: 0 0 16px rgb(160 194 245 / 15%), 0 0 34px rgb(118 157 214 / 9%), 0 12px 34px rgb(0 0 0 / 11%);
+  border-color: rgb(136 155 184 / 29%);
+  box-shadow: 0 0 16px rgb(166 187 215 / 10%), 0 0 34px rgb(140 163 195 / 5%), 0 12px 34px rgb(0 0 0 / 11%);
 }
 
 .workspace-heading {
-  box-shadow: 0 0 22px rgb(160 194 245 / 18%), 0 0 40px rgb(118 157 214 / 10%), 0 18px 48px rgb(0 0 0 / 16%);
+  box-shadow: 0 0 22px rgb(166 187 215 / 12%), 0 0 40px rgb(140 163 195 / 6%), 0 18px 48px rgb(0 0 0 / 16%);
 }
 
 .toolbar {
-  box-shadow: 0 0 16px rgb(160 194 245 / 14%), 0 0 28px rgb(118 157 214 / 8%);
+  box-shadow: 0 0 16px rgb(166 187 215 / 9%), 0 0 28px rgb(140 163 195 / 5%);
 }
 
 @keyframes moonlight-swing {
