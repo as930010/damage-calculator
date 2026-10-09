@@ -42,7 +42,8 @@
   background-color:var(--page-bg);
   background-image:
     radial-gradient(ellipse at 78% -8%,rgb(10 15 38 / 10%),transparent 42rem),
-    radial-gradient(ellipse 320px 160px at 50% 100%,rgb(181 102 47 / 4%),transparent 100%),
+    linear-gradient(180deg,transparent 0%,rgb(132 80 66 / 1%) 38%,rgb(166 91 59 / 3.5%) 74%,rgb(175 83 46 / 6%) 100%),
+    radial-gradient(ellipse min(175vw,4200px) 6800px at 50% calc(100% - 93px),rgb(185 113 64 / 8%) 0%,rgb(141 82 66 / 4%) 52%,transparent 100%),
     radial-gradient(circle at 78px 299px,rgb(235 198 119 / 43%) 0 0.68px,transparent 1.40px),
     radial-gradient(circle at 241px 95px,rgb(160 166 224 / 30%) 0 0.68px,transparent 1.40px),
     radial-gradient(circle at 197px 305px,rgb(160 166 224 / 43%) 0 0.68px,transparent 1.40px),
@@ -92,7 +93,7 @@
     radial-gradient(circle at 138px 183px,rgb(160 166 224 / 32%) 0 1.15px,transparent 1.87px),
     radial-gradient(circle at 314px 234px,rgb(160 166 224 / 32%) 0 0.68px,transparent 1.40px);
   background-size:
-    100% 100%,100% 100%,
+    100% 100%,100% 100%,100% 100%,100% 100%,
     493px 601px,
     577px 493px,
     631px 587px,
@@ -160,12 +161,7 @@ body {
 
 .toolbar {
   border-color: rgb(117 130 155 / 20%);
-  background:
-    radial-gradient(1.8px 1.8px at 11% 24%, rgb(196 216 182 / 25%) 44%, transparent 100%),
-    radial-gradient(.9px .9px at 43% 76%, rgb(238 185 105 / 21%) 50%, transparent 100%),
-    radial-gradient(1.6px 1.6px at 69% 18%, rgb(196 216 182 / 24%) 46%, transparent 100%),
-    radial-gradient(1px 1px at 93% 72%, rgb(203 219 178 / 22%) 50%, transparent 100%),
-    rgb(13 17 27 / 92%);
+  background:rgb(13 17 27 / 92%);
 }
 
 .battle-panel,
@@ -175,26 +171,7 @@ body {
 .weapon-magic-stone-panel,
 .global-source-panel,
 .results-panel {
-  background:
-    radial-gradient(.7px .7px at 2% 53%, rgb(196 216 182 / 30%) 48%, transparent 100%),
-    radial-gradient(1px 1px at 4% 14%, rgb(196 216 182 / 42%) 48%, transparent 100%),
-    radial-gradient(1.8px 1.8px at 8% 88%, rgb(196 216 182 / 32%) 46%, transparent 100%),
-    radial-gradient(1px 1px at 13% 63%, rgb(203 219 178 / 34%) 50%, transparent 100%),
-    radial-gradient(.7px .7px at 19% 10%, rgb(238 185 105 / 28%) 48%, transparent 100%),
-    radial-gradient(1.4px 1.4px at 27% 35%, rgb(196 216 182 / 35%) 48%, transparent 100%),
-    radial-gradient(1px 1px at 33% 72%, rgb(203 219 178 / 29%) 50%, transparent 100%),
-    radial-gradient(1px 1px at 39% 82%, rgb(238 185 105 / 32%) 50%, transparent 100%),
-    radial-gradient(2.2px 2.2px at 46% 48%, rgb(196 216 182 / 32%) 42%, transparent 100%),
-    radial-gradient(1.4px 1.4px at 52% 18%, rgb(196 216 182 / 37%) 48%, transparent 100%),
-    radial-gradient(.7px .7px at 59% 92%, rgb(238 185 105 / 27%) 48%, transparent 100%),
-    radial-gradient(1px 1px at 66% 67%, rgb(203 219 178 / 33%) 50%, transparent 100%),
-    radial-gradient(1.7px 1.7px at 72% 12%, rgb(196 216 182 / 30%) 46%, transparent 100%),
-    radial-gradient(1.4px 1.4px at 78% 39%, rgb(196 216 182 / 36%) 48%, transparent 100%),
-    radial-gradient(.7px .7px at 85% 76%, rgb(203 219 178 / 29%) 48%, transparent 100%),
-    radial-gradient(1px 1px at 93% 16%, rgb(238 185 105 / 31%) 50%, transparent 100%),
-    radial-gradient(1.4px 1.4px at 96% 84%, rgb(196 216 182 / 38%) 48%, transparent 100%),
-    radial-gradient(2px 2px at 99% 52%, rgb(196 216 182 / 29%) 45%, transparent 100%),
-    linear-gradient(145deg, rgb(17 22 35 / 70%), rgb(12 16 26 / 70%));
+  background:linear-gradient(145deg,rgb(17 22 35 / 70%),rgb(12 16 26 / 70%));
 }
 
 body::before {
@@ -224,15 +201,15 @@ body::before {
 .global-source-panel,
 .results-panel {
   border-color: rgb(136 155 184 / 29%);
-  box-shadow: 0 0 38px 4px rgb(166 187 215 / 7%), 0 0 112px 22px rgb(140 163 195 / 3.5%), inset 0 1px 0 rgb(218 228 244 / 4%);
+  box-shadow:none;
 }
 
 .workspace-heading {
-  box-shadow: 0 0 46px 4px rgb(166 187 215 / 8%), 0 0 128px 24px rgb(140 163 195 / 4%), inset 0 1px 0 rgb(218 228 244 / 5%);
+  box-shadow:none;
 }
 
 .toolbar {
-  box-shadow: 0 0 36px 4px rgb(166 187 215 / 7%), 0 0 108px 20px rgb(140 163 195 / 3.5%), inset 0 1px 0 rgb(218 228 244 / 4%);
+  box-shadow:none;
 }
 
 .results-panel {
@@ -240,7 +217,7 @@ body::before {
 }
 
 .damage-panel {
-  box-shadow: inset 0 1px 0 rgb(218 228 244 / 5%);
+  box-shadow:none;
 }
 
 @keyframes moonlight-sway {
@@ -275,7 +252,7 @@ body::before {
 .stat{border-color:#39485d;background:linear-gradient(145deg,#19222e,#151d28)}
 .stat[open]{border-color:#6983a7;background:#1c2939}
 .panel-heading,.editor-section,.right-ice-set-area{border-color:rgb(137 160 193 / 30%)}
-.equipment-canvas{background-image:radial-gradient(circle,rgb(160 189 226 / 5%) .8px,transparent 1.3px);background-size:28px 28px}
+
 .gear-slot,.beast-accessory-slot{border-color:color-mix(in srgb,var(--group-color),#40516a 48%)}
 .field input,.picker-control>input{border-color:#40516a}
 .field input:hover,.picker-control>input:hover{border-color:#627b9b}
@@ -306,27 +283,18 @@ body{color:var(--text-main);background:transparent}
   isolation:isolate;
   overflow:hidden;
   border-color:rgb(116 126 171 / 27%);
-  background:
-    radial-gradient(ellipse at 86% 110%,rgb(196 116 57 / 9%),transparent 34rem),
-    linear-gradient(90deg,rgb(7 12 32 / 65%),rgb(10 16 43 / 65%) 58%,rgb(17 14 34 / 65%));
-  box-shadow:inset 0 -1px 0 rgb(198 174 228 / 8%);
-}
-.topbar::after{
-  position:absolute;z-index:-1;right:0;bottom:0;left:0;height:9px;content:"";pointer-events:none;opacity:.48;
-  background:linear-gradient(2deg,transparent 42%,rgb(190 157 206 / 19%) 48% 53%,transparent 60%);
+  background:linear-gradient(90deg,rgb(7 12 32 / 65%),rgb(10 16 43 / 65%) 58%,rgb(17 14 34 / 65%));
+  box-shadow:none;
 }
 .workspace-heading{
   border-color:rgb(139 139 191 / 35%);
   background:
-    radial-gradient(ellipse 43% 115% at 83% 116%,rgb(222 136 77 / 16%),transparent 74%),
-    radial-gradient(ellipse 54% 110% at 9% 0%,rgb(50 56 111 / 10%),transparent 76%),
+    radial-gradient(ellipse 410px 185px at 87% 100%,rgb(215 136 74 / 14%) 0%,rgb(179 102 67 / 6%) 48%,transparent 100%),
     linear-gradient(112deg,rgb(10 16 39 / 65%),rgb(8 13 31 / 65%) 55%,rgb(22 17 39 / 65%));
-  box-shadow:0 18px 48px rgb(0 0 0 / 22%),0 0 46px 3px rgb(140 131 201 / 7%),inset 0 1px 0 rgb(220 215 245 / 7%);
+  background-clip:padding-box;
+  box-shadow:none;
 }
-.workspace-heading::before{
-  position:absolute;z-index:-1;right:12%;bottom:-38px;width:min(36vw,390px);height:180px;content:"";pointer-events:none;
-  background:radial-gradient(ellipse at 50% 100%,rgb(237 147 62 / 16%),rgb(191 112 48 / 8%) 42%,transparent 75%);
-}
+
 .workspace-heading::after{
   right:3%;bottom:-24px;width:130px;height:205px;border:0;border-radius:0;box-shadow:none;opacity:.2;transform:none;
   background:linear-gradient(180deg,rgb(75 77 139 / 82%),rgb(27 31 69 / 84%));
@@ -334,55 +302,47 @@ body{color:var(--text-main);background:transparent}
 }
 .eyebrow{color:#bdb9d3}
 .eyebrow::before{background:#9a9bc8}
-.workspace-heading h1{color:var(--text-heading);text-shadow:0 1px 18px rgb(5 7 18 / 48%)}
+.workspace-heading h1{color:var(--text-heading)}
 .workspace-heading .workspace-summary{color:#c6c4dc}
 .canvas-title-input{
   border-color:rgb(143 136 190 / 52%);
   background:rgb(7 12 28 / 65%);
-  box-shadow:0 8px 22px rgb(0 0 0 / 18%),inset 0 1px 0 rgb(220 215 245 / 5%);
+  box-shadow:none;
 }
 .canvas-title-input .field{color:#d1cee6}
 .workflow-steps li{border-color:rgb(145 141 187 / 28%);background:rgb(12 20 55 / 65%);color:#e2deef}
 .workflow-steps li span:first-child{background:rgb(143 126 192 / 23%);color:#c5b9de}
 .toolbar{
   border-color:rgb(126 133 183 / 30%);
-  background:
-    radial-gradient(ellipse at 7% 50%,rgb(184 117 54 / 8%),transparent 45%),
-    linear-gradient(100deg,rgb(10 16 39 / 65%),rgb(8 13 31 / 65%));
+  background:linear-gradient(100deg,rgb(10 16 39 / 65%),rgb(8 13 31 / 65%));
 }
 .toolbar,.workflow-steps li,.panel-heading,.editor-section,.right-ice-set-area{border-color:rgb(137 139 184 / 32%)}
 .battle-panel,.damage-panel,.equipment-panel,.inspector,.weapon-magic-stone-panel,.global-source-panel,.results-panel{
   border-color:rgb(125 134 183 / 34%);
   background-color:transparent;
   background-image:
-    radial-gradient(ellipse at 100% 0%,rgb(82 78 151 / 8%),transparent 36rem),
-    radial-gradient(ellipse at 0% 100%,rgb(157 93 47 / 4%) 0%,transparent 34rem),
     repeating-linear-gradient(113deg,transparent 0 74px,rgb(191 174 225 / 1.2%) 75px,transparent 78px),
     linear-gradient(145deg,rgb(10 16 39 / 65%),rgb(7 11 27 / 65%));
-  box-shadow:0 14px 36px rgb(0 0 0 / 24%),0 0 40px 3px rgb(119 112 182 / 6%),inset 0 1px 0 rgb(220 215 245 / 6%);
+  box-shadow:none;
 }
-.damage-panel{border-top:1px solid rgb(145 133 177 / 25%);box-shadow:inset 0 1px 0 rgb(220 215 245 / 5%)}
+.damage-panel{border-top:1px solid rgb(145 133 177 / 25%);box-shadow:none}
 .panel-heading{background:linear-gradient(90deg,rgb(16 22 48 / 65%),rgb(11 15 34 / 45%))}
 .panel-heading h2{color:#cac8dc}
 .panel-heading h2::before{background:linear-gradient(180deg,#aaa8d2,#7f89bf)}
 .panel-note{color:#adb3ce}
 .right-ice-set-area,.editor-section{border-color:rgb(146 139 183 / 31%)}
 .right-ice-set-area{background:transparent}
-/* Let the campfire ambience span the full equipment panel, including the note and set effects. */
+/* Keep the equipment panel surface flat so page ambience stays behind the UI. */
 .equipment-panel{
   background-image:
-    radial-gradient(ellipse 88% 54% at 54% 64%,rgb(196 110 54 / 11%),transparent 76%),
-    radial-gradient(ellipse at 100% 0%,rgb(82 78 151 / 8%),transparent 36rem),
-    radial-gradient(ellipse at 0% 100%,rgb(157 93 47 / 4%) 0%,transparent 34rem),
+    radial-gradient(ellipse 76% 42% at 52% 63%,rgb(195 111 55 / 8%) 0%,rgb(164 91 59 / 3%) 52%,transparent 100%),
     repeating-linear-gradient(113deg,transparent 0 74px,rgb(191 174 225 / 1.2%) 75px,transparent 78px),
     linear-gradient(145deg,rgb(10 16 39 / 65%),rgb(7 11 27 / 65%));
+  background-clip:padding-box;
 }
-/* Keep battle and results panels in the same restrained, fire-warmed palette. */
+/* Keep battle and results panels consistent with the flat activity surfaces. */
 .battle-panel,.results-panel,.results-panel .damage-panel{
   background-image:
-    radial-gradient(ellipse 88% 54% at 54% 64%,rgb(196 110 54 / 7%),transparent 76%),
-    radial-gradient(ellipse at 100% 0%,rgb(82 78 151 / 4%),transparent 36rem),
-    radial-gradient(ellipse at 0% 100%,rgb(157 93 47 / 3%) 0%,transparent 34rem),
     repeating-linear-gradient(113deg,transparent 0 74px,rgb(191 174 225 / 1.2%) 75px,transparent 78px),
     linear-gradient(145deg,rgb(10 14 29 / 65%),rgb(7 9 20 / 65%));
 }
@@ -392,16 +352,8 @@ body{color:var(--text-main);background:transparent}
 .results-panel .stat,.results-panel .equipment-damage-card,.results-panel .damage-summary>div{
   background:linear-gradient(145deg,rgb(12 14 24 / 65%),rgb(8 10 18 / 65%));
 }
-.equipment-canvas{
-  background-color:transparent;
-  background-image:
-    radial-gradient(circle at 11% 22%,rgb(160 166 224 / 11%) 0 .8px,transparent 1.7px),
-    radial-gradient(circle at 27% 69%,rgb(238 185 105 / 10%) 0 .9px,transparent 1.9px),
-    radial-gradient(circle at 52% 36%,rgb(160 166 224 / 9%) 0 .7px,transparent 1.6px),
-    radial-gradient(circle at 76% 76%,rgb(238 185 105 / 8%) 0 .8px,transparent 1.8px);
-  background-size:100% 100%;
-}
-.group-label{filter:saturate(.82);text-shadow:0 1px 9px rgb(0 0 0 / 78%)}
+.equipment-canvas{background-color:transparent;background-image:none}
+.group-label{filter:saturate(.82)}
 .left-label{color:#b6a5e2}
 .inner-label{color:#a9bde7}
 .gear-slot,.beast-accessory-slot{color:color-mix(in srgb,var(--group-color),#a59bda 78%)}
@@ -410,19 +362,19 @@ body{color:var(--text-main);background:transparent}
 .gear-slot,.beast-accessory-slot{
   border-color:color-mix(in srgb,var(--group-color),#7776ad 85%);
   background:linear-gradient(155deg,rgb(19 26 48 / 80%),rgb(13 18 38 / 80%));
-  box-shadow:0 4px 12px rgb(0 0 0 / 23%),inset 0 1px 0 rgb(220 215 245 / 7%);
+  box-shadow:none;
 }
-.gear-slot span,.beast-accessory-slot span{color:#e7e4f1;text-shadow:0 1px 2px #080b17}
+.gear-slot span,.beast-accessory-slot span{color:#e7e4f1}
 .gear-slot .gear-slot-item-name{color:#f3e8d4}
-.gear-slot:hover,.beast-accessory-slot:hover{background:linear-gradient(155deg,#303251,#252a45);filter:brightness(1.05)}
-.gear-slot.selected,.beast-accessory-slot.selected{box-shadow:0 0 0 2px color-mix(in srgb,color-mix(in srgb,var(--group-color),#a59bda 85%),transparent 65%),0 5px 15px rgb(0 0 0 / 28%),inset 0 1px 0 rgb(235 226 249 / 11%)}
+.gear-slot:hover,.beast-accessory-slot:hover{background:linear-gradient(155deg,#303251,#252a45)}
+.gear-slot.selected,.beast-accessory-slot.selected{box-shadow:none}
 .stat,.equipment-damage-card,.damage-summary>div{
   border-color:#414967;
   background:linear-gradient(145deg,rgb(11 17 42 / 65%),rgb(7 11 27 / 65%));
-  box-shadow:inset 0 1px 0 rgb(220 215 245 / 5%);
+  box-shadow:none;
 }
-.stat{border-radius:11px;transition:border-color 160ms ease,background-color 160ms ease,box-shadow 160ms ease}
-.stat:hover{border-color:#7374a2;box-shadow:0 6px 18px rgb(0 0 0 / 18%),inset 0 1px 0 rgb(220 215 245 / 6%)}
+.stat{border-radius:11px;transition:border-color 160ms ease,background-color 160ms ease}
+.stat:hover{border-color:#7374a2;box-shadow:none}
 .stat[open]{border-color:#a48abb;background:linear-gradient(145deg,rgb(47 41 70 / 65%),rgb(31 35 63 / 65%))}
 .stat-details{border-top-color:rgb(157 145 190 / 28%)}
 .stat-source-row{border-bottom-color:rgb(145 151 192 / 21%)}
@@ -435,7 +387,7 @@ body{color:var(--text-main);background:transparent}
 .equipment-damage-gain strong.gain-positive,.damage-ratio-positive>strong.gain-positive,.damage-ratio .positive,.damage-ratio-group>strong.positive{color:#b4d3ed}
 .damage-ratio-negative strong,.negative{color:#ef9d9f}
 .damage-summary .final-damage{border-color:#9e7845;background:linear-gradient(130deg,rgb(65 52 30 / 65%),rgb(41 39 27 / 65%))}
-.damage-summary .final-damage strong{color:#ffda8d;text-shadow:0 0 18px rgb(236 170 83 / 18%)}
+.damage-summary .final-damage strong{color:#ffda8d}
 .damage-ratio,.calculation-inspection-panel,.formula-detail{border-color:rgb(145 143 189 / 33%)}
 .calculation-comparison thead th{background:#292d50;color:#ded9ef}
 .calculation-comparison th,.calculation-comparison td{border-bottom-color:rgb(145 143 189 / 25%)}
@@ -455,18 +407,17 @@ button,.pet-skill-toggle,.picker-clear,.circuit-board-add{
 }
 button:hover,.pet-skill-toggle:hover{border-color:#a18abb;background:linear-gradient(180deg,#393654,#292d50);color:#f5edfa}
 button:active,.pet-skill-toggle:active{filter:brightness(1.08)}
-#baseline,.toolbar .transfer-actions button{border-color:#987447}
-#baseline{background:linear-gradient(180deg,#443820,#302a1c);color:#ffe1a0}
-#baseline:hover{border-color:#dfb968;background:linear-gradient(180deg,#58472a,#3b321e)}
+#baseline{border-color:var(--violet-control-edge);background:linear-gradient(180deg,#282d50,#1b2140);color:#d7daf0}
+#baseline:hover{border-color:#737ca6;background:linear-gradient(180deg,#343a60,#242b4a);color:#f0eef8}
 .toggle{color:#d0d0e3}.toggle input{accent-color:#c5a6e6}
 .picker-control>input{border-radius:10px}
 .picker-list{
   border-color:#71698d;background:#13172e;color:var(--text-main);
-  box-shadow:0 14px 32px rgb(0 0 0 / 48%),inset 0 1px 0 rgb(230 221 247 / 7%);
+  box-shadow:none;
 }
-.picker-list button{color:#e9e4f3}
+.picker-list button{color:#e9e4f3;border-left:3px solid transparent}
 .picker-list button:hover,.picker-list button[aria-selected=true]{background:#282b48;color:#f3eafa}
-.picker-list button[aria-selected=true]{box-shadow:inset 3px 0 #c5a6e6}
+.picker-list button[aria-selected=true]{border-left-color:#c5a6e6}
 .picker-list small{color:#b8bdd5}
 .picker-clear:hover{background:#303251;color:#fff0f5}
 .picker-control .picker-clear,.picker-control .picker-clear:hover{
@@ -478,7 +429,7 @@ button:active,.pet-skill-toggle:active{filter:brightness(1.08)}
 .picker-control .picker-clear:hover{color:#eee8f6}
 .innerwear-type-switch,.mobile-picker-actions{border-color:#5a587c;background:#171b34}
 .innerwear-type-switch button[aria-pressed=true],button[aria-selected=true],[role=tab][aria-selected=true]{border-color:#bd9655;background:linear-gradient(180deg,#453a25,#302d20);color:#ffe5aa}
-.mobile-picker-dialog{border-color:#71698d;background:#0d132b;color:var(--text-main);box-shadow:0 24px 72px rgb(0 0 0 / 64%),0 0 42px rgb(161 135 197 / 8%)}
+.mobile-picker-dialog{border-color:#71698d;background:#0d132b;color:var(--text-main);box-shadow:none}
 .mobile-picker-dialog::backdrop{background:rgb(4 6 16 / 84%);backdrop-filter:none}
 .mobile-picker-header{border-bottom-color:#505476;background:linear-gradient(100deg,#151d38,#1b1a32)}
 .mobile-picker-header h2{color:#f3eafa}
@@ -488,7 +439,7 @@ button:active,.pet-skill-toggle:active{filter:brightness(1.08)}
 .mobile-picker-option small{color:#b9bfd8}
 .mobile-picker-empty,.input-hint,.input-warning,.circuit-board-total.input-warning{color:var(--lantern-gold)}
 .portrait-awakening-error,.right-ice-selection-warning{color:#f0aa9c}
-.panel-note,.input-hint,.input-warning{text-shadow:0 1px 1px rgb(0 0 0 / 35%)}
+.panel-note,.input-hint,.input-warning{text-shadow:none}
 .site-credits-notes{border-color:rgb(131 137 181 / 28%);background:rgb(12 18 44 / 65%);color:#aeb4cf}
 .site-credits-block h2,.site-release-list strong,.site-thanks-list strong{color:#e8def2}
 .site-credits-block p,.site-thanks-list li,.site-release-list p{color:#b1b5cf}
@@ -496,7 +447,7 @@ button:active,.pet-skill-toggle:active{filter:brightness(1.08)}
 .buff-simulator-link:hover{border-color:#a18abb;background:#292d50}
 .live-dot{background:#b6a3dc;box-shadow:0 0 9px rgb(182 163 220 / 48%)}
 .inspector-backdrop{background:rgb(4 6 16 / 80%);backdrop-filter:none}
-.mobile-inspector-open #inspector{border-color:#9c8150;box-shadow:0 18px 52px rgb(0 0 0 / 65%),0 0 32px rgb(146 123 190 / 8%)}
+.mobile-inspector-open #inspector{border-color:#9c8150;box-shadow:none}
 .mobile-inspector-open #inspector .inspector-title{background:#0d132b}
 
 /* Keep the ambient glow centered and continuous as the viewport widens. */
@@ -513,9 +464,9 @@ body::before{
 }
 @media (prefers-reduced-motion:reduce){body::before{opacity:.2}}
 @media (max-width:700px){
-  .topbar::after{opacity:.3}
+
   .workspace-heading::after{right:1%;width:86px;height:150px;opacity:.12}
-  .workspace-heading::before{right:4%;width:56vw;height:140px}
+
   .stat-list{gap:9px}
   .mobile-inspector-open #inspector{border-color:#9c8150}
 }
@@ -526,13 +477,9 @@ body::before{
 .site-credits-notes{
   border-color:rgb(125 134 183 / 34%);
   background-color:transparent;
-  background-image:
-    radial-gradient(circle at 3% 18%,rgb(238 185 105 / 20%) 0 .7px,transparent 1.7px),
-    radial-gradient(circle at 97% 78%,rgb(196 216 182 / 15%) 0 .8px,transparent 1.8px),
-    radial-gradient(ellipse 70% 58% at 48% 100%,rgb(181 102 47 / 5%),transparent 100%),
-    linear-gradient(145deg,rgb(10 14 29 / 65%),rgb(7 9 20 / 65%));
+  background-image:linear-gradient(145deg,rgb(10 14 29 / 65%),rgb(7 9 20 / 65%));
   color:var(--text-muted);
-  box-shadow:0 12px 30px rgb(0 0 0 / 18%),inset 0 1px 0 rgb(220 215 245 / 5%);
+  box-shadow:none;
 }
 .site-credits-notes>summary{min-height:42px;background:transparent;color:#c6c3d4;letter-spacing:.02em}
 .site-credits-notes>summary::before{color:#b89361}
@@ -551,7 +498,7 @@ footer{
   min-height:156px;
   padding:18px 24px 96px;
   border-top-color:rgb(164 129 99 / 24%);
-  background:radial-gradient(ellipse 300px 100px at 50% 100%,rgb(191 104 46 / 9%),transparent 100%);
+  background:radial-gradient(ellipse 520px 220px at 50% calc(100% - 93px),rgb(255 205 117 / 12%) 0%,rgb(220 145 81 / 8%) 36%,rgb(191 104 46 / 3%) 68%,transparent 100%);
 }
 footer::before,footer::after{
   position:absolute;
@@ -583,10 +530,65 @@ footer::after{
     linear-gradient(-16deg,transparent 36%,#805538 39% 53%,transparent 56%);
 }
 @media (max-width:380px){.workspace-heading::after{display:none}}
-/* Keep one outer halo around the results group; nested damage panels retain only their inset edge. */
+/* Panel and card hierarchy now comes from surface color and border definition. */
 .workspace-heading,.toolbar,.battle-panel,.equipment-panel,.inspector,.weapon-magic-stone-panel,.global-source-panel,.results-panel,.site-credits-notes{
-  box-shadow:0 0 112px 0 rgb(232 150 72 / 5%),0 0 210px 0 rgb(150 177 222 / 3%),inset 0 1px 0 rgb(220 215 245 / 5%);
+  box-shadow:none;
 }
 .mobile-inspector-open #inspector{
-  box-shadow:0 0 112px 0 rgb(232 150 72 / 5%),0 0 210px 0 rgb(150 177 222 / 3%),inset 0 1px 0 rgb(220 215 245 / 5%);
+  box-shadow:none;
+}
+
+/* Keep fills and warm light inside the rounded panel edges. */
+.workspace-heading,.toolbar,.battle-panel,.damage-panel,.equipment-panel,.inspector,.weapon-magic-stone-panel,.global-source-panel,.results-panel,.site-credits-notes,.stat,.equipment-damage-card,.damage-summary>div,.gear-slot,.beast-accessory-slot{
+  background-clip:padding-box;
+}
+.battle-panel>.panel-heading:first-child,.damage-panel>.panel-heading:first-child,.equipment-panel>.panel-heading:first-child,.results-panel>.panel-heading:first-child{
+  border-top-left-radius:inherit;
+  border-top-right-radius:inherit;
+  background-clip:padding-box;
+}
+
+/* Keep shadows off every activity panel and card, including interactive states. */
+.app-shell :is(
+  [class*="panel"],
+  [class*="card"],
+  .workbench,
+  .workspace-heading,
+  .toolbar,
+  .inspector,
+  .site-credits-notes,
+  .site-credits-block,
+  .canvas-title-input,
+  .toolbar-actions,
+  .stat,
+  .equipment-damage-card,
+  .damage-summary > div,
+  .gear-slot,
+  .beast-accessory-slot,
+  .right-ice-set-area,
+  .editor-section,
+  .calculation-inspection-panel,
+  .formula-detail,
+  .picker-list,
+  .mobile-picker-dialog,
+  #inspector
+),
+.app-shell :is(
+  [class*="panel"],
+  [class*="card"],
+  .stat,
+  .gear-slot,
+  .beast-accessory-slot,
+  .picker-list
+):hover,
+.app-shell :is([class*="panel"], [class*="card"], .stat)[open],
+.app-shell .gear-slot.selected,
+.app-shell .beast-accessory-slot.selected {
+  box-shadow: none !important;
+}
+
+.app-shell :is([class*="panel"], [class*="card"], .workspace-heading, .stat, .gear-slot, .beast-accessory-slot)::before,
+.app-shell :is([class*="panel"], [class*="card"], .workspace-heading, .stat, .gear-slot, .beast-accessory-slot)::after {
+  box-shadow: none !important;
+  filter: none !important;
 }
