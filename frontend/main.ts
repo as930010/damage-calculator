@@ -1068,7 +1068,7 @@ async function start() {
       const configured = slot.selectionCell ? val(slot.selectionCell) : slot.weapon ? val('Weapon.ENHC') : slot.innerwearId ? val(data.innerwear.slots.find(s => s.id === slot.innerwearId)!.enhancementCell) : '';
       const isAccessory = slot.group === 'accessories';
       const isIceEquipment = slot.group === 'leftIce' || slot.group === 'rightIce' || slot.group === 'iceWeapon';
-      const selectedItemName = slot.selectionCell && !isAccessory && configured
+      const selectedItemName = slot.selectionCell && slot.group !== 'costume' && !isAccessory && configured
         ? isIceEquipment ? ICE_EQUIPMENT_SHORT_NAMES[configured] ?? configured : configured
         : '';
       const isRightIceSetSlot = (slot.group === 'rightIce' || slot.group === 'iceWeapon') && !!slot.selectionCell && !!configured;
@@ -1080,7 +1080,7 @@ async function start() {
       button.classList.toggle('right-ice-effect-2', rightIceEffectIndex === 2);
       button.classList.toggle('right-ice-effect-3', rightIceEffectIndex === 3);
       button.setAttribute('aria-label', `${group.name} ${slot.label}：${configured || '未設定'}${rightIceSetHint}`); button.setAttribute('aria-pressed', String(selected.id === slot.id));
-      button.title = `${group.name} ${slot.label}${configured ? '\n' + configured : ''}${rightIceSetHint}`;
+      button.title = `${group.name} ${slot.label}${configured && slot.group !== 'costume' ? '\n' + configured : ''}${rightIceSetHint}`;
       button.innerHTML = `<span class="gear-slot-label">${h(slot.label)}</span>${selectedItemName ? `<span class="gear-slot-item-name">${h(selectedItemName)}</span>` : ''}${configured ? '<i></i>' : ''}`;
       button.addEventListener('click', () => { selected = slot; selectedBeastSlotId = null; renderSlots(); renderBeastAccessories(); renderInspector(); openMobileInspector(); }); container.append(button);
     }
