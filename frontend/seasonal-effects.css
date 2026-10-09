@@ -37,13 +37,16 @@
   --warning: var(--lantern-gold);
   --negative: #e99a9d;
   --positive-bg: #1a2a3e;
+  --campfire-glow-bottom-offset: 93px;
   --negative-bg: #38242e;
   accent-color: #c5a6e6;
   background-color:var(--page-bg);
   background-image:
     radial-gradient(ellipse at 78% -8%,rgb(10 15 38 / 10%),transparent 42rem),
     linear-gradient(180deg,transparent 0%,rgb(132 80 66 / 1%) 38%,rgb(166 91 59 / 3.5%) 74%,rgb(175 83 46 / 6%) 100%),
-    radial-gradient(ellipse min(175vw,4200px) 6800px at 50% calc(100% - 93px),rgb(185 113 64 / 8%) 0%,rgb(141 82 66 / 4%) 52%,transparent 100%),
+    radial-gradient(ellipse min(175vw,4200px) 6800px at 50% calc(100% - var(--campfire-glow-bottom-offset, 93px)),rgb(185 113 64 / 8%) 0%,rgb(141 82 66 / 4%) 52%,transparent 100%),
+    /* Concentrated firelight shares the document-wide background stack. */
+    radial-gradient(ellipse 520px 220px at 50% calc(100% - var(--campfire-glow-bottom-offset, 93px)),rgb(255 205 117 / 12%) 0%,rgb(220 145 81 / 8%) 36%,rgb(191 104 46 / 3%) 68%,transparent 100%),
     radial-gradient(circle at 78px 299px,rgb(235 198 119 / 43%) 0 0.68px,transparent 1.40px),
     radial-gradient(circle at 241px 95px,rgb(160 166 224 / 30%) 0 0.68px,transparent 1.40px),
     radial-gradient(circle at 197px 305px,rgb(160 166 224 / 43%) 0 0.68px,transparent 1.40px),
@@ -93,7 +96,7 @@
     radial-gradient(circle at 138px 183px,rgb(160 166 224 / 32%) 0 1.15px,transparent 1.87px),
     radial-gradient(circle at 314px 234px,rgb(160 166 224 / 32%) 0 0.68px,transparent 1.40px);
   background-size:
-    100% 100%,100% 100%,100% 100%,100% 100%,
+    100% 100%,100% 100%,100% 100%,100% 100%,100% 100%,
     493px 601px,
     577px 493px,
     631px 587px,
@@ -458,12 +461,12 @@ body::before{
   transform-origin:var(--moonlight-bleed) calc(var(--moonlight-bleed) - 24px);
   background:
     radial-gradient(ellipse min(110vw,2600px) min(120vh,1080px) at var(--moonlight-bleed) calc(var(--moonlight-bleed) - 24px),rgb(173 172 229 / 5%) 0%,rgb(143 143 207 / 2.6%) 38%,transparent 76%),
-    radial-gradient(ellipse min(max(1100px,calc(130vw - 720px)),2600px) min(110vh,1040px) at 50% calc(100% - var(--moonlight-bleed)),rgb(221 144 69 / 4.5%) 0%,rgb(177 106 52 / 2.2%) 46%,transparent 78%),
     conic-gradient(from 18deg at var(--moonlight-bleed) calc(var(--moonlight-bleed) - 24px),transparent 0deg 33deg,rgb(193 188 239 / 0%) 36deg,rgb(193 188 239 / 11%) 41deg,rgb(193 188 239 / 0%) 46deg,transparent 51deg 360deg);
   opacity:.3;
 }
 @media (prefers-reduced-motion:reduce){body::before{opacity:.2}}
 @media (max-width:700px){
+  :root{--campfire-glow-bottom-offset:calc(189px + env(safe-area-inset-bottom, 0px));}
 
   .workspace-heading::after{right:1%;width:86px;height:150px;opacity:.12}
 
@@ -498,7 +501,7 @@ footer{
   min-height:156px;
   padding:18px 24px 96px;
   border-top-color:rgb(164 129 99 / 24%);
-  background:radial-gradient(ellipse 520px 220px at 50% calc(100% - 93px),rgb(255 205 117 / 12%) 0%,rgb(220 145 81 / 8%) 36%,rgb(191 104 46 / 3%) 68%,transparent 100%);
+
 }
 footer::before,footer::after{
   position:absolute;
