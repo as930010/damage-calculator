@@ -117,10 +117,13 @@ test("activity CSS changes only visual properties on non-decorative selectors", 
   for (const rule of leafRules(seasonalCss)) {
     for (const selector of splitSelectors(rule.selector)) {
       if (selector.includes("::")) continue;
-      for (const [property] of declarations(rule.body)) {
+      for (const [property, value] of declarations(rule.body)) {
         if (rule.insideKeyframes) {
           if (!["transform", "opacity"].includes(property)) violations.push(selector + " sets " + property + " in keyframes");
           continue;
+        }
+        if (selector.includes(":focus") && ["outline", "outline-style"].includes(property) && /^(?:0(?:\s|$)|none\b)/i.test(value)) {
+          violations.push(selector + " hides its focus indicator");
         }
         if (property.startsWith("--") && selector === ":root") continue;
         if (property.startsWith("--") || !allowedThemeProperties.has(property)) {
