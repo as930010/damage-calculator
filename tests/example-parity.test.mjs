@@ -90,7 +90,7 @@ test('本機維護參照可比對公開配裝範例的計算輸出', { skip: !ha
   const manuallyChanged = structuredClone(sample);
   for (const group of data.weaponGrades.colorGroups) {
     const preset = group.options.find(option => option.id === group.presetByGrade['深淵']);
-    for (const cell of group.selectorCells) manuallyChanged.values[cell] = preset.name;
+    for (const cell of group.settingKeys) manuallyChanged.values[cell] = preset.name;
   }
   manuallyChanged.values['Weapon.MagicStone.Red.1'] = '攻擊力等級+1.5';
   manuallyChanged.values['Weapon.MagicStone.Yellow.1'] = '致命一擊傷害+1.7%';
@@ -130,5 +130,8 @@ test('被侵蝕的荊棘角把310秒Buff週期平均放入乘算效果，並單�
   const item = data.catalogs['equipment/accessories.json'].items.find(entry => entry.name === '被侵蝕的荊棘角');
   assert.equal(item.appraisal.canAppraise, false);
   assert.match(item.description, /使用特殊主動技能時/);
-  assert.match(item.developerNote, /15\.0580645161291%/);
+  const provenance = JSON.parse(await readFile(new URL('../docs/data-maintenance/legacy-source-provenance.json', import.meta.url), 'utf8'));
+  const developerNote = provenance.sourceRecords.find(record => record.sourceDocument === 'data/equipment/accessories.json'
+    && record.path === 'items[6].developerNote')?.value;
+  assert.match(developerNote, /15\.0580645161291%/);
 });

@@ -60,6 +60,20 @@ export function normalizeTranscendenceSkillDamageShare(value: unknown): number {
     : DEFAULT_TRANSCENDENCE_SKILL_DAMAGE_SHARE_PCT;
 }
 
+/** Preserve saved venue choices when legacy labels are replaced in the catalog. */
+export function migrateLegacyEnvironmentSelection(values: Record<string, string | number>): "renamed" | "removed" | null {
+  const value = values["Effect.Environment"];
+  if (value === "小屋") {
+    values["Effect.Environment"] = "小屋/溫泉";
+    return "renamed";
+  }
+  if (value === "其他") {
+    delete values["Effect.Environment"];
+    return "removed";
+  }
+  return null;
+}
+
 export function parseTranscendenceSkillDamageShareInput(raw: string): number | null {
   if (!/^(?:0|[1-9]\d{0,2})(?:\.\d{0,2})?$/.test(raw)) return null;
   const value = Number(raw);

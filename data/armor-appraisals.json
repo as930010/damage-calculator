@@ -1,7 +1,6 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "dataUpdatedAt": "2026-09-25",
-  "sourceRange": "係數區!AG2:AH9",
   "options": [
     {
       "id": "armor-appraisal-crit-1",
@@ -66,7 +65,6 @@
         "Left.Armor.Upper.Appraisal.2",
         "Left.Armor.Upper.Appraisal.3"
       ],
-      "calculationRow": "計算機!38",
       "wearSet": "shared"
     },
     {
@@ -76,7 +74,6 @@
         "Left.Armor.Bottom.Appraisal.2",
         "Left.Armor.Bottom.Appraisal.3"
       ],
-      "calculationRow": "計算機!39",
       "wearSet": "lowerwearA"
     },
     {
@@ -86,7 +83,6 @@
         "Left.Armor.SwitchBottom.Appraisal.2",
         "Left.Armor.SwitchBottom.Appraisal.3"
       ],
-      "calculationRow": "計算機!40",
       "wearSet": "lowerwearB",
       "enabledBy": "Lowerwear.Alternative.Enabled"
     },
@@ -97,7 +93,6 @@
         "Left.Armor.Gloves.Appraisal.2",
         "Left.Armor.Gloves.Appraisal.3"
       ],
-      "calculationRow": "計算機!41",
       "wearSet": "shared"
     },
     {
@@ -107,12 +102,7 @@
         "Left.Armor.Shoes.Appraisal.2",
         "Left.Armor.Shoes.Appraisal.3"
       ],
-      "calculationRow": "計算機!42",
       "wearSet": "shared"
     }
-  ],
-  "notes": [
-    "選項按名稱內含致命一擊、極大化、所有技能傷害分類，效果值由係數區 AH 欄查得。",
-    "無關傷害在計算機 F/G/L 沒有匹配項，故輸出為 0。武器成長等級等額外效果不屬於這組三個鑑定選項，需由對應獨立規則計算。"
   ]
 }

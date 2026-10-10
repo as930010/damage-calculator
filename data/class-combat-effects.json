@@ -1,6 +1,5 @@
 {
-  "schemaVersion": 1,
-  "source": "user-provided class passive table",
+  "schemaVersion": 2,
   "classCodeAliases": {
     "OS": "OZ"
   },

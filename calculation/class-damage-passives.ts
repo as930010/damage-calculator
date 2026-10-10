@@ -19,11 +19,8 @@ function finiteNumberMap(value: unknown, field: string): Record<string, number> 
 }
 
 export function parseClassDamagePassives(value: unknown): ClassDamagePassivesDocument {
-  if (!isRecord(value) || value.schemaVersion !== 1) {
+  if (!isRecord(value) || value.schemaVersion !== 2) {
     throw new TypeError("Unsupported class damage passives document.");
-  }
-  if (typeof value.source !== "string" || value.source.trim() === "") {
-    throw new TypeError("Class damage passive source must be a non-empty string.");
   }
 
   const critDamagePctByClass = finiteNumberMap(value.critDamagePctByClass, "critDamagePctByClass");
@@ -43,8 +40,7 @@ export function parseClassDamagePassives(value: unknown): ClassDamagePassivesDoc
   }
 
   return {
-    schemaVersion: 1,
-    source: value.source,
+    schemaVersion: 2,
     critDamagePctByClass,
     bossDamagePctByClass,
     multiplicativeCritDamagePctByClass,

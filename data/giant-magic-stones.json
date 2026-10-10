@@ -1,17 +1,6 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "dataUpdatedAt": "2026-09-25",
-  "sourceSheet": "係數區",
-  "selectorCells": [
-    "Weapon.GiantStone.1",
-    "Weapon.GiantStone.2",
-    "Weapon.GiantStone.3"
-  ],
-  "effectOutputRows": [
-    "計算機!61",
-    "計算機!62",
-    "計算機!63"
-  ],
   "options": [
     {
       "id": "giant-stone-6",
@@ -32,10 +21,6 @@
       "name": "攻擊力+5.5%",
       "stats": {
         "doubleAttackPct": 5.5
-      },
-      "source": {
-        "sheet": "係數區",
-        "cell": "W2"
       }
     },
     {
@@ -43,10 +28,6 @@
       "name": "攻擊力+6%",
       "stats": {
         "doubleAttackPct": 6
-      },
-      "source": {
-        "sheet": "係數區",
-        "cell": "W3"
       }
     },
     {
@@ -54,10 +35,6 @@
       "name": "攻擊力等級+7",
       "stats": {
         "attackLevel": 7
-      },
-      "source": {
-        "sheet": "係數區",
-        "cell": "W4"
       }
     },
     {
@@ -65,15 +42,12 @@
       "name": "攻擊力等級+8",
       "stats": {
         "attackLevel": 8
-      },
-      "source": {
-        "sheet": "係數區",
-        "cell": "W5"
       }
     }
   ],
-  "notes": [
-    "攻擊力+百分比依計算機 E61:E63 實際欄位彙入雙攻%。",
-    "攻擊力等級+數值依計算機 U61:U63 實際欄位彙入攻擊力等級。"
+  "settingKeys": [
+    "Weapon.GiantStone.1",
+    "Weapon.GiantStone.2",
+    "Weapon.GiantStone.3"
   ]
 }

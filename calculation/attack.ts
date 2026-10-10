@@ -12,11 +12,8 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 /** Validate attack coefficients and enhancement multipliers loaded from JSON. */
 export function parseAttackParameters(value: unknown): AttackParametersDocument {
-  if (!isRecord(value) || value.schemaVersion !== 1) {
+  if (!isRecord(value) || value.schemaVersion !== 2) {
     throw new TypeError("Unsupported attack parameters document.");
-  }
-  if (typeof value.source !== "string" || !value.source.trim()) {
-    throw new TypeError("Attack parameter source must be a non-empty string.");
   }
   if (!isRecord(value.classes) || Object.keys(value.classes).length === 0) {
     throw new TypeError("Attack parameters must include class coefficients.");
@@ -47,7 +44,7 @@ export function parseAttackParameters(value: unknown): AttackParametersDocument 
     weaponEnhancementFactors[level] = factor;
   }
 
-  return { schemaVersion: 1, source: value.source, classes, weaponEnhancementFactors };
+  return { schemaVersion: 2, classes, weaponEnhancementFactors };
 }
 
 /** Resolve C53/D53 class coefficients and B32 weapon enhancement factor from JSON. */

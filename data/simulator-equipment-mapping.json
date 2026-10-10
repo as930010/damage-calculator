@@ -1,11 +1,5 @@
 {
-  "schemaVersion": 1,
-  "source": {
-    "workbook": "Google Sheets current export",
-    "sheet": "裝備模擬區",
-    "calculationSheet": "計算機",
-    "extractedAt": "2026-09-26"
-  },
+  "schemaVersion": 2,
   "selections": [
     {
       "selectionCell": "Costume.OnePiece",
@@ -435,11 +429,5 @@
         "enabledBy": "Nephron.Innerwear.Shoes"
       }
     ]
-  },
-  "notes": [
-    "selectionCell and calculationRows describe the traced input-to-output references; computed contribution handling lives in Calculation Engine modules.",
-    "The calculation sheet uses two separate lowerwear configurations. Their common attributes are averaged; strongerPct and heatPct stay conditional and are evaluated in the boss-health formula.",
-    "Innerwear body selection is not present in the current workbook. Slots remain extensible for future catalog data.",
-    "Rows 32 and 33 in 計算機 have no database FILTER formula; the selected accessory is preserved as catalog data but has no direct row contribution in the current sheet."
-  ]
+  }
 }

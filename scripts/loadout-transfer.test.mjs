@@ -37,14 +37,11 @@ const mappedCells = new Set([
   ...mapping.selections.map((entry) => entry.selectionCell),
   ...mapping.magicStoneSelections.inputGroups.map((entry) => entry.selectionCell),
 ]);
-const firstInput = simulatorInputs.inputs.find((input) => {
-  const cell = input.simulatorCells.trim();
-  const fieldId = cell;
-  return isFieldId(fieldId) && !mappedCells.has(fieldId)
-    && simulatorInputs.catalogs.find((catalog) => catalog.id === input.catalogId)?.options.some((option) => String(option.value).trim() !== "");
-});
-const inputCell = firstInput.simulatorCells.trim();
-const inputFieldId = isFieldId(inputCell) ? inputCell : undefined;
+const firstInputField = simulatorInputs.inputs.flatMap(input => input.fieldIds.map(fieldId => ({ input, fieldId })))
+  .find(({ input, fieldId }) => isFieldId(fieldId) && !mappedCells.has(fieldId)
+    && simulatorInputs.catalogs.find(catalog => catalog.id === input.catalogId)?.options.some(option => String(option.value).trim() !== ""));
+const firstInput = firstInputField?.input;
+const inputFieldId = firstInputField?.fieldId;
 const firstOption = simulatorInputs.catalogs.find((catalog) => catalog.id === firstInput.catalogId).options.find((option) => String(option.value).trim() !== "");
 const state = {
   schemaVersion: 3,
@@ -76,6 +73,19 @@ test("older loadout exports default skill damage share to 100% transcendence", (
   assert.equal(imported.transcendenceSkillDamageSharePct, 100);
 });
 
+test("legacy venue names migrate on import without changing unrelated values", () => {
+  const legacyHut = JSON.parse(serializeLoadout(state, data).json);
+  const environmentCode = String(codeForFieldId("Effect.Environment"));
+  legacyHut.values[environmentCode] = "小屋";
+  const migrated = parseLoadoutJson(JSON.stringify(legacyHut), state, data);
+  assert.equal(migrated.state.values["Effect.Environment"], "小屋/溫泉");
+
+  legacyHut.values[environmentCode] = "其他";
+  const cleared = parseLoadoutJson(JSON.stringify(legacyHut), state, data);
+  assert.equal(cleared.state.values["Effect.Environment"], undefined);
+  assert.ok(cleared.clearedFields.includes("Effect.Environment"));
+});
+
 test("legacy glove circuit Transcendence choice migrates to the combined single-skill option", () => {
   const gloveCircuit = circuits.inputs.find(entry => entry.slot === "gloves");
   const legacyState = { ...state, values: { ...state.values, [gloveCircuit.attributeCell]: "超越技傷%" } };
@@ -88,32 +98,32 @@ test("portrait awakening damage values round-trip and one-sided allocations comp
   const portrait = otherEffects.portraitAwakening;
   const validState = {
     ...state,
-    values: { ...state.values, [portrait.strongCell]: 2, [portrait.transcendenceCell]: 3 },
+    values: { ...state.values, [portrait.strongSettingKey]: 2, [portrait.transcendenceSettingKey]: 3 },
   };
   const exported = JSON.parse(serializeLoadout(validState, data).json);
-  assert.equal(exported.values[String(codeForFieldId(portrait.strongCell))], 2);
-  assert.equal(exported.values[String(codeForFieldId(portrait.transcendenceCell))], 3);
+  assert.equal(exported.values[String(codeForFieldId(portrait.strongSettingKey))], 2);
+  assert.equal(exported.values[String(codeForFieldId(portrait.transcendenceSettingKey))], 3);
   assert.deepEqual(parseLoadoutJson(JSON.stringify(exported), state, data).state, semanticState(validState));
 
-  const oneSidedState = { ...state, values: { ...state.values, [portrait.transcendenceCell]: 4 } };
+  const oneSidedState = { ...state, values: { ...state.values, [portrait.transcendenceSettingKey]: 4 } };
   const oneSidedExport = JSON.parse(serializeLoadout(oneSidedState, data).json);
-  assert.equal(oneSidedExport.values[String(codeForFieldId(portrait.strongCell))], 1);
-  assert.equal(oneSidedExport.values[String(codeForFieldId(portrait.transcendenceCell))], 4);
+  assert.equal(oneSidedExport.values[String(codeForFieldId(portrait.strongSettingKey))], 1);
+  assert.equal(oneSidedExport.values[String(codeForFieldId(portrait.transcendenceSettingKey))], 4);
 
-  exported.values[String(codeForFieldId(portrait.strongCell))] = 2;
-  exported.values[String(codeForFieldId(portrait.transcendenceCell))] = 4;
+  exported.values[String(codeForFieldId(portrait.strongSettingKey))] = 2;
+  exported.values[String(codeForFieldId(portrait.transcendenceSettingKey))] = 4;
   const normalizedImport = parseLoadoutJson(JSON.stringify(exported), state, data);
-  assert.equal(normalizedImport.state.values[portrait.strongCell], 1);
-  assert.equal(normalizedImport.state.values[portrait.transcendenceCell], 4);
-  assert.ok(normalizedImport.clearedFields.includes(portrait.strongCell));
+  assert.equal(normalizedImport.state.values[portrait.strongSettingKey], 1);
+  assert.equal(normalizedImport.state.values[portrait.transcendenceSettingKey], 4);
+  assert.ok(normalizedImport.clearedFields.includes(portrait.strongSettingKey));
 });
 
 test("colored weapon magic-stone selections round-trip as compact numeric-code fields", () => {
   const values = {};
   for (const group of weaponGrades.colorGroups) {
-    values[group.selectorCells[0]] = group.options[0].name;
+    values[group.settingKeys[0]] = group.options[0].name;
   }
-  const configured = { ...state, values: { ...state.values, [weaponGrades.selectorCell]: "深淵", ...values } };
+  const configured = { ...state, values: { ...state.values, [weaponGrades.settingKey]: "深淵", ...values } };
   const exported = serializeLoadout(configured, data);
   assert.deepEqual(parseLoadoutJson(exported.json, state, data).state, semanticState(configured));
   assert.equal(Object.keys(values).length, 3);

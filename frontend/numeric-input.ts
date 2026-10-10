@@ -22,3 +22,8 @@ export function preventScientificNotation(input: HTMLInputElement): void {
     lastValidValue = input.value;
   });
 }
+
+/** Remove binary floating-point display tails without changing useful decimal precision. */
+export function canonicalizeNumber(value: number): number {
+  return Number.isFinite(value) ? Number(value.toPrecision(15)) : value;
+}

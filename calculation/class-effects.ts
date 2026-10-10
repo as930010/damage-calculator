@@ -65,11 +65,8 @@ export function parseClassCombatEffects(value: unknown): ClassCombatEffectsDocum
   if (!isRecord(value)) {
     throw new TypeError("Class combat effects document must be an object.");
   }
-  if (value.schemaVersion !== 1) {
+  if (value.schemaVersion !== 2) {
     throw new TypeError("Unsupported class combat effects schemaVersion.");
-  }
-  if (typeof value.source !== "string" || value.source.trim() === "") {
-    throw new TypeError("Class combat effects source must be a non-empty string.");
   }
   if (!isRecord(value.methods)) {
     throw new TypeError("Class combat effects methods must be an object.");
@@ -109,8 +106,7 @@ export function parseClassCombatEffects(value: unknown): ClassCombatEffectsDocum
   }
 
   const document: ClassCombatEffectsDocument = {
-    schemaVersion: 1,
-    source: value.source,
+    schemaVersion: 2,
     methods,
     ...(classCodeAliases ? { classCodeAliases } : {}),
     classes,

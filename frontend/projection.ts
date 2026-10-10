@@ -35,7 +35,7 @@ export function projectAttributes(data: GameData, state: LoadoutState) {
       .filter(effect => state[effect.stateKey] ?? effect.defaultEnabled)
       .map(({ sourceId, stats }) => ({ sourceId, stats })),
     ...data.parameters.conditionalEffects
-      .filter(effect => text(effect.selectorCell) === effect.selectorValue)
+      .filter(effect => text(effect.settingKey) === effect.selectorValue)
       .map(({ sourceId, stats }) => ({ sourceId, stats })),
   ];
   const groups: Record<"shared" | "lowerwearA" | "lowerwearB", StatContribution[]> = {
@@ -103,7 +103,7 @@ export function projectAttributes(data: GameData, state: LoadoutState) {
   const glovesCircuitRows = readGloveCircuitRows(values, glovesCircuitRule.attributeCell, glovesCircuitRule.valueCell);
   validateGloveCircuitRows(glovesCircuitRows);
   for (const row of glovesCircuitRows) {
-    if (row.attribute && row.percentageValue !== null && !data.circuits.statKeyBySheetName[row.attribute] && row.attribute !== "無關傷害") {
+    if (row.attribute && row.percentageValue !== null && !data.circuits.statKeyByAttributeName[row.attribute] && row.attribute !== "無關傷害") {
       throw new RangeError("電路板「" + row.attribute + "」尚未有屬性對應，請使用已定義的屬性名稱。");
     }
   }
@@ -113,7 +113,7 @@ export function projectAttributes(data: GameData, state: LoadoutState) {
     if ((attribute && percentageValue === undefined) || (!attribute && percentageValue !== undefined)) {
       throw new RangeError("請填完整電路板項目與數值。");
     }
-    if (attribute && percentageValue !== undefined && !data.circuits.statKeyBySheetName[attribute] && attribute !== "無關傷害") {
+    if (attribute && percentageValue !== undefined && !data.circuits.statKeyByAttributeName[attribute] && attribute !== "無關傷害") {
       throw new RangeError("電路板「" + attribute + "」尚未有屬性對應，請使用已定義的屬性名稱。");
     }
     return [slot.slot, { attribute, percentageValue }];
@@ -132,29 +132,29 @@ export function projectAttributes(data: GameData, state: LoadoutState) {
     }
   }
   for (const entry of resolveCircuitBoardEffects(data.circuits, circuits)) if (entry.contribution) groups[entry.wearSet].push(entry.contribution);
-  const colorSetOption = data.colorSetEffects.options.find(option => option.name === text(data.colorSetEffects.selectorCell));
+  const colorSetOption = data.colorSetEffects.options.find(option => option.name === text(data.colorSetEffects.settingKey));
   const requiredCircuitAttribute = colorSetOption?.calculatedStat?.requiredAttribute ?? "";
   const requiredCircuitValue = glovesCircuitRows
     .filter(row => row.attribute === requiredCircuitAttribute)
     .reduce((total, row) => total + (row.percentageValue ?? 0), 0);
-  const colorSet = resolveColorSetEffect(data.colorSetEffects, text(data.colorSetEffects.selectorCell), requiredCircuitAttribute, requiredCircuitValue);
+  const colorSet = resolveColorSetEffect(data.colorSetEffects, text(data.colorSetEffects.settingKey), requiredCircuitAttribute, requiredCircuitValue);
   if (colorSet) groups.shared.push(colorSet);
   groups.shared.push(...resolveWeaponTransformationsFromCells(data.transformations, values));
-  const growth = resolveWeaponGrowth(data.growth, text(data.growth.selectorCell));
+  const growth = resolveWeaponGrowth(data.growth, text(data.growth.settingKey));
   if (growth) groups.shared.push(growth);
   for (const group of Object.values(data.weaponAppraisals.groups)) {
-    const source = resolveNamedStatOption(group.options, text(group.selectorCell), `weapon-appraisal:${group.selectorCell}`);
+    const source = resolveNamedStatOption(group.options, text(group.settingKey), `weapon-appraisal:${group.settingKey}`);
     if (source) groups.shared.push(source);
   }
-  for (const cell of data.giantStones.selectorCells) {
+  for (const cell of data.giantStones.settingKeys) {
     const source = resolveNamedStatOption(data.giantStones.options, text(cell), `giant-stone:${cell}`);
     if (source) groups.shared.push(source);
   }
   for (const colorGroup of data.weaponGrades.colorGroups) {
-    const presetId = colorGroup.presetByGrade[text(data.weaponGrades.selectorCell)];
+    const presetId = colorGroup.presetByGrade[text(data.weaponGrades.settingKey)];
     const presetOption = colorGroup.options.find(option => option.id === presetId);
-    const hasSavedSlotSelection = colorGroup.selectorCells.some(cell => values[cell] !== undefined);
-    for (const [index, cell] of colorGroup.selectorCells.entries()) {
+    const hasSavedSlotSelection = colorGroup.settingKeys.some(cell => values[cell] !== undefined);
+    for (const [index, cell] of colorGroup.settingKeys.entries()) {
       const selection = hasSavedSlotSelection ? text(cell) : presetOption?.name ?? "";
       const source = resolveNamedStatOption(colorGroup.options, selection, `weapon-magic-stone:${colorGroup.id}:${index + 1}`);
       if (source) groups.shared.push(source);
@@ -186,7 +186,7 @@ export function projectAttributes(data: GameData, state: LoadoutState) {
   const rightIceCells = data.mapping.selections.filter(entry => entry.catalogFile.endsWith("right-ice.json")).map(entry => entry.selectionCell);
   groups.shared.push(
     ...resolveRightIceSetEffects(data.rightIceSets, rightIceCells.map(text), data.rightIceSets.selectionCells.map(text)),
-      ...resolveResonanceEffects(data.resonance, Object.fromEntries(data.resonance.effects.map(effect => [effect.inputCell, values[effect.inputCell]]))),
+      ...resolveResonanceEffects(data.resonance, Object.fromEntries(data.resonance.effects.map(effect => [effect.settingKey, values[effect.settingKey]]))),
     ...resolveRaidSetEffects(data.raidSets, accessoryCells.map(text)),
   );
   const atmaPieces = accessoryCells.map(text).filter(name => name.includes("亞特瑪")).length;
@@ -207,7 +207,7 @@ export function projectAttributes(data: GameData, state: LoadoutState) {
       return { attribute: text(`MasterBeast.${part}.Mirror.${slot}.Attribute`), value: number(`MasterBeast.${part}.Mirror.${slot}.Value`), fractionToPercentagePoints: true };
     }),
   }));
-  const selectedSpiritClasses = data.spiritRecord.classSelectors.selectorCells.map(text);
+  const selectedSpiritClasses = data.spiritRecord.classSelectors.settingKeys.map(text);
   const selectedSpiritRecords = resolveSpiritRecordSelections(data.spiritRecord, selectedSpiritClasses);
   groups.shared.push(...resolveSpiritRecordEffects(data.spiritRecord, state.Job, data.classes.classes.find(entry => entry.id === state.Job)!.attackType, selectedSpiritRecords));
   const addNamedOption = (catalog: readonly import("../calculation/equipment-effects.ts").NamedStatOption[], cell: string, source: string) => {
@@ -219,10 +219,10 @@ export function projectAttributes(data: GameData, state: LoadoutState) {
   addNamedOption(data.otherEffects.environments, "Effect.Environment", "environment");
   addNamedOption(data.otherEffects.peakOptions, "Peak.Option", "peak-option");
   addNamedOption(data.pets.options, "Pet.Passive", "pet");
-  for (const effect of data.otherEffects.binaryEffects) addNamedOption(effect.options, effect.selectorCell, effect.name);
+  for (const effect of data.otherEffects.binaryEffects) addNamedOption(effect.options, effect.settingKey, effect.name);
   const portraitAwakening = data.otherEffects.portraitAwakening;
-  const rawStrong = values[portraitAwakening.strongCell];
-  const rawTranscendence = values[portraitAwakening.transcendenceCell];
+  const rawStrong = values[portraitAwakening.strongSettingKey];
+  const rawTranscendence = values[portraitAwakening.transcendenceSettingKey];
   const hasStrong = rawStrong !== undefined && rawStrong !== '';
   const hasTranscendence = rawTranscendence !== undefined && rawTranscendence !== '';
   if (hasStrong || hasTranscendence) {
@@ -246,11 +246,11 @@ export function projectAttributes(data: GameData, state: LoadoutState) {
       { statKey: portraitAwakening.transcendenceStatKey, value: split.transcendenceSkillDamagePct },
     ];
     groups.shared.push({
-      sourceId: `立繪、覺醒:${portraitAwakening.legacySelectorCell}`,
+      sourceId: `立繪、覺醒:${portraitAwakening.legacySettingKey}`,
       stats: Object.fromEntries(portraitSkillValues.filter(entry => entry.value > 0).map(entry => [entry.statKey, entry.value])),
     });
   }
-  for (const stage of data.otherEffects.guildFountain) addNamedOption(stage.options, stage.selectorCell, `guild-fountain-${stage.stage}`);
+  for (const stage of data.otherEffects.guildFountain) addNamedOption(stage.options, stage.settingKey, `guild-fountain-${stage.stage}`);
   if (!state.lowerwearAlternativeEnabled) groups.lowerwearB = [];
   const rules: AttributeRule[] = data.attributes.attributes.filter((entry) => entry.active && entry.aggregation === "sum")
     .map((entry) => ({ key: entry.key, aggregation: "sum", cap: entry.cap }));

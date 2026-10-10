@@ -1,35 +1,17 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "dataUpdatedAt": "2026-09-25",
-  "sourceSheet": "係數區",
-  "selectorCell": "Weapon.Growth",
   "levels": [
     {
       "id": "weapon-growth-0",
       "name": "Lv.0",
-      "stats": {},
-      "source": {
-        "sheet": "係數區",
-        "cell": "K2",
-        "calculationCells": [
-          "計算機!L64",
-          "計算機!U64"
-        ]
-      }
+      "stats": {}
     },
     {
       "id": "weapon-growth-1",
       "name": "Lv.1",
       "stats": {
         "allSkillDamagePct": 15
-      },
-      "source": {
-        "sheet": "係數區",
-        "cell": "K3",
-        "calculationCells": [
-          "計算機!L64",
-          "計算機!U64"
-        ]
       }
     },
     {
@@ -38,14 +20,6 @@
       "stats": {
         "allSkillDamagePct": 15,
         "attackLevel": 15
-      },
-      "source": {
-        "sheet": "係數區",
-        "cell": "K4",
-        "calculationCells": [
-          "計算機!L64",
-          "計算機!U64"
-        ]
       }
     },
     {
@@ -54,14 +28,6 @@
       "stats": {
         "allSkillDamagePct": 15,
         "attackLevel": 20
-      },
-      "source": {
-        "sheet": "係數區",
-        "cell": "K5",
-        "calculationCells": [
-          "計算機!L64",
-          "計算機!U64"
-        ]
       }
     },
     {
@@ -70,14 +36,6 @@
       "stats": {
         "allSkillDamagePct": 20,
         "attackLevel": 20
-      },
-      "source": {
-        "sheet": "係數區",
-        "cell": "K6",
-        "calculationCells": [
-          "計算機!L64",
-          "計算機!U64"
-        ]
       }
     },
     {
@@ -86,14 +44,6 @@
       "stats": {
         "allSkillDamagePct": 20,
         "attackLevel": 25
-      },
-      "source": {
-        "sheet": "係數區",
-        "cell": "K7",
-        "calculationCells": [
-          "計算機!L64",
-          "計算機!U64"
-        ]
       }
     },
     {
@@ -102,18 +52,8 @@
       "stats": {
         "allSkillDamagePct": 20,
         "attackLevel": 25
-      },
-      "source": {
-        "sheet": "係數區",
-        "cell": "K8",
-        "calculationCells": [
-          "計算機!L64",
-          "計算機!U64"
-        ]
       }
     }
   ],
-  "notes": [
-    "所有技能傷害%依計算機!L64，攻擊力等級依計算機!U64；Lv.0 的兩項效果均為 0。"
-  ]
+  "settingKey": "Weapon.Growth"
 }

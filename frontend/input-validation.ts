@@ -1,5 +1,5 @@
 export interface InputValidationReference {
-  simulatorCells: string;
+  fieldIds: readonly string[];
   catalogId: string;
 }
 
@@ -12,6 +12,6 @@ export function findValidationCatalog<
   TInput extends InputValidationReference,
   TCatalog extends InputChoiceCatalog,
 >(inputs: readonly TInput[], catalogs: readonly TCatalog[], fieldId: string): TCatalog | undefined {
-  const input = inputs.find(entry => entry.simulatorCells.split(/\s+/).includes(fieldId));
+  const input = inputs.find(entry => entry.fieldIds.includes(fieldId));
   return input ? catalogs.find(catalog => catalog.id === input.catalogId) : undefined;
 }

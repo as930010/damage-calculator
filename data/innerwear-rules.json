@@ -1,6 +1,5 @@
 {
-  "schemaVersion": 1,
-  "source": "Google Sheets 計算機!38:42；D40 H21、Lv.13 G7 依使用者確認修正，正式／實驗組共用",
+  "schemaVersion": 2,
   "baseLevel": 99,
   "itemLevelBonus": 20,
   "baselineCoefficient": 400,

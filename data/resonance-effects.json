@@ -1,81 +1,53 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "dataUpdatedAt": "2026-09-25",
-  "selectorCells": [
-    "Resonance.AllATK.Points",
-    "Resonance.TranscendenceSkillDMG.Points",
-    "Resonance.Polarization.Points",
-    "Resonance.BossDMG.Points",
-    "Resonance.Adapt.Points"
-  ],
   "effects": [
     {
       "id": "resonance-double-attack",
       "name": "雙攻",
-      "inputCell": "Resonance.AllATK.Points",
       "multiplier": 10,
       "stats": {
         "physicalAttack": 1,
         "magicalAttack": 1
       },
-      "sourceCells": [
-        "計算機!C65",
-        "計算機!D65"
-      ],
-      "formula": "輸入值 × 10，分別加至物攻與魔攻"
+      "settingKey": "Resonance.AllATK.Points"
     },
     {
       "id": "resonance-skill-damage",
       "name": "技傷",
-      "inputCell": "Resonance.TranscendenceSkillDMG.Points",
       "multiplier": 0.35,
       "stats": {
         "transcendenceSkillDamagePct": 1,
         "strongSkillDamagePct": 1
       },
-      "sourceCells": [
-        "計算機!K66"
-      ],
-      "formula": "輸入值 × 0.35"
+      "settingKey": "Resonance.TranscendenceSkillDMG.Points"
     },
     {
       "id": "resonance-polarization",
       "name": "兩極",
-      "inputCell": "Resonance.Polarization.Points",
       "multiplier": 0.15,
       "stats": {
         "polarizationPct": 1
       },
-      "sourceCells": [
-        "計算機!J67"
-      ],
-      "formula": "輸入值 × 0.15；之後由角色總值套用 60 上限"
+      "settingKey": "Resonance.Polarization.Points"
     },
     {
       "id": "resonance-boss-damage",
       "name": "B傷",
-      "inputCell": "Resonance.BossDMG.Points",
       "multiplier": 0.3,
       "stats": {
         "bossDamagePct": 1
       },
-      "sourceCells": [
-        "計算機!I68"
-      ],
-      "formula": "輸入值 × 0.3"
+      "settingKey": "Resonance.BossDMG.Points"
     },
     {
       "id": "resonance-adaptability",
       "name": "適應",
-      "inputCell": "Resonance.Adapt.Points",
       "multiplier": 0.07,
       "stats": {
         "adaptabilityPct": 1
       },
-      "sourceCells": [
-        "計算機!Q69"
-      ],
-      "formula": "輸入值 × 0.07；之後由角色總值套用 60 上限"
+      "settingKey": "Resonance.Adapt.Points"
     }
   ]
 }

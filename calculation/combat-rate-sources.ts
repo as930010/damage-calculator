@@ -14,7 +14,7 @@ export type CombatRateSourceRule =
       method: "multiplicative";
       valueSource: {
         kind: "enhancementText";
-        inputCell: string;
+        inputFieldId: string;
         bonusPct: number;
         note?: string;
       };
@@ -22,7 +22,7 @@ export type CombatRateSourceRule =
     };
 
 export interface CombatRateSourceRulesDocument {
-  schemaVersion: 1;
+  schemaVersion: 2;
   sources: readonly CombatRateSourceRule[];
 }
 
@@ -45,13 +45,13 @@ function resolveRuleValue(rule: CombatRateSourceRule, values: CombatRateSourceVa
     return value;
   }
 
-  const raw = values.selections[rule.valueSource.inputCell];
+  const raw = values.selections[rule.valueSource.inputFieldId];
   if (raw == null || String(raw).trim() === "") {
-    throw new RangeError("Missing enhancement selection: " + rule.valueSource.inputCell);
+    throw new RangeError("Missing enhancement selection: " + rule.valueSource.inputFieldId);
   }
   const levelText = String(raw).match(/[0-9]+/)?.[0];
   if (levelText === undefined) {
-    throw new RangeError("No enhancement level found in " + rule.valueSource.inputCell + ": " + raw);
+    throw new RangeError("No enhancement level found in " + rule.valueSource.inputFieldId + ": " + raw);
   }
   const level = Number(levelText);
   if (!Number.isSafeInteger(level) || !Number.isFinite(rule.valueSource.bonusPct)) {
@@ -65,7 +65,7 @@ export function resolveCombatRateSources(
   document: CombatRateSourceRulesDocument,
   values: CombatRateSourceValues,
 ): ResolvedCombatRateSources {
-  if (document.schemaVersion !== 1) throw new TypeError("Unsupported combat-rate source rules.");
+  if (document.schemaVersion !== 2) throw new TypeError("Unsupported combat-rate source rules.");
   const result: Record<CombatAttribute, PercentEffect[]> = { critRate: [], extremization: [] };
   const ids = new Set<string>();
   for (const rule of document.sources) {

@@ -23,8 +23,9 @@ test("the confirmed sample stores all 217 inputs using semantic IDs and compact 
 
 test("class selection is represented by Job and option catalogs reference semantic IDs", async () => {
   const inputOptions = JSON.parse(await readFile(join(root, "data/simulator-input-options.json"), "utf8"));
-  assert.ok(!inputOptions.inputs.some(input => /(?:^|\s)[A-Z]+[0-9]+(?=\s|$)/.test(input.simulatorCells)));
-  assert.ok(inputOptions.inputs.some(input => input.simulatorCells.includes("SpiritRecord.Class.1")));
+  assert.ok(inputOptions.inputs.some(input => input.fieldIds.includes("SpiritRecord.Class.1")));
+  assert.ok(inputOptions.inputs.every(input => Array.isArray(input.fieldIds) && input.fieldIds.every(isFieldId)));
+  assert.ok(inputOptions.catalogs.every(catalog => catalog.options.every(option => !Object.hasOwn(option, "cell"))));
   assert.equal(sample.Job, "DaB");
   for (const color of ["Red", "Blue", "Yellow"]) {
     for (let index = 1; index <= 9; index++) {

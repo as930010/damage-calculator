@@ -1,7 +1,6 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "dataUpdatedAt": "2026-09-25",
-  "source": "Google Sheets: 係數區!A2:C61, 物魔對照; passive defaults confirmed by user",
   "classes": [
     {
       "id": "KE",

@@ -1,15 +1,11 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "selectionCells": [
     "Right.Ice.SetEffect.1",
     "Right.Ice.SetEffect.2",
     "Right.Ice.SetEffect.3"
   ],
   "maxSelectedSets": 3,
-  "notes": [
-    "T 欄門檻公式轉為所需件數條件；W 欄統計已選右冰部位的各套裝件數。",
-    "只計算使用者在裝備模擬區 B27:B29 選取的套裝；再依已裝備件數套用效果。同一套裝只套用目前件數所符合的最高階效果，該階資料須包含仍適用的低階套效，最多可選三套。"
-  ],
   "effects": [
     {
       "id": "right-ice-set-effects-eb590d92a2b9",
@@ -27,8 +23,7 @@
         "type": "rightIcePieceCount",
         "setName": "騎士團",
         "operator": "exactly",
-        "count": 3,
-        "sourceFormula": "T2: =IF(W2=3,True)"
+        "count": 3
       }
     },
     {
@@ -48,8 +43,7 @@
         "type": "rightIcePieceCount",
         "setName": "騎士團",
         "operator": "atLeast",
-        "count": 4,
-        "sourceFormula": "T3: =IF(AND(W2>=4,T2<>True),True)"
+        "count": 4
       }
     },
     {
@@ -68,8 +62,7 @@
         "type": "rightIcePieceCount",
         "setName": "幻影面紗",
         "operator": "exactly",
-        "count": 2,
-        "sourceFormula": "T4: =IF(W4=2,True)"
+        "count": 2
       }
     },
     {
@@ -89,8 +82,7 @@
         "type": "rightIcePieceCount",
         "setName": "幻影面紗",
         "operator": "atLeast",
-        "count": 3,
-        "sourceFormula": "T5: =IF(AND(W4>=3,T4<>True),True)"
+        "count": 3
       }
     },
     {
@@ -110,8 +102,7 @@
         "type": "rightIcePieceCount",
         "setName": "真理假面",
         "operator": "exactly",
-        "count": 2,
-        "sourceFormula": "T6: =IF(W6=2,True)"
+        "count": 2
       }
     },
     {
@@ -135,8 +126,7 @@
         "type": "rightIcePieceCount",
         "setName": "真理假面",
         "operator": "atLeast",
-        "count": 3,
-        "sourceFormula": "T7: =IF(AND(W6>=3,T6<>True),True)"
+        "count": 3
       }
     },
     {
@@ -155,8 +145,7 @@
         "type": "rightIcePieceCount",
         "setName": "紫霄花郎",
         "operator": "exactly",
-        "count": 2,
-        "sourceFormula": "T8: =IF(W8=2,True)"
+        "count": 2
       }
     },
     {
@@ -177,8 +166,7 @@
         "type": "rightIcePieceCount",
         "setName": "紫霄花郎",
         "operator": "atLeast",
-        "count": 3,
-        "sourceFormula": "T9: =IF(AND(W8>=3,T8<>True),True)"
+        "count": 3
       }
     },
     {
@@ -198,8 +186,7 @@
         "type": "rightIcePieceCount",
         "setName": "星辰牧者",
         "operator": "exactly",
-        "count": 2,
-        "sourceFormula": "T10: =IF(W10=2,True)"
+        "count": 2
       }
     },
     {
@@ -222,8 +209,7 @@
         "type": "rightIcePieceCount",
         "setName": "星辰牧者",
         "operator": "atLeast",
-        "count": 3,
-        "sourceFormula": "T11: =IF(AND(W10>=3,T10<>True),True)"
+        "count": 3
       }
     },
     {
@@ -243,8 +229,7 @@
         "type": "rightIcePieceCount",
         "setName": "日冕．灼耀花仙",
         "operator": "exactly",
-        "count": 2,
-        "sourceFormula": "T12: =IF(W12=2,True)"
+        "count": 2
       }
     },
     {
@@ -266,8 +251,7 @@
         "type": "rightIcePieceCount",
         "setName": "日冕．灼耀花仙",
         "operator": "atLeast",
-        "count": 3,
-        "sourceFormula": "T13: =IF(AND(W12>=3,T12<>True),True)"
+        "count": 3
       }
     },
     {
@@ -287,8 +271,7 @@
         "type": "rightIcePieceCount",
         "setName": "幽潮吞源",
         "operator": "exactly",
-        "count": 2,
-        "sourceFormula": "T14: =IF(W14=2,True)"
+        "count": 2
       }
     },
     {
@@ -310,8 +293,7 @@
         "type": "rightIcePieceCount",
         "setName": "幽潮吞源",
         "operator": "atLeast",
-        "count": 3,
-        "sourceFormula": "T15: =IF(AND(W14>=3,T14<>True),True)"
+        "count": 3
       }
     },
     {
@@ -332,8 +314,7 @@
         "type": "rightIcePieceCount",
         "setName": "猛虎奇談",
         "operator": "exactly",
-        "count": 2,
-        "sourceFormula": "T16: =IF(W16=2,True)"
+        "count": 2
       }
     },
     {
@@ -355,8 +336,7 @@
         "type": "rightIcePieceCount",
         "setName": "猛虎奇談",
         "operator": "atLeast",
-        "count": 3,
-        "sourceFormula": "T17: =IF(AND(W16>=3,T16<>True),True)"
+        "count": 3
       }
     },
     {
@@ -375,8 +355,7 @@
         "type": "rightIcePieceCount",
         "setName": "厄瑞玻斯的哀歌",
         "operator": "exactly",
-        "count": 2,
-        "sourceFormula": "T18: =IF(W18=2,True)"
+        "count": 2
       }
     },
     {
@@ -397,8 +376,7 @@
         "type": "rightIcePieceCount",
         "setName": "厄瑞玻斯的哀歌",
         "operator": "atLeast",
-        "count": 3,
-        "sourceFormula": "T19: =IF(AND(W18>=3,T18<>True),True)"
+        "count": 3
       }
     },
     {
@@ -417,8 +395,7 @@
         "type": "rightIcePieceCount",
         "setName": "薇塔芳塔娜",
         "operator": "exactly",
-        "count": 2,
-        "sourceFormula": "T20: =IF(W20=2,True)"
+        "count": 2
       }
     },
     {
@@ -438,8 +415,7 @@
         "type": "rightIcePieceCount",
         "setName": "薇塔芳塔娜",
         "operator": "atLeast",
-        "count": 3,
-        "sourceFormula": "T21: =IF(AND(W20>=3,T20<>True),True)"
+        "count": 3
       }
     },
     {
@@ -458,8 +434,7 @@
         "type": "rightIcePieceCount",
         "setName": "深淵的存在",
         "operator": "exactly",
-        "count": 2,
-        "sourceFormula": "T22: =IF(W22=2,True)"
+        "count": 2
       }
     },
     {
@@ -479,8 +454,7 @@
         "type": "rightIcePieceCount",
         "setName": "深淵的存在",
         "operator": "atLeast",
-        "count": 3,
-        "sourceFormula": "T23: =IF(AND(W22>=3,T22<>True),True)"
+        "count": 3
       }
     },
     {
@@ -499,8 +473,7 @@
         "type": "rightIcePieceCount",
         "setName": "飛龍乘雲",
         "operator": "exactly",
-        "count": 2,
-        "sourceFormula": "T24: =IF(W24=2,True)"
+        "count": 2
       }
     },
     {
@@ -520,8 +493,7 @@
         "type": "rightIcePieceCount",
         "setName": "飛龍乘雲",
         "operator": "atLeast",
-        "count": 3,
-        "sourceFormula": "T25: =IF(AND(W24>=3,T24<>True),True)"
+        "count": 3
       }
     }
   ]

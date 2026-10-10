@@ -125,7 +125,11 @@ const sourceCellLabels = {
   "B103": "combat-rate:lowerwear-enhancement",
   "B105": "combat-rate:shoes-enhancement",
 };
-for (const [statKey, cell] of Object.entries(bundledData.masterBeast?.overallPotentialSourceCells ?? {})) {
+const legacySourceProvenance = JSON.parse(await readFile(join(root, "docs/data-maintenance/legacy-source-provenance.json"), "utf8"));
+const overallPotentialSourceCells = legacySourceProvenance.sourceRecords.find(record =>
+  record.sourceDocument === "data/master-beast-effects.json" && record.path === "overallPotentialSourceCells",
+)?.value ?? {};
+for (const [statKey, cell] of Object.entries(overallPotentialSourceCells)) {
   sourceCellLabels[cell] = `master-beast-potential:${statKey}`;
 }
 const anonymousSourceIds = new Map();

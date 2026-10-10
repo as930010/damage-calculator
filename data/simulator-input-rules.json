@@ -1,14 +1,6 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 3,
   "dataUpdatedAt": "2026-09-25",
-  "source": {
-    "workbook": "Google Sheets current export",
-    "sheets": [
-      "裝備模擬區",
-      "計算機",
-      "係數區"
-    ]
-  },
   "innerwear": {
     "itemSelectionSupported": false,
     "futureItemCatalogEditable": true,
@@ -29,8 +21,7 @@
       "keepEachProfileValue": true,
       "bossHealthCondition": "atOrBelow50Percent"
     },
-    "damageFactorFormula": "1 / (0.5 / (1 + strongerPct/100) + 0.5 / (1 + heatPct/100))",
-    "sourceFormula": "計算機!B163"
+    "damageFactorFormula": "1 / (0.5 / (1 + strongerPct/100) + 0.5 / (1 + heatPct/100))"
   },
   "innerwearInputTerms": {
     "acceptedSheetTerms": [
@@ -55,16 +46,12 @@
     "note": "保留任意新增項目；數值由玩家填寫。"
   },
   "chips": {
-    "statOptionsSource": "係數區!P2:P8",
-    "tuningLevelSource": "係數區!Q2:Q7",
     "attributeValueSources": {
-      "default": "係數區!R2:R7",
       "special": [
         "強烈技傷%",
         "超越技傷%",
         "Boss傷害%"
-      ],
-      "specialSource": "係數區!S2:S7"
+      ]
     },
     "sourceRows": {
       "level": [
@@ -101,16 +88,12 @@
   },
   "weapon": {
     "forgingSupported": false,
-    "growthEffects": {
-      "計算機!L64": "所有技能傷害%",
-      "計算機!U64": "攻擊力等級"
-    },
     "otherOptions": "依裝備模擬區下拉式選單與計算機公式映射。"
   },
   "rightIceSetEffects": {
-    "selectorCells": "Right.Ice.SetEffect.1 Right.Ice.SetEffect.2 Right.Ice.SetEffect.3",
     "maxSelectedSets": 3,
     "duplicateSelection": "invalid",
-    "activation": "Only user-selected set names are checked against their equipped piece count and tier requirements."
+    "activation": "Only user-selected set names are checked against their equipped piece count and tier requirements.",
+    "settingKeys": "Right.Ice.SetEffect.1 Right.Ice.SetEffect.2 Right.Ice.SetEffect.3"
   }
 }

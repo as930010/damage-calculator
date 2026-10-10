@@ -1,7 +1,6 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "dataUpdatedAt": "2026-09-25",
-  "selectorRange": "裝備模擬區!S4:S9；由係數區!A2:F61 查得支線及兩項特性，填入 T4:V9",
   "defaultMaxedStats": {
     "physicalAttack": 400,
     "magicalAttack": 400,
@@ -47,8 +46,7 @@
           "value": 3
         }
       ],
-      "otherwiseValue": "count",
-      "sourceCell": "計算機!L141"
+      "otherwiseValue": "count"
     },
     {
       "name": "2支線",
@@ -79,8 +77,7 @@
           "value": 3
         }
       ],
-      "otherwiseValue": "count",
-      "sourceCell": "計算機!L142"
+      "otherwiseValue": "count"
     },
     {
       "name": "3支線",
@@ -111,8 +108,7 @@
           "value": 3
         }
       ],
-      "otherwiseValue": "count",
-      "sourceCell": "計算機!L143"
+      "otherwiseValue": "count"
     },
     {
       "name": "4支線",
@@ -144,8 +140,7 @@
           "value": 3
         }
       ],
-      "otherwiseValue": "count",
-      "sourceCell": "計算機!L144"
+      "otherwiseValue": "count"
     }
   ],
   "traits": [
@@ -162,8 +157,7 @@
           "value": 3
         }
       ],
-      "otherwiseValue": 0,
-      "sourceCell": "計算機!J145"
+      "otherwiseValue": 0
     },
     {
       "name": "巨人審判者",
@@ -182,8 +176,7 @@
           "value": 2
         }
       ],
-      "otherwiseValue": 0,
-      "sourceCell": "計算機!N146"
+      "otherwiseValue": 0
     },
     {
       "name": "動武",
@@ -202,8 +195,7 @@
           "value": 2
         }
       ],
-      "otherwiseValue": 0,
-      "sourceCell": "計算機!O147"
+      "otherwiseValue": 0
     },
     {
       "name": "扭曲的視線",
@@ -214,8 +206,7 @@
           "value": 2
         }
       ],
-      "otherwiseValue": 0,
-      "sourceCell": "計算機!M148"
+      "otherwiseValue": 0
     },
     {
       "name": "物理特化",
@@ -231,8 +222,7 @@
           "value": 1
         }
       ],
-      "otherwiseValue": 0,
-      "sourceCell": "計算機!E149"
+      "otherwiseValue": 0
     },
     {
       "name": "魔法特化",
@@ -248,8 +238,7 @@
           "value": 1
         }
       ],
-      "otherwiseValue": 0,
-      "sourceCell": "計算機!E150"
+      "otherwiseValue": 0
     },
     {
       "name": "時空",
@@ -260,8 +249,7 @@
           "value": 2
         }
       ],
-      "otherwiseValue": 0,
-      "sourceCell": "計算機!R151"
+      "otherwiseValue": 0
     },
     {
       "name": "魔族",
@@ -272,20 +260,10 @@
           "value": 2
         }
       ],
-      "otherwiseValue": 0,
-      "sourceCell": "計算機!Q152"
+      "otherwiseValue": 0
     }
   ],
   "classSelectors": {
-    "selectorCells": [
-      "SpiritRecord.Class.1",
-      "SpiritRecord.Class.2",
-      "SpiritRecord.Class.3",
-      "SpiritRecord.Class.4",
-      "SpiritRecord.Class.5",
-      "SpiritRecord.Class.6"
-    ],
-    "sourceRange": "係數區!A2:F61",
     "classes": [
       {
         "classCode": "KE",
@@ -767,6 +745,14 @@
           "扭曲的視線"
         ]
       }
+    ],
+    "settingKeys": [
+      "SpiritRecord.Class.1",
+      "SpiritRecord.Class.2",
+      "SpiritRecord.Class.3",
+      "SpiritRecord.Class.4",
+      "SpiritRecord.Class.5",
+      "SpiritRecord.Class.6"
     ]
   }
 }

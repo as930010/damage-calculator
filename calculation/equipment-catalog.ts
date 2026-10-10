@@ -49,7 +49,7 @@ export interface SimulatorMagicStoneSelectionMapping {
 }
 
 export interface SimulatorEquipmentMappingDocument {
-  schemaVersion: 1;
+  schemaVersion: 2;
   selections: readonly SimulatorEquipmentSelectionMapping[];
   magicStoneSelections: {
     catalogFile: string;

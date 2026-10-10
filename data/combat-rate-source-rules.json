@@ -1,7 +1,6 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "dataUpdatedAt": "2026-09-25",
-  "source": "Google Sheets 計算機!B77, B103, B105",
   "sources": [
     {
       "id": "sheet:計算機!B77",
@@ -10,7 +9,6 @@
         "extremization"
       ],
       "method": "multiplicative",
-      "sourceCell": "計算機!B77",
       "valueSource": {
         "kind": "parameter",
         "key": "yellowBeastSpiritStoneRatePct"
@@ -26,11 +24,10 @@
         "critRate"
       ],
       "method": "multiplicative",
-      "sourceCell": "計算機!B103",
       "valueSource": {
         "kind": "enhancementText",
-        "inputCell": "Left.Armor.Bottom.ENHC",
-        "bonusPct": 2
+        "bonusPct": 2,
+        "inputFieldId": "Left.Armor.Bottom.ENHC"
       }
     },
     {
@@ -39,11 +36,10 @@
         "extremization"
       ],
       "method": "multiplicative",
-      "sourceCell": "計算機!B105",
       "valueSource": {
         "kind": "enhancementText",
-        "inputCell": "Left.Armor.Shoes.ENHC",
-        "bonusPct": 2
+        "bonusPct": 2,
+        "inputFieldId": "Left.Armor.Shoes.ENHC"
       }
     }
   ]

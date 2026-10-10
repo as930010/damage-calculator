@@ -12,16 +12,16 @@ const simulatorInputs = await read("data/simulator-input-options.json");
 
 test("every validation input is a semantic ID with a valid catalog", () => {
   for (const input of simulatorInputs.inputs) {
-    const fields = input.simulatorCells.split(/\s+/);
+    const fields = input.fieldIds;
     assert.ok(fields.length > 0);
-    assert.ok(fields.every(isFieldId), input.simulatorCells);
+    assert.ok(fields.every(isFieldId), input.fieldIds.join(" "));
     assert.ok(simulatorInputs.catalogs.some(catalog => catalog.id === input.catalogId), input.catalogId);
   }
 });
 
 test("semantic IDs resolve their exact option catalogs", () => {
   for (const input of simulatorInputs.inputs) {
-    for (const fieldId of input.simulatorCells.split(/\s+/)) {
+    for (const fieldId of input.fieldIds) {
       const actual = findValidationCatalog(simulatorInputs.inputs, simulatorInputs.catalogs, fieldId);
       assert.equal(actual?.id, input.catalogId, fieldId);
     }

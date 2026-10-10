@@ -150,8 +150,8 @@ test('立繪、覺醒輸入任一技傷比例後會互補至5%，並套用至正
   const baseline = projectDamage(data, loadout).result;
   const values = {
     ...loadout.values,
-    [data.otherEffects.portraitAwakening.strongCell]: 2,
-    [data.otherEffects.portraitAwakening.transcendenceCell]: 3,
+    [data.otherEffects.portraitAwakening.strongSettingKey]: 2,
+    [data.otherEffects.portraitAwakening.transcendenceSettingKey]: 3,
   };
   const result = projectDamage(data, { ...loadout, values }).result;
   const expectedStrong = baseline.attributes.stats.strongSkillDamagePct.finalTotal + 2;
@@ -163,18 +163,18 @@ test('立繪、覺醒輸入任一技傷比例後會互補至5%，並套用至正
   assert.ok(Math.abs(result.finalDamage.skillDamageWeighting.combinedFactor - expectedFactor) < 1e-12);
   const singleInput = projectDamage(data, { ...loadout, values: {
     ...loadout.values,
-    [data.otherEffects.portraitAwakening.strongCell]: 3,
+    [data.otherEffects.portraitAwakening.strongSettingKey]: 3,
   } }).result;
   assert.equal(singleInput.attributes.stats.strongSkillDamagePct.finalTotal, baseline.attributes.stats.strongSkillDamagePct.finalTotal + 3);
   assert.equal(singleInput.attributes.stats.transcendenceSkillDamagePct.finalTotal, baseline.attributes.stats.transcendenceSkillDamagePct.finalTotal + 2);
   assert.throws(() => projectAttributes(data, { ...loadout, values: {
     ...loadout.values,
-    [data.otherEffects.portraitAwakening.strongCell]: 2,
-    [data.otherEffects.portraitAwakening.transcendenceCell]: 4,
+    [data.otherEffects.portraitAwakening.strongSettingKey]: 2,
+    [data.otherEffects.portraitAwakening.transcendenceSettingKey]: 4,
   } }), /合計必須為 5/);
   assert.throws(() => projectAttributes(data, { ...loadout, values: {
     ...loadout.values,
-    [data.otherEffects.portraitAwakening.strongCell]: 1.5,
+    [data.otherEffects.portraitAwakening.strongSettingKey]: 1.5,
   } }), /正整數/);
 });
 
@@ -280,7 +280,7 @@ test('戒指B的強烈技術戒指、通用技術戒指效果與互斥欄位正�
 
   const ringBSelections = data.mapping.selections.filter(entry => entry.slotId === 'ringB');
   assert.deepEqual(ringBSelections.map(entry => entry.selectionCell), ['Accessory.Ring2']);
-  const ringBInput = data.simulatorInputs.inputs.find(entry => entry.simulatorCells.split(/\s+/).includes('Accessory.Ring2'));
+  const ringBInput = data.simulatorInputs.inputs.find(entry => entry.fieldIds.includes('Accessory.Ring2'));
   const ringBOptionCatalog = data.simulatorInputs.catalogs.find(entry => entry.id === ringBInput?.catalogId);
   assert.ok(ringBOptionCatalog?.options.some(option => option.value === '強烈的技術戒指'));
   assert.ok(ringBOptionCatalog?.options.some(option => option.value === '強烈鬥士的技術戒指'));
@@ -499,7 +499,6 @@ test('單技傷電路板、芯片、武器變換、共鳴、聖獸與賦靈錄�
   const strongChip = data.chips.chips.find(entry => entry.name === '強烈技傷%');
   const transcendenceChip = data.chips.chips.find(entry => entry.name === '超越技傷%');
   assert.deepEqual(strongChip.tuningLevels, transcendenceChip.tuningLevels);
-  assert.equal(strongChip.valueSourceColumn, transcendenceChip.valueSourceColumn);
 
   const weaponTransform = data.transformations.slots[0];
   const weaponResult = projectDamage(data, { ...baseState, values: {
@@ -508,7 +507,7 @@ test('單技傷電路板、芯片、武器變換、共鳴、聖獸與賦靈錄�
   assert.equal(weaponResult.attributes.stats.strongSkillDamagePct.finalTotal - baseline.attributes.stats.strongSkillDamagePct.finalTotal, 5);
 
   const resonance = data.resonance.effects.find(entry => entry.id === 'resonance-skill-damage');
-  const resonanceResult = projectDamage(data, { ...baseState, values: { ...baseValues, [resonance.inputCell]: 100 } }).result;
+  const resonanceResult = projectDamage(data, { ...baseState, values: { ...baseValues, [resonance.settingKey]: 100 } }).result;
   assert.equal(resonanceResult.attributes.stats.strongSkillDamagePct.finalTotal - baseline.attributes.stats.strongSkillDamagePct.finalTotal, 35);
   assert.equal(resonanceResult.attributes.stats.transcendenceSkillDamagePct.finalTotal - baseline.attributes.stats.transcendenceSkillDamagePct.finalTotal, 35);
 

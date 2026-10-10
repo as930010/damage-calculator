@@ -10,7 +10,7 @@ export interface RightIceSetEffect {
 }
 
 export interface RightIceSetEffectDocument {
-  schemaVersion: 1;
+  schemaVersion: 2;
   selectionCells: readonly string[];
   maxSelectedSets: number;
   effects: readonly RightIceSetEffect[];
@@ -30,7 +30,7 @@ export interface ChipOption {
 }
 
 export interface ChipCatalogDocument {
-  schemaVersion: 1;
+  schemaVersion: 2;
   chips: readonly ChipOption[];
 }
 
@@ -41,20 +41,20 @@ export interface WeaponGrowthLevel {
 }
 
 export interface WeaponGrowthDocument {
-  schemaVersion: 1;
+  schemaVersion: 2;
   levels: readonly WeaponGrowthLevel[];
 }
 
 export interface ResonanceEffectRule {
   id: string;
   name: string;
-  inputCell: string;
+  settingKey: string;
   multiplier: number;
   stats: Readonly<Record<string, number>>;
 }
 
 export interface ResonanceEffectDocument {
-  schemaVersion: 1;
+  schemaVersion: 2;
   effects: readonly ResonanceEffectRule[];
 }
 
@@ -73,7 +73,7 @@ export interface RaidSetRule {
 }
 
 export interface RaidSetEffectDocument {
-  schemaVersion: 1;
+  schemaVersion: 2;
   sets: readonly RaidSetRule[];
 }
 
@@ -85,7 +85,7 @@ export interface AtmaEffectRule {
 }
 
 export interface AtmaEffectDocument {
-  schemaVersion: 1;
+  schemaVersion: 2;
   activeWhenPieceCountEquals: number;
   rules: readonly AtmaEffectRule[];
 }
@@ -98,11 +98,10 @@ export interface MasterBeastOption {
 }
 
 export interface MasterBeastEffectDocument {
-  schemaVersion: 1;
+  schemaVersion: 2;
   armorSpiritStoneSetEffect: {
     id: string;
     multiplicativeDamagePct: number;
-    source: string;
   };
   spiritStoneColorSelector: {
     defaultColor: "黃" | "綠";
@@ -110,7 +109,7 @@ export interface MasterBeastEffectDocument {
     yellowRateValuePct: number;
   };
   options: readonly MasterBeastOption[];
-  statKeyBySheetName: Readonly<Record<string, string>>;
+  statKeyByAttributeName: Readonly<Record<string, string>>;
   customAttributeOptions: {
     head: readonly string[];
     necklace: readonly string[];
@@ -168,9 +167,9 @@ export interface SpiritRecordTrait {
 }
 
 export interface SpiritRecordEffectDocument {
-  schemaVersion: 1;
+  schemaVersion: 2;
   classSelectors: {
-    selectorCells: readonly string[];
+    settingKeys: readonly string[];
     classes: readonly { classCode: string; branch: string; traits: readonly [string, string] }[];
   };
   defaultMaxedStats: Readonly<Record<string, number>>;
@@ -183,8 +182,8 @@ export function resolveSpiritRecordSelections(
   document: SpiritRecordEffectDocument,
   selectedClassCodes: readonly (string | null | undefined)[],
 ): string[] {
-  if (selectedClassCodes.length > document.classSelectors.selectorCells.length) {
-    throw new RangeError(`賦靈錄最多接受 ${document.classSelectors.selectorCells.length} 個職業選擇。`);
+  if (selectedClassCodes.length > document.classSelectors.settingKeys.length) {
+    throw new RangeError(`賦靈錄最多接受 ${document.classSelectors.settingKeys.length} 個職業選擇。`);
   }
   const selectedCodes = new Set<string>();
   return selectedClassCodes.flatMap((classCode) => {
@@ -207,8 +206,8 @@ export interface CircuitBoardRule {
 }
 
 export interface CircuitBoardRulesDocument {
-  schemaVersion: 1;
-  statKeyBySheetName: Readonly<Record<string, string | readonly string[]>>;
+  schemaVersion: 2;
+  statKeyByAttributeName: Readonly<Record<string, string | readonly string[]>>;
   inputs: readonly CircuitBoardRule[];
 }
 
@@ -237,7 +236,7 @@ export interface ArmorAppraisalSlot {
 }
 
 export interface ArmorAppraisalDocument {
-  schemaVersion: 1;
+  schemaVersion: 2;
   options: readonly ArmorAppraisalOption[];
   slots: readonly ArmorAppraisalSlot[];
 }
@@ -271,27 +270,24 @@ export interface AccessoryEffectGroup {
   selectionCell: string;
   slotId: string;
   inputCells: readonly string[];
-  source: string;
   options: readonly AccessoryEffectOption[];
   optionsByEquipmentName?: Readonly<Record<string, readonly AccessoryEffectOption[]>>;
 }
 
 export interface AccessoryEffectDocument {
-  schemaVersion: 1;
+  schemaVersion: 2;
   groups: readonly AccessoryEffectGroup[];
 }
 
 export interface ColorSetEffectDocument {
-  schemaVersion: 1;
-  selectorCell: string;
-  source: string;
+  schemaVersion: 2;
+  settingKey: string;
   options: readonly {
     name: string;
     stats?: Readonly<Record<string, number>>;
     calculatedStat?: {
       outputKey: string;
-      sourceAttributeCell: string;
-      sourceValueCell: string;
+      inputValueLabel: string;
       requiredAttribute: string;
       baseMultiplier: number;
       inputMultiplier: number;
@@ -407,16 +403,16 @@ export function resolveResonanceEffects(
     inputValues: Readonly<Record<string, unknown>>,
 ): StatContribution[] {
   return document.effects.flatMap((effect) => {
-      if (!isResonanceInputCell(effect.inputCell)) {
-        throw new RangeError(`${effect.id} 使用了未設定上限的共鳴欄位：${effect.inputCell}`);
+      if (!isResonanceInputCell(effect.settingKey)) {
+        throw new RangeError(`${effect.id} 使用了未設定上限的共鳴欄位：${effect.settingKey}`);
       }
-    const rawValue = inputValues[effect.inputCell];
+    const rawValue = inputValues[effect.settingKey];
       if (rawValue === undefined || rawValue === null || rawValue === "") return [];
       if ((typeof rawValue === "number" && !Number.isFinite(rawValue)) || !Number.isFinite(effect.multiplier)) {
-      throw new TypeError(`${effect.inputCell} resonance input and multiplier must be finite.`);
+      throw new TypeError(`${effect.settingKey} resonance input and multiplier must be finite.`);
     }
-      const points = parseResonancePoints(effect.inputCell, rawValue);
-      if (points === null) throw new RangeError(`${effect.inputCell} 共鳴點數必須是範圍內的非負整數。`);
+      const points = parseResonancePoints(effect.settingKey, rawValue);
+      if (points === null) throw new RangeError(`${effect.settingKey} 共鳴點數必須是範圍內的非負整數。`);
       if (points === 0) return [];
     const stats = Object.fromEntries(
       Object.entries(effect.stats).map(([key, scalar]) => {
@@ -512,7 +508,7 @@ export function resolveMasterBeastEffects(
   const addManual = (entry: MasterBeastManualValue | undefined, sourceId: string) => {
     if (!entry || entry.attribute == null || entry.attribute.trim() === "" || entry.value == null) return;
     if (!Number.isFinite(entry.value)) throw new TypeError(sourceId + " must be finite.");
-    const key = document.statKeyBySheetName[entry.attribute];
+    const key = document.statKeyByAttributeName[entry.attribute];
     if (!key) return;
     const value = entry.fractionToPercentagePoints ? entry.value * 100 : entry.value;
     result.push({ sourceId, stats: { [key]: value } });
@@ -599,7 +595,7 @@ export function resolveCircuitBoardEffects(
       if (!Number.isFinite(selection.percentageValue)) {
         throw new TypeError(rule.slot + " circuit-board percentage must be finite.");
       }
-      const mappedStatKeys = document.statKeyBySheetName[selection.attribute];
+      const mappedStatKeys = document.statKeyByAttributeName[selection.attribute];
       if (!mappedStatKeys) return { slot: rule.slot, wearSet: rule.wearSet, contribution: null };
       const statKeys = Array.isArray(mappedStatKeys) ? mappedStatKeys : [mappedStatKeys];
       return {
@@ -690,7 +686,7 @@ export function resolveColorSetEffect(
   if (!option.calculatedStat) throw new RangeError(`百億/內布隆套效「${selectedName}」沒有計算規則。`);
   const formula = option.calculatedStat;
   const rawValue = sourceAttribute === formula.requiredAttribute ? sourceValue ?? 0 : 0;
-  if (!Number.isFinite(rawValue)) throw new TypeError(`${formula.sourceValueCell} 必須是有限數值。`);
+  if (!Number.isFinite(rawValue)) throw new TypeError(`${formula.inputValueLabel} 必須是有限數值。`);
   const sourcePoints = rawValue * formula.inputValueToPoints;
   const sourceRatio = sourcePoints / 100;
   const outputPct = (formula.baseMultiplier * (1 + sourceRatio * formula.inputMultiplier) - 1) * 100;

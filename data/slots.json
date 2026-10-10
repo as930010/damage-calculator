@@ -1,7 +1,6 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "dataUpdatedAt": "2026-09-25",
-  "source": "Google Sheets equipment database slot columns; virtual categories from worksheet names",
   "slots": [
     {
       "id": "top",

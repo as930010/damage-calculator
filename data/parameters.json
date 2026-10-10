@@ -1,7 +1,6 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "dataUpdatedAt": "2026-10-07",
-  "source": "Google Sheets: 計算機!C154, D154, H154, E76, E93, Q37, Q53, Q86, R86, T101, T102, B77 (formerly B76), V87; fixed cells and conditional sources; user-confirmed global effect",
   "characterBase": {
     "physicalAttack": 1202,
     "magicalAttack": 1202,
@@ -70,11 +69,11 @@
   "conditionalEffects": [
     {
       "sourceId": "sheet:計算機!T102",
-      "selectorCell": "Accessory.FaceTop",
       "selectorValue": "MAESTRO光環",
       "stats": {
         "multiplicativeCritDamagePct": 2
-      }
+      },
+      "settingKey": "Accessory.FaceTop"
     }
   ],
   "critDamageProductBasePct": 50,

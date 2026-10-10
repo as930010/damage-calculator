@@ -1,72 +1,55 @@
 {
-  "schemaVersion": 1,
-  "note": "同一選項來源由多個輸入格共用一份 catalog；輸入格透過 catalogId 連結，避免重複維護。",
+  "schemaVersion": 2,
   "catalogs": [
     {
       "id": "option-catalog-f86b43489660",
       "options": [
         {
-          "cell": "AL2",
           "value": "攻擊力+40"
         },
         {
-          "cell": "AL3",
           "value": "攻擊力+80"
         },
         {
-          "cell": "AL4",
           "value": "攻擊力+120"
         },
         {
-          "cell": "AL5",
           "value": "攻擊力+160"
         },
         {
-          "cell": "AL6",
           "value": "攻擊力+200"
         },
         {
-          "cell": "AL7",
           "value": "雙攻+0.6%"
         },
         {
-          "cell": "AL8",
           "value": "雙攻+1.2%"
         },
         {
-          "cell": "AL9",
           "value": "雙攻+1.8%"
         },
         {
-          "cell": "AL10",
           "value": "雙攻+2.4%"
         },
         {
-          "cell": "AL11",
           "value": "雙攻+3%"
         },
         {
-          "cell": "AL12",
           "value": "Boss傷害+1%"
         },
         {
-          "cell": "AL13",
           "value": "Boss傷害+2%"
         },
         {
-          "cell": "AL14",
           "value": "Boss傷害+3%"
         },
         {
-          "cell": "AL15",
           "value": "Boss傷害+4%"
         },
         {
-          "cell": "AL16",
           "value": "Boss傷害+5%"
         },
         {
-          "cell": "AL17",
           "value": "無關傷害"
         }
       ]
@@ -75,39 +58,33 @@
       "id": "option-catalog-88ecb3d3a560",
       "options": [
         {
-          "cell": "AF2",
           "value": "雙攻%"
         },
         {
-          "cell": "AF3",
           "value": "兩極化%"
         },
         {
-          "cell": "AF4",
           "value": "致命傷害%"
         },
         {
-          "cell": "AF5",
           "value": "Boss傷害%"
         },
         {
-          "cell": "AF6",
           "value": "超越技傷%"
         },
         {
-          "cell": "AF7",
           "value": "所有技能傷害%"
         },
         {
-          "cell": "AF8",
+          "value": "無視防禦%"
+        },
+        {
           "value": "致命一擊%"
         },
         {
-          "cell": "AF9",
           "value": "極大化%"
         },
         {
-          "cell": "AF10",
           "value": "無關傷害"
         }
       ]
@@ -116,19 +93,15 @@
       "id": "option-catalog-a6df72b366dd",
       "options": [
         {
-          "cell": "A42",
           "value": "騎士團"
         },
         {
-          "cell": "A43",
           "value": "幻影面紗"
         },
         {
-          "cell": "A44",
           "value": "日冕．灼耀花仙"
         },
         {
-          "cell": "A45",
           "value": "厄瑞玻斯的哀歌"
         }
       ]
@@ -137,27 +110,21 @@
       "id": "option-catalog-7d1f8d30c649",
       "options": [
         {
-          "cell": "AD13",
           "value": "雙攻%"
         },
         {
-          "cell": "AD14",
           "value": "兩極化%"
         },
         {
-          "cell": "AD15",
           "value": "致命傷害%"
         },
         {
-          "cell": "AD16",
           "value": "所有技能傷害%"
         },
         {
-          "cell": "AD17",
           "value": "無視防禦%"
         },
         {
-          "cell": "AD18",
           "value": "其他"
         }
       ]
@@ -166,51 +133,39 @@
       "id": "option-catalog-3a417dd00eea",
       "options": [
         {
-          "cell": "A2",
           "value": "騎士團"
         },
         {
-          "cell": "A3",
           "value": "幻影面紗"
         },
         {
-          "cell": "A4",
           "value": "真理假面"
         },
         {
-          "cell": "A5",
           "value": "紫霄花郎"
         },
         {
-          "cell": "A6",
           "value": "星辰牧者"
         },
         {
-          "cell": "A7",
           "value": "日冕．灼耀花仙"
         },
         {
-          "cell": "A8",
           "value": "幽潮吞源"
         },
         {
-          "cell": "A9",
           "value": "猛虎奇談"
         },
         {
-          "cell": "A10",
           "value": "厄瑞玻斯的哀歌"
         },
         {
-          "cell": "A11",
           "value": "薇塔芳塔娜"
         },
         {
-          "cell": "A12",
           "value": "深淵的存在"
         },
         {
-          "cell": "A13",
           "value": "飛龍乘雲"
         }
       ]
@@ -219,15 +174,12 @@
       "id": "option-catalog-21e473c1c44f",
       "options": [
         {
-          "cell": "AB13",
           "value": "致命一擊"
         },
         {
-          "cell": "AB14",
           "value": "極大化"
         },
         {
-          "cell": "AB15",
           "value": "其他"
         }
       ]
@@ -277,15 +229,12 @@
       "id": "option-catalog-0bc187fbcda5",
       "options": [
         {
-          "cell": "A5",
           "value": "MAESTRO光環"
         },
         {
-          "cell": "A6",
           "value": "魂靈皇冠"
         },
         {
-          "cell": "A7",
           "value": "麻木皇冠"
         }
       ]
@@ -294,11 +243,9 @@
       "id": "option-catalog-c914793cc91d",
       "options": [
         {
-          "cell": "A33",
           "value": "亞特瑪手臂"
         },
         {
-          "cell": "A34",
           "value": "新皇后的手臂裝飾"
         }
       ]
@@ -307,15 +254,12 @@
       "id": "option-catalog-b8a66ebdd002",
       "options": [
         {
-          "cell": "A35",
           "value": "亞特瑪項鍊"
         },
         {
-          "cell": "A36",
           "value": "班德王國項鍊"
         },
         {
-          "cell": "A37",
           "value": "堅毅的鬥士項鍊"
         }
       ]
@@ -324,19 +268,15 @@
       "id": "option-catalog-5ed6c4802af7",
       "options": [
         {
-          "cell": "Y2",
           "value": "米色"
         },
         {
-          "cell": "Y3",
           "value": "紫色"
         },
         {
-          "cell": "Y4",
           "value": "綠色"
         },
         {
-          "cell": "Y5",
           "value": "藍色"
         }
       ]
@@ -345,35 +285,27 @@
       "id": "option-catalog-3ffd3537063b",
       "options": [
         {
-          "cell": "A46",
           "value": "騎士團"
         },
         {
-          "cell": "A47",
           "value": "神埃"
         },
         {
-          "cell": "A48",
           "value": "幻影面紗"
         },
         {
-          "cell": "A49",
           "value": "紫霄花郎"
         },
         {
-          "cell": "A50",
           "value": "日冕．灼耀花仙"
         },
         {
-          "cell": "A51",
           "value": "猛虎奇談"
         },
         {
-          "cell": "A52",
           "value": "薇塔芳塔娜"
         },
         {
-          "cell": "A53",
           "value": "飛龍乘雲"
         }
       ]
@@ -382,43 +314,33 @@
       "id": "option-catalog-eb9040276ce5",
       "options": [
         {
-          "cell": "AC13",
           "value": 3.5
         },
         {
-          "cell": "AC14",
           "value": 4
         },
         {
-          "cell": "AC15",
           "value": 4.5
         },
         {
-          "cell": "AC16",
           "value": 5
         },
         {
-          "cell": "AC17",
           "value": 5.5
         },
         {
-          "cell": "AC18",
           "value": 6
         },
         {
-          "cell": "AC19",
           "value": 6.5
         },
         {
-          "cell": "AC20",
           "value": 7
         },
         {
-          "cell": "AC21",
           "value": 7.5
         },
         {
-          "cell": "AC22",
           "value": 8
         }
       ]
@@ -427,23 +349,18 @@
       "id": "option-catalog-a71dcb0f0e70",
       "options": [
         {
-          "cell": "AU2",
           "value": "攻擊力+1%"
         },
         {
-          "cell": "AU3",
           "value": "所有技能傷害+1%"
         },
         {
-          "cell": "AU4",
           "value": "致命一擊+3%"
         },
         {
-          "cell": "AU5",
           "value": "極大化+3%"
         },
         {
-          "cell": "AU6",
           "value": "無關傷害"
         }
       ]
@@ -463,31 +380,24 @@
       "id": "option-catalog-ca5d8d24cebc",
       "options": [
         {
-          "cell": "A18",
           "value": "騎士團"
         },
         {
-          "cell": "A19",
           "value": "神埃"
         },
         {
-          "cell": "A20",
           "value": "幻影面紗"
         },
         {
-          "cell": "A21",
           "value": "星辰牧者"
         },
         {
-          "cell": "A22",
           "value": "厄瑞玻斯的哀歌"
         },
         {
-          "cell": "A23",
           "value": "深淵的存在"
         },
         {
-          "cell": "A24",
           "value": "飛龍乘雲"
         }
       ]
@@ -507,15 +417,12 @@
       "id": "option-catalog-24917966f1aa",
       "options": [
         {
-          "cell": "A2",
           "value": "Type-Q女王的勳章"
         },
         {
-          "cell": "A3",
           "value": "暗鬼的徽章"
         },
         {
-          "cell": "A4",
           "value": "火魔的印記"
         }
       ]
@@ -524,31 +431,24 @@
       "id": "option-catalog-8e5b542aec9d",
       "options": [
         {
-          "cell": "A2",
           "value": "東方美食"
         },
         {
-          "cell": "A3",
           "value": "天下一味"
         },
         {
-          "cell": "A4",
           "value": "貝斯馬共存節"
         },
         {
-          "cell": "A5",
           "value": "艾利亞諾德共存節"
         },
         {
-          "cell": "A6",
           "value": "運動女僕"
         },
         {
-          "cell": "A7",
           "value": "共存節禮服"
         },
         {
-          "cell": "A8",
           "value": "高貴格鬥士"
         }
       ]
@@ -557,43 +457,33 @@
       "id": "option-catalog-414d108fd752",
       "options": [
         {
-          "cell": "AB2",
           "value": "致命一擊8%"
         },
         {
-          "cell": "AB3",
           "value": "致命一擊9%"
         },
         {
-          "cell": "AB4",
           "value": "致命一擊10%"
         },
         {
-          "cell": "AB5",
           "value": "致命一擊11%"
         },
         {
-          "cell": "AB6",
           "value": "致命一擊12%"
         },
         {
-          "cell": "AB7",
           "value": "極大化8%"
         },
         {
-          "cell": "AB8",
           "value": "極大化9%"
         },
         {
-          "cell": "AB9",
           "value": "極大化10%"
         },
         {
-          "cell": "AB10",
           "value": "極大化11%"
         },
         {
-          "cell": "AB11",
           "value": "極大化12%"
         },
         {
@@ -605,23 +495,18 @@
       "id": "option-catalog-629929671064",
       "options": [
         {
-          "cell": "A31",
           "value": "騎士團"
         },
         {
-          "cell": "A32",
           "value": "神埃"
         },
         {
-          "cell": "A33",
           "value": "真理假面"
         },
         {
-          "cell": "A34",
           "value": "日冕．灼耀花仙"
         },
         {
-          "cell": "A35",
           "value": "厄瑞玻斯的哀歌"
         }
       ]
@@ -630,43 +515,33 @@
       "id": "option-catalog-717ee30befef",
       "options": [
         {
-          "cell": "AE13",
           "value": 0.2
         },
         {
-          "cell": "AE14",
           "value": 0.4
         },
         {
-          "cell": "AE15",
           "value": 0.6
         },
         {
-          "cell": "AE16",
           "value": 0.8
         },
         {
-          "cell": "AE17",
           "value": 1
         },
         {
-          "cell": "AE18",
           "value": 1.2
         },
         {
-          "cell": "AE19",
           "value": 1.4
         },
         {
-          "cell": "AE20",
           "value": 1.6
         },
         {
-          "cell": "AE21",
           "value": 1.8
         },
         {
-          "cell": "AE22",
           "value": 2
         }
       ]
@@ -675,15 +550,12 @@
       "id": "option-catalog-1ffd50e6c0ac",
       "options": [
         {
-          "cell": "N2",
           "value": "超越技傷%"
         },
         {
-          "cell": "N3",
           "value": "Boss傷害%"
         },
         {
-          "cell": "N4",
           "value": "無關傷害"
         }
       ]
@@ -692,11 +564,9 @@
       "id": "option-catalog-d3b938610e58",
       "options": [
         {
-          "cell": "AF13",
           "value": "超越技傷%"
         },
         {
-          "cell": "AF14",
           "value": "其他"
         }
       ]
@@ -705,19 +575,15 @@
       "id": "option-catalog-f7853015a33f",
       "options": [
         {
-          "cell": "W2",
           "value": "攻擊力+5.5%"
         },
         {
-          "cell": "W3",
           "value": "攻擊力+6%"
         },
         {
-          "cell": "W4",
           "value": "攻擊力等級+7"
         },
         {
-          "cell": "W5",
           "value": "攻擊力等級+8"
         }
       ]
@@ -726,31 +592,24 @@
       "id": "option-catalog-9bd94655596d",
       "options": [
         {
-          "cell": "A19",
           "value": "命運的預言書"
         },
         {
-          "cell": "A20",
           "value": "機器人偶頭"
         },
         {
-          "cell": "A21",
           "value": "夢緣香爐"
         },
         {
-          "cell": "A22",
           "value": "普萊卡斯的形象"
         },
         {
-          "cell": "A23",
           "value": "攜帶式能量環"
         },
         {
-          "cell": "A24",
           "value": "魔族之眼"
         },
         {
-          "cell": "A25",
           "value": "粉絲手燈"
         }
       ]
@@ -759,19 +618,15 @@
       "id": "option-catalog-8c8ef2e12ca3",
       "options": [
         {
-          "cell": "AY2",
           "value": 0
         },
         {
-          "cell": "AY3",
           "value": 71.92
         },
         {
-          "cell": "AY4",
           "value": 83.94
         },
         {
-          "cell": "AY5",
           "value": 96.01
         }
       ]
@@ -780,19 +635,15 @@
       "id": "option-catalog-ef87b39302a9",
       "options": [
         {
-          "cell": "A9",
           "value": "亞特瑪臉下"
         },
         {
-          "cell": "A10",
           "value": "精銳格雷特的面甲"
         },
         {
-          "cell": "A11",
           "value": "巴力溫毛飾"
         },
         {
-          "cell": "A12",
           "value": "瑪瑙碎片"
         }
       ]
@@ -801,31 +652,24 @@
       "id": "option-catalog-a7da0a6a7424",
       "options": [
         {
-          "cell": "P2",
           "value": "流血%"
         },
         {
-          "cell": "P3",
           "value": "兩極化%"
         },
         {
-          "cell": "P4",
           "value": "強者%"
         },
         {
-          "cell": "P5",
           "value": "排熱%"
         },
         {
-          "cell": "P6",
           "value": "雙攻%"
         },
         {
-          "cell": "P7",
           "value": "超越技傷%"
         },
         {
-          "cell": "P8",
           "value": "Boss傷害%"
         }
       ]
@@ -834,19 +678,15 @@
       "id": "option-catalog-8d928a8b48c0",
       "options": [
         {
-          "cell": "A14",
           "value": "騎士團"
         },
         {
-          "cell": "A15",
           "value": "神埃"
         },
         {
-          "cell": "A16",
           "value": "真理假面"
         },
         {
-          "cell": "A17",
           "value": "日冕．灼耀花仙"
         }
       ]
@@ -855,31 +695,24 @@
       "id": "option-catalog-77524e534e9f",
       "options": [
         {
-          "cell": "A9",
           "value": "狩獵5%B傷"
         },
         {
-          "cell": "A10",
           "value": "賢者12%致命"
         },
         {
-          "cell": "A11",
           "value": "賢者12%極大"
         },
         {
-          "cell": "A12",
           "value": "亞特瑪6%B傷"
         },
         {
-          "cell": "A13",
           "value": "亞特瑪4%技傷"
         },
         {
-          "cell": "A14",
           "value": "亞特瑪5%超越"
         },
         {
-          "cell": "A15",
           "value": "無關傷害"
         }
       ]
@@ -888,23 +721,18 @@
       "id": "option-catalog-16acddec81de",
       "options": [
         {
-          "cell": "A61",
           "value": "騎士團"
         },
         {
-          "cell": "A62",
           "value": "神埃"
         },
         {
-          "cell": "A63",
           "value": "紫霄花郎"
         },
         {
-          "cell": "A64",
           "value": "幽潮吞源"
         },
         {
-          "cell": "A65",
           "value": "深淵的存在"
         }
       ]
@@ -913,27 +741,21 @@
       "id": "option-catalog-c4c9d626d9e6",
       "options": [
         {
-          "cell": "AZ2",
           "value": 50
         },
         {
-          "cell": "AZ3",
           "value": 60
         },
         {
-          "cell": "AZ4",
           "value": 70
         },
         {
-          "cell": "AZ5",
           "value": 80
         },
         {
-          "cell": "AZ6",
           "value": 90
         },
         {
-          "cell": "AZ7",
           "value": 95
         }
       ]
@@ -942,51 +764,39 @@
       "id": "option-catalog-ff7fcde60871",
       "options": [
         {
-          "cell": "AP2",
           "value": "無視防禦%"
         },
         {
-          "cell": "AP3",
           "value": "所有技能傷害%"
         },
         {
-          "cell": "AP4",
           "value": "Boss傷害%"
         },
         {
-          "cell": "AP5",
           "value": "致命傷害%"
         },
         {
-          "cell": "AP6",
           "value": "雙攻%"
         },
         {
-          "cell": "AP7",
           "value": "兩極化%"
         },
         {
-          "cell": "AP8",
           "value": "適應力%"
         },
         {
-          "cell": "AP9",
           "value": "100%血殺%"
         },
         {
-          "cell": "AP10",
           "value": "流血%"
         },
         {
-          "cell": "AP11",
           "value": "致命一擊%"
         },
         {
-          "cell": "AP12",
           "value": "極大化%"
         },
         {
-          "cell": "AP13",
           "value": "無關傷害"
         }
       ]
@@ -995,31 +805,24 @@
       "id": "option-catalog-0fcc9c3dc7e6",
       "options": [
         {
-          "cell": "A54",
           "value": "騎士團"
         },
         {
-          "cell": "A55",
           "value": "神埃"
         },
         {
-          "cell": "A56",
           "value": "真理假面"
         },
         {
-          "cell": "A57",
           "value": "星辰牧者"
         },
         {
-          "cell": "A58",
           "value": "幽潮吞源"
         },
         {
-          "cell": "A59",
           "value": "厄瑞玻斯的哀歌"
         },
         {
-          "cell": "A60",
           "value": "薇塔芳塔娜"
         }
       ]
@@ -1028,35 +831,27 @@
       "id": "option-catalog-64b257d9bcf4",
       "options": [
         {
-          "cell": "AG2",
           "value": "致命一擊+1%"
         },
         {
-          "cell": "AG3",
           "value": "致命一擊+1.5%"
         },
         {
-          "cell": "AG4",
           "value": "致命一擊+2%"
         },
         {
-          "cell": "AG5",
           "value": "極大化+1%"
         },
         {
-          "cell": "AG6",
           "value": "極大化+1.5%"
         },
         {
-          "cell": "AG7",
           "value": "極大化+2%"
         },
         {
-          "cell": "AG8",
           "value": "所有技能傷害+0.5%"
         },
         {
-          "cell": "AG9",
           "value": "無關傷害"
         }
       ]
@@ -1065,87 +860,66 @@
       "id": "option-catalog-91e87fc4ab46",
       "options": [
         {
-          "cell": "AN2",
           "value": "所有技能傷害+0.6%"
         },
         {
-          "cell": "AN3",
           "value": "所有技能傷害+1.2%"
         },
         {
-          "cell": "AN4",
           "value": "所有技能傷害+1.8%"
         },
         {
-          "cell": "AN5",
           "value": "所有技能傷害+2.4%"
         },
         {
-          "cell": "AN6",
           "value": "所有技能傷害+3%"
         },
         {
-          "cell": "AN7",
           "value": "所有技能傷害+0.6%"
         },
         {
-          "cell": "AN8",
           "value": "致命傷害+1.2%"
         },
         {
-          "cell": "AN9",
           "value": "致命傷害+1.8%"
         },
         {
-          "cell": "AN10",
           "value": "致命傷害+2.4%"
         },
         {
-          "cell": "AN11",
           "value": "致命傷害+3%"
         },
         {
-          "cell": "AN12",
           "value": "強者+0.6%"
         },
         {
-          "cell": "AN13",
           "value": "強者+1.2%"
         },
         {
-          "cell": "AN14",
           "value": "強者+1.8%"
         },
         {
-          "cell": "AN15",
           "value": "強者+2.4%"
         },
         {
-          "cell": "AN16",
           "value": "強者+3%"
         },
         {
-          "cell": "AN17",
           "value": "排熱+0.6%"
         },
         {
-          "cell": "AN18",
           "value": "排熱+1.2%"
         },
         {
-          "cell": "AN19",
           "value": "排熱+1.8%"
         },
         {
-          "cell": "AN20",
           "value": "排熱+2.4%"
         },
         {
-          "cell": "AN21",
           "value": "排熱+3%"
         },
         {
-          "cell": "AN22",
           "value": "無關傷害"
         }
       ]
@@ -1154,27 +928,21 @@
       "id": "option-catalog-5309e5d65e7e",
       "options": [
         {
-          "cell": "A25",
           "value": "騎士團"
         },
         {
-          "cell": "A26",
           "value": "紫霄花郎"
         },
         {
-          "cell": "A27",
           "value": "幽潮吞源"
         },
         {
-          "cell": "A28",
           "value": "猛虎奇談"
         },
         {
-          "cell": "A29",
           "value": "薇塔芳塔娜"
         },
         {
-          "cell": "A30",
           "value": "飛龍乘雲"
         }
       ]
@@ -1183,91 +951,69 @@
       "id": "option-catalog-fca3ffaecf1f",
       "options": [
         {
-          "cell": "V2",
           "value": "騎士團"
         },
         {
-          "cell": "V3",
           "value": "騎士團"
         },
         {
-          "cell": "V4",
           "value": "幻影面紗"
         },
         {
-          "cell": "V5",
           "value": "幻影面紗"
         },
         {
-          "cell": "V6",
           "value": "真理假面"
         },
         {
-          "cell": "V7",
           "value": "真理假面"
         },
         {
-          "cell": "V8",
           "value": "紫霄花郎"
         },
         {
-          "cell": "V9",
           "value": "紫霄花郎"
         },
         {
-          "cell": "V10",
           "value": "星辰牧者"
         },
         {
-          "cell": "V11",
           "value": "星辰牧者"
         },
         {
-          "cell": "V12",
           "value": "日冕．灼耀花仙"
         },
         {
-          "cell": "V13",
           "value": "日冕．灼耀花仙"
         },
         {
-          "cell": "V14",
           "value": "幽潮吞源"
         },
         {
-          "cell": "V15",
           "value": "幽潮吞源"
         },
         {
-          "cell": "V16",
           "value": "猛虎奇談"
         },
         {
-          "cell": "V17",
           "value": "猛虎奇談"
         },
         {
-          "cell": "V18",
           "value": "厄瑞玻斯的哀歌"
         },
         {
-          "cell": "V19",
           "value": "厄瑞玻斯的哀歌"
         },
         {
-          "cell": "V20",
           "value": "薇塔芳塔娜"
         },
         {
-          "cell": "V21",
           "value": "薇塔芳塔娜"
         },
         {
-          "cell": "V22",
           "value": "深淵的存在"
         },
         {
-          "cell": "V23",
           "value": "深淵的存在"
         }
       ]
@@ -1276,19 +1022,15 @@
       "id": "option-catalog-83d51421effa",
       "options": [
         {
-          "cell": "BB2",
           "value": "適應靈藥"
         },
         {
-          "cell": "BB3",
           "value": "天上甜點"
         },
         {
-          "cell": "BB4",
           "value": "巨人靈藥"
         },
         {
-          "cell": "BB5",
           "value": "其他"
         }
       ]
@@ -1297,19 +1039,15 @@
       "id": "option-catalog-9063ccca31d6",
       "options": [
         {
-          "cell": "A15",
           "value": "憤怒戒指"
         },
         {
-          "cell": "A16",
           "value": "鬥士憤怒戒指"
         },
         {
-          "cell": "A17",
           "value": "完整的能量變換裝置"
         },
         {
-          "cell": "A18",
           "value": "鏡之世界的碎片"
         }
       ]
@@ -1318,23 +1056,18 @@
       "id": "option-catalog-987fecd02ec8",
       "options": [
         {
-          "cell": "AW2",
           "value": "致命一擊+4%"
         },
         {
-          "cell": "AW3",
           "value": "極大化+4%"
         },
         {
-          "cell": "AW4",
           "value": "致命一擊+2%"
         },
         {
-          "cell": "AW5",
           "value": "極大化+2%"
         },
         {
-          "cell": "AW6",
           "value": "無關傷害"
         }
       ]
@@ -1343,115 +1076,87 @@
       "id": "option-catalog-e68237ce7fa2",
       "options": [
         {
-          "cell": "Z2",
           "value": "致命傷害+1%"
         },
         {
-          "cell": "Z3",
           "value": "致命傷害+2%"
         },
         {
-          "cell": "Z4",
           "value": "致命傷害+3%"
         },
         {
-          "cell": "Z5",
           "value": "致命傷害+4%"
         },
         {
-          "cell": "Z6",
           "value": "致命傷害+5%"
         },
         {
-          "cell": "Z7",
           "value": "適應力+1%"
         },
         {
-          "cell": "Z8",
           "value": "適應力+2%"
         },
         {
-          "cell": "Z9",
           "value": "適應力+3%"
         },
         {
-          "cell": "Z10",
           "value": "Boss傷害+1%"
         },
         {
-          "cell": "Z11",
           "value": "Boss傷害+2%"
         },
         {
-          "cell": "Z12",
           "value": "Boss傷害+3%"
         },
         {
-          "cell": "Z13",
           "value": "Boss傷害+4%"
         },
         {
-          "cell": "Z14",
           "value": "Boss傷害+5%"
         },
         {
-          "cell": "Z15",
           "value": "Boss傷害+6%"
         },
         {
-          "cell": "Z16",
           "value": "Boss傷害+7%"
         },
         {
-          "cell": "Z17",
           "value": "Boss傷害+8%"
         },
         {
-          "cell": "Z18",
           "value": "Boss傷害+9%"
         },
         {
-          "cell": "Z19",
           "value": "Boss傷害+10%"
         },
         {
-          "cell": "Z20",
           "value": "Boss傷害+11%"
         },
         {
-          "cell": "Z21",
           "value": "Boss傷害+12%"
         },
         {
-          "cell": "Z22",
           "value": "Boss傷害+13%"
         },
         {
-          "cell": "Z23",
           "value": "Boss傷害+14%"
         },
         {
-          "cell": "Z24",
           "value": "Boss傷害+15%"
         },
         {
-          "cell": "Z25",
           "value": "攻擊力+200"
         },
         {
-          "cell": "Z26",
           "value": "攻擊力+300"
         },
         {
-          "cell": "Z27",
           "value": "攻擊力+400"
         },
         {
-          "cell": "Z28",
           "value": "攻擊力+500"
         },
         {
-          "cell": "Z29",
           "value": "攻擊力+600"
         }
       ]
@@ -1460,15 +1165,12 @@
       "id": "option-catalog-491562dd1e9d",
       "options": [
         {
-          "cell": "AV2",
           "value": "致命一擊+2%"
         },
         {
-          "cell": "AV3",
           "value": "極大化+2%"
         },
         {
-          "cell": "AV4",
           "value": "無關傷害"
         }
       ]
@@ -1477,91 +1179,69 @@
       "id": "option-catalog-76b3d1d0fc12",
       "options": [
         {
-          "cell": "I2",
           "value": 0
         },
         {
-          "cell": "I3",
           "value": 1
         },
         {
-          "cell": "I4",
           "value": 2
         },
         {
-          "cell": "I5",
           "value": 3
         },
         {
-          "cell": "I6",
           "value": 4
         },
         {
-          "cell": "I7",
           "value": 5
         },
         {
-          "cell": "I8",
           "value": 6
         },
         {
-          "cell": "I9",
           "value": 7
         },
         {
-          "cell": "I10",
           "value": 8
         },
         {
-          "cell": "I11",
           "value": 9
         },
         {
-          "cell": "I12",
           "value": 10
         },
         {
-          "cell": "I13",
           "value": 11
         },
         {
-          "cell": "I14",
           "value": 12
         },
         {
-          "cell": "I15",
           "value": 13
         },
         {
-          "cell": "I16",
           "value": 14
         },
         {
-          "cell": "I17",
           "value": 15
         },
         {
-          "cell": "I18",
           "value": 16
         },
         {
-          "cell": "I19",
           "value": 17
         },
         {
-          "cell": "I20",
           "value": 18
         },
         {
-          "cell": "I21",
           "value": 19
         },
         {
-          "cell": "I22",
           "value": 20
         },
         {
-          "cell": "I23",
           "value": 21
         }
       ]
@@ -1570,19 +1250,15 @@
       "id": "option-catalog-1a18d703db93",
       "options": [
         {
-          "cell": "L2",
           "value": "流血%"
         },
         {
-          "cell": "L3",
           "value": "Boss傷害%"
         },
         {
-          "cell": "L4",
           "value": "重置機率%"
         },
         {
-          "cell": "L5",
           "value": "無關傷害"
         }
       ]
@@ -1591,19 +1267,15 @@
       "id": "option-catalog-5f2425328fda",
       "options": [
         {
-          "cell": "A66",
           "value": "騎士團"
         },
         {
-          "cell": "A67",
           "value": "紫霄花郎"
         },
         {
-          "cell": "A68",
           "value": "幽潮吞源"
         },
         {
-          "cell": "A69",
           "value": "薇塔芳塔娜"
         }
       ]
@@ -1612,7 +1284,6 @@
       "id": "option-catalog-fdda7268ce18",
       "options": [
         {
-          "cell": "A8",
           "value": "亞特瑪臉中"
         }
       ]
@@ -1621,27 +1292,21 @@
       "id": "option-catalog-23122e89a169",
       "options": [
         {
-          "cell": "Q2",
           "value": "+5"
         },
         {
-          "cell": "Q3",
           "value": "+6"
         },
         {
-          "cell": "Q4",
           "value": "+7"
         },
         {
-          "cell": "Q5",
           "value": "+8"
         },
         {
-          "cell": "Q6",
           "value": "+9"
         },
         {
-          "cell": "Q7",
           "value": "+10"
         }
       ]
@@ -1650,43 +1315,33 @@
       "id": "option-catalog-bb28ed8d39bf",
       "options": [
         {
-          "cell": "AG13",
           "value": 0.5
         },
         {
-          "cell": "AG14",
           "value": 1
         },
         {
-          "cell": "AG15",
           "value": 1.5
         },
         {
-          "cell": "AG16",
           "value": 2
         },
         {
-          "cell": "AG17",
           "value": 2.5
         },
         {
-          "cell": "AG18",
           "value": 3
         },
         {
-          "cell": "AG19",
           "value": 3.5
         },
         {
-          "cell": "AG20",
           "value": 4
         },
         {
-          "cell": "AG21",
           "value": 4.5
         },
         {
-          "cell": "AG22",
           "value": 5
         }
       ]
@@ -1695,11 +1350,9 @@
       "id": "option-catalog-aecebaae726a",
       "options": [
         {
-          "cell": "V2",
           "value": "燦爛"
         },
         {
-          "cell": "V3",
           "value": "深淵"
         }
       ]
@@ -1708,43 +1361,33 @@
       "id": "option-catalog-a292118b7fc4",
       "options": [
         {
-          "cell": "U2",
           "value": "攻擊力等級+3.25"
         },
         {
-          "cell": "U3",
           "value": "攻擊力等級+2.75"
         },
         {
-          "cell": "U4",
           "value": "攻擊力等級+2.25"
         },
         {
-          "cell": "U5",
           "value": "致命一擊+6.5%"
         },
         {
-          "cell": "U6",
           "value": "致命一擊+5.5%"
         },
         {
-          "cell": "U7",
           "value": "致命一擊+4.5%"
         },
         {
-          "cell": "U8",
           "value": "極大化+6.5%"
         },
         {
-          "cell": "U9",
           "value": "極大化+5.5%"
         },
         {
-          "cell": "U10",
           "value": "極大化+4.5%"
         },
         {
-          "cell": "U11",
           "value": "無關傷害"
         }
       ]
@@ -1753,22 +1396,18 @@
       "id": "option-catalog-41bf529ba1aa",
       "options": [
         {
-          "cell": "BC2",
           "value": "小屋"
         },
         {
-          "cell": "BC3",
           "value": "強化小屋"
         },
         {
-          "cell": "BC4",
           "value": "集合地"
         },
         {
           "value": "共存節"
         },
         {
-          "cell": "BC5",
           "value": "其他"
         }
       ]
@@ -1777,23 +1416,18 @@
       "id": "option-catalog-b033738d4d5c",
       "options": [
         {
-          "cell": "A70",
           "value": "騎士團"
         },
         {
-          "cell": "A71",
           "value": "幻影面紗"
         },
         {
-          "cell": "A72",
           "value": "星辰牧者"
         },
         {
-          "cell": "A73",
           "value": "猛虎奇談"
         },
         {
-          "cell": "A74",
           "value": "深淵的存在"
         }
       ]
@@ -1802,11 +1436,9 @@
       "id": "option-catalog-5f3d8028fef2",
       "options": [
         {
-          "cell": "A31",
           "value": "靈魂的枷鎖"
         },
         {
-          "cell": "A32",
           "value": "發光之花"
         }
       ]
@@ -1815,11 +1447,9 @@
       "id": "option-catalog-801126ce1802",
       "options": [
         {
-          "cell": "O2",
           "value": "Boss傷害%"
         },
         {
-          "cell": "O3",
           "value": "無關傷害"
         }
       ]
@@ -1828,27 +1458,21 @@
       "id": "option-catalog-9240a234397a",
       "options": [
         {
-          "cell": "BA2",
           "value": 0
         },
         {
-          "cell": "BA3",
           "value": 10
         },
         {
-          "cell": "BA4",
           "value": 20
         },
         {
-          "cell": "BA5",
           "value": 30
         },
         {
-          "cell": "BA6",
           "value": 35
         },
         {
-          "cell": "BA7",
           "value": 40
         }
       ]
@@ -1857,243 +1481,183 @@
       "id": "option-catalog-be2a52193a9b",
       "options": [
         {
-          "cell": "A2",
           "value": "KE"
         },
         {
-          "cell": "A3",
           "value": "RM"
         },
         {
-          "cell": "A4",
           "value": "IM"
         },
         {
-          "cell": "A5",
           "value": "GE"
         },
         {
-          "cell": "A6",
           "value": "AS"
         },
         {
-          "cell": "A7",
           "value": "OZ"
         },
         {
-          "cell": "A8",
           "value": "MM"
         },
         {
-          "cell": "A9",
           "value": "LA"
         },
         {
-          "cell": "A10",
           "value": "AN"
         },
         {
-          "cell": "A11",
           "value": "DaB"
         },
         {
-          "cell": "A12",
           "value": "TW"
         },
         {
-          "cell": "A13",
           "value": "PR"
         },
         {
-          "cell": "A14",
           "value": "FB"
         },
         {
-          "cell": "A15",
           "value": "RH"
         },
         {
-          "cell": "A16",
           "value": "NI"
         },
         {
-          "cell": "A17",
           "value": "RE"
         },
         {
-          "cell": "A18",
           "value": "CU"
         },
         {
-          "cell": "A19",
           "value": "CE"
         },
         {
-          "cell": "A20",
           "value": "CS"
         },
         {
-          "cell": "A21",
           "value": "CA"
         },
         {
-          "cell": "A22",
           "value": "CC"
         },
         {
-          "cell": "A23",
           "value": "FP"
         },
         {
-          "cell": "A24",
           "value": "CeT"
         },
         {
-          "cell": "A25",
           "value": "DiA"
         },
         {
-          "cell": "A26",
           "value": "VI"
         },
         {
-          "cell": "A27",
           "value": "BR"
         },
         {
-          "cell": "A28",
           "value": "SH"
         },
         {
-          "cell": "A29",
           "value": "SU"
         },
         {
-          "cell": "A30",
           "value": "ES"
         },
         {
-          "cell": "A31",
           "value": "FL"
         },
         {
-          "cell": "A32",
           "value": "BQ"
         },
         {
-          "cell": "A33",
           "value": "AD"
         },
         {
-          "cell": "A34",
           "value": "DB"
         },
         {
-          "cell": "A35",
           "value": "DN"
         },
         {
-          "cell": "A36",
           "value": "MP"
         },
         {
-          "cell": "A37",
           "value": "OM"
         },
         {
-          "cell": "A38",
           "value": "CT"
         },
         {
-          "cell": "A39",
           "value": "IN"
         },
         {
-          "cell": "A40",
           "value": "DA"
         },
         {
-          "cell": "A41",
           "value": "DE"
         },
         {
-          "cell": "A42",
           "value": "TB"
         },
         {
-          "cell": "A43",
           "value": "BMa"
         },
         {
-          "cell": "A44",
           "value": "MN"
         },
         {
-          "cell": "A45",
           "value": "PO"
         },
         {
-          "cell": "A46",
           "value": "RI"
         },
         {
-          "cell": "A47",
           "value": "BL"
         },
         {
-          "cell": "A48",
           "value": "HE"
         },
         {
-          "cell": "A49",
           "value": "BI"
         },
         {
-          "cell": "A50",
           "value": "EW"
         },
         {
-          "cell": "A51",
           "value": "RS"
         },
         {
-          "cell": "A52",
           "value": "NL"
         },
         {
-          "cell": "A53",
           "value": "TP"
         },
         {
-          "cell": "A54",
           "value": "LI"
         },
         {
-          "cell": "A55",
           "value": "CEL"
         },
         {
-          "cell": "A56",
           "value": "NP"
         },
         {
-          "cell": "A57",
           "value": "MO"
         },
         {
-          "cell": "A58",
           "value": "GB"
         },
         {
-          "cell": "A59",
           "value": "AV"
         },
         {
-          "cell": "A60",
           "value": "AC"
         },
         {
-          "cell": "A61",
           "value": "MI"
         }
       ]
@@ -2102,15 +1666,12 @@
       "id": "option-catalog-0f9c5b87ae49",
       "options": [
         {
-          "cell": "X2",
           "value": "火焰"
         },
         {
-          "cell": "X3",
           "value": "流水"
         },
         {
-          "cell": "X4",
           "value": "草木"
         }
       ]
@@ -2133,47 +1694,36 @@
       "id": "option-catalog-409337b9f603",
       "options": [
         {
-          "cell": "AJ2",
           "value": "致命一擊+1%"
         },
         {
-          "cell": "AJ3",
           "value": "致命一擊+2%"
         },
         {
-          "cell": "AJ4",
           "value": "致命一擊+3%"
         },
         {
-          "cell": "AJ5",
           "value": "致命一擊+4%"
         },
         {
-          "cell": "AJ6",
           "value": "致命一擊+5%"
         },
         {
-          "cell": "AJ7",
           "value": "極大化+1%"
         },
         {
-          "cell": "AJ8",
           "value": "極大化+2%"
         },
         {
-          "cell": "AJ9",
           "value": "極大化+3%"
         },
         {
-          "cell": "AJ10",
           "value": "極大化+4%"
         },
         {
-          "cell": "AJ11",
           "value": "極大化+5%"
         },
         {
-          "cell": "AJ12",
           "value": "無關傷害"
         }
       ]
@@ -2182,11 +1732,9 @@
       "id": "option-catalog-cd482ba318a5",
       "options": [
         {
-          "cell": "AI2",
           "value": "純淨"
         },
         {
-          "cell": "AI3",
           "value": "Dogma"
         }
       ]
@@ -2195,11 +1743,9 @@
       "id": "option-catalog-e4896ad96468",
       "options": [
         {
-          "cell": "A13",
           "value": "天線耳環"
         },
         {
-          "cell": "A14",
           "value": "軍團幹部裝飾"
         }
       ]
@@ -2208,23 +1754,18 @@
       "id": "option-catalog-0d3104cf336b",
       "options": [
         {
-          "cell": "A26",
           "value": "亞特瑪上衣 - 橘"
         },
         {
-          "cell": "A27",
           "value": "亞特瑪上衣 - 米"
         },
         {
-          "cell": "A28",
           "value": "亞特瑪上衣 - 紫"
         },
         {
-          "cell": "A29",
           "value": "亞特瑪上衣 - 綠"
         },
         {
-          "cell": "A30",
           "value": "亞特瑪上衣 - 藍"
         }
       ]
@@ -2233,23 +1774,18 @@
       "id": "option-catalog-8ada2b66ee97",
       "options": [
         {
-          "cell": "A38",
           "value": "超越的技術戒指"
         },
         {
-          "cell": "A39",
           "value": "超越鬥士的技術戒指"
         },
         {
-          "cell": "A40",
           "value": "技術的戒指"
         },
         {
-          "cell": "A41",
           "value": "強烈的技術戒指"
         },
         {
-          "cell": "A42",
           "value": "強烈鬥士的技術戒指"
         }
       ]
@@ -2258,39 +1794,30 @@
       "id": "option-catalog-cf6fdd30db2b",
       "options": [
         {
-          "cell": "A2",
           "value": "幻影面紗"
         },
         {
-          "cell": "A3",
           "value": "真理假面"
         },
         {
-          "cell": "A4",
           "value": "紫霄花郎"
         },
         {
-          "cell": "A5",
           "value": "星辰牧者"
         },
         {
-          "cell": "A6",
           "value": "日冕．灼耀花仙"
         },
         {
-          "cell": "A7",
           "value": "幽潮吞源"
         },
         {
-          "cell": "A8",
           "value": "猛虎奇談"
         },
         {
-          "cell": "A9",
           "value": "厄瑞玻斯的哀歌"
         },
         {
-          "cell": "A10",
           "value": "薇塔芳塔娜"
         }
       ]
@@ -2299,23 +1826,18 @@
       "id": "option-catalog-51dd8e26eb4d",
       "options": [
         {
-          "cell": "AD2",
           "value": "致命傷害+2%"
         },
         {
-          "cell": "AD3",
           "value": "致命傷害+3%"
         },
         {
-          "cell": "AD4",
           "value": "致命傷害+4%"
         },
         {
-          "cell": "AD5",
           "value": "致命傷害+5%"
         },
         {
-          "cell": "AD6",
           "value": "適應力+1%"
         },
         {
@@ -2327,27 +1849,21 @@
       "id": "option-catalog-d864c66e78f5",
       "options": [
         {
-          "cell": "G2",
           "value": "Lv.8"
         },
         {
-          "cell": "G3",
           "value": "Lv.9"
         },
         {
-          "cell": "G4",
           "value": "Lv.10"
         },
         {
-          "cell": "G5",
           "value": "Lv.11"
         },
         {
-          "cell": "G6",
           "value": "Lv.12"
         },
         {
-          "cell": "G7",
           "value": "Lv.13"
         }
       ]
@@ -2356,31 +1872,24 @@
       "id": "option-catalog-6bb70c5676bf",
       "options": [
         {
-          "cell": "K2",
           "value": "Lv.0"
         },
         {
-          "cell": "K3",
           "value": "Lv.1"
         },
         {
-          "cell": "K4",
           "value": "Lv.2"
         },
         {
-          "cell": "K5",
           "value": "Lv.3"
         },
         {
-          "cell": "K6",
           "value": "Lv.4"
         },
         {
-          "cell": "K7",
           "value": "Lv.5"
         },
         {
-          "cell": "K8",
           "value": "Lv.6"
         }
       ]
@@ -2389,23 +1898,18 @@
       "id": "option-catalog-f6f2627f2c0f",
       "options": [
         {
-          "cell": "M2",
           "value": "強者%"
         },
         {
-          "cell": "M3",
           "value": "排熱%"
         },
         {
-          "cell": "M4",
           "value": "兩極化%"
         },
         {
-          "cell": "M5",
           "value": "Boss傷害%"
         },
         {
-          "cell": "M6",
           "value": "無關傷害"
         }
       ]
@@ -2414,43 +1918,33 @@
       "id": "option-catalog-2f1611a1937d",
       "options": [
         {
-          "cell": "T2",
           "value": "攻擊力等級+4"
         },
         {
-          "cell": "T3",
           "value": "攻擊力等級+3.5"
         },
         {
-          "cell": "T4",
           "value": "攻擊力等級+3"
         },
         {
-          "cell": "T5",
           "value": "致命一擊+8%"
         },
         {
-          "cell": "T6",
           "value": "致命一擊+7%"
         },
         {
-          "cell": "T7",
           "value": "致命一擊+6%"
         },
         {
-          "cell": "T8",
           "value": "極大化+8%"
         },
         {
-          "cell": "T9",
           "value": "極大化+7%"
         },
         {
-          "cell": "T10",
           "value": "極大化+6%"
         },
         {
-          "cell": "T11",
           "value": "無關傷害"
         }
       ]
@@ -2459,27 +1953,21 @@
       "id": "option-catalog-fe60831365cd",
       "options": [
         {
-          "cell": "A36",
           "value": "騎士團"
         },
         {
-          "cell": "A37",
           "value": "神埃"
         },
         {
-          "cell": "A38",
           "value": "真理假面"
         },
         {
-          "cell": "A39",
           "value": "星辰牧者"
         },
         {
-          "cell": "A40",
           "value": "猛虎奇談"
         },
         {
-          "cell": "A41",
           "value": "深淵的存在"
         }
       ]
@@ -2488,31 +1976,24 @@
       "id": "option-catalog-ac629c6b86cb",
       "options": [
         {
-          "cell": "A2",
           "value": "狩獵2.5%B傷"
         },
         {
-          "cell": "A3",
           "value": "賢者6%致命"
         },
         {
-          "cell": "A4",
           "value": "賢者6%極大"
         },
         {
-          "cell": "A5",
           "value": "亞特瑪3%B傷"
         },
         {
-          "cell": "A6",
           "value": "亞特瑪2%技傷"
         },
         {
-          "cell": "A7",
           "value": "亞特瑪2.5%超越"
         },
         {
-          "cell": "A8",
           "value": "無關傷害"
         }
       ]
@@ -2520,369 +2001,629 @@
   ],
   "inputs": [
     {
-      "simulatorCells": "GuildFountain.Stage3",
       "inputType": "list",
-      "catalogId": "option-catalog-f86b43489660"
+      "catalogId": "option-catalog-f86b43489660",
+      "fieldIds": [
+        "GuildFountain.Stage3"
+      ]
     },
     {
-      "simulatorCells": "MasterBeast.Head.Mirror.1.Attribute MasterBeast.Head.Mirror.2.Attribute MasterBeast.Head.Mirror.3.Attribute MasterBeast.Armor.Mirror.1.Attribute MasterBeast.Armor.Mirror.2.Attribute MasterBeast.Armor.Mirror.3.Attribute MasterBeast.Necklace.Mirror.1.Attribute MasterBeast.Necklace.Mirror.2.Attribute MasterBeast.Necklace.Mirror.3.Attribute MasterBeast.Ring1.Mirror.1.Attribute MasterBeast.Ring1.Mirror.2.Attribute MasterBeast.Ring1.Mirror.3.Attribute MasterBeast.Ring2.Mirror.1.Attribute MasterBeast.Ring2.Mirror.2.Attribute MasterBeast.Ring2.Mirror.3.Attribute",
       "inputType": "list",
-      "catalogId": "option-catalog-88ecb3d3a560"
+      "catalogId": "option-catalog-88ecb3d3a560",
+      "fieldIds": [
+        "MasterBeast.Head.Mirror.1.Attribute",
+        "MasterBeast.Head.Mirror.2.Attribute",
+        "MasterBeast.Head.Mirror.3.Attribute",
+        "MasterBeast.Armor.Mirror.1.Attribute",
+        "MasterBeast.Armor.Mirror.2.Attribute",
+        "MasterBeast.Armor.Mirror.3.Attribute",
+        "MasterBeast.Necklace.Mirror.1.Attribute",
+        "MasterBeast.Necklace.Mirror.2.Attribute",
+        "MasterBeast.Necklace.Mirror.3.Attribute",
+        "MasterBeast.Ring1.Mirror.1.Attribute",
+        "MasterBeast.Ring1.Mirror.2.Attribute",
+        "MasterBeast.Ring1.Mirror.3.Attribute",
+        "MasterBeast.Ring2.Mirror.1.Attribute",
+        "MasterBeast.Ring2.Mirror.2.Attribute",
+        "MasterBeast.Ring2.Mirror.3.Attribute"
+      ]
     },
     {
-      "simulatorCells": "Right.Ice.Support",
       "inputType": "list",
-      "catalogId": "option-catalog-a6df72b366dd"
+      "catalogId": "option-catalog-a6df72b366dd",
+      "fieldIds": [
+        "Right.Ice.Support"
+      ]
     },
     {
-      "simulatorCells": "MasterBeast.Ring1.CustomAttribute MasterBeast.Ring2.CustomAttribute",
       "inputType": "list",
-      "catalogId": "option-catalog-7d1f8d30c649"
+      "catalogId": "option-catalog-7d1f8d30c649",
+      "fieldIds": [
+        "MasterBeast.Ring1.CustomAttribute",
+        "MasterBeast.Ring2.CustomAttribute"
+      ]
     },
     {
-      "simulatorCells": "Ice.Weapon.Set",
       "inputType": "list",
-      "catalogId": "option-catalog-3a417dd00eea"
+      "catalogId": "option-catalog-3a417dd00eea",
+      "fieldIds": [
+        "Ice.Weapon.Set"
+      ]
     },
     {
-      "simulatorCells": "MasterBeast.Head.CustomAttribute",
       "inputType": "list",
-      "catalogId": "option-catalog-21e473c1c44f"
+      "catalogId": "option-catalog-21e473c1c44f",
+      "fieldIds": [
+        "MasterBeast.Head.CustomAttribute"
+      ]
     },
     {
-      "simulatorCells": "Weapon.Transform.1.Stat Weapon.Transform.2.Stat Weapon.Transform.3.Stat Weapon.Transform.4.Stat",
       "inputType": "list",
-      "catalogId": "option-catalog-6fa7e8aa123a"
+      "catalogId": "option-catalog-6fa7e8aa123a",
+      "fieldIds": [
+        "Weapon.Transform.1.Stat",
+        "Weapon.Transform.2.Stat",
+        "Weapon.Transform.3.Stat",
+        "Weapon.Transform.4.Stat"
+      ]
     },
     {
-      "simulatorCells": "Accessory.FaceTop",
       "inputType": "list",
-      "catalogId": "option-catalog-0bc187fbcda5"
+      "catalogId": "option-catalog-0bc187fbcda5",
+      "fieldIds": [
+        "Accessory.FaceTop"
+      ]
     },
     {
-      "simulatorCells": "Accessory.Arm",
       "inputType": "list",
-      "catalogId": "option-catalog-c914793cc91d"
+      "catalogId": "option-catalog-c914793cc91d",
+      "fieldIds": [
+        "Accessory.Arm"
+      ]
     },
     {
-      "simulatorCells": "Accessory.Necklace",
       "inputType": "list",
-      "catalogId": "option-catalog-b8a66ebdd002"
+      "catalogId": "option-catalog-b8a66ebdd002",
+      "fieldIds": [
+        "Accessory.Necklace"
+      ]
     },
     {
-      "simulatorCells": "Atma.Color",
       "inputType": "list",
-      "catalogId": "option-catalog-5ed6c4802af7"
+      "catalogId": "option-catalog-5ed6c4802af7",
+      "fieldIds": [
+        "Atma.Color"
+      ]
     },
     {
-      "simulatorCells": "Right.Ice.Top",
       "inputType": "list",
-      "catalogId": "option-catalog-3ffd3537063b"
+      "catalogId": "option-catalog-3ffd3537063b",
+      "fieldIds": [
+        "Right.Ice.Top"
+      ]
     },
     {
-      "simulatorCells": "MasterBeast.Head.CustomValue",
       "inputType": "list",
-      "catalogId": "option-catalog-eb9040276ce5"
+      "catalogId": "option-catalog-eb9040276ce5",
+      "fieldIds": [
+        "MasterBeast.Head.CustomValue"
+      ]
     },
     {
-      "simulatorCells": "Accessory.Top.Appraisal.1 Accessory.Top.Appraisal.2 Accessory.Top.Appraisal.3",
       "inputType": "list",
-      "catalogId": "option-catalog-a71dcb0f0e70"
+      "catalogId": "option-catalog-a71dcb0f0e70",
+      "fieldIds": [
+        "Accessory.Top.Appraisal.1",
+        "Accessory.Top.Appraisal.2",
+        "Accessory.Top.Appraisal.3"
+      ]
     },
     {
-      "simulatorCells": "Effect.Emblem Effect.PortraitAwakening",
       "inputType": "list",
-      "catalogId": "option-catalog-1bf0bfe45d3e"
+      "catalogId": "option-catalog-1bf0bfe45d3e",
+      "fieldIds": [
+        "Effect.Emblem",
+        "Effect.PortraitAwakening"
+      ]
     },
     {
-      "simulatorCells": "Right.Ice.FaceTop",
       "inputType": "list",
-      "catalogId": "option-catalog-ca5d8d24cebc"
+      "catalogId": "option-catalog-ca5d8d24cebc",
+      "fieldIds": [
+        "Right.Ice.FaceTop"
+      ]
     },
     {
-      "simulatorCells": "Peak.Option",
       "inputType": "list",
-      "catalogId": "option-catalog-a2c610f4bfac"
+      "catalogId": "option-catalog-a2c610f4bfac",
+      "fieldIds": [
+        "Peak.Option"
+      ]
     },
     {
-      "simulatorCells": "Accessory.WeaponAccessory",
       "inputType": "list",
-      "catalogId": "option-catalog-24917966f1aa"
+      "catalogId": "option-catalog-24917966f1aa",
+      "fieldIds": [
+        "Accessory.WeaponAccessory"
+      ]
     },
     {
-      "simulatorCells": "Costume.OnePiece",
       "inputType": "list",
-      "catalogId": "option-catalog-8e5b542aec9d"
+      "catalogId": "option-catalog-8e5b542aec9d",
+      "fieldIds": [
+        "Costume.OnePiece"
+      ]
     },
     {
-      "simulatorCells": "MasterBeast.Head.Option1 MasterBeast.Head.Option2",
       "inputType": "list",
-      "catalogId": "option-catalog-414d108fd752"
+      "catalogId": "option-catalog-414d108fd752",
+      "fieldIds": [
+        "MasterBeast.Head.Option1",
+        "MasterBeast.Head.Option2"
+      ]
     },
     {
-      "simulatorCells": "Right.Ice.FaceBottom",
       "inputType": "list",
-      "catalogId": "option-catalog-629929671064"
+      "catalogId": "option-catalog-629929671064",
+      "fieldIds": [
+        "Right.Ice.FaceBottom"
+      ]
     },
     {
-      "simulatorCells": "MasterBeast.Ring1.CustomValue MasterBeast.Ring2.CustomValue",
       "inputType": "list",
-      "catalogId": "option-catalog-717ee30befef"
+      "catalogId": "option-catalog-717ee30befef",
+      "fieldIds": [
+        "MasterBeast.Ring1.CustomValue",
+        "MasterBeast.Ring2.CustomValue"
+      ]
     },
     {
-      "simulatorCells": "Left.Armor.Gloves.Circuit.Attribute",
       "inputType": "list",
-      "catalogId": "option-catalog-1ffd50e6c0ac"
+      "catalogId": "option-catalog-1ffd50e6c0ac",
+      "fieldIds": [
+        "Left.Armor.Gloves.Circuit.Attribute"
+      ]
     },
     {
-      "simulatorCells": "MasterBeast.Necklace.CustomAttribute",
       "inputType": "list",
-      "catalogId": "option-catalog-d3b938610e58"
+      "catalogId": "option-catalog-d3b938610e58",
+      "fieldIds": [
+        "MasterBeast.Necklace.CustomAttribute"
+      ]
     },
     {
-      "simulatorCells": "Weapon.GiantStone.1 Weapon.GiantStone.2 Weapon.GiantStone.3",
       "inputType": "list",
-      "catalogId": "option-catalog-f7853015a33f"
+      "catalogId": "option-catalog-f7853015a33f",
+      "fieldIds": [
+        "Weapon.GiantStone.1",
+        "Weapon.GiantStone.2",
+        "Weapon.GiantStone.3"
+      ]
     },
     {
-      "simulatorCells": "Accessory.Support",
       "inputType": "list",
-      "catalogId": "option-catalog-9bd94655596d"
+      "catalogId": "option-catalog-9bd94655596d",
+      "fieldIds": [
+        "Accessory.Support"
+      ]
     },
     {
-      "simulatorCells": "Stage.BossDEF",
       "inputType": "list",
-      "catalogId": "option-catalog-8c8ef2e12ca3"
+      "catalogId": "option-catalog-8c8ef2e12ca3",
+      "fieldIds": [
+        "Stage.BossDEF"
+      ]
     },
     {
-      "simulatorCells": "Accessory.FaceBottom",
       "inputType": "list",
-      "catalogId": "option-catalog-ef87b39302a9"
+      "catalogId": "option-catalog-ef87b39302a9",
+      "fieldIds": [
+        "Accessory.FaceBottom"
+      ]
     },
     {
-      "simulatorCells": "Left.Armor.Upper.Chip.Attribute Left.Armor.Bottom.Chip.Attribute Left.Armor.SwitchBottom.Chip.Attribute Left.Armor.Gloves.Chip.Attribute Left.Armor.Shoes.Chip.Attribute",
       "inputType": "list",
-      "catalogId": "option-catalog-a7da0a6a7424"
+      "catalogId": "option-catalog-a7da0a6a7424",
+      "fieldIds": [
+        "Left.Armor.Upper.Chip.Attribute",
+        "Left.Armor.Bottom.Chip.Attribute",
+        "Left.Armor.SwitchBottom.Chip.Attribute",
+        "Left.Armor.Gloves.Chip.Attribute",
+        "Left.Armor.Shoes.Chip.Attribute"
+      ]
     },
     {
-      "simulatorCells": "Right.Ice.WeaponAccessory",
       "inputType": "list",
-      "catalogId": "option-catalog-8d928a8b48c0"
+      "catalogId": "option-catalog-8d928a8b48c0",
+      "fieldIds": [
+        "Right.Ice.WeaponAccessory"
+      ]
     },
     {
-      "simulatorCells": "Ice.Weapon.MagicStone.1 Ice.Weapon.MagicStone.2 Weapon.MagicStone.1 Weapon.MagicStone.2 Weapon.MagicStone.3 Weapon.MagicStone.4 Weapon.MagicStone.5 Weapon.MagicStone.6",
       "inputType": "list",
-      "catalogId": "option-catalog-77524e534e9f"
+      "catalogId": "option-catalog-77524e534e9f",
+      "fieldIds": [
+        "Ice.Weapon.MagicStone.1",
+        "Ice.Weapon.MagicStone.2",
+        "Weapon.MagicStone.1",
+        "Weapon.MagicStone.2",
+        "Weapon.MagicStone.3",
+        "Weapon.MagicStone.4",
+        "Weapon.MagicStone.5",
+        "Weapon.MagicStone.6"
+      ]
     },
     {
-      "simulatorCells": "Right.Ice.Arm",
       "inputType": "list",
-      "catalogId": "option-catalog-16acddec81de"
+      "catalogId": "option-catalog-16acddec81de",
+      "fieldIds": [
+        "Right.Ice.Arm"
+      ]
     },
     {
-      "simulatorCells": "Stage.Adapt",
       "inputType": "list",
-      "catalogId": "option-catalog-c4c9d626d9e6"
+      "catalogId": "option-catalog-c4c9d626d9e6",
+      "fieldIds": [
+        "Stage.Adapt"
+      ]
     },
     {
-      "simulatorCells": "Accessory.FaceMiddle.Appraisal.1 Accessory.FaceMiddle.Appraisal.2 Accessory.FaceMiddle.Appraisal.3 Accessory.FaceBottom.Appraisal.1 Accessory.FaceBottom.Appraisal.2 Accessory.FaceBottom.Appraisal.3 Accessory.Arm.Appraisal.1 Accessory.Arm.Appraisal.2 Accessory.Arm.Appraisal.3 Accessory.Necklace.Appraisal.1 Accessory.Necklace.Appraisal.2 Accessory.Necklace.Appraisal.3",
       "inputType": "list",
-      "catalogId": "option-catalog-ff7fcde60871"
+      "catalogId": "option-catalog-ff7fcde60871",
+      "fieldIds": [
+        "Accessory.FaceMiddle.Appraisal.1",
+        "Accessory.FaceMiddle.Appraisal.2",
+        "Accessory.FaceMiddle.Appraisal.3",
+        "Accessory.FaceBottom.Appraisal.1",
+        "Accessory.FaceBottom.Appraisal.2",
+        "Accessory.FaceBottom.Appraisal.3",
+        "Accessory.Arm.Appraisal.1",
+        "Accessory.Arm.Appraisal.2",
+        "Accessory.Arm.Appraisal.3",
+        "Accessory.Necklace.Appraisal.1",
+        "Accessory.Necklace.Appraisal.2",
+        "Accessory.Necklace.Appraisal.3"
+      ]
     },
     {
-      "simulatorCells": "Right.Ice.Bottom",
       "inputType": "list",
-      "catalogId": "option-catalog-0fcc9c3dc7e6"
+      "catalogId": "option-catalog-0fcc9c3dc7e6",
+      "fieldIds": [
+        "Right.Ice.Bottom"
+      ]
     },
     {
-      "simulatorCells": "Left.Armor.Upper.Appraisal.1 Left.Armor.Upper.Appraisal.2 Left.Armor.Upper.Appraisal.3 Left.Armor.Bottom.Appraisal.1 Left.Armor.Bottom.Appraisal.2 Left.Armor.Bottom.Appraisal.3 Left.Armor.SwitchBottom.Appraisal.1 Left.Armor.SwitchBottom.Appraisal.2 Left.Armor.SwitchBottom.Appraisal.3 Left.Armor.Gloves.Appraisal.1 Left.Armor.Gloves.Appraisal.2 Left.Armor.Gloves.Appraisal.3 Left.Armor.Shoes.Appraisal.1 Left.Armor.Shoes.Appraisal.2 Left.Armor.Shoes.Appraisal.3",
       "inputType": "list",
-      "catalogId": "option-catalog-64b257d9bcf4"
+      "catalogId": "option-catalog-64b257d9bcf4",
+      "fieldIds": [
+        "Left.Armor.Upper.Appraisal.1",
+        "Left.Armor.Upper.Appraisal.2",
+        "Left.Armor.Upper.Appraisal.3",
+        "Left.Armor.Bottom.Appraisal.1",
+        "Left.Armor.Bottom.Appraisal.2",
+        "Left.Armor.Bottom.Appraisal.3",
+        "Left.Armor.SwitchBottom.Appraisal.1",
+        "Left.Armor.SwitchBottom.Appraisal.2",
+        "Left.Armor.SwitchBottom.Appraisal.3",
+        "Left.Armor.Gloves.Appraisal.1",
+        "Left.Armor.Gloves.Appraisal.2",
+        "Left.Armor.Gloves.Appraisal.3",
+        "Left.Armor.Shoes.Appraisal.1",
+        "Left.Armor.Shoes.Appraisal.2",
+        "Left.Armor.Shoes.Appraisal.3"
+      ]
     },
     {
-      "simulatorCells": "GuildFountain.Stage4",
       "inputType": "list",
-      "catalogId": "option-catalog-91e87fc4ab46"
+      "catalogId": "option-catalog-91e87fc4ab46",
+      "fieldIds": [
+        "GuildFountain.Stage4"
+      ]
     },
     {
-      "simulatorCells": "Right.Ice.FaceMiddle",
       "inputType": "list",
-      "catalogId": "option-catalog-5309e5d65e7e"
+      "catalogId": "option-catalog-5309e5d65e7e",
+      "fieldIds": [
+        "Right.Ice.FaceMiddle"
+      ]
     },
     {
-      "simulatorCells": "Right.Ice.SetEffect.1 Right.Ice.SetEffect.2 Right.Ice.SetEffect.3",
       "inputType": "list",
-      "catalogId": "option-catalog-fca3ffaecf1f"
+      "catalogId": "option-catalog-fca3ffaecf1f",
+      "fieldIds": [
+        "Right.Ice.SetEffect.1",
+        "Right.Ice.SetEffect.2",
+        "Right.Ice.SetEffect.3"
+      ]
     },
     {
-      "simulatorCells": "Effect.Consumable",
       "inputType": "list",
-      "catalogId": "option-catalog-83d51421effa"
+      "catalogId": "option-catalog-83d51421effa",
+      "fieldIds": [
+        "Effect.Consumable"
+      ]
     },
     {
-      "simulatorCells": "Accessory.Ring1",
       "inputType": "list",
-      "catalogId": "option-catalog-9063ccca31d6"
+      "catalogId": "option-catalog-9063ccca31d6",
+      "fieldIds": [
+        "Accessory.Ring1"
+      ]
     },
     {
-      "simulatorCells": "Pet.Passive",
       "inputType": "list",
-      "catalogId": "option-catalog-987fecd02ec8"
+      "catalogId": "option-catalog-987fecd02ec8",
+      "fieldIds": [
+        "Pet.Passive"
+      ]
     },
     {
-      "simulatorCells": "MasterBeast.OverallPotential",
       "inputType": "list",
-      "catalogId": "option-catalog-e68237ce7fa2"
+      "catalogId": "option-catalog-e68237ce7fa2",
+      "fieldIds": [
+        "MasterBeast.OverallPotential"
+      ]
     },
     {
-      "simulatorCells": "Accessory.Ring1.Appraisal.1 Accessory.Ring1.Appraisal.2 Accessory.Ring2.Appraisal.1 Accessory.Ring2.Appraisal.2",
       "inputType": "list",
-      "catalogId": "option-catalog-491562dd1e9d"
+      "catalogId": "option-catalog-491562dd1e9d",
+      "fieldIds": [
+        "Accessory.Ring1.Appraisal.1",
+        "Accessory.Ring1.Appraisal.2",
+        "Accessory.Ring2.Appraisal.1",
+        "Accessory.Ring2.Appraisal.2"
+      ]
     },
     {
-      "simulatorCells": "Left.Armor.Upper.FORGE Left.Armor.Bottom.FORGE Left.Armor.SwitchBottom.FORGE Left.Armor.Gloves.FORGE Left.Armor.Shoes.FORGE",
       "inputType": "list",
-      "catalogId": "option-catalog-76b3d1d0fc12"
+      "catalogId": "option-catalog-76b3d1d0fc12",
+      "fieldIds": [
+        "Left.Armor.Upper.FORGE",
+        "Left.Armor.Bottom.FORGE",
+        "Left.Armor.SwitchBottom.FORGE",
+        "Left.Armor.Gloves.FORGE",
+        "Left.Armor.Shoes.FORGE"
+      ]
     },
     {
-      "simulatorCells": "Left.Armor.Upper.Circuit.Attribute",
       "inputType": "list",
-      "catalogId": "option-catalog-1a18d703db93"
+      "catalogId": "option-catalog-1a18d703db93",
+      "fieldIds": [
+        "Left.Armor.Upper.Circuit.Attribute"
+      ]
     },
     {
-      "simulatorCells": "Right.Ice.Necklace",
       "inputType": "list",
-      "catalogId": "option-catalog-5f2425328fda"
+      "catalogId": "option-catalog-5f2425328fda",
+      "fieldIds": [
+        "Right.Ice.Necklace"
+      ]
     },
     {
-      "simulatorCells": "Accessory.FaceMiddle",
       "inputType": "list",
-      "catalogId": "option-catalog-fdda7268ce18"
+      "catalogId": "option-catalog-fdda7268ce18",
+      "fieldIds": [
+        "Accessory.FaceMiddle"
+      ]
     },
     {
-      "simulatorCells": "Left.Armor.Upper.Chip.Tuning Left.Armor.Bottom.Chip.Tuning Left.Armor.SwitchBottom.Chip.Tuning Left.Armor.Gloves.Chip.Tuning Left.Armor.Shoes.Chip.Tuning",
       "inputType": "list",
-      "catalogId": "option-catalog-23122e89a169"
+      "catalogId": "option-catalog-23122e89a169",
+      "fieldIds": [
+        "Left.Armor.Upper.Chip.Tuning",
+        "Left.Armor.Bottom.Chip.Tuning",
+        "Left.Armor.SwitchBottom.Chip.Tuning",
+        "Left.Armor.Gloves.Chip.Tuning",
+        "Left.Armor.Shoes.Chip.Tuning"
+      ]
     },
     {
-      "simulatorCells": "MasterBeast.Necklace.CustomValue",
       "inputType": "list",
-      "catalogId": "option-catalog-bb28ed8d39bf"
+      "catalogId": "option-catalog-bb28ed8d39bf",
+      "fieldIds": [
+        "MasterBeast.Necklace.CustomValue"
+      ]
     },
     {
-      "simulatorCells": "Weapon.MagicStone.Grade",
       "inputType": "list",
-      "catalogId": "option-catalog-aecebaae726a"
+      "catalogId": "option-catalog-aecebaae726a",
+      "fieldIds": [
+        "Weapon.MagicStone.Grade"
+      ]
     },
     {
-      "simulatorCells": "Weapon.Appraisal.Additional1 Weapon.Appraisal.Additional2",
       "inputType": "list",
-      "catalogId": "option-catalog-a292118b7fc4"
+      "catalogId": "option-catalog-a292118b7fc4",
+      "fieldIds": [
+        "Weapon.Appraisal.Additional1",
+        "Weapon.Appraisal.Additional2"
+      ]
     },
     {
-      "simulatorCells": "Effect.Environment",
       "inputType": "list",
-      "catalogId": "option-catalog-41bf529ba1aa"
+      "catalogId": "option-catalog-41bf529ba1aa",
+      "fieldIds": [
+        "Effect.Environment"
+      ]
     },
     {
-      "simulatorCells": "Right.Ice.Ring",
       "inputType": "list",
-      "catalogId": "option-catalog-b033738d4d5c"
+      "catalogId": "option-catalog-b033738d4d5c",
+      "fieldIds": [
+        "Right.Ice.Ring"
+      ]
     },
     {
-      "simulatorCells": "Accessory.Bottom",
       "inputType": "list",
-      "catalogId": "option-catalog-5f3d8028fef2"
+      "catalogId": "option-catalog-5f3d8028fef2",
+      "fieldIds": [
+        "Accessory.Bottom"
+      ]
     },
     {
-      "simulatorCells": "Left.Armor.Shoes.Circuit.Attribute",
       "inputType": "list",
-      "catalogId": "option-catalog-801126ce1802"
+      "catalogId": "option-catalog-801126ce1802",
+      "fieldIds": [
+        "Left.Armor.Shoes.Circuit.Attribute"
+      ]
     },
     {
-      "simulatorCells": "Stage.CritRatePenalty",
       "inputType": "list",
-      "catalogId": "option-catalog-9240a234397a"
+      "catalogId": "option-catalog-9240a234397a",
+      "fieldIds": [
+        "Stage.CritRatePenalty"
+      ]
     },
     {
-      "simulatorCells": "SpiritRecord.Class.1 SpiritRecord.Class.2 SpiritRecord.Class.3 SpiritRecord.Class.4 SpiritRecord.Class.5 SpiritRecord.Class.6",
       "inputType": "list",
-      "catalogId": "option-catalog-be2a52193a9b"
+      "catalogId": "option-catalog-be2a52193a9b",
+      "fieldIds": [
+        "SpiritRecord.Class.1",
+        "SpiritRecord.Class.2",
+        "SpiritRecord.Class.3",
+        "SpiritRecord.Class.4",
+        "SpiritRecord.Class.5",
+        "SpiritRecord.Class.6"
+      ]
     },
     {
-      "simulatorCells": "Atma.Element",
       "inputType": "list",
-      "catalogId": "option-catalog-0f9c5b87ae49"
+      "catalogId": "option-catalog-0f9c5b87ae49",
+      "fieldIds": [
+        "Atma.Element"
+      ]
     },
     {
-      "simulatorCells": "Left.Armor.SetColor",
       "inputType": "list",
-      "catalogId": "option-catalog-bc1e5293ab87"
+      "catalogId": "option-catalog-bc1e5293ab87",
+      "fieldIds": [
+        "Left.Armor.SetColor"
+      ]
     },
     {
-      "simulatorCells": "GuildFountain.Stage2",
       "inputType": "list",
-      "catalogId": "option-catalog-409337b9f603"
+      "catalogId": "option-catalog-409337b9f603",
+      "fieldIds": [
+        "GuildFountain.Stage2"
+      ]
     },
     {
-      "simulatorCells": "Effect.Title",
       "inputType": "list",
-      "catalogId": "option-catalog-cd482ba318a5"
+      "catalogId": "option-catalog-cd482ba318a5",
+      "fieldIds": [
+        "Effect.Title"
+      ]
     },
     {
-      "simulatorCells": "Accessory.Earring",
       "inputType": "list",
-      "catalogId": "option-catalog-e4896ad96468"
+      "catalogId": "option-catalog-e4896ad96468",
+      "fieldIds": [
+        "Accessory.Earring"
+      ]
     },
     {
-      "simulatorCells": "Accessory.Top",
       "inputType": "list",
-      "catalogId": "option-catalog-0d3104cf336b"
+      "catalogId": "option-catalog-0d3104cf336b",
+      "fieldIds": [
+        "Accessory.Top"
+      ]
     },
     {
-      "simulatorCells": "Accessory.Ring2",
       "inputType": "list",
-      "catalogId": "option-catalog-8ada2b66ee97"
+      "catalogId": "option-catalog-8ada2b66ee97",
+      "fieldIds": [
+        "Accessory.Ring2"
+      ]
     },
     {
-      "simulatorCells": "Left.Ice.Set",
       "inputType": "list",
-      "catalogId": "option-catalog-cf6fdd30db2b"
+      "catalogId": "option-catalog-cf6fdd30db2b",
+      "fieldIds": [
+        "Left.Ice.Set"
+      ]
     },
     {
-      "simulatorCells": "MasterBeast.Ring1.Option1 MasterBeast.Ring1.Option2 MasterBeast.Ring2.Option1 MasterBeast.Ring2.Option2",
       "inputType": "list",
-      "catalogId": "option-catalog-51dd8e26eb4d"
+      "catalogId": "option-catalog-51dd8e26eb4d",
+      "fieldIds": [
+        "MasterBeast.Ring1.Option1",
+        "MasterBeast.Ring1.Option2",
+        "MasterBeast.Ring2.Option1",
+        "MasterBeast.Ring2.Option2"
+      ]
     },
     {
-      "simulatorCells": "Weapon.ENHC Left.Armor.Upper.ENHC Left.Armor.Bottom.ENHC Left.Armor.SwitchBottom.ENHC Left.Armor.Gloves.ENHC Left.Armor.Shoes.ENHC",
       "inputType": "list",
-      "catalogId": "option-catalog-d864c66e78f5"
+      "catalogId": "option-catalog-d864c66e78f5",
+      "fieldIds": [
+        "Weapon.ENHC",
+        "Left.Armor.Upper.ENHC",
+        "Left.Armor.Bottom.ENHC",
+        "Left.Armor.SwitchBottom.ENHC",
+        "Left.Armor.Gloves.ENHC",
+        "Left.Armor.Shoes.ENHC"
+      ]
     },
     {
-      "simulatorCells": "Weapon.Growth",
       "inputType": "list",
-      "catalogId": "option-catalog-6bb70c5676bf"
+      "catalogId": "option-catalog-6bb70c5676bf",
+      "fieldIds": [
+        "Weapon.Growth"
+      ]
     },
     {
-      "simulatorCells": "Left.Armor.Bottom.Circuit.Attribute Left.Armor.SwitchBottom.Circuit.Attribute",
       "inputType": "list",
-      "catalogId": "option-catalog-f6f2627f2c0f"
+      "catalogId": "option-catalog-f6f2627f2c0f",
+      "fieldIds": [
+        "Left.Armor.Bottom.Circuit.Attribute",
+        "Left.Armor.SwitchBottom.Circuit.Attribute"
+      ]
     },
     {
-      "simulatorCells": "Weapon.Appraisal.Primary",
       "inputType": "list",
-      "catalogId": "option-catalog-2f1611a1937d"
+      "catalogId": "option-catalog-2f1611a1937d",
+      "fieldIds": [
+        "Weapon.Appraisal.Primary"
+      ]
     },
     {
-      "simulatorCells": "Right.Ice.Earring",
       "inputType": "list",
-      "catalogId": "option-catalog-fe60831365cd"
+      "catalogId": "option-catalog-fe60831365cd",
+      "fieldIds": [
+        "Right.Ice.Earring"
+      ]
     },
     {
-      "simulatorCells": "Costume.MagicStone Left.Ice.Hair.MagicStone Left.Ice.Upper.MagicStone Left.Ice.Bottom.MagicStone Left.Ice.Gloves.MagicStone Left.Ice.Shoes.MagicStone Left.Armor.Upper.MagicStone.1 Left.Armor.Upper.MagicStone.2 Left.Armor.Upper.MagicStone.3 Left.Armor.Upper.MagicStone.4 Left.Armor.Bottom.MagicStone.1 Left.Armor.Bottom.MagicStone.2 Left.Armor.Bottom.MagicStone.3 Left.Armor.Bottom.MagicStone.4 Left.Armor.SwitchBottom.MagicStone.1 Left.Armor.SwitchBottom.MagicStone.2 Left.Armor.SwitchBottom.MagicStone.3 Left.Armor.SwitchBottom.MagicStone.4 Left.Armor.Gloves.MagicStone.1 Left.Armor.Gloves.MagicStone.2 Left.Armor.Gloves.MagicStone.3 Left.Armor.Gloves.MagicStone.4 Left.Armor.Shoes.MagicStone.1 Left.Armor.Shoes.MagicStone.2 Left.Armor.Shoes.MagicStone.3 Left.Armor.Shoes.MagicStone.4",
       "inputType": "list",
-      "catalogId": "option-catalog-ac629c6b86cb"
+      "catalogId": "option-catalog-ac629c6b86cb",
+      "fieldIds": [
+        "Costume.MagicStone",
+        "Left.Ice.Hair.MagicStone",
+        "Left.Ice.Upper.MagicStone",
+        "Left.Ice.Bottom.MagicStone",
+        "Left.Ice.Gloves.MagicStone",
+        "Left.Ice.Shoes.MagicStone",
+        "Left.Armor.Upper.MagicStone.1",
+        "Left.Armor.Upper.MagicStone.2",
+        "Left.Armor.Upper.MagicStone.3",
+        "Left.Armor.Upper.MagicStone.4",
+        "Left.Armor.Bottom.MagicStone.1",
+        "Left.Armor.Bottom.MagicStone.2",
+        "Left.Armor.Bottom.MagicStone.3",
+        "Left.Armor.Bottom.MagicStone.4",
+        "Left.Armor.SwitchBottom.MagicStone.1",
+        "Left.Armor.SwitchBottom.MagicStone.2",
+        "Left.Armor.SwitchBottom.MagicStone.3",
+        "Left.Armor.SwitchBottom.MagicStone.4",
+        "Left.Armor.Gloves.MagicStone.1",
+        "Left.Armor.Gloves.MagicStone.2",
+        "Left.Armor.Gloves.MagicStone.3",
+        "Left.Armor.Gloves.MagicStone.4",
+        "Left.Armor.Shoes.MagicStone.1",
+        "Left.Armor.Shoes.MagicStone.2",
+        "Left.Armor.Shoes.MagicStone.3",
+        "Left.Armor.Shoes.MagicStone.4"
+      ]
     }
   ]
 }

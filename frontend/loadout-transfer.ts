@@ -2,8 +2,9 @@ import { getEquipmentOptionName, type EquipmentCatalogItem, type SimulatorEquipm
 import { isResonanceInputCell, parseResonancePoints } from '../calculation/resonance-input.ts';
 import type { GameData } from './data.ts';
 import { codeForFieldId, fieldIdForCode, isFieldId } from './field-ids.ts';
-import { normalizePortraitAwakeningSplit, normalizeTranscendenceSkillDamageShare, type LoadoutState } from './state.ts';
+import { migrateLegacyEnvironmentSelection, normalizePortraitAwakeningSplit, normalizeTranscendenceSkillDamageShare, type LoadoutState } from './state.ts';
 import { findValidationCatalog } from './input-validation.ts';
+import { canonicalizeNumber } from './numeric-input.ts';
 
 type TransferData = Pick<GameData,
   | 'classes' | 'mapping' | 'catalogs' | 'simulatorInputs' | 'masterBeast'
@@ -29,8 +30,8 @@ export function equipmentTransferCode(itemId: string): number {
   return hash >>> 0;
 }
 
-function inputOption(data: TransferData, cell: string) {
-  const catalog = findValidationCatalog(data.simulatorInputs.inputs, data.simulatorInputs.catalogs, cell);
+function inputOption(data: TransferData, fieldId: string) {
+  const catalog = findValidationCatalog(data.simulatorInputs.inputs, data.simulatorInputs.catalogs, fieldId);
   return catalog ? { catalog, options: catalog.options } : null;
 }
 
@@ -48,10 +49,10 @@ function customOptions(data: TransferData, cell: string, values: Record<string, 
     'MasterBeast.OverallPotential': data.masterBeast.options.filter(option => option.category === 'overall').map(option => option.name),
   };
   if (address in direct) return direct[address];
-  for (const entry of data.otherEffects.binaryEffects) if (entry.selectorCell === address) return entry.options.map(option => option.name);
-  for (const entry of data.otherEffects.guildFountain) if (entry.selectorCell === address) return entry.options.map(option => option.name);
-  if (data.colorSetEffects.selectorCell && data.colorSetEffects.selectorCell === address) return data.colorSetEffects.options.map(option => option.name);
-  if (data.spiritRecord.classSelectors.selectorCells.some(cell => cell === address)) return data.spiritRecord.classSelectors.classes.map(entry => entry.classCode);
+  for (const entry of data.otherEffects.binaryEffects) if (entry.settingKey === address) return entry.options.map(option => option.name);
+  for (const entry of data.otherEffects.guildFountain) if (entry.settingKey === address) return entry.options.map(option => option.name);
+  if (data.colorSetEffects.settingKey && data.colorSetEffects.settingKey === address) return data.colorSetEffects.options.map(option => option.name);
+  if (data.spiritRecord.classSelectors.settingKeys.some(cell => cell === address)) return data.spiritRecord.classSelectors.classes.map(entry => entry.classCode);
   for (const slot of data.innerwear.slots) if (slot.typeCell === address) return ["百億", "內布隆"];
   for (const field of data.nephronArmor.fields) {
     for (const transform of field.transformFields) {
@@ -72,14 +73,14 @@ function customOptions(data: TransferData, cell: string, values: Record<string, 
       if (innerwear && innerwear.forgingCell === address) return Object.keys(data.innerwear.forgingAttack);
     }
   }
-  if (data.weaponGrades.selectorCell === address) return data.weaponGrades.options.map(option => option.name);
+  if (data.weaponGrades.settingKey === address) return data.weaponGrades.options.map(option => option.name);
   for (const group of data.weaponGrades.colorGroups) {
-    if (group.selectorCells.includes(address)) return group.options.map(option => option.name);
+    if (group.settingKeys.includes(address)) return group.options.map(option => option.name);
   }
   if (address === 'Weapon.ENHC') return Object.keys(data.attack.weaponEnhancementFactors).map(level => `Lv.${level}`);
-  if (data.growth.selectorCell === address) return data.growth.levels.map(level => level.name);
+  if (data.growth.settingKey === address) return data.growth.levels.map(level => level.name);
   for (const slot of data.appraisals.slots) if (slot.inputCells.some(cell => cell === address)) return data.appraisals.options.map(option => option.name);
-  for (const input of data.circuits.inputs) if (input.attributeCell === address) return [...Object.keys(data.circuits.statKeyBySheetName), '無關傷害'];
+  for (const input of data.circuits.inputs) if (input.attributeCell === address) return [...Object.keys(data.circuits.statKeyByAttributeName), '無關傷害'];
   for (const slot of data.chipSlots.slots) {
     if (slot.attributeCell === address) return data.chips.chips.map(chip => chip.name);
     if (slot.tuningCell === address) {
@@ -87,8 +88,8 @@ function customOptions(data: TransferData, cell: string, values: Record<string, 
       return data.chips.chips.find(chip => chip.name === chipName)?.tuningLevels.map(level => level.level) ?? [];
     }
   }
-  for (const group of Object.values(data.weaponAppraisals.groups)) if (group.selectorCell === address) return group.options.map(option => option.name);
-  if (data.giantStones.selectorCells.some(cell => cell === address)) return data.giantStones.options.map(option => option.name);
+  for (const group of Object.values(data.weaponAppraisals.groups)) if (group.settingKey === address) return group.options.map(option => option.name);
+  if (data.giantStones.settingKeys.some(cell => cell === address)) return data.giantStones.options.map(option => option.name);
   for (const slot of data.transformations.slots) if (slot.choiceCell === address) return data.transformations.options;
   if (data.rightIceSets.selectionCells.some(cell => cell === address)) {
     return [...new Set(data.rightIceSets.effects.map(effect => effect.setName))];
@@ -147,13 +148,17 @@ function isValidPrimitive(value: unknown): value is string | number {
   return typeof value === 'string' || typeof value === 'number' && Number.isFinite(value);
 }
 
+function isMasterBeastMirrorValue(fieldId: string): boolean {
+  return /^MasterBeast\..+\.Mirror\.\d+\.Value$/.test(fieldId);
+}
+
 export function serializeLoadout(state: LoadoutState, data: TransferData): { json: string; omittedFields: string[] } {
   const mappings = equipmentMappings(data);
   const values: Record<string, string | number> = {};
   const omittedFields: string[] = [];
   const fieldValues = { ...state.values };
   const portrait = data.otherEffects.portraitAwakening;
-  const portraitCells = [portrait.strongCell, portrait.transcendenceCell];
+  const portraitCells = [portrait.strongSettingKey, portrait.transcendenceSettingKey];
   const hasPortraitValues = portraitCells.some(cell => fieldValues[cell] !== undefined && fieldValues[cell] !== '');
   const invalidPortraitCells = new Set(portraitCells.filter(cell => {
     const raw = fieldValues[cell];
@@ -163,12 +168,12 @@ export function serializeLoadout(state: LoadoutState, data: TransferData): { jso
   }));
   if (hasPortraitValues && invalidPortraitCells.size === 0) {
     const split = normalizePortraitAwakeningSplit(
-      fieldValues[portrait.strongCell],
-      fieldValues[portrait.transcendenceCell],
+      fieldValues[portrait.strongSettingKey],
+      fieldValues[portrait.transcendenceSettingKey],
       portrait.maxTotalPct,
     );
-    fieldValues[portrait.strongCell] = split.strongSkillDamagePct;
-    fieldValues[portrait.transcendenceCell] = split.transcendenceSkillDamagePct;
+    fieldValues[portrait.strongSettingKey] = split.strongSkillDamagePct;
+    fieldValues[portrait.transcendenceSettingKey] = split.transcendenceSkillDamagePct;
   }
 
   for (const [key, value] of Object.entries(fieldValues)) {
@@ -182,10 +187,13 @@ export function serializeLoadout(state: LoadoutState, data: TransferData): { jso
       omittedFields.push(key);
       continue;
     }
-    if (typeof value === 'string' && value.trim() === '') continue;
+    const transferValue = fieldId && isMasterBeastMirrorValue(fieldId) && typeof value === 'number'
+      ? canonicalizeNumber(value)
+      : value;
+    if (typeof transferValue === 'string' && transferValue.trim() === '') continue;
 
       if (isResonanceInputCell(fieldId)) {
-        const points = parseResonancePoints(fieldId, value);
+        const points = parseResonancePoints(fieldId, transferValue);
         if (points === null) { omittedFields.push(fieldId); continue; }
         values[String(fieldCode)] = points;
         continue;
@@ -193,8 +201,8 @@ export function serializeLoadout(state: LoadoutState, data: TransferData): { jso
 
     const mapping = mappings.get(fieldId);
     if (mapping) {
-      if (typeof value !== 'string') { omittedFields.push(fieldId); continue; }
-      const matches = matchEquipment(data, mapping, value);
+      if (typeof transferValue !== 'string') { omittedFields.push(fieldId); continue; }
+      const matches = matchEquipment(data, mapping, transferValue);
       if (matches.length !== 1) { omittedFields.push(fieldId); continue; }
       values[String(fieldCode)] = equipmentTransferCode(matches[0].id);
       continue;
@@ -202,11 +210,11 @@ export function serializeLoadout(state: LoadoutState, data: TransferData): { jso
 
     const choices = cellOptions(data, fieldId, fieldValues);
     if (choices) {
-      if (!choices.some(option => String(option) === String(value))) { omittedFields.push(fieldId); continue; }
-      values[String(fieldCode)] = value;
+      if (!choices.some(option => String(option) === String(transferValue))) { omittedFields.push(fieldId); continue; }
+      values[String(fieldCode)] = transferValue;
       continue;
     }
-    values[String(fieldCode)] = value;
+    values[String(fieldCode)] = transferValue;
   }
 
   const payload = {
@@ -245,11 +253,14 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
   const optionValuesById: Record<string, string | number> = {};
   for (const [code, value] of Object.entries(rawValues)) {
     const fieldId = fieldIdForCode(code);
-      if (fieldId && isValidPrimitive(value)) {
-        if (isResonanceInputCell(fieldId)) {
-          const points = parseResonancePoints(fieldId, value);
-          if (points !== null) optionValuesById[fieldId] = points;
-        } else optionValuesById[fieldId] = value;
+    if (fieldId && isValidPrimitive(value)) {
+      const importedValue = isMasterBeastMirrorValue(fieldId) && typeof value === 'number'
+        ? canonicalizeNumber(value)
+        : value;
+      if (isResonanceInputCell(fieldId)) {
+        const points = parseResonancePoints(fieldId, importedValue);
+        if (points !== null) optionValuesById[fieldId] = points;
+      } else optionValuesById[fieldId] = importedValue;
       }
   }
   const optionValues = optionValuesById;
@@ -260,24 +271,36 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
         clearedFields.push(fieldId ?? code);
         continue;
       }
+      const importedValue = isMasterBeastMirrorValue(fieldId) && typeof value === 'number'
+        ? canonicalizeNumber(value)
+        : value;
       if (mappings.has(fieldId)) continue;
-      if (typeof value === 'string' && value.trim() === '') continue;
-        if (isResonanceInputCell(fieldId)) {
-          const points = parseResonancePoints(fieldId, value);
-          if (points === null) clearedFields.push(fieldId);
-          else values[fieldId] = points;
-          continue;
-        }
+      if (typeof importedValue === 'string' && importedValue.trim() === '') continue;
+      const candidateValue: Record<string, string | number> = { [fieldId]: importedValue };
+      const environmentMigration = fieldId === 'Effect.Environment'
+        ? migrateLegacyEnvironmentSelection(candidateValue)
+        : null;
+      const normalizedValue = candidateValue[fieldId];
+      if (environmentMigration === 'removed') {
+        clearedFields.push(fieldId);
+        continue;
+      }
+      if (isResonanceInputCell(fieldId)) {
+        const points = parseResonancePoints(fieldId, normalizedValue);
+        if (points === null) clearedFields.push(fieldId);
+        else values[fieldId] = points;
+        continue;
+      }
       const choices = cellOptions(data, fieldId, optionValues);
       if (choices) {
-        if (choices.some(option => String(option) === String(value))) values[fieldId] = value;
+        if (choices.some(option => String(option) === String(normalizedValue))) values[fieldId] = normalizedValue;
         else clearedFields.push(fieldId);
-      } else values[fieldId] = value;
+      } else values[fieldId] = normalizedValue;
     }
   }
 
   const portrait = data.otherEffects.portraitAwakening;
-  const portraitCells = [portrait.strongCell, portrait.transcendenceCell];
+  const portraitCells = [portrait.strongSettingKey, portrait.transcendenceSettingKey];
   for (const cell of portraitCells) {
     const value = values[cell];
     if (value === undefined || value === '') continue;
@@ -289,19 +312,19 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
   }
   const hasPortraitValues = portraitCells.some(cell => values[cell] !== undefined && values[cell] !== '');
   if (hasPortraitValues) {
-    const strongValue = values[portrait.strongCell];
-    const transcendenceValue = values[portrait.transcendenceCell];
+    const strongValue = values[portrait.strongSettingKey];
+    const transcendenceValue = values[portrait.transcendenceSettingKey];
     if (strongValue !== undefined && strongValue !== '' && transcendenceValue !== undefined && transcendenceValue !== ''
       && Number(strongValue) + Number(transcendenceValue) !== portrait.maxTotalPct) {
       const split = normalizePortraitAwakeningSplit(strongValue, transcendenceValue, portrait.maxTotalPct);
-      if (Number(strongValue) !== split.strongSkillDamagePct) clearedFields.push(portrait.strongCell);
-      if (Number(transcendenceValue) !== split.transcendenceSkillDamagePct) clearedFields.push(portrait.transcendenceCell);
-      values[portrait.strongCell] = split.strongSkillDamagePct;
-      values[portrait.transcendenceCell] = split.transcendenceSkillDamagePct;
+      if (Number(strongValue) !== split.strongSkillDamagePct) clearedFields.push(portrait.strongSettingKey);
+      if (Number(transcendenceValue) !== split.transcendenceSkillDamagePct) clearedFields.push(portrait.transcendenceSettingKey);
+      values[portrait.strongSettingKey] = split.strongSkillDamagePct;
+      values[portrait.transcendenceSettingKey] = split.transcendenceSkillDamagePct;
     } else if (strongValue === undefined || strongValue === '' || transcendenceValue === undefined || transcendenceValue === '') {
       const split = normalizePortraitAwakeningSplit(strongValue, transcendenceValue, portrait.maxTotalPct);
-      values[portrait.strongCell] = split.strongSkillDamagePct;
-      values[portrait.transcendenceCell] = split.transcendenceSkillDamagePct;
+      values[portrait.strongSettingKey] = split.strongSkillDamagePct;
+      values[portrait.transcendenceSettingKey] = split.transcendenceSkillDamagePct;
     }
   }
 
@@ -354,6 +377,7 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
   if (typeof candidate.lowerwearAlternativeEnabled !== 'boolean') clearedFields.push('強／排褲切換');
   if (!(color === '黃' || color === '綠' || color === '')) clearedFields.push('聖獸精靈石顏色');
   if (typeof candidate.petSkillAttackEnabled !== 'boolean') clearedFields.push('寵物被動');
+  if (migrateLegacyEnvironmentSelection(values) === 'removed') clearedFields.push('Effect.Environment');
 
   const uniqueCleared = [...new Set(clearedFields)];
   return {

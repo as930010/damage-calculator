@@ -1,7 +1,6 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "dataUpdatedAt": "2026-09-25",
-  "source": "係數區!AW2:AX6 → 計算機!F93:G93",
   "options": [
     {
       "id": "pet-crit-4",
@@ -28,6 +27,14 @@
       "id": "pet-extremization-2",
       "name": "極大化+2%",
       "stats": {
+        "extremizationPct": 2
+      }
+    },
+    {
+      "id": "pet-crit-extremization-2",
+      "name": "致命一擊+2%、極大化+2%",
+      "stats": {
+        "critRatePct": 2,
         "extremizationPct": 2
       }
     },

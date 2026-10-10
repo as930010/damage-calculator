@@ -1,7 +1,6 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "dataUpdatedAt": "2026-10-02",
-  "source": "Nephron innerwear rules supplied by user",
   "transformations": [
     {
       "id": "enhancement-double-attack",
@@ -533,9 +532,5 @@
       "wearSet": "shared",
       "slotId": "shoes"
     }
-  ],
-  "notes": [
-    "每件防具各有三條變換屬性；前三種效果為防具強化等級乘上所選百分比檔位，其餘依所選檔位直接加算。",
-    "每件防具可裝一個彈匣；同種類同等級不可重複裝備。極度緩慢的技能傷害增幅常駐套用，減傷與動速不屬於此傷害計算器輸出。"
   ]
 }

@@ -199,7 +199,7 @@ export function resolveSupplementalSimulatorSources(
   for (const entry of circuitBoard) {
     if (!entry.contribution) {
       const attribute = selections.circuitBoardValues?.[entry.slot]?.attribute;
-      if (attribute?.trim() && !documents.circuitBoard.statKeyBySheetName[attribute]) {
+      if (attribute?.trim() && !documents.circuitBoard.statKeyByAttributeName[attribute]) {
         unmappedCircuitBoardSlots.push(entry.slot);
       }
       continue;

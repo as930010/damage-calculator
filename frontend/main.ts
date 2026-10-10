@@ -1,7 +1,7 @@
 import { getEquipmentOptionName } from '../calculation/equipment-catalog.ts';
 import { type AccessoryEffectOption } from '../calculation/equipment-effects.ts';
 import { loadGameData, readJson, escapeHtml as h, formatNumber as fmt } from './data.ts';
-import { readState, readBaseline, saveState, normalizeTranscendenceSkillDamageShare, normalizePortraitAwakeningSplit, parseTranscendenceSkillDamageShareInput, type LoadoutState } from './state.ts';
+import { readState, readBaseline, saveState, migrateLegacyEnvironmentSelection, normalizeTranscendenceSkillDamageShare, normalizePortraitAwakeningSplit, parseTranscendenceSkillDamageShareInput, type LoadoutState } from './state.ts';
 import { parseLoadoutJson, serializeLoadout } from './loadout-transfer.ts';
 import { projectAttributes, projectCombatRates, projectDamage } from './projection.ts';
 import { compareLoadoutResults } from './calculation-comparison.ts';
@@ -10,7 +10,7 @@ import { GLOVE_CIRCUIT_ROWS_FIELD, readGloveCircuitRows, serializeGloveCircuitRo
 import { icon } from './icons.ts';
 import { capOverflowPercentage } from './cap-warnings.ts';
 import { findValidationCatalog } from './input-validation.ts';
-import { preventScientificNotation } from './numeric-input.ts';
+import { canonicalizeNumber, preventScientificNotation } from './numeric-input.ts';
 import { resolveClassCode, sanitizeClassCode } from './class-code.ts';
 import { resolveUnsignedInteger, sanitizeUnsignedInteger } from './direct-input.ts';
 
@@ -39,6 +39,7 @@ async function start() {
     ? await readJson<LoadoutState>(`examples/${sampleId}.json`)
     : readState(data.classes.classes.find(entry => entry.active)?.id ?? 'DaB');
   state.transcendenceSkillDamageSharePct = normalizeTranscendenceSkillDamageShare(state.transcendenceSkillDamageSharePct);
+  const startupLegacyEnvironmentMigrated = migrateLegacyEnvironmentSelection(state.values) !== null;
   const migrateLegacyHeadStoneLabel = (target: LoadoutState) => {
     if (target.values['MasterBeast.Head.CustomAttribute'] !== '其他') return false;
     target.values['MasterBeast.Head.CustomAttribute'] = '無關傷害';
@@ -52,27 +53,27 @@ async function start() {
   };
   const migrateLegacyPortraitAwakening = (target: LoadoutState) => {
     const portrait = data.otherEffects.portraitAwakening;
-    const legacyValue = target.values[portrait.legacySelectorCell];
+    const legacyValue = target.values[portrait.legacySettingKey];
     if (legacyValue === undefined) return false;
     if (legacyValue === '有'
-      && target.values[portrait.strongCell] === undefined
-      && target.values[portrait.transcendenceCell] === undefined) {
-      target.values[portrait.transcendenceCell] = portrait.maxTotalPct;
+      && target.values[portrait.strongSettingKey] === undefined
+      && target.values[portrait.transcendenceSettingKey] === undefined) {
+      target.values[portrait.transcendenceSettingKey] = portrait.maxTotalPct;
     }
-    delete target.values[portrait.legacySelectorCell];
+    delete target.values[portrait.legacySettingKey];
     return true;
   };
   const normalizePortraitAwakeningValues = (target: LoadoutState) => {
     const portrait = data.otherEffects.portraitAwakening;
     const split = normalizePortraitAwakeningSplit(
-      target.values[portrait.strongCell],
-      target.values[portrait.transcendenceCell],
+      target.values[portrait.strongSettingKey],
+      target.values[portrait.transcendenceSettingKey],
       portrait.maxTotalPct,
     );
-    const changed = target.values[portrait.strongCell] !== split.strongSkillDamagePct
-      || target.values[portrait.transcendenceCell] !== split.transcendenceSkillDamagePct;
-    target.values[portrait.strongCell] = split.strongSkillDamagePct;
-    target.values[portrait.transcendenceCell] = split.transcendenceSkillDamagePct;
+    const changed = target.values[portrait.strongSettingKey] !== split.strongSkillDamagePct
+      || target.values[portrait.transcendenceSettingKey] !== split.transcendenceSkillDamagePct;
+    target.values[portrait.strongSettingKey] = split.strongSkillDamagePct;
+    target.values[portrait.transcendenceSettingKey] = split.transcendenceSkillDamagePct;
     return changed;
   };
   const startupLegacyHeadStoneLabelMigrated = migrateLegacyHeadStoneLabel(state);
@@ -153,8 +154,8 @@ async function start() {
     return clearedCells;
   };
   const startupDuplicateNephronMagazineCells = clearDuplicateNephronMagazines(state);
-  if ((startupLegacyHeadStoneLabelMigrated || startupLegacyGloveCircuitMigrated || startupLegacyPortraitAwakeningMigrated || startupPortraitAwakeningNormalized || startupDuplicateTransformationCells.length || startupDuplicateNephronTransformationCells.length || startupInvalidAccessoryAppraisalCells.length || startupDuplicateNephronMagazineCells.length) && !sampleMode) saveState(state);
-  const weaponMagicStoneCells = data.weaponGrades.colorGroups.flatMap(group => group.selectorCells);
+  if ((startupLegacyEnvironmentMigrated || startupLegacyHeadStoneLabelMigrated || startupLegacyGloveCircuitMigrated || startupLegacyPortraitAwakeningMigrated || startupPortraitAwakeningNormalized || startupDuplicateTransformationCells.length || startupDuplicateNephronTransformationCells.length || startupInvalidAccessoryAppraisalCells.length || startupDuplicateNephronMagazineCells.length) && !sampleMode) saveState(state);
+  const weaponMagicStoneCells = data.weaponGrades.colorGroups.flatMap(group => group.settingKeys);
   const applyWeaponMagicStonePreset = (grade: string, overwrite = false) => {
     if (!grade) return;
     if (!overwrite && weaponMagicStoneCells.some(cell => state.values[cell] !== undefined)) return;
@@ -162,19 +163,20 @@ async function start() {
       const optionId = colorGroup.presetByGrade[grade];
       const option = colorGroup.options.find(entry => entry.id === optionId);
       if (!option) continue;
-      for (const cell of colorGroup.selectorCells) state.values[cell] = option.name;
+      for (const cell of colorGroup.settingKeys) state.values[cell] = option.name;
     }
   };
-  applyWeaponMagicStonePreset(String(state.values[data.weaponGrades.selectorCell] ?? ''));
+  applyWeaponMagicStonePreset(String(state.values[data.weaponGrades.settingKey] ?? ''));
   let baseline = sampleMode ? null : readBaseline();
   if (baseline) {
+    const migratedBaselineEnvironment = migrateLegacyEnvironmentSelection(baseline.values) !== null;
     const migratedBaseline = migrateLegacyHeadStoneLabel(baseline);
     const migratedBaselineGloveCircuit = migrateLegacyGloveCircuitSkillDamage(baseline);
     const migratedBaselinePortraitAwakening = migrateLegacyPortraitAwakening(baseline);
     const normalizedBaselinePortraitAwakening = normalizePortraitAwakeningValues(baseline);
     const clearedBaselineMagazines = clearDuplicateNephronMagazines(baseline);
     const clearedBaselineTransformations = clearDuplicateNephronTransformationChoices(baseline);
-    if (migratedBaseline || migratedBaselineGloveCircuit || migratedBaselinePortraitAwakening || normalizedBaselinePortraitAwakening || clearedBaselineMagazines.length || clearedBaselineTransformations.length) saveState(baseline, true);
+    if (migratedBaselineEnvironment || migratedBaseline || migratedBaselineGloveCircuit || migratedBaselinePortraitAwakening || normalizedBaselinePortraitAwakening || clearedBaselineMagazines.length || clearedBaselineTransformations.length) saveState(baseline, true);
   }
   let selected = data.layout.slots.find(slot => slot.weapon)!;
   type BeastAccessorySlotId = 'headwear' | 'armor' | 'necklace' | 'ring-one' | 'ring-two';
@@ -514,10 +516,10 @@ async function start() {
       'atma-wood-multiplicative-crit-damage': '草木亞特瑪乘算致命傷害',
     };
     if (atma) return atmaNames[atma.id] ?? `亞特瑪來源待確認（${atma.id}）`;
-    if (sourceId.startsWith('weapon-growth')) return `武器成長：${String(state.values[data.growth.selectorCell] ?? '')}`;
+    if (sourceId.startsWith('weapon-growth')) return `武器成長：${String(state.values[data.growth.settingKey] ?? '')}`;
     if (sourceId.startsWith('weapon-appraisal:')) {
       const cell = sourceId.slice('weapon-appraisal:'.length);
-      const group = Object.values(data.weaponAppraisals.groups).find(entry => entry.selectorCell === cell);
+      const group = Object.values(data.weaponAppraisals.groups).find(entry => entry.settingKey === cell);
       return `武器鑑定${group ? `：${String(state.values[cell] ?? '')}` : ''}`;
     }
     if (sourceId.startsWith('giant-stone:')) {
@@ -549,7 +551,7 @@ async function start() {
     if (sourceId.startsWith('pet:')) return `寵物：${String(state.values['Pet.Passive'] ?? '')}`;
     if (sourceId === '標誌:Effect.Emblem') return '標誌';
     const binaryEffect = data.otherEffects.binaryEffects.find(entry => entry.name === sourceId);
-    if (binaryEffect) return `${binaryEffect.name}：${String(state.values[binaryEffect.selectorCell] ?? '')}`;
+    if (binaryEffect) return `${binaryEffect.name}：${String(state.values[binaryEffect.settingKey] ?? '')}`;
     if (sourceId.startsWith('guild-fountain-')) {
       return '公會噴泉';
     }
@@ -657,22 +659,25 @@ async function start() {
       root.append(warning);
     }
   }
-          const numeric = (parent: HTMLElement, label: string, cell: string, percentage = true, constraints?: { min?: number; max?: number; step?: number | 'any'; integer?: boolean }, disabled = false) => {
+          const numeric = (parent: HTMLElement, label: string, cell: string, percentage = true, constraints?: { min?: number; max?: number; step?: number | 'any'; integer?: boolean }, disabled = false, editableDecimal = false) => {
     const wrapper = document.createElement('label'); wrapper.className = 'field'; wrapper.textContent = label;
             const integer = constraints?.integer === true;
-            const input = document.createElement('input'); input.type = integer ? 'text' : 'number'; input.step = integer ? '1' : 'any'; input.placeholder = disabled ? '請先選擇屬性' : '請填寫數值';
+            const input = document.createElement('input'); input.type = integer || editableDecimal ? 'text' : 'number'; input.step = integer ? '1' : 'any'; input.placeholder = disabled ? '請先選擇屬性' : '請填寫數值';
             if (integer) {
               const maximum = constraints?.max ?? 999;
               input.inputMode = 'numeric'; input.pattern = '[0-9]*'; input.maxLength = String(maximum).length;
               input.autocomplete = 'off'; input.spellcheck = false;
               input.title = `只接受 ${constraints?.min ?? 0}–${maximum} 的整數。`;
+            } else if (editableDecimal) {
+              input.inputMode = 'decimal'; input.autocomplete = 'off'; input.spellcheck = false;
             } else {
               preventScientificNotation(input);
             }
     if (constraints?.min !== undefined) input.min = String(constraints.min);
     if (constraints?.max !== undefined) input.max = String(constraints.max);
     if (constraints?.step !== undefined) input.step = String(constraints.step);
-    input.value = val(cell) === '' ? '' : String(Number(val(cell)) * (percentage ? 100 : 1));
+    const initialValue = Number(val(cell)) * (percentage ? 100 : 1);
+    input.value = val(cell) === '' ? '' : String(editableDecimal ? canonicalizeNumber(initialValue) : initialValue);
     if (disabled) { input.disabled = true; wrapper.classList.add('field-disabled'); wrapper.setAttribute('aria-disabled', 'true'); wrapper.title = '請先選擇屬性'; }
             if (integer) {
               const minimum = constraints?.min ?? 0;
@@ -729,6 +734,90 @@ async function start() {
                 if (input.value === '') input.value = lastValidValue;
                 input.setAttribute('aria-invalid', 'false');
               });
+            } else if (editableDecimal) {
+              const isDecimalDraft = (value: string) => /^\d*(?:\.\d*)?$/.test(value);
+              const isCompleteDecimal = (value: string) => /^(?:\d+(?:\.\d*)?|\.\d+)$/.test(value);
+              const minimum = constraints?.min;
+              const maximum = constraints?.max;
+              const step = typeof constraints?.step === 'number' ? constraints.step : undefined;
+              const isAllowedNumber = (value: number) => {
+                if (!Number.isFinite(value) || (minimum !== undefined && value < minimum - 1e-9) || (maximum !== undefined && value > maximum + 1e-9)) return false;
+                if (step === undefined) return true;
+                const stepIndex = (value - (minimum ?? 0)) / step;
+                return Math.abs(stepIndex - Math.round(stepIndex)) <= 1e-8;
+              };
+              const formatEditableDecimal = (value: number) => String(canonicalizeNumber(value));
+              const storeEditableDecimal = (value: number) => canonicalizeNumber(percentage ? value / 100 : value);
+              let lastValidValue = input.value;
+              const isValidInsertion = (inserted: string) => {
+                const start = input.selectionStart ?? input.value.length;
+                const end = input.selectionEnd ?? start;
+                return isDecimalDraft(input.value.slice(0, start) + inserted + input.value.slice(end));
+              };
+              const commitDecimal = () => {
+                const raw = input.value;
+                if (raw === '') {
+                  lastValidValue = '';
+                  input.setAttribute('aria-invalid', 'false');
+                  return;
+                }
+                const normalized = raw.startsWith('.') ? `0${raw}` : raw;
+                const parsed = Number(normalized);
+                if (!isCompleteDecimal(normalized) || normalized.endsWith('.') || !isAllowedNumber(parsed)) {
+                  input.value = lastValidValue;
+                  input.setAttribute('aria-invalid', 'true');
+                  return;
+                }
+                input.value = formatEditableDecimal(parsed);
+                lastValidValue = input.value;
+                state.values[cell] = storeEditableDecimal(parsed);
+                input.setAttribute('aria-invalid', 'false');
+                update();
+              };
+              input.addEventListener('beforeinput', event => {
+                const inputEvent = event as InputEvent;
+                if (inputEvent.inputType.startsWith('insert') && inputEvent.data !== null && !isValidInsertion(inputEvent.data)) {
+                  event.preventDefault();
+                  input.setAttribute('aria-invalid', 'true');
+                }
+              });
+              input.addEventListener('paste', event => {
+                const pasted = event.clipboardData?.getData('text') ?? '';
+                if (!isValidInsertion(pasted)) {
+                  event.preventDefault();
+                  input.setAttribute('aria-invalid', 'true');
+                }
+              });
+              input.addEventListener('input', () => {
+                const raw = input.value;
+                if (!isDecimalDraft(raw)) {
+                  input.setAttribute('aria-invalid', 'true');
+                  return;
+                }
+                input.setAttribute('aria-invalid', 'false');
+                if (raw === '') {
+                  lastValidValue = '';
+                  state.values[cell] = '';
+                  update();
+                  return;
+                }
+                if (!isCompleteDecimal(raw) || raw.endsWith('.')) return;
+                const parsed = Number(raw);
+                if (!isAllowedNumber(parsed)) {
+                  input.setAttribute('aria-invalid', 'true');
+                  return;
+                }
+                lastValidValue = formatEditableDecimal(parsed);
+                state.values[cell] = storeEditableDecimal(parsed);
+                update();
+              });
+              input.addEventListener('keydown', event => {
+                if (event.key === 'Enter') {
+                  event.preventDefault();
+                  input.blur();
+                }
+              });
+              input.addEventListener('blur', commitDecimal);
             } else {
               input.addEventListener('input', () => {
                 if (input.value !== '' && constraints?.min !== undefined && Number(input.value) < constraints.min) {
@@ -777,7 +866,7 @@ async function start() {
     petSkillLabel.textContent = '寵物具有 2% 雙攻';
     petSkillToggle.append(petSkillCheckbox, petSkillLabel);
     general.append(petSkillToggle);
-    for (const effect of data.otherEffects.binaryEffects) pick(general, effect.name, effect.selectorCell, effect.options);
+    for (const effect of data.otherEffects.binaryEffects) pick(general, effect.name, effect.settingKey, effect.options);
     const portrait = data.otherEffects.portraitAwakening;
     const portraitSection = document.createElement('section');
     portraitSection.className = 'portrait-awakening-fields';
@@ -791,8 +880,8 @@ async function start() {
     const portraitInputs = new Map<string, HTMLInputElement>();
     const portraitErrors = new Map<string, HTMLElement>();
     const portraitFields = [
-      { cell: portrait.strongCell, otherCell: portrait.transcendenceCell, label: '強烈技傷%' },
-      { cell: portrait.transcendenceCell, otherCell: portrait.strongCell, label: '超越技傷%' },
+      { cell: portrait.strongSettingKey, otherCell: portrait.transcendenceSettingKey, label: '強烈技傷%' },
+      { cell: portrait.transcendenceSettingKey, otherCell: portrait.strongSettingKey, label: '超越技傷%' },
     ] as const;
     for (const entry of portraitFields) {
       const wrapper = document.createElement('label');
@@ -880,19 +969,19 @@ async function start() {
     }
     portraitSection.append(portraitHeading, portraitNote, portraitGrid);
     general.append(portraitSection);
-    field(general, '百億/內布隆套效', data.colorSetEffects.selectorCell, options(data.colorSetEffects.options.map(option => option.name)));
+    field(general, '百億/內布隆套效', data.colorSetEffects.settingKey, options(data.colorSetEffects.options.map(option => option.name)));
     const atma = group('亞特瑪');
     field(atma, '亞特瑪屬性', 'Atma.Element', options(['火焰', '流水', '草木']));
     field(atma, '亞特瑪顏色', 'Atma.Color', options(['藍色', '綠色', '紫色', '米色']));
             const resonance = group('共鳴輸入', '輸入已分配的共鳴點，例如適應力點滿應該填100而非7。');
             const resonanceLimits: Record<string, number> = { 雙攻: 999, 技傷: 100, 適應: 100, 兩極: 50, B傷: 50 };
             for (const effect of data.resonance.effects) {
-              numeric(resonance, effect.name, effect.inputCell, false, { min: 0, max: resonanceLimits[effect.name] ?? 999, step: 1, integer: true });
+              numeric(resonance, effect.name, effect.settingKey, false, { min: 0, max: resonanceLimits[effect.name] ?? 999, step: 1, integer: true });
             }
     const spirit = group('賦靈錄');
     const spiritClassCodes = data.spiritRecord.classSelectors.classes.map(entry => entry.classCode);
-    const selectedSpiritClassCodes = data.spiritRecord.classSelectors.selectorCells.map(val);
-    data.spiritRecord.classSelectors.selectorCells.forEach((cell, index) => {
+    const selectedSpiritClassCodes = data.spiritRecord.classSelectors.settingKeys.map(val);
+    data.spiritRecord.classSelectors.settingKeys.forEach((cell, index) => {
       const selectedElsewhere = selectedSpiritClassCodes.filter((_, otherIndex) => otherIndex !== index && selectedSpiritClassCodes[otherIndex] !== '');
       const usedElsewhere = new Set(selectedElsewhere.map(code => resolveClassCode(code, spiritClassCodes)?.toLocaleLowerCase()).filter((code): code is string => Boolean(code)));
       const currentCode = resolveClassCode(selectedSpiritClassCodes[index], spiritClassCodes);
@@ -931,21 +1020,21 @@ async function start() {
       spirit.append(wrapper);
     });
     const fountain = group('公會噴泉');
-    for (const stage of data.otherEffects.guildFountain) pick(fountain, `${stage.stage}階`, stage.selectorCell, stage.options);
+    for (const stage of data.otherEffects.guildFountain) pick(fountain, `${stage.stage}階`, stage.settingKey, stage.options);
   }
   function renderWeaponMagicStones() {
     const root = document.querySelector<HTMLElement>('#weapon-magic-stone-fields')!;
     root.replaceChildren();
     const grid = document.createElement('div'); grid.className = 'weapon-magic-stone-grid'; root.append(grid);
-    const gradePicker = createPicker('武器魔力石', options(data.weaponGrades.options.map(option => option.name)), val(data.weaponGrades.selectorCell), value => {
-      state.values[data.weaponGrades.selectorCell] = value;
+    const gradePicker = createPicker('武器魔力石', options(data.weaponGrades.options.map(option => option.name)), val(data.weaponGrades.settingKey), value => {
+      state.values[data.weaponGrades.settingKey] = value;
       applyWeaponMagicStonePreset(value, true);
       update();
       renderWeaponMagicStones();
     });
     gradePicker.classList.add('weapon-magic-stone-grade');
     grid.append(gradePicker);
-    data.giantStones.selectorCells.forEach((cell, index) => field(
+    data.giantStones.settingKeys.forEach((cell, index) => field(
       grid,
       `巨型魔力石 ${index + 1}`,
       cell,
@@ -956,7 +1045,7 @@ async function start() {
       const card = document.createElement('section'); card.className = `weapon-magic-stone-color weapon-magic-stone-${colorGroup.id}`;
       const heading = document.createElement('h3'); heading.textContent = `${colorGroup.name}（9 格）`; card.append(heading);
       const slots = document.createElement('div'); slots.className = 'weapon-magic-stone-slots'; card.append(slots);
-      colorGroup.selectorCells.forEach((cell, index) => field(
+      colorGroup.settingKeys.forEach((cell, index) => field(
         slots,
         `${index + 1}`,
         cell,
@@ -1051,6 +1140,8 @@ async function start() {
         valueCell,
         true,
         { min: valueRule.minPct, max: valueRule.maxPct, step: valueRule.stepPct },
+        false,
+        true,
       );
     });
   }
@@ -1203,7 +1294,7 @@ async function start() {
     }
     if (selected.weapon) {
       field(panel, '武器強化', 'Weapon.ENHC', options(Object.keys(data.attack.weaponEnhancementFactors).map(level => `Lv.${level}`)));
-      field(panel, '武器成長', data.growth.selectorCell, data.growth.levels.map(level => ({ value: level.name, label: level.name, detail: summary(level.stats) })));
+      field(panel, '武器成長', data.growth.settingKey, data.growth.levels.map(level => ({ value: level.name, label: level.name, detail: summary(level.stats) })));
     }
     if (selected.stoneCells?.length) {
       const area = section(panel, '魔法石', true);
@@ -1363,7 +1454,7 @@ async function start() {
       }
     }
     if (selected.weapon) {
-      const appraisal = section(panel, '武器鑑定'); Object.values(data.weaponAppraisals.groups).forEach((group, i) => field(appraisal, `鑑定 ${i + 1}`, group.selectorCell, group.options.map(option => ({ value: option.name, label: option.name }))));
+      const appraisal = section(panel, '武器鑑定'); Object.values(data.weaponAppraisals.groups).forEach((group, i) => field(appraisal, `鑑定 ${i + 1}`, group.settingKey, group.options.map(option => ({ value: option.name, label: option.name }))));
       const transform = section(panel, '武器變換');
       const transformationGrid = attributeValueGrid(transform, 'weapon-transformation-grid');
       data.transformations.slots.forEach((slot, i) => {
@@ -1650,7 +1741,7 @@ async function start() {
       renderSkillDamageShare();
       const duplicateTransformationCells = clearDuplicateTransformationChoices(state);
       const duplicateNephronTransformationCells = clearDuplicateNephronTransformationChoices(state);
-      applyWeaponMagicStonePreset(String(state.values[data.weaponGrades.selectorCell] ?? ''));
+      applyWeaponMagicStonePreset(String(state.values[data.weaponGrades.settingKey] ?? ''));
       renderClassPicker();
       toggle.checked = state.lowerwearAlternativeEnabled;
       update();

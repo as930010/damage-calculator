@@ -1,6 +1,5 @@
 {
-  "schemaVersion": 1,
-  "source": "Google Sheets: 係數區!A1:C62 and 係數區!G1:H7",
+  "schemaVersion": 2,
   "classes": {
     "KE": {
       "physical": 580,

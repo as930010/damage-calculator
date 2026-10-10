@@ -19,8 +19,7 @@ export interface ClassCombatEffectProfile {
 }
 
 export interface ClassCombatEffectsDocument {
-  schemaVersion: 1;
-  source: string;
+  schemaVersion: 2;
   methods: Readonly<Record<CalculationMethod, string>>;
   classCodeAliases?: Readonly<Record<string, string>>;
   classes: Readonly<Record<string, ClassCombatEffectProfile>>;
@@ -134,8 +133,7 @@ export interface ClassAttackCoefficients {
 }
 
 export interface AttackParametersDocument {
-  schemaVersion: 1;
-  source: string;
+  schemaVersion: 2;
   classes: Readonly<Record<string, ClassAttackCoefficients>>;
   weaponEnhancementFactors: Readonly<Record<string, number>>;
 }
@@ -174,8 +172,7 @@ export interface AttackCalculationResult {
 }
 
 export interface ClassDamagePassivesDocument {
-  schemaVersion: 1;
-  source: string;
+  schemaVersion: 2;
   /** Missing class keys are unconfigured, never assumed to be 0%. */
   critDamagePctByClass: Readonly<Record<string, number>>;
   bossDamagePctByClass: Readonly<Record<string, number>>;

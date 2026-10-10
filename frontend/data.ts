@@ -30,7 +30,7 @@ export interface GameData {
     characterBase: Record<string, number>;
     characterBaseByClass?: Readonly<Record<string, Readonly<Record<string, number>>>>;
     fixedEffects: StatContribution[];
-    conditionalEffects: { sourceId: string; selectorCell: string; selectorValue: string; stats: Readonly<Record<string, number>> }[];
+    conditionalEffects: { sourceId: string; settingKey: string; selectorValue: string; stats: Readonly<Record<string, number>> }[];
     optionalEffects: { sourceId: string; stateKey: "petSkillAttackEnabled"; defaultEnabled: boolean; stats: Readonly<Record<string, number>> }[];
     critDamageProductBasePct: number;
     critDamageProductBaselinePctToSubtract: number;
@@ -46,17 +46,17 @@ export interface GameData {
   chipSlots: ChipSlotsDocument;
   circuits: CircuitBoardRulesDocument;
   transformations: WeaponTransformationDocument & { options: string[] };
-  growth: WeaponGrowthDocument & { selectorCell: string };
-  weaponAppraisals: { groups: Record<string, { selectorCell: string; options: NamedStatOption[] }> };
+  growth: WeaponGrowthDocument & { settingKey: string };
+  weaponAppraisals: { groups: Record<string, { settingKey: string; options: NamedStatOption[] }> };
   weaponGrades: {
-    selectorCell: string;
+    settingKey: string;
     options: NamedStatOption[];
     colorGroups: {
-      id: string; name: string; selectorCells: string[]; options: NamedStatOption[];
+      id: string; name: string; settingKeys: string[]; options: NamedStatOption[];
       presetByGrade: Record<string, string>;
     }[];
   };
-  giantStones: { selectorCells: string[]; options: NamedStatOption[] };
+  giantStones: { settingKeys: string[]; options: NamedStatOption[] };
   accessoryEffects: AccessoryEffectDocument;
   colorSetEffects: ColorSetEffectDocument;
   classCombatEffects: ClassCombatEffectsDocument;
@@ -70,16 +70,16 @@ export interface GameData {
   spiritRecord: SpiritRecordEffectDocument;
   otherEffects: {
     consumables: NamedStatOption[]; environments: NamedStatOption[]; titles: NamedStatOption[];
-    guildFountain: { stage: number; selectorCell: string; options: NamedStatOption[] }[];
+    guildFountain: { stage: number; settingKey: string; options: NamedStatOption[] }[];
     peakOptions: NamedStatOption[];
-    binaryEffects: { selectorCell: string; name: string; options: NamedStatOption[]; source: string }[];
+    binaryEffects: { settingKey: string; name: string; options: NamedStatOption[] }[];
     portraitAwakening: {
-      legacySelectorCell: string; strongCell: string; transcendenceCell: string;
+      legacySettingKey: string; strongSettingKey: string; transcendenceSettingKey: string;
       strongStatKey: string; transcendenceStatKey: string; minPct: number; maxPct: number; maxTotalPct: number;
     };
   };
   pets: { options: NamedStatOption[] };
-  simulatorInputs: { catalogs: { id: string; options: { value: string | number }[] }[]; inputs: { simulatorCells: string; inputType: string; catalogId: string }[] };
+  simulatorInputs: { schemaVersion: 2; catalogs: { id: string; options: { value: string | number }[] }[]; inputs: { fieldIds: string[]; inputType: string; catalogId: string }[] };
 }
 
 export const GAME_DATA_FILES = {

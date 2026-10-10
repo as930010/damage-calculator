@@ -1,10 +1,7 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "dataUpdatedAt": "2026-09-25",
-  "pieceCountInput": "裝備模擬區!M2:O7 中名稱包含「亞特瑪」的項目",
   "activeWhenPieceCountEquals": 4,
-  "elementInput": "裝備模擬區!L9",
-  "colorInput": "裝備模擬區!N9",
   "rules": [
     {
       "id": "atma-wood-crit-rate",
@@ -14,10 +11,7 @@
       },
       "stats": {
         "critRatePct": -6
-      },
-      "sourceCells": [
-        "計算機!F100"
-      ]
+      }
     },
     {
       "id": "atma-water-fire-multiplicative-damage",
@@ -41,10 +35,7 @@
         "米色": {
           "multiplicativeDamagePct": 20
         }
-      },
-      "sourceCells": [
-        "計算機!S100"
-      ]
+      }
     },
     {
       "id": "atma-wood-multiplicative-crit-damage",
@@ -65,14 +56,7 @@
         "米色": {
           "multiplicativeCritDamagePct": 30
         }
-      },
-      "sourceCells": [
-        "計算機!T100"
-      ]
+      }
     }
-  ],
-  "notes": [
-    "僅在套裝件數正好為 4 時套用，對應計算機!B100 的判斷。",
-    "流水／火焰的 S98 與草木的 T98 是不同乘算來源，不可合併到加算傷害。"
   ]
 }

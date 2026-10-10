@@ -8,7 +8,7 @@ export interface WeaponTransformationRule {
 }
 
 export interface WeaponTransformationDocument {
-  schemaVersion: 1;
+  schemaVersion: 2;
   rules: readonly WeaponTransformationRule[];
   slots: readonly { choiceCell: string; valueCell: string; scalingTextCell: string }[];
 }

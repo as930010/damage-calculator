@@ -1,7 +1,6 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "dataUpdatedAt": "2026-09-25",
-  "source": "裝備模擬區下拉範圍與計算機第 22、24、27、30、32、33、35 列公式",
   "groups": [
     {
       "id": "accessory-upper-clothing",
@@ -11,7 +10,6 @@
         "Accessory.Top.Appraisal.2",
         "Accessory.Top.Appraisal.3"
       ],
-      "source": "裝備模擬區!O11:O13 -> 計算機!E30:G30、L30; 係數區!AU2:AU6",
       "options": [
         {
           "name": "攻擊力+1%",
@@ -53,7 +51,6 @@
         "Accessory.FaceMiddle.Appraisal.2",
         "Accessory.FaceMiddle.Appraisal.3"
       ],
-      "source": "裝備模擬區!M15:M17 -> 計算機!E22:R22; 致命一擊與極大化 x1，其餘 x1.5; 係數區!AP2:AP13",
       "options": [
         {
           "name": "無視防禦%",
@@ -137,7 +134,6 @@
         "Accessory.FaceBottom.Appraisal.2",
         "Accessory.FaceBottom.Appraisal.3"
       ],
-      "source": "裝備模擬區!M19:M21 -> 計算機!E24:R24; 全部 x2; 係數區!AP2:AP13",
       "options": [
         {
           "name": "無視防禦%",
@@ -221,7 +217,6 @@
         "Accessory.Arm.Appraisal.2",
         "Accessory.Arm.Appraisal.3"
       ],
-      "source": "裝備模擬區!O15:O17 -> 計算機!E32:R32; 致命一擊與極大化 x1.5，其餘 x1; 係數區!AP2:AP13",
       "options": [
         {
           "name": "無視防禦%",
@@ -305,7 +300,6 @@
         "Accessory.Necklace.Appraisal.2",
         "Accessory.Necklace.Appraisal.3"
       ],
-      "source": "裝備模擬區!O19:O21 -> 計算機!E33:R33; 致命一擊與極大化 x2，其餘 x1; 係數區!AP2:AP13",
       "options": [
         {
           "name": "無視防禦%",
@@ -408,7 +402,6 @@
         "Accessory.Ring1.Appraisal.1",
         "Accessory.Ring1.Appraisal.2"
       ],
-      "source": "裝備模擬區!M23:M24 -> 計算機!F27:G27; 係數區!AV2:AV4",
       "options": [
         {
           "name": "致命一擊+2%",
@@ -437,7 +430,6 @@
         "Accessory.Ring2.Appraisal.1",
         "Accessory.Ring2.Appraisal.2"
       ],
-      "source": "裝備模擬區!O23:O24 -> 計算機!F35:G35; 係數區!AV2:AV4",
       "options": [
         {
           "name": "致命一擊+2%",

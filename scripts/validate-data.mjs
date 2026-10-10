@@ -36,11 +36,11 @@ const requiredFields = {
   "data/attack-parameters.json": ["schemaVersion", "classes", "weaponEnhancementFactors"],
   "data/attributes.json": ["schemaVersion", "attributes"],
   "data/chip-slots.json": ["schemaVersion", "slots"],
-  "data/circuit-board-rules.json": ["schemaVersion", "statKeyBySheetName", "inputs"],
+  "data/circuit-board-rules.json": ["schemaVersion", "statKeyByAttributeName", "inputs"],
   "data/class-combat-effects.json": ["schemaVersion", "methods", "classes"],
   "data/class-damage-passives.json": ["schemaVersion", "critDamagePctByClass", "bossDamagePctByClass", "multiplicativeCritDamagePctByClass"],
   "data/classes.json": ["schemaVersion", "classes"],
-  "data/color-set-effects.json": ["schemaVersion", "selectorCell", "options"],
+  "data/color-set-effects.json": ["schemaVersion", "settingKey", "options"],
   "data/combat-rate-source-rules.json": ["schemaVersion", "sources"],
   "data/equipment-layout.json": ["schemaVersion", "groups", "slots"],
   "data/equipment/accessories.json": ["schemaVersion", "items"],
@@ -50,23 +50,23 @@ const requiredFields = {
   "data/equipment/one-piece-costumes.json": ["schemaVersion", "items"],
   "data/equipment/right-ice-set-effects.json": ["schemaVersion", "selectionCells", "maxSelectedSets", "effects"],
   "data/equipment/right-ice.json": ["schemaVersion", "items"],
-  "data/giant-magic-stones.json": ["schemaVersion", "selectorCells", "effectOutputRows", "options"],
+  "data/giant-magic-stones.json": ["schemaVersion", "settingKeys", "options"],
   "data/innerwear-rules.json": ["schemaVersion", "baseLevel", "slots", "enhancementStats", "forgingAttack", "forgingBonuses"],
-  "data/nephron-armor-rules.json": ["schemaVersion", "dataUpdatedAt", "transformations", "magazines", "levelLabels", "fields", "notes"],
+  "data/nephron-armor-rules.json": ["schemaVersion", "dataUpdatedAt", "transformations", "magazines", "levelLabels", "fields"],
   "data/master-beast-effects.json": ["schemaVersion", "armorSpiritStoneSetEffect", "spiritStoneColorSelector", "options", "customAttributeOptions"],
   "data/other-effect-options.json": ["schemaVersion", "consumables", "environments", "titles", "guildFountain", "binaryEffects", "peakOptions"],
   "data/parameters.json": ["schemaVersion", "characterBase", "fixedEffects", "optionalEffects", "conditionalEffects"],
   "data/pet-effects.json": ["schemaVersion", "options"],
   "data/raid-set-effects.json": ["schemaVersion", "sets"],
-  "data/resonance-effects.json": ["schemaVersion", "selectorCells", "effects"],
+  "data/resonance-effects.json": ["schemaVersion", "effects"],
   "data/simulator-equipment-mapping.json": ["schemaVersion", "selections", "magicStoneSelections"],
   "data/simulator-input-options.json": ["schemaVersion", "catalogs", "inputs"],
   "data/simulator-input-rules.json": ["schemaVersion", "innerwear", "lowerwearAlternatives", "circuitBoards", "chips", "weapon", "rightIceSetEffects"],
   "data/slots.json": ["schemaVersion", "slots"],
   "data/spirit-record-effects.json": ["schemaVersion", "classSelectors", "defaultMaxedStats", "branchBonuses", "traits"],
   "data/weapon-appraisals.json": ["schemaVersion", "groups"],
-  "data/weapon-grade-options.json": ["schemaVersion", "selectorCell", "options", "colorGroups"],
-  "data/weapon-growth.json": ["schemaVersion", "selectorCell", "levels"],
+  "data/weapon-grade-options.json": ["schemaVersion", "settingKey", "options", "colorGroups"],
+  "data/weapon-growth.json": ["schemaVersion", "settingKey", "levels"],
   "data/weapon-transformations.json": ["schemaVersion", "rules", "slots"],
   "data/examples/public-example-2026-09-28.json": ["schemaVersion", "Job", "values", "lowerwearAlternativeEnabled"],
 };
@@ -80,8 +80,21 @@ for (const [name, fields] of Object.entries(requiredFields)) {
   for (const field of fields) {
     if (!(field in document) || document[field] === null) errors.push(`${name}: 缺少必要欄位 ${field}。`);
   }
-  if (name.startsWith("data/") && !name.startsWith("data/examples/") && document.schemaVersion !== 1) {
-    errors.push(`${name}: 不支援的資料結構版本 ${document.schemaVersion}，預期版本 1。`);
+  const schemaVersion2Files = new Set([
+    "data/accessory-special-effects.json", "data/armor-appraisals.json", "data/atma-effects.json",
+    "data/attack-parameters.json", "data/attributes.json", "data/circuit-board-rules.json",
+    "data/class-combat-effects.json", "data/class-damage-passives.json", "data/classes.json",
+    "data/color-set-effects.json", "data/combat-rate-source-rules.json", "data/equipment/chips.json",
+    "data/equipment/right-ice-set-effects.json", "data/giant-magic-stones.json", "data/innerwear-rules.json",
+    "data/master-beast-effects.json", "data/nephron-armor-rules.json", "data/other-effect-options.json",
+    "data/parameters.json", "data/resonance-effects.json", "data/simulator-equipment-mapping.json",
+    "data/pet-effects.json", "data/raid-set-effects.json", "data/simulator-input-options.json",
+    "data/slots.json", "data/spirit-record-effects.json", "data/weapon-appraisals.json",
+    "data/weapon-grade-options.json", "data/weapon-growth.json", "data/weapon-transformations.json",
+  ]);
+  const supportedSchemaVersion = name === "data/simulator-input-rules.json" ? 3 : schemaVersion2Files.has(name) ? 2 : 1;
+  if (name.startsWith("data/") && !name.startsWith("data/examples/") && document.schemaVersion !== supportedSchemaVersion) {
+    errors.push(`${name}: 不支援的資料結構版本 ${document.schemaVersion}，預期版本 ${supportedSchemaVersion}。`);
   }
   if (typeof document.dataUpdatedAt === "string" && !/^\d{4}-\d{2}-\d{2}$/.test(document.dataUpdatedAt)) {
     errors.push(`${name}: dataUpdatedAt 必須使用 YYYY-MM-DD 格式。`);
@@ -209,8 +222,11 @@ if (simulatorOptions) {
   const catalogIds = new Set((simulatorOptions.catalogs ?? []).map((catalog) => catalog.id));
   if (catalogIds.size !== (simulatorOptions.catalogs ?? []).length) errors.push("data/simulator-input-options.json: 選項目錄 id 重複。");
   for (const input of simulatorOptions.inputs ?? []) {
-    if (!catalogIds.has(input.catalogId)) errors.push(`data/simulator-input-options.json: ${input.simulatorCells} 引用不存在的選項目錄 ${input.catalogId}。`);
-    if (input.inputType !== "list") errors.push(`data/simulator-input-options.json: ${input.simulatorCells} 使用不支援的輸入類型 ${input.inputType}。`);
+    if (!Array.isArray(input.fieldIds) || input.fieldIds.length === 0 || input.fieldIds.some(fieldId => typeof fieldId !== "string" || !fieldId.trim())) {
+      errors.push("data/simulator-input-options.json: fieldIds 必須是非空欄位 ID 陣列。");
+    }
+    if (!catalogIds.has(input.catalogId)) errors.push(`data/simulator-input-options.json: ${input.fieldIds?.join(" ") ?? "(missing fieldIds)"} 引用不存在的選項目錄 ${input.catalogId}。`);
+    if (input.inputType !== "list") errors.push(`data/simulator-input-options.json: ${input.fieldIds?.join(" ") ?? "(missing fieldIds)"} 使用不支援的輸入類型 ${input.inputType}。`);
   }
 }
 
@@ -219,12 +235,12 @@ if (weaponGrades) {
   const gradesByName = new Map((weaponGrades.options ?? []).map(option => [option.name, option]));
   const groups = weaponGrades.colorGroups ?? [];
   if (groups.length !== 3) errors.push("data/weapon-grade-options.json: 武器魔力石必須有紅、藍、黃三組。");
-  const allCells = groups.flatMap(group => group.selectorCells ?? []);
+  const allCells = groups.flatMap(group => group.settingKeys ?? []);
   if (allCells.length !== 27 || new Set(allCells).size !== 27) errors.push("data/weapon-grade-options.json: 三色魔力石必須各有 9 個不重複欄位。");
   for (const grade of gradesByName.keys()) {
     const totals = {};
     for (const group of groups) {
-      if ((group.selectorCells ?? []).length !== 9) errors.push(`data/weapon-grade-options.json: ${group.name} 必須有 9 格。`);
+      if ((group.settingKeys ?? []).length !== 9) errors.push(`data/weapon-grade-options.json: ${group.name} 必須有 9 格。`);
       const option = group.options?.find(entry => entry.id === group.presetByGrade?.[grade]);
       if (!option) { errors.push(`data/weapon-grade-options.json: ${grade} 缺少 ${group.name} 預設。`); continue; }
       for (const [stat, value] of Object.entries(option.stats ?? {})) totals[stat] = (totals[stat] ?? 0) + value * 9;

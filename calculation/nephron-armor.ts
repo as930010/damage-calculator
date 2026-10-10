@@ -30,7 +30,7 @@ export interface NephronArmorFieldRules {
 }
 
 export interface NephronArmorRulesDocument {
-  schemaVersion: 1;
+  schemaVersion: 2;
   transformations: readonly NephronTransformationOption[];
   magazines: readonly NephronMagazineOption[];
   levelLabels: readonly string[];

@@ -16,7 +16,7 @@ export interface InnerwearSlot {
 }
 
 export interface InnerwearRulesDocument {
-  schemaVersion: 1;
+  schemaVersion: 2;
   baseLevel: number;
   itemLevelBonus: number;
   baselineCoefficient: number;
