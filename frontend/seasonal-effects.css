@@ -352,7 +352,7 @@ body{color:var(--text-main);background:transparent}
   background:linear-gradient(145deg,rgb(11 17 42 / 65%),rgb(7 11 27 / 65%));
   box-shadow:none;
 }
-.stat{border-radius:11px;transition:border-color 160ms ease,background-color 160ms ease}
+.stat{border-radius:11px;transition:background-color 160ms ease}
 .stat:hover{border-color:#7374a2;box-shadow:none}
 .stat[open]{border-color:#a48abb;background:linear-gradient(145deg,rgb(47 41 70 / 65%),rgb(31 35 63 / 65%))}
 .stat-details{border-top-color:rgb(157 145 190 / 28%)}
