@@ -249,7 +249,7 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
         if (isResonanceInputCell(fieldId)) {
           const points = parseResonancePoints(fieldId, value);
           if (points !== null) optionValuesById[fieldId] = points;
-        } else optionValuesById[fieldId] = value;
+        } else optionValuesById[fieldId] = fieldId === 'Effect.Environment' && value === '小屋' ? '小屋/溫泉' : value;
       }
   }
   const optionValues = optionValuesById;
@@ -270,7 +270,9 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
         }
       const choices = cellOptions(data, fieldId, optionValues);
       if (choices) {
-        if (choices.some(option => String(option) === String(value))) values[fieldId] = value;
+        const normalizedValue = fieldId === 'Effect.Environment' && value === '小屋' ? '小屋/溫泉' : value;
+        if (fieldId === 'Effect.Environment' && value === '其他') clearedFields.push(fieldId);
+        else if (choices.some(option => String(option) === String(normalizedValue))) values[fieldId] = normalizedValue;
         else clearedFields.push(fieldId);
       } else values[fieldId] = value;
     }

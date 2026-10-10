@@ -13,6 +13,7 @@ import { findValidationCatalog } from './input-validation.ts';
 import { preventScientificNotation } from './numeric-input.ts';
 import { resolveClassCode, sanitizeClassCode } from './class-code.ts';
 import { resolveUnsignedInteger, sanitizeUnsignedInteger } from './direct-input.ts';
+import { historyShortcutAction, LoadoutHistory } from './history.ts';
 
 const ICE_EQUIPMENT_SHORT_NAMES: Record<string, string> = {
   '幻影面紗': '面紗',
@@ -42,6 +43,14 @@ async function start() {
   const migrateLegacyHeadStoneLabel = (target: LoadoutState) => {
     if (target.values['MasterBeast.Head.CustomAttribute'] !== '其他') return false;
     target.values['MasterBeast.Head.CustomAttribute'] = '無關傷害';
+    return true;
+  };
+  const migrateLegacyEnvironmentLabel = (target: LoadoutState) => {
+    const cell = 'Effect.Environment';
+    const value = target.values[cell];
+    if (value === '小屋') target.values[cell] = '小屋/溫泉';
+    else if (value === '其他') delete target.values[cell];
+    else return false;
     return true;
   };
   const migrateLegacyGloveCircuitSkillDamage = (target: LoadoutState) => {
@@ -76,6 +85,7 @@ async function start() {
     return changed;
   };
   const startupLegacyHeadStoneLabelMigrated = migrateLegacyHeadStoneLabel(state);
+  const startupLegacyEnvironmentLabelMigrated = migrateLegacyEnvironmentLabel(state);
   const startupLegacyGloveCircuitMigrated = migrateLegacyGloveCircuitSkillDamage(state);
   const startupLegacyPortraitAwakeningMigrated = migrateLegacyPortraitAwakening(state);
   const startupPortraitAwakeningNormalized = normalizePortraitAwakeningValues(state);
@@ -153,7 +163,7 @@ async function start() {
     return clearedCells;
   };
   const startupDuplicateNephronMagazineCells = clearDuplicateNephronMagazines(state);
-  if ((startupLegacyHeadStoneLabelMigrated || startupLegacyGloveCircuitMigrated || startupLegacyPortraitAwakeningMigrated || startupPortraitAwakeningNormalized || startupDuplicateTransformationCells.length || startupDuplicateNephronTransformationCells.length || startupInvalidAccessoryAppraisalCells.length || startupDuplicateNephronMagazineCells.length) && !sampleMode) saveState(state);
+  if ((startupLegacyHeadStoneLabelMigrated || startupLegacyEnvironmentLabelMigrated || startupLegacyGloveCircuitMigrated || startupLegacyPortraitAwakeningMigrated || startupPortraitAwakeningNormalized || startupDuplicateTransformationCells.length || startupDuplicateNephronTransformationCells.length || startupInvalidAccessoryAppraisalCells.length || startupDuplicateNephronMagazineCells.length) && !sampleMode) saveState(state);
   const weaponMagicStoneCells = data.weaponGrades.colorGroups.flatMap(group => group.selectorCells);
   const applyWeaponMagicStonePreset = (grade: string, overwrite = false) => {
     if (!grade) return;
@@ -167,15 +177,18 @@ async function start() {
   };
   applyWeaponMagicStonePreset(String(state.values[data.weaponGrades.selectorCell] ?? ''));
   let baseline = sampleMode ? null : readBaseline();
+  let baselineIsValid = false;
   if (baseline) {
     const migratedBaseline = migrateLegacyHeadStoneLabel(baseline);
+    const migratedBaselineEnvironment = migrateLegacyEnvironmentLabel(baseline);
     const migratedBaselineGloveCircuit = migrateLegacyGloveCircuitSkillDamage(baseline);
     const migratedBaselinePortraitAwakening = migrateLegacyPortraitAwakening(baseline);
     const normalizedBaselinePortraitAwakening = normalizePortraitAwakeningValues(baseline);
     const clearedBaselineMagazines = clearDuplicateNephronMagazines(baseline);
     const clearedBaselineTransformations = clearDuplicateNephronTransformationChoices(baseline);
-    if (migratedBaseline || migratedBaselineGloveCircuit || migratedBaselinePortraitAwakening || normalizedBaselinePortraitAwakening || clearedBaselineMagazines.length || clearedBaselineTransformations.length) saveState(baseline, true);
+    if (migratedBaseline || migratedBaselineEnvironment || migratedBaselineGloveCircuit || migratedBaselinePortraitAwakening || normalizedBaselinePortraitAwakening || clearedBaselineMagazines.length || clearedBaselineTransformations.length) saveState(baseline, true);
   }
+  const history = new LoadoutHistory(state);
   let selected = data.layout.slots.find(slot => slot.weapon)!;
   type BeastAccessorySlotId = 'headwear' | 'armor' | 'necklace' | 'ring-one' | 'ring-two';
   type BeastManualCategory = keyof typeof data.masterBeast.customAttributeOptions;
@@ -339,6 +352,59 @@ async function start() {
     if (event.key === 'Escape' && document.body.classList.contains('mobile-inspector-open')) closeMobileInspector();
   });
   mobileInspectorQuery.addEventListener('change', event => { if (!event.matches && document.body.classList.contains('mobile-inspector-open')) closeMobileInspector(); });
+  const toolbarActions = app.querySelector<HTMLElement>('.toolbar-actions')!;
+  const baselineButton = toolbarActions.querySelector<HTMLButtonElement>('#baseline')!;
+  const transferButtons = toolbarActions.querySelector<HTMLElement>('.transfer-actions')!;
+  const toolbar = app.querySelector<HTMLElement>('.toolbar')!;
+  const transferStatus = toolbar.querySelector<HTMLElement>('#transfer-status')!;
+  const saveStatus = toolbar.querySelector<HTMLElement>('#save-status')!;
+  const historyActions = document.createElement('div');
+  historyActions.className = 'history-actions';
+  historyActions.setAttribute('role', 'group');
+  historyActions.setAttribute('aria-label', '操作歷史');
+  const makeHistoryButton = (id: string, glyph: string, label: string, shortcut: string, ariaShortcuts: string) => {
+    const button = document.createElement('button');
+    button.id = id;
+    button.type = 'button';
+    button.disabled = true;
+    button.title = `${label}（${shortcut}）`;
+    button.setAttribute('aria-label', `${label}（${shortcut}）`);
+    button.setAttribute('aria-keyshortcuts', ariaShortcuts);
+    button.innerHTML = `<span class="history-action-glyph" aria-hidden="true">${h(glyph)}</span><span>${h(label)}</span>`;
+    return button;
+  };
+  const undoButton = makeHistoryButton('undo', '↶', '復原', 'Ctrl+Z / ⌘Z', 'Control+Z Meta+Z');
+  const redoButton = makeHistoryButton('redo', '↷', '重做', 'Ctrl+Y / Ctrl+Shift+Z / ⌘Y / ⌘Shift+Z', 'Control+Y Control+Shift+Z Meta+Y Meta+Shift+Z');
+  historyActions.append(undoButton, redoButton);
+  const baselineActions = document.createElement('div');
+  baselineActions.className = 'baseline-actions';
+  const baselineControlGroup = document.createElement('div');
+  baselineControlGroup.className = 'baseline-control-group';
+  const baselineButtons = document.createElement('div');
+  baselineButtons.className = 'baseline-buttons';
+  const transferControlGroup = document.createElement('div');
+  transferControlGroup.className = 'transfer-control-group';
+  const restoreBaselineButton = document.createElement('button');
+  restoreBaselineButton.id = 'restore-baseline';
+  restoreBaselineButton.type = 'button';
+  restoreBaselineButton.disabled = true;
+  restoreBaselineButton.textContent = '還原至比較基準';
+  restoreBaselineButton.setAttribute('aria-label', '還原至比較基準配置');
+  restoreBaselineButton.title = '尚未設定可用的基準配置';
+  baselineButton.title = '保存目前完整配置作為比較基準；不會改動操作歷史';
+  baselineButtons.append(restoreBaselineButton, baselineButton);
+  baselineControlGroup.append(baselineButtons);
+  transferControlGroup.append(transferButtons);
+  baselineActions.append(baselineControlGroup, transferControlGroup);
+  toolbarActions.replaceChildren(historyActions, baselineActions);
+  const toolbarFeedback = document.createElement('div');
+  toolbarFeedback.className = 'toolbar-feedback';
+  toolbar.append(toolbarFeedback);
+  const placeToolbarFeedback = () => {
+    toolbarFeedback.append(saveStatus, transferStatus);
+  };
+  placeToolbarFeedback();
+
   if (sampleMode) {
     app.querySelector('.workspace-heading')!.insertAdjacentHTML('afterend', '<p class="sample-banner">已載入驗算範例。這個分頁的調整不會覆蓋你原本儲存在瀏覽器的配裝。</p>');
     document.querySelector('footer')!.textContent = '這個分頁使用驗算範例；調整只保留至關閉或重新整理頁面。';
@@ -353,6 +419,17 @@ async function start() {
   const val = (fieldId: string) => String(state.values[fieldId] ?? '');
   const summary = (stats: Readonly<Record<string, number>>) => Object.entries(stats).filter(([, value]) => value !== 0).map(([key, value]) => `${data.attributes.attributes.find(a => a.key === key)?.name ?? key} ${fmt(value)}`).join(' · ');
   const options = (names: readonly string[]): PickerOption[] => names.map(name => ({ value: name, label: name }));
+  const refreshHistoryControls = () => {
+    undoButton.disabled = !history.canUndo;
+    redoButton.disabled = !history.canRedo;
+    const canRestore = Boolean(baseline && baselineIsValid && !history.matches(baseline));
+    restoreBaselineButton.disabled = !canRestore;
+    restoreBaselineButton.title = !baseline
+      ? '請先設定比較基準'
+      : !baselineIsValid
+        ? '已保存的基準配置無法套用目前資料，請重新設定基準'
+      : canRestore ? '一鍵還原至比較基準（可用復原撤銷）' : '目前配置已與基準一致';
+  };
   const lowerwearConditionalCircuitConflict = (): string | null => {
     if (!state.lowerwearAlternativeEnabled) return null;
     const lowerwear = data.circuits.inputs.find(slot => slot.slot === "lowerwear");
@@ -395,9 +472,15 @@ async function start() {
       return { value, label: percentLabel && typeof option.value === 'number' ? `${value}%` : value };
     });
   };
-  const update = () => {
+  const update = (force = false) => {
+    const changed = history.record(state);
+    if (!changed && !force) {
+      refreshHistoryControls();
+      return;
+    }
     document.querySelector('#save-status')!.textContent = sampleMode ? '驗算範例模式：本頁調整不儲存' : saveState(state) ? '已儲存於此裝置' : '此瀏覽器無法儲存設定';
     renderSlots(); renderBeastAccessories(); renderMasterBeastColorSelector(); renderResults();
+    refreshHistoryControls();
   };
   function sourceLabel(sourceId: string): string {
     if (sourceId === 'character-base') return '角色基礎係數';
@@ -1425,7 +1508,14 @@ async function start() {
       let baselineDamage: ReturnType<typeof projectDamage> | null = null;
       let damageCalculationError: unknown;
       try { currentDamage = projectDamage(data, state); } catch (error) { damageCalculationError = error; }
-      try { if (baseline) baselineDamage = projectDamage(data, baseline); } catch { /* Keep current attributes visible if the saved build is stale. */ }
+      baselineIsValid = false;
+      if (baseline) {
+        try {
+          projectAttributes(data, baseline);
+          baselineIsValid = true;
+        } catch { /* Keep current attributes visible if the saved build is stale. */ }
+        try { baselineDamage = projectDamage(data, baseline); } catch { /* Damage can be unavailable while the saved configuration is still restorable. */ }
+      }
       if (!currentDamage) renderCalculationComparison(undefined, baselineDamage?.result);
       const equipmentDamageSummary = document.querySelector<HTMLElement>('#equipment-damage-summary')!;
       const baselineFinalDamage = baselineDamage?.result.finalDamage.finalDamage;
@@ -1609,23 +1699,84 @@ async function start() {
   renderSkillDamageShare();
   const toggle = document.querySelector<HTMLInputElement>('#alternate')!; toggle.checked = state.lowerwearAlternativeEnabled;
   const battle = document.querySelector<HTMLElement>('#battle-settings')!;
-  for (const [fieldId, label] of [['Stage.Adapt','關卡適應力'],['Stage.CritRatePenalty','關卡扣致命'],['Stage.BossDEF','Boss防禦']] as const) {
-    const catalog = findValidationCatalog(data.simulatorInputs.inputs, data.simulatorInputs.catalogs, fieldId);
-    const error = document.createElement('span');
-    error.className = 'input-hint class-picker-error';
-    error.hidden = true;
-    error.setAttribute('role', 'alert');
-    const picker = createPicker(label, options((catalog?.options ?? []).map(option => String(option.value))), val(fieldId), value => { state.values[fieldId] = value; error.textContent = ''; error.hidden = true; update(); }, {
-      sanitize: sanitizeUnsignedInteger,
-      resolve: resolveUnsignedInteger,
-      onInvalid: () => { error.textContent = '請輸入純數字（非負整數），或從選項中選擇。'; error.hidden = false; },
-      onInput: () => { error.textContent = ''; error.hidden = true; },
-      allowCharacter: character => /^[0-9]$/.test(character),
-    });
-    battle.append(picker, error);
-  }
+  const renderBattleSettings = () => {
+    battle.replaceChildren();
+    for (const [fieldId, label] of [['Stage.Adapt','關卡適應力'],['Stage.CritRatePenalty','關卡扣致命'],['Stage.BossDEF','Boss防禦']] as const) {
+      const catalog = findValidationCatalog(data.simulatorInputs.inputs, data.simulatorInputs.catalogs, fieldId);
+      const error = document.createElement('span');
+      error.className = 'input-hint class-picker-error';
+      error.hidden = true;
+      error.setAttribute('role', 'alert');
+      const picker = createPicker(label, options((catalog?.options ?? []).map(option => String(option.value))), val(fieldId), value => { state.values[fieldId] = value; error.textContent = ''; error.hidden = true; update(); }, {
+        sanitize: sanitizeUnsignedInteger,
+        resolve: resolveUnsignedInteger,
+        onInvalid: () => { error.textContent = '請輸入純數字（非負整數），或從選項中選擇。'; error.hidden = false; },
+        onInput: () => { error.textContent = ''; error.hidden = true; },
+        allowCharacter: character => /^[0-9]$/.test(character),
+      });
+      battle.append(picker, error);
+    }
+  };
+  renderBattleSettings();
   toggle.addEventListener('change', () => { state.lowerwearAlternativeEnabled = toggle.checked; update(); renderInspector(); });
-  document.querySelector('#baseline')!.addEventListener('click', () => { try { projectAttributes(data, state); baseline = structuredClone(state); const stored = sampleMode ? false : saveState(baseline, true); renderResults(); document.querySelector('#save-status')!.textContent = stored ? '比較基準已儲存' : '比較基準僅保留至關閉頁面'; } catch { renderResults(); } });
+  const refreshConfigurationUi = () => {
+    renderClassPicker();
+    toggle.checked = state.lowerwearAlternativeEnabled;
+    renderBattleSettings();
+    renderSkillDamageShare();
+    update(true);
+    renderInspector();
+    renderTitleInput();
+    renderGlobalInputs();
+    renderWeaponMagicStones();
+    renderRightIceSetSelectors();
+  };
+  const applyHistorySnapshot = (snapshot: LoadoutState) => {
+    Object.assign(state, snapshot);
+    refreshConfigurationUi();
+  };
+  const undo = () => {
+    const previous = history.undo();
+    if (previous) applyHistorySnapshot(previous);
+  };
+  const redo = () => {
+    const next = history.redo();
+    if (next) applyHistorySnapshot(next);
+  };
+  undoButton.addEventListener('click', undo);
+  redoButton.addEventListener('click', redo);
+  restoreBaselineButton.addEventListener('click', () => {
+    if (!baseline || !baselineIsValid || history.matches(baseline)) return;
+    applyHistorySnapshot(structuredClone(baseline));
+  });
+  baselineButton.addEventListener('click', () => {
+    try {
+      projectAttributes(data, state);
+      baseline = structuredClone(state);
+      baselineIsValid = true;
+      const stored = sampleMode ? false : saveState(baseline, true);
+      renderResults();
+      refreshHistoryControls();
+      document.querySelector('#save-status')!.textContent = stored ? '比較基準已儲存' : '比較基準僅保留至關閉頁面';
+    } catch {
+      renderResults();
+      refreshHistoryControls();
+    }
+  });
+  const isEditableHistoryTarget = (target: EventTarget | null): boolean => {
+    if (!(target instanceof HTMLElement)) return false;
+    if (target.isContentEditable || target.closest('[contenteditable="true"], [role="textbox"]')) return true;
+    if (target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement) return true;
+    if (target instanceof HTMLInputElement) return !['button', 'submit', 'reset', 'checkbox', 'radio', 'file', 'image', 'color'].includes(target.type);
+    return false;
+  };
+  document.addEventListener('keydown', event => {
+    if (event.defaultPrevented) return;
+    const action = historyShortcutAction(event, isEditableHistoryTarget(event.target));
+    if (action === 'undo' && history.canUndo) { event.preventDefault(); undo(); }
+    else if (action === 'redo' && history.canRedo) { event.preventDefault(); redo(); }
+  });
+  refreshHistoryControls();
   document.querySelector<HTMLButtonElement>('#export-loadout')!.addEventListener('click', () => {
     const exported = serializeLoadout(state, data);
     const blobUrl = URL.createObjectURL(new Blob([exported.json], { type: 'application/json' }));
@@ -1664,6 +1815,6 @@ async function start() {
       fileInput.value = '';
     }
   });
-  renderSlots(); renderInspector(); renderTitleInput(); renderBeastAccessories(); renderMasterBeastColorSelector(); renderGlobalInputs(); renderWeaponMagicStones(); renderRightIceSetSelectors(); renderResults();
+  renderSlots(); renderInspector(); renderTitleInput(); renderBeastAccessories(); renderMasterBeastColorSelector(); renderGlobalInputs(); renderWeaponMagicStones(); renderRightIceSetSelectors(); renderResults(); refreshHistoryControls();
 }
 start().catch(error => { document.querySelector('#app')!.innerHTML = `<section class="error-card"><h1>無法載入工具</h1><p>${h(error instanceof Error ? error.message : error)}</p></section>`; });

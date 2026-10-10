@@ -60,7 +60,7 @@
   "environments": [
     {
       "id": "location-2",
-      "name": "小屋",
+      "name": "小屋/溫泉",
       "stats": {
         "critRatePct": 5,
         "extremizationPct": 5
@@ -101,15 +101,6 @@
       "stats": {
         "multiplicativeDamagePct": 5,
         "adaptabilityPct": 3
-      }
-    },
-    {
-      "id": "location-5",
-      "name": "其他",
-      "stats": {},
-      "source": {
-        "sheet": "係數區",
-        "cell": "BC5"
       }
     }
   ],
@@ -519,9 +510,9 @@
         },
         {
           "id": "guild-fountain-4-7",
-          "name": "所有技能傷害+0.6%",
+          "name": "致命傷害+0.6%",
           "stats": {
-            "allSkillDamagePct": 0.6
+            "critDamagePct": 0.6
           },
           "source": {
             "sheet": "係數區",
