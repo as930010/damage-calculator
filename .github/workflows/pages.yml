@@ -37,6 +37,7 @@ jobs:
       - run: pnpm run test:data-loading
       - run: pnpm run test:data-schema
       - run: pnpm run test:input-fields
+      - run: pnpm run test:history
       - run: pnpm run test:core
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

@@ -47,6 +47,12 @@ test("other-effect schema contains semantic keys and current environment options
   assert.equal(effects.schemaVersion, 2);
   assert.deepEqual(effects.environments.map(option => option.name), ["小屋/溫泉", "強化小屋", "集合地", "共存節"]);
   assert.ok(effects.consumables.some(option => option.name === "其他"), "consumable fallback remains distinct from venue choices");
+  const guildFountainCritDamage = effects.guildFountain.find(stage => stage.stage === 4)?.options.find(option => option.id === "guild-fountain-4-7");
+  assert.deepEqual(guildFountainCritDamage, {
+    id: "guild-fountain-4-7",
+    name: "致命傷害+0.6%",
+    stats: { critDamagePct: 0.6 },
+  });
 
   const keys = [
     ...effects.guildFountain.map(stage => stage.settingKey),

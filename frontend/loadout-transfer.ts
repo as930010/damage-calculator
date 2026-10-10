@@ -257,11 +257,16 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
       const importedValue = isMasterBeastMirrorValue(fieldId) && typeof value === 'number'
         ? canonicalizeNumber(value)
         : value;
+      const candidateValue: Record<string, string | number> = { [fieldId]: importedValue };
+      const environmentMigration = fieldId === 'Effect.Environment'
+        ? migrateLegacyEnvironmentSelection(candidateValue)
+        : null;
+      if (environmentMigration === 'removed') continue;
       if (isResonanceInputCell(fieldId)) {
-        const points = parseResonancePoints(fieldId, importedValue);
+        const points = parseResonancePoints(fieldId, candidateValue[fieldId]);
         if (points !== null) optionValuesById[fieldId] = points;
-      } else optionValuesById[fieldId] = importedValue;
-      }
+      } else optionValuesById[fieldId] = candidateValue[fieldId];
+    }
   }
   const optionValues = optionValuesById;
   if (isRecord(rawValues)) {

@@ -329,9 +329,9 @@
         },
         {
           "id": "guild-fountain-4-7",
-          "name": "所有技能傷害+0.6%",
+          "name": "致命傷害+0.6%",
           "stats": {
-            "allSkillDamagePct": 0.6
+            "critDamagePct": 0.6
           }
         },
         {

@@ -10,6 +10,7 @@
     "test:data-loading": "node --test scripts/game-data-bundle.test.mjs",
     "test:data-schema": "node --test scripts/data-schema.test.mjs",
     "test:input-fields": "node --test scripts/input-field-validation.test.mjs",
+    "test:history": "node --test tests/history.test.mjs",
     "test:core": "node --test tests/attack-calculation.test.mjs tests/cap-warnings.test.mjs tests/class-passive-validation.test.mjs tests/confirmed-corrections.test.mjs tests/global-input-projection.test.mjs tests/example-parity.test.mjs tests/right-ice-set-validation.test.mjs tests/nephron-armor.test.mjs tests/numeric-input.test.mjs tests/requested-regressions.test.mjs",
     "build": "node scripts/build.mjs",
     "preview": "node scripts/preview.mjs"

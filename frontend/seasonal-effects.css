@@ -1,0 +1,604 @@
+/* Coexistence Festival only. Remove this stylesheet link to disable the seasonal effect. */
+
+:root {
+  --page-bg: #080b17;
+  --panel: #0A1027;
+  --panel-alt: #0C1430;
+  --surface: #0e1425;
+  --surface-raised: #202743;
+  --control: #181f35;
+  --control-hover: #252d49;
+  --field: #0c1324;
+  --border: #303a57;
+  --border-strong: var(--midnight-violet-edge);
+  --border-mid: #3b4564;
+  --border-row: #29324f;
+  --border-control: var(--violet-control-edge);
+  --accent: var(--lantern-gold);
+  --accent-surface: #2b2540;
+  --night-indigo: #0E1A46;
+  --midnight-violet-edge: #535078;
+  --violet-control-edge: #4a5574;
+  --warm-wood: #9a805e;
+  --lantern-gold: #f1ca83;
+  --ember-orange: #d98759;
+  --moon-lavender: #a6a9dc;
+  --night-shadow: #070b16;
+  --accent-border: var(--warm-wood);
+  --text-main: #e6e5ef;
+  --text-input: #f1eff8;
+  --text-heading: #f5eedc;
+  --text-strong: #d5cfe7;
+  --text-label: #c5c5dd;
+  --text-muted: #aeb3cc;
+  --text-soft: #9098b8;
+  --text-source: #c6c5da;
+  --positive: #a8c8de;
+  --warning: var(--lantern-gold);
+  --negative: #e99a9d;
+  --positive-bg: #1a2a3e;
+  --campfire-glow-bottom-offset: 93px;
+  --negative-bg: #38242e;
+  accent-color: #c5a6e6;
+  background-color:var(--page-bg);
+  background-image:
+    radial-gradient(ellipse at 78% -8%,rgb(10 15 38 / 10%),transparent 42rem),
+    linear-gradient(180deg,transparent 0%,rgb(132 80 66 / 1%) 38%,rgb(166 91 59 / 3.5%) 74%,rgb(175 83 46 / 6%) 100%),
+    radial-gradient(ellipse min(175vw,4200px) 6800px at 50% calc(100% - var(--campfire-glow-bottom-offset, 93px)),rgb(185 113 64 / 8%) 0%,rgb(141 82 66 / 4%) 52%,transparent 100%),
+    /* Concentrated firelight shares the document-wide background stack. */
+    radial-gradient(ellipse 520px 220px at 50% calc(100% - var(--campfire-glow-bottom-offset, 93px)),rgb(255 205 117 / 12%) 0%,rgb(220 145 81 / 8%) 36%,rgb(191 104 46 / 3%) 68%,transparent 100%),
+    radial-gradient(circle at 78px 299px,rgb(235 198 119 / 43%) 0 0.68px,transparent 1.40px),
+    radial-gradient(circle at 241px 95px,rgb(160 166 224 / 30%) 0 0.68px,transparent 1.40px),
+    radial-gradient(circle at 197px 305px,rgb(160 166 224 / 43%) 0 0.68px,transparent 1.40px),
+    radial-gradient(circle at 222px 354px,rgb(224 218 177 / 36%) 0 1.15px,transparent 1.87px),
+    radial-gradient(circle at 118px 152px,rgb(224 218 177 / 46%) 0 1.15px,transparent 1.87px),
+    radial-gradient(circle at 264px 509px,rgb(160 166 224 / 26%) 0 0.68px,transparent 1.40px),
+    radial-gradient(circle at 25px 261px,rgb(224 218 177 / 42%) 0 0.9px,transparent 1.62px),
+    radial-gradient(circle at 309px 28px,rgb(160 166 224 / 33%) 0 0.9px,transparent 1.62px),
+    radial-gradient(circle at 285px 249px,rgb(160 166 224 / 32%) 0 0.9px,transparent 1.62px),
+    radial-gradient(circle at 534px 82px,rgb(224 218 177 / 35%) 0 0.9px,transparent 1.62px),
+    radial-gradient(circle at 162px 455px,rgb(224 218 177 / 27%) 0 1.15px,transparent 1.87px),
+    radial-gradient(circle at 239px 260px,rgb(160 166 224 / 36%) 0 0.9px,transparent 1.62px),
+    radial-gradient(circle at 166px 458px,rgb(235 198 119 / 45%) 0 1.15px,transparent 1.87px),
+    radial-gradient(circle at 24px 505px,rgb(235 198 119 / 26%) 0 0.9px,transparent 1.62px),
+    radial-gradient(circle at 147px 423px,rgb(224 218 177 / 33%) 0 1.15px,transparent 1.87px),
+    radial-gradient(circle at 115px 20px,rgb(224 218 177 / 29%) 0 0.9px,transparent 1.62px),
+    radial-gradient(circle at 61px 211px,rgb(235 198 119 / 45%) 0 1.15px,transparent 1.87px),
+    radial-gradient(circle at 344px 473px,rgb(235 198 119 / 26%) 0 0.68px,transparent 1.40px),
+    radial-gradient(circle at 108px 441px,rgb(224 218 177 / 45%) 0 1.15px,transparent 1.87px),
+    radial-gradient(circle at 300px 517px,rgb(224 218 177 / 40%) 0 0.68px,transparent 1.40px),
+    radial-gradient(circle at 165px 315px,rgb(160 166 224 / 40%) 0 1.15px,transparent 1.87px),
+    radial-gradient(circle at 422px 209px,rgb(160 166 224 / 25%) 0 1.15px,transparent 1.87px),
+    radial-gradient(circle at 511px 357px,rgb(224 218 177 / 42%) 0 1.15px,transparent 1.87px),
+    radial-gradient(circle at 234px 380px,rgb(224 218 177 / 31%) 0 0.68px,transparent 1.40px),
+    radial-gradient(circle at 424px 101px,rgb(224 218 177 / 41%) 0 0.9px,transparent 1.62px),
+    radial-gradient(circle at 331px 186px,rgb(235 198 119 / 27%) 0 1.15px,transparent 1.87px),
+    radial-gradient(circle at 203px 265px,rgb(224 218 177 / 28%) 0 0.9px,transparent 1.62px),
+    radial-gradient(circle at 360px 279px,rgb(160 166 224 / 32%) 0 1.15px,transparent 1.87px),
+    radial-gradient(circle at 269px 323px,rgb(160 166 224 / 35%) 0 0.68px,transparent 1.40px),
+    radial-gradient(circle at 29px 327px,rgb(160 166 224 / 26%) 0 0.68px,transparent 1.40px),
+    radial-gradient(circle at 446px 107px,rgb(224 218 177 / 24%) 0 1.15px,transparent 1.87px),
+    radial-gradient(circle at 340px 438px,rgb(235 198 119 / 26%) 0 0.68px,transparent 1.40px),
+    radial-gradient(circle at 312px 96px,rgb(224 218 177 / 26%) 0 0.9px,transparent 1.62px),
+    radial-gradient(circle at 289px 247px,rgb(235 198 119 / 31%) 0 1.15px,transparent 1.87px),
+    radial-gradient(circle at 176px 89px,rgb(224 218 177 / 44%) 0 0.9px,transparent 1.62px),
+    radial-gradient(circle at 331px 150px,rgb(160 166 224 / 40%) 0 0.9px,transparent 1.62px),
+    radial-gradient(circle at 156px 362px,rgb(160 166 224 / 43%) 0 0.68px,transparent 1.40px),
+    radial-gradient(circle at 399px 431px,rgb(235 198 119 / 35%) 0 0.9px,transparent 1.62px),
+    radial-gradient(circle at 217px 61px,rgb(224 218 177 / 38%) 0 0.9px,transparent 1.62px),
+    radial-gradient(circle at 139px 324px,rgb(224 218 177 / 31%) 0 0.9px,transparent 1.62px),
+    radial-gradient(circle at 514px 487px,rgb(224 218 177 / 44%) 0 1.15px,transparent 1.87px),
+    radial-gradient(circle at 57px 461px,rgb(235 198 119 / 33%) 0 0.9px,transparent 1.62px),
+    radial-gradient(circle at 495px 35px,rgb(224 218 177 / 33%) 0 0.9px,transparent 1.62px),
+    radial-gradient(circle at 350px 393px,rgb(224 218 177 / 32%) 0 0.9px,transparent 1.62px),
+    radial-gradient(circle at 204px 216px,rgb(160 166 224 / 43%) 0 0.9px,transparent 1.62px),
+    radial-gradient(circle at 42px 330px,rgb(224 218 177 / 32%) 0 0.68px,transparent 1.40px),
+    radial-gradient(circle at 138px 183px,rgb(160 166 224 / 32%) 0 1.15px,transparent 1.87px),
+    radial-gradient(circle at 314px 234px,rgb(160 166 224 / 32%) 0 0.68px,transparent 1.40px);
+  background-size:
+    100% 100%,100% 100%,100% 100%,100% 100%,100% 100%,
+    493px 601px,
+    577px 493px,
+    631px 587px,
+    451px 563px,
+    603px 521px,
+    487px 637px,
+    559px 449px,
+    617px 557px,
+    467px 613px,
+    643px 479px,
+    521px 587px,
+    577px 461px,
+    431px 629px,
+    659px 541px,
+    493px 463px,
+    613px 607px,
+    541px 491px,
+    457px 577px,
+    631px 523px,
+    479px 647px,
+    587px 457px,
+    523px 619px,
+    647px 503px,
+    439px 551px,
+    603px 637px,
+    511px 469px,
+    667px 589px,
+    469px 533px,
+    557px 643px,
+    491px 577px,
+    637px 437px,
+    547px 611px,
+    433px 493px,
+    619px 647px,
+    577px 521px,
+    463px 599px,
+    653px 467px,
+    497px 629px,
+    607px 443px,
+    443px 563px,
+    589px 617px,
+    527px 479px,
+    641px 557px,
+    457px 647px,
+    613px 491px,
+    479px 593px,
+    661px 527px,
+    517px 433px;
+  background-repeat:repeat;
+}
+
+body {
+  background: transparent;
+}
+
+.topbar {
+  border-color: rgb(112 124 150 / 17%);
+  background: rgb(9 11 17 / 94%);
+}
+
+.workspace-heading {
+  border-color: rgb(130 145 174 / 27%);
+  background:linear-gradient(112deg,rgb(20 27 43 / 96%),rgb(15 19 31 / 96%) 56%,rgb(24 21 35 / 90%)),var(--panel);
+}
+
+.toolbar {
+  border-color: rgb(117 130 155 / 20%);
+  background:rgb(13 17 27 / 92%);
+}
+
+.battle-panel,
+.damage-panel,
+.equipment-panel,
+.inspector,
+.weapon-magic-stone-panel,
+.global-source-panel,
+.results-panel {
+  background:linear-gradient(145deg,rgb(17 22 35 / 70%),rgb(12 16 26 / 70%));
+}
+
+body::before {
+  --moonlight-sway-start: -1deg;
+  --moonlight-sway-end: 1deg;
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  background:
+    radial-gradient(ellipse min(110vw, 1580px) min(120vh, 1080px) at 0 -24px, rgb(220 231 248 / 9%) 0%, rgb(177 197 226 / 4.5%) 38%, rgb(137 163 199 / 1.5%) 70%, transparent 100%),
+    radial-gradient(ellipse min(150vw, 1900px) min(155vh, 1360px) at 0 -24px, rgb(131 156 193 / 4%) 0%, rgb(100 124 163 / 2%) 45%, transparent 100%),
+    conic-gradient(from 18deg at 0 -24px, transparent 0deg 33deg, rgb(220 231 248 / 0%) 36deg, rgb(220 231 248 / 24%) 41deg, rgb(220 231 248 / 0%) 46deg, transparent 51deg 360deg);
+  opacity: .36;
+  transform-origin: 0 -24px;
+  will-change: transform;
+  animation: moonlight-sway 18s ease-in-out infinite;
+}
+
+.workspace-heading,
+.toolbar,
+.battle-panel,
+.equipment-panel,
+.inspector,
+.weapon-magic-stone-panel,
+.global-source-panel,
+.results-panel {
+  border-color: rgb(136 155 184 / 29%);
+  box-shadow:none;
+}
+
+.workspace-heading {
+  box-shadow:none;
+}
+
+.toolbar {
+  box-shadow:none;
+}
+
+.results-panel {
+  overflow: visible;
+}
+
+.damage-panel {
+  box-shadow:none;
+}
+
+@keyframes moonlight-sway {
+  0%, 100% {
+    transform: rotate(var(--moonlight-sway-start));
+  }
+
+  50% {
+    transform: rotate(var(--moonlight-sway-end));
+  }
+}
+
+@media (min-width: 1600px) {
+  body::before {
+    --moonlight-sway-start: -.5deg;
+    --moonlight-sway-end: .5deg;
+    opacity: .28;
+    animation-duration: 26s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before {
+    opacity: .22;
+    will-change: auto;
+    transform: none;
+    animation: none;
+  }
+}
+
+/* Seasonal visual refinements and responsive controls. */
+.stat{border-color:#39485d;background:linear-gradient(145deg,#19222e,#151d28)}
+.stat[open]{border-color:#6983a7;background:#1c2939}
+.panel-heading,.editor-section,.right-ice-set-area{border-color:rgb(137 160 193 / 30%)}
+
+.gear-slot,.beast-accessory-slot{border-color:color-mix(in srgb,var(--group-color),#40516a 48%)}
+.field input,.picker-control>input{border-color:#40516a}
+.field input:hover,.picker-control>input:hover{border-color:#627b9b}
+.damage-ratio,.calculation-inspection-panel{border-color:#3a4a60}
+
+/* Keep top-level controls inside the viewport on narrow screens. */
+@media(max-width:700px){
+  .app-shell,#app.layout,.workbench{width:100%;max-width:100vw;min-width:0}
+  .topbar{box-sizing:border-box;display:grid;width:100%;max-width:100vw;grid-template-columns:minmax(0,1fr);overflow:hidden}
+  .topbar>.brand{grid-column:1;grid-row:1;width:100%;min-width:0;flex-wrap:wrap}
+  .topbar>.developer-info{grid-column:1;grid-row:2;width:100%;min-width:0}
+  .topbar>.top-meta{grid-column:1;grid-row:3;width:max-content;max-width:100%;justify-self:end;align-self:start;margin:0}
+  .top-meta .buff-simulator-link{max-width:100%;white-space:normal}
+  .workspace-heading{display:block;width:100%;min-width:0}
+  .workspace-intro,.workspace-summary,.workflow-steps{width:100%;max-width:100%;min-width:0}
+  .workspace-summary{overflow-wrap:anywhere}
+  .workflow-steps{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .toolbar .class-settings{display:flex;width:100%;max-width:none;min-width:0;flex:0 0 100%;flex-direction:column;align-items:flex-start;gap:8px}
+  .toolbar .class-settings #class-picker{width:min(230px,100%);max-width:100%;min-width:0;flex:0 1 auto}
+  .skill-damage-share-control{width:min(202px,100%);max-width:100%;min-width:0;min-height:44px;height:44px;flex:0 1 auto;align-self:flex-start;grid-template-columns:max-content 72px 54px;align-content:center}
+  .skill-damage-share-number-wrap{min-height:44px}
+  .skill-damage-share-number-wrap input{min-height:44px;font-size:16px}
+}
+@media(max-width:900px){
+  .skill-damage-share-control{min-height:44px;height:44px}
+  .skill-damage-share-number-wrap{min-height:44px}
+  .skill-damage-share-number-wrap input{min-height:44px;font-size:16px}
+}
+
+/* Coexistence night theme: midnight blue and violet with restrained campfire warmth. */
+:root{color-scheme:dark}
+body{color:var(--text-main);background:transparent}
+.topbar{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  border-color:rgb(116 126 171 / 27%);
+  background:linear-gradient(90deg,rgb(7 12 32 / 65%),rgb(10 16 43 / 65%) 58%,rgb(17 14 34 / 65%));
+  box-shadow:none;
+}
+.workspace-heading{
+  border-color:rgb(139 139 191 / 35%);
+  background:
+    radial-gradient(ellipse 410px 185px at 87% 100%,rgb(215 136 74 / 14%) 0%,rgb(179 102 67 / 6%) 48%,transparent 100%),
+    linear-gradient(112deg,rgb(10 16 39 / 65%),rgb(8 13 31 / 65%) 55%,rgb(22 17 39 / 65%));
+  background-clip:padding-box;
+  box-shadow:none;
+}
+
+.workspace-heading::after{
+  right:3%;bottom:-24px;width:130px;height:205px;border:0;border-radius:0;box-shadow:none;opacity:.2;transform:none;
+  background:linear-gradient(180deg,rgb(75 77 139 / 82%),rgb(27 31 69 / 84%));
+  clip-path:polygon(50% 0,63% 25%,56% 25%,75% 48%,65% 48%,91% 77%,62% 77%,62% 100%,38% 100%,38% 77%,9% 77%,35% 48%,25% 48%,44% 25%,37% 25%);
+}
+.eyebrow{color:#bdb9d3}
+.eyebrow::before{background:#9a9bc8}
+.workspace-heading h1{color:var(--text-heading)}
+.workspace-heading .workspace-summary{color:#c6c4dc}
+.canvas-title-input{
+  border-color:rgb(143 136 190 / 52%);
+  background:rgb(7 12 28 / 65%);
+  box-shadow:none;
+}
+.canvas-title-input .field{color:#d1cee6}
+.workflow-steps li{border-color:rgb(145 141 187 / 28%);background:rgb(12 20 55 / 65%);color:#e2deef}
+.workflow-steps li span:first-child{background:rgb(143 126 192 / 23%);color:#c5b9de}
+.toolbar{
+  border-color:rgb(126 133 183 / 30%);
+  background:linear-gradient(100deg,rgb(10 16 39 / 65%),rgb(8 13 31 / 65%));
+}
+.toolbar,.workflow-steps li,.panel-heading,.editor-section,.right-ice-set-area{border-color:rgb(137 139 184 / 32%)}
+.battle-panel,.damage-panel,.equipment-panel,.inspector,.weapon-magic-stone-panel,.global-source-panel,.results-panel{
+  border-color:rgb(125 134 183 / 34%);
+  background-color:transparent;
+  background-image:
+    repeating-linear-gradient(113deg,transparent 0 74px,rgb(191 174 225 / 1.2%) 75px,transparent 78px),
+    linear-gradient(145deg,rgb(10 16 39 / 65%),rgb(7 11 27 / 65%));
+  box-shadow:none;
+}
+.damage-panel{border-top:1px solid rgb(145 133 177 / 25%);box-shadow:none}
+.panel-heading{background:linear-gradient(90deg,rgb(16 22 48 / 65%),rgb(11 15 34 / 45%))}
+.panel-heading h2{color:#cac8dc}
+.panel-heading h2::before{background:linear-gradient(180deg,#aaa8d2,#7f89bf)}
+.panel-note{color:#adb3ce}
+.right-ice-set-area,.editor-section{border-color:rgb(146 139 183 / 31%)}
+.right-ice-set-area{background:transparent}
+/* Keep the equipment panel surface flat so page ambience stays behind the UI. */
+.equipment-panel{
+  background-image:
+    radial-gradient(ellipse 76% 42% at 52% 63%,rgb(195 111 55 / 8%) 0%,rgb(164 91 59 / 3%) 52%,transparent 100%),
+    repeating-linear-gradient(113deg,transparent 0 74px,rgb(191 174 225 / 1.2%) 75px,transparent 78px),
+    linear-gradient(145deg,rgb(10 16 39 / 65%),rgb(7 11 27 / 65%));
+  background-clip:padding-box;
+}
+/* Keep battle and results panels consistent with the flat activity surfaces. */
+.battle-panel,.results-panel,.results-panel .damage-panel{
+  background-image:
+    repeating-linear-gradient(113deg,transparent 0 74px,rgb(191 174 225 / 1.2%) 75px,transparent 78px),
+    linear-gradient(145deg,rgb(10 14 29 / 65%),rgb(7 9 20 / 65%));
+}
+.battle-panel .panel-heading,.results-panel .panel-heading{
+  background:linear-gradient(90deg,rgb(15 18 29 / 65%),rgb(11 13 22 / 45%));
+}
+.results-panel .stat,.results-panel .equipment-damage-card,.results-panel .damage-summary>div{
+  background:linear-gradient(145deg,rgb(12 14 24 / 65%),rgb(8 10 18 / 65%));
+}
+.equipment-canvas{background-color:transparent;background-image:none}
+.group-label{filter:saturate(.82)}
+.left-label{color:#b6a5e2}
+.inner-label{color:#a9bde7}
+.gear-slot,.beast-accessory-slot{color:color-mix(in srgb,var(--group-color),#a59bda 78%)}
+.gear-slot i{background:color-mix(in srgb,var(--group-color),#a59bda 78%)}
+.inspector-title svg,.inspector-title small{color:color-mix(in srgb,var(--group-color),#a59bda 78%)}
+.gear-slot,.beast-accessory-slot{
+  border-color:color-mix(in srgb,var(--group-color),#7776ad 85%);
+  background:linear-gradient(155deg,rgb(19 26 48 / 80%),rgb(13 18 38 / 80%));
+  box-shadow:none;
+}
+.gear-slot span,.beast-accessory-slot span{color:#e7e4f1}
+.gear-slot .gear-slot-item-name{color:#f3e8d4}
+.gear-slot:hover,.beast-accessory-slot:hover{background:linear-gradient(155deg,#303251,#252a45)}
+.gear-slot.selected,.beast-accessory-slot.selected{box-shadow:none}
+.stat,.equipment-damage-card,.damage-summary>div{
+  border-color:#414967;
+  background:linear-gradient(145deg,rgb(11 17 42 / 65%),rgb(7 11 27 / 65%));
+  box-shadow:none;
+}
+.stat{border-radius:11px;transition:border-color 160ms ease,background-color 160ms ease}
+.stat:hover{border-color:#7374a2;box-shadow:none}
+.stat[open]{border-color:#a48abb;background:linear-gradient(145deg,rgb(47 41 70 / 65%),rgb(31 35 63 / 65%))}
+.stat-details{border-top-color:rgb(157 145 190 / 28%)}
+.stat-source-row{border-bottom-color:rgb(145 151 192 / 21%)}
+.stat-source-row strong{color:#eee5f5}
+.stat-detail-heading,.stat-average,.stat-source-empty{color:#c0bed9}
+.equipment-damage-card{border-radius:11px}
+.equipment-damage-card span,.damage-summary span{color:#c1c2dc}
+.equipment-damage-card strong{color:#f6edf0}
+.equipment-damage-gain strong,.damage-ratio-positive strong,.positive{color:#b4d3ed}
+.equipment-damage-gain strong.gain-positive,.damage-ratio-positive>strong.gain-positive,.damage-ratio .positive,.damage-ratio-group>strong.positive{color:#b4d3ed}
+.damage-ratio-negative strong,.negative{color:#ef9d9f}
+.damage-summary .final-damage{border-color:#9e7845;background:linear-gradient(130deg,rgb(65 52 30 / 65%),rgb(41 39 27 / 65%))}
+.damage-summary .final-damage strong{color:#ffda8d}
+.damage-ratio,.calculation-inspection-panel,.formula-detail{border-color:rgb(145 143 189 / 33%)}
+.calculation-comparison thead th{background:#292d50;color:#ded9ef}
+.calculation-comparison th,.calculation-comparison td{border-bottom-color:rgb(145 143 189 / 25%)}
+input,select,textarea,.picker-control>input,.mobile-picker-search{
+  border-color:#4a5274;background-color:#0e1429;color:var(--text-input);caret-color:#d4b9ed;
+}
+input::placeholder,.mobile-picker-search::placeholder{color:#9ba3c0}
+input:hover,select:hover,textarea:hover,.picker-control>input:hover{border-color:#8885b9}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible,summary:focus-visible{
+  outline:2px solid #c4a8e7;outline-offset:3px;box-shadow:0 0 0 4px rgb(155 139 216 / 15%);
+}
+#transcendence-skill-share-number:focus,#transcendence-skill-share-number:focus-visible{outline:0!important;box-shadow:none!important}
+button,.pet-skill-toggle,.picker-clear,.circuit-board-add{
+  border-color:var(--violet-control-edge);
+  background:linear-gradient(180deg,#282d50,#1b2140);
+  color:#e7e3f2;
+}
+button:hover,.pet-skill-toggle:hover{border-color:#a18abb;background:linear-gradient(180deg,#393654,#292d50);color:#f5edfa}
+button:active,.pet-skill-toggle:active{filter:brightness(1.08)}
+#baseline{border-color:var(--violet-control-edge);background:linear-gradient(180deg,#282d50,#1b2140);color:#d7daf0}
+#baseline:hover{border-color:#737ca6;background:linear-gradient(180deg,#343a60,#242b4a);color:#f0eef8}
+.toggle{color:#d0d0e3}.toggle input{accent-color:#c5a6e6}
+.picker-control>input{border-radius:10px}
+.picker-list{
+  border-color:#71698d;background:#13172e;color:var(--text-main);
+  box-shadow:none;
+}
+.picker-list button{color:#e9e4f3;border-left:3px solid transparent}
+.picker-list button:hover,.picker-list button[aria-selected=true]{background:#282b48;color:#f3eafa}
+.picker-list button[aria-selected=true]{border-left-color:#c5a6e6}
+.picker-list small{color:#b8bdd5}
+.picker-clear:hover{background:#303251;color:#fff0f5}
+.picker-control .picker-clear,.picker-control .picker-clear:hover{
+  border-color:transparent;
+  background:transparent;
+  color:#b9bdd3;
+  box-shadow:none;
+}
+.picker-control .picker-clear:hover{color:#eee8f6}
+.innerwear-type-switch,.mobile-picker-actions{border-color:#5a587c;background:#171b34}
+.innerwear-type-switch button[aria-pressed=true],button[aria-selected=true],[role=tab][aria-selected=true]{border-color:#bd9655;background:linear-gradient(180deg,#453a25,#302d20);color:#ffe5aa}
+.mobile-picker-dialog{border-color:#71698d;background:#0d132b;color:var(--text-main);box-shadow:none}
+.mobile-picker-dialog::backdrop{background:rgb(4 6 16 / 84%);backdrop-filter:none}
+.mobile-picker-header{border-bottom-color:#505476;background:linear-gradient(100deg,#151d38,#1b1a32)}
+.mobile-picker-header h2{color:#f3eafa}
+.mobile-picker-option{border-color:#41496b;background:linear-gradient(145deg,#171e38,#11182f)}
+.mobile-picker-option[aria-selected=true]{border-color:#bc9554;background:#25243a}
+.mobile-picker-option span{color:#eee8f4}
+.mobile-picker-option small{color:#b9bfd8}
+.mobile-picker-empty,.input-hint,.input-warning,.circuit-board-total.input-warning{color:var(--lantern-gold)}
+.portrait-awakening-error,.right-ice-selection-warning{color:#f0aa9c}
+.panel-note,.input-hint,.input-warning{text-shadow:none}
+.site-credits-notes{border-color:rgb(131 137 181 / 28%);background:rgb(12 18 44 / 65%);color:#aeb4cf}
+.site-credits-block h2,.site-release-list strong,.site-thanks-list strong{color:#e8def2}
+.site-credits-block p,.site-thanks-list li,.site-release-list p{color:#b1b5cf}
+.buff-simulator-link{border-color:#5a5b7e;background:rgb(17 20 42 / 82%);color:#e6e2f1}
+.buff-simulator-link:hover{border-color:#a18abb;background:#292d50}
+.live-dot{background:#b6a3dc;box-shadow:0 0 9px rgb(182 163 220 / 48%)}
+.inspector-backdrop{background:rgb(4 6 16 / 80%);backdrop-filter:none}
+.mobile-inspector-open #inspector{border-color:#9c8150;box-shadow:none}
+.mobile-inspector-open #inspector .inspector-title{background:#0d132b}
+
+/* Keep the ambient glow centered and continuous as the viewport widens. */
+body::before{
+  --moonlight-sway-start:-.55deg;--moonlight-sway-end:.55deg;
+  --moonlight-bleed:clamp(24px,3vw,80px);
+  inset:calc(var(--moonlight-bleed) * -1);
+  transform-origin:var(--moonlight-bleed) calc(var(--moonlight-bleed) - 24px);
+  background:
+    radial-gradient(ellipse min(110vw,2600px) min(120vh,1080px) at var(--moonlight-bleed) calc(var(--moonlight-bleed) - 24px),rgb(173 172 229 / 5%) 0%,rgb(143 143 207 / 2.6%) 38%,transparent 76%),
+    conic-gradient(from 18deg at var(--moonlight-bleed) calc(var(--moonlight-bleed) - 24px),transparent 0deg 33deg,rgb(193 188 239 / 0%) 36deg,rgb(193 188 239 / 11%) 41deg,rgb(193 188 239 / 0%) 46deg,transparent 51deg 360deg);
+  opacity:.3;
+}
+@media (prefers-reduced-motion:reduce){body::before{opacity:.2}}
+@media (max-width:700px){
+  :root{--campfire-glow-bottom-offset:calc(189px + env(safe-area-inset-bottom, 0px));}
+
+  .workspace-heading::after{right:1%;width:86px;height:150px;opacity:.12}
+
+  .stat-list{gap:9px}
+  .mobile-inspector-open #inspector{border-color:#9c8150}
+}
+/* The source panel and inspector inherit their 65% translucent parent surfaces. */
+.global-source-panel>summary{background-color:transparent}
+.equipment-panel>.panel-heading{background:linear-gradient(90deg,rgb(16 22 48 / 65%),rgb(11 15 34 / 65%))}
+.mobile-inspector-open #inspector .inspector-title{background:rgb(13 19 43 / 65%)}
+.site-credits-notes{
+  border-color:rgb(125 134 183 / 34%);
+  background-color:transparent;
+  background-image:linear-gradient(145deg,rgb(10 14 29 / 65%),rgb(7 9 20 / 65%));
+  color:var(--text-muted);
+  box-shadow:none;
+}
+.site-credits-notes>summary{min-height:44px;background:transparent;color:#c6c3d4;letter-spacing:.02em}
+.site-credits-notes>summary::before{color:#b89361}
+.site-credits-content{border-top-color:rgb(164 147 126 / 20%)}
+.site-credits-block+.site-credits-block{border-left-color:rgb(164 147 126 / 20%)}
+.site-credits-block h2{color:#d4ccda}
+.site-credits-block p,.site-thanks-list li,.site-release-list p{color:#b8b5c5}
+.site-thanks-list strong,.site-release-list strong{color:#e7ddc9}
+.site-release-list time{color:#a9a4b3}
+
+/* A small CSS-only campfire anchors the page footer; no particles or animation. */
+footer{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  min-height:156px;
+  padding:18px 24px 96px;
+  border-top-color:rgb(164 129 99 / 24%);
+
+}
+footer::before,footer::after{
+  position:absolute;
+  z-index:-1;
+  left:50%;
+  content:"";
+  pointer-events:none;
+  transform:translateX(-50%);
+}
+footer::before{
+  bottom:37px;
+  width:38px;
+  height:56px;
+  clip-path:polygon(49% 0,62% 20%,59% 37%,78% 48%,71% 66%,91% 78%,77% 94%,57% 100%,33% 96%,15% 83%,24% 66%,20% 51%,39% 38%,33% 22%);
+  background:
+    radial-gradient(ellipse at 49% 77%,rgb(255 237 171 / 95%) 0 8%,rgb(255 196 88 / 85%) 22%,transparent 54%),
+    linear-gradient(155deg,#f5bd5f 0%,#df793c 52%,#963f38 100%);
+  filter:drop-shadow(0 0 14px rgb(255 153 66 / 30%));
+  opacity:.78;
+}
+footer::after{
+  bottom:20px;
+  width:78px;
+  height:24px;
+  background:
+    radial-gradient(circle at 21% 22%,rgb(255 202 112 / 58%) 0 1px,transparent 2px),
+    radial-gradient(circle at 77% 14%,rgb(255 186 86 / 45%) 0 1px,transparent 2px),
+    linear-gradient(16deg,transparent 36%,#60412e 39% 53%,transparent 56%),
+    linear-gradient(-16deg,transparent 36%,#805538 39% 53%,transparent 56%);
+}
+@media (max-width:380px){.workspace-heading::after{display:none}}
+/* Panel and card hierarchy now comes from surface color and border definition. */
+.workspace-heading,.toolbar,.battle-panel,.equipment-panel,.inspector,.weapon-magic-stone-panel,.global-source-panel,.results-panel,.site-credits-notes{
+  box-shadow:none;
+}
+.mobile-inspector-open #inspector{
+  box-shadow:none;
+}
+
+/* Keep fills and warm light inside the rounded panel edges. */
+.workspace-heading,.toolbar,.battle-panel,.damage-panel,.equipment-panel,.inspector,.weapon-magic-stone-panel,.global-source-panel,.results-panel,.site-credits-notes,.stat,.equipment-damage-card,.damage-summary>div,.gear-slot,.beast-accessory-slot{
+  background-clip:padding-box;
+}
+.battle-panel>.panel-heading:first-child,.damage-panel>.panel-heading:first-child,.equipment-panel>.panel-heading:first-child,.results-panel>.panel-heading:first-child{
+  border-top-left-radius:inherit;
+  border-top-right-radius:inherit;
+  background-clip:padding-box;
+}
+
+/* Keep shadows off every activity panel and card, including interactive states. */
+.app-shell :is(
+  [class*="panel"],
+  [class*="card"],
+  .workbench,
+  .workspace-heading,
+  .toolbar,
+  .inspector,
+  .site-credits-notes,
+  .site-credits-block,
+  .canvas-title-input,
+  .toolbar-actions,
+  .stat,
+  .equipment-damage-card,
+  .damage-summary > div,
+  .gear-slot,
+  .beast-accessory-slot,
+  .right-ice-set-area,
+  .editor-section,
+  .calculation-inspection-panel,
+  .formula-detail,
+  .picker-list,
+  .mobile-picker-dialog,
+  #inspector
+),
+.app-shell :is(
+  [class*="panel"],
+  [class*="card"],
+  .stat,
+  .gear-slot,
+  .beast-accessory-slot,
+  .picker-list
+):hover,
+.app-shell :is([class*="panel"], [class*="card"], .stat)[open],
+.app-shell .gear-slot.selected,
+.app-shell .beast-accessory-slot.selected {
+  box-shadow: none !important;
+}
+
+.app-shell :is([class*="panel"], [class*="card"], .workspace-heading, .stat, .gear-slot, .beast-accessory-slot)::before,
+.app-shell :is([class*="panel"], [class*="card"], .workspace-heading, .stat, .gear-slot, .beast-accessory-slot)::after {
+  box-shadow: none !important;
+  filter: none !important;
+}
