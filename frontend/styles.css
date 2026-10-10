@@ -23,7 +23,7 @@ button{padding:10px 15px} h1,h2,p{margin:0} h1{font-size:27px; letter-spacing:.0
 /* 5. Result cards and damage breakdown */
 .results-panel{margin-top:24px} .stat-list{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); padding:0 22px 22px; gap:10px} .stat{border:1px solid var(--border-strong); border-radius:8px; padding:13px; background:var(--surface)} .stat summary{display:flex; align-items:center; gap:10px; cursor:pointer; list-style:none; font-size:12px} .stat summary span{color:var(--text-label)}
 .stat strong{margin-left:auto; font-variant-numeric:tabular-nums; font-size:16px} .stat p{font-size:11px; color:#8e9aac; margin-top:10px} .input-hint{display:block; margin-top:8px; color:var(--warning); line-height:1.6} .positive{color:var(--positive)} .negative{color:var(--negative)} .input-warning,.error-card{color:#e7bf86; padding:22px; font-size:14px}
-footer{display:flex; flex-wrap:wrap; align-items:center; justify-content:center; column-gap:8px; row-gap:3px; font-size:11px; color:#727d8d; text-align:center; padding:28px; border-top:1px solid var(--border-dim)} footer .footer-product,footer .footer-version,footer .footer-updated{flex:none; white-space:nowrap} footer .footer-updated::before{content:"｜"; margin-inline-end:6px} a{color:#9fb5f5}
+footer{position:relative; isolation:isolate; overflow:hidden; display:flex; flex-wrap:wrap; align-items:center; justify-content:center; column-gap:8px; row-gap:3px; min-height:156px; font-size:11px; color:#727d8d; text-align:center; padding:18px 24px 96px; border-top:1px solid var(--border-dim)} footer .footer-product,footer .footer-version,footer .footer-updated{flex:none; white-space:nowrap} footer .footer-updated::before{content:"｜"; margin-inline-end:6px} a{color:#9fb5f5}
 /* 6. Responsive layout rules */
 @media(max-width:1240px) {
   .equipment-workspace{grid-template-columns:minmax(0,1fr)} .inspector{min-height:0} .workbench{padding:22px} .equipment-canvas{height:650px} .stat-list{grid-template-columns:repeat(2,minmax(0,1fr))} .inspector .field{max-width:540px}
@@ -133,14 +133,10 @@ footer{display:flex; flex-wrap:wrap; align-items:center; justify-content:center;
 }
 /* Requested readability and responsive layout refinements. */
 .weapon-magic-stone-color.weapon-magic-stone-red{border-color:#b97878} .weapon-magic-stone-color.weapon-magic-stone-blue{border-color:#718fb8} .weapon-magic-stone-color.weapon-magic-stone-yellow{border-color:#b9a36c}
-.toolbar .transfer-actions{order:10; margin-left:auto} .toolbar #transfer-status,.toolbar #save-status{order:5} .toolbar #save-status{margin-left:0}
-@media(max-width:1000px) {
-  .toolbar #baseline{margin-left:auto} .toolbar .transfer-actions{flex-basis:100%; justify-content:flex-end; margin-left:0}
-}
 @media(max-width:600px) {
   .gear-beast-slots .beast-accessory-slot{width:60px; height:60px} /* Beast slots are 5px wider than regular gear slots on phones; preserve the ring pair edge gap. */ .gear-beast-slots .beast-accessory-slot-ring-one{left:calc(var(--beast-ring-one-x) - 6px)}
 }
-.gear-slot[data-slot-id="inner-lowerwearAlternative"]{transform:translate(calc(-50% + 1px),-50%)} .toolbar-actions{display:contents} .inspector-close,.inspector-backdrop{display:none}
+.gear-slot[data-slot-id="inner-lowerwearAlternative"]{transform:translate(calc(-50% + 1px),-50%)} .inspector-close,.inspector-backdrop{display:none}
 @media(max-width:700px) {
   .workbench{padding-bottom:20px} .app-shell{padding-bottom:calc(112px + env(safe-area-inset-bottom))} .toolbar-actions{position:fixed; inset:auto 0 0; z-index:130; display:grid; box-sizing:border-box; width:100%; max-width:100vw; grid-template-columns:repeat(2,minmax(0,1fr)); grid-template-areas:"restore baseline" "history transfer"; align-items:stretch; gap:6px; padding:6px calc(8px + env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) calc(8px + env(safe-area-inset-left)); border-top:1px solid var(--border-strong); background:color-mix(in srgb,var(--panel) 94%,transparent); box-shadow:0 -8px 24px #0005; backdrop-filter:blur(12px)} #inspector{display:none}
   .mobile-inspector-open #inspector{position:fixed; inset:auto 10px calc(78px + env(safe-area-inset-bottom)); z-index:120; display:block; width:auto; max-height:calc(100dvh - 108px - env(safe-area-inset-bottom)); min-height:0; overflow-y:auto; overscroll-behavior:contain; padding:16px; border-color:var(--accent-border); box-shadow:0 18px 60px #0009}
@@ -165,22 +161,76 @@ footer{display:flex; flex-wrap:wrap; align-items:center; justify-content:center;
 
 .field-disabled{opacity:.58} .field-disabled input:disabled{cursor:not-allowed}
 
-/* Responsive toolbar actions: keep primary tasks grouped and history compact. */
-.toolbar .history-actions{display:flex;align-items:center;gap:6px}
-.toolbar .history-actions button{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-width:44px;min-height:44px;padding:6px 10px;font-size:12px;white-space:nowrap}
-.history-action-glyph{font-size:17px;line-height:1}
-.toolbar-actions>.baseline-actions{display:flex;align-items:flex-start;gap:10px;min-width:0;margin-left:auto}
+.beast-mirror-grid{max-height:none; overflow:visible} .beast-mirror-grid .picker-list{max-height:min(420px,calc(100dvh - 96px))}
+.picker-control>.picker-list.opens-above{top:auto;bottom:100%}
+
+.class-picker-error[hidden]{display:none}
+
+/* Shared toolbar layout: controls and actions wrap as complete functional groups. */
+.toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;min-width:0;margin:0 0 22px;padding:8px 10px}
+.toolbar-settings{display:flex;flex:1 1 600px;align-items:center;gap:8px 12px;min-width:0}
+.toolbar .class-settings{display:flex;flex:0 1 auto;align-items:center;gap:8px;min-width:0}
+.toolbar .class-settings #class-picker{width:230px;min-width:0;flex:0 1 230px}
+.skill-damage-share-control{display:grid;flex:0 0 202px;grid-template-columns:max-content 72px 54px;align-items:center;justify-content:space-between;gap:0;width:202px;min-width:0;padding:0 8px;white-space:nowrap}
+.skill-damage-share-label{white-space:nowrap}
+.skill-damage-share-control output{display:grid;width:54px;grid-template-columns:1fr 5ch auto;align-items:center;justify-self:end;text-align:right}
+.skill-damage-share-control output span:first-child{text-align:right}
+.skill-damage-share-complement{width:5ch;text-align:right;font-variant-numeric:tabular-nums}
+.skill-damage-share-number-wrap{display:flex;flex:0 0 72px;align-items:center;justify-self:center;gap:4px;width:72px;min-width:72px;height:44px;min-height:44px;padding:0 6px}
+.skill-damage-share-number-wrap input{width:100%;height:100%;min-width:0;min-height:0;padding:0;text-align:right;font-size:11px}
+.toolbar .toggle{flex:0 0 auto;min-height:44px;white-space:nowrap}
+.toolbar-actions{display:flex;flex:1 1 550px;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:8px;min-width:0}
+.toolbar .history-actions{display:flex;flex:0 0 auto;align-items:center;gap:6px}
+.toolbar .baseline-actions{display:flex;flex:0 1 auto;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:8px;min-width:0;margin-left:auto}
 .toolbar .baseline-control-group,.toolbar .transfer-control-group{display:flex;flex:0 0 auto;flex-direction:column;align-items:stretch;gap:4px;width:max-content;min-width:0}
-.toolbar .baseline-buttons{display:flex;align-items:center;gap:6px}
-.toolbar #restore-baseline,.toolbar #baseline{font-size:13px}
-.toolbar .transfer-control-group>.transfer-actions{align-self:stretch;justify-content:flex-start;margin:0}
-.toolbar .toolbar-feedback{box-sizing:border-box;display:grid;grid-template-columns:minmax(0,239px) minmax(0,176px);justify-content:end;align-items:start;column-gap:10px;flex:0 0 100%;min-width:0;padding:0 0 0 2px}
+.toolbar .baseline-buttons,.toolbar .transfer-actions{display:flex;align-items:center;gap:6px}
+.toolbar .toolbar-actions button{min-height:44px;font-size:13px;white-space:nowrap}
+.toolbar .toolbar-feedback{box-sizing:border-box;display:grid;grid-template-columns:minmax(0,239px) minmax(0,176px);justify-content:end;align-items:start;column-gap:10px;flex:1 0 100%;min-width:0;padding:0 0 0 2px}
 .toolbar .toolbar-feedback>#save-status,.toolbar .toolbar-feedback>#transfer-status{display:block;min-width:0;max-width:100%;margin:0;overflow-wrap:anywhere;white-space:normal;text-overflow:clip;text-align:left;font-size:11px;line-height:1.35}
 .toolbar .toolbar-feedback>#save-status{grid-column:1}
 .toolbar .toolbar-feedback>#transfer-status{grid-column:2}
 .toolbar .toolbar-feedback>#save-status:empty,.toolbar .toolbar-feedback>#transfer-status:empty{display:none}
 .toolbar .toolbar-feedback:not(:has(>#save-status:not(:empty),>#transfer-status:not(:empty))){display:none}
+
+@media(max-width:1000px){
+  .toolbar-settings,.toolbar-actions{flex-basis:100%}
+  .toolbar-settings{flex-wrap:wrap}
+  .toolbar-actions{justify-content:flex-start}
+  .toolbar .baseline-actions{justify-content:flex-start;margin-left:0}
+}
+@media(max-width:900px){
+  button,.buff-simulator-link{min-height:44px}
+  .field input,.picker-control>input,.global-input-group input,.attribute-value-grid input,.circuit-board-row .field input,.beast-accessory-controls .field input,.beast-mirror-grid input{min-height:44px;font-size:16px}
+  .picker-control>input{padding-right:52px}
+  .picker-control>.picker-clear{right:0;width:44px;min-width:44px;min-height:44px}
+  .toolbar #class-picker input,.skill-damage-share-number-wrap input{font-size:16px}
+  .toolbar #class-picker input{min-height:44px}
+  .toolbar .toggle{min-height:44px}
+  .picker-list button{min-height:44px}
+  .pet-skill-toggle,.circuit-board-remove,.circuit-board-add{min-width:44px;min-height:44px}
+  .circuit-board-remove,.circuit-board-add{font-size:12px}
+  .stat{padding:0 10px}
+  .stat summary{min-height:44px;padding-block:10px}
+  .editor-section>summary,.beast-mirror-details>summary,.calculation-inspection-panel>summary,.formula-detail summary,.calculation-comparison details summary{display:flex;align-items:center;min-height:44px}
+}
 @media(max-width:700px){
+  .app-shell,#app.layout,.workbench{width:100%;max-width:100vw;min-width:0}
+  .topbar{box-sizing:border-box;display:grid;width:100%;max-width:100vw;grid-template-columns:minmax(0,1fr);align-items:start;overflow:hidden}
+  .topbar>.brand{grid-column:1;grid-row:1;width:100%;min-width:0;flex-wrap:wrap}
+  .topbar>.developer-info{grid-column:1;grid-row:2;width:100%;min-width:0}
+  .topbar>.top-meta{grid-column:1;grid-row:3;width:max-content;max-width:100%;justify-self:end;align-self:start;margin:0}
+  .top-meta .buff-simulator-link{max-width:100%;white-space:normal}
+  .workspace-heading{display:block;width:100%;min-width:0}
+  .workspace-intro,.workspace-summary,.workflow-steps{width:100%;max-width:100%;min-width:0}
+  .workspace-summary{overflow-wrap:anywhere}
+  .workflow-steps{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .toolbar{gap:8px;margin-bottom:14px;padding:8px}
+  .toolbar-settings{flex:0 0 100%;flex-direction:column;align-items:stretch;gap:8px}
+  .toolbar .class-settings{width:100%;flex-wrap:wrap;gap:8px;}
+  .toolbar .class-settings #class-picker{width:min(230px,100%);max-width:100%;flex:0 1 230px}
+  .skill-damage-share-control{width:202px;max-width:100%;flex-basis:202px;min-height:46px}
+  .toolbar .toggle{font-size:12px}
+  .toolbar-actions{position:fixed;inset:auto 0 0;z-index:130;display:grid;box-sizing:border-box;width:100%;max-width:100vw;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"restore baseline" "history transfer";align-items:stretch;gap:6px;padding:6px calc(8px + env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) calc(8px + env(safe-area-inset-left));border-top:1px solid var(--border-strong);background:color-mix(in srgb,var(--panel) 94%,transparent);box-shadow:0 -8px 24px #0005;backdrop-filter:blur(12px)}
   .toolbar .toolbar-actions>.history-actions{grid-area:history;display:flex;align-items:center;justify-content:flex-start;gap:6px;min-width:0}
   .toolbar .history-actions button{width:44px;min-width:44px;min-height:44px;padding:0;gap:0;font-size:0}
   .toolbar .history-actions button>span:not(.history-action-glyph){position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
@@ -193,12 +243,14 @@ footer{display:flex; flex-wrap:wrap; align-items:center; justify-content:center;
   .toolbar .baseline-actions .transfer-actions button{flex:1 1 0;min-width:44px;min-height:44px;padding:6px 4px;border-radius:10px;font-size:13px;line-height:1.25;white-space:nowrap}
   .toolbar .toolbar-feedback{grid-template-columns:minmax(0,1fr);justify-content:stretch;row-gap:4px;padding-inline:2px}
   .toolbar .toolbar-feedback>#save-status,.toolbar .toolbar-feedback>#transfer-status{grid-column:1;width:100%}
+  #inspector{display:none}
+  .workbench{padding-bottom:20px}
+  .app-shell{padding-bottom:calc(112px + env(safe-area-inset-bottom))}
+  .mobile-inspector-open #inspector{position:fixed;inset:max(10px,4dvh) 8px calc(106px + env(safe-area-inset-bottom));z-index:120;display:block;width:auto;max-height:calc(100dvh - 116px - env(safe-area-inset-bottom));min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:16px;border-color:var(--accent-border);box-shadow:0 18px 60px #0009}
+  .mobile-inspector-open #inspector-backdrop{position:fixed;inset:0;z-index:110;display:block;background:#080a0ecc;backdrop-filter:blur(2px)}
+  .mobile-inspector-open #inspector .inspector-title{position:sticky;top:-16px;z-index:2;margin:-16px -16px 14px;padding:16px 58px 14px 16px;border-bottom:1px solid var(--border);background:var(--panel)}
+  .inspector-close{display:grid;place-items:center;flex:none;width:44px;height:44px;padding:0;border-color:var(--border-strong);font-size:24px;line-height:1;color:var(--text-muted)}
+  .mobile-inspector-open #inspector .inspector-close{position:absolute;top:10px;right:10px;z-index:3}
+  body.mobile-inspector-open{overflow:hidden;overscroll-behavior:none}
   .mobile-inspector-open #inspector{inset:max(10px,4dvh) 8px calc(106px + env(safe-area-inset-bottom));max-height:calc(100dvh - 116px - env(safe-area-inset-bottom))}
 }
-
-
-
-.beast-mirror-grid{max-height:none; overflow:visible} .beast-mirror-grid .picker-list{max-height:min(420px,calc(100dvh - 96px))}
-.picker-control>.picker-list.opens-above{top:auto;bottom:100%}
-
-.class-picker-error[hidden]{display:none}

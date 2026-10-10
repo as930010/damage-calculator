@@ -8,7 +8,7 @@ body{min-width:320px; background:transparent; letter-spacing:.012em} .app-shell{
 .workspace-heading::after{position:absolute; z-index:-1; right:-64px; bottom:-138px; width:360px; height:250px; border:1px solid rgb(156 190 238 / 14%); border-radius:50%; box-shadow:0 0 0 24px rgb(156 190 238 / 3%),0 0 0 50px rgb(156 190 238 / 3%); content:""; transform:rotate(-18deg); pointer-events:none}
 .eyebrow{display:inline-flex; align-items:center; gap:9px; color:#a9c8f4; font-size:10px; font-weight:700; letter-spacing:.22em} .eyebrow::before{width:19px; height:1px; background:#8bb4ec; content:""} .workspace-heading h1{max-width:760px; margin:13px 0 0; color:#f3f6fc; font-size:clamp(18px,2vw,25px); font-weight:650; letter-spacing:.02em; line-height:1.62}
 /* Pass 2 — Normalize spacing and section rhythm throughout the workbench. */
-.toolbar{min-height:58px; gap:12px; margin:0 0 22px; padding:8px 10px; border:1px solid rgb(117 139 171 / 18%); border-radius:14px; background:rgb(23 29 38 / 82%)} .toolbar #class-picker{width:min(230px,26vw)} .toolbar #class-picker input{min-height:42px} .toolbar .toggle{min-height:42px; padding-inline:8px} .toolbar .transfer-actions{gap:8px}
+.toolbar{border:1px solid rgb(117 139 171 / 18%); border-radius:14px; background:rgb(23 29 38 / 82%)}
 .battle-panel,.equipment-panel,.inspector,.weapon-magic-stone-panel,.global-source-panel,.results-panel{border-color:rgb(119 139 165 / 24%); border-radius:16px; background:linear-gradient(145deg,rgb(28 35 46 / 98%),rgb(23 29 38 / 98%)); box-shadow:0 12px 34px rgb(0 0 0 / 11%)} .battle-panel{margin-bottom:20px} .panel-heading{min-height:56px; padding:16px 22px}
 .panel-heading h2{font-size:15px; font-weight:650; letter-spacing:.035em} .panel-heading>span{color:#9eafc7} .battle-fields{gap:12px 16px; padding:17px 20px 4px} .panel-note{color:#9caec4; line-height:1.75} .equipment-workspace{gap:18px} .equipment-canvas{background-image:radial-gradient(circle,rgb(133 161 198 / 8%) 1px,transparent 1px); background-size:22px 22px}
 .gear-slot,.beast-accessory-slot{box-shadow:0 4px 12px rgb(0 0 0 / 13%)} .group-label{font-weight:650; text-shadow:0 1px 8px rgb(0 0 0 / 55%)}
@@ -27,13 +27,13 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
 }
 @media(max-width:700px) {
   .topbar{gap:10px; padding:calc(10px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) 10px calc(14px + env(safe-area-inset-left))} .brand{flex:none} .developer-info{min-width:0; margin-left:0; overflow-wrap:anywhere} .developer-info>span.developer-support{display:none} .top-meta{margin-left:auto} .workbench{width:100%; padding:18px 12px 20px} .workspace-heading{margin-bottom:14px; padding:20px 18px; border-radius:15px} .workspace-heading h1{margin-top:10px; font-size:17px; line-height:1.55}
-  .toolbar{gap:8px; margin-bottom:14px; padding:8px} .toolbar #class-picker{width:min(210px,52vw)} .toolbar .toggle{gap:6px; min-height:44px; padding-inline:2px; font-size:12px} .battle-panel{margin-bottom:14px} .battle-fields{grid-template-columns:minmax(0,1fr); gap:10px; padding:14px 16px 2px} .battle-fields>*,.battle-fields .field,.battle-fields .picker{width:100%; min-width:0} .panel-heading{min-height:50px; padding:14px 16px}
+.battle-panel{margin-bottom:14px} .battle-fields{grid-template-columns:minmax(0,1fr); gap:10px; padding:14px 16px 2px} .battle-fields>*,.battle-fields .field,.battle-fields .picker{width:100%; min-width:0} .panel-heading{min-height:50px; padding:14px 16px}
   .panel-note{padding-inline:16px} .equipment-workspace{gap:14px} .equipment-panel,.results-panel,.weapon-magic-stone-panel,.global-source-panel{border-radius:14px} .equipment-canvas{min-width:660px} .stat-list{grid-template-columns:minmax(0,1fr); gap:8px; padding:2px 12px 16px} .combat-rate-pair{grid-column:1/-1; grid-template-columns:1fr} .stat{padding:0 10px} .stat summary{min-height:44px; padding-block:10px; flex-wrap:wrap; gap:5px} .stat strong{font-size:14px}
   footer{padding-inline:12px;column-gap:4px;row-gap:4px} footer .footer-updated::before{content:none}
   .damage-summary{gap:8px; padding:12px} .damage-summary>div{min-height:76px; padding:11px} .damage-summary .final-damage{grid-column:1/-1} .damage-summary .final-damage strong{font-size:22px} .damage-comparison,.calculation-comparison{margin-inline:12px} .mobile-picker-dialog{width:calc(100vw - 12px); height:min(92dvh,900px); max-height:92dvh; border-radius:18px} .mobile-picker-header{padding:14px}
 }
 @media(max-width:380px) {
-  .workbench{padding-inline:9px} .stat-list{grid-template-columns:minmax(0,1fr)} .toolbar #class-picker{width:min(180px,48vw)} .toolbar .toggle{font-size:12px}
+  .workbench{padding-inline:9px} .stat-list{grid-template-columns:minmax(0,1fr)}
 }
 @media(prefers-reduced-motion:reduce) {
   *,*::before,*::after{scroll-behavior:auto!important; animation-duration:.01ms!important; animation-iteration-count:1!important; transition-duration:.01ms!important}
@@ -175,15 +175,10 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
 @media(min-width:701px) and (max-width:1240px){.site-credits-notes{width:min(calc(100% - clamp(32px,6vw,56px)),1384px);max-width:1384px}}
 @media(min-width:701px){.workbench{padding-bottom:20px}}
 
-.toolbar .class-settings{display:flex;align-items:center;gap:8px;width:auto;min-width:0;flex:0 0 auto}
-.toolbar .class-settings #class-picker{width:230px;flex:0 0 230px}
-.skill-damage-share-control{display:grid;width:202px;flex:0 0 202px;grid-template-columns:max-content 72px 54px;align-items:center;justify-content:space-between;gap:0;padding:5px 8px;border:1px solid rgb(117 139 171 / 18%);border-radius:10px;background:rgb(15 21 29 / 48%);color:#aab8cb;font-size:10px;white-space:nowrap}
-.skill-damage-share-label{white-space:nowrap}
-.skill-damage-share-control output{display:grid;width:54px;grid-template-columns:1fr 5ch auto;align-items:center;justify-self:end;color:#d5e3f7;font-size:10px;text-align:right}
-.skill-damage-share-control output span:first-child{text-align:right}
-.skill-damage-share-complement{width:5ch;text-align:right;font-variant-numeric:tabular-nums}
-.skill-damage-share-number-wrap{display:flex;width:72px;min-width:72px;justify-self:center;box-sizing:border-box;align-items:center;gap:4px;padding:0 6px;border:1px solid #39485d;border-radius:7px;background:#151c25;color:#aab8cb}
-.skill-damage-share-number-wrap input{width:100%;min-width:0;min-height:27px;padding:3px 0;border:0;outline:0;background:transparent;color:#e2ecfa;text-align:right;font-family:inherit;font-size:11px;font-weight:600}
+.skill-damage-share-control{border:1px solid rgb(117 139 171 / 18%);border-radius:10px;background:rgb(15 21 29 / 48%);color:#aab8cb;font-size:10px}
+.skill-damage-share-control output{color:#d5e3f7;font-size:10px}
+.skill-damage-share-number-wrap{border:1px solid #39485d;border-radius:7px;background:#151c25;color:#aab8cb}
+.skill-damage-share-number-wrap input{border:0;outline:0;background:transparent;color:#e2ecfa;text-align:right;font-family:inherit;font-weight:600}
 .skill-damage-share-number-wrap:focus-within{border-color:#8caedb;box-shadow:none}
 #transcendence-skill-share-number:focus,#transcendence-skill-share-number:focus-visible{outline:0!important;box-shadow:none!important}
 .skill-damage-share-number-wrap.is-invalid{border-color:#ff9c8a;box-shadow:none}
@@ -193,22 +188,4 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
 .portrait-awakening-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;max-width:50%}
 .portrait-awakening-error{color:#ff9c8a;font-size:9px;line-height:1.25}
 @media(max-width:520px){.portrait-awakening-grid{grid-template-columns:repeat(2,minmax(0,1fr));max-width:100%}}
-@media(max-width:700px){.toolbar .class-settings{width:100%;max-width:300px;min-width:0;flex-basis:100%;flex-direction:column;align-items:flex-start}.toolbar .class-settings #class-picker{width:min(210px,52vw);flex-basis:auto}.skill-damage-share-control{width:202px;max-width:100%;flex-basis:202px}}
-@media(max-width:380px){.toolbar .class-settings{max-width:none}}
-
 .toolbar-actions button:disabled{cursor:not-allowed;opacity:1;filter:none;color:var(--text-soft);border-color:rgb(116 133 164 / 46%);background:rgb(21 27 45 / 88%)}
-
-@media(max-width:900px){
-  button,.buff-simulator-link{min-height:44px}
-  .field input,.picker-control>input,.global-input-group input,.attribute-value-grid input,.circuit-board-row .field input,.beast-accessory-controls .field input,.beast-mirror-grid input{min-height:44px;font-size:16px}
-  .picker-control>input{padding-right:52px}
-  .picker-control>.picker-clear{right:0;width:44px;min-width:44px;min-height:44px}
-  .toolbar #class-picker input{min-height:44px;font-size:16px}
-  .toolbar .toggle{min-height:44px}
-  .picker-list button{min-height:44px}
-  .pet-skill-toggle,.circuit-board-remove,.circuit-board-add{min-width:44px;min-height:44px}
-  .circuit-board-remove,.circuit-board-add{font-size:12px}
-  .stat{padding:0 10px}
-  .stat summary{min-height:44px;padding-block:10px}
-  .editor-section>summary,.beast-mirror-details>summary,.calculation-inspection-panel>summary,.formula-detail summary,.calculation-comparison details summary{display:flex;align-items:center;min-height:44px}
-}

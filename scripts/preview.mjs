@@ -4,7 +4,8 @@ import { dirname, extname, join, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../dist");
-const port = Number(process.argv[2] ?? 4173);
+const args = process.argv.slice(2);
+const port = Number(args.find(argument => /^\d+$/.test(argument)) ?? 4173);
 if (!Number.isInteger(port) || port < 1 || port > 65535) {
   throw new Error("Preview port must be an integer between 1 and 65535.");
 }

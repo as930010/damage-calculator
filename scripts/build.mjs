@@ -163,11 +163,29 @@ await writeFile(join(output, "data", "game-data.json"), bundledDataJson);
 const dataRevision = createHash("sha256").update(bundledDataJson).digest("hex").slice(0, 16);
 const revisionResult = spawnSync("git", ["rev-parse", "--short", "HEAD"], { cwd: root, encoding: "utf8" });
 const buildRevision = revisionResult.status === 0 ? `${revisionResult.stdout.trim()}-${dataRevision}` : `build-${Date.now()}-${dataRevision}`;
-const indexHtml = (await readFile(join(root, "index.html"), "utf8")).replaceAll("__BUILD_REVISION__", buildRevision);
+const sourceIndexHtml = await readFile(join(root, "index.html"), "utf8");
+const stylesheetFiles = [...sourceIndexHtml.matchAll(/href="\.\/frontend\/([^"?]+\.css)(?:\?[^"]*)?"/g)]
+  .map((match) => match[1]);
+if (!stylesheetFiles.length || new Set(stylesheetFiles).size !== stylesheetFiles.length) {
+  throw new Error("The page must reference a unique set of local stylesheets.");
+}
+for (const file of stylesheetFiles) {
+  if (file.includes("/") || file.includes("\\") || !file.endsWith(".css")) {
+    throw new Error("Unsupported stylesheet path: " + file);
+  }
+}
+const stylesheets = Object.fromEntries(await Promise.all(stylesheetFiles.map(async (file) => [
+  file,
+  minifyCss(await readFile(join(root, "frontend", file), "utf8")),
+])));
+const stylesheetInput = stylesheetFiles.map((file) => `${file}\0${stylesheets[file]}`).join("\n");
+const stylesheetRevision = createHash("sha256").update(stylesheetInput).digest("hex").slice(0, 16);
+const indexHtml = sourceIndexHtml
+  .replaceAll("__BUILD_REVISION__", buildRevision)
+  .replaceAll("__STYLESHEET_REVISION__", stylesheetRevision);
 await writeFile(join(output, "index.html"), indexHtml);
-for (const file of ["styles.css", "polish.css", "seasonal-effects.css"]) {
-  const source = await readFile(join(root, "frontend", file), "utf8");
-  await writeFile(join(output, "frontend", file), minifyCss(source));
+for (const [file, content] of Object.entries(stylesheets)) {
+  await writeFile(join(output, "frontend", file), content);
 }
 const simulatorBuild = spawnSync(process.execPath, [join(root, "features", "buff-simulator", "scripts", "build.mjs")], {
   cwd: root,
