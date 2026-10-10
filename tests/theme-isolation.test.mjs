@@ -49,7 +49,7 @@ function leafRules(source) {
       const block = stack.pop();
       if (block) {
         const body = css.slice(block.contentStart, index);
-        if (!body.includes("{") && !block.insideKeyframes) rules.push({ selector: block.selector, body });
+        if (!body.includes("{")) rules.push({ selector: block.selector, body, insideKeyframes: block.insideKeyframes });
       }
       start = index + 1;
     }
@@ -118,6 +118,10 @@ test("activity CSS changes only visual properties on non-decorative selectors", 
     for (const selector of splitSelectors(rule.selector)) {
       if (selector.includes("::")) continue;
       for (const [property] of declarations(rule.body)) {
+        if (rule.insideKeyframes) {
+          if (!["transform", "opacity"].includes(property)) violations.push(selector + " sets " + property + " in keyframes");
+          continue;
+        }
         if (property.startsWith("--") && selector === ":root") continue;
         if (property.startsWith("--") || !allowedThemeProperties.has(property)) {
           violations.push(selector + " sets " + property);
