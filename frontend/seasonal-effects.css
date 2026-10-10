@@ -178,8 +178,6 @@ body {
 }
 
 body::before {
-  --moonlight-sway-start: -1deg;
-  --moonlight-sway-end: 1deg;
   position: fixed;
   z-index: 100;
   inset: 0;
@@ -190,9 +188,6 @@ body::before {
     radial-gradient(ellipse min(150vw, 1900px) min(155vh, 1360px) at 0 -24px, rgb(131 156 193 / 4%) 0%, rgb(100 124 163 / 2%) 45%, transparent 100%),
     conic-gradient(from 18deg at 0 -24px, transparent 0deg 33deg, rgb(220 231 248 / 0%) 36deg, rgb(220 231 248 / 24%) 41deg, rgb(220 231 248 / 0%) 46deg, transparent 51deg 360deg);
   opacity: .36;
-  transform-origin: 0 -24px;
-  will-change: transform;
-  animation: moonlight-sway 18s ease-in-out infinite;
 }
 
 .workspace-heading,
@@ -219,31 +214,15 @@ body::before {
   box-shadow:none;
 }
 
-@keyframes moonlight-sway {
-  0%, 100% {
-    transform: rotate(var(--moonlight-sway-start));
-  }
-
-  50% {
-    transform: rotate(var(--moonlight-sway-end));
-  }
-}
-
 @media (min-width: 1600px) {
   body::before {
-    --moonlight-sway-start: -.5deg;
-    --moonlight-sway-end: .5deg;
     opacity: .28;
-    animation-duration: 26s;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   body::before {
     opacity: .22;
-    will-change: auto;
-    transform: none;
-    animation: none;
   }
 }
 
@@ -430,10 +409,8 @@ button:active,.pet-skill-toggle:active{filter:brightness(1.08)}
 
 /* Keep the ambient glow centered and continuous as the viewport widens. */
 body::before{
-  --moonlight-sway-start:-.55deg;--moonlight-sway-end:.55deg;
   --moonlight-bleed:clamp(24px,3vw,80px);
   inset:calc(var(--moonlight-bleed) * -1);
-  transform-origin:var(--moonlight-bleed) calc(var(--moonlight-bleed) - 24px);
   background:
     radial-gradient(ellipse min(110vw,2600px) min(120vh,1080px) at var(--moonlight-bleed) calc(var(--moonlight-bleed) - 24px),rgb(173 172 229 / 5%) 0%,rgb(143 143 207 / 2.6%) 38%,transparent 76%),
     conic-gradient(from 18deg at var(--moonlight-bleed) calc(var(--moonlight-bleed) - 24px),transparent 0deg 33deg,rgb(193 188 239 / 0%) 36deg,rgb(193 188 239 / 11%) 41deg,rgb(193 188 239 / 0%) 46deg,transparent 51deg 360deg);
