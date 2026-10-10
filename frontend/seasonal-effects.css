@@ -378,7 +378,6 @@ input:hover,select:hover,textarea:hover,.picker-control>input:hover{border-color
 input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible,summary:focus-visible{
   outline:2px solid #c4a8e7;outline-offset:3px;box-shadow:0 0 0 4px rgb(155 139 216 / 15%);
 }
-#transcendence-skill-share-number:focus,#transcendence-skill-share-number:focus-visible{outline:0!important;box-shadow:none!important}
 button,.pet-skill-toggle,.picker-clear,.circuit-board-add{
   border-color:var(--violet-control-edge);
   background:linear-gradient(180deg,#282d50,#1b2140);
