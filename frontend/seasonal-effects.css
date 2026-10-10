@@ -275,7 +275,14 @@ body::before {
   .workflow-steps{grid-template-columns:repeat(3,minmax(0,1fr))}
   .toolbar .class-settings{display:flex;width:100%;max-width:none;min-width:0;flex:0 0 100%;flex-direction:column;align-items:flex-start;gap:8px}
   .toolbar .class-settings #class-picker{width:min(230px,100%);max-width:100%;min-width:0;flex:0 1 auto}
-  .skill-damage-share-control{width:min(202px,100%);max-width:100%;min-width:0;min-height:38px;height:38px;flex:0 1 auto;align-self:flex-start;grid-template-columns:max-content 72px 54px;align-content:center}
+  .skill-damage-share-control{width:min(202px,100%);max-width:100%;min-width:0;min-height:44px;height:44px;flex:0 1 auto;align-self:flex-start;grid-template-columns:max-content 72px 54px;align-content:center}
+  .skill-damage-share-number-wrap{min-height:44px}
+  .skill-damage-share-number-wrap input{min-height:44px;font-size:16px}
+}
+@media(max-width:900px){
+  .skill-damage-share-control{min-height:44px;height:44px}
+  .skill-damage-share-number-wrap{min-height:44px}
+  .skill-damage-share-number-wrap input{min-height:44px;font-size:16px}
 }
 
 /* Coexistence night theme: midnight blue and violet with restrained campfire warmth. */
@@ -484,7 +491,7 @@ body::before{
   color:var(--text-muted);
   box-shadow:none;
 }
-.site-credits-notes>summary{min-height:42px;background:transparent;color:#c6c3d4;letter-spacing:.02em}
+.site-credits-notes>summary{min-height:44px;background:transparent;color:#c6c3d4;letter-spacing:.02em}
 .site-credits-notes>summary::before{color:#b89361}
 .site-credits-content{border-top-color:rgb(164 147 126 / 20%)}
 .site-credits-block+.site-credits-block{border-left-color:rgb(164 147 126 / 20%)}

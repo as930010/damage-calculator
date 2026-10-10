@@ -6,9 +6,24 @@ let mobilePickerSearchToggle: HTMLButtonElement | null = null;
 let mobilePickerSearch: HTMLInputElement | null = null;
 let mobilePickerList: HTMLElement | null = null;
 let mobilePickerReturnTarget: HTMLElement | null = null;
+let activeMobileSuggestionsRepositioner: (() => void) | null = null;
+let mobileSuggestionsResizeListenerInstalled = false;
 type OutsideCommitPicker = { root: HTMLElement; commitOrClose: () => void };
 const outsideCommitPickers = new Set<OutsideCommitPicker>();
 let outsideCommitListenerInstalled = false;
+
+function setActiveMobileSuggestionsRepositioner(reposition: () => void) {
+  activeMobileSuggestionsRepositioner = reposition;
+  if (mobileSuggestionsResizeListenerInstalled) return;
+  const sync = () => activeMobileSuggestionsRepositioner?.();
+  window.addEventListener('resize', sync, { passive: true });
+  window.visualViewport?.addEventListener('resize', sync, { passive: true });
+  mobileSuggestionsResizeListenerInstalled = true;
+}
+
+function clearActiveMobileSuggestionsRepositioner(reposition: (() => void) | null) {
+  if (reposition && activeMobileSuggestionsRepositioner === reposition) activeMobileSuggestionsRepositioner = null;
+}
 
 function registerOutsidePointerCommit(picker: OutsideCommitPicker) {
   if (!outsideCommitListenerInstalled) {
@@ -65,8 +80,9 @@ export function createPicker(label: string, options: readonly PickerOption[], va
   input.setAttribute('aria-controls', list.id);
   let matches: PickerOption[] = [], index = -1, committed = value;
   let directEntryDirty = false;
+  let repositionMobileSuggestions: (() => void) | null = null;
   const mobileQuery = window.matchMedia('(max-width: 700px)');
-  const close = () => { list.hidden = true; input.setAttribute('aria-expanded', 'false'); input.removeAttribute('aria-activedescendant'); input.value = displayValue(committed); clear.hidden = committed === ''; };
+  const close = () => { list.hidden = true; clearActiveMobileSuggestionsRepositioner(repositionMobileSuggestions); input.setAttribute('aria-expanded', 'false'); input.removeAttribute('aria-activedescendant'); input.value = displayValue(committed); clear.hidden = committed === ''; };
   const commit = (option: PickerOption) => { directEntryDirty = false; committed = option.value; close(); onChange(option.value); };
   const commitDirectEntry = () => {
     if (!directEntry) return;
@@ -79,9 +95,39 @@ export function createPicker(label: string, options: readonly PickerOption[], va
     else { directEntry.onInvalid(typedValue); close(); }
   };
   if (directEntry) registerOutsidePointerCommit({ root, commitOrClose: commitDirectEntry });
+  repositionMobileSuggestions = () => {
+    if (!list.isConnected || list.hidden) {
+      clearActiveMobileSuggestionsRepositioner(repositionMobileSuggestions);
+      return;
+    }
+    if (!mobileQuery.matches || !directEntry) {
+      list.classList.remove('opens-above');
+      list.style.removeProperty('max-height');
+      return;
+    }
+    const actionBar = document.querySelector<HTMLElement>('.toolbar-actions');
+    const inputRect = input.getBoundingClientRect();
+    const visualViewport = window.visualViewport;
+    const visibleTop = visualViewport?.offsetTop ?? 0;
+    const visibleBottom = Math.min(window.innerHeight, visibleTop + (visualViewport?.height ?? window.innerHeight));
+    const actionBarTop = Math.min(actionBar?.getBoundingClientRect().top ?? visibleBottom, visibleBottom);
+    const spaceBelow = Math.max(0, actionBarTop - inputRect.bottom - 8);
+    const spaceAbove = Math.max(0, inputRect.top - visibleTop - 8);
+    const opensAbove = spaceBelow < 200 && spaceAbove > spaceBelow;
+    const availableSpace = opensAbove ? spaceAbove : spaceBelow;
+    list.classList.toggle('opens-above', opensAbove);
+    list.style.maxHeight = `${Math.max(96, Math.min(300, availableSpace))}px`;
+  };
   const draw = (query: string) => {
     matches = options.filter(option => (option.label + (directEntry ? ' ' + option.value : '')).toLocaleLowerCase().includes(query.toLocaleLowerCase()));
     index = -1; list.replaceChildren(); list.hidden = false; input.setAttribute('aria-expanded', 'true');
+    if (mobileQuery.matches && directEntry) {
+      repositionMobileSuggestions();
+      setActiveMobileSuggestionsRepositioner(repositionMobileSuggestions);
+    } else {
+      list.classList.remove('opens-above');
+      list.style.removeProperty('max-height');
+    }
     for (const [i, option] of matches.entries()) {
       const row = document.createElement('button'); row.type = 'button'; row.role = 'option'; row.id = `${list.id}-${i}`; row.tabIndex = -1;
       const name = document.createElement('span'); name.textContent = option.label; row.append(name);
