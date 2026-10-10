@@ -41,13 +41,15 @@ function leafRules(source) {
       continue;
     }
     if (character === "{") {
-      stack.push({ selector: css.slice(start, index).trim(), contentStart: index + 1 });
+      const selector = css.slice(start, index).trim();
+      const insideKeyframes = stack.some(parent => /^@(?:-webkit-)?keyframes\b/i.test(parent.selector));
+      stack.push({ selector, contentStart: index + 1, insideKeyframes });
       start = index + 1;
     } else if (character === "}") {
       const block = stack.pop();
       if (block) {
         const body = css.slice(block.contentStart, index);
-        if (!body.includes("{")) rules.push({ selector: block.selector, body });
+        if (!body.includes("{") && !block.insideKeyframes) rules.push({ selector: block.selector, body });
       }
       start = index + 1;
     }
@@ -97,7 +99,7 @@ const allowedThemeProperties = new Set([
   "border-color", "border-top-color", "border-right-color", "border-bottom-color", "border-left-color",
   "border-radius", "border-top-left-radius", "border-top-right-radius", "border-bottom-left-radius",
   "border-bottom-right-radius", "border-style", "box-shadow", "caret-color", "color", "color-scheme",
-  "filter", "outline-color", "outline-style", "opacity", "text-shadow",
+  "backdrop-filter", "filter", "outline", "outline-color", "outline-offset", "outline-style", "opacity", "text-shadow",
   "transition", "transition-delay", "transition-duration", "transition-property", "transition-timing-function",
 ]);
 
