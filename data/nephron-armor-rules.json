@@ -283,7 +283,7 @@
     {
       "id": "super-extreme-slow",
       "name": "超級彈匣[極度緩慢]",
-      "statKey": "allSkillDamagePct",
+      "statKey": "multiplicativeDamagePct",
       "levelValuesPct": [
         0.5,
         1,

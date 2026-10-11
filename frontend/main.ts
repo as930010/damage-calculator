@@ -1355,7 +1355,11 @@ async function start() {
         const magazineLevelChoices = availableLevels.map(level => {
           const levelIndex = Number(level.match(/[0-9]+/)?.[0]) - 1;
           const amount = currentMagazine?.levelValuesPct[levelIndex];
-          return { value: level, label: level, detail: amount === undefined ? undefined : '數值：' + amount + '%' };
+          return {
+            value: level, label: level,
+            detail: amount === undefined ? undefined
+              : (currentMagazine?.statKey === 'multiplicativeDamagePct' ? '乘算傷害增幅：' : '數值：') + amount + '%',
+          };
         });
         field(magazineGrid, '彈匣等級', nephronField.magazineLevelCell,
           magazineLevelChoices, true, !selectedMagazine, '請先選擇彈匣');
@@ -1521,7 +1525,12 @@ async function start() {
       const chipGrid = attributeValueGrid(chipArea);
       field(chipGrid, '芯片屬性', chip.attributeCell, chipAttributeOptions(chip), true);
       const chosen = data.chips.chips.find(entry => entry.name === val(chip.attributeCell));
-      field(chipGrid, '芯片調校等級', chip.tuningCell, options(chosen?.tuningLevels.map(level => level.level) ?? []), false, val(chip.attributeCell) === '');
+      const tuningChoices: PickerOption[] = chosen?.tuningLevels.map(level => ({
+        value: level.level,
+        label: level.level,
+        detail: `${chosen.name.replace(/%$/, '')}增幅：${fmt(level.value)}%`,
+      })) ?? [];
+      field(chipGrid, '芯片調校等級', chip.tuningCell, tuningChoices, false, val(chip.attributeCell) === '');
       const conditionalChipConflict = lowerwearConditionalChipConflict();
       if (conditionalChipConflict && (chip.id === "lowerwear" || chip.id === "lowerwearAlternative")) {
         const warning = document.createElement("p");

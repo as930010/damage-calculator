@@ -543,6 +543,47 @@ test('RM 致命傷害基底採 180%，乘算後扣除同一個 180% 基準', asy
   assert.ok(Math.abs(result.multiplicativeCritDamage.value - 0.18) < 1e-12);
 });
 
+test('極度緩慢彈匣各等級獨立乘算，且不同部位效果相乘而不增加加算技傷', async () => {
+  const data = await loadData();
+  const upper = data.innerwear.slots.find(entry => entry.id === 'upper');
+  const gloves = data.innerwear.slots.find(entry => entry.id === 'gloves');
+  const upperMagazine = data.nephronArmor.fields.find(entry => entry.slotId === 'upper');
+  const glovesMagazine = data.nephronArmor.fields.find(entry => entry.slotId === 'gloves');
+  const magazine = data.nephronArmor.magazines.find(entry => entry.id === 'super-extreme-slow');
+  const baseState = {
+    schemaVersion: 3, Job: 'KE', lowerwearAlternativeEnabled: false,
+    values: {
+      'Weapon.ENHC': 'Lv.12',
+      'Left.Armor.Bottom.ENHC': 'Lv.10', 'Left.Armor.Shoes.ENHC': 'Lv.10',
+      'Left.Armor.Bottom.FORGE': 0, 'Left.Armor.Shoes.FORGE': 0,
+      [upper.typeCell]: '內布隆', [upper.enhancementCell]: 'Lv.10', [upper.forgingCell]: 0,
+      [gloves.typeCell]: '內布隆', [gloves.enhancementCell]: 'Lv.10', [gloves.forgingCell]: 0,
+    },
+  };
+  const base = projectDamage(data, baseState);
+  assert.equal(magazine.statKey, 'multiplicativeDamagePct');
+  const check = (values, factor) => {
+    const current = projectDamage(data, { ...baseState, values: { ...baseState.values, ...values } });
+    assert.equal(current.attributes.stats.allSkillDamagePct.finalTotal, base.attributes.stats.allSkillDamagePct.finalTotal);
+    assert.ok(Math.abs(current.result.generalMultiplicativeDamage.value / base.result.generalMultiplicativeDamage.value - factor) < 1e-12);
+    assert.ok(base.result.finalDamage.finalDamage > 0);
+    assert.ok(Math.abs(current.result.finalDamage.finalDamage / base.result.finalDamage.finalDamage - factor) < 1e-12);
+    return current;
+  };
+  for (const [index, amount] of [0.5, 1, 1.5, 2, 2.5, 3].entries()) {
+    const current = check({
+      [upperMagazine.magazineCell]: magazine.name,
+      [upperMagazine.magazineLevelCell]: 'Lv.' + (index + 1),
+    }, 1 + amount / 100);
+    assert.equal(current.result.generalMultiplicativeDamage.factors.find(entry =>
+      entry.sourceId === `nephron-magazine:upper:super-extreme-slow:Lv.${index + 1}`).valuePct, amount);
+  }
+  check({
+    [upperMagazine.magazineCell]: magazine.name, [upperMagazine.magazineLevelCell]: 'Lv.5',
+    [glovesMagazine.magazineCell]: magazine.name, [glovesMagazine.magazineLevelCell]: 'Lv.6',
+  }, 1.025 * 1.03);
+});
+
 test('Nephron selects independent armor types, fifth magic stone, conversion, and magazine in the computed source groups', async () => {
   const data = await loadData();
   const upper = data.innerwear.slots.find(entry => entry.id === 'upper');

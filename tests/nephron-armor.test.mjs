@@ -122,7 +122,7 @@ test('all Nephron magazines have six specified levels and resolve the advertised
   const slow = resolveNephronArmorSources(armor, [{
     slotId:'upper', enhancement:'Lv.10', transformations:[{},{},{}], magazine:'超級彈匣[極度緩慢]', magazineLevel:'Lv.5',
   }]);
-  assert.deepEqual(statsFor(slow), { allSkillDamagePct: 2.5 });
+  assert.deepEqual(statsFor(slow), { multiplicativeDamagePct: 2.5 });
   const booster = resolveNephronArmorSources(armor, [{
     slotId:'upper', enhancement:'Lv.10', transformations:[{},{},{}], magazine:'超級彈匣[推進器]', magazineLevel:'Lv.6',
   }]);
