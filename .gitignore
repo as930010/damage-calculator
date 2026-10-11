@@ -7,3 +7,13 @@ online-current-export.xlsx
 /data/manifest.json
 /data/examples/live-sheet-2026-09-28-expected.json
 /features/buff-simulator/data/manifest.json
+
+# Temporary diagnostics and cleanup artifacts are not repository deliverables.
+/tests/browser/rendering-audit.mjs
+/tests/browser/README.md
+/tools/README-cleanup.md
+/tools/cleanup-development-artifacts.ps1
+/test-results/
+/playwright-report/
+/performance-results/
+/audit-results/

@@ -5,4 +5,5 @@
 - Before handoff, state clearly which changes are uncommitted, committed but unpushed, pushed but not deployed, deployed, and not yet integrated.
 - Keep the seasonal theme as a removable visual module. Put functionality, calculation/data changes, shared UI/UX, accessibility, and responsive layout in the main codebase; seasonal files may contain visual styling and decorative effects only.
 - Do not remove user data, unintegrated work, or files with uncertain purpose. Verify generated artifacts and references before cleaning them; do not use broad Git cleanup commands.
+- Do not retain, commit, or push temporary diagnostic tools, cleanup utilities, browser test profiles, screenshots, traces, test logs, or test/audit result reports. Run transient checks in memory when possible; remove required temporary artifacts immediately after use. Keep the existing formal automated tests and build/data validation scripts. Only retain a diagnostic artifact when the user explicitly requests it.
 - For structural codebase exploration, use the installed `codebase-memory` skill.
