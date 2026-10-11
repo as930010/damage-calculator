@@ -33,6 +33,15 @@ Set-Location -LiteralPath 'C:\Users\user\Documents\ChatGPT\傷害計算機'
 
 執行前請關閉使用這些副本的瀏覽器、編輯器、終端機與開發伺服器。腳本會檢查程序命令列是否明確包含候選路徑；這只能發現明確的命令列參照，不能證明沒有其他程序持有檔案控制代碼。若程序查詢失敗，腳本會停止。存取被拒、路徑／連結狀態變動或出現不支援屬性時，也會停止該項。
 
+若只想清除專案內可重建的 `dist`，使用獨立模式，不會列出或處理 Temp 項目：
+
+```powershell
+.\tools\cleanup-development-artifacts.ps1 -BuildOutputOnly
+.\tools\cleanup-development-artifacts.ps1 -BuildOutputOnly -Execute
+```
+
+預覽確認它是專案根目錄的普通 `dist` 目錄、沒有連結或重要使用者檔案，且已關閉本機預覽伺服器後，才輸入 `DELETE-E`。下次 `pnpm run build` 會重新產生 `dist`。不要同時指定 `-ResidualOnly` 與 `-BuildOutputOnly`。
+
 腳本不修改 Execution Policy，不要求系統管理員權限，不呼叫其他清理工具。PowerShell 版本若無法可靠讀取連結目標，候選項會安全停止。執行日誌寫入 `%LOCALAPPDATA%\DamageCalculatorCleanupLogs`；預覽不建立日誌、不變更檔案。清理完成後可再執行預覽核對路徑狀態。
 
 ## 明確保護範圍

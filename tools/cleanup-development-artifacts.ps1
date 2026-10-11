@@ -1,5 +1,5 @@
 ﻿[CmdletBinding()]
-param([switch]$Execute,[switch]$ResidualOnly)
+param([switch]$Execute,[switch]$ResidualOnly,[switch]$BuildOutputOnly)
 
 Set-StrictMode -Version 2.0
 $ErrorActionPreference = 'Stop'
@@ -165,12 +165,16 @@ function Add-Candidate([string]$Category,[string]$Path,[switch]$Optional) {
     if (@($script:Items | Where-Object { $_.Path -eq $full }).Count) { throw "白名單重複：$full" }
     $script:Items += [pscustomobject]@{ Category=$Category; Path=$full; Optional=[bool]$Optional }
 }
+if ($ResidualOnly -and $BuildOutputOnly) { throw 'ResidualOnly 與 BuildOutputOnly 不能同時使用。' }
 if ($ResidualOnly) {
     # Exact paths identified by the latest audit. This mode intentionally
     # excludes browser profiles, snapshots, dist, and every other candidate.
     Add-Candidate 'B UI、Buff、RWD、效能測試副本' "$script:ExpectedTemp\damage-calculator-buff-release"
     Add-Candidate 'B UI、Buff、RWD、效能測試副本' "$script:ExpectedTemp\damage-calculator-buff-ab-20261011"
     Add-Candidate 'B UI、Buff、RWD、效能測試副本' "$script:ExpectedTemp\damage-calculator-mobile-ab-20261011"
+} elseif ($BuildOutputOnly) {
+    # Optional generated output, isolated from all Temp candidates.
+    Add-Candidate 'E 可重建建置輸出' "$project\dist" -Optional
 } else {
 Add-Candidate 'A 瀏覽器測試 Profile' "$script:ExpectedTemp\buff-ui-review-cdp"
 Add-Candidate 'A 瀏覽器測試 Profile' "$script:ExpectedTemp\buff-ui-review-cdp2"
@@ -209,7 +213,7 @@ foreach ($item in $script:Items) {
     if ($item.Path -eq $project -or (Test-SameOrChild $project $item.Path)) { throw "候選項目是專案或其上層，拒絕：$($item.Path)" }
 }
 
-Write-Host "模式：$(if ($Execute) {'執行（仍需逐類及特殊項確認）'} else {'唯讀預覽'})$(if ($ResidualOnly) {'；僅列出三個已鑑識的殘留副本'} else {''})"
+Write-Host "模式：$(if ($Execute) {'執行（仍需逐類及特殊項確認）'} else {'唯讀預覽'})$(if ($ResidualOnly) {'；僅列出三個已鑑識的殘留副本'} elseif ($BuildOutputOnly) {'；僅列出可重建 dist'} else {''})"
 Write-Host "專案：$project | PowerShell $($PSVersionTable.PSVersion)"
 $available = @()
 foreach ($item in $script:Items) {
