@@ -331,14 +331,12 @@ body{color:var(--text-main);background:transparent}
   background:linear-gradient(145deg,rgb(11 17 42 / 65%),rgb(7 11 27 / 65%));
   box-shadow:none;
 }
-.stat{border-radius:11px;transition:background-color 160ms ease}
 .stat:hover{border-color:#7374a2;box-shadow:none}
 .stat[open]{border-color:#a48abb;background:linear-gradient(145deg,rgb(47 41 70 / 65%),rgb(31 35 63 / 65%))}
 .stat-details{border-top-color:rgb(157 145 190 / 28%)}
 .stat-source-row{border-bottom-color:rgb(145 151 192 / 21%)}
 .stat-source-row strong{color:#eee5f5}
 .stat-detail-heading,.stat-average,.stat-source-empty{color:#c0bed9}
-.equipment-damage-card{border-radius:11px}
 .equipment-damage-card span,.damage-summary span{color:#c1c2dc}
 .equipment-damage-card strong{color:#f6edf0}
 .equipment-damage-gain strong,.damage-ratio-positive strong,.positive{color:#b4d3ed}
@@ -355,7 +353,7 @@ input,select,textarea,.picker-control>input,.mobile-picker-search{
 input::placeholder,.mobile-picker-search::placeholder{color:#9ba3c0}
 input:hover,select:hover,textarea:hover,.picker-control>input:hover{border-color:#8885b9}
 input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible,summary:focus-visible{
-  outline:2px solid #c4a8e7;outline-offset:3px;box-shadow:0 0 0 4px rgb(155 139 216 / 15%);
+  outline-color:#c4a8e7;box-shadow:0 0 0 4px rgb(155 139 216 / 15%);
 }
 button,.pet-skill-toggle,.picker-clear,.circuit-board-add{
   border-color:var(--violet-control-edge);
@@ -367,7 +365,6 @@ button:active,.pet-skill-toggle:active{filter:brightness(1.08)}
 #baseline{border-color:var(--violet-control-edge);background:linear-gradient(180deg,#282d50,#1b2140);color:#d7daf0}
 #baseline:hover{border-color:#737ca6;background:linear-gradient(180deg,#343a60,#242b4a);color:#f0eef8}
 .toggle{color:#d0d0e3}.toggle input{accent-color:#c5a6e6}
-.picker-control>input{border-radius:10px}
 .picker-list{
   border-color:#71698d;background:#13172e;color:var(--text-main);
   box-shadow:none;

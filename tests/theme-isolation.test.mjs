@@ -99,8 +99,7 @@ const allowedThemeProperties = new Set([
   "border-color", "border-top-color", "border-right-color", "border-bottom-color", "border-left-color",
   "border-radius", "border-top-left-radius", "border-top-right-radius", "border-bottom-left-radius",
   "border-bottom-right-radius", "border-style", "box-shadow", "caret-color", "color", "color-scheme",
-  "backdrop-filter", "filter", "outline", "outline-color", "outline-offset", "outline-style", "opacity", "text-shadow",
-  "transition", "transition-delay", "transition-duration", "transition-property", "transition-timing-function",
+  "backdrop-filter", "filter", "outline-color", "opacity", "text-shadow",
 ]);
 
 test("activity theme is optional and its complete removal leaves a buildable core", () => {
@@ -116,7 +115,9 @@ test("activity CSS changes only visual properties on non-decorative selectors", 
   const violations = [];
   for (const rule of leafRules(seasonalCss)) {
     for (const selector of splitSelectors(rule.selector)) {
-      if (selector.includes("::")) continue;
+      // Decorative generated shapes may have dimensions. Placeholder/backdrop
+      // selectors remain subject to the same core-layout boundary as controls.
+      if (/::(?:before|after)$/.test(selector)) continue;
       for (const [property, value] of declarations(rule.body)) {
         if (rule.insideKeyframes) {
           if (!["transform", "opacity"].includes(property)) violations.push(selector + " sets " + property + " in keyframes");
