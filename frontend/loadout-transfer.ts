@@ -221,6 +221,11 @@ export function serializeLoadout(state: LoadoutState, data: TransferData): { jso
     format: 'damage-calculator-loadout',
     formatVersion: 3,
     Job: state.Job,
+    // Keep these commonly edited settings readable in the exported JSON.
+    // Their numeric transfer codes remain in `values` for compatibility with existing files.
+    'Stage.Adapt': state.values['Stage.Adapt'] ?? null,
+    'Stage.CritRatePenalty': state.values['Stage.CritRatePenalty'] ?? null,
+    'Stage.BossDEF': state.values['Stage.BossDEF'] ?? null,
     values,
     lowerwearAlternativeEnabled: state.lowerwearAlternativeEnabled,
     masterBeastSpiritStoneColor: state.masterBeastSpiritStoneColor,
@@ -302,6 +307,22 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
         else clearedFields.push(fieldId);
       } else values[fieldId] = normalizedValue;
     }
+  }
+
+  // Older compact exports use numeric codes 1, 2, and 3. Accept the explicit semantic
+  // fields as a fallback so readable exports still round-trip if those codes are absent.
+  for (const fieldId of ['Stage.Adapt', 'Stage.CritRatePenalty', 'Stage.BossDEF'] as const) {
+    if (values[fieldId] !== undefined) continue;
+    const explicitValue = candidate[fieldId];
+    if (!isValidPrimitive(explicitValue) || typeof explicitValue === 'string' && explicitValue.trim() === '') continue;
+    const choices = cellOptions(data, fieldId, optionValues);
+    if (choices && !choices.some(option => String(option) === String(explicitValue))) {
+      clearedFields.push(fieldId);
+      continue;
+    }
+    values[fieldId] = explicitValue;
+    const clearedIndex = clearedFields.lastIndexOf(fieldId);
+    if (clearedIndex >= 0) clearedFields.splice(clearedIndex, 1);
   }
 
   const portrait = data.otherEffects.portraitAwakening;

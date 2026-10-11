@@ -66,6 +66,38 @@ test("numeric-code JSON export imports back to the same loadout", () => {
   assert.deepEqual(exported.omittedFields, ["Z999"]);
 });
 
+test("export visibly includes job and stage settings, and import accepts semantic stage fields", () => {
+  const configured = {
+    ...state,
+    Job: classes.classes.find((entry) => entry.active && entry.id !== state.Job)?.id ?? state.Job,
+    values: { ...state.values, "Stage.Adapt": 95, "Stage.CritRatePenalty": 30, "Stage.BossDEF": 71.92 },
+  };
+  const exported = JSON.parse(serializeLoadout(configured, data).json);
+  assert.equal(exported.Job, configured.Job);
+  assert.equal(exported["Stage.Adapt"], 95);
+  assert.equal(exported["Stage.CritRatePenalty"], 30);
+  assert.equal(exported["Stage.BossDEF"], 71.92);
+  assert.equal(exported.values[String(codeForFieldId("Stage.Adapt"))], 95);
+  assert.equal(exported.values[String(codeForFieldId("Stage.CritRatePenalty"))], 30);
+  assert.equal(exported.values[String(codeForFieldId("Stage.BossDEF"))], 71.92);
+  assert.deepEqual(parseLoadoutJson(JSON.stringify(exported), state, data).state, semanticState(configured));
+
+  const compactV3 = { ...exported };
+  delete compactV3["Stage.Adapt"];
+  delete compactV3["Stage.CritRatePenalty"];
+  delete compactV3["Stage.BossDEF"];
+  assert.deepEqual(parseLoadoutJson(JSON.stringify(compactV3), state, data).state, semanticState(configured));
+
+  delete exported.values[String(codeForFieldId("Stage.Adapt"))];
+  delete exported.values[String(codeForFieldId("Stage.CritRatePenalty"))];
+  delete exported.values[String(codeForFieldId("Stage.BossDEF"))];
+  const semanticImport = parseLoadoutJson(JSON.stringify(exported), state, data).state;
+  assert.equal(semanticImport.Job, configured.Job);
+  assert.equal(semanticImport.values["Stage.Adapt"], 95);
+  assert.equal(semanticImport.values["Stage.CritRatePenalty"], 30);
+  assert.equal(semanticImport.values["Stage.BossDEF"], 71.92);
+});
+
 test("older loadout exports default skill damage share to 100% transcendence", () => {
   const exported = JSON.parse(serializeLoadout(state, data).json);
   delete exported.transcendenceSkillDamageSharePct;
