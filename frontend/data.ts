@@ -127,4 +127,5 @@ export async function loadGameData(): Promise<GameData> {
 }
 export const escapeHtml = (value: unknown): string => String(value ?? "").replace(/[&<>"']/g, (character) =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]!);
-export const formatNumber = (value: number): string => new Intl.NumberFormat("zh-TW", { maximumFractionDigits: 5 }).format(value);
+const numberFormatter = new Intl.NumberFormat("zh-TW", { maximumFractionDigits: 5 });
+export const formatNumber = (value: number): string => numberFormatter.format(value);

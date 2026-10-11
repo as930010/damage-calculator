@@ -15,6 +15,10 @@ import { resolveClassCode, sanitizeClassCode } from './class-code.ts';
 import { resolveUnsignedInteger, sanitizeUnsignedInteger } from './direct-input.ts';
 import { historyShortcutAction, LoadoutHistory } from './history.ts';
 
+const preciseNumberFormatter = new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 10 });
+const visibleNumberFormatter = new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 3 });
+const twoDecimalFormatter = new Intl.NumberFormat('zh-TW', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
 const ICE_EQUIPMENT_SHORT_NAMES: Record<string, string> = {
   '幻影面紗': '面紗',
   '真理假面': '真理',
@@ -1570,8 +1574,8 @@ async function start() {
     }
     const rows = compareLoadoutResults(currentResult, baselineResult);
 
-    const precise = (value: number) => new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 10 }).format(value);
-    const visiblePrecise = (value: number) => new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 3 }).format(value);
+    const precise = (value: number) => preciseNumberFormatter.format(value);
+    const visiblePrecise = (value: number) => visibleNumberFormatter.format(value);
     const displayComparisonValue = (row: typeof rows[number], value: number) => {
       if (row.key === 'critRate' || row.key === 'extremizationRate') return `${precise(value * 100)}%`;
       return row.key === 'finalDamage' ? visiblePrecise(value) : precise(value);
@@ -1600,22 +1604,28 @@ async function start() {
     const target = document.querySelector('#results')!;
       let currentDamage: ReturnType<typeof projectDamage> | null = null;
       let baselineDamage: ReturnType<typeof projectDamage> | null = null;
+      let baselineAttributes: ReturnType<typeof projectAttributes> | ReturnType<typeof projectDamage>['attributes'] | null = null;
       let damageCalculationError: unknown;
       try { currentDamage = projectDamage(data, state); } catch (error) { damageCalculationError = error; }
       baselineIsValid = false;
       if (baseline) {
         try {
-          projectAttributes(data, baseline);
+          baselineDamage = projectDamage(data, baseline);
+          baselineAttributes = baselineDamage.attributes;
           baselineIsValid = true;
-        } catch { /* Keep current attributes visible if the saved build is stale. */ }
-        try { baselineDamage = projectDamage(data, baseline); } catch { /* Damage can be unavailable while the saved configuration is still restorable. */ }
+        } catch {
+          try {
+            baselineAttributes = projectAttributes(data, baseline);
+            baselineIsValid = true;
+          } catch { /* Keep current attributes visible if the saved build is stale. */ }
+        }
       }
       if (!currentDamage) renderCalculationComparison(undefined, baselineDamage?.result);
       const equipmentDamageSummary = document.querySelector<HTMLElement>('#equipment-damage-summary')!;
       const baselineFinalDamage = baselineDamage?.result.finalDamage.finalDamage;
       const currentFinalDamage = currentDamage?.result.finalDamage.finalDamage;
-      const summaryDamageNumber = (value: number) => new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 3 }).format(value);
-      const summaryPercent = (value: number) => new Intl.NumberFormat('zh-TW', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
+      const summaryDamageNumber = (value: number) => visibleNumberFormatter.format(value);
+      const summaryPercent = (value: number) => twoDecimalFormatter.format(value);
       const damageGainRatio = baselineFinalDamage !== undefined && currentFinalDamage !== undefined && baselineFinalDamage !== 0
         ? currentFinalDamage / baselineFinalDamage - 1
         : undefined;
@@ -1623,12 +1633,14 @@ async function start() {
       const damageGainClass = damageGainRatio === undefined || damageGainRatio === 0 ? '' : damageGainRatio > 0 ? 'gain-positive' : 'gain-negative';
       equipmentDamageSummary.innerHTML = '<div class="equipment-damage-card"><span>基準配置</span><strong>' + (baselineFinalDamage === undefined ? '—' : summaryDamageNumber(baselineFinalDamage)) + '</strong></div><div class="equipment-damage-card"><span>新配置</span><strong>' + (currentFinalDamage === undefined ? '—' : summaryDamageNumber(currentFinalDamage)) + '</strong></div><div class="equipment-damage-card equipment-damage-gain"><span>增幅</span><strong class="' + damageGainClass + '">' + damageGain + '</strong></div>';
     try {
-      const current = projectAttributes(data, state); let before: ReturnType<typeof projectAttributes> | null = null;
-      try { if (baseline) before = projectAttributes(data, baseline); } catch { /* Old data cannot hide current results. */ }
+      const current = currentDamage?.attributes ?? projectAttributes(data, state);
+      const before = baselineAttributes;
     document.querySelector('#comparison-label')!.textContent = before ? '與已儲存配置比較' : baseline ? '比較基準已不適用目前資料，請重新設定' : '可儲存目前配置作為比較基準';
 
-      let currentCombatRates: ReturnType<typeof projectCombatRates> | null = null;
-      try { currentCombatRates = projectCombatRates(data, state); } catch { /* Show other attributes even if rate inputs are incomplete. */ }
+      let currentCombatRates: ReturnType<typeof projectCombatRates> | null = currentDamage?.result.combatRates ?? null;
+      if (!currentCombatRates) {
+        try { currentCombatRates = projectCombatRates(data, state); } catch { /* Show other attributes even if rate inputs are incomplete. */ }
+      }
     const currentClass = data.classes.classes.find(entry => entry.id === state.Job);
     const baselineClass = baseline ? data.classes.classes.find(entry => entry.id === baseline?.Job) : undefined;
     const critDamageSupplement = (damage: ReturnType<typeof projectDamage> | null) => damage
@@ -1649,10 +1661,10 @@ async function start() {
     if (attackStat) {
       visibleStats.unshift({ key: 'attackPower', stat: attackStat, previousStat: before?.stats[baselineAttackKey] });
     }
-    const percentFormat = (value: number) => new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 3 }).format(value);
+    const percentFormat = (value: number) => visibleNumberFormatter.format(value);
     const signedDelta = (value: number, format: (value: number) => string, suffix = '') => { const magnitude = format(Math.abs(value)); return magnitude === format(0) ? '' : (value > 0 ? '+' : '−') + magnitude + suffix; };
     const finalDamageFormat = (value: number) => {
-      const parts = new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 3 }).formatToParts(value);
+      const parts = visibleNumberFormatter.formatToParts(value);
       const integer = parts.filter(part => part.type !== 'decimal' && part.type !== 'fraction').map(part => part.value).join('');
       const decimal = parts.filter(part => part.type === 'decimal' || part.type === 'fraction').map(part => part.value).join('');
       return `<span class="damage-integer">${h(integer)}</span>${decimal ? `<span class="damage-decimal">${h(decimal)}</span>` : ''}`;
@@ -1735,13 +1747,10 @@ async function start() {
         renderCalculationComparison(result, baselineDamage?.result);
         let damageRatioHtml = '';
         if (baseline && before) {
-          let damageRatio: number | null = null;
-          try {
-            const previous = projectDamage(data, baseline).result;
-            damageRatio = previous.finalDamage.finalDamage === 0
-              ? null
-              : result.finalDamage.finalDamage / previous.finalDamage.finalDamage * 100;
-          } catch { /* Keep the current damage visible when a saved baseline is stale. */ }
+          const previousFinalDamage = baselineDamage?.result.finalDamage.finalDamage;
+          const damageRatio = previousFinalDamage === undefined || previousFinalDamage === 0
+            ? null
+            : result.finalDamage.finalDamage / previousFinalDamage * 100;
           const damageDifference = damageRatio === null ? null : damageRatio - 100;
           const damageDifferenceClass = damageDifference === null || damageDifference === 0 ? '' : damageDifference > 0 ? 'positive' : 'negative';
           const damageRatioClass = damageDifference === null || damageDifference === 0 ? '' : damageDifference > 0 ? 'damage-ratio-positive' : 'damage-ratio-negative';
