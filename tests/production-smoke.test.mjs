@@ -101,10 +101,13 @@ test('optional loader shares requests and retries failures; export failure remai
   const first = load(); assert.equal(load(), first);
   await assert.rejects(first, /offline/);
   assert.equal(await load(), module); assert.equal(await load(), module); assert.equal(calls, 2);
-  let fail = true;
+  const attempts = [];
   const page = await productionPage({ reader: async path => {
-    if (fail && path.includes('/loadout-transfer-')) { fail = false; throw new Error('offline'); }
-    return readFile(resolve(root, path), 'utf8');
+    if (path.includes('/loadout-transfer-')) {
+      attempts.push(path);
+      if (!path.includes('?retry=')) throw new Error('cached failure for original URL');
+    }
+    return readFile(resolve(root, path.split('?')[0]), 'utf8');
   } });
   try {
     page.dom.window.document.querySelector('#export-loadout').click();
@@ -112,7 +115,20 @@ test('optional loader shares requests and retries failures; export failure remai
     assert.equal(page.blobs.length, 0);
     assert.ok(page.dom.window.document.querySelector('#damage-result').textContent.trim());
     await page.exportJson();
+    assert.equal(attempts.length, 2);
+    assert.ok(attempts[1].endsWith('?retry=1'));
+    await page.exportJson(); assert.equal(attempts.length, 2, 'successful retry module is reused');
   } finally { page.close(); }
+});
+
+test('transfer retries are bounded and request page reload after four failed attempts', async () => {
+  const runtime = await createRuntime();
+  const { createTransferLoader } = await runtime.load('frontend/loadout-transfer-loader.ts');
+  let attempts = 0;
+  const load = createTransferLoader(async () => { attempts++; throw new Error('offline'); });
+  for (let i = 0; i < 4; i++) await assert.rejects(load(), /offline/);
+  await assert.rejects(load(), /重新整理/); await assert.rejects(load(), /重新整理/);
+  assert.equal(attempts, 4);
 });
 
 test('production sample uses its versioned JSON without overwriting saved state', async () => {

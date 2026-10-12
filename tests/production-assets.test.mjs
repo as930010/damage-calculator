@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFile, readdir } from 'node:fs/promises';
-import { resolve, join } from 'node:path';
+import { readFile, readdir, mkdtemp, rmdir } from 'node:fs/promises';
+import { resolve, join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
-import { productionAssets, validateAssets, contentHash } from '../scripts/production-assets.mjs';
+import { productionAssets, validateAssets, contentHash, writeProduction, cleanOutput } from '../scripts/production-assets.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const options = { root, compiled: resolve(root, 'dist') };
@@ -21,8 +21,35 @@ test('repeat builds are byte-identical; linked CSS, JS and JSON have content ver
   const initial = first.manifest.js[first.manifest.entry].imports;
   assert.equal(initial.filter(item => item.kind === 'dynamic-import').length, 1);
   const transfer = initial.find(item => item.kind === 'dynamic-import').path;
+  assert.equal(first.manifest.transfer, transfer);
+  assert.ok(first.files.get('index.html').toString().includes(`name="loadout-transfer-url" content="./${transfer}"`));
   assert.match(transfer, /loadout-transfer-/);
   assert.ok(first.files.get(transfer).length > 0);
+});
+
+test('failed asset writes cannot publish a ready manifest and a subsequent publish removes partial output', async () => {
+  const temporary = await mkdtemp(join(root, '.build-verification-'));
+  assert.equal(dirname(temporary), resolve(root), 'cleanup stays in the project workspace');
+  const fixture = broken => {
+    const files = new Map(broken ? [['assets', Buffer.from('force a file/directory collision')]] : []);
+    files.set('index.html', Buffer.from('<script src="./assets/main.js"></script>'));
+    files.set('assets/main.js', Buffer.from('export const value = 1;'));
+    const manifest = { format: 1, entry: 'assets/main.js', js: { 'assets/main.js': { imports: [] } }, css: [], data: {},
+      files: Object.fromEntries([...files].map(([name, bytes]) => [name, { bytes: bytes.length, hash: contentHash(bytes) }])) };
+    files.set('asset-manifest.json', Buffer.from(JSON.stringify(manifest)));
+    return { files, manifest };
+  };
+  try {
+    await assert.rejects(writeProduction(temporary, fixture(true).files));
+    await assert.rejects(readFile(join(temporary, 'site-dist/asset-manifest.json')), { code: 'ENOENT' });
+    const good = fixture(false);
+    await writeProduction(temporary, good.files);
+    assert.deepEqual(JSON.parse(await readFile(join(temporary, 'site-dist/asset-manifest.json'))), good.manifest);
+    assert.equal((await readFile(join(temporary, 'site-dist/assets/main.js'))).toString(), 'export const value = 1;');
+  } finally {
+    await cleanOutput(temporary, 'site-dist');
+    await rmdir(temporary);
+  }
 });
 
 test('a seasonal CSS edit changes only its URL; removing its HTML link omits its output', async () => {

@@ -34,9 +34,18 @@ export async function createRuntime({ dom, sourceReader, transformSource, global
   Object.assign(globals, extraGlobals);
   const context = createContext(globals);
   const modules = new Map();
+  const dependencyPath = (specifier, parent) => {
+    if (/^https?:/.test(specifier)) {
+      const url = new URL(specifier);
+      const base = new URL('./', dom.window.document.baseURI);
+      if (url.origin !== base.origin || !url.pathname.startsWith(base.pathname)) throw new Error('Unexpected external test import');
+      return resolve(root, 'site-dist', decodeURIComponent(url.pathname.slice(base.pathname.length))) + url.search;
+    }
+    return resolve(dirname(parent.identifier.split('?')[0]), specifier);
+  };
   async function getModule(path) {
     if (modules.has(path)) return modules.get(path);
-    let source = sourceReader ? await sourceReader(relative(root, path).replaceAll('\\', '/')) : await readFile(path, 'utf8');
+    let source = sourceReader ? await sourceReader(relative(root, path).replaceAll('\\', '/')) : await readFile(path.split('?')[0], 'utf8');
     source = stripTypeScriptTypes(source);
     const file = relative(root, path).replaceAll('\\', '/');
     if (transformSource) source = transformSource(file, source);
@@ -53,8 +62,8 @@ export async function createRuntime({ dom, sourceReader, transformSource, global
     if (file === 'frontend/main.ts') source = source.replace('start().catch(', 'globalThis.__startup = start().catch(');
     const module = new SourceTextModule(source, { context, identifier: path,
       importModuleDynamically: async (specifier, parent) => {
-        const child = await getModule(resolve(dirname(parent.identifier), specifier));
-        if (child.status === 'unlinked') await child.link((name, owner) => getModule(resolve(dirname(owner.identifier), name)));
+        const child = await getModule(dependencyPath(specifier, parent));
+        if (child.status === 'unlinked') await child.link((name, owner) => getModule(dependencyPath(name, owner)));
         if (child.status === 'linked') await child.evaluate();
         return child;
       },

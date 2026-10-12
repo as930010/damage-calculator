@@ -181,7 +181,9 @@ test('actual main import/restore retains baseline and reuses the same index', as
     const file = document.querySelector('#loadout-file');
     Object.defineProperty(file, 'files', { value: [{ text: async () => fixture.transfers.export.json }] });
     page.runtime.resetCounts(); file.dispatchEvent(new Event('change'));
-    await new Promise(resolve => setTimeout(resolve, 0));
+    for (let i = 0; i < 200 && document.querySelector('#transfer-status').textContent.includes('正在載入'); i++) {
+      await new Promise(resolve => setTimeout(resolve, 5));
+    }
     assert.match(document.querySelector('#transfer-status').textContent, /已匯入/);
     assert.equal(page.runtime.counts.createCatalogIndex ?? 0, 0);
     assert.equal(page.runtime.counts.evaluateLoadout, 1);

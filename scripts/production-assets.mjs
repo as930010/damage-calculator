@@ -72,6 +72,8 @@ export async function productionAssets({ root, compiled, buff = false, html, css
     if (meta.entryPoint === slash(relative(root, join(compiled, 'frontend/main.js')))) entry = name;
   }
   if (!entry) throw new Error('Missing production entry');
+  const transfer = buff ? undefined : js[entry].imports.find(item => item.kind === 'dynamic-import' && /\/loadout-transfer-/.test(item.path))?.path;
+  if (!buff && !transfer) throw new Error('Missing loadout transfer chunk');
   html = html.replace(/href="\.\/frontend\/([^"?]+\.css)(?:\?[^"]*)?"/g, (_match, name) => {
     if (name.includes('/') || name.includes('\\') || css.some(item => item.source === name)) throw new Error('Invalid stylesheet reference');
     css.push({ source: name });
@@ -86,10 +88,10 @@ export async function productionAssets({ root, compiled, buff = false, html, css
   if (!css.length) throw new Error('Missing production CSS');
   html = html.replace(/src="\.\/frontend\/main\.js(?:\?[^"]*)?"/, `src="./${entry}"`);
   if (!buff) html = html.replace('content="__BUILD_REVISION__"', `content="${contentHash(files.get(data['data/game-data.json']))}"`)
-    .replace('</head>', `<meta name="game-data-url" content="./${data['data/game-data.json']}">\n</head>`);
+    .replace('</head>', `<meta name="game-data-url" content="./${data['data/game-data.json']}">\n<meta name="loadout-transfer-url" content="./${transfer}">\n</head>`);
   files.set('index.html', Buffer.from(html));
   files.set('.nojekyll', Buffer.alloc(0));
-  const manifest = { format: 1, entry, js, css, data, files: Object.fromEntries(
+  const manifest = { format: 1, entry, js, css, data, ...(transfer ? { transfer } : {}), files: Object.fromEntries(
     [...files].sort(([a], [b]) => a.localeCompare(b, 'en')).map(([name, bytes]) => [name, { bytes: bytes.length, hash: contentHash(bytes) }])) };
   validateAssets(files, manifest);
   files.set('asset-manifest.json', Buffer.from(`${JSON.stringify(manifest, null, 2)}\n`));
@@ -109,6 +111,7 @@ export function validateAssets(files, manifest, prefix = '') {
     if (!files.has(prefix + dependency.path)) throw new Error(`Unresolved JS dependency: ${dependency.path}`);
   }
   for (const name of Object.values(manifest.data)) if (!files.has(prefix + name)) throw new Error(`Unresolved data: ${name}`);
+  if (manifest.transfer && (!manifest.js[manifest.transfer] || !html.includes(`name="loadout-transfer-url" content="./${manifest.transfer}"`))) throw new Error('Invalid transfer retry URL');
   if (!html.includes(`src="./${manifest.entry}"`) || /__(?:BUILD|STYLESHEET)_REVISION__/.test(html)) throw new Error('Invalid production HTML');
 }
 
