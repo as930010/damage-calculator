@@ -1,9 +1,9 @@
 import { calculateChallenge, calculateTeam } from "../calculation/engine.ts";
 import { calculateControlTimes } from "../calculation/control-time.ts";
-import type { EffectKey, SelectedMember, SelectedOption, TeamMode } from "../calculation/types.ts";
+import type { EffectKey, SelectedMember, SelectedOption, SkillReferenceCatalog, TeamMode } from "../calculation/types.ts";
 import { resolveLoadoutOption } from "../calculation/options.ts";
 import { supportRankLabel } from "./formatters.ts";
-import { loadGameCatalog, type GameCatalog } from "./data-loader.ts";
+import { loadCoreCatalog, loadSkillReferenceCatalog, type CoreCatalog } from "./data-loader.ts";
 
 function getAppRoot(): HTMLElement {
   const root = document.querySelector<HTMLElement>("#app");
@@ -14,7 +14,9 @@ const app = getAppRoot();
 
 type TeamKey = "single" | "first" | "second";
 
-let catalog: GameCatalog;
+let catalog: CoreCatalog;
+let skillReference: SkillReferenceCatalog | null = null;
+let skillReferenceRequest: Promise<void> | null = null;
 let mode: TeamMode = "single";
 let membersByTeam: Record<string, string[]> = { single: [], first: [], second: [] };
 let optionsByTeam: Record<string, Record<string, boolean | number>> = { single: {}, first: {}, second: {} };
@@ -209,13 +211,14 @@ function skillReferencePanel(): string {
 }
 
 function updateSkillReference(): void {
+  if (!skillReference || !app.querySelector<HTMLDetailsElement>(".skill-reference")?.open) return;
   const results = app.querySelector<HTMLElement>("[data-skill-results]");
   if (!results) return;
   const query = app.querySelector<HTMLInputElement>("[data-skill-query]")?.value.trim().toLocaleLowerCase() ?? "";
   const teams = mode === "single" ? ["single"] : ["first", "second"];
   const selectedCodes = new Set(teams.flatMap((team) => membersFor(team).map((member) => member.classCode)));
   const hasSelection = selectedCodes.size > 0;
-  const matches = catalog.skillReference.roles.map((role) => {
+  const matches = skillReference.roles.map((role) => {
     const className = catalog.classes.find((record) => record.code === role.code)?.name ?? role.code;
     const skills = role.skills.filter((skill) => (!hasSelection || selectedCodes.has(role.code)) &&
       (!query || `${role.code} ${className} ${skill.name} ${skill.category} ${skill.description}`.toLocaleLowerCase().includes(query)));
@@ -231,6 +234,40 @@ function updateSkillReference(): void {
       }).join("")}</div>
     </article>`).join("")
     : `<p class="skill-empty">沒有符合的技能。</p>`;
+}
+
+function showSkillReferenceStatus(failed: boolean): void {
+  if (!app.querySelector<HTMLDetailsElement>(".skill-reference")?.open) return;
+  const results = app.querySelector<HTMLElement>("[data-skill-results]");
+  if (!results) return;
+  results.setAttribute("aria-busy", String(!failed));
+  results.innerHTML = failed
+    ? `<p class="skill-empty" role="alert">技能參照載入失敗，請重試。</p><button type="button" data-skill-retry>重新載入</button>`
+    : `<p class="skill-empty" role="status">正在載入技能參照…</p>`;
+  results.querySelector<HTMLButtonElement>("[data-skill-retry]")?.addEventListener("click", ensureSkillReference);
+}
+
+function ensureSkillReference(): void {
+  if (!app.querySelector<HTMLDetailsElement>(".skill-reference")?.open) return;
+  if (skillReference) {
+    updateSkillReference();
+    return;
+  }
+  if (skillReferenceRequest) return;
+  showSkillReferenceStatus(false);
+  skillReferenceRequest = (async () => {
+    try {
+      skillReference = await loadSkillReferenceCatalog(new URL("data/", document.baseURI), catalog.classes);
+      // Read the current panel, roster and query after loading; shell() may have replaced them.
+      updateSkillReference();
+    } catch {
+      skillReference = null;
+      showSkillReferenceStatus(true);
+    } finally {
+      skillReferenceRequest = null;
+      app.querySelector<HTMLElement>("[data-skill-results]")?.removeAttribute("aria-busy");
+    }
+  })();
 }
 
 function teamPanel(team: TeamKey, title: string, memberCount: number): string {
@@ -283,6 +320,18 @@ function shell(): void {
   <datalist id="class-list">${catalog.classes.filter((record) => record.enabled).map((record) => `<option value="${escapeHtml(record.code)}">${escapeHtml(record.name)}</option>`).join("")}</datalist>
   <section id="results" aria-live="polite"></section>
   ${skillReferencePanel()}`;
+  const skillPanel = app.querySelector<HTMLDetailsElement>(".skill-reference")!;
+  let skillPanelOpen = false;
+  skillPanel.addEventListener("toggle", () => {
+    if (skillPanel.open === skillPanelOpen) return;
+    skillPanelOpen = skillPanel.open;
+    if (skillPanel.open) {
+      if (skillReferenceRequest) showSkillReferenceStatus(false);
+      ensureSkillReference();
+    } else {
+      skillPanel.querySelector("[data-skill-results]")?.replaceChildren();
+    }
+  });
   app.querySelectorAll<HTMLDetailsElement>(".option-disclosure").forEach((disclosure) => disclosure.addEventListener("toggle", () => {
     const team = disclosure.dataset.team as TeamKey | undefined;
     if (team && Boolean(optionDisclosureOpen[team]) !== disclosure.open) {
@@ -324,7 +373,7 @@ function metric(label: string, value: string, emphasis = false): string {
   return `<div class="metric ${emphasis ? "metric-emphasis" : ""}"><span>${label}</span><strong>${value}</strong></div>`;
 }
 
-function formatEffectValue(key: EffectKey, value: number, definitions: Map<EffectKey, GameCatalog["effectTypes"][number]>): string {
+function formatEffectValue(key: EffectKey, value: number, definitions: Map<EffectKey, CoreCatalog["effectTypes"][number]>): string {
   const unit = definitions.get(key)?.unit;
   if (unit === "extra-seconds-per-second") return `${value.toFixed(2)} 秒／秒`;
   if (unit === "seconds") return `${value.toFixed(2)} 秒`;
@@ -333,7 +382,7 @@ function formatEffectValue(key: EffectKey, value: number, definitions: Map<Effec
   return asPercent(value);
 }
 
-function formatResultValue(key: EffectKey, value: number | string, definitions: Map<EffectKey, GameCatalog["effectTypes"][number]>): string {
+function formatResultValue(key: EffectKey, value: number | string, definitions: Map<EffectKey, CoreCatalog["effectTypes"][number]>): string {
   if (typeof value === "string") return supportRankLabel(value, key, catalog.parameters.superArmorRankLabels);
   if (key === "buff" || key === "debuff") return asMultiplier(value);
   return formatEffectValue(key, value, definitions);
@@ -428,7 +477,7 @@ function updateResults(): void {
 }
 
 async function start(): Promise<void> {
-  catalog = await loadGameCatalog(new URL("data/", document.baseURI));
+  catalog = await loadCoreCatalog(new URL("data/", document.baseURI));
   for (const team of ["single", "first", "second"]) {
     optionsByTeam[team] = Object.fromEntries(catalog.loadoutOptions.map((option) => {
       if (option.userInput?.kind === "percentage") {
