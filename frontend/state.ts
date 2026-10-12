@@ -5,19 +5,32 @@ import { isResonanceInputCell, parseResonancePoints } from "../calculation/reson
 
 export const DEFAULT_TRANSCENDENCE_SKILL_DAMAGE_SHARE_PCT = 100;
 
-const optionalEffectsByCatalog = new WeakMap<CatalogIndex, { fields: string[]; valueCells: Map<string, string> }>();
+const optionalEffectsByCatalog = new WeakMap<CatalogIndex, {
+  fields: string[]; choices: Map<string, readonly unknown[]>; circuitChoices: Map<string, readonly unknown[]>;
+  valueCells: Map<string, string>;
+}>();
 function optionalEffectFields(index: CatalogIndex) {
   let fields = optionalEffectsByCatalog.get(index);
   if (fields) return fields;
   const valueCells = new Map<string, string>();
+  const choices = new Map<string, readonly unknown[]>();
+  const circuitChoices = new Map<string, readonly unknown[]>();
   for (const input of index.data.circuits.inputs) valueCells.set(input.attributeCell, input.valueCell);
+  for (const input of index.data.circuits.inputs) circuitChoices.set(input.attributeCell, input.attributeOptions);
   for (const armor of index.data.nephronArmor.fields) for (const input of armor.transformFields) valueCells.set(input.attributeCell, input.valueCell);
   for (const cell of Object.keys(FIELD_ID_TO_CODE)) {
     if (/^MasterBeast\..+\.(?:CustomAttribute|Mirror\.\d+\.Attribute)$/.test(cell)) {
       valueCells.set(cell, cell.replace(/Attribute$/, 'Value'));
     }
   }
-  fields = { fields: Object.keys(FIELD_ID_TO_CODE).filter(cell => index.resolveFieldChoices(cell, {})?.includes('無關傷害')), valueCells };
+  const optionalFields: string[] = [];
+  for (const cell of Object.keys(FIELD_ID_TO_CODE)) {
+    const fieldChoices = index.resolveFieldChoices(cell, {});
+    if (!fieldChoices?.some(choice => String(choice) === '無關傷害')) continue;
+    optionalFields.push(cell);
+    choices.set(cell, fieldChoices);
+  }
+  fields = { fields: optionalFields, choices, circuitChoices, valueCells };
   optionalEffectsByCatalog.set(index, fields);
   return fields;
 }
@@ -30,8 +43,7 @@ export function normalizeOptionalEffectValues(values: Record<string, string | nu
   };
   const fields = optionalEffectFields(index);
   for (const cell of fields.fields) {
-    const choices = index.data.circuits.inputs.find(circuit => circuit.attributeCell === cell)?.attributeOptions
-      ?? index.resolveFieldChoices(cell, values);
+    const choices = fields.circuitChoices.get(cell) ?? fields.choices.get(cell);
     if (!choices?.some(choice => String(choice) === String(values[cell] ?? ''))) set(cell, '無關傷害');
     const valueCell = fields.valueCells.get(cell);
     if (valueCell && values[cell] === '無關傷害') set(valueCell, 0);

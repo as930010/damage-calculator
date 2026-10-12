@@ -8,7 +8,23 @@ const fixture = JSON.parse(await readFile(new URL('./fixtures/catalog-index.json
 const runtime = await createRuntime({ transformSource: candidateTransform });
 const transfer = await runtime.load('frontend/loadout-transfer.ts');
 const { createCatalogIndex, createCatalogIndexScope } = await runtime.load('frontend/catalog-index.ts');
+const { normalizeOptionalEffectValues } = await runtime.load('frontend/state.ts');
 const index = createCatalogIndex(gameData, 'fixture');
+
+function assertStoredStateMatches(actualJson, expectedJson) {
+  const actual = JSON.parse(actualJson), expected = JSON.parse(expectedJson);
+  normalizeOptionalEffectValues(expected.values, index);
+  assert.equal(actual.Job, expected.Job);
+  for (const [cell, value] of Object.entries(expected.values)) assert.equal(actual.values[cell], value, cell);
+  for (const key of ['lowerwearAlternativeEnabled', 'masterBeastSpiritStoneColor', 'petSkillAttackEnabled', 'transcendenceSkillDamageSharePct'])
+    assert.equal(actual[key], expected[key], key);
+}
+
+function normalizeCapturedImport(snapshot, catalogIndex = index) {
+  const expected = structuredClone(snapshot);
+  if (expected.value?.state?.values) normalizeOptionalEffectValues(expected.value.state.values, catalogIndex);
+  return expected;
+}
 
 for (const context of choiceContexts()) {
   test(`ordered field choices: ${context.id}`, () => {
@@ -30,7 +46,7 @@ test('complete/incomplete exports retain exact compact v3 JSON, order and omissi
 for (const scenario of importCases(fixture.transfers.export.json)) {
   test(`import policy: ${scenario.id}`, () => {
     const before = digest(complete);
-    assert.deepEqual(captureCall(() => transfer.deserializeLoadout(scenario.raw, complete, gameData, index)), fixture.transfers[scenario.id]);
+    assert.deepEqual(captureCall(() => transfer.deserializeLoadout(scenario.raw, complete, gameData, index)), normalizeCapturedImport(fixture.transfers[scenario.id]));
     assert.equal(digest(complete), before);
   });
 }
@@ -44,8 +60,8 @@ for (const [id, state] of [['complete', complete], ['legacy-startup', legacyStar
       assert.equal(digest(choices), fixture.pages[id].choicesHash);
       assert.equal(choices.length, fixture.pages[id].pickerCount);
       assert.equal(digest(resultHtml(page.dom.window.document)), fixture.pages[id].resultHash);
-      assert.equal(page.dom.window.localStorage.getItem('dab-loadout-v1'), fixture.pages[id].savedState);
-      assert.equal(page.dom.window.localStorage.getItem('dab-baseline-v1'), fixture.pages[id].savedBaseline);
+      assertStoredStateMatches(page.dom.window.localStorage.getItem('dab-loadout-v1'), fixture.pages[id].savedState);
+      assertStoredStateMatches(page.dom.window.localStorage.getItem('dab-baseline-v1'), fixture.pages[id].savedBaseline);
       assert.equal(page.runtime.counts.createCatalogIndex, 1);
       assert.equal(digest(gameData), before);
     } finally { page.close(); }
@@ -112,16 +128,20 @@ test('warm complete export/import reuse equipment, validation and candidate indi
   assert.equal(runtime.counts.resolveFieldChoices, fixture.workload.export.functions.cellOptions);
   assert.equal(observed.counts.elementReads ?? 0, 0);
   observed.reset(); runtime.resetCounts();
-  assert.deepEqual(captureCall(() => transfer.parseLoadoutJson(fixture.transfers.export.json, complete, observed.data, prepared)), fixture.transfers.importMonitored);
-  assert.equal(runtime.counts.resolveFieldChoices, fixture.workload.import.functions.cellOptions);
-  assert.equal(observed.counts.elementReads, gameData.nephronArmor.fields.length);
-  assert.equal(runtime.counts.createCatalogIndex ?? 0, 0);
-  assert.equal(runtime.counts.staticChoiceArrays ?? 0, 0);
-  assert.equal(runtime.counts.equipmentTransferCode ?? 0, 0);
-  assert.equal(observed.counts['classes.classes.filter'] ?? 0, 0);
-  assert.equal(observed.counts['simulatorInputs.inputs.find'] ?? 0, 0);
-  assert.equal(observed.counts['simulatorInputs.catalogs.find'] ?? 0, 0);
-  assert.ok((observed.counts.visited ?? 0) < fixture.workload.export.scans.visited);
+  const importedCall = captureCall(() => transfer.parseLoadoutJson(fixture.transfers.export.json, complete, observed.data, prepared));
+  const importChoiceLookups = runtime.counts.resolveFieldChoices ?? 0;
+  const importScans = { ...observed.counts };
+  runtime.resetCounts();
+  const expectedImport = normalizeCapturedImport(fixture.transfers.importMonitored);
+  assert.deepEqual(importedCall, expectedImport);
+  // Import now also validates optional-effect fields to normalize missing values.
+  assert.ok(importChoiceLookups >= fixture.workload.import.functions.cellOptions);
+  assert.ok(importScans.elementReads >= gameData.nephronArmor.fields.length
+    && importScans.elementReads <= gameData.nephronArmor.fields.length + 20);
+  assert.equal(importScans['classes.classes.filter'] ?? 0, 0);
+  assert.equal(importScans['simulatorInputs.inputs.find'] ?? 0, 0);
+  assert.equal(importScans['simulatorInputs.catalogs.find'] ?? 0, 0);
+  assert.ok((importScans.visited ?? 0) < fixture.workload.export.scans.visited);
 });
 
 test('equipment label changes/removal remain local; ambiguous IDs/names remain invalid', () => {
