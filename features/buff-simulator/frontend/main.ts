@@ -20,6 +20,18 @@ let membersByTeam: Record<string, string[]> = { single: [], first: [], second: [
 let optionsByTeam: Record<string, Record<string, boolean | number>> = { single: {}, first: {}, second: {} };
 let bossReductions: Partial<Record<TeamMode, number>> = {};
 let optionDisclosureOpen: Partial<Record<TeamKey, boolean>> = {};
+let lastPersistedState: string | null = null;
+let inputValues = new WeakMap<HTMLInputElement, string>();
+const composingInputs = new WeakSet<HTMLInputElement>();
+
+// The app root survives shell rebuilds; install composition listeners only once.
+app.addEventListener("compositionstart", event => {
+  if (event.target instanceof HTMLInputElement) composingInputs.add(event.target);
+});
+app.addEventListener("compositionend", event => {
+  if (event.target instanceof HTMLInputElement) composingInputs.delete(event.target);
+  syncInputs(event);
+});
 
 interface SavedSimulatorState {
   version: 1;
@@ -81,8 +93,11 @@ function restoreSavedState(): void {
 
 function persistSavedState(): void {
   const saved: SavedSimulatorState = { version: 1, mode, membersByTeam, optionsByTeam, bossReductions, optionDisclosureOpen };
+  const serialized = JSON.stringify(saved);
+  if (serialized === lastPersistedState) return;
   try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+    window.localStorage.setItem(STORAGE_KEY, serialized);
+    lastPersistedState = serialized;
   } catch {
     // The simulator remains usable when browser storage is unavailable or full.
   }
@@ -117,10 +132,10 @@ function optionsFor(team: string): SelectedOption[] {
 }
 
 function membersFor(team: string): SelectedMember[] {
-  return [...document.querySelectorAll<HTMLInputElement>(`[data-member][data-team="${team}"]`)]
-    .map((input) => catalog.classes.find((record) => record.enabled &&
-      (record.code.toLocaleLowerCase() === input.value.trim().toLocaleLowerCase() ||
-       record.name.toLocaleLowerCase() === input.value.trim().toLocaleLowerCase())))
+  return (membersByTeam[team] ?? [])
+    .map((value) => catalog.classes.find((record) => record.enabled &&
+      (record.code.toLocaleLowerCase() === value.trim().toLocaleLowerCase() ||
+       record.name.toLocaleLowerCase() === value.trim().toLocaleLowerCase())))
     .filter((record) => record !== undefined)
     .map((record) => {
       const profile = catalog.classEffects.find((item) => item.classId === record.id && item.mode === mode);
@@ -228,6 +243,32 @@ function teamPanel(team: TeamKey, title: string, memberCount: number): string {
   </section>`;
 }
 
+function inputValue(input: HTMLInputElement): string {
+  if (input.type === "checkbox") return String(input.checked);
+  if (input.type === "number") return `${Number(input.value)}:${input.validity.badInput}`;
+  if (input.hasAttribute("data-skill-query")) return input.value.trim().toLocaleLowerCase();
+  return input.value;
+}
+
+function syncInputs(event: Event): void {
+  const input = event.target;
+  if (!(input instanceof HTMLInputElement) || composingInputs.has(input) || (event as InputEvent).isComposing) return;
+  const isSearch = input.hasAttribute("data-skill-query");
+  const isMember = input.hasAttribute("data-member");
+  if (!isSearch && !isMember && !input.hasAttribute("data-option") && !input.hasAttribute("data-option-value") && input.id !== "boss-reduction") return;
+  const value = inputValue(input);
+  if (inputValues.get(input) === value) return;
+  inputValues.set(input, value);
+  if (isSearch) {
+    updateSkillReference();
+    return;
+  }
+  saveCurrentInputs();
+  persistSavedState();
+  updateResults();
+  if (isMember) updateSkillReference();
+}
+
 function shell(): void {
   app.innerHTML = `<section class="hero">
     <div class="hero-console">
@@ -244,24 +285,21 @@ function shell(): void {
   ${skillReferencePanel()}`;
   app.querySelectorAll<HTMLDetailsElement>(".option-disclosure").forEach((disclosure) => disclosure.addEventListener("toggle", () => {
     const team = disclosure.dataset.team as TeamKey | undefined;
-    if (team) {
+    if (team && Boolean(optionDisclosureOpen[team]) !== disclosure.open) {
       optionDisclosureOpen[team] = disclosure.open;
       persistSavedState();
     }
   }));
   app.querySelectorAll<HTMLButtonElement>("[data-mode]").forEach((button) => button.addEventListener("click", () => {
+    const nextMode = button.dataset.mode as TeamMode;
+    if (nextMode === mode) return;
     saveCurrentInputs();
-    mode = button.dataset.mode as TeamMode;
+    mode = nextMode;
     persistSavedState();
     shell();
-    updateResults();
   }));
-  const syncInputs = () => {
-    saveCurrentInputs();
-    persistSavedState();
-    updateResults();
-    updateSkillReference();
-  };
+  inputValues = new WeakMap();
+  app.querySelectorAll<HTMLInputElement>("input").forEach(input => inputValues.set(input, inputValue(input)));
   app.oninput = syncInputs;
   app.onchange = syncInputs;
   updateResults();

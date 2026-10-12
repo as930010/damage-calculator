@@ -1,0 +1,1634 @@
+{
+  "defaultSingle": {
+    "results": [
+      {
+        "mode": "single",
+        "buffMultiplier": 1.392272340425532,
+        "debuffMultiplier": 1,
+        "buffIncrease": 0.39227234042553194,
+        "debuffIncrease": 0,
+        "defenseBreak": 0.779,
+        "defenseBreakDamageIncrease": 1.2740544936226423,
+        "defenseDamageMultiplier": 2.2740544936226423,
+        "totalDamageMultiplier": 3.1661031720911943,
+        "shield": 0,
+        "attackReduction": 0,
+        "cooldownAcceleration": 0,
+        "cooldownReductionSeconds": 0,
+        "resistanceReduction": 400,
+        "mpRecoveryPerSecond": 0,
+        "actionSpeedMultiplicative": 0.14400000000000013,
+        "actionSpeedDiminishing": 0,
+        "roarBlock": "none",
+        "debuffCleanse": "none",
+        "superArmor": "none",
+        "breakdown": [
+          {
+            "key": "buff",
+            "values": [
+              0,
+              0.144,
+              0.04,
+              0.1,
+              0.06382978723404253,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "multiply",
+            "result": 1.392272340425532
+          },
+          {
+            "key": "debuff",
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "multiply",
+            "result": 1
+          },
+          {
+            "key": "defenseBreak",
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0.48,
+              0.5,
+              0.15,
+              0,
+              0
+            ],
+            "aggregation": "remaining-product",
+            "result": 0.779
+          },
+          {
+            "key": "shield",
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "remaining-product",
+            "result": 0
+          },
+          {
+            "key": "attackReduction",
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "multiply",
+            "result": 0
+          },
+          {
+            "key": "cooldownAcceleration",
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "multiply",
+            "result": 0
+          },
+          {
+            "key": "cooldownReductionSeconds",
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "sum",
+            "result": 0
+          },
+          {
+            "key": "resistanceReduction",
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              150,
+              0,
+              0,
+              100,
+              150
+            ],
+            "aggregation": "sum",
+            "result": 400
+          },
+          {
+            "key": "mpRecoveryPerSecond",
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "multiply",
+            "result": 0
+          },
+          {
+            "key": "actionSpeedMultiplicative",
+            "values": [
+              0.14400000000000002,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "capped-multiply",
+            "result": 0.14400000000000013
+          },
+          {
+            "key": "actionSpeedDiminishing",
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "multiply",
+            "result": 0
+          },
+          {
+            "key": "roarBlock",
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "rank",
+            "result": "none"
+          },
+          {
+            "key": "debuffCleanse",
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "rank",
+            "result": "none"
+          },
+          {
+            "key": "superArmor",
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "rank",
+            "result": "none"
+          }
+        ],
+        "ignoredClassIds": []
+      }
+    ],
+    "resultHtmlHash": "03ace45205675450a6208ee68c836a5a7ae44b924ba1348b7924ce11b4c1ae62",
+    "skillHtmlHash": "7a415abaaf9e49969a39211a3227ec1d490978ee4af8cfbfecee040db00545b4",
+    "saved": null
+  },
+  "configuredSingle": {
+    "results": [
+      {
+        "mode": "single",
+        "buffMultiplier": 1.761497872340426,
+        "debuffMultiplier": 1.2100000000000002,
+        "buffIncrease": 0.761497872340426,
+        "debuffIncrease": 0.2100000000000002,
+        "defenseBreak": 0.81215,
+        "defenseBreakDamageIncrease": 1.8548589699668843,
+        "defenseDamageMultiplier": 2.8548589699668843,
+        "totalDamageMultiplier": 6.084881881728663,
+        "shield": 0.19999999999999996,
+        "attackReduction": 0,
+        "cooldownAcceleration": 0.19999999999999996,
+        "cooldownReductionSeconds": 0,
+        "resistanceReduction": 550,
+        "mpRecoveryPerSecond": 1.0986250000000002,
+        "actionSpeedMultiplicative": 0.4,
+        "actionSpeedDiminishing": 0,
+        "roarBlock": "none",
+        "debuffCleanse": "strong",
+        "superArmor": "strong",
+        "breakdown": [
+          {
+            "key": "buff",
+            "values": [
+              0,
+              0.2544000000000002,
+              0,
+              0.2,
+              0,
+              0.1,
+              0.06382978723404253,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "multiply",
+            "result": 1.761497872340426
+          },
+          {
+            "key": "debuff",
+            "values": [
+              0.2100000000000002,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "multiply",
+            "result": 1.2100000000000002
+          },
+          {
+            "key": "defenseBreak",
+            "values": [
+              0,
+              0.15,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0.48,
+              0.5,
+              0.15,
+              0,
+              0
+            ],
+            "aggregation": "remaining-product",
+            "result": 0.81215
+          },
+          {
+            "key": "shield",
+            "values": [
+              0,
+              0.19999999999999996,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "remaining-product",
+            "result": 0.19999999999999996
+          },
+          {
+            "key": "attackReduction",
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "multiply",
+            "result": 0
+          },
+          {
+            "key": "cooldownAcceleration",
+            "values": [
+              0,
+              0.2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "multiply",
+            "result": 0.19999999999999996
+          },
+          {
+            "key": "cooldownReductionSeconds",
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "sum",
+            "result": 0
+          },
+          {
+            "key": "resistanceReduction",
+            "values": [
+              0,
+              150,
+              0,
+              0,
+              0,
+              0,
+              0,
+              150,
+              0,
+              0,
+              100,
+              150
+            ],
+            "aggregation": "sum",
+            "result": 550
+          },
+          {
+            "key": "mpRecoveryPerSecond",
+            "values": [
+              0.01875,
+              1.06,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "multiply",
+            "result": 1.0986250000000002
+          },
+          {
+            "key": "actionSpeedMultiplicative",
+            "values": [
+              0,
+              0.1,
+              0.3,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "capped-multiply",
+            "result": 0.4
+          },
+          {
+            "key": "actionSpeedDiminishing",
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "multiply",
+            "result": 0
+          },
+          {
+            "key": "roarBlock",
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "rank",
+            "result": "none"
+          },
+          {
+            "key": "debuffCleanse",
+            "values": [
+              0,
+              3,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "rank",
+            "result": "strong"
+          },
+          {
+            "key": "superArmor",
+            "values": [
+              0,
+              3,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "rank",
+            "result": "strong"
+          }
+        ],
+        "ignoredClassIds": []
+      }
+    ],
+    "resultHtmlHash": "dea9be9bbe95b5d77784e9b480babb182654e2fad6244230f7fc1a79c47eeb40",
+    "skillHtmlHash": "bebc80cc76fbe671cff04048b1b4a0369caa6aef0edee70fa9422558cb388848",
+    "saved": {
+      "version": 1,
+      "mode": "single",
+      "membersByTeam": {
+        "single": [
+          "DaB",
+          "NP",
+          "",
+          "",
+          "",
+          ""
+        ],
+        "first": [
+          "",
+          "",
+          "",
+          ""
+        ],
+        "second": [
+          "",
+          "",
+          "",
+          ""
+        ]
+      },
+      "optionsByTeam": {
+        "single": {
+          "green-beast": false,
+          "hundred-billion-green-set-effect": true,
+          "hundred-billion-red-top-critical-damage": true,
+          "steel-wall-defense-break": true,
+          "wind-ball-defense-break": true,
+          "movement-speed-shoes": 30,
+          "skill-damage-gloves": 25
+        },
+        "first": {
+          "movement-speed-shoes": 14.4,
+          "skill-damage-gloves": 18,
+          "green-beast": true,
+          "hundred-billion-green-set-effect": true,
+          "hundred-billion-red-top-critical-damage": true,
+          "steel-wall-defense-break": true,
+          "wind-ball-defense-break": true,
+          "incense-defense-break": true,
+          "dark-ghost-badge-resistance": true,
+          "ice-crystal-resistance": true
+        },
+        "second": {
+          "movement-speed-shoes": 14.4,
+          "skill-damage-gloves": 18,
+          "green-beast": true,
+          "hundred-billion-green-set-effect": true,
+          "hundred-billion-red-top-critical-damage": true,
+          "steel-wall-defense-break": true,
+          "wind-ball-defense-break": true,
+          "incense-defense-break": true,
+          "dark-ghost-badge-resistance": true,
+          "ice-crystal-resistance": true
+        }
+      },
+      "bossReductions": {
+        "single": 0.8
+      },
+      "optionDisclosureOpen": {}
+    }
+  },
+  "configuredChallenge": {
+    "results": [
+      {
+        "mode": "challenge",
+        "buffMultiplier": 1.7464664238297876,
+        "debuffMultiplier": 1.2100000000000002,
+        "buffIncrease": 0.7464664238297876,
+        "debuffIncrease": 0.2100000000000002,
+        "defenseBreak": 0.6243000000000001,
+        "defenseBreakDamageIncrease": 1.4765133663617669,
+        "defenseDamageMultiplier": 2.476513366361767,
+        "totalDamageMultiplier": 5.23342840544497,
+        "shield": 0.19999999999999996,
+        "attackReduction": 0,
+        "cooldownAcceleration": 0.19999999999999996,
+        "cooldownReductionSeconds": 0,
+        "resistanceReduction": 550,
+        "mpRecoveryPerSecond": 0.19999999999999996,
+        "actionSpeedMultiplicative": 0.2584000000000002,
+        "actionSpeedDiminishing": 0,
+        "roarBlock": "none",
+        "debuffCleanse": "strong",
+        "superArmor": "strong",
+        "breakdown": [
+          {
+            "key": "buff",
+            "values": [
+              0,
+              0.2544000000000002,
+              0,
+              0.144,
+              0.04,
+              0.1,
+              0.06382978723404253,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "multiply",
+            "result": 1.7464664238297876
+          },
+          {
+            "key": "debuff",
+            "values": [
+              0.2100000000000002,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "multiply",
+            "result": 1.2100000000000002
+          },
+          {
+            "key": "defenseBreak",
+            "values": [
+              0,
+              0.15,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0.48,
+              0,
+              0.15,
+              0,
+              0
+            ],
+            "aggregation": "remaining-product",
+            "result": 0.6243000000000001
+          },
+          {
+            "key": "shield",
+            "values": [
+              0,
+              0.19999999999999996,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "remaining-product",
+            "result": 0.19999999999999996
+          },
+          {
+            "key": "attackReduction",
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "multiply",
+            "result": 0
+          },
+          {
+            "key": "cooldownAcceleration",
+            "values": [
+              0,
+              0.2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "multiply",
+            "result": 0.19999999999999996
+          },
+          {
+            "key": "cooldownReductionSeconds",
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "sum",
+            "result": 0
+          },
+          {
+            "key": "resistanceReduction",
+            "values": [
+              0,
+              150,
+              0,
+              0,
+              0,
+              0,
+              0,
+              150,
+              0,
+              0,
+              100,
+              150
+            ],
+            "aggregation": "sum",
+            "result": 550
+          },
+          {
+            "key": "mpRecoveryPerSecond",
+            "values": [
+              0,
+              0.2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "multiply",
+            "result": 0.19999999999999996
+          },
+          {
+            "key": "actionSpeedMultiplicative",
+            "values": [
+              0,
+              0.1,
+              0.14400000000000002,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "capped-multiply",
+            "result": 0.2584000000000002
+          },
+          {
+            "key": "actionSpeedDiminishing",
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "multiply",
+            "result": 0
+          },
+          {
+            "key": "roarBlock",
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "rank",
+            "result": "none"
+          },
+          {
+            "key": "debuffCleanse",
+            "values": [
+              0,
+              3,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "rank",
+            "result": "strong"
+          },
+          {
+            "key": "superArmor",
+            "values": [
+              0,
+              3,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "rank",
+            "result": "strong"
+          }
+        ],
+        "ignoredClassIds": []
+      },
+      {
+        "mode": "challenge",
+        "buffMultiplier": 1.893023046808511,
+        "debuffMultiplier": 1,
+        "buffIncrease": 0.893023046808511,
+        "debuffIncrease": 0,
+        "defenseBreak": 0.81215,
+        "defenseBreakDamageIncrease": 3.4563925279666474,
+        "defenseDamageMultiplier": 4.456392527966647,
+        "totalDamageMultiplier": 8.436053761066105,
+        "shield": 0.19999999999999996,
+        "attackReduction": 0,
+        "cooldownAcceleration": 0.19999999999999996,
+        "cooldownReductionSeconds": 0,
+        "resistanceReduction": 550,
+        "mpRecoveryPerSecond": 0.19999999999999996,
+        "actionSpeedMultiplicative": 0.2584000000000002,
+        "actionSpeedDiminishing": 0,
+        "roarBlock": "none",
+        "debuffCleanse": "strong",
+        "superArmor": "strong",
+        "breakdown": [
+          {
+            "key": "buff",
+            "values": [
+              0.2544000000000002,
+              0,
+              0.24,
+              0.04,
+              0.1,
+              0.06382978723404253,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "multiply",
+            "result": 1.893023046808511
+          },
+          {
+            "key": "debuff",
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "multiply",
+            "result": 1
+          },
+          {
+            "key": "defenseBreak",
+            "values": [
+              0.15,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0.48,
+              0.5,
+              0.15,
+              0,
+              0
+            ],
+            "aggregation": "remaining-product",
+            "result": 0.81215
+          },
+          {
+            "key": "shield",
+            "values": [
+              0.19999999999999996,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "remaining-product",
+            "result": 0.19999999999999996
+          },
+          {
+            "key": "attackReduction",
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "multiply",
+            "result": 0
+          },
+          {
+            "key": "cooldownAcceleration",
+            "values": [
+              0.2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "multiply",
+            "result": 0.19999999999999996
+          },
+          {
+            "key": "cooldownReductionSeconds",
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "sum",
+            "result": 0
+          },
+          {
+            "key": "resistanceReduction",
+            "values": [
+              150,
+              0,
+              0,
+              0,
+              0,
+              0,
+              150,
+              0,
+              0,
+              100,
+              150
+            ],
+            "aggregation": "sum",
+            "result": 550
+          },
+          {
+            "key": "mpRecoveryPerSecond",
+            "values": [
+              0.2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "multiply",
+            "result": 0.19999999999999996
+          },
+          {
+            "key": "actionSpeedMultiplicative",
+            "values": [
+              0.1,
+              0.14400000000000002,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "capped-multiply",
+            "result": 0.2584000000000002
+          },
+          {
+            "key": "actionSpeedDiminishing",
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "multiply",
+            "result": 0
+          },
+          {
+            "key": "roarBlock",
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "rank",
+            "result": "none"
+          },
+          {
+            "key": "debuffCleanse",
+            "values": [
+              3,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "rank",
+            "result": "strong"
+          },
+          {
+            "key": "superArmor",
+            "values": [
+              3,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "rank",
+            "result": "strong"
+          }
+        ],
+        "ignoredClassIds": [
+          "su"
+        ]
+      },
+      {
+        "mode": "challenge",
+        "buffMultiplier": 1.893023046808511,
+        "debuffMultiplier": 1.2100000000000002,
+        "buffIncrease": 0.893023046808511,
+        "debuffIncrease": 0.2100000000000002,
+        "defenseBreak": 0.81215,
+        "defenseBreakDamageIncrease": 3.4563925279666474,
+        "defenseDamageMultiplier": 4.456392527966647,
+        "totalDamageMultiplier": 10.20762505088999,
+        "shield": 0.19999999999999996,
+        "attackReduction": 0,
+        "cooldownAcceleration": 0.19999999999999996,
+        "cooldownReductionSeconds": 0,
+        "resistanceReduction": 550,
+        "mpRecoveryPerSecond": 0.19999999999999996,
+        "actionSpeedMultiplicative": 0.2584000000000002,
+        "actionSpeedDiminishing": 0,
+        "roarBlock": "none",
+        "debuffCleanse": "strong",
+        "superArmor": "strong",
+        "breakdown": [
+          {
+            "key": "buff",
+            "values": [
+              0,
+              0.2544000000000002,
+              0,
+              0.24,
+              0.04,
+              0.1,
+              0.06382978723404253,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "multiply",
+            "result": 1.893023046808511
+          },
+          {
+            "key": "debuff",
+            "values": [
+              0.2100000000000002,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "multiply",
+            "result": 1.2100000000000002
+          },
+          {
+            "key": "defenseBreak",
+            "values": [
+              0,
+              0.15,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0.48,
+              0.5,
+              0.15,
+              0,
+              0
+            ],
+            "aggregation": "remaining-product",
+            "result": 0.81215
+          },
+          {
+            "key": "shield",
+            "values": [
+              0,
+              0.19999999999999996,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "remaining-product",
+            "result": 0.19999999999999996
+          },
+          {
+            "key": "attackReduction",
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "multiply",
+            "result": 0
+          },
+          {
+            "key": "cooldownAcceleration",
+            "values": [
+              0,
+              0.2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "multiply",
+            "result": 0.19999999999999996
+          },
+          {
+            "key": "cooldownReductionSeconds",
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "sum",
+            "result": 0
+          },
+          {
+            "key": "resistanceReduction",
+            "values": [
+              0,
+              150,
+              0,
+              0,
+              0,
+              0,
+              0,
+              150,
+              0,
+              0,
+              100,
+              150
+            ],
+            "aggregation": "sum",
+            "result": 550
+          },
+          {
+            "key": "mpRecoveryPerSecond",
+            "values": [
+              0,
+              0.2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "multiply",
+            "result": 0.19999999999999996
+          },
+          {
+            "key": "actionSpeedMultiplicative",
+            "values": [
+              0,
+              0.1,
+              0.14400000000000002,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "capped-multiply",
+            "result": 0.2584000000000002
+          },
+          {
+            "key": "actionSpeedDiminishing",
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "multiply",
+            "result": 0
+          },
+          {
+            "key": "roarBlock",
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "rank",
+            "result": "none"
+          },
+          {
+            "key": "debuffCleanse",
+            "values": [
+              0,
+              3,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "rank",
+            "result": "strong"
+          },
+          {
+            "key": "superArmor",
+            "values": [
+              0,
+              3,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "aggregation": "rank",
+            "result": "strong"
+          }
+        ],
+        "ignoredClassIds": [
+          "np",
+          "su"
+        ]
+      }
+    ],
+    "resultHtmlHash": "d655b2aee4699886b092381862935a7014e4fda42e278f2bb582c51b81da1208",
+    "skillHtmlHash": "4244d347670560bfe3731b4ce74ac66de50aab98622f5ac236e1ff0aecd5487f",
+    "saved": {
+      "version": 1,
+      "mode": "challenge",
+      "membersByTeam": {
+        "single": [
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        "first": [
+          "DaB",
+          "NP",
+          "",
+          ""
+        ],
+        "second": [
+          "NP",
+          "SU",
+          "",
+          ""
+        ]
+      },
+      "optionsByTeam": {
+        "single": {
+          "green-beast": true,
+          "hundred-billion-green-set-effect": true,
+          "hundred-billion-red-top-critical-damage": true,
+          "steel-wall-defense-break": true,
+          "wind-ball-defense-break": true,
+          "movement-speed-shoes": 14.4,
+          "skill-damage-gloves": 18
+        },
+        "first": {
+          "green-beast": true,
+          "hundred-billion-green-set-effect": true,
+          "hundred-billion-red-top-critical-damage": true,
+          "steel-wall-defense-break": true,
+          "wind-ball-defense-break": false,
+          "movement-speed-shoes": 14.4,
+          "skill-damage-gloves": 18
+        },
+        "second": {
+          "green-beast": true,
+          "hundred-billion-green-set-effect": true,
+          "hundred-billion-red-top-critical-damage": true,
+          "steel-wall-defense-break": true,
+          "wind-ball-defense-break": true,
+          "movement-speed-shoes": 14.4,
+          "skill-damage-gloves": 30
+        }
+      },
+      "bossReductions": {
+        "single": 0.7192000000000001,
+        "challenge": 0.955
+      },
+      "optionDisclosureOpen": {}
+    }
+  },
+  "invalidInputs": {
+    "results": [],
+    "resultHtmlHash": "1b123be7e6bdddadc6859c51663bdb40ca296fae66b3a3880fa389daab53477f",
+    "skillHtmlHash": "7a415abaaf9e49969a39211a3227ec1d490978ee4af8cfbfecee040db00545b4",
+    "saved": {
+      "version": 1,
+      "mode": "single",
+      "membersByTeam": {
+        "single": [
+          "<不存在&>",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        "first": [
+          "",
+          "",
+          "",
+          ""
+        ],
+        "second": [
+          "",
+          "",
+          "",
+          ""
+        ]
+      },
+      "optionsByTeam": {
+        "single": {
+          "green-beast": true,
+          "hundred-billion-green-set-effect": true,
+          "hundred-billion-red-top-critical-damage": true,
+          "steel-wall-defense-break": true,
+          "wind-ball-defense-break": true,
+          "movement-speed-shoes": 14.4,
+          "skill-damage-gloves": 18
+        },
+        "first": {
+          "movement-speed-shoes": 14.4,
+          "skill-damage-gloves": 18,
+          "green-beast": true,
+          "hundred-billion-green-set-effect": true,
+          "hundred-billion-red-top-critical-damage": true,
+          "steel-wall-defense-break": true,
+          "wind-ball-defense-break": true,
+          "incense-defense-break": true,
+          "dark-ghost-badge-resistance": true,
+          "ice-crystal-resistance": true
+        },
+        "second": {
+          "movement-speed-shoes": 14.4,
+          "skill-damage-gloves": 18,
+          "green-beast": true,
+          "hundred-billion-green-set-effect": true,
+          "hundred-billion-red-top-critical-damage": true,
+          "steel-wall-defense-break": true,
+          "wind-ball-defense-break": true,
+          "incense-defense-break": true,
+          "dark-ghost-badge-resistance": true,
+          "ice-crystal-resistance": true
+        }
+      },
+      "bossReductions": {
+        "single": 0.7192000000000001
+      },
+      "optionDisclosureOpen": {}
+    }
+  }
+}

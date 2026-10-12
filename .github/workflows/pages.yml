@@ -40,6 +40,7 @@ jobs:
       - run: pnpm run test:history
       - run: pnpm run test:theme-isolation
       - run: pnpm run test:core
+      - run: pnpm run test:buff
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
