@@ -43,7 +43,6 @@ export function serializeLoadout(state: LoadoutState, data: TransferData, suppli
   const values: Record<string, string | number> = {};
   const omittedFields: string[] = [];
   const fieldValues = { ...state.values };
-  normalizeOptionalEffectValues(fieldValues, index);
   const portrait = data.otherEffects.portraitAwakening;
   const portraitCells = [portrait.strongSettingKey, portrait.transcendenceSettingKey];
   const hasPortraitValues = portraitCells.some(cell => fieldValues[cell] !== undefined && fieldValues[cell] !== '');

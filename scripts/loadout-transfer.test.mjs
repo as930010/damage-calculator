@@ -6,6 +6,8 @@ import { fileURLToPath } from "node:url";
 import { getEquipmentOptionName } from "../dist/calculation/equipment-catalog.js";
 import { parseLoadoutJson, serializeLoadout } from "../dist/frontend/loadout-transfer.js";
 import { codeForFieldId, isFieldId } from "../dist/frontend/field-ids.js";
+import { createCatalogIndex } from "../dist/frontend/catalog-index.js";
+import { normalizeOptionalEffectValues } from "../dist/frontend/state.js";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = async (path) => JSON.parse(await readFile(join(root, path), "utf8"));
@@ -22,13 +24,18 @@ const [classes, mapping, simulatorInputs, masterBeast, layout, attack, innerwear
 const catalogFiles = [...new Set([...mapping.selections.map((item) => item.catalogFile), mapping.magicStoneSelections.catalogFile])];
 const catalogs = Object.fromEntries(await Promise.all(catalogFiles.map(async (file) => [file, await read(`data/${file}`)])));
 const data = { classes, mapping, simulatorInputs, masterBeast, catalogs, layout, attack, innerwear, nephronArmor, appraisals, chips, chipSlots, circuits, transformations, growth, weaponAppraisals, weaponGrades, giantStones, colorSetEffects, spiritRecord, otherEffects, pets, rightIceSets };
-const semanticState = (value) => ({
-  ...value,
-  schemaVersion: 3,
-  transcendenceSkillDamageSharePct: Number.isInteger(value.transcendenceSkillDamageSharePct) && value.transcendenceSkillDamageSharePct >= 0 && value.transcendenceSkillDamageSharePct <= 100
-    ? value.transcendenceSkillDamageSharePct : 100,
-  values: Object.fromEntries(Object.entries(value.values).filter(([fieldId]) => isFieldId(fieldId))),
-});
+const catalogIndex = createCatalogIndex(data);
+const semanticState = (value) => {
+  const values = Object.fromEntries(Object.entries(value.values).filter(([fieldId]) => isFieldId(fieldId)));
+  normalizeOptionalEffectValues(values, catalogIndex);
+  return {
+    ...value,
+    schemaVersion: 3,
+    transcendenceSkillDamageSharePct: Number.isInteger(value.transcendenceSkillDamageSharePct) && value.transcendenceSkillDamageSharePct >= 0 && value.transcendenceSkillDamageSharePct <= 100
+      ? value.transcendenceSkillDamageSharePct : 100,
+    values,
+  };
+};
 const firstMapping = mapping.selections.find((entry) => catalogs[entry.catalogFile].items.some((item) => item.active && item.slotId === entry.slotId));
 const firstMappingFieldId = firstMapping.selectionCell;
 const firstItem = catalogs[firstMapping.catalogFile].items.find((item) => item.active && item.slotId === firstMapping.slotId);
@@ -203,7 +210,7 @@ test("corrupted option codes and invalid cells are cleared without losing valid 
   exported.values[String(codeForFieldId(inputFieldId))] = "deleted-option";
   exported.values.BAD = {};
   const result = parseLoadoutJson(JSON.stringify(exported), state, data);
-  assert.equal(result.state.values[inputFieldId], undefined);
+  assert.equal(result.state.values[inputFieldId], '無關傷害');
   assert.equal(result.state.values.BAD, undefined);
   assert.equal(result.state.values[firstMappingFieldId], equipmentName);
   assert.ok(result.clearedFields.includes(inputFieldId));
