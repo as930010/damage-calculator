@@ -6,7 +6,7 @@ import { parseLoadoutJson, serializeLoadout } from './loadout-transfer.ts';
 import { evaluateLoadout, type projectDamage } from './projection.ts';
 import { createBaselineEvaluationCache } from './baseline-evaluation.ts';
 import { compareLoadoutResults } from './calculation-comparison.ts';
-import { createPicker, type PickerOption } from './picker.ts';
+import { createPicker, updatePicker, disposePickers, type PickerOption } from './picker.ts';
 import { GLOVE_CIRCUIT_ROWS_FIELD, readGloveCircuitRows, serializeGloveCircuitRows, gloveCircuitRowsTotal } from './circuit-board-rows.ts';
 import { icon } from './icons.ts';
 import { capOverflowPercentage } from './cap-warnings.ts';
@@ -480,6 +480,43 @@ async function start() {
     }
     return choices;
   };
+  const renderedHtml = new WeakMap<Element, string>();
+  const writeHtml = (target: Element, html: string, preserveDetails = false) => {
+    if (renderedHtml.get(target) === html) return;
+    const detailKey = (detail: HTMLDetailsElement) => detail.querySelector('summary span')?.textContent ?? detail.querySelector('summary')?.textContent ?? '';
+    const opened = preserveDetails ? new Set([...target.querySelectorAll<HTMLDetailsElement>('details[open]')].map(detailKey)) : null;
+    target.innerHTML = html; renderedHtml.set(target, html);
+    if (opened) target.querySelectorAll<HTMLDetailsElement>('details').forEach(detail => { if (opened.has(detailKey(detail))) detail.open = true; });
+  };
+  const setAttribute = (node: HTMLElement, name: string, value: string) => {
+    if (node.getAttribute(name) !== value) node.setAttribute(name, value);
+  };
+  const toggleClass = (node: HTMLElement, name: string, enabled: boolean) => {
+    if (node.classList.contains(name) !== enabled) node.classList.toggle(name, enabled);
+  };
+  const slotButtons = new Map<string, HTMLButtonElement>();
+  const beastButtons = new Map<string, HTMLButtonElement>();
+  let slotUiKey = '', beastUiKey = '', masterUiKey = '', rightIceUiKey = '';
+  const slotSignature = () => JSON.stringify([selected.id, state.lowerwearAlternativeEnabled,
+    data.layout.slots.map(slot => slot.selectionCell ? val(slot.selectionCell) : slot.weapon ? val('Weapon.ENHC')
+      : slot.innerwearId ? val(catalogIndex.innerwearById(slot.innerwearId)!.enhancementCell) : ''),
+    data.rightIceSets.selectionCells.map(val)]);
+  const beastSignature = () => JSON.stringify([selectedBeastSlotId,
+    beastAccessorySlots.map(slot => [...(slot.fixedCells ?? []), ...(slot.stoneCells ?? []), ...slot.mirrorCells.flat()].map(val))]);
+  const masterSignature = () => JSON.stringify([state.masterBeastSpiritStoneColor, val('MasterBeast.OverallPotential')]);
+  const rightIceSignature = () => JSON.stringify([data.rightIceSets.selectionCells.map(val),
+    data.mapping.selections.filter(selection => selection.catalogFile.endsWith('right-ice.json')).map(selection => val(selection.selectionCell))]);
+  const refreshEquipmentUi = () => {
+    if (slotUiKey !== slotSignature()) renderSlots();
+    if (beastUiKey !== beastSignature()) renderBeastAccessories();
+    if (masterUiKey !== masterSignature()) renderMasterBeastColorSelector();
+  };
+  // Conservative snapshot for complex controls: only Stage fields are excluded.
+  // Their candidates/values never depend on Stage; all other changes may redraw them.
+  const configurationControlSignature = () => JSON.stringify({ ...state,
+    values: Object.fromEntries(Object.keys(state.values).filter(cell => !cell.startsWith('Stage.')).sort().map(cell => [cell, state.values[cell]])) });
+  const configurationControlKeys = new Map<string, string>();
+  const refreshRightIceSelectors = () => { if (rightIceUiKey !== rightIceSignature()) renderRightIceSetSelectors(); };
   const update = (force = false) => {
     const changed = history.record(state);
     if (!changed && !force) {
@@ -487,7 +524,7 @@ async function start() {
       return;
     }
     document.querySelector('#save-status')!.textContent = sampleMode ? '驗算範例模式：本頁調整不儲存' : saveState(state) ? '已儲存於此裝置' : '此瀏覽器無法儲存設定';
-    renderSlots(); renderBeastAccessories(); renderMasterBeastColorSelector(); renderResults();
+    refreshEquipmentUi(); renderResults();
     refreshHistoryControls();
   };
   function sourceLabel(sourceId: string): string {
@@ -687,7 +724,7 @@ async function start() {
           document.querySelector<HTMLElement>('#transfer-status')!.textContent = `已清除不符合目前裝備的鑑定選項（${cleared.length} 個欄位）。`;
         }
       }
-      update(); renderRightIceSetSelectors();
+      update(); refreshRightIceSelectors();
       if (redraw) {
         const opened = [...document.querySelectorAll<HTMLDetailsElement>('#inspector details[open]')].map(node => node.querySelector('summary')!.textContent);
         renderInspector();
@@ -715,13 +752,14 @@ async function start() {
   function renderRightIceSetSelectors() {
     const root = document.querySelector<HTMLElement>('#right-ice-set-selectors');
     if (!root) return;
+    rightIceUiKey = rightIceSignature();
     const cells = data.rightIceSets.selectionCells;
     const availableNames = [...new Set(validationChoices(cells[0]).map(option => option.value))];
     const allowedNames = [...availableNames.filter(name => name !== '騎士團'), ...availableNames.filter(name => name === '騎士團')];
     const defaultOrder = new Map(allowedNames.map((name, index) => [name, index]));
     const equippedCounts = getEquippedRightIceSetCounts();
     const selectedNames = cells.map(val);
-    root.replaceChildren();
+    disposePickers(root); root.replaceChildren();
     cells.forEach((cell, index) => {
       const usedElsewhere = new Set(selectedNames.filter((name, other) => other !== index && name !== ''));
       const choices = allowedNames
@@ -931,7 +969,8 @@ async function start() {
   };
   function renderGlobalInputs() {
     const root = document.querySelector<HTMLElement>('#global-source-fields')!;
-    root.replaceChildren();
+    configurationControlKeys.set('global', configurationControlSignature());
+    disposePickers(root); root.replaceChildren();
     const group = (label: string, noteText?: string) => {
       const container = document.createElement('section'); container.className = 'global-input-group';
       const heading = document.createElement('h3'); heading.textContent = label; container.append(heading);
@@ -1113,7 +1152,8 @@ async function start() {
   }
   function renderWeaponMagicStones() {
     const root = document.querySelector<HTMLElement>('#weapon-magic-stone-fields')!;
-    root.replaceChildren();
+    configurationControlKeys.set('stones', configurationControlSignature());
+    disposePickers(root); root.replaceChildren();
     const grid = document.createElement('div'); grid.className = 'weapon-magic-stone-grid'; root.append(grid);
     const gradePicker = createPicker('武器魔力石', options(data.weaponGrades.options.map(option => option.name)), val(data.weaponGrades.settingKey), value => {
       state.values[data.weaponGrades.settingKey] = value;
@@ -1143,32 +1183,44 @@ async function start() {
       colors.append(card);
     }
   }
+  let masterColorPicker: HTMLElement | undefined;
+  let masterPotentialPicker: HTMLElement | undefined;
   function renderMasterBeastColorSelector() {
     const root = document.querySelector<HTMLElement>('#master-beast-controls')!;
-    root.replaceChildren();
+    masterUiKey = masterSignature();
+    const color = state.masterBeastSpiritStoneColor ?? data.masterBeast.spiritStoneColorSelector.defaultColor;
+    if (masterColorPicker && masterPotentialPicker) {
+      updatePicker(masterColorPicker, color);
+      updatePicker(masterPotentialPicker, val('MasterBeast.OverallPotential'));
+      return;
+    }
     const inputs = document.createElement('div'); inputs.className = 'master-beast-control-inputs'; root.append(inputs);
-    inputs.append(createPicker(
+    masterColorPicker = createPicker(
       '聖獸精靈石顏色',
       options(data.masterBeast.spiritStoneColorSelector.options),
-      state.masterBeastSpiritStoneColor ?? data.masterBeast.spiritStoneColorSelector.defaultColor,
+      color,
       value => { state.masterBeastSpiritStoneColor = value as LoadoutState['masterBeastSpiritStoneColor']; update(); },
-    ));
+    );
+    inputs.append(masterColorPicker);
     field(inputs, '聖獸潛力', 'MasterBeast.OverallPotential', options(catalogIndex.resolveFieldChoices('MasterBeast.OverallPotential', state.values) as readonly string[]));
+    masterPotentialPicker = inputs.lastElementChild as HTMLElement;
   }
   function renderTitleInput() {
     const root = document.querySelector<HTMLElement>('#title-input')!;
-    root.replaceChildren();
+    const picker = root.querySelector<HTMLElement>('.picker');
+    if (picker) { updatePicker(picker, val('Effect.Title'), true); return; }
     field(root, '稱號', 'Effect.Title', titleChoices);
   }
   function renderBeastAccessories() {
     const root = document.querySelector<HTMLElement>('#beast-accessory-fields')!;
+    beastUiKey = beastSignature();
     const rightIceEarring = data.layout.slots.find(slot => slot.selectionCell === 'Right.Ice.Earring');
     const rightIceNecklace = data.layout.slots.find(slot => slot.selectionCell === 'Right.Ice.Necklace');
     const rightIceSupport = data.layout.slots.find(slot => slot.selectionCell === 'Right.Ice.Support');
     const accessoryWeapon = data.layout.slots.find(slot => slot.selectionCell === 'Accessory.WeaponAccessory');
     const accessoryRingOne = data.layout.slots.find(slot => slot.selectionCell === 'Accessory.Ring1');
     const accessoryRingTwo = data.layout.slots.find(slot => slot.selectionCell === 'Accessory.Ring2');
-    if (rightIceEarring && rightIceNecklace && rightIceSupport && accessoryWeapon && accessoryRingOne && accessoryRingTwo) {
+    if (!beastButtons.size && rightIceEarring && rightIceNecklace && rightIceSupport && accessoryWeapon && accessoryRingOne && accessoryRingTwo) {
       const rightIceToAccessoryGap = accessoryWeapon.x - rightIceSupport.x;
       const beastCenterX = rightIceEarring.x - rightIceToAccessoryGap;
       const beastRingStep = accessoryRingTwo.x - accessoryRingOne.x;
@@ -1178,24 +1230,27 @@ async function start() {
       canvas.style.setProperty('--beast-ring-one-x', `${ringOneX}%`);
       canvas.style.setProperty('--beast-ring-two-x', `${beastCenterX}%`);
     }
-    root.replaceChildren();
     for (const slot of beastAccessorySlots) {
-      const button = document.createElement('button'); button.type = 'button'; button.className = `beast-accessory-slot beast-accessory-slot-${slot.id}`; button.dataset.beastSlotId = slot.id;
+      let button = beastButtons.get(slot.id);
+      if (!button) {
+        button = document.createElement('button'); button.type = 'button'; button.className = `beast-accessory-slot beast-accessory-slot-${slot.id}`; button.dataset.beastSlotId = slot.id;
+        button.addEventListener('click', () => {
+          selectedBeastSlotId = slot.id;
+          renderBeastAccessories(); renderInspector(); openMobileInspector();
+        });
+        beastButtons.set(slot.id, button); root.append(button);
+      }
       const cells = [...(slot.fixedCells ?? []), ...(slot.stoneCells ?? []), ...slot.mirrorCells.flat()];
       const hasValue = cells.some(cell => val(cell) !== '');
-      button.classList.toggle('configured', hasValue);
-      button.classList.toggle('selected', selectedBeastSlotId === slot.id);
-      button.setAttribute('aria-label', `${slot.label}${hasValue ? '（已設定）' : ''}`);
-      button.setAttribute('aria-pressed', String(selectedBeastSlotId === slot.id));
-      button.innerHTML = `${icon(slot.icon)}<span>${h(slot.label)}</span>${hasValue ? '<i></i>' : ''}`;
-      button.addEventListener('click', () => {
-        selectedBeastSlotId = slot.id;
-        renderBeastAccessories(); renderInspector(); openMobileInspector();
-      });
-      root.append(button);
+      toggleClass(button, 'configured', hasValue);
+      toggleClass(button, 'selected', selectedBeastSlotId === slot.id);
+      setAttribute(button, 'aria-label', `${slot.label}${hasValue ? '（已設定）' : ''}`);
+      setAttribute(button, 'aria-pressed', String(selectedBeastSlotId === slot.id));
+      writeHtml(button, `${icon(slot.icon)}<span>${h(slot.label)}</span>${hasValue ? '<i></i>' : ''}`);
     }
   }
   function renderBeastInspector(panel: HTMLElement) {
+    disposePickers(panel);
     const slot = beastAccessorySlots.find(candidate => candidate.id === selectedBeastSlotId)!;
     panel.innerHTML = `<div class="inspector-title beast-inspector-title"><span class="beast-inspector-icon">${icon(slot.icon)}</span><div><small>聖獸飾品</small><h2>${h(slot.label)}</h2></div><button class="inspector-close" type="button" aria-label="關閉部位設定">×</button></div>`;
     const fixed = section(panel, '固定效果', true);
@@ -1235,7 +1290,8 @@ async function start() {
     });
   }
   function renderSlots() {
-    const container = document.querySelector('#slots')!; container.replaceChildren();
+    const container = document.querySelector('#slots')!;
+    slotUiKey = slotSignature();
     const rightIceSetEffectIndexes = new Map<string, number>();
     data.rightIceSets.selectionCells.forEach((cell, index) => {
       const setName = val(cell);
@@ -1243,8 +1299,13 @@ async function start() {
     });
     for (const slot of data.layout.slots) {
       const group = data.layout.groups.find(group => group.id === slot.group)!;
-      const button = document.createElement('button'); button.type = 'button'; button.className = 'gear-slot'; button.dataset.slotId = slot.id;
-      button.style.cssText = `left:${slot.x}%;top:${slot.y}%;--group-color:${group.color}`;
+      let button = slotButtons.get(slot.id);
+      if (!button) {
+        button = document.createElement('button'); button.type = 'button'; button.className = 'gear-slot'; button.dataset.slotId = slot.id;
+        button.style.cssText = `left:${slot.x}%;top:${slot.y}%;--group-color:${group.color}`;
+        button.addEventListener('click', () => { selected = slot; selectedBeastSlotId = null; renderSlots(); renderBeastAccessories(); renderInspector(); openMobileInspector(); });
+        slotButtons.set(slot.id, button); container.append(button);
+      }
       const configured = slot.selectionCell ? val(slot.selectionCell) : slot.weapon ? val('Weapon.ENHC') : slot.innerwearId ? val(data.innerwear.slots.find(s => s.id === slot.innerwearId)!.enhancementCell) : '';
       const isAccessory = slot.group === 'accessories';
       const isIceEquipment = slot.group === 'leftIce' || slot.group === 'rightIce' || slot.group === 'iceWeapon';
@@ -1254,20 +1315,21 @@ async function start() {
       const isRightIceSetSlot = (slot.group === 'rightIce' || slot.group === 'iceWeapon') && !!slot.selectionCell && !!configured;
       const rightIceEffectIndex = isRightIceSetSlot ? rightIceSetEffectIndexes.get(configured) : undefined;
       const rightIceSetHint = rightIceEffectIndex ? `；屬於套效 ${rightIceEffectIndex}` : '';
-      button.classList.toggle('configured', !!configured); button.classList.toggle('selected', selected.id === slot.id);
-      button.classList.toggle('inactive', !!slot.enabledBy && !state.lowerwearAlternativeEnabled);
-      button.classList.toggle('right-ice-effect-1', rightIceEffectIndex === 1);
-      button.classList.toggle('right-ice-effect-2', rightIceEffectIndex === 2);
-      button.classList.toggle('right-ice-effect-3', rightIceEffectIndex === 3);
-      button.setAttribute('aria-label', `${group.name} ${slot.label}：${configured || '未設定'}${rightIceSetHint}`); button.setAttribute('aria-pressed', String(selected.id === slot.id));
-      button.title = `${group.name} ${slot.label}${configured && slot.group !== 'costume' ? '\n' + configured : ''}${rightIceSetHint}`;
-      button.innerHTML = `<span class="gear-slot-label">${h(slot.label)}</span>${selectedItemName ? `<span class="gear-slot-item-name">${h(selectedItemName)}</span>` : ''}${configured ? '<i></i>' : ''}`;
-      button.addEventListener('click', () => { selected = slot; selectedBeastSlotId = null; renderSlots(); renderBeastAccessories(); renderInspector(); openMobileInspector(); }); container.append(button);
+      toggleClass(button, 'configured', !!configured); toggleClass(button, 'selected', selected.id === slot.id);
+      toggleClass(button, 'inactive', !!slot.enabledBy && !state.lowerwearAlternativeEnabled);
+      toggleClass(button, 'right-ice-effect-1', rightIceEffectIndex === 1);
+      toggleClass(button, 'right-ice-effect-2', rightIceEffectIndex === 2);
+      toggleClass(button, 'right-ice-effect-3', rightIceEffectIndex === 3);
+      setAttribute(button, 'aria-label', `${group.name} ${slot.label}：${configured || '未設定'}${rightIceSetHint}`); setAttribute(button, 'aria-pressed', String(selected.id === slot.id));
+      setAttribute(button, 'title', `${group.name} ${slot.label}${configured && slot.group !== 'costume' ? '\n' + configured : ''}${rightIceSetHint}`);
+      writeHtml(button, `<span class="gear-slot-label">${h(slot.label)}</span>${selectedItemName ? `<span class="gear-slot-item-name">${h(selectedItemName)}</span>` : ''}${configured ? '<i></i>' : ''}`);
     }
   }
   function renderInspector() {
     const panel = document.querySelector<HTMLElement>('#inspector')!;
+    configurationControlKeys.set('inspector', JSON.stringify([selected.id, selectedBeastSlotId, configurationControlSignature()]));
     if (selectedBeastSlotId) { renderBeastInspector(panel); return; }
+    disposePickers(panel);
     const group = data.layout.groups.find(group => group.id === selected.group)!;
     const innerwearSlot = selected.innerwearId ? data.innerwear.slots.find(slot => slot.id === selected.innerwearId) : undefined;
     const innerwearType = innerwearSlot && val(innerwearSlot.typeCell) === "內布隆" ? "內布隆" : "百億";
@@ -1275,7 +1337,7 @@ async function start() {
     panel.innerHTML = `<div class="inspector-title" style="--group-color:${group.color}">${icon(selected.icon)}<div class="inspector-title-copy"><small>${h(group.name)}</small><h2>${h(selected.label)}</h2></div>${typeSwitch}<button class="inspector-close" type="button" aria-label="關閉部位設定">×</button></div>`;
     if (innerwearSlot) panel.querySelectorAll<HTMLButtonElement>("[data-innerwear-type]").forEach(button => button.addEventListener("click", () => {
       state.values[innerwearSlot.typeCell] = button.dataset.innerwearType!;
-      update(); renderSlots(); renderInspector();
+      update(); renderInspector();
     }));
     if (selected.enabledBy && !state.lowerwearAlternativeEnabled) { panel.insertAdjacentHTML('beforeend', '<p class="panel-note">請先啟用上方「強/排褲切換」。設定會保留於裝置，停用時不參與計算。</p>'); return; }
     if (selected.selectionCell) {
@@ -1578,11 +1640,11 @@ async function start() {
   ) {
     const target = document.querySelector<HTMLElement>('#calculation-comparison')!;
     if (!currentResult) {
-      target.innerHTML = '<p>目前配裝的輸入尚未完成或無法計算，修正後即可與比較基準對照。</p>';
+      writeHtml(target, '<p>目前配裝的輸入尚未完成或無法計算，修正後即可與比較基準對照。</p>', true);
       return;
     }
     if (!baselineResult) {
-      target.innerHTML = `<p>${baseline ? '已設定的比較基準目前無法計算，請重新設定基準。' : '先點選「設為比較基準」保存目前配置，表格就會比較基準與目前配裝。'}</p>`;
+      writeHtml(target, `<p>${baseline ? '已設定的比較基準目前無法計算，請重新設定基準。' : '先點選「設為比較基準」保存目前配置，表格就會比較基準與目前配裝。'}</p>`, true);
       return;
     }
     const rows = compareLoadoutResults(currentResult, baselineResult);
@@ -1611,7 +1673,7 @@ async function start() {
       return `<tr class="${rowClass}"><th scope="row">${h(row.label)}</th><td>${displayComparisonValue(row, row.expected)}</td><td>${displayComparisonValue(row, row.actual)}</td><td class="${row.delta > 0 ? 'positive' : row.delta < 0 ? 'negative' : ''}">${displayComparisonDelta(row)}</td></tr>`;
     }).join('')}</tbody></table></div>`;
     const differences = mismatches.length ? table(mismatches) : '<p>目前配置與比較基準的計算值相同。</p>';
-    target.innerHTML = `<p>依比較基準與目前配裝的未格式化數值比對 ${visibleRows.length} 項：${visibleRows.length - mismatches.length} 項相同、${mismatches.length} 項不同。</p>${differences}<details><summary>查看全部比較值（${visibleRows.length} 項）</summary>${table(visibleRows)}</details>`;
+    writeHtml(target, `<p>依比較基準與目前配裝的未格式化數值比對 ${visibleRows.length} 項：${visibleRows.length - mismatches.length} 項相同、${mismatches.length} 項不同。</p>${differences}<details><summary>查看全部比較值（${visibleRows.length} 項）</summary>${table(visibleRows)}</details>`, true);
   }
   function renderResults() {
     const target = document.querySelector('#results')!;
@@ -1633,7 +1695,7 @@ async function start() {
         : undefined;
       const damageGain = damageGainRatio === undefined ? '—' : summaryPercent(damageGainRatio * 100) + '%';
       const damageGainClass = damageGainRatio === undefined || damageGainRatio === 0 ? '' : damageGainRatio > 0 ? 'gain-positive' : 'gain-negative';
-      equipmentDamageSummary.innerHTML = '<div class="equipment-damage-card"><span>基準配置</span><strong>' + (baselineFinalDamage === undefined ? '—' : summaryDamageNumber(baselineFinalDamage)) + '</strong></div><div class="equipment-damage-card"><span>新配置</span><strong>' + (currentFinalDamage === undefined ? '—' : summaryDamageNumber(currentFinalDamage)) + '</strong></div><div class="equipment-damage-card equipment-damage-gain"><span>增幅</span><strong class="' + damageGainClass + '">' + damageGain + '</strong></div>';
+      writeHtml(equipmentDamageSummary, '<div class="equipment-damage-card"><span>基準配置</span><strong>' + (baselineFinalDamage === undefined ? '—' : summaryDamageNumber(baselineFinalDamage)) + '</strong></div><div class="equipment-damage-card"><span>新配置</span><strong>' + (currentFinalDamage === undefined ? '—' : summaryDamageNumber(currentFinalDamage)) + '</strong></div><div class="equipment-damage-card equipment-damage-gain"><span>增幅</span><strong class="' + damageGainClass + '">' + damageGain + '</strong></div>', true);
     try {
       if (!currentEvaluation.attributes) throw currentEvaluation.attributeError;
       const current = currentEvaluation.attributes;
@@ -1697,7 +1759,7 @@ async function start() {
         ? currentDamage.result.generalMultiplicativeDamage.factors.map(effect => `<p class="stat-source-row"><span>${h(sourceLabel(effect.sourceId))}</span><strong>×${fmt(effect.factor)}</strong></p>`).join('')
         : '<p class="stat-source-empty">目前沒有額外乘算來源</p>'}<p class="stat-average">乘算效果總倍率 ×${fmt(currentDamage.result.generalMultiplicativeDamage.value)}</p></div></details>`
       : `<div class="stat"><p>乘算效果</p><strong>待補輸入</strong><small class="input-hint">${h(calculationIssue(damageCalculationError))}</small></div>`;
-    target.innerHTML = `<div class="stat-list">${visibleStats.map(({ key, stat, previousStat }) => {
+    writeHtml(target, `<div class="stat-list">${visibleStats.map(({ key, stat, previousStat }) => {
       const meta = data.attributes.attributes.find(entry => entry.key === key);
       const isPercent = meta?.unit === 'percent';
       const isCritDamage = key === 'critDamagePct';
@@ -1738,7 +1800,7 @@ async function start() {
         : '';
       const lowerwearBDetails = state.lowerwearAlternativeEnabled && stat.lowerwearBSources.length ? `<p class="stat-detail-heading">強/排褲來源</p>${sourceRows(stat.lowerwearBSources, isPercent)}` : '';
       return `<details class="stat"><summary><span>${h(shownName)}</span><strong>${fmt(displayTotal)}${isPercent ? '%' : ''}</strong>${attributeCapWarning}${deltaBadge}</summary><div class="stat-details">${sharedDetails}${critDamageDetails}${lowerwearBDetails}<p class="stat-average">${lowerwearAverageLabel} ${fmt(lowerwearAverage)}${isPercent ? '%' : ''}</p>${comparison}</div></details>`;
-    }).join('')}${conditionalDamageCards}${multiplicativeEffectCard}${combatRateCards}</div>`;
+    }).join('')}${conditionalDamageCards}${multiplicativeEffectCard}${combatRateCards}</div>`, true);
       const damageTarget = document.querySelector('#damage-result')!;
       try {
         if (!currentDamage) throw damageCalculationError;
@@ -1761,25 +1823,34 @@ async function start() {
         const critDamageFactors = result.multiplicativeCritDamage.factors.filter(effect => effect.sourceId !== 'character-base:crit-damage-product');
         const critDamageMultiplier = critDamageFactors.map(effect => `×${fmt(effect.factor)}（${sourceLabel(effect.sourceId)}）`).join('、') || '無額外來源';
         const critDamageCalculation = `角色基底 ${fmt(critDamageBaseFactor * 100)}%（×${fmt(critDamageBaseFactor)}）${critDamageFactors.map(effect => ` ×${fmt(effect.factor)}`).join('')} − ${fmt(result.multiplicativeCritDamage.baselinePct)}% 基準 = +${fmt(result.multiplicativeCritDamage.value * 100)}%`;
-        damageTarget.innerHTML = `<div class="damage-summary"><div><span>最小攻擊力</span><strong>${fmt(result.attack.lowerDamage)}</strong></div><div><span>最大攻擊力</span><strong>${fmt(result.attack.upperDamage)}</strong></div><div class="final-damage"><span>最終傷害</span><strong>${finalDamageFormat(result.finalDamage.finalDamage)}</strong></div></div>${damageRatioHtml}`;
+        writeHtml(damageTarget, `<div class="damage-summary"><div><span>最小攻擊力</span><strong>${fmt(result.attack.lowerDamage)}</strong></div><div><span>最大攻擊力</span><strong>${fmt(result.attack.upperDamage)}</strong></div><div class="final-damage"><span>最終傷害</span><strong>${finalDamageFormat(result.finalDamage.finalDamage)}</strong></div></div>${damageRatioHtml}`, true);
         const skillWeighting = result.finalDamage.skillDamageWeighting;
         const skillWeightingText = `超越 ${fmt(skillWeighting.transcendenceSharePct)}% ×${fmt(skillWeighting.transcendenceFactor)} + 強烈 ${fmt(skillWeighting.strongSharePct)}% ×${fmt(skillWeighting.strongFactor)} = ×${fmt(skillWeighting.combinedFactor)}`;
         const calculationDetailsTarget = document.querySelector<HTMLElement>("#calculation-details")!;
         const formulaWasOpen = calculationDetailsTarget.querySelector<HTMLDetailsElement>(".formula-detail")?.open ?? false;
-        calculationDetailsTarget.innerHTML = `<details class="formula-detail"${formulaWasOpen ? ' open' : ''}><summary>展開傷害計算明細</summary><p>強烈／超越技傷加權：${h(skillWeightingText)}</p><p>致命傷害被動：${fmt(result.classCritDamagePassivePct)}%　乘算暴傷增幅：+${fmt(result.multiplicativeCritDamage.value * 100)}%</p><p>乘算暴傷計算：${h(critDamageCalculation)}</p><p>乘算暴傷來源：${h(critDamageMultiplier)}</p><p>爆擊乘算來源：${h(rateSources(result.combatRates.critRate.multipliers))}</p><p>極大乘算來源：${h(rateSources(result.combatRates.extremization.multipliers))}</p><p>乘算傷害：${fmt(result.generalMultiplicativeDamage.value)} 倍　強者／排熱因子：${fmt(result.finalDamage.conditionalFactor)}</p><p>適應力因子：${fmt(result.finalDamage.adaptationFactor)}　防禦因子：${fmt(result.finalDamage.defenseFactor)}</p></details>`;
+        writeHtml(calculationDetailsTarget, `<details class="formula-detail"${formulaWasOpen ? ' open' : ''}><summary>展開傷害計算明細</summary><p>強烈／超越技傷加權：${h(skillWeightingText)}</p><p>致命傷害被動：${fmt(result.classCritDamagePassivePct)}%　乘算暴傷增幅：+${fmt(result.multiplicativeCritDamage.value * 100)}%</p><p>乘算暴傷計算：${h(critDamageCalculation)}</p><p>乘算暴傷來源：${h(critDamageMultiplier)}</p><p>爆擊乘算來源：${h(rateSources(result.combatRates.critRate.multipliers))}</p><p>極大乘算來源：${h(rateSources(result.combatRates.extremization.multipliers))}</p><p>乘算傷害：${fmt(result.generalMultiplicativeDamage.value)} 倍　強者／排熱因子：${fmt(result.finalDamage.conditionalFactor)}</p><p>適應力因子：${fmt(result.finalDamage.adaptationFactor)}　防禦因子：${fmt(result.finalDamage.defenseFactor)}</p></details>`, true);
       } catch (error) {
-        damageTarget.innerHTML = `<p class="input-warning">尚未計算：${h(calculationIssue(error))}請完成後再試。</p>`;
-        document.querySelector('#calculation-details')!.replaceChildren();
+        writeHtml(damageTarget, `<p class="input-warning">尚未計算：${h(calculationIssue(error))}請完成後再試。</p>`, true);
+        const details = document.querySelector('#calculation-details')!;
+        renderedHtml.delete(details); details.replaceChildren();
       }
     } catch (error) {
       const message = h(calculationIssue(error));
-      target.innerHTML = `<p class="input-warning" role="status">${message}</p>`;
-      document.querySelector('#damage-result')!.innerHTML = `<p class="input-warning">尚未計算：${message}</p>`;
-      document.querySelector('#calculation-details')!.replaceChildren();
+      writeHtml(target, `<p class="input-warning" role="status">${message}</p>`, true);
+      writeHtml(document.querySelector('#damage-result')!, `<p class="input-warning">尚未計算：${message}</p>`);
+      const details = document.querySelector('#calculation-details')!;
+      renderedHtml.delete(details); details.replaceChildren();
     }
   }
+  let classPickerControl: HTMLElement | undefined;
+  let classPickerError: HTMLElement | undefined;
   const renderClassPicker = () => {
     const root = document.querySelector<HTMLElement>('#class-picker')!;
+    if (classPickerControl && classPickerError) {
+      updatePicker(classPickerControl, state.Job, true);
+      classPickerError.textContent = ''; classPickerError.hidden = true;
+      return;
+    }
     const error = document.createElement('span');
     error.className = 'input-hint class-picker-error';
     error.hidden = true;
@@ -1793,14 +1864,21 @@ async function start() {
     });
     const input = picker.querySelector<HTMLInputElement>('input');
     if (input) input.placeholder = '輸入職業代碼（例如 DaB）';
+    classPickerControl = picker; classPickerError = error;
     root.replaceChildren(picker, error);
   };
   renderClassPicker();
   renderSkillDamageShare();
   const toggle = document.querySelector<HTMLInputElement>('#alternate')!; toggle.checked = state.lowerwearAlternativeEnabled;
   const battle = document.querySelector<HTMLElement>('#battle-settings')!;
+  const battlePickers = new Map<string, { picker: HTMLElement; error: HTMLElement }>();
   const renderBattleSettings = () => {
-    battle.replaceChildren();
+    if (battlePickers.size) {
+      for (const [cell, { picker, error }] of battlePickers) {
+        updatePicker(picker, val(cell), true); error.textContent = ''; error.hidden = true;
+      }
+      return;
+    }
     for (const [fieldId, label] of [['Stage.Adapt','關卡適應力'],['Stage.CritRatePenalty','關卡扣致命'],['Stage.BossDEF','Boss防禦']] as const) {
       const catalog = catalogIndex.validationCatalog(fieldId);
       const error = document.createElement('span');
@@ -1814,6 +1892,7 @@ async function start() {
         onInput: () => { error.textContent = ''; error.hidden = true; },
         allowCharacter: character => /^[0-9]$/.test(character),
       });
+      battlePickers.set(fieldId, { picker, error });
       battle.append(picker, error);
     }
   };
@@ -1825,14 +1904,19 @@ async function start() {
     renderBattleSettings();
     renderSkillDamageShare();
     update(true);
-    renderInspector();
+    if (configurationControlKeys.get('inspector') !== JSON.stringify([selected.id, selectedBeastSlotId, configurationControlSignature()])) renderInspector();
     renderTitleInput();
-    renderGlobalInputs();
-    renderWeaponMagicStones();
-    renderRightIceSetSelectors();
+    if (configurationControlKeys.get('global') !== configurationControlSignature()) renderGlobalInputs();
+    if (configurationControlKeys.get('stones') !== configurationControlSignature()) renderWeaponMagicStones();
+    refreshRightIceSelectors();
   };
   const applyHistorySnapshot = (snapshot: LoadoutState) => {
     Object.assign(state, snapshot);
+    // Public/legacy samples may omit these settings. A complete snapshot restore
+    // must not retain properties that a later import added to the same object.
+    for (const key of ['masterBeastSpiritStoneColor', 'petSkillAttackEnabled'] as const) {
+      if (!Object.hasOwn(snapshot, key)) delete (state as Partial<LoadoutState>)[key];
+    }
     refreshConfigurationUi();
   };
   const undo = () => {
@@ -1891,12 +1975,16 @@ async function start() {
     document.querySelector<HTMLElement>('#transfer-status')!.textContent = `配裝 JSON 已匯出${details}。`;
   });
   const fileInput = document.querySelector<HTMLInputElement>('#loadout-file')!;
+  let importRequest = 0;
   document.querySelector<HTMLButtonElement>('#import-loadout')!.addEventListener('click', () => fileInput.click());
   fileInput.addEventListener('change', async () => {
     const file = fileInput.files?.[0];
     if (!file) return;
+    const request = ++importRequest;
     try {
-      const imported = parseLoadoutJson(await file.text(), state, data, catalogIndex);
+      const json = await file.text();
+      if (request !== importRequest) return;
+      const imported = parseLoadoutJson(json, state, data, catalogIndex);
       Object.assign(state, imported.state);
       migrateLegacyPortraitAwakening(state);
       normalizePortraitAwakeningValues(state);
@@ -1908,9 +1996,10 @@ async function start() {
       const partial = clearedFields.length ? `；${clearedFields.length} 個無法對應或重複的欄位已留空（${clearedFields.slice(0, 5).join('、')}${clearedFields.length > 5 ? '…' : ''}）` : '';
       document.querySelector<HTMLElement>('#transfer-status')!.textContent = `${sampleMode ? '配裝已匯入；範例模式不會儲存到此裝置' : '配裝已匯入並儲存於此裝置'}${partial}。`;
     } catch (error) {
+      if (request !== importRequest) return;
       document.querySelector<HTMLElement>('#transfer-status')!.textContent = `匯入失敗：${error instanceof Error ? error.message : '檔案無法讀取。'}`;
     } finally {
-      fileInput.value = '';
+      if (request === importRequest) fileInput.value = '';
     }
   });
   renderSlots(); renderInspector(); renderTitleInput(); renderBeastAccessories(); renderMasterBeastColorSelector(); renderGlobalInputs(); renderWeaponMagicStones(); renderRightIceSetSelectors(); renderResults(); refreshHistoryControls();

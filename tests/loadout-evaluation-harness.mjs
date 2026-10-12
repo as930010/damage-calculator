@@ -24,6 +24,8 @@ export async function createRuntime({ dom, sourceReader, transformSource, global
     globals.requestAnimationFrame = callback => setTimeout(callback, 0);
     globals.cancelAnimationFrame = clearTimeout;
     globals.fetch = async url => {
+      if (String(url).includes('/data/examples/public-example-2026-09-28.json'))
+        return { ok: true, json: async () => structuredClone(sample) };
       if (!String(url).includes('/data/game-data.json')) throw new Error(`Unexpected request: ${url}`);
       return { ok: true, json: async () => structuredClone(gameData) };
     };
@@ -67,7 +69,7 @@ export async function createRuntime({ dom, sourceReader, transformSource, global
 
 export async function createPage(state, baseline, options = {}) {
   const html = await readFile(resolve(root, 'index.html'), 'utf8');
-  const dom = new JSDOM(html, { url: 'https://loadout.test/', pretendToBeVisual: true });
+  const dom = new JSDOM(html, { url: options.url ?? 'https://loadout.test/', pretendToBeVisual: true });
   dom.window.localStorage.setItem('dab-loadout-v1', JSON.stringify(state));
   if (baseline) dom.window.localStorage.setItem('dab-baseline-v1', JSON.stringify(baseline));
   const runtime = await createRuntime({ dom, ...options });

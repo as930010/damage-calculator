@@ -20,6 +20,7 @@ export async function uiPage(state = stateA, baseline = stateA, options = {}) {
       if (file === 'frontend/projection.ts') source = source.replace(
         /(export function evaluateLoadout[^\{]+\{)/, '$1\nif (includeFallbackRates) __observeEvaluation(state);');
       if (file === 'frontend/main.ts') {
+        source = source.replace('const skillWeightingText =', "__count('formulaHtml'); const skillWeightingText =");
         for (const name of ['renderSlots', 'renderBeastAccessories', 'renderMasterBeastColorSelector',
           'renderInspector', 'renderTitleInput', 'renderGlobalInputs', 'renderWeaponMagicStones',
           'renderRightIceSetSelectors', 'renderCalculationComparison']) source = source.replace(
@@ -29,6 +30,8 @@ export async function uiPage(state = stateA, baseline = stateA, options = {}) {
       }
       if (file === 'frontend/picker.ts') {
         source = source.replace(/(export function createPicker[^\{]+\{)/, "$1\n__count('createPicker');");
+        source = source.replace('disposed = true; controller.abort();', "__count('disposePicker'); disposed = true; controller.abort();");
+        source = source.replace(/(function normalizeSearchText[^\{]+\{)/, "$1\n__count('normalizeSearchText');");
         source += '\nexport const __pickerRegistrations = () => [...outsideCommitPickers].map(entry => entry.root.isConnected);';
       }
       return options.transformSource?.(file, source) ?? source;
@@ -94,7 +97,7 @@ export const workloadActions = {
     const input = page.dom.window.document.querySelector('input[aria-label="武器強化"]');
     input.dispatchEvent(new page.dom.window.Event('focus'));
     const option = [...page.dom.window.document.getElementById(input.getAttribute('aria-controls')).querySelectorAll('[role="option"]')]
-      .find(node => node.querySelector('span')?.textContent === 'Lv.12'); assert.ok(option); option.click();
+      .find(node => node.querySelector('span')?.textContent === 'Lv.13'); assert.ok(option); option.click();
   },
   class: async page => enter(page, '職業', 'KE'),
   beast: async page => {
