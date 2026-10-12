@@ -295,5 +295,9 @@ export const FIELD_ID_TO_CODE: Readonly<Record<string, number>> = Object.freeze(
   "Innerwear.Shoes.Magazine.Level": 293,
   "Left.Armor.Gloves.Circuit.Rows": 294,
   "Effect.PortraitAwakening.StrongSkillDamagePct": 295,
-  "Effect.PortraitAwakening.TranscendenceSkillDamagePct": 296
+  "Effect.PortraitAwakening.TranscendenceSkillDamagePct": 296,
+  "Left.Armor.Upper.Circuit.Rows": 297,
+  "Left.Armor.Bottom.Circuit.Rows": 298,
+  "Left.Armor.SwitchBottom.Circuit.Rows": 299,
+  "Left.Armor.Shoes.Circuit.Rows": 300
 });

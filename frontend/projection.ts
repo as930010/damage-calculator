@@ -8,7 +8,7 @@ import { calculateLoadoutCombatRates, prepareLoadoutAttributes, evaluatePrepared
 import { resolveClassDamagePassiveContributions } from "../calculation/class-damage-passives.ts";
 import type { GameData } from "./data.ts";
 import { DEFAULT_TRANSCENDENCE_SKILL_DAMAGE_SHARE_PCT, normalizePortraitAwakeningSplit, type LoadoutState } from "./state.ts";
-import { readGloveCircuitRows, validateGloveCircuitRows } from "./circuit-board-rows.ts";
+import { readCircuitBoardRows, validateCircuitBoardRows, type CircuitBoardRow } from "./circuit-board-rows.ts";
 
 /** UI state to supported stat sources; game arithmetic remains in calculation/. */
 export function resolveLoadoutSources(data: GameData, state: LoadoutState) {
@@ -97,42 +97,38 @@ export function resolveLoadoutSources(data: GameData, state: LoadoutState) {
       throw new RangeError("下衣與強/排褲不可同時使用「" + lowerwearAttribute + "」芯片。請讓兩套配置分別使用「強者%」與「排熱%」，以符合 Boss 體力切換條件。");
     }
   }
-  const glovesCircuitRule = data.circuits.inputs.find(slot => slot.slot === "gloves")!;
-  const glovesCircuitRows = readGloveCircuitRows(values, glovesCircuitRule.attributeCell, glovesCircuitRule.valueCell);
-  validateGloveCircuitRows(glovesCircuitRows);
-  for (const row of glovesCircuitRows) {
-    if (row.attribute && row.percentageValue !== null && !data.circuits.statKeyByAttributeName[row.attribute] && row.attribute !== "無關傷害") {
-      throw new RangeError("電路板「" + row.attribute + "」尚未有屬性對應，請使用已定義的屬性名稱。");
+  const circuitRowsBySlot = new Map<string, CircuitBoardRow[]>();
+  const activeCircuitSlots = data.circuits.inputs.filter(slot => state.lowerwearAlternativeEnabled || slot.wearSet !== "lowerwearB");
+  for (const slot of activeCircuitSlots) {
+    const rows = readCircuitBoardRows(values, slot.attributeCell, slot.valueCell);
+    validateCircuitBoardRows(rows, slot.attributeOptions, slot.slot + "電路板");
+    for (const row of rows) {
+      if (row.attribute && row.percentageValue !== null && !data.circuits.statKeyByAttributeName[row.attribute] && row.attribute !== "無關傷害") {
+        throw new RangeError("電路板「" + row.attribute + "」尚未有屬性對應，請使用已定義的屬性名稱。");
+      }
     }
+    circuitRowsBySlot.set(slot.slot, rows);
   }
-  const circuits = Object.fromEntries(data.circuits.inputs.filter(slot => state.lowerwearAlternativeEnabled || slot.wearSet !== "lowerwearB").map((slot) => {
-    if (slot.slot === "gloves") return [slot.slot, glovesCircuitRows];
-    const attribute = text(slot.attributeCell), percentageValue = number(slot.valueCell);
-    if ((attribute && percentageValue === undefined) || (!attribute && percentageValue !== undefined)) {
-      throw new RangeError("請填完整電路板項目與數值。");
-    }
-    if (attribute && percentageValue !== undefined && !data.circuits.statKeyByAttributeName[attribute] && attribute !== "無關傷害") {
-      throw new RangeError("電路板「" + attribute + "」尚未有屬性對應，請使用已定義的屬性名稱。");
-    }
-    return [slot.slot, { attribute, percentageValue }];
+  const circuits = Object.fromEntries(activeCircuitSlots.map(slot => {
+    const rows = circuitRowsBySlot.get(slot.slot)!;
+    // Gloves already used row-based source IDs; legacy boards keep their scalar source ID
+    // until the user adds a second row.
+    return [slot.slot, slot.slot === "gloves" || rows.length > 1 ? rows : rows[0]];
   }));
   if (state.lowerwearAlternativeEnabled) {
-    const lowerwearCircuit = data.circuits.inputs.find(slot => slot.slot === "lowerwear")!;
-    const alternativeCircuit = data.circuits.inputs.find(slot => slot.slot === "lowerwearAlternative")!;
-    const lowerwearAttribute = text(lowerwearCircuit.attributeCell);
-    const alternativeAttribute = text(alternativeCircuit.attributeCell);
     const conditionalAttributes = new Set(["強者%", "排熱%"]);
-    const lowerwearValue = number(lowerwearCircuit.valueCell);
-    const alternativeValue = number(alternativeCircuit.valueCell);
-    if (conditionalAttributes.has(lowerwearAttribute) && lowerwearAttribute === alternativeAttribute
-      && lowerwearValue !== undefined && lowerwearValue > 0 && alternativeValue !== undefined && alternativeValue > 0) {
-      throw new RangeError("下衣與強/排褲不可同時使用「" + lowerwearAttribute + "」。請讓兩套配置分別使用「強者%」與「排熱%」，以符合 Boss 體力切換條件。");
+    const lowerwearRows = circuitRowsBySlot.get("lowerwear") ?? [];
+    const alternativeRows = circuitRowsBySlot.get("lowerwearAlternative") ?? [];
+    const conflict = lowerwearRows.find(row => conditionalAttributes.has(row.attribute) && (row.percentageValue ?? 0) > 0
+      && alternativeRows.some(peer => peer.attribute === row.attribute && (peer.percentageValue ?? 0) > 0));
+    if (conflict) {
+      throw new RangeError("下衣與強/排褲不可同時使用「" + conflict.attribute + "」。請讓兩套配置分別使用「強者%」與「排熱%」，以符合 Boss 體力切換條件。");
     }
   }
   for (const entry of resolveCircuitBoardEffects(data.circuits, circuits)) if (entry.contribution) groups[entry.wearSet].push(entry.contribution);
   const colorSetOption = data.colorSetEffects.options.find(option => option.name === text(data.colorSetEffects.settingKey));
   const requiredCircuitAttribute = colorSetOption?.calculatedStat?.requiredAttribute ?? "";
-  const requiredCircuitValue = glovesCircuitRows
+  const requiredCircuitValue = (circuitRowsBySlot.get("gloves") ?? [])
     .filter(row => row.attribute === requiredCircuitAttribute)
     .reduce((total, row) => total + (row.percentageValue ?? 0), 0);
   const colorSet = resolveColorSetEffect(data.colorSetEffects, text(data.colorSetEffects.settingKey), requiredCircuitAttribute, requiredCircuitValue);

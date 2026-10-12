@@ -1,6 +1,6 @@
 import { isFieldId, FIELD_ID_TO_CODE } from "./field-ids.ts";
 import type { CatalogIndex } from './catalog-index.ts';
-import { GLOVE_CIRCUIT_ROWS_FIELD, readGloveCircuitRows, serializeGloveCircuitRows, normalizeGloveCircuitRows, normalizeCircuitPercentage } from './circuit-board-rows.ts';
+import { circuitBoardRowsField, readCircuitBoardRows, serializeCircuitBoardRows, normalizeCircuitBoardRows, normalizeCircuitPercentage } from './circuit-board-rows.ts';
 import { isResonanceInputCell, parseResonancePoints } from "../calculation/resonance-input.ts";
 
 export const DEFAULT_TRANSCENDENCE_SKILL_DAMAGE_SHARE_PCT = 100;
@@ -49,11 +49,14 @@ export function normalizeOptionalEffectValues(values: Record<string, string | nu
     if (valueCell && values[cell] === '無關傷害') set(valueCell, 0);
   }
   for (const circuit of index.data.circuits.inputs) {
-    if (circuit.slot !== 'gloves') set(circuit.valueCell, normalizeCircuitPercentage(values[circuit.valueCell]));
-    else {
-      const rows = normalizeGloveCircuitRows(readGloveCircuitRows(values, circuit.attributeCell, circuit.valueCell), circuit.attributeOptions);
-      set(GLOVE_CIRCUIT_ROWS_FIELD, serializeGloveCircuitRows(rows));
-    }
+    const rows = normalizeCircuitBoardRows(
+      readCircuitBoardRows(values, circuit.attributeCell, circuit.valueCell),
+      circuit.attributeOptions,
+    );
+    set(circuitBoardRowsField(circuit.attributeCell), serializeCircuitBoardRows(rows));
+    // Keep the original single-row cells synchronized for old readers and transfers.
+    set(circuit.attributeCell, rows[0].attribute);
+    set(circuit.valueCell, normalizeCircuitPercentage(rows[0].percentageValue));
   }
   return changed;
 }

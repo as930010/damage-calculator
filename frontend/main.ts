@@ -9,7 +9,7 @@ import { evaluateLoadout, type projectDamage } from './projection.ts';
 import { createBaselineEvaluationCache } from './baseline-evaluation.ts';
 import { compareLoadoutResults } from './calculation-comparison.ts';
 import { createPicker, updatePicker, disposePickers, type PickerOption } from './picker.ts';
-import { GLOVE_CIRCUIT_ROWS_FIELD, readGloveCircuitRows, serializeGloveCircuitRows, gloveCircuitRowsTotal, normalizeGloveCircuitRows, normalizeCircuitPercentage } from './circuit-board-rows.ts';
+import { circuitBoardRowsField, readCircuitBoardRows, serializeCircuitBoardRows, circuitBoardRowsTotal, normalizeCircuitBoardRows, normalizeCircuitPercentage } from './circuit-board-rows.ts';
 import { icon } from './icons.ts';
 import { capOverflowPercentage } from './cap-warnings.ts';
 import { createCatalogIndexScope } from './catalog-index.ts';
@@ -141,7 +141,7 @@ async function start() {
   };
   const startupDuplicateNephronMagazineCells = clearDuplicateNephronMagazines(state);
   const startupOptionalEffectsNormalized = normalizeOptionalEffectValues(state.values, catalogIndex);
-  if ((startupLegacyEnvironmentMigrated || startupLegacyHeadStoneLabelMigrated || startupLegacyGloveCircuitMigrated || startupLegacyPortraitAwakeningMigrated || startupPortraitAwakeningNormalized || startupDuplicateTransformationCells.length || startupDuplicateNephronTransformationCells.length || startupInvalidAccessoryAppraisalCells.length || startupDuplicateNephronMagazineCells.length) && !sampleMode) saveState(state);
+  if ((startupLegacyEnvironmentMigrated || startupLegacyHeadStoneLabelMigrated || startupLegacyGloveCircuitMigrated || startupLegacyPortraitAwakeningMigrated || startupPortraitAwakeningNormalized || startupOptionalEffectsNormalized || startupDuplicateTransformationCells.length || startupDuplicateNephronTransformationCells.length || startupInvalidAccessoryAppraisalCells.length || startupDuplicateNephronMagazineCells.length) && !sampleMode) saveState(state);
   const weaponMagicStoneCells = data.weaponGrades.colorGroups.flatMap(group => group.settingKeys);
   const applyWeaponMagicStonePreset = (grade: string, overwrite = false) => {
     if (!grade) return;
@@ -441,17 +441,23 @@ async function start() {
     const lowerwear = data.circuits.inputs.find(slot => slot.slot === "lowerwear");
     const alternative = data.circuits.inputs.find(slot => slot.slot === "lowerwearAlternative");
     if (!lowerwear || !alternative) return null;
-    const selected = val(lowerwear.attributeCell);
-    return selected === val(alternative.attributeCell) && (selected === "強者%" || selected === "排熱%") ? selected : null;
+    const conditionalAttributes = new Set(["強者%", "排熱%"]);
+    const lowerwearAttributes = new Set(readCircuitBoardRows(state.values, lowerwear.attributeCell, lowerwear.valueCell)
+      .map(row => row.attribute).filter(attribute => conditionalAttributes.has(attribute)));
+    return readCircuitBoardRows(state.values, alternative.attributeCell, alternative.valueCell)
+      .find(row => lowerwearAttributes.has(row.attribute))?.attribute ?? null;
   };
-  const circuitAttributeOptions = (slot: (typeof data.circuits.inputs)[number]) => {
+  const circuitAttributeOptions = (slot: (typeof data.circuits.inputs)[number], rows: ReturnType<typeof readCircuitBoardRows>, rowIndex: number) => {
     if (!state.lowerwearAlternativeEnabled || (slot.slot !== "lowerwear" && slot.slot !== "lowerwearAlternative")) return options(slot.attributeOptions);
     const peerSlot = slot.slot === "lowerwear" ? "lowerwearAlternative" : "lowerwear";
     const peer = data.circuits.inputs.find(entry => entry.slot === peerSlot);
-    const peerAttribute = peer ? val(peer.attributeCell) : "";
-    const names = peerAttribute === "強者%" || peerAttribute === "排熱%"
-      ? slot.attributeOptions.filter(name => name !== peerAttribute)
-      : slot.attributeOptions;
+    const conditionalAttributes = new Set(["強者%", "排熱%"]);
+    const peerAttributes = new Set(peer
+      ? readCircuitBoardRows(state.values, peer.attributeCell, peer.valueCell).map(row => row.attribute)
+      : []);
+    const currentAttribute = rows[rowIndex]?.attribute;
+    const names = slot.attributeOptions.filter(name =>
+      !conditionalAttributes.has(name) || !peerAttributes.has(name) || name === currentAttribute);
     return options(names);
   };
   const lowerwearConditionalChipConflict = (): string | null => {
@@ -608,9 +614,10 @@ async function start() {
     if (sourceId.startsWith('circuit-board:')) {
       const [slotId, rowNumber] = sourceId.slice('circuit-board:'.length).split(':');
       const slot = data.circuits.inputs.find(entry => entry.slot === slotId);
-      if (slotId === 'gloves' && rowNumber && slot) {
-        const row = readGloveCircuitRows(state.values, slot.attributeCell, slot.valueCell)[Number(rowNumber) - 1];
-        if (row) return '手套電路板第 ' + rowNumber + ' 列：' + row.attribute + ' ' + fmt((row.percentageValue ?? 0) * 100) + '%';
+      if (rowNumber && slot) {
+        const row = readCircuitBoardRows(state.values, slot.attributeCell, slot.valueCell)[Number(rowNumber) - 1];
+        const slotNames: Record<string, string> = { upper: '上衣', lowerwear: '下衣', lowerwearAlternative: '強/排褲', gloves: '手套', shoes: '鞋子' };
+        if (row) return (slotNames[slotId] ?? slotId) + '電路板第 ' + rowNumber + ' 列：' + row.attribute + ' ' + fmt((row.percentageValue ?? 0) * 100) + '%';
       }
       const slotNames: Record<string, string> = { upper: '上衣電路板', lowerwear: '下衣電路板', lowerwearAlternative: '強/排褲電路板', gloves: '手套電路板', shoes: '鞋子電路板' };
       if (slotNames[slotId] && !rowNumber) return slotNames[slotId];
@@ -1505,118 +1512,117 @@ async function start() {
       }
       const circuit = data.circuits.inputs.find(slot => slot.slot === selected.innerwearId)!;
       const board = section(panel, '電路板');
-      if (circuit.slot !== 'gloves') {
-        const boardGrid = attributeValueGrid(board);
-        field(boardGrid, '電路板項目', circuit.attributeCell, circuitAttributeOptions(circuit), true);
-        numeric(boardGrid, '電路板數值（%）', circuit.valueCell, true, { min: 0, max: 18 }, val(circuit.attributeCell) === '' || val(circuit.attributeCell) === '無關傷害');
-      } else {
-        const note = document.createElement('p');
-        note.className = 'panel-note circuit-board-limit-note';
-        note.textContent = '可依需求新增或移除項目列；所有列的數值總和上限為 18.0%。';
-        const rowList = document.createElement('div');
-        rowList.className = 'circuit-board-rows';
-        const totalStatus = document.createElement('p');
-        totalStatus.className = 'circuit-board-total';
-        totalStatus.setAttribute('aria-live', 'polite');
-        const actions = document.createElement('div');
-        actions.className = 'circuit-board-actions';
-        const addRowButton = document.createElement('button');
-        addRowButton.type = 'button';
-        addRowButton.className = 'circuit-board-add';
-        addRowButton.textContent = '新增電路板列';
-        actions.append(addRowButton);
-        board.append(note, rowList, totalStatus, actions);
+      const note = document.createElement('p');
+      note.className = 'panel-note circuit-board-limit-note';
+      note.textContent = '可依需求新增或移除項目列；所有列的數值總和上限為 18.0%。';
+      const rowList = document.createElement('div');
+      rowList.className = 'circuit-board-rows';
+      const totalStatus = document.createElement('p');
+      totalStatus.className = 'circuit-board-total';
+      totalStatus.setAttribute('aria-live', 'polite');
+      const actions = document.createElement('div');
+      actions.className = 'circuit-board-actions';
+      const addRowButton = document.createElement('button');
+      addRowButton.type = 'button';
+      addRowButton.className = 'circuit-board-add';
+      addRowButton.textContent = '新增電路板列';
+      actions.append(addRowButton);
+      board.append(note, rowList, totalStatus, actions);
 
-        const readRows = () => readGloveCircuitRows(state.values, circuit.attributeCell, circuit.valueCell);
-        const storeRows = (rows: ReturnType<typeof readRows>) => {
-          state.values[GLOVE_CIRCUIT_ROWS_FIELD] = serializeGloveCircuitRows(rows);
-        };
-        const refreshTotal = (rows: ReturnType<typeof readRows>) => {
-          const totalPct = gloveCircuitRowsTotal(rows) * 100;
-          if (totalPct > 18 + 1e-9) {
-            totalStatus.textContent = '目前總和 ' + fmt(totalPct) + '%，已超過 18.0% 上限。';
-            totalStatus.classList.add('input-warning');
-          } else {
-            totalStatus.textContent = '目前總和：' + fmt(totalPct) + '% / 18.0%';
-            totalStatus.classList.remove('input-warning');
-          }
-          [...rowList.querySelectorAll<HTMLInputElement>('input[type="number"]')].forEach(input => {
-            input.max = '18';
-          });
-        };
-        const renderCircuitRows = () => {
-          const rows = readRows();
-          disposePickers(rowList);
-          rowList.replaceChildren();
-          rows.forEach((row, index) => {
-            const rowElement = document.createElement('div');
-            rowElement.className = 'circuit-board-row';
-            const picker = createPicker('電路板項目 ' + (index + 1), options(circuit.attributeOptions), row.attribute, value => {
-              rows[index] = { ...rows[index], attribute: value, percentageValue: value === '無關傷害' ? 0 : rows[index].percentageValue };
-              storeRows(rows);
-              update();
-              renderCircuitRows();
-            });
-            rowElement.append(picker);
-
-            const valueField = document.createElement('label');
-            valueField.className = 'field circuit-board-value';
-            valueField.append(document.createTextNode('電路板數值 ' + (index + 1) + '（%）'));
-            const input = document.createElement('input');
-            input.type = 'number';
-            preventScientificNotation(input);
-            input.min = '0';
-            input.step = 'any';
-            input.placeholder = row.attribute ? '請填寫數值' : '請先選擇屬性';
-            input.value = row.percentageValue === null ? '' : String(canonicalizeNumber(row.percentageValue * 100));
-            input.disabled = !row.attribute || row.attribute === '無關傷害';
-            valueField.append(input);
-            rowElement.append(valueField);
-
-            const removeButton = document.createElement('button');
-            removeButton.type = 'button';
-            removeButton.className = 'circuit-board-remove';
-            removeButton.textContent = '移除';
-            removeButton.setAttribute('aria-label', '移除第 ' + (index + 1) + ' 列電路板');
-            removeButton.disabled = rows.length === 1;
-            removeButton.title = rows.length === 1 ? '至少保留一列' : '移除此列';
-            removeButton.addEventListener('click', () => {
-              rows.splice(index, 1);
-              storeRows(rows);
-              update();
-              renderCircuitRows();
-              addRowButton.focus();
-            });
-            rowElement.append(removeButton);
-            rowList.append(rowElement);
-
-            input.addEventListener('input', () => {
-              if (input.validity.badInput) return;
-              const percentageValue = canonicalizeNumber(normalizeCircuitPercentage(Number(input.value) / 100));
-              const candidateRows = rows.map((entry, rowIndex) => rowIndex === index ? { ...entry, percentageValue } : entry);
-              input.setCustomValidity('');
-              rows.splice(0, rows.length, ...normalizeGloveCircuitRows(candidateRows, circuit.attributeOptions, index));
-              [...rowList.querySelectorAll<HTMLInputElement>('input[type="number"]')].forEach((control, rowIndex) => {
-                const displayed = canonicalizeNumber((rows[rowIndex].percentageValue ?? 0) * 100);
-                if (rowIndex !== index || control.value === '' || Number(control.value) !== displayed) control.value = String(displayed);
-              });
-              storeRows(rows);
-              update();
-              refreshTotal(rows);
-            });
-          });
-          refreshTotal(rows);
-        };
-        addRowButton.addEventListener('click', () => {
-          const rows = readRows();
-          rows.push({ attribute: '無關傷害', percentageValue: 0 });
-          storeRows(rows);
-          update();
-          renderCircuitRows();
-          rowList.lastElementChild?.querySelector<HTMLInputElement>('input')?.focus();
+      const readRows = () => readCircuitBoardRows(state.values, circuit.attributeCell, circuit.valueCell);
+      const storeRows = (rows: ReturnType<typeof readRows>) => {
+        state.values[circuitBoardRowsField(circuit.attributeCell)] = serializeCircuitBoardRows(rows);
+        state.values[circuit.attributeCell] = rows[0].attribute;
+        state.values[circuit.valueCell] = normalizeCircuitPercentage(rows[0].percentageValue);
+      };
+      const refreshTotal = (rows: ReturnType<typeof readRows>) => {
+        const totalPct = canonicalizeNumber(circuitBoardRowsTotal(rows) * 100);
+        if (totalPct > 18 + 1e-9) {
+          totalStatus.textContent = '目前總和 ' + fmt(totalPct) + '%，已超過 18.0% 上限。';
+          totalStatus.classList.add('input-warning');
+        } else {
+          totalStatus.textContent = '目前總和：' + fmt(totalPct) + '% / 18.0%';
+          totalStatus.classList.remove('input-warning');
+        }
+        addRowButton.disabled = rows.length >= circuit.attributeOptions.length;
+        addRowButton.title = addRowButton.disabled ? '已達可選項目數量上限' : '新增電路板列';
+        [...rowList.querySelectorAll<HTMLInputElement>('input[type="number"]')].forEach(input => {
+          input.max = '18';
         });
+      };
+      const renderCircuitRows = () => {
+        const rows = readRows();
+        disposePickers(rowList);
+        rowList.replaceChildren();
+        rows.forEach((row, index) => {
+          const rowElement = document.createElement('div');
+          rowElement.className = 'circuit-board-row';
+          const picker = createPicker('電路板項目 ' + (index + 1), circuitAttributeOptions(circuit, rows, index), row.attribute, value => {
+            rows[index] = { ...rows[index], attribute: value, percentageValue: value === '無關傷害' ? 0 : rows[index].percentageValue };
+            storeRows(rows);
+            update();
+            renderCircuitRows();
+          });
+          rowElement.append(picker);
+
+          const valueField = document.createElement('label');
+          valueField.className = 'field circuit-board-value';
+          valueField.append(document.createTextNode('電路板數值 ' + (index + 1) + '（%）'));
+          const input = document.createElement('input');
+          input.type = 'number';
+          preventScientificNotation(input);
+          input.min = '0';
+          input.step = 'any';
+          input.placeholder = row.attribute ? '請填寫數值' : '請先選擇屬性';
+          input.value = row.percentageValue === null ? '' : String(canonicalizeNumber(row.percentageValue * 100));
+          input.disabled = !row.attribute || row.attribute === '無關傷害';
+          valueField.append(input);
+          rowElement.append(valueField);
+
+          const removeButton = document.createElement('button');
+          removeButton.type = 'button';
+          removeButton.className = 'circuit-board-remove';
+          removeButton.textContent = '移除';
+          removeButton.setAttribute('aria-label', '移除第 ' + (index + 1) + ' 列電路板');
+          removeButton.disabled = rows.length === 1;
+          removeButton.title = rows.length === 1 ? '至少保留一列' : '移除此列';
+          removeButton.addEventListener('click', () => {
+            rows.splice(index, 1);
+            storeRows(rows);
+            update();
+            renderCircuitRows();
+            addRowButton.focus();
+          });
+          rowElement.append(removeButton);
+          rowList.append(rowElement);
+
+          input.addEventListener('input', () => {
+            if (input.validity.badInput) return;
+            const percentageValue = normalizeCircuitPercentage(Number(input.value) / 100);
+            const candidateRows = rows.map((entry, rowIndex) => rowIndex === index ? { ...entry, percentageValue } : entry);
+            input.setCustomValidity('');
+            rows.splice(0, rows.length, ...normalizeCircuitBoardRows(candidateRows, circuit.attributeOptions, index));
+            [...rowList.querySelectorAll<HTMLInputElement>('input[type="number"]')].forEach((control, rowIndex) => {
+              const displayed = canonicalizeNumber((rows[rowIndex].percentageValue ?? 0) * 100);
+              if (rowIndex !== index || control.value === '' || Number(control.value) !== displayed) control.value = String(displayed);
+            });
+            storeRows(rows);
+            update();
+            refreshTotal(rows);
+          });
+        });
+        refreshTotal(rows);
+      };
+      addRowButton.addEventListener('click', () => {
+        const rows = readRows();
+        if (rows.length >= circuit.attributeOptions.length) return;
+        rows.push({ attribute: '無關傷害', percentageValue: 0 });
+        storeRows(rows);
+        update();
         renderCircuitRows();
-      }
+        rowList.lastElementChild?.querySelector<HTMLInputElement>('input')?.focus();
+      });
+      renderCircuitRows();
       const conditionalCircuitConflict = lowerwearConditionalCircuitConflict();
       if (conditionalCircuitConflict && (circuit.slot === "lowerwear" || circuit.slot === "lowerwearAlternative")) {
         const warning = document.createElement("p");
