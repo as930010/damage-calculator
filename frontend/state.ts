@@ -1,7 +1,54 @@
-import { isFieldId } from "./field-ids.ts";
+import { isFieldId, FIELD_ID_TO_CODE } from "./field-ids.ts";
+import type { CatalogIndex } from './catalog-index.ts';
+import { GLOVE_CIRCUIT_ROWS_FIELD, readGloveCircuitRows, serializeGloveCircuitRows, normalizeGloveCircuitRows, normalizeCircuitPercentage } from './circuit-board-rows.ts';
 import { isResonanceInputCell, parseResonancePoints } from "../calculation/resonance-input.ts";
 
 export const DEFAULT_TRANSCENDENCE_SKILL_DAMAGE_SHARE_PCT = 100;
+
+const optionalEffectsByCatalog = new WeakMap<CatalogIndex, { fields: string[]; valueCells: Map<string, string> }>();
+function optionalEffectFields(index: CatalogIndex) {
+  let fields = optionalEffectsByCatalog.get(index);
+  if (fields) return fields;
+  const valueCells = new Map<string, string>();
+  for (const input of index.data.circuits.inputs) valueCells.set(input.attributeCell, input.valueCell);
+  for (const armor of index.data.nephronArmor.fields) for (const input of armor.transformFields) valueCells.set(input.attributeCell, input.valueCell);
+  for (const cell of Object.keys(FIELD_ID_TO_CODE)) {
+    if (/^MasterBeast\..+\.(?:CustomAttribute|Mirror\.\d+\.Attribute)$/.test(cell)) {
+      valueCells.set(cell, cell.replace(/Attribute$/, 'Value'));
+    }
+  }
+  fields = { fields: Object.keys(FIELD_ID_TO_CODE).filter(cell => index.resolveFieldChoices(cell, {})?.includes('無關傷害')), valueCells };
+  optionalEffectsByCatalog.set(index, fields);
+  return fields;
+}
+
+/** Shared by startup, import, history and controls; never replaces valid selections. */
+export function normalizeOptionalEffectValues(values: Record<string, string | number>, index: CatalogIndex): boolean {
+  let changed = false;
+  const set = (cell: string, value: string | number) => {
+    if (values[cell] !== value) { values[cell] = value; changed = true; }
+  };
+  const fields = optionalEffectFields(index);
+  for (const cell of fields.fields) {
+    const choices = index.data.circuits.inputs.find(circuit => circuit.attributeCell === cell)?.attributeOptions
+      ?? index.resolveFieldChoices(cell, values);
+    if (!choices?.some(choice => String(choice) === String(values[cell] ?? ''))) set(cell, '無關傷害');
+    const valueCell = fields.valueCells.get(cell);
+    if (valueCell && values[cell] === '無關傷害') set(valueCell, 0);
+  }
+  for (const circuit of index.data.circuits.inputs) {
+    if (circuit.slot !== 'gloves') set(circuit.valueCell, normalizeCircuitPercentage(values[circuit.valueCell]));
+    else {
+      const rows = normalizeGloveCircuitRows(readGloveCircuitRows(values, circuit.attributeCell, circuit.valueCell), circuit.attributeOptions);
+      set(GLOVE_CIRCUIT_ROWS_FIELD, serializeGloveCircuitRows(rows));
+    }
+  }
+  return changed;
+}
+
+export function isUnrelatedEffectValue(cell: string, values: Readonly<Record<string, string | number>>, index: CatalogIndex): boolean {
+  return [...optionalEffectFields(index).valueCells].some(([attribute, valueCell]) => valueCell === cell && values[attribute] === '無關傷害');
+}
 
 export interface PortraitAwakeningSplit {
   strongSkillDamagePct: number;

@@ -56,7 +56,7 @@ test('unset mirrors default to unrelated damage and disabled zero without overwr
     openHeadMirrors(page);
     assert.equal(page.dom.window.document.querySelector('input[aria-label="迷鏡效果屬性"]').value, '無關傷害');
     assert.equal(mirrorInput(page).value, '0'); assert.equal(mirrorInput(page).disabled, true);
-    assert.equal(page.readState().values[mirrorAttributeCell], undefined);
+    assert.equal(page.readState().values[mirrorAttributeCell], '無關傷害');
     selectPicker(page, '迷鏡效果屬性', '致命一擊%');
     const input = mirrorInput(page);
     assert.equal(input.disabled, false);
@@ -244,11 +244,16 @@ test('stage undo/redo keep complex control subtrees and release no unrelated pic
 test('import/undo/redo dispose detached direct-entry controls immediately and retain one catalog index', async () => {
   const page = await uiPage();
   try {
+    const potentialCell = 'MasterBeast.OverallPotential';
+    const changedPotential = gameData.masterBeast.options.find(option => option.category === 'overall' && option.name !== stateA.values[potentialCell]);
+    assert.ok(changedPotential);
+    const alternateState = structuredClone(stateB);
+    alternateState.values[potentialCell] = changedPotential.name;
     const picker = await page.runtime.load('frontend/picker.ts');
     const count = picker.__pickerRegistrations().length;
     page.runtime.resetCounts();
     for (let i = 0; i < 4; i++) {
-      await page.importState(i % 2 ? stateA : stateB);
+      await page.importState(i % 2 ? stateA : alternateState);
       for (const name of ['undo', 'redo']) {
         await workloadActions[name](page);
         assert.equal(picker.__pickerRegistrations().length, count);

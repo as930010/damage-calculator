@@ -4,11 +4,12 @@ import { type AccessoryEffectOption } from '../calculation/equipment-effects.ts'
 import { loadGameData, readJson, escapeHtml as h, formatNumber as fmt } from './data.ts';
 import { readState, readBaseline, saveState, migrateLegacyEnvironmentSelection, migrateLegacyGloveCircuitSkillDamage as migrateGloveCircuit, migrateLegacyPortraitAwakening as migratePortrait, normalizePortraitAwakeningValues as normalizePortraitValues, normalizeTranscendenceSkillDamageShare, parseTranscendenceSkillDamageShareInput, type LoadoutState } from './state.ts';
 import { createTransferLoader } from './loadout-transfer-loader.ts';
+import { normalizeOptionalEffectValues, isUnrelatedEffectValue } from './state.ts';
 import { evaluateLoadout, type projectDamage } from './projection.ts';
 import { createBaselineEvaluationCache } from './baseline-evaluation.ts';
 import { compareLoadoutResults } from './calculation-comparison.ts';
 import { createPicker, updatePicker, disposePickers, type PickerOption } from './picker.ts';
-import { GLOVE_CIRCUIT_ROWS_FIELD, readGloveCircuitRows, serializeGloveCircuitRows, gloveCircuitRowsTotal } from './circuit-board-rows.ts';
+import { GLOVE_CIRCUIT_ROWS_FIELD, readGloveCircuitRows, serializeGloveCircuitRows, gloveCircuitRowsTotal, normalizeGloveCircuitRows, normalizeCircuitPercentage } from './circuit-board-rows.ts';
 import { icon } from './icons.ts';
 import { capOverflowPercentage } from './cap-warnings.ts';
 import { createCatalogIndexScope } from './catalog-index.ts';
@@ -108,7 +109,7 @@ async function start() {
       const seen = new Set<string>();
       for (const transform of field.transformFields) {
         const choice = String(target.values[transform.attributeCell] ?? '');
-        if (!choice) continue;
+        if (!choice || choice === '無關傷害') continue;
         if (seen.has(choice)) {
           delete target.values[transform.attributeCell];
           delete target.values[transform.valueCell];
@@ -139,6 +140,7 @@ async function start() {
     return clearedCells;
   };
   const startupDuplicateNephronMagazineCells = clearDuplicateNephronMagazines(state);
+  const startupOptionalEffectsNormalized = normalizeOptionalEffectValues(state.values, catalogIndex);
   if ((startupLegacyEnvironmentMigrated || startupLegacyHeadStoneLabelMigrated || startupLegacyGloveCircuitMigrated || startupLegacyPortraitAwakeningMigrated || startupPortraitAwakeningNormalized || startupDuplicateTransformationCells.length || startupDuplicateNephronTransformationCells.length || startupInvalidAccessoryAppraisalCells.length || startupDuplicateNephronMagazineCells.length) && !sampleMode) saveState(state);
   const weaponMagicStoneCells = data.weaponGrades.colorGroups.flatMap(group => group.settingKeys);
   const applyWeaponMagicStonePreset = (grade: string, overwrite = false) => {
@@ -152,6 +154,7 @@ async function start() {
     }
   };
   applyWeaponMagicStonePreset(String(state.values[data.weaponGrades.settingKey] ?? ''));
+  if (startupOptionalEffectsNormalized && !sampleMode) saveState(state);
   let baseline = sampleMode ? null : readBaseline();
   let baselineIsValid = false;
   if (baseline) {
@@ -162,7 +165,8 @@ async function start() {
     const normalizedBaselinePortraitAwakening = normalizePortraitAwakeningValues(baseline);
     const clearedBaselineMagazines = clearDuplicateNephronMagazines(baseline);
     const clearedBaselineTransformations = clearDuplicateNephronTransformationChoices(baseline);
-    if (migratedBaselineEnvironment || migratedBaseline || migratedBaselineGloveCircuit || migratedBaselinePortraitAwakening || normalizedBaselinePortraitAwakening || clearedBaselineMagazines.length || clearedBaselineTransformations.length) saveState(baseline, true);
+    const normalizedBaselineOptionalEffects = normalizeOptionalEffectValues(baseline.values, catalogIndex);
+    if (normalizedBaselineOptionalEffects || migratedBaselineEnvironment || migratedBaseline || migratedBaselineGloveCircuit || migratedBaselinePortraitAwakening || normalizedBaselinePortraitAwakening || clearedBaselineMagazines.length || clearedBaselineTransformations.length) saveState(baseline, true);
   }
   const history = new LoadoutHistory(state);
   let selected = data.layout.slots.find(slot => slot.weapon)!;
@@ -519,6 +523,7 @@ async function start() {
   const configurationControlKeys = new Map<string, string>();
   const refreshRightIceSelectors = () => { if (rightIceUiKey !== rightIceSignature()) renderRightIceSetSelectors(); };
   const update = (force = false) => {
+    normalizeOptionalEffectValues(state.values, catalogIndex);
     const changed = history.record(state);
     if (!changed && !force) {
       refreshHistoryControls();
@@ -712,10 +717,6 @@ async function start() {
   };
   const field = (parent: HTMLElement, label: string, cell: string, choices: readonly PickerOption[], redraw = false, disabled = false, disabledHint = '請先選擇屬性') => {
     const picker = createPicker(label, choices, val(cell), value => {
-      if (/^MasterBeast\..+\.Mirror\.\d+\.Attribute$/.test(cell)) {
-        value ||= '無關傷害';
-        if (value === '無關傷害') state.values[cell.replace(/\.Attribute$/, '.Value')] = 0;
-      }
       state.values[cell] = value;
       for (const armor of data.nephronArmor.fields) {
         const transform = armor.transformFields.find(entry => entry.attributeCell === cell);
@@ -744,6 +745,7 @@ async function start() {
       if (input) { input.disabled = true; input.placeholder = disabledHint; }
     }
     parent.append(picker);
+    if (isUnrelatedEffectValue(cell, state.values, catalogIndex)) updatePicker(picker, '0', true);
     return picker;
   };
   function getEquippedRightIceSetCounts() {
@@ -953,6 +955,14 @@ async function start() {
               input.addEventListener('blur', commitDecimal);
             } else {
               input.addEventListener('input', () => {
+                if (data.circuits.inputs.some(circuit => circuit.valueCell === cell)) {
+                  if (input.validity.badInput) return;
+                  const value = normalizeCircuitPercentage(Number(input.value) / 100);
+                  state.values[cell] = canonicalizeNumber(value);
+                  if (input.value === '' || Number(input.value) !== canonicalizeNumber(value * 100)) input.value = String(canonicalizeNumber(value * 100));
+                  update();
+                  return;
+                }
                 if (input.value !== '' && constraints?.min !== undefined && Number(input.value) < constraints.min) {
                   input.value = val(cell) === '' ? '' : String(Number(val(cell)) * (percentage ? 100 : 1));
                   return;
@@ -1274,7 +1284,7 @@ async function start() {
       const [attributeCell, valueCell] = slot.stoneCells;
       const stoneGrid = attributeValueGrid(stone);
       field(stoneGrid, '精靈石屬性', attributeCell, options(data.masterBeast.customAttributeOptions[slot.stoneCategory]), true);
-      field(stoneGrid, '精靈石數值（%）', valueCell, validationChoices(valueCell, true), false, val(attributeCell) === '');
+      field(stoneGrid, '精靈石數值（%）', valueCell, validationChoices(valueCell, true), false, val(attributeCell) === '' || val(attributeCell) === '無關傷害');
     } else {
       stone.insertAdjacentHTML('beforeend', `<p class="panel-note beast-mapping-note">盔甲精靈石的個別屬性不影響傷害，無需設定。精靈石套裝增幅 ${fmt(data.masterBeast.armorSpiritStoneSetEffect.multiplicativeDamagePct)}% 已預設套用。</p>`);
     }
@@ -1283,9 +1293,8 @@ async function start() {
     mirrorArea.classList.add('beast-mirror-section');
     const mirrorGrid = attributeValueGrid(mirrorArea, 'beast-mirror-grid');
     slot.mirrorCells.forEach(([attributeCell, valueCell]) => {
-      const attribute = val(attributeCell) || '無關傷害';
-      const picker = field(mirrorGrid, '迷鏡效果屬性', attributeCell, options(data.masterBeast.customAttributeOptions.mirror), true);
-      if (!val(attributeCell)) updatePicker(picker, attribute, true);
+      const attribute = val(attributeCell);
+      field(mirrorGrid, '迷鏡效果屬性', attributeCell, options(data.masterBeast.customAttributeOptions.mirror), true);
       const unrelated = attribute === '無關傷害';
       const valueRule = data.masterBeast.mirrorValueRules.byAttribute[attribute] ?? data.masterBeast.mirrorValueRules.default;
       const input = numeric(
@@ -1416,7 +1425,7 @@ async function start() {
             .map(other => val(other.attributeCell))
             .filter(Boolean));
           const availableAttributes = data.nephronArmor.transformations
-            .filter(entry => !selectedElsewhere.has(entry.name));
+            .filter(entry => entry.name === '無關傷害' || !selectedElsewhere.has(entry.name));
           field(transformationGrid, '變換 ' + (index + 1) + ' 屬性', transform.attributeCell,
             availableAttributes.map(entry => ({ value: entry.name, label: entry.name.replace('（依強化等級）', '(×強化)') })), true);
           const tiers = attribute?.tierValuesPct ?? [];
@@ -1499,7 +1508,7 @@ async function start() {
       if (circuit.slot !== 'gloves') {
         const boardGrid = attributeValueGrid(board);
         field(boardGrid, '電路板項目', circuit.attributeCell, circuitAttributeOptions(circuit), true);
-        numeric(boardGrid, '電路板數值（%）', circuit.valueCell, true, undefined, val(circuit.attributeCell) === '');
+        numeric(boardGrid, '電路板數值（%）', circuit.valueCell, true, { min: 0, max: 18 }, val(circuit.attributeCell) === '' || val(circuit.attributeCell) === '無關傷害');
       } else {
         const note = document.createElement('p');
         note.className = 'panel-note circuit-board-limit-note';
@@ -1531,19 +1540,19 @@ async function start() {
             totalStatus.textContent = '目前總和：' + fmt(totalPct) + '% / 18.0%';
             totalStatus.classList.remove('input-warning');
           }
-          [...rowList.querySelectorAll<HTMLInputElement>('input[type="number"]')].forEach((input, index) => {
-            const otherTotalPct = rows.reduce((total, row, rowIndex) => total + (rowIndex === index ? 0 : (row.percentageValue ?? 0) * 100), 0);
-            input.max = String(Math.max(0, 18 - otherTotalPct));
+          [...rowList.querySelectorAll<HTMLInputElement>('input[type="number"]')].forEach(input => {
+            input.max = '18';
           });
         };
         const renderCircuitRows = () => {
           const rows = readRows();
+          disposePickers(rowList);
           rowList.replaceChildren();
           rows.forEach((row, index) => {
             const rowElement = document.createElement('div');
             rowElement.className = 'circuit-board-row';
             const picker = createPicker('電路板項目 ' + (index + 1), options(circuit.attributeOptions), row.attribute, value => {
-              rows[index] = { ...rows[index], attribute: value, percentageValue: value ? rows[index].percentageValue : null };
+              rows[index] = { ...rows[index], attribute: value, percentageValue: value === '無關傷害' ? 0 : rows[index].percentageValue };
               storeRows(rows);
               update();
               renderCircuitRows();
@@ -1559,8 +1568,8 @@ async function start() {
             input.min = '0';
             input.step = 'any';
             input.placeholder = row.attribute ? '請填寫數值' : '請先選擇屬性';
-            input.value = row.percentageValue === null ? '' : String(row.percentageValue * 100);
-            input.disabled = !row.attribute;
+            input.value = row.percentageValue === null ? '' : String(canonicalizeNumber(row.percentageValue * 100));
+            input.disabled = !row.attribute || row.attribute === '無關傷害';
             valueField.append(input);
             rowElement.append(valueField);
 
@@ -1582,23 +1591,15 @@ async function start() {
             rowList.append(rowElement);
 
             input.addEventListener('input', () => {
-              const percentageValue = input.value === '' ? null : Number(input.value) / 100;
-              if (percentageValue !== null && (!Number.isFinite(percentageValue) || percentageValue < 0)) {
-                input.setCustomValidity('數值不得小於 0。');
-                totalStatus.textContent = '電路板數值不得小於 0%。';
-                totalStatus.classList.add('input-warning');
-                return;
-              }
+              if (input.validity.badInput) return;
+              const percentageValue = canonicalizeNumber(normalizeCircuitPercentage(Number(input.value) / 100));
               const candidateRows = rows.map((entry, rowIndex) => rowIndex === index ? { ...entry, percentageValue } : entry);
-              const totalPct = gloveCircuitRowsTotal(candidateRows) * 100;
-              if (totalPct > 18 + 1e-9) {
-                input.setCustomValidity('所有列的總和不可超過 18.0%。');
-                totalStatus.textContent = '總和將達 ' + fmt(totalPct) + '%，不可超過 18.0%。';
-                totalStatus.classList.add('input-warning');
-                return;
-              }
               input.setCustomValidity('');
-              rows[index] = { ...rows[index], percentageValue };
+              rows.splice(0, rows.length, ...normalizeGloveCircuitRows(candidateRows, circuit.attributeOptions, index));
+              [...rowList.querySelectorAll<HTMLInputElement>('input[type="number"]')].forEach((control, rowIndex) => {
+                const displayed = canonicalizeNumber((rows[rowIndex].percentageValue ?? 0) * 100);
+                if (rowIndex !== index || control.value === '' || Number(control.value) !== displayed) control.value = String(displayed);
+              });
               storeRows(rows);
               update();
               refreshTotal(rows);
@@ -1608,7 +1609,7 @@ async function start() {
         };
         addRowButton.addEventListener('click', () => {
           const rows = readRows();
-          rows.push({ attribute: '', percentageValue: null });
+          rows.push({ attribute: '無關傷害', percentageValue: 0 });
           storeRows(rows);
           update();
           renderCircuitRows();
@@ -1942,6 +1943,7 @@ async function start() {
   renderBattleSettings();
   toggle.addEventListener('change', () => { state.lowerwearAlternativeEnabled = toggle.checked; update(); renderInspector(); });
   const refreshConfigurationUi = () => {
+    normalizeOptionalEffectValues(state.values, catalogIndex);
     renderClassPicker();
     toggle.checked = state.lowerwearAlternativeEnabled;
     renderBattleSettings();

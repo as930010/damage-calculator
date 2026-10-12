@@ -5,6 +5,7 @@ import { isResonanceInputCell, parseResonancePoints } from '../calculation/reson
 import { codeForFieldId, fieldIdForCode, isFieldId } from './field-ids.ts';
 import { migrateLegacyEnvironmentSelection, migrateLegacyGloveCircuitSkillDamage, normalizePortraitAwakeningSplit, normalizeTranscendenceSkillDamageShare, type LoadoutState } from './state.ts';
 import { canonicalizeNumber } from './numeric-input.ts';
+import { normalizeOptionalEffectValues, isUnrelatedEffectValue } from './state.ts';
 
 type TransferData = CatalogData;
 type JsonRecord = Record<string, unknown>;
@@ -42,6 +43,7 @@ export function serializeLoadout(state: LoadoutState, data: TransferData, suppli
   const values: Record<string, string | number> = {};
   const omittedFields: string[] = [];
   const fieldValues = { ...state.values };
+  normalizeOptionalEffectValues(fieldValues, index);
   const portrait = data.otherEffects.portraitAwakening;
   const portraitCells = [portrait.strongSettingKey, portrait.transcendenceSettingKey];
   const hasPortraitValues = portraitCells.some(cell => fieldValues[cell] !== undefined && fieldValues[cell] !== '');
@@ -95,6 +97,7 @@ export function serializeLoadout(state: LoadoutState, data: TransferData, suppli
 
     const choices = index.resolveFieldChoices(fieldId, fieldValues);
     if (choices) {
+      if (transferValue === 0 && isUnrelatedEffectValue(fieldId, fieldValues, index)) { values[String(fieldCode)] = 0; continue; }
       if (!choices.some(option => String(option) === String(transferValue))) { omittedFields.push(fieldId); continue; }
       values[String(fieldCode)] = transferValue;
       continue;
@@ -287,6 +290,7 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
   if (!(color === '黃' || color === '綠' || color === '')) clearedFields.push('聖獸精靈石顏色');
   if (typeof candidate.petSkillAttackEnabled !== 'boolean') clearedFields.push('寵物被動');
   if (migrateLegacyEnvironmentSelection(values) === 'removed') clearedFields.push('Effect.Environment');
+  normalizeOptionalEffectValues(values, index);
 
   const uniqueCleared = [...new Set(clearedFields)];
   return {

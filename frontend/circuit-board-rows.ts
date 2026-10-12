@@ -1,3 +1,5 @@
+import { canonicalizeNumber } from './numeric-input.ts';
+
 export interface CircuitBoardRow {
   attribute: string;
   /** Percentage stored as a decimal ratio, matching the other state values. */
@@ -5,6 +7,30 @@ export interface CircuitBoardRow {
 }
 
 export const GLOVE_CIRCUIT_ROWS_FIELD = "Left.Armor.Gloves.Circuit.Rows";
+
+/** Values are decimal ratios; each board has an independent 18% budget. */
+export function normalizeCircuitPercentage(value: unknown): number {
+  const parsed = typeof value === 'number' || typeof value === 'string' ? Number(value) : 0;
+  return Number.isFinite(parsed) ? Math.min(0.18, Math.max(0, parsed)) : 0;
+}
+
+export function normalizeGloveCircuitRows(rows: readonly CircuitBoardRow[], options: readonly string[], preferredIndex?: number): CircuitBoardRow[] {
+  const normalized = rows.map(row => {
+    const attribute = options.includes(row.attribute) ? row.attribute : '無關傷害';
+    return { attribute, percentageValue: attribute === '無關傷害' ? 0 : normalizeCircuitPercentage(row.percentageValue) };
+  });
+  // Without an edit record, earlier rows retain their values first.
+  const order = normalized.map((_, index) => index);
+  if (preferredIndex !== undefined && order.includes(preferredIndex)) {
+    order.splice(order.indexOf(preferredIndex), 1); order.unshift(preferredIndex);
+  }
+  let remaining = 0.18;
+  for (const index of order) {
+    normalized[index].percentageValue = Math.min(normalized[index].percentageValue, remaining);
+    remaining = Math.max(0, canonicalizeNumber(remaining - normalized[index].percentageValue));
+  }
+  return normalized;
+}
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   !!value && typeof value === "object" && !Array.isArray(value);
@@ -16,7 +42,7 @@ export function readGloveCircuitRows(
   legacyValueCell: string,
 ): CircuitBoardRow[] {
   const savedRows = values[GLOVE_CIRCUIT_ROWS_FIELD];
-  if (savedRows !== undefined && savedRows !== "") {
+  if (savedRows != null && savedRows !== "") {
     if (typeof savedRows !== "string") throw new TypeError("手套電路板列資料格式無效。");
     let parsed: unknown;
     try { parsed = JSON.parse(savedRows) as unknown; }
@@ -25,23 +51,17 @@ export function readGloveCircuitRows(
       throw new TypeError("手套電路板至少需要一列。");
     }
     return parsed.map((entry, index) => {
-      if (!isRecord(entry) || typeof entry.attribute !== "string") {
+      if (!isRecord(entry)) {
         throw new TypeError("手套電路板第 " + (index + 1) + " 列資料無效。");
       }
       const percentageValue = entry.percentageValue;
-      if (percentageValue !== null && (typeof percentageValue !== "number" || !Number.isFinite(percentageValue))) {
-        throw new TypeError("手套電路板第 " + (index + 1) + " 列數值無效。");
-      }
-      return { attribute: entry.attribute, percentageValue };
+      return { attribute: typeof entry.attribute === 'string' ? entry.attribute : '', percentageValue: percentageValue === null ? null : normalizeCircuitPercentage(percentageValue) };
     });
   }
 
   const attribute = String(values[legacyAttributeCell] ?? "");
   const rawValue = values[legacyValueCell];
-  const percentageValue = rawValue === undefined || rawValue === "" ? null : Number(rawValue);
-  if (percentageValue !== null && !Number.isFinite(percentageValue)) {
-    throw new TypeError("手套電路板數值無效。");
-  }
+  const percentageValue = rawValue === undefined || rawValue === "" ? null : normalizeCircuitPercentage(rawValue);
   if (!attribute && percentageValue === null) return [{ attribute: "", percentageValue: null }];
   return [{ attribute, percentageValue }];
 }

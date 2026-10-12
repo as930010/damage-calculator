@@ -90,6 +90,8 @@ function getMobilePickerDialog() {
 /** Only explicit selections are saved; desktop typing filters the list. */
 export interface PickerDirectEntry { sanitize: (value: string) => string; resolve: (value: string) => string | null; onInvalid: (value: string) => void; onInput?: () => void; allowCharacter?: (character: string) => boolean }
 export function createPicker(label: string, options: readonly PickerOption[], value: string, onChange: (value: string) => void, directEntry?: PickerDirectEntry): HTMLElement {
+  const clearedValue = options.some(option => option.value === '無關傷害') ? '無關傷害' : '';
+  if (clearedValue && !options.some(option => option.value === value)) value = clearedValue;
   const controller = new window.AbortController();
   let disposed = false;
   const listen = <K extends keyof HTMLElementEventMap>(target: HTMLElement, type: K, handler: (event: HTMLElementEventMap[K]) => void) =>
@@ -230,7 +232,7 @@ export function createPicker(label: string, options: readonly PickerOption[], va
     } else if (event.key === 'Enter' && !list.hidden && index >= 0) { event.preventDefault(); commit(matches[index]); } else if (event.key === 'Enter' && directEntry) { event.preventDefault(); commitDirectEntry(); }
   });
   listen(clear, 'mousedown', event => event.preventDefault());
-  listen(clear, 'click', () => { directEntryDirty = false; committed = ''; input.value = ''; close(); onChange(''); });
+  listen(clear, 'click', () => { directEntryDirty = false; committed = clearedValue; close(); onChange(clearedValue); });
   pickerHandles.set(root, {
     update(value, resetDraft) {
       if (disposed || !resetDraft && committed === value && !directEntryDirty) return;
