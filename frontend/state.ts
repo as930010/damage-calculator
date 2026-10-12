@@ -74,6 +74,33 @@ export function migrateLegacyEnvironmentSelection(values: Record<string, string 
   return null;
 }
 
+/** Shared migration only; callers retain their own validation and cleared-field policy. */
+export function migrateLegacyGloveCircuitSkillDamage(values: Record<string, string | number>, attributeCell: string | undefined): boolean {
+  if (!attributeCell || values[attributeCell] !== '超越技傷%') return false;
+  values[attributeCell] = '單技傷%';
+  return true;
+}
+
+type PortraitFields = { legacySettingKey: string; strongSettingKey: string; transcendenceSettingKey: string; maxTotalPct: number };
+export function migrateLegacyPortraitAwakening(values: Record<string, string | number>, portrait: PortraitFields): boolean {
+  const legacyValue = values[portrait.legacySettingKey];
+  if (legacyValue === undefined) return false;
+  if (legacyValue === '有' && values[portrait.strongSettingKey] === undefined && values[portrait.transcendenceSettingKey] === undefined) {
+    values[portrait.transcendenceSettingKey] = portrait.maxTotalPct;
+  }
+  delete values[portrait.legacySettingKey];
+  return true;
+}
+
+/** Startup/restore policy; imports still report invalid and corrected fields separately. */
+export function normalizePortraitAwakeningValues(values: Record<string, string | number>, portrait: PortraitFields): boolean {
+  const split = normalizePortraitAwakeningSplit(values[portrait.strongSettingKey], values[portrait.transcendenceSettingKey], portrait.maxTotalPct);
+  const changed = values[portrait.strongSettingKey] !== split.strongSkillDamagePct || values[portrait.transcendenceSettingKey] !== split.transcendenceSkillDamagePct;
+  values[portrait.strongSettingKey] = split.strongSkillDamagePct;
+  values[portrait.transcendenceSettingKey] = split.transcendenceSkillDamagePct;
+  return changed;
+}
+
 export function parseTranscendenceSkillDamageShareInput(raw: string): number | null {
   if (!/^(?:0|[1-9]\d{0,2})(?:\.\d{0,2})?$/.test(raw)) return null;
   const value = Number(raw);

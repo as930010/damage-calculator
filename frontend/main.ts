@@ -1,7 +1,7 @@
 import { getEquipmentOptionName } from '../calculation/equipment-catalog.ts';
 import { type AccessoryEffectOption } from '../calculation/equipment-effects.ts';
 import { loadGameData, readJson, escapeHtml as h, formatNumber as fmt } from './data.ts';
-import { readState, readBaseline, saveState, migrateLegacyEnvironmentSelection, normalizeTranscendenceSkillDamageShare, normalizePortraitAwakeningSplit, parseTranscendenceSkillDamageShareInput, type LoadoutState } from './state.ts';
+import { readState, readBaseline, saveState, migrateLegacyEnvironmentSelection, migrateLegacyGloveCircuitSkillDamage as migrateGloveCircuit, migrateLegacyPortraitAwakening as migratePortrait, normalizePortraitAwakeningValues as normalizePortraitValues, normalizeTranscendenceSkillDamageShare, parseTranscendenceSkillDamageShareInput, type LoadoutState } from './state.ts';
 import { parseLoadoutJson, serializeLoadout } from './loadout-transfer.ts';
 import { evaluateLoadout, type projectDamage } from './projection.ts';
 import { createBaselineEvaluationCache } from './baseline-evaluation.ts';
@@ -10,9 +10,9 @@ import { createPicker, type PickerOption } from './picker.ts';
 import { GLOVE_CIRCUIT_ROWS_FIELD, readGloveCircuitRows, serializeGloveCircuitRows, gloveCircuitRowsTotal } from './circuit-board-rows.ts';
 import { icon } from './icons.ts';
 import { capOverflowPercentage } from './cap-warnings.ts';
-import { findValidationCatalog } from './input-validation.ts';
+import { createCatalogIndexScope } from './catalog-index.ts';
 import { canonicalizeNumber, preventScientificNotation } from './numeric-input.ts';
-import { resolveClassCode, sanitizeClassCode } from './class-code.ts';
+import { sanitizeClassCode } from './class-code.ts';
 import { resolveUnsignedInteger, sanitizeUnsignedInteger } from './direct-input.ts';
 import { historyShortcutAction, LoadoutHistory } from './history.ts';
 
@@ -41,13 +41,15 @@ async function start() {
   // This page loads GameData once. Controls/import/history change state, never this data.
   // A future in-session data/parameter refresh must replace this revision token.
   const calculationDataRevision = Symbol('loaded-game-data');
+  const catalogIndex = createCatalogIndexScope().get(data, calculationDataRevision);
+  const innerwearOrder = new Map(data.innerwear.slots.map((slot, index) => [`innerwear:${slot.id}`, index]));
   const baselineEvaluationCache = createBaselineEvaluationCache();
   const sampleId = new URLSearchParams(location.search).get('sample');
   if (sampleId !== null && !/^[a-z0-9-]+$/.test(sampleId)) throw new RangeError('驗算範例名稱無效。');
   const sampleMode = sampleId !== null;
   const state: LoadoutState = sampleMode
     ? await readJson<LoadoutState>(`examples/${sampleId}.json`)
-    : readState(data.classes.classes.find(entry => entry.active)?.id ?? 'DaB');
+    : readState(catalogIndex.activeClasses[0]?.id ?? 'DaB');
   state.transcendenceSkillDamageSharePct = normalizeTranscendenceSkillDamageShare(state.transcendenceSkillDamageSharePct);
   const startupLegacyEnvironmentMigrated = migrateLegacyEnvironmentSelection(state.values) !== null;
   const migrateLegacyHeadStoneLabel = (target: LoadoutState) => {
@@ -55,37 +57,9 @@ async function start() {
     target.values['MasterBeast.Head.CustomAttribute'] = '無關傷害';
     return true;
   };
-  const migrateLegacyGloveCircuitSkillDamage = (target: LoadoutState) => {
-    const gloveCircuit = data.circuits.inputs.find(entry => entry.slot === 'gloves');
-    if (!gloveCircuit || target.values[gloveCircuit.attributeCell] !== '超越技傷%') return false;
-    target.values[gloveCircuit.attributeCell] = '單技傷%';
-    return true;
-  };
-  const migrateLegacyPortraitAwakening = (target: LoadoutState) => {
-    const portrait = data.otherEffects.portraitAwakening;
-    const legacyValue = target.values[portrait.legacySettingKey];
-    if (legacyValue === undefined) return false;
-    if (legacyValue === '有'
-      && target.values[portrait.strongSettingKey] === undefined
-      && target.values[portrait.transcendenceSettingKey] === undefined) {
-      target.values[portrait.transcendenceSettingKey] = portrait.maxTotalPct;
-    }
-    delete target.values[portrait.legacySettingKey];
-    return true;
-  };
-  const normalizePortraitAwakeningValues = (target: LoadoutState) => {
-    const portrait = data.otherEffects.portraitAwakening;
-    const split = normalizePortraitAwakeningSplit(
-      target.values[portrait.strongSettingKey],
-      target.values[portrait.transcendenceSettingKey],
-      portrait.maxTotalPct,
-    );
-    const changed = target.values[portrait.strongSettingKey] !== split.strongSkillDamagePct
-      || target.values[portrait.transcendenceSettingKey] !== split.transcendenceSkillDamagePct;
-    target.values[portrait.strongSettingKey] = split.strongSkillDamagePct;
-    target.values[portrait.transcendenceSettingKey] = split.transcendenceSkillDamagePct;
-    return changed;
-  };
+  const migrateLegacyGloveCircuitSkillDamage = (target: LoadoutState) => migrateGloveCircuit(target.values, catalogIndex.gloveCircuit?.attributeCell);
+  const migrateLegacyPortraitAwakening = (target: LoadoutState) => migratePortrait(target.values, data.otherEffects.portraitAwakening);
+  const normalizePortraitAwakeningValues = (target: LoadoutState) => normalizePortraitValues(target.values, data.otherEffects.portraitAwakening);
   const startupLegacyHeadStoneLabelMigrated = migrateLegacyHeadStoneLabel(state);
   const startupLegacyGloveCircuitMigrated = migrateLegacyGloveCircuitSkillDamage(state);
   const startupLegacyPortraitAwakeningMigrated = migrateLegacyPortraitAwakening(state);
@@ -423,7 +397,29 @@ async function start() {
   }
   const val = (fieldId: string) => String(state.values[fieldId] ?? '');
   const summary = (stats: Readonly<Record<string, number>>) => Object.entries(stats).filter(([, value]) => value !== 0).map(([key, value]) => `${data.attributes.attributes.find(a => a.key === key)?.name ?? key} ${fmt(value)}`).join(' · ');
-  const options = (names: readonly string[]): PickerOption[] => names.map(name => ({ value: name, label: name }));
+  const pickerOptionsByNames = new WeakMap<readonly string[], readonly PickerOption[]>();
+  const options = (names: readonly string[]): readonly PickerOption[] => {
+    let choices = pickerOptionsByNames.get(names);
+    if (!choices) { choices = Object.freeze(names.map(name => Object.freeze({ value: name, label: name }))); pickerOptionsByNames.set(names, choices); }
+    return choices;
+  };
+  const titleChoices = options([...new Set(catalogIndex.resolveFieldChoices('Effect.Title', state.values) as readonly string[])]);
+  const validationPickerChoices = new Map<string, readonly PickerOption[]>();
+  const classPickerChoices = Object.freeze(catalogIndex.activeClasses.map(entry => Object.freeze({ value: entry.id, label: entry.name })));
+  const equipmentPickerChoices = new Map<string, readonly PickerOption[]>();
+  const orderedEquipmentItems = new Map<string, ReturnType<typeof catalogIndex.equipmentItems>>();
+  const stonePickerChoices = new Map<'armor' | 'weapon', readonly PickerOption[]>();
+  const magicStoneChoices = (application: 'armor' | 'weapon'): readonly PickerOption[] => {
+    let choices = stonePickerChoices.get(application);
+    if (!choices) {
+      choices = Object.freeze(catalogIndex.activeCatalogItems(data.mapping.magicStoneSelections.catalogFile).map(item => {
+        const name = getEquipmentOptionName(item, application);
+        return Object.freeze({ value: name, label: name, detail: summary(item.targetApplications?.[application]?.stats ?? item.stats ?? {}) });
+      }));
+      stonePickerChoices.set(application, choices);
+    }
+    return choices;
+  };
   const refreshHistoryControls = () => {
     undoButton.disabled = !history.canUndo;
     redoButton.disabled = !history.canRedo;
@@ -462,7 +458,7 @@ async function start() {
     return selected === val(alternative.attributeCell) && (selected === "強者%" || selected === "排熱%") ? selected : null;
   };
   const chipAttributeOptions = (slot: (typeof data.chipSlots.slots)[number]) => {
-    const chipNames = data.chips.chips.map(entry => entry.name);
+    const chipNames = catalogIndex.resolveFieldChoices(slot.attributeCell, state.values) as readonly string[];
     if (!state.lowerwearAlternativeEnabled || (slot.id !== "lowerwear" && slot.id !== "lowerwearAlternative")) return options(chipNames);
     const peerId = slot.id === "lowerwear" ? "lowerwearAlternative" : "lowerwear";
     const peer = data.chipSlots.slots.find(entry => entry.id === peerId);
@@ -470,12 +466,19 @@ async function start() {
     const blocked = peerAttribute === "強者%" || peerAttribute === "排熱%";
     return options(blocked ? chipNames.filter(name => name !== peerAttribute) : chipNames);
   };
-  const validationChoices = (cell: string, percentLabel = false): PickerOption[] => {
-    const catalog = findValidationCatalog(data.simulatorInputs.inputs, data.simulatorInputs.catalogs, cell);
-    return (catalog?.options ?? []).map(option => {
-      const value = String(option.value);
-      return { value, label: percentLabel && typeof option.value === 'number' ? `${value}%` : value };
-    });
+  const validationChoices = (cell: string, percentLabel = false): readonly PickerOption[] => {
+    const catalog = catalogIndex.validationCatalog(cell);
+    if (!catalog) return [];
+    const key = JSON.stringify([catalog.id, percentLabel]);
+    let choices = validationPickerChoices.get(key);
+    if (!choices) {
+      choices = Object.freeze(catalog.options.map(option => {
+        const value = String(option.value);
+        return Object.freeze({ value, label: percentLabel && typeof option.value === 'number' ? value + '%' : value });
+      }));
+      validationPickerChoices.set(key, choices);
+    }
+    return choices;
   };
   const update = (force = false) => {
     const changed = history.record(state);
@@ -1055,22 +1058,22 @@ async function start() {
     }
     portraitSection.append(portraitHeading, portraitNote, portraitGrid);
     general.append(portraitSection);
-    field(general, '百億/內布隆套效', data.colorSetEffects.settingKey, options(data.colorSetEffects.options.map(option => option.name)));
+    field(general, '百億/內布隆套效', data.colorSetEffects.settingKey, options(catalogIndex.resolveFieldChoices(data.colorSetEffects.settingKey, state.values) as readonly string[]));
     const atma = group('亞特瑪');
-    field(atma, '亞特瑪屬性', 'Atma.Element', options(['火焰', '流水', '草木']));
-    field(atma, '亞特瑪顏色', 'Atma.Color', options(['藍色', '綠色', '紫色', '米色']));
+    field(atma, '亞特瑪屬性', 'Atma.Element', options(catalogIndex.resolveFieldChoices('Atma.Element', state.values) as readonly string[]));
+    field(atma, '亞特瑪顏色', 'Atma.Color', options(catalogIndex.resolveFieldChoices('Atma.Color', state.values) as readonly string[]));
             const resonance = group('共鳴輸入', '輸入已分配的共鳴點，例如適應力點滿應該填100而非7。');
             const resonanceLimits: Record<string, number> = { 雙攻: 999, 技傷: 100, 適應: 100, 兩極: 50, B傷: 50 };
             for (const effect of data.resonance.effects) {
               numeric(resonance, effect.name, effect.settingKey, false, { min: 0, max: resonanceLimits[effect.name] ?? 999, step: 1, integer: true });
             }
     const spirit = group('賦靈錄');
-    const spiritClassCodes = data.spiritRecord.classSelectors.classes.map(entry => entry.classCode);
+    const spiritClassCodes = catalogIndex.spiritClassCodes;
     const selectedSpiritClassCodes = data.spiritRecord.classSelectors.settingKeys.map(val);
     data.spiritRecord.classSelectors.settingKeys.forEach((cell, index) => {
       const selectedElsewhere = selectedSpiritClassCodes.filter((_, otherIndex) => otherIndex !== index && selectedSpiritClassCodes[otherIndex] !== '');
-      const usedElsewhere = new Set(selectedElsewhere.map(code => resolveClassCode(code, spiritClassCodes)?.toLocaleLowerCase()).filter((code): code is string => Boolean(code)));
-      const currentCode = resolveClassCode(selectedSpiritClassCodes[index], spiritClassCodes);
+      const usedElsewhere = new Set(selectedElsewhere.map(code => catalogIndex.resolveSpiritClassCode(code)?.toLocaleLowerCase()).filter((code): code is string => Boolean(code)));
+      const currentCode = catalogIndex.resolveSpiritClassCode(selectedSpiritClassCodes[index]);
       const choices = spiritClassCodes
         .filter(code => !usedElsewhere.has(code.toLocaleLowerCase()) || code === currentCode)
         .map(code => ({ value: code, label: code }));
@@ -1087,11 +1090,11 @@ async function start() {
       }, {
         sanitize: sanitizeClassCode,
         resolve: value => {
-          const resolved = resolveClassCode(value, spiritClassCodes);
-          return resolved && !selectedElsewhere.some(code => resolveClassCode(code, spiritClassCodes)?.toLocaleLowerCase() === resolved.toLocaleLowerCase()) ? resolved : null;
+          const resolved = catalogIndex.resolveSpiritClassCode(value);
+          return resolved && !selectedElsewhere.some(code => catalogIndex.resolveSpiritClassCode(code)?.toLocaleLowerCase() === resolved.toLocaleLowerCase()) ? resolved : null;
         },
         onInvalid: value => {
-          const resolved = resolveClassCode(value, spiritClassCodes);
+          const resolved = catalogIndex.resolveSpiritClassCode(value);
           error.textContent = resolved && usedElsewhere.has(resolved.toLocaleLowerCase())
             ? '職業「' + resolved + '」已在其他欄位選擇。'
             : value ? '查無此職業代碼，請確認後再按 Enter。' : '請輸入職業代碼。';
@@ -1150,12 +1153,12 @@ async function start() {
       state.masterBeastSpiritStoneColor ?? data.masterBeast.spiritStoneColorSelector.defaultColor,
       value => { state.masterBeastSpiritStoneColor = value as LoadoutState['masterBeastSpiritStoneColor']; update(); },
     ));
-    field(inputs, '聖獸潛力', 'MasterBeast.OverallPotential', options(data.masterBeast.options.filter(option => option.category === 'overall').map(option => option.name)));
+    field(inputs, '聖獸潛力', 'MasterBeast.OverallPotential', options(catalogIndex.resolveFieldChoices('MasterBeast.OverallPotential', state.values) as readonly string[]));
   }
   function renderTitleInput() {
     const root = document.querySelector<HTMLElement>('#title-input')!;
     root.replaceChildren();
-    field(root, '稱號', 'Effect.Title', options([...new Set(data.otherEffects.titles.map(entry => entry.name))]));
+    field(root, '稱號', 'Effect.Title', titleChoices);
   }
   function renderBeastAccessories() {
     const root = document.querySelector<HTMLElement>('#beast-accessory-fields')!;
@@ -1277,16 +1280,22 @@ async function start() {
     if (selected.enabledBy && !state.lowerwearAlternativeEnabled) { panel.insertAdjacentHTML('beforeend', '<p class="panel-note">請先啟用上方「強/排褲切換」。設定會保留於裝置，停用時不參與計算。</p>'); return; }
     if (selected.selectionCell) {
       const selectionCell = selected.selectionCell;
-      const mapping = data.mapping.selections.find(entry => entry.selectionCell === selectionCell)!;
-      const slotItems = data.catalogs[mapping.catalogFile].items.filter(item => item.active && item.slotId === mapping.slotId);
-      const isRightIceCatalog = mapping.catalogFile.endsWith('right-ice.json');
-      const isMysticSetName = (name: string) => name === '神埃' || name === '神秘的埃羅德';
-      const isKnightSetName = (name: string) => name === '騎士團' || name === '艾里奧斯守護騎士團';
-      const items = isRightIceCatalog
-        ? [...slotItems.filter(item => !isMysticSetName(item.name) && !isKnightSetName(item.name)), ...slotItems.filter(item => isMysticSetName(item.name)), ...slotItems.filter(item => isKnightSetName(item.name))]
-        : slotItems;
+      const mapping = catalogIndex.equipmentMappings.get(selectionCell)!;
+      let items = orderedEquipmentItems.get(selectionCell);
+      if (!items) {
+        const slotItems = catalogIndex.equipmentItems(mapping);
+        const isRightIceCatalog = mapping.catalogFile.endsWith('right-ice.json');
+        const isMysticSetName = (name: string) => name === '神埃' || name === '神秘的埃羅德';
+        const isKnightSetName = (name: string) => name === '騎士團' || name === '艾里奧斯守護騎士團';
+        items = isRightIceCatalog
+          ? Object.freeze([...slotItems.filter(item => !isMysticSetName(item.name) && !isKnightSetName(item.name)), ...slotItems.filter(item => isMysticSetName(item.name)), ...slotItems.filter(item => isKnightSetName(item.name))])
+          : slotItems;
+        orderedEquipmentItems.set(selectionCell, items);
+      }
       const isAccessory = mapping.catalogFile === 'equipment/accessories.json';
-      field(panel, selected.sharedSelection ? '左冰套裝（五部位共用）' : '選擇裝備', selectionCell, items.map(item => ({ value: item.name, label: item.name, detail: summary(item.stats ?? {}) })), isAccessory);
+      let choices = equipmentPickerChoices.get(selectionCell);
+      if (!choices) { choices = Object.freeze(items.map(item => Object.freeze({ value: item.name, label: item.name, detail: summary(item.stats ?? {}) }))); equipmentPickerChoices.set(selectionCell, choices); }
+      field(panel, selected.sharedSelection ? '左冰套裝（五部位共用）' : '選擇裝備', selectionCell, choices, isAccessory);
       if (isAccessory) {
         const appraisalGroup = data.accessoryEffects.groups.find(entry => entry.selectionCell === selectionCell);
         const selectedItem = items.find(item => item.name === val(selectionCell));
@@ -1390,9 +1399,8 @@ async function start() {
       const area = section(panel, '魔法石', true);
       const visibleStoneCells = innerwearSlot && innerwearType === "百億" ? selected.stoneCells.slice(0, 4) : selected.stoneCells;
       for (const [index, cell] of visibleStoneCells.entries()) {
-        const mapping = data.mapping.magicStoneSelections.inputGroups.find(entry => entry.selectionCell === cell)!;
-        const items = data.catalogs[data.mapping.magicStoneSelections.catalogFile].items.filter(item => item.active);
-        field(area, `魔法石 ${index + 1}`, cell, items.map(item => ({ value: getEquipmentOptionName(item, mapping.application), label: getEquipmentOptionName(item, mapping.application), detail: summary(item.targetApplications?.[mapping.application]?.stats ?? item.stats ?? {}) })));
+        const mapping = catalogIndex.equipmentMappings.get(cell)!;
+        field(area, `魔法石 ${index + 1}`, cell, magicStoneChoices(mapping.application!));
       }
     }
     if (selected.innerwearId) {
@@ -1590,7 +1598,7 @@ async function start() {
       if (row.key === 'critRate' || row.key === 'extremizationRate') return `${sign}${precise(row.delta * 100)}%`;
       return `${sign}${row.key === 'finalDamage' ? visiblePrecise(row.delta) : precise(row.delta)}`;
     };
-    const activeAttackType = data.classes.classes.find(entry => entry.id === state.Job)?.attackType;
+    const activeAttackType = catalogIndex.classById(state.Job)?.attackType;
     const visibleRows = rows.filter(row =>
       (!['physicalAttack', 'magicalAttack'].includes(row.key)
         || row.key === (activeAttackType === 'physical' ? 'physicalAttack' : 'magicalAttack'))
@@ -1633,8 +1641,8 @@ async function start() {
     document.querySelector('#comparison-label')!.textContent = before ? '與已儲存配置比較' : baseline ? '比較基準已不適用目前資料，請重新設定' : '可儲存目前配置作為比較基準';
 
       const currentCombatRates = currentEvaluation.combatRates;
-    const currentClass = data.classes.classes.find(entry => entry.id === state.Job);
-    const baselineClass = baseline ? data.classes.classes.find(entry => entry.id === baseline?.Job) : undefined;
+    const currentClass = catalogIndex.classById(state.Job);
+    const baselineClass = baseline ? catalogIndex.classById(baseline.Job) : undefined;
     const critDamageSupplement = (damage: ReturnType<typeof projectDamage> | null) => damage
       ? damage.result.classCritDamagePassivePct + damage.result.multiplicativeCritDamage.value * 100
       : 0;
@@ -1689,7 +1697,6 @@ async function start() {
         ? currentDamage.result.generalMultiplicativeDamage.factors.map(effect => `<p class="stat-source-row"><span>${h(sourceLabel(effect.sourceId))}</span><strong>×${fmt(effect.factor)}</strong></p>`).join('')
         : '<p class="stat-source-empty">目前沒有額外乘算來源</p>'}<p class="stat-average">乘算效果總倍率 ×${fmt(currentDamage.result.generalMultiplicativeDamage.value)}</p></div></details>`
       : `<div class="stat"><p>乘算效果</p><strong>待補輸入</strong><small class="input-hint">${h(calculationIssue(damageCalculationError))}</small></div>`;
-    const innerwearOrder = new Map(data.innerwear.slots.map((slot, index) => [`innerwear:${slot.id}`, index]));
     target.innerHTML = `<div class="stat-list">${visibleStats.map(({ key, stat, previousStat }) => {
       const meta = data.attributes.attributes.find(entry => entry.key === key);
       const isPercent = meta?.unit === 'percent';
@@ -1773,15 +1780,13 @@ async function start() {
   }
   const renderClassPicker = () => {
     const root = document.querySelector<HTMLElement>('#class-picker')!;
-    const activeClasses = data.classes.classes.filter(entry => entry.active);
-    const classCodes = activeClasses.map(entry => entry.id);
     const error = document.createElement('span');
     error.className = 'input-hint class-picker-error';
     error.hidden = true;
     error.setAttribute('role', 'alert');
-    const picker = createPicker('職業', activeClasses.map(entry => ({ value: entry.id, label: entry.name })), state.Job, value => { state.Job = value; error.textContent = ''; error.hidden = true; update(); }, {
+    const picker = createPicker('職業', classPickerChoices, state.Job, value => { state.Job = value; error.textContent = ''; error.hidden = true; update(); }, {
       sanitize: sanitizeClassCode,
-      resolve: value => resolveClassCode(value, classCodes),
+      resolve: catalogIndex.resolveActiveClassCode,
       onInvalid: value => { error.textContent = value ? '查無此職業代碼，請確認後再按 Enter。' : '請輸入職業代碼。'; error.hidden = false; },
       onInput: () => { error.textContent = ''; error.hidden = true; },
       allowCharacter: character => /^[A-Za-z]$/.test(character),
@@ -1797,7 +1802,7 @@ async function start() {
   const renderBattleSettings = () => {
     battle.replaceChildren();
     for (const [fieldId, label] of [['Stage.Adapt','關卡適應力'],['Stage.CritRatePenalty','關卡扣致命'],['Stage.BossDEF','Boss防禦']] as const) {
-      const catalog = findValidationCatalog(data.simulatorInputs.inputs, data.simulatorInputs.catalogs, fieldId);
+      const catalog = catalogIndex.validationCatalog(fieldId);
       const error = document.createElement('span');
       error.className = 'input-hint class-picker-error';
       error.hidden = true;
@@ -1875,7 +1880,7 @@ async function start() {
   });
   refreshHistoryControls();
   document.querySelector<HTMLButtonElement>('#export-loadout')!.addEventListener('click', () => {
-    const exported = serializeLoadout(state, data);
+    const exported = serializeLoadout(state, data, catalogIndex);
     const blobUrl = URL.createObjectURL(new Blob([exported.json], { type: 'application/json' }));
     const link = document.createElement('a');
     link.href = blobUrl;
@@ -1891,7 +1896,7 @@ async function start() {
     const file = fileInput.files?.[0];
     if (!file) return;
     try {
-      const imported = parseLoadoutJson(await file.text(), state, data);
+      const imported = parseLoadoutJson(await file.text(), state, data, catalogIndex);
       Object.assign(state, imported.state);
       migrateLegacyPortraitAwakening(state);
       normalizePortraitAwakeningValues(state);

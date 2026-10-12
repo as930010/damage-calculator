@@ -11,12 +11,12 @@ export const gameData = JSON.parse(await readFile(resolve(root, 'dist/data/game-
 export const sample = JSON.parse(await readFile(resolve(root, 'data/examples/public-example-2026-09-28.json'), 'utf8'));
 
 /** Real source modules, with counters inserted only in the test's VM copies. */
-export async function createRuntime({ dom, sourceReader, instrument = true } = {}) {
+export async function createRuntime({ dom, sourceReader, transformSource, globals: extraGlobals, instrument = true } = {}) {
   const counts = {};
   const globals = { console, structuredClone, URL, URLSearchParams, Intl, Error, RangeError, TypeError,
     TextEncoder, TextDecoder, btoa, atob,
     setTimeout, clearTimeout, queueMicrotask,
-    __count: name => { counts[name] = (counts[name] ?? 0) + 1; } };
+    __count: (name, amount = 1) => { counts[name] = (counts[name] ?? 0) + amount; }, ...extraGlobals };
   if (dom) {
     for (const name of ['window', 'document', 'location', 'localStorage', 'navigator', 'HTMLElement',
       'HTMLInputElement', 'HTMLSelectElement', 'HTMLTextAreaElement', 'HTMLDetailsElement', 'Element',
@@ -36,11 +36,15 @@ export async function createRuntime({ dom, sourceReader, instrument = true } = {
     let source = sourceReader ? await sourceReader(relative(root, path).replaceAll('\\', '/')) : await readFile(path, 'utf8');
     source = stripTypeScriptTypes(source);
     const file = relative(root, path).replaceAll('\\', '/');
+    if (transformSource) source = transformSource(file, source);
     if (instrument) {
       const names = file === 'calculation/attribute-aggregation.ts' ? ['aggregateCharacterAttributes', 'prepareCharacterAttributeInput']
         : file === 'frontend/projection.ts' ? ['projectAttributes', 'resolveLoadoutSources', 'projectDamage', 'projectCombatRates', 'evaluateLoadout']
         : file === 'calculation/loadout-engine.ts' ? ['calculateLoadout', 'calculateLoadoutCombatRates', 'prepareLoadoutAttributes', 'evaluatePreparedLoadout']
-        : file === 'frontend/main.ts' ? ['renderResults'] : [];
+        : file === 'frontend/main.ts' ? ['renderResults']
+        : file === 'frontend/catalog-index.ts' ? ['createCatalogIndex', 'equipmentTransferCode', 'resolveFieldChoices', 'matchEquipment', 'resolveEquipmentCode']
+        : file === 'frontend/loadout-transfer.ts' ? ['customOptions', 'cellOptions', 'equipmentMappings', 'equipmentTransferCode', 'matchEquipment', 'resolveEquipmentCode']
+        : file === 'frontend/input-validation.ts' ? ['findValidationCatalog', 'createValidationCatalogIndex'] : [];
       for (const name of names) source = source.replace(new RegExp(`(function ${name}\\([\\s\\S]*?\\)\\s*\\{)`), `$1\n__count('${name}');`);
     }
     if (file === 'frontend/main.ts') source = source.replace('start().catch(', 'globalThis.__startup = start().catch(');
