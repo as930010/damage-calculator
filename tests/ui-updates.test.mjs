@@ -2,6 +2,121 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { gameData } from './loadout-evaluation-harness.mjs';
 import { uiPage, stateA, stateB, stageFields, enter, assertStageSync, measureDom, workloadActions } from './ui-update-harness.mjs';
+import { createRuntime } from './loadout-evaluation-harness.mjs';
+
+function pickerRows(page, label) {
+  const { document, Event } = page.dom.window;
+  const input = document.querySelector(`input[aria-label="${label}"]`);
+  assert.ok(input, label);
+  input.dispatchEvent(new Event('focus'));
+  return [...document.getElementById(input.getAttribute('aria-controls')).querySelectorAll('[role="option"]')];
+}
+
+function selectPicker(page, label, value) {
+  const row = pickerRows(page, label).find(node => node.querySelector('span')?.textContent === value);
+  assert.ok(row, value); row.click();
+}
+
+const mirrorAttributeCell = 'MasterBeast.Head.Mirror.1.Attribute';
+const mirrorValueCell = 'MasterBeast.Head.Mirror.1.Value';
+const mirrorInput = page => page.dom.window.document.querySelector('.beast-mirror-grid .field > input');
+const openHeadMirrors = page => page.dom.window.document.querySelector('.beast-accessory-slot[data-beast-slot-id="headwear"]').click();
+
+test('magazine kinds show their actual effects and chip tuning shows only percentages', async () => {
+  const state = structuredClone(stateA);
+  state.values['Innerwear.Upper.Type'] = '內布隆';
+  const page = await uiPage(state);
+  try {
+    page.dom.window.document.querySelector('.gear-slot[data-slot-id="inner-upper"]').click();
+    const rows = pickerRows(page, '彈匣種類');
+    const expected = {
+      '超級彈匣[極度緩慢]': '乘算%',
+      '超級彈匣[推進器]': '超適應力% · 兩極化-10%',
+      '戰鬥彈匣Type - I': '流血%',
+      '戰鬥彈匣Type - II': '所有技能傷害%',
+      '戰鬥彈匣Type - III': '超越技傷% · 強烈技傷%',
+      '戰鬥彈匣Type - IV': '致命傷害%',
+      '戰鬥彈匣Type - V': 'Boss傷害%',
+      '經典彈匣Type - I': '兩極化%',
+    };
+    assert.deepEqual(rows.map(row => row.querySelector('span').textContent), gameData.nephronArmor.magazines.map(item => item.name));
+    for (const row of rows) assert.equal(row.querySelector('small').textContent, expected[row.querySelector('span').textContent]);
+    const chip = gameData.chips.chips.find(item => item.name === state.values['Left.Armor.Upper.Chip.Attribute']);
+    const tuning = pickerRows(page, '芯片調校等級');
+    assert.deepEqual(tuning.map(row => row.querySelector('span').textContent), chip.tuningLevels.map(level => level.level));
+    assert.deepEqual(tuning.map(row => row.querySelector('small').textContent), chip.tuningLevels.map(level => `${level.value}%`));
+  } finally { page.close(); }
+});
+
+test('unset mirrors default to unrelated damage and disabled zero without overwriting saved fields', async () => {
+  const state = structuredClone(stateA);
+  delete state.values[mirrorAttributeCell]; delete state.values[mirrorValueCell];
+  const page = await uiPage(state);
+  try {
+    openHeadMirrors(page);
+    assert.equal(page.dom.window.document.querySelector('input[aria-label="迷鏡效果屬性"]').value, '無關傷害');
+    assert.equal(mirrorInput(page).value, '0'); assert.equal(mirrorInput(page).disabled, true);
+    assert.equal(page.readState().values[mirrorAttributeCell], undefined);
+    selectPicker(page, '迷鏡效果屬性', '致命一擊%');
+    const input = mirrorInput(page);
+    assert.equal(input.disabled, false);
+    input.value = '0'; input.dispatchEvent(new page.dom.window.Event('input', { bubbles: true }));
+    assert.equal(page.readState().values[mirrorValueCell], 0);
+    const zeroJson = await page.exportJson();
+    await page.importJson(JSON.stringify(zeroJson)); openHeadMirrors(page);
+    assert.equal(page.readState().values[mirrorValueCell], 0);
+    assert.equal(mirrorInput(page).disabled, false); assert.equal(mirrorInput(page).value, '0');
+    const restoredInput = mirrorInput(page);
+    restoredInput.value = '0.3'; restoredInput.dispatchEvent(new page.dom.window.Event('input', { bubbles: true }));
+    assert.equal(page.readState().values[mirrorValueCell], 0.003);
+    restoredInput.value = '0.1'; restoredInput.dispatchEvent(new page.dom.window.Event('input', { bubbles: true }));
+    restoredInput.dispatchEvent(new page.dom.window.Event('blur'));
+    assert.equal(page.readState().values[mirrorValueCell], 0.003);
+    assert.equal(restoredInput.value, '0.3');
+  } finally { page.close(); }
+});
+
+test('unrelated mirror selection zeroes its value, survives export/reload and undo/redo', async () => {
+  const page = await uiPage();
+  let reloaded;
+  try {
+    openHeadMirrors(page);
+    const beforeDamage = page.dom.window.document.querySelector('#damage-result').textContent;
+    selectPicker(page, '迷鏡效果屬性', '無關傷害');
+    assert.equal(page.readState().values[mirrorAttributeCell], '無關傷害');
+    assert.equal(page.readState().values[mirrorValueCell], 0);
+    assert.equal(mirrorInput(page).disabled, true); assert.equal(mirrorInput(page).value, '0');
+    const afterDamage = page.dom.window.document.querySelector('#damage-result').textContent;
+    assert.notEqual(afterDamage, beforeDamage);
+    await workloadActions.undo(page); openHeadMirrors(page);
+    assert.equal(mirrorInput(page).disabled, false); assert.equal(mirrorInput(page).value, '0.1');
+    assert.equal(page.dom.window.document.querySelector('#damage-result').textContent, beforeDamage);
+    await workloadActions.redo(page); openHeadMirrors(page);
+    assert.equal(mirrorInput(page).disabled, true);
+    assert.equal(page.dom.window.document.querySelector('#damage-result').textContent, afterDamage);
+    const json = await page.exportJson();
+    await page.importJson(JSON.stringify(json));
+    assert.equal(page.readState().values[mirrorValueCell], 0);
+    reloaded = await uiPage(page.readState()); openHeadMirrors(reloaded);
+    assert.equal(mirrorInput(reloaded).disabled, true); assert.equal(mirrorInput(reloaded).value, '0');
+    assert.equal(reloaded.dom.window.document.querySelector('#damage-result').textContent, afterDamage);
+  } finally { page.close(); reloaded?.close(); }
+});
+
+test('mirror calculation accepts zero, ignores unrelated damage and retains positive range/step validation', async () => {
+  const runtime = await createRuntime();
+  const { resolveMasterBeastEffects } = await runtime.load('calculation/equipment-effects.ts');
+  const resolve = (attribute, value) => resolveMasterBeastEffects(gameData.masterBeast, { mirrorManual: [{ attribute, value }] });
+  for (const attribute of ['雙攻%', '致命一擊%', '極大化%']) {
+    const sources = resolve(attribute, 0).filter(source => source.sourceId.startsWith('master-beast:mirror:'));
+    assert.equal(sources.length, 1); assert.deepEqual(Object.values(sources[0].stats), [0]);
+  }
+  for (const value of [0, 0.5, null, NaN]) assert.equal(resolve('無關傷害', value).filter(source => source.sourceId.startsWith('master-beast:mirror:')).length, 0);
+  assert.equal(resolve('雙攻%', 0.001).at(-1).stats.doubleAttackPct, 0.1);
+  assert.equal(resolve('致命一擊%', 0.003).at(-1).stats.critRatePct, 0.3);
+  for (const value of [-0.001, 0.0005, 0.011, NaN, Infinity]) assert.throws(() => resolve('雙攻%', value), RangeError);
+  assert.throws(() => resolve('致命一擊%', 0.001), RangeError);
+});
 
 test('import synchronizes all stage controls with actual calculation State and exported JSON', async () => {
   const page = await uiPage();

@@ -517,6 +517,7 @@ export function resolveMasterBeastEffects(
   addManual(selection.necklaceManual, "master-beast:necklace-manual");
   (selection.ringManual ?? []).forEach((entry, index) => addManual(entry, "master-beast:ring-manual:" + (index + 1)));
   (selection.mirrorManual ?? []).forEach((entry, index) => {
+    if (entry.attribute === "無關傷害") return;
     const sourceId = "master-beast:mirror:" + (index + 1);
     if (entry.attribute?.trim() && entry.value != null) {
       const rule = document.mirrorValueRules.byAttribute[entry.attribute] ?? document.mirrorValueRules.default;
@@ -526,11 +527,11 @@ export function resolveMasterBeastEffects(
       }
       const percentagePoints = entry.value * 100;
       const stepIndex = (percentagePoints - rule.minPct) / rule.stepPct;
-      if (!Number.isFinite(percentagePoints)
+      if (percentagePoints !== 0 && (!Number.isFinite(percentagePoints)
         || percentagePoints < rule.minPct - 1e-9
         || percentagePoints > rule.maxPct + 1e-9
-        || Math.abs(stepIndex - Math.round(stepIndex)) > 1e-8) {
-        throw new RangeError(`迷鏡效果「${entry.attribute}」數值須為 ${rule.minPct}%～${rule.maxPct}%，每檔 ${rule.stepPct}%。`);
+        || Math.abs(stepIndex - Math.round(stepIndex)) > 1e-8)) {
+        throw new RangeError(`迷鏡效果「${entry.attribute}」數值須為 0% 或 ${rule.minPct}%～${rule.maxPct}%，每檔 ${rule.stepPct}%。`);
       }
     }
     addManual({ ...entry, fractionToPercentagePoints: true }, sourceId);

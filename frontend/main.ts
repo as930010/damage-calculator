@@ -711,6 +711,10 @@ async function start() {
   };
   const field = (parent: HTMLElement, label: string, cell: string, choices: readonly PickerOption[], redraw = false, disabled = false, disabledHint = '請先選擇屬性') => {
     const picker = createPicker(label, choices, val(cell), value => {
+      if (/^MasterBeast\..+\.Mirror\.\d+\.Attribute$/.test(cell)) {
+        value ||= '無關傷害';
+        if (value === '無關傷害') state.values[cell.replace(/\.Attribute$/, '.Value')] = 0;
+      }
       state.values[cell] = value;
       for (const armor of data.nephronArmor.fields) {
         const transform = armor.transformFields.find(entry => entry.attributeCell === cell);
@@ -739,6 +743,7 @@ async function start() {
       if (input) { input.disabled = true; input.placeholder = disabledHint; }
     }
     parent.append(picker);
+    return picker;
   };
   function getEquippedRightIceSetCounts() {
     const counts = new Map<string, number>();
@@ -957,6 +962,7 @@ async function start() {
               });
             }
     wrapper.append(input); parent.append(wrapper);
+    return input;
   };
   const section = (parent: HTMLElement, label: string, open = false) => {
     const details = document.createElement('details'); details.className = 'editor-section'; details.open = open;
@@ -1276,17 +1282,25 @@ async function start() {
     mirrorArea.classList.add('beast-mirror-section');
     const mirrorGrid = attributeValueGrid(mirrorArea, 'beast-mirror-grid');
     slot.mirrorCells.forEach(([attributeCell, valueCell]) => {
-      field(mirrorGrid, '迷鏡效果屬性', attributeCell, options(data.masterBeast.customAttributeOptions.mirror), true);
-      const valueRule = data.masterBeast.mirrorValueRules.byAttribute[val(attributeCell)] ?? data.masterBeast.mirrorValueRules.default;
-      numeric(
+      const attribute = val(attributeCell) || '無關傷害';
+      const picker = field(mirrorGrid, '迷鏡效果屬性', attributeCell, options(data.masterBeast.customAttributeOptions.mirror), true);
+      if (!val(attributeCell)) updatePicker(picker, attribute, true);
+      const unrelated = attribute === '無關傷害';
+      const valueRule = data.masterBeast.mirrorValueRules.byAttribute[attribute] ?? data.masterBeast.mirrorValueRules.default;
+      const input = numeric(
         mirrorGrid,
         '迷鏡效果數值（%）',
         valueCell,
         true,
-        { min: valueRule.minPct, max: valueRule.maxPct, step: valueRule.stepPct },
-        false,
+        { min: 0, max: valueRule.maxPct, step: valueRule.stepPct },
+        unrelated,
         true,
       );
+      if (unrelated) {
+        input.value = '0';
+        input.placeholder = '此屬性無需數值';
+        input.parentElement!.title = '此屬性無需數值';
+      }
     });
   }
   function renderSlots() {
@@ -1426,8 +1440,17 @@ async function start() {
         const magazineChoices = data.nephronArmor.magazines
           .filter(magazine => !otherSelections.some(entry => entry.name === magazine.name
             && entry.level === selectedMagazineLevel) || magazine.name === selectedMagazine)
-          .map(magazine => magazine.name);
-        field(magazineGrid, '彈匣種類', nephronField.magazineCell, options(magazineChoices), true);
+          .map(magazine => {
+            const attributeName = (key: string) => key === 'multiplicativeDamagePct'
+              ? '乘算%' : data.attributes.attributes.find(attribute => attribute.key === key)?.name ?? key;
+            const levelKeys = [magazine.levelStatKey ?? magazine.statKey, ...(magazine.additionalLevelStatKeys ?? [])];
+            const detail = [
+              ...levelKeys.filter((key): key is NonNullable<typeof key> => !!key).map(attributeName),
+              ...Object.entries(magazine.baseStats ?? {}).map(([key, value]) => `${attributeName(key).replace(/%$/, '')}${fmt(value)}%`),
+            ].join(' · ');
+            return { value: magazine.name, label: magazine.name, detail };
+          });
+        field(magazineGrid, '彈匣種類', nephronField.magazineCell, magazineChoices, true);
         const currentMagazine = data.nephronArmor.magazines.find(entry => entry.name === selectedMagazine);
         const availableLevels = data.nephronArmor.levelLabels.filter(level =>
           !otherSelections.some(entry => entry.name === selectedMagazine && entry.level === level)
@@ -1607,7 +1630,7 @@ async function start() {
       const tuningChoices: PickerOption[] = chosen?.tuningLevels.map(level => ({
         value: level.level,
         label: level.level,
-        detail: `${chosen.name.replace(/%$/, '')}增幅：${fmt(level.value)}%`,
+        detail: `${fmt(level.value)}%`,
       })) ?? [];
       field(chipGrid, '芯片調校等級', chip.tuningCell, tuningChoices, false, val(chip.attributeCell) === '');
       const conditionalChipConflict = lowerwearConditionalChipConflict();
