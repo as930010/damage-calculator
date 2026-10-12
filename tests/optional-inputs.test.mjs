@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { createRuntime, gameData } from './loadout-evaluation-harness.mjs';
 import { uiPage, stateA, workloadActions } from './ui-update-harness.mjs';
 
@@ -143,6 +144,13 @@ test('all circuit boards support bounded rows and retain them across compact exp
       while (JSON.parse(page.readState().values[rowField]).length < board.max) add.click();
       assert.equal(JSON.parse(page.readState().values[rowField]).length, board.max, board.slot);
       assert.equal(add.disabled, true, board.slot);
+      const styles = page.dom.window.document.createElement('style');
+      styles.textContent = await readFile(new URL('../frontend/styles.css', import.meta.url), 'utf8');
+      page.dom.window.document.head.append(styles);
+      assert.equal(page.dom.window.getComputedStyle(add).opacity, '0.58', `${board.slot} add button visibly disabled`);
+      assert.equal(page.dom.window.getComputedStyle(add).cursor, 'not-allowed', `${board.slot} add button cursor`);
+      add.click();
+      assert.equal(JSON.parse(page.readState().values[rowField]).length, board.max, `${board.slot} disabled add has no effect`);
       page.dom.window.document.querySelector('.circuit-board-remove:not([disabled])').click();
       assert.equal(JSON.parse(page.readState().values[rowField]).length, board.max - 1, board.slot);
       assert.equal(page.dom.window.document.querySelector('.circuit-board-add').disabled, false, board.slot);
