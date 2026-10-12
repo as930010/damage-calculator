@@ -1,4 +1,5 @@
 import { getEquipmentOptionName } from '../calculation/equipment-catalog.ts';
+import { getClassEffects } from '../calculation/class-effects.ts';
 import { type AccessoryEffectOption } from '../calculation/equipment-effects.ts';
 import { loadGameData, readJson, escapeHtml as h, formatNumber as fmt } from './data.ts';
 import { readState, readBaseline, saveState, migrateLegacyEnvironmentSelection, migrateLegacyGloveCircuitSkillDamage as migrateGloveCircuit, migrateLegacyPortraitAwakening as migratePortrait, normalizePortraitAwakeningValues as normalizePortraitValues, normalizeTranscendenceSkillDamageShare, parseTranscendenceSkillDamageShareInput, type LoadoutState } from './state.ts';
@@ -1444,7 +1445,7 @@ async function start() {
             const attributeName = (key: string) => key === 'multiplicativeDamagePct'
               ? '乘算%' : data.attributes.attributes.find(attribute => attribute.key === key)?.name ?? key;
             const levelKeys = [magazine.levelStatKey ?? magazine.statKey, ...(magazine.additionalLevelStatKeys ?? [])];
-            const detail = [
+            const detail = magazine.id === 'combat-type-iii' ? '強烈、超越技傷%' : [
               ...levelKeys.filter((key): key is NonNullable<typeof key> => !!key).map(attributeName),
               ...Object.entries(magazine.baseStats ?? {}).map(([key, value]) => `${attributeName(key).replace(/%$/, '')}${fmt(value)}%`),
             ].join(' · ');
@@ -1758,9 +1759,28 @@ async function start() {
       const overflow = capOverflowPercentage(valueBeforeCap * 100, 100);
       return overflow === null ? '' : `<small class="cap-overflow" role="status">超出上限 ${fmt(overflow)}%</small>`;
     };
-    const combatRateCards = currentCombatRates
-      ? `<div class="combat-rate-pair"><div class="stat"><p>實戰致命一擊機率</p><strong>${fmt(currentCombatRates.critRate.finalRate * 100)}%</strong>${probabilityCapWarning(currentCombatRates.critRate.valueBeforeUpperCap)}</div><div class="stat"><p>實戰極大化</p><strong>${fmt(currentCombatRates.extremization.finalRate * 100)}%</strong>${probabilityCapWarning(currentCombatRates.extremization.valueBeforeUpperCap)}</div></div>`
-      : `<div class="combat-rate-pair"><div class="stat"><p>實戰致命一擊機率</p><strong>待補輸入</strong><small class="input-hint">${h(calculationIssue(damageCalculationError))}</small></div><div class="stat"><p>實戰極大化</p><strong>待補輸入</strong><small class="input-hint">${h(calculationIssue(damageCalculationError))}</small></div></div>`;
+    const combatRateCard = (label: string, attribute: 'critRate' | 'extremization', statKey: 'critRatePct' | 'extremizationPct') => {
+      if (!currentCombatRates) return `<details class="stat"><summary><span>${h(label)}</span><strong>待補輸入</strong></summary><div class="stat-details"><p class="input-hint">${h(calculationIssue(damageCalculationError))}</p></div></details>`;
+      const rate = currentCombatRates[attribute];
+      const stat = current.stats[statKey];
+      const classDiminishing = getClassEffects(data.classCombatEffects, currentCombatRates.classId, attribute)
+        .filter(effect => effect.method === 'diminishing');
+      const classRows = classDiminishing.map(effect =>
+        `<p class="stat-source-row"><span>${h(sourceLabel(effect.sourceId))}（${h(effect.id)}）</span><strong>+${fmt(effect.valuePct)}%</strong></p>`,
+      ).join('');
+      const multiplierRows = rate.multipliers.map(effect =>
+        `<p class="stat-source-row"><span>${h(sourceLabel(effect.sourceId))}</span><strong>+${fmt(effect.valuePct)}%（×${fmt(effect.factor)}）</strong></p>`,
+      ).join('');
+      const nonDiminishingRows = rate.nonDiminishingSources.map(effect =>
+        `<p class="stat-source-row"><span>${h(sourceLabel(effect.sourceId))}</span><strong>+${fmt(effect.valuePct)}%</strong></p>`,
+      ).join('');
+      const baseRows = stat ? `${sourceRows(stat.sharedSources, true)}${sourceRows(stat.lowerwearASources, true)}${state.lowerwearAlternativeEnabled
+        ? `<p class="stat-detail-heading">強/排褲來源</p>${sourceRows(stat.lowerwearBSources, true)}<p class="stat-average">下衣與強/排褲平均 ${fmt(stat.lowerwearAverage)}%</p>` : ''}` : '';
+      const finalAdjustment = rate.finalAdjustmentPct
+        ? `<p class="stat-source-row"><span>${attribute === 'critRate' ? '關卡扣致命' : '最終調整'}</span><strong>${fmt(rate.finalAdjustmentPct)}%</strong></p>` : '';
+      return `<details class="stat"><summary><span>${h(label)}</span><strong>${fmt(rate.finalRate * 100)}%</strong>${probabilityCapWarning(rate.valueBeforeUpperCap)}</summary><div class="stat-details"><p class="stat-detail-heading">角色屬性來源</p>${baseRows || '<p class="stat-source-empty">目前沒有額外屬性來源</p>'}<p class="stat-average">角色屬性合計 ${fmt(rate.baseRawStatPct)}%</p>${classRows ? `<p class="stat-detail-heading">遞減來源</p>${classRows}` : ''}<p class="stat-average">遞減前 ${fmt(rate.rawStatPct)}% → 遞減後 ${fmt(rate.tierRate * 100)}%</p>${multiplierRows ? `<p class="stat-detail-heading">乘算來源</p>${multiplierRows}<p class="stat-average">乘算合計 ×${fmt(rate.multiplierProduct)}</p>` : ''}${nonDiminishingRows ? `<p class="stat-detail-heading">非遞減來源</p>${nonDiminishingRows}` : ''}${finalAdjustment}<p class="stat-average">上限前 ${fmt(rate.valueBeforeUpperCap * 100)}% → 實戰 ${fmt(rate.finalRate * 100)}%</p></div></details>`;
+    };
+    const combatRateCards = `<div class="combat-rate-pair">${combatRateCard('實戰致命一擊機率', 'critRate', 'critRatePct')}${combatRateCard('實戰極大化', 'extremization', 'extremizationPct')}</div>`;
     const conditionalDamageCard = (label: string, valuePct: number, sources: readonly { sourceId: string; valuePct: number }[], previousValuePct: number | undefined) => {
       const delta = previousValuePct === undefined ? null : valuePct - previousValuePct;
       const deltaText = delta === null ? '' : signedDelta(delta, percentFormat, '%');

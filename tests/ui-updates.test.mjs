@@ -34,7 +34,7 @@ test('magazine kinds show their actual effects and chip tuning shows only percen
       '超級彈匣[推進器]': '超適應力% · 兩極化-10%',
       '戰鬥彈匣Type - I': '流血%',
       '戰鬥彈匣Type - II': '所有技能傷害%',
-      '戰鬥彈匣Type - III': '超越技傷% · 強烈技傷%',
+      '戰鬥彈匣Type - III': '強烈、超越技傷%',
       '戰鬥彈匣Type - IV': '致命傷害%',
       '戰鬥彈匣Type - V': 'Boss傷害%',
       '經典彈匣Type - I': '兩極化%',
@@ -188,6 +188,41 @@ test('expanded result cards remain expanded and formula sources refresh after a 
     assert.equal(document.querySelector('#calculation-details details').open, true);
     assert.notEqual(document.querySelector('#calculation-details details').textContent, oldFormula);
     assert.match(document.querySelector('#calculation-details').textContent, /50%/);
+  } finally { page.close(); }
+});
+
+test('combat rate cards expand to show individual sources and keep their state after stage changes', async () => {
+  const page = await uiPage();
+  try {
+    const { document } = page.dom.window;
+    const projection = await page.runtime.load('frontend/projection.ts');
+    const rates = projection.projectCombatRates(gameData, stateA);
+    for (const [label, rate] of [
+      ['實戰致命一擊機率', rates.critRate], ['實戰極大化', rates.extremization],
+    ]) {
+      const card = [...document.querySelectorAll('#results .combat-rate-pair details')]
+        .find(node => node.querySelector('summary span')?.textContent === label);
+      assert.ok(card, label);
+      assert.equal(card.querySelector('summary strong').textContent, `${rate.finalRate * 100}%`);
+      card.querySelector('summary').click();
+      assert.equal(card.open, true);
+      const detail = card.querySelector('.stat-details').textContent;
+      assert.match(detail, /角色屬性來源/);
+      assert.match(detail, /角色屬性合計/);
+      assert.match(detail, /遞減前/);
+      assert.match(detail, /遞減後/);
+      assert.match(detail, /上限前/);
+      assert.ok(card.querySelectorAll('.stat-source-row').length >= rate.multipliers.length + rate.nonDiminishingSources.length);
+      if (rate.multipliers.length) assert.match(detail, /乘算來源/);
+      if (rate.nonDiminishingSources.length) assert.match(detail, /非遞減來源/);
+    }
+    const before = document.querySelector('#results .combat-rate-pair details .stat-details').textContent;
+    enter(page, '關卡扣致命', '10');
+    const cards = [...document.querySelectorAll('#results .combat-rate-pair details')];
+    assert.equal(cards.length, 2);
+    assert.ok(cards.every(card => card.open));
+    assert.match(cards[0].querySelector('.stat-details').textContent, /關卡扣致命-10%/);
+    assert.notEqual(cards[0].querySelector('.stat-details').textContent, before);
   } finally { page.close(); }
 });
 
