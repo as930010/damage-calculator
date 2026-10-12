@@ -3,6 +3,7 @@ import { access, readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
+import { JSDOM } from "jsdom";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const [indexHtml, buildScript, sharedStyles, mainSource] = await Promise.all([
@@ -143,4 +144,82 @@ test("shared styles and DOM own toolbar grouping and responsive sizing", () => {
   assert.match(mainSource, /toolbarSettings\.className\s*=\s*'toolbar-settings'/);
   assert.match(mainSource, /classSettings\.className\s*=\s*'class-settings'/);
   assert.match(mainSource, /historyActions\.className\s*=\s*'history-actions'/);
+});
+
+// Evaluate the actual styles on representative DOM. jsdom does not evaluate
+// viewport media queries, so flatten the active rules for each tested width.
+// Real-browser geometry and interactive states are checked in Production Preview.
+function cssAtWidth(sources, width) {
+  const parser = new JSDOM("<!doctype html>");
+  const active = [];
+  function visit(rules) {
+    for (const rule of rules) {
+      if (rule.type === 1) active.push(rule.cssText);
+      else if (rule.type === 4) {
+        const condition = rule.conditionText;
+        if (condition.includes("prefers-reduced-motion")) continue;
+        const minimums = [...condition.matchAll(/min-width\s*:\s*(\d+)px/g)];
+        const maximums = [...condition.matchAll(/max-width\s*:\s*(\d+)px/g)];
+        if (minimums.every(match => width >= Number(match[1])) && maximums.every(match => width <= Number(match[1]))) visit(rule.cssRules);
+      }
+    }
+  }
+  for (const source of sources) {
+    const element = parser.window.document.createElement("style");
+    element.textContent = source;
+    parser.window.document.head.append(element);
+    assert.ok(element.sheet, "stylesheet must parse");
+    visit(element.sheet.cssRules);
+  }
+  parser.window.close();
+  return active.join("\n");
+}
+
+const componentMarkup = `<div class="app-shell"><header class="topbar">
+  <div class="brand"><span><strong>模擬器</strong><small>說明</small></span></div>
+  <div class="developer-info"><span class="developer-mobile">開發者資訊</span></div>
+  <div class="top-meta"><a class="buff-simulator-link" href="#">另一頁</a></div>
+</header><main class="workbench"><div class="canvas-title-input"><div class="field">
+  <label>稱號</label><div class="picker-control"><input></div>
+</div></div><section class="results-panel"><section class="damage-panel"><div class="damage-summary">
+  <div>最小</div><div>最大</div><div class="final-damage">最終</div>
+</div></section></section></main></div>`;
+const widths = [1280, 701, 700, 601, 600, 441, 440, 390, 375];
+
+test("core CSS owns damage-summary and title layout without activity CSS", async () => {
+  const polish = await readFile(resolve(root, "frontend/polish.css"), "utf8");
+  for (const width of widths) {
+    const dom = new JSDOM(`<!doctype html><style>${cssAtWidth([sharedStyles, polish], width)}</style>${componentMarkup}`);
+    try {
+      const style = selector => dom.window.getComputedStyle(dom.window.document.querySelector(selector));
+      assert.equal(style(".damage-summary").gridTemplateColumns, "repeat(3,minmax(0,1fr))", `damage columns at ${width}`);
+      assert.equal(style(".damage-summary").gap, width <= 700 ? "8px" : "12px");
+      assert.equal(style(".damage-summary").padding, width <= 700 ? "12px" : "16px 22px 22px");
+      assert.equal(style(".damage-summary>div").minHeight, width <= 700 ? "76px" : "88px");
+      assert.equal(style(".canvas-title-input").width, width <= 700 ? "190px" : "min(32%, 210px)");
+      assert.equal(style(".canvas-title-input").left, width <= 700 ? "110px" : "max(82px, 19% - 62.5px)");
+      assert.equal(style(".canvas-title-input .field").display, "grid");
+      assert.equal(style(".canvas-title-input .field").gap, "8px");
+      assert.equal(style(".buff-simulator-link").minHeight, width <= 600 ? "44px" : "34px");
+    } finally { dom.window.close(); }
+  }
+});
+
+test("Buff header retains its final relative geometry and distinct mobile navigation", async () => {
+  const buff = await readFile(resolve(root, "features/buff-simulator/frontend/styles.css"), "utf8");
+  for (const width of widths) {
+    const dom = new JSDOM(`<!doctype html><style>${cssAtWidth([buff], width)}</style>${componentMarkup}`);
+    try {
+      const style = selector => dom.window.getComputedStyle(dom.window.document.querySelector(selector));
+      assert.equal(style(".topbar").position, "relative", `position at ${width}`);
+      assert.equal(style(".topbar").top, "auto");
+      assert.equal(style(".topbar").zIndex, "auto");
+      assert.equal(style(".topbar").height, "auto");
+      assert.equal(style(".topbar").minHeight, "72px");
+      assert.equal(style(".topbar").width, "100%");
+      assert.equal(style(".topbar").display, width <= 700 ? "grid" : "flex");
+      assert.equal(style(".topbar").gap, width <= 700 ? "8px" : "14px");
+      assert.equal(style(".buff-simulator-link").minHeight, width <= 600 ? "32px" : "34px");
+    } finally { dom.window.close(); }
+  }
 });

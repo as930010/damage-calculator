@@ -26,7 +26,7 @@
 body { margin: 0; min-width: 320px; background: radial-gradient(ellipse at 70% -20%, #1c3440 0, transparent 48%), var(--bg); }
 button, input { font: inherit; }
 .app-shell { max-width: 1440px; margin: 0 auto; padding: 0 30px 42px; }
-.topbar { height: 76px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #27323e; }
+
 .brand { color: var(--text); text-decoration: none; display: flex; align-items: center; gap: 12px; }
 .brand-mark { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 12px; color: #0a2525; background: var(--accent); font-weight: 900; }
 .brand strong, .brand small { display: block; }
@@ -163,7 +163,7 @@ footer { padding: 24px 0; text-align: center; }
 }
 @media (max-width: 600px) {
   .app-shell { padding: 0 14px 28px; }
-  .topbar { height: 64px; }
+
   .local-note { font-size: 10px; }
   .layout { padding-top: 24px; }
   .hero { align-items: stretch; flex-direction: column; }
@@ -230,7 +230,7 @@ body::before {
 
 .app-shell { width: 100%; max-width: none; margin: 0; padding: 0 0 42px; }
 .layout { width: min(100%, 1440px); margin-inline: auto; padding-inline: clamp(18px, 4vw, 56px); }
-.topbar { height: 72px; border-color: rgba(165, 205, 198, .15); }
+
 .brand { gap: 13px; }
 .brand-mark {
   position: relative;
@@ -680,7 +680,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
   --gold: #f0b66d;
 }
 body, .app-shell { background: #15171c; color: var(--text); }
-.topbar { background: #1b1e24; border-color: #2d3038; }
+
 .brand-mark { color: #c3d0ff; background: #252c3a; box-shadow: none; }
 .hero { display: flex; justify-content: flex-end; min-height: 0; margin: 12px 0 20px; padding: 0; overflow: visible; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
 .hero::before, .hero::after { display: none; }
@@ -761,14 +761,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 
 
 /* Design pass 3: tighten the information rhythm and interaction states */
-.topbar {
-  position: sticky;
-  top: 0;
-  z-index: 40;
-  height: 64px;
-  background: rgb(27 30 36 / 94%);
-  backdrop-filter: blur(14px);
-}
+
 .layout { padding-top: 22px; }
 .section-label {
   min-height: 30px;
@@ -802,7 +795,7 @@ body::before {
   background-image: linear-gradient(rgb(180 190 210 / 2%) 1px, transparent 1px), linear-gradient(90deg, rgb(180 190 210 / 2%) 1px, transparent 1px);
 }
 @media (max-width: 700px) {
-  .topbar { height: 58px; }
+
   .layout { padding-top: 16px; }
   .section-label { margin-bottom: 8px; }
   .result-heading, .result-stack .result-heading { min-height: 88px; padding: 13px 14px; }
@@ -825,7 +818,7 @@ body::before {
 }
 
 /* Design pass 4: stable mode selector and inset brand alignment */
-.topbar { padding-inline: 12px; }
+
 .hero-console { width: 330px; flex: 0 0 330px; }
 .mode-switch { width: 100%; }
 .mode-switch button { align-items: center; white-space: nowrap; }
@@ -879,14 +872,7 @@ details:not(.skill-reference)[open] > summary::before { transform: rotate(45deg)
     .option-editor-input input { width: 7.2em; min-width: 7.2em; }
 }
 /* Design pass 5: compact result headers across both team modes */
-.topbar {
-  top: 8px;
-  height: 60px;
-  margin-top: 8px;
-  padding-inline: 12px;
-  border: 1px solid #2d3038;
-  border-radius: 14px;
-}
+
 .team-panel { padding-block: 12px 13px; }
 .panel-heading { margin-bottom: 8px; }
 .metric-section { padding-block: 13px 15px; }
@@ -895,7 +881,7 @@ details:not(.skill-reference)[open] > summary::before { transform: rotate(45deg)
 .metric-section-heading > div { gap: 0; }
 .result-stack .metric-section { padding-block: 12px 14px; }
 @media (max-width: 700px) {
-  .topbar { top: 6px; height: 56px; margin-top: 6px; }
+
   .team-panel, .challenge-workspace .team-panel { padding-block: 11px 12px; }
   .metric-section, .result-stack .metric-section { padding-block: 10px 12px; }
 }
@@ -941,22 +927,7 @@ details:not(.skill-reference)[open] > summary::before { transform: rotate(45deg)
 @media(max-width:600px){.simulator-back-link{font-size:11px}}
 
 /* Local visual refinement: align header and result palette with Damage Calculator. */
-.topbar {
-  position: relative;
-  top: auto;
-  z-index: auto;
-  width: 100vw;
-  height: auto;
-  min-height: 72px;
-  margin: 0 0 0 calc(50% - 50vw);
-  padding: 12px clamp(18px, 4vw, 58px);
-  gap: 14px;
-  border: 0;
-  border-bottom: 1px solid #2d3038;
-  border-radius: 0;
-  background: #1b1e24;
-  backdrop-filter: none;
-}
+
 .brand {
   flex: none;
   gap: 0;
@@ -1055,14 +1026,14 @@ details:not(.skill-reference)[open] > summary::before { transform: rotate(45deg)
 .option-chip:has(input:checked) { border-color: #596b9c; background: #252c3a; }
 
 @media (max-width: 700px) {
-  .topbar { min-height: 64px; padding: 10px 16px; gap: 10px; }
+
   .developer-info { flex: 1; min-width: 0; margin: 0 8px; white-space: normal; overflow-wrap: anywhere; font-size: 10px; }
   .developer-info span:last-child { display: none; }
   .top-meta { gap: 8px; }
   .simulator-back-link { min-height: 32px; padding-inline: 9px; font-size: 11px; }
 }
 @media (max-width: 440px) {
-  .topbar { padding-inline: 12px; }
+
   .developer-info { display: none; }
   .top-meta { margin-left: auto; }
 }
@@ -1077,9 +1048,11 @@ details:not(.skill-reference)[open] > summary::before { transform: rotate(45deg)
 .support-grid .metric:nth-child(4) strong { color: #e5e8ee; }
 .option-chip { color: #aebbd0; }
 .option-chip:has(input:checked) { color: #e5e8ee; }
-/* Match the Damage Calculator header layout; keep the developer block in flex flow. */
+/* Header: final desktop geometry and visual defaults; mobile layout follows below. */
 .topbar {
   position: relative;
+  top: auto;
+  z-index: auto;
   display: flex;
   align-items: center;
   width: 100%;

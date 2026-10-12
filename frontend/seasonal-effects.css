@@ -148,25 +148,6 @@
   background-repeat:repeat;
 }
 
-body {
-  background: transparent;
-}
-
-.topbar {
-  border-color: rgb(112 124 150 / 17%);
-  background: rgb(9 11 17 / 94%);
-}
-
-.workspace-heading {
-  border-color: rgb(130 145 174 / 27%);
-  background:linear-gradient(112deg,rgb(20 27 43 / 96%),rgb(15 19 31 / 96%) 56%,rgb(24 21 35 / 90%)),var(--panel);
-}
-
-.toolbar {
-  border-color: rgb(117 130 155 / 20%);
-  background:rgb(13 17 27 / 92%);
-}
-
 .battle-panel,
 .damage-panel,
 .equipment-panel,
@@ -188,30 +169,6 @@ body::before {
     radial-gradient(ellipse min(150vw, 1900px) min(155vh, 1360px) at 0 -24px, rgb(131 156 193 / 4%) 0%, rgb(100 124 163 / 2%) 45%, transparent 100%),
     conic-gradient(from 18deg at 0 -24px, transparent 0deg 33deg, rgb(220 231 248 / 0%) 36deg, rgb(220 231 248 / 24%) 41deg, rgb(220 231 248 / 0%) 46deg, transparent 51deg 360deg);
   opacity: .36;
-}
-
-.workspace-heading,
-.toolbar,
-.battle-panel,
-.equipment-panel,
-.inspector,
-.weapon-magic-stone-panel,
-.global-source-panel,
-.results-panel {
-  border-color: rgb(136 155 184 / 29%);
-  box-shadow:none;
-}
-
-.workspace-heading {
-  box-shadow:none;
-}
-
-.toolbar {
-  box-shadow:none;
-}
-
-.damage-panel {
-  box-shadow:none;
 }
 
 @media (min-width: 1600px) {
