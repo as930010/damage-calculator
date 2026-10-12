@@ -96,7 +96,7 @@ test("game data loading uses one cache-busted request and returns the full previ
   const previousDocument = globalThis.document;
   const previousFetch = globalThis.fetch;
   const requests = [];
-  globalThis.document = { querySelector: () => ({ content: "test-revision" }) };
+  globalThis.document = { querySelector: selector => selector.includes('build-revision') ? ({ content: 'test-revision' }) : null };
   globalThis.fetch = async (url, options) => {
     requests.push({ url: String(url), options });
     return { ok: true, json: async () => bundle };
@@ -118,25 +118,24 @@ test("game data loading uses one cache-busted request and returns the full previ
 
 test("the built revision changes with game data so cached bundles cannot go stale", async () => {
   const dataRevision = createHash("sha256").update(await readFile(join(root, "dist/data/game-data.json"))).digest("hex").slice(0, 16);
-  const html = await readFile(join(root, "dist/index.html"), "utf8");
-  const revision = html.match(/<meta name="build-revision" content="([^"]+)"/u)?.[1];
-  assert.ok(revision?.endsWith(dataRevision));
-  assert.ok(html.includes(`main.js?v=${revision}`));
+  const html = await readFile(join(root, "site-dist/index.html"), "utf8");
+  const manifest = JSON.parse(await readFile(join(root, "site-dist/asset-manifest.json"), "utf8"));
+  assert.equal(html.match(/<meta name="build-revision" content="([^"]+)"/u)?.[1], dataRevision);
+  assert.ok(html.includes(manifest.data['data/game-data.json']));
+  assert.ok(html.includes(manifest.entry));
+  assert.deepEqual(await readFile(join(root, 'site-dist', manifest.data['data/game-data.json'])), await readFile(join(root, 'dist/data/game-data.json')));
 });
 
 test("stylesheet cache keys cover exactly the CSS linked by the selected theme", async () => {
-  const html = await readFile(join(root, "dist/index.html"), "utf8");
-  const references = [...html.matchAll(/href="\.\/frontend\/([^"?]+\.css)\?v=([^"]+)"/g)];
-  const files = references.map((match) => match[1]);
-  const revisions = new Set(references.map((match) => match[2]));
-  assert.ok(files.length > 0, "the built page links at least one stylesheet");
-  assert.equal(new Set(files).size, files.length, "stylesheet references are unique");
-  assert.equal(revisions.size, 1, "all stylesheet links share one content-derived revision");
-  const cssContents = await Promise.all(files.map(async (file) => readFile(join(root, "dist/frontend", file), "utf8")));
-  const stylesheetInput = files.map((file, index) => file + "\0" + cssContents[index]).join("\n");
-  const expectedRevision = createHash("sha256").update(stylesheetInput).digest("hex").slice(0, 16);
-  assert.deepEqual([...revisions], [expectedRevision]);
-  const emittedCss = (await readdir(join(root, "dist/frontend"))).filter((file) => file.endsWith(".css")).sort();
-  assert.deepEqual(emittedCss, [...files].sort(), "the build emits no unlinked/stale stylesheets");
+  const html = await readFile(join(root, "site-dist/index.html"), "utf8");
+  const files = [...html.matchAll(/href="\.\/([^"?]+\.css)"/g)].map(match => match[1]);
+  assert.ok(files.length > 0); assert.equal(new Set(files).size, files.length);
+  for (const file of files) {
+    const content = await readFile(join(root, 'site-dist', file));
+    const revision = createHash('sha256').update(content).digest('hex').slice(0, 16);
+    assert.ok(file.endsWith('-' + revision + '.css'), 'each stylesheet URL covers its own content');
+  }
+  const emittedCss = (await readdir(join(root, 'site-dist/assets'))).filter(file => file.endsWith('.css')).map(file => 'assets/' + file).sort();
+  assert.deepEqual(emittedCss, [...files].sort(), 'no unlinked or stale stylesheets');
   assert.doesNotMatch(html, /__STYLESHEET_REVISION__/u);
 });

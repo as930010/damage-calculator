@@ -116,14 +116,20 @@ export const GAME_DATA_FILES = {
   colorSetEffects: "color-set-effects.json",
 } as const satisfies Record<Exclude<keyof GameData, "catalogs">, string>;
 
+declare const __GAME_ASSET_PATHS__: Readonly<Record<string, string>>;
 export async function readJson<T>(path: string, cache: RequestCache = "no-store"): Promise<T> {
   const buildRevision = document.querySelector<HTMLMetaElement>('meta[name="build-revision"]')?.content ?? "dev";
-  const response = await fetch(`./data/${path}?v=${encodeURIComponent(buildRevision)}`, { cache });
+  const versioned = typeof __GAME_ASSET_PATHS__ === 'undefined' ? undefined : __GAME_ASSET_PATHS__[path];
+  const response = await fetch(versioned ? `./data/${versioned}` : `./data/${path}?v=${encodeURIComponent(buildRevision)}`, { cache });
   if (!response.ok) throw new Error(`無法讀取 ${path}：${response.status}`);
   return response.json() as Promise<T>;
 }
 export async function loadGameData(): Promise<GameData> {
-  return readJson<GameData>("game-data.json", "force-cache");
+  const url = document.querySelector<HTMLMetaElement>('meta[name="game-data-url"]')?.content;
+  if (!url) return readJson<GameData>("game-data.json", "force-cache");
+  const response = await fetch(url, { cache: "force-cache" });
+  if (!response.ok) throw new Error(`無法讀取 game-data.json：${response.status}`);
+  return response.json() as Promise<GameData>;
 }
 export const escapeHtml = (value: unknown): string => String(value ?? "").replace(/[&<>"']/g, (character) =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]!);

@@ -31,6 +31,7 @@ export async function createRuntime({ dom, sourceReader, transformSource, global
     };
     dom.window.matchMedia = () => ({ matches: false, addEventListener() {}, removeEventListener() {} });
   }
+  Object.assign(globals, extraGlobals);
   const context = createContext(globals);
   const modules = new Map();
   async function getModule(path) {
@@ -50,12 +51,20 @@ export async function createRuntime({ dom, sourceReader, transformSource, global
       for (const name of names) source = source.replace(new RegExp(`(function ${name}\\([\\s\\S]*?\\)\\s*\\{)`), `$1\n__count('${name}');`);
     }
     if (file === 'frontend/main.ts') source = source.replace('start().catch(', 'globalThis.__startup = start().catch(');
-    const module = new SourceTextModule(source, { context, identifier: path });
+    const module = new SourceTextModule(source, { context, identifier: path,
+      importModuleDynamically: async (specifier, parent) => {
+        const child = await getModule(resolve(dirname(parent.identifier), specifier));
+        if (child.status === 'unlinked') await child.link((name, owner) => getModule(resolve(dirname(owner.identifier), name)));
+        if (child.status === 'linked') await child.evaluate();
+        return child;
+      },
+    });
     modules.set(path, module);
     return module;
   }
   return {
     counts,
+    loadedFiles: () => [...modules.keys()].map(path => relative(root, path).replaceAll('\\', '/')),
     resetCounts() { for (const key of Object.keys(counts)) delete counts[key]; },
     async load(path) {
       const module = await getModule(resolve(root, path));

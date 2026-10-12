@@ -1,4 +1,5 @@
-import { cp, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
+import { cleanOutput, minifyCss, productionAssets, writeProduction } from './production-assets.mjs';
+import { cp, mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -12,80 +13,12 @@ const packagePath = require.resolve("typescript/package.json");
 const compilerPackage = JSON.parse(await readFile(packagePath, "utf8"));
 const compilerPath = resolve(dirname(packagePath), compilerPackage.bin.tsc);
 
-function minifyCss(source) {
-  let output = "";
-  let quote = "";
-  let inComment = false;
-  let pendingSpace = false;
-
-  for (let index = 0; index < source.length; index += 1) {
-    const character = source[index];
-    const next = source[index + 1] ?? "";
-
-    if (inComment) {
-      output += character;
-      if (character === "*" && next === "/") {
-        output += next;
-        index += 1;
-        inComment = false;
-      }
-      continue;
-    }
-
-    if (quote) {
-      output += character;
-      if (character === "\\" && next) {
-        output += next;
-        index += 1;
-      } else if (character === quote) {
-        quote = "";
-      }
-      continue;
-    }
-
-    if (character === "/" && next === "*") {
-      if (pendingSpace && output && !/[{};]/.test(output.at(-1))) output += " ";
-      pendingSpace = false;
-      output += "/*";
-      index += 1;
-      inComment = true;
-      continue;
-    }
-
-    if (character === "\\" && next) {
-      if (pendingSpace && output && !/[{};]/.test(output.at(-1))) output += " ";
-      pendingSpace = false;
-      output += character + next;
-      index += 1;
-      continue;
-    }
-
-    if (character === "\"" || character === "'") {
-      if (pendingSpace && output && !/[{};]/.test(output.at(-1)) && !/[{};]/.test(character)) output += " ";
-      pendingSpace = false;
-      quote = character;
-      output += character;
-      continue;
-    }
-
-    if (/\s/.test(character)) {
-      pendingSpace = true;
-      continue;
-    }
-
-    if (pendingSpace && output && !/[{};]/.test(output.at(-1)) && !/[{};]/.test(character)) output += " ";
-    pendingSpace = false;
-    output += character;
-  }
-
-  return output.trim();
-}
-
 // Remove only the generated dist directory inside this project.
 if (dirname(output) !== root || output !== join(root, "dist")) {
   throw new Error("Invalid build output directory.");
 }
-await rm(output, { recursive: true, force: true });
+await cleanOutput(root, 'site-dist');
+await cleanOutput(root, 'dist');
 
 const compilation = spawnSync(process.execPath, [compilerPath, "-p", "tsconfig.build.json"], {
   cwd: root,
@@ -195,4 +128,17 @@ if (simulatorBuild.error) throw simulatorBuild.error;
 if (simulatorBuild.status !== 0) process.exit(simulatorBuild.status ?? 1);
 await cp(join(root, "features", "buff-simulator", "dist"), join(output, "buff-simulator"), { recursive: true });
 await writeFile(join(output, ".nojekyll"), "");
-console.log("Built static site in dist/. Run npm run preview to open it locally.");
+const optimized = await productionAssets({ root, compiled: output });
+const simulatorRoot = join(root, 'features', 'buff-simulator', 'site-dist');
+async function includeSimulator(dir, prefix) {
+  for (const item of await readdir(dir, { withFileTypes: true })) {
+    if (item.isDirectory()) await includeSimulator(join(dir, item.name), prefix + item.name + '/');
+    else if (item.isFile()) optimized.files.set(prefix + item.name, await readFile(join(dir, item.name)));
+    else throw new Error('Unsupported simulator output');
+  }
+}
+await includeSimulator(simulatorRoot, 'buff-simulator/');
+optimized.manifest.pages = ['buff-simulator/asset-manifest.json'];
+optimized.files.set('asset-manifest.json', Buffer.from(JSON.stringify(optimized.manifest, null, 2)+'\n'));
+await writeProduction(root, optimized.files);
+console.log('Built deployment in site-dist/; dist/ retains Node test modules. Run pnpm run preview.');

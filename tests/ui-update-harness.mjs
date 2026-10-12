@@ -53,7 +53,10 @@ export async function uiPage(state = stateA, baseline = stateA, options = {}) {
       assert.match(document.querySelector('#transfer-status').textContent, /已匯入/);
     },
     async exportJson() {
+      const before = blobs.length;
       document.querySelector('#export-loadout').click();
+      for (let i = 0; i < 100 && blobs.length === before; i++) await new Promise(resolve => setTimeout(resolve, 5));
+      assert.equal(blobs.length, before + 1, 'export completes after optional module loading');
       const reader = new page.dom.window.FileReader();
       return new Promise((resolve, reject) => {
         reader.onload = () => resolve(JSON.parse(reader.result)); reader.onerror = reject;

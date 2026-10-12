@@ -3,6 +3,7 @@ node_modules/
 dist/
 online-current-export.xlsx
 /docs/**/*.md
+!/docs/BUILD.md
 /data/examples/README.md
 /data/manifest.json
 /data/examples/live-sheet-2026-09-28-expected.json
@@ -17,3 +18,5 @@ online-current-export.xlsx
 /playwright-report/
 /performance-results/
 /audit-results/
+
+site-dist/

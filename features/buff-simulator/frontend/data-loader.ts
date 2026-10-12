@@ -153,8 +153,11 @@ export function parseSkillReferenceCatalog(payload: unknown, classes: readonly C
   return skillReference;
 }
 
+// Production substitutes only versioned URL strings; data remains external and skills stay lazy.
+declare const __BUFF_ASSET_PATHS__: Readonly<Record<string, string>>;
 async function fetchJson(baseUrl: URL, path: string, fetcher: typeof fetch): Promise<unknown> {
-  const response = await fetcher(new URL(path, baseUrl), { cache: "no-cache" });
+  const versioned = typeof __BUFF_ASSET_PATHS__ === "undefined" ? undefined : __BUFF_ASSET_PATHS__[path];
+  const response = await fetcher(new URL(versioned ?? path, baseUrl), { cache: versioned ? "force-cache" : "no-cache" });
   if (!response.ok) throw new Error(`Unable to load ${path}: HTTP ${response.status}`);
   return response.json() as Promise<unknown>;
 }

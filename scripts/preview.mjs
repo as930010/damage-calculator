@@ -3,7 +3,7 @@ import { readFile, stat } from "node:fs/promises";
 import { dirname, extname, join, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), "../dist");
+const root = resolve(dirname(fileURLToPath(import.meta.url)), "../site-dist");
 const args = process.argv.slice(2);
 const port = Number(args.find(argument => /^\d+$/.test(argument)) ?? 4173);
 if (!Number.isInteger(port) || port < 1 || port > 65535) {
@@ -11,10 +11,13 @@ if (!Number.isInteger(port) || port < 1 || port > 65535) {
 }
 try {
   await stat(join(root, "index.html"));
+  await stat(join(root, "asset-manifest.json"));
 } catch {
   throw new Error("Build the website first with npm run build.");
 }
 
+const base = args.find(arg => arg.startsWith('--base='))?.slice(7) ?? '/';
+if (!/^\/(?:[a-zA-Z0-9_-]+\/)*$/.test(base)) throw new Error('Invalid preview base path');
 const contentTypes = {
   ".html": "text/html; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
@@ -33,7 +36,8 @@ const server = createServer(async (request, response) => {
   }
   try {
     const pathname = decodeURIComponent(new URL(request.url, "http://localhost").pathname);
-    let file = resolve(root, `.${pathname}`);
+    if (!pathname.startsWith(base)) { response.writeHead(404); response.end('Not found'); return; }
+    let file = resolve(root, './'+pathname.slice(base.length));
     if (file !== root && !file.startsWith(`${root}${sep}`)) {
       response.writeHead(403);
       response.end("Forbidden");
@@ -55,5 +59,5 @@ const server = createServer(async (request, response) => {
 });
 
 server.listen(port, "127.0.0.1", () => {
-  console.log(`Preview: http://127.0.0.1:${port}`);
+  console.log(`Preview: http://127.0.0.1:${port}${base}`);
 });

@@ -1,3 +1,4 @@
+import { cleanOutput, productionAssets, writeProduction } from '../../../scripts/production-assets.mjs';
 import { cp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { dirname, join, resolve } from "node:path";
@@ -14,7 +15,8 @@ const require = createRequire(import.meta.url);
 const packagePath = require.resolve("typescript/package.json");
 const compiler = JSON.parse(await readFile(packagePath, "utf8"));
 const tsc = resolve(dirname(packagePath), compiler.bin.tsc);
-await rm(output, { recursive: true, force: true });
+await cleanOutput(root, 'site-dist');
+await cleanOutput(root, 'dist');
 const result = spawnSync(process.execPath, [tsc, "-p", "tsconfig.build.json"], {
   cwd: root,
   stdio: "inherit",
@@ -55,4 +57,5 @@ await sanitizePublicJson(join(output, "data"));
 await cp(join(root, "frontend", "styles.css"), join(output, "frontend", "styles.css"));
 await cp(join(root, "index.html"), join(output, "index.html"));
 await writeFile(join(output, ".nojekyll"), "");
-console.log("Static site built in dist/.");
+await writeProduction(root, (await productionAssets({ root, compiled: output, buff: true })).files);
+console.log('Buff deployment built in site-dist/; Node modules in dist/.');

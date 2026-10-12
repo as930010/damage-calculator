@@ -2,7 +2,7 @@ import { getEquipmentOptionName } from '../calculation/equipment-catalog.ts';
 import { type AccessoryEffectOption } from '../calculation/equipment-effects.ts';
 import { loadGameData, readJson, escapeHtml as h, formatNumber as fmt } from './data.ts';
 import { readState, readBaseline, saveState, migrateLegacyEnvironmentSelection, migrateLegacyGloveCircuitSkillDamage as migrateGloveCircuit, migrateLegacyPortraitAwakening as migratePortrait, normalizePortraitAwakeningValues as normalizePortraitValues, normalizeTranscendenceSkillDamageShare, parseTranscendenceSkillDamageShareInput, type LoadoutState } from './state.ts';
-import { parseLoadoutJson, serializeLoadout } from './loadout-transfer.ts';
+import { createTransferLoader } from './loadout-transfer-loader.ts';
 import { evaluateLoadout, type projectDamage } from './projection.ts';
 import { createBaselineEvaluationCache } from './baseline-evaluation.ts';
 import { compareLoadoutResults } from './calculation-comparison.ts';
@@ -1963,16 +1963,27 @@ async function start() {
     else if (action === 'redo' && history.canRedo) { event.preventDefault(); redo(); }
   });
   refreshHistoryControls();
-  document.querySelector<HTMLButtonElement>('#export-loadout')!.addEventListener('click', () => {
-    const exported = serializeLoadout(state, data, catalogIndex);
-    const blobUrl = URL.createObjectURL(new Blob([exported.json], { type: 'application/json' }));
-    const link = document.createElement('a');
-    link.href = blobUrl;
-    link.download = `damage-calculator-loadout-${new Date().toISOString().slice(0, 10)}.json`;
-    link.click();
-    URL.revokeObjectURL(blobUrl);
-    const details = exported.omittedFields.length ? `；${exported.omittedFields.length} 個無法識別欄位已留空` : '';
-    document.querySelector<HTMLElement>('#transfer-status')!.textContent = `配裝 JSON 已匯出${details}。`;
+  const loadTransfer = createTransferLoader();
+  let exporting = false;
+  document.querySelector<HTMLButtonElement>('#export-loadout')!.addEventListener('click', async () => {
+    if (exporting) return;
+    exporting = true;
+    document.querySelector<HTMLElement>('#transfer-status')!.textContent = '正在載入配裝匯出功能…';
+    try {
+      const exportState = structuredClone(state);
+      const { serializeLoadout } = await loadTransfer();
+      const exported = serializeLoadout(exportState, data, catalogIndex);
+      const blobUrl = URL.createObjectURL(new Blob([exported.json], { type: 'application/json' }));
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = `damage-calculator-loadout-${new Date().toISOString().slice(0, 10)}.json`;
+      link.click();
+      URL.revokeObjectURL(blobUrl);
+      const details = exported.omittedFields.length ? `；${exported.omittedFields.length} 個無法識別欄位已留空` : '';
+      document.querySelector<HTMLElement>('#transfer-status')!.textContent = `配裝 JSON 已匯出${details}。`;
+    } catch (error) {
+      document.querySelector<HTMLElement>('#transfer-status')!.textContent = `匯出失敗：${error instanceof Error ? error.message : '功能無法載入。'}；可重試，若頁面版本已更新請重新載入。`;
+    } finally { exporting = false; }
   });
   const fileInput = document.querySelector<HTMLInputElement>('#loadout-file')!;
   let importRequest = 0;
@@ -1982,7 +1993,8 @@ async function start() {
     if (!file) return;
     const request = ++importRequest;
     try {
-      const json = await file.text();
+      document.querySelector<HTMLElement>('#transfer-status')!.textContent = '正在載入配裝匯入功能…';
+      const [json, { parseLoadoutJson }] = await Promise.all([file.text(), loadTransfer()]);
       if (request !== importRequest) return;
       const imported = parseLoadoutJson(json, state, data, catalogIndex);
       Object.assign(state, imported.state);

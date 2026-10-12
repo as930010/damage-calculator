@@ -15,9 +15,9 @@ function countFunction(source, name) {
   return source.replace(pattern, `$1 globalThis.__calls.${name}++;`);
 }
 
-export async function boot({ saved = null, storageThrows = false, compiled = false, fetchSkill } = {}) {
+export async function boot({ saved = null, storageThrows = false, compiled = false, production = false, fetchSkill } = {}) {
   // Run the real source without rebuilding during incremental work; compiled verifies release output.
-  const root = compiled ? buildRoot : sourceRoot;
+  const root = production ? new URL('../site-dist/', import.meta.url) : compiled ? buildRoot : sourceRoot;
   const failures = [];
   const virtualConsole = new VirtualConsole();
   virtualConsole.on('jsdomError', error => failures.push(error.message));
@@ -65,20 +65,20 @@ export async function boot({ saved = null, storageThrows = false, compiled = fal
       const path = new URL(String(url)).pathname.split('/data/')[1];
       requests.push(path);
       const response = { ok: true, json: async () => JSON.parse(await readFile(new URL(`data/${path}`, root), 'utf8')) };
-      return path === 'skill-reference.json' && fetchSkill ? fetchSkill(response) : response;
+      return /^skill-reference[.-]/.test(path) && fetchSkill ? fetchSkill(response) : response;
     },
   });
   const modules = new Map();
   async function moduleFor(url) {
     if (modules.has(url.href)) return modules.get(url.href);
     let source = await readFile(url, 'utf8');
-    if (!compiled) source = stripTypeScriptTypes(source);
-    if (/\/frontend\/main\.(js|ts)$/.test(url.pathname)) {
+    if (!compiled && !production) source = stripTypeScriptTypes(source);
+    if (!production && /\/frontend\/main\.(js|ts)$/.test(url.pathname)) {
       for (const name of ['updateResults', 'updateSkillReference', 'saveCurrentInputs', 'shell']) source = countFunction(source, name);
       source = source.replace('start().catch(', 'globalThis.__startup = start().catch(');
       source += '\nexport const __pendingSkills = () => skillReferenceRequest;';
     }
-    if (/\/calculation\/engine\.(js|ts)$/.test(url.pathname)) {
+    if (!production && /\/calculation\/engine\.(js|ts)$/.test(url.pathname)) {
       for (const name of ['calculateTeam', 'calculateChallenge']) source = countFunction(source, name);
       assert.equal(source.match(/return result;/g)?.length, 1);
       source = source.replace('return result;', 'globalThis.__teamResults.push(JSON.parse(JSON.stringify(result))); return result;');
@@ -87,10 +87,15 @@ export async function boot({ saved = null, storageThrows = false, compiled = fal
     modules.set(url.href, module);
     return module;
   }
-  const entry = await moduleFor(new URL(`frontend/main.${compiled ? 'js' : 'ts'}`, root));
+  const manifest = production ? JSON.parse(await readFile(new URL('asset-manifest.json', root), 'utf8')) : null;
+  const entry = await moduleFor(new URL(production ? manifest.entry : `frontend/main.${compiled ? 'js' : 'ts'}`, root));
   await entry.link((specifier, parent) => moduleFor(new URL(specifier, parent.identifier)));
   await entry.evaluate();
   await context.__startup;
+  if (production) {
+    for (let i = 0; i < 100 && !window.document.querySelector('#results'); i++) await tick();
+    assert.ok(window.document.querySelector('#results'), 'production core initialization completes');
+  }
   assert.deepEqual(failures, [], 'the actual entry must start successfully');
   // jsdom queues the same initial details toggle events that browsers can queue.
   await tick();
@@ -109,7 +114,12 @@ export async function boot({ saved = null, storageThrows = false, compiled = fal
       panel.open = value;
       panel.dispatchEvent(new window.Event('toggle'));
     },
-    async settleSkills() { await entry.namespace.__pendingSkills(); await tick(); },
+    async settleSkills() {
+      if (production) {
+        for (let i = 0; i < 100 && app.querySelector('[data-skill-results]')?.getAttribute('aria-busy') === 'true'; i++) await tick();
+      } else await entry.namespace.__pendingSkills();
+      await tick();
+    },
     async openSkills() { this.setSkillsOpen(true); await this.settleSkills(); },
     saved: () => savedValues.has(storageKey) ? JSON.parse(savedValues.get(storageKey)) : null,
     close() { dom.window.close(); assert.deepEqual(failures, [], 'no event handler may throw'); },
