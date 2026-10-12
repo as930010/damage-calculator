@@ -4,8 +4,9 @@ import { readFile } from 'node:fs/promises';
 import { resolveResonanceEffects, resolveRightIceSetEffects } from '../dist/calculation/equipment-effects.js';
 import { calculateFinalDamage } from '../dist/calculation/final-damage.js';
 import { codeForFieldId } from '../dist/frontend/field-ids.js';
+import { createCatalogIndex } from '../dist/frontend/catalog-index.js';
 import { deserializeLoadout } from '../dist/frontend/loadout-transfer.js';
-import { parseTranscendenceSkillDamageShareInput, readState } from '../dist/frontend/state.js';
+import { normalizeOptionalEffectValues, parseTranscendenceSkillDamageShareInput, readState } from '../dist/frontend/state.js';
 
 const readJson = async path => JSON.parse(await readFile(new URL(`../${path}`, import.meta.url), 'utf8'));
 
@@ -87,13 +88,15 @@ test('舊版配裝匯入保留有效共鳴值，清除負數、小數及超過�
   const result = deserializeLoadout(oldLoadout, current, data);
 
   assert.equal(result.state.transcendenceSkillDamageSharePct, 100);
-  assert.deepEqual(result.state.values, {
+  const expected = {
     'Resonance.AllATK.Points': 0,
     'Resonance.TranscendenceSkillDMG.Points': 100,
     'Resonance.Polarization.Points': 50,
     'Resonance.BossDMG.Points': 50,
     'Resonance.Adapt.Points': 100,
-  });
+  };
+  normalizeOptionalEffectValues(expected, createCatalogIndex(data));
+  assert.deepEqual(result.state.values, expected);
   assert.equal(result.clearedFields.some(field => field.startsWith('Resonance.')), false);
 
   const malformed = {
@@ -107,7 +110,9 @@ test('舊版配裝匯入保留有效共鳴值，清除負數、小數及超過�
     },
   };
   const invalid = deserializeLoadout(malformed, current, data);
-  assert.deepEqual(invalid.state.values, {});
+  const invalidExpected = {};
+  normalizeOptionalEffectValues(invalidExpected, createCatalogIndex(data));
+  assert.deepEqual(invalid.state.values, invalidExpected);
   for (const field of [
     'Resonance.AllATK.Points',
     'Resonance.TranscendenceSkillDMG.Points',
