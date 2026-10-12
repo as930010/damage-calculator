@@ -115,17 +115,25 @@ export function calculateLoadoutCombatRates(input: CombatRateCalculationInput): 
   });
 }
 
-/** Run the spreadsheet-mapped source groups through the complete combat calculation chain. */
-export function calculateLoadout(input: LoadoutCalculationInput): LoadoutCalculationResult {
+export type LoadoutAttributeInput = Pick<LoadoutCalculationInput,
+  'attributeRules' | 'sources' | 'characterBaseStats' | 'attackParameters' | 'classId'>
+  & { weaponEnhancementLevel?: number };
+
+/** Keep the preliminary U1 pass and the final weapon-base pass in their original order. */
+export function prepareLoadoutAttributes(input: LoadoutAttributeInput, requireWeapon = false) {
   const preliminaryPrepared = prepareCharacterAttributeInput(
     input.attributeRules,
     withCharacterBaseStats(input.sources, input.characterBaseStats),
   );
   const preliminaryAttributes = aggregateCharacterAttributes(preliminaryPrepared.attributeInput);
+  // Without a weapon selection both attribute passes have identical inputs.
+  if (input.weaponEnhancementLevel === undefined && !requireWeapon) {
+    return { attributes: preliminaryAttributes, prepared: preliminaryPrepared, resolvedAttack: undefined };
+  }
   const resolvedAttack = resolveAttackParameters(
     input.attackParameters,
     input.classId,
-    input.weaponEnhancementLevel,
+    input.weaponEnhancementLevel!,
   );
   // C53/D53 depend on U1 (attack level), then C1/D1 include their values.
   // Resolve this acyclic step before final aggregation so the attack formula consumes them.
@@ -150,76 +158,98 @@ export function calculateLoadout(input: LoadoutCalculationInput): LoadoutCalcula
     ),
   );
   const attributes = aggregateCharacterAttributes(prepared.attributeInput);
-  const attack = calculateAttack({
-    attackType: input.attackType,
-    physicalAttack: statTotal(attributes, "physicalAttack"),
-    magicalAttack: statTotal(attributes, "magicalAttack"),
-    doubleAttackPct: statTotal(attributes, "doubleAttackPct"),
-    skillTypeAttackPct: statTotal(attributes, "skillTypeAttackPct"),
-    attackLevel: statTotal(attributes, "attackLevel"),
-    ...resolvedAttack,
-  });
-  const combatRates = calculateLoadoutCombatRates({
-    classId: input.classId,
-    classCombatEffects: input.classCombatEffects,
-    baseCritRatePct: statTotal(attributes, "critRatePct"),
-    baseExtremizationPct: statTotal(attributes, "extremizationPct"),
-    combatRateSourceRules: input.combatRateSourceRules,
-    combatRateSourceValues: input.combatRateSourceValues,
-    additionalCritRateEffects: input.additionalCritRateEffects,
-    additionalExtremizationEffects: input.additionalExtremizationEffects,
-    targetCritPenaltyPct: input.targetCritPenaltyPct,
-  });
+  return { attributes, prepared, resolvedAttack };
+}
 
-  const generalMultiplicativeDamage = calculateProductStat(
-    prepared.generalMultiplicativeEffects,
-  );
-  const multiplicativeCritDamage = calculateProductStat(
-    [
-      ...prepared.multiplicativeCritDamageEffects,
-      { sourceId: "character-base:crit-damage-product", valuePct: input.critDamageProductBasePct },
-    ],
-    input.critDamageProductBaselinePctToSubtract,
-  );
-  const classCritDamagePassivePct = resolveClassCritDamagePassivePct(
-    input.classDamagePassives,
-    input.classId,
-  );
-  const finalDamage = calculateFinalDamage({
-    lowerDamage: attack.lowerDamage,
-    upperDamage: attack.upperDamage,
-    critRate: combatRates.critRate.finalRate,
-    extremizationRate: combatRates.extremization.finalRate,
-    critDamagePct: statTotal(attributes, "critDamagePct"),
-    classCritDamagePassivePct,
-    multiplicativeCritDamageOffset: multiplicativeCritDamage.value,
-    bossDamagePct: statTotal(attributes, "bossDamagePct"),
-    polarizationPct: statTotal(attributes, "polarizationPct"),
-    transcendenceSkillDamagePct: statTotal(attributes, "transcendenceSkillDamagePct"),
-    strongSkillDamagePct: statTotal(attributes, "strongSkillDamagePct"),
-    transcendenceSkillDamageSharePct: input.transcendenceSkillDamageSharePct ?? 100,
-    allSkillDamagePct: statTotal(attributes, "allSkillDamagePct"),
-    bleedDamagePct: statTotal(attributes, "bleedDamagePct"),
-    fullHealthKillDamagePct: statTotal(attributes, "fullHealthKillDamagePct"),
-    strongerPct: attributes.conditionalDamage.strongerPct,
-    heatPct: attributes.conditionalDamage.heatPct,
-    generalMultiplicativeDamage: generalMultiplicativeDamage.value,
-    adaptabilityPct: statTotal(attributes, "adaptabilityPct"),
-    superAdaptabilityPct: statTotal(attributes, "superAdaptabilityPct"),
-    stageAdaptabilityPenaltyPct: input.stageAdaptabilityPenaltyPct,
-    enemyDefensePct: input.enemyDefensePct,
-    defenseIgnorePct: statTotal(attributes, "defenseIgnorePct"),
-  });
+/** Preserve already completed rates if a later damage step rejects incomplete input. */
+export function evaluatePreparedLoadout(
+  input: LoadoutCalculationInput,
+  preparation: ReturnType<typeof prepareLoadoutAttributes>,
+): { result: LoadoutCalculationResult | null; combatRates: CombatRateEngineResult | null; error?: unknown } {
+  const { attributes, prepared, resolvedAttack } = preparation;
+  let combatRates: CombatRateEngineResult | null = null;
+  try {
+    if (!resolvedAttack) throw new RangeError('Loadout damage requires a weapon enhancement selection.');
+    const attack = calculateAttack({
+      attackType: input.attackType,
+      physicalAttack: statTotal(attributes, "physicalAttack"),
+      magicalAttack: statTotal(attributes, "magicalAttack"),
+      doubleAttackPct: statTotal(attributes, "doubleAttackPct"),
+      skillTypeAttackPct: statTotal(attributes, "skillTypeAttackPct"),
+      attackLevel: statTotal(attributes, "attackLevel"),
+      ...resolvedAttack,
+    });
+    combatRates = calculateLoadoutCombatRates({
+      classId: input.classId,
+      classCombatEffects: input.classCombatEffects,
+      baseCritRatePct: statTotal(attributes, "critRatePct"),
+      baseExtremizationPct: statTotal(attributes, "extremizationPct"),
+      combatRateSourceRules: input.combatRateSourceRules,
+      combatRateSourceValues: input.combatRateSourceValues,
+      additionalCritRateEffects: input.additionalCritRateEffects,
+      additionalExtremizationEffects: input.additionalExtremizationEffects,
+      targetCritPenaltyPct: input.targetCritPenaltyPct,
+    });
 
-  return {
-    attributes,
-    attack,
-    combatRates,
-    generalMultiplicativeDamage,
-    multiplicativeCritDamage,
-    classCritDamagePassivePct,
-    finalDamage,
-  };
+    const generalMultiplicativeDamage = calculateProductStat(
+      prepared.generalMultiplicativeEffects,
+    );
+    const multiplicativeCritDamage = calculateProductStat(
+      [
+        ...prepared.multiplicativeCritDamageEffects,
+        { sourceId: "character-base:crit-damage-product", valuePct: input.critDamageProductBasePct },
+      ],
+      input.critDamageProductBaselinePctToSubtract,
+    );
+    const classCritDamagePassivePct = resolveClassCritDamagePassivePct(
+      input.classDamagePassives,
+      input.classId,
+    );
+    const finalDamage = calculateFinalDamage({
+      lowerDamage: attack.lowerDamage,
+      upperDamage: attack.upperDamage,
+      critRate: combatRates.critRate.finalRate,
+      extremizationRate: combatRates.extremization.finalRate,
+      critDamagePct: statTotal(attributes, "critDamagePct"),
+      classCritDamagePassivePct,
+      multiplicativeCritDamageOffset: multiplicativeCritDamage.value,
+      bossDamagePct: statTotal(attributes, "bossDamagePct"),
+      polarizationPct: statTotal(attributes, "polarizationPct"),
+      transcendenceSkillDamagePct: statTotal(attributes, "transcendenceSkillDamagePct"),
+      strongSkillDamagePct: statTotal(attributes, "strongSkillDamagePct"),
+      transcendenceSkillDamageSharePct: input.transcendenceSkillDamageSharePct ?? 100,
+      allSkillDamagePct: statTotal(attributes, "allSkillDamagePct"),
+      bleedDamagePct: statTotal(attributes, "bleedDamagePct"),
+      fullHealthKillDamagePct: statTotal(attributes, "fullHealthKillDamagePct"),
+      strongerPct: attributes.conditionalDamage.strongerPct,
+      heatPct: attributes.conditionalDamage.heatPct,
+      generalMultiplicativeDamage: generalMultiplicativeDamage.value,
+      adaptabilityPct: statTotal(attributes, "adaptabilityPct"),
+      superAdaptabilityPct: statTotal(attributes, "superAdaptabilityPct"),
+      stageAdaptabilityPenaltyPct: input.stageAdaptabilityPenaltyPct,
+      enemyDefensePct: input.enemyDefensePct,
+      defenseIgnorePct: statTotal(attributes, "defenseIgnorePct"),
+    });
+
+    return { result: {
+      attributes,
+      attack,
+      combatRates,
+      generalMultiplicativeDamage,
+      multiplicativeCritDamage,
+      classCritDamagePassivePct,
+      finalDamage,
+    }, combatRates };
+  } catch (error) {
+    return { result: null, combatRates, error };
+  }
+}
+
+/** Existing external calculation contract; failures still throw the original error. */
+export function calculateLoadout(input: LoadoutCalculationInput): LoadoutCalculationResult {
+  const evaluation = evaluatePreparedLoadout(input, prepareLoadoutAttributes(input, true));
+  if (!evaluation.result) throw evaluation.error;
+  return evaluation.result;
 }
 
 export function mergeLoadoutSources(

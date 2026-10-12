@@ -3,7 +3,8 @@ import { type AccessoryEffectOption } from '../calculation/equipment-effects.ts'
 import { loadGameData, readJson, escapeHtml as h, formatNumber as fmt } from './data.ts';
 import { readState, readBaseline, saveState, migrateLegacyEnvironmentSelection, normalizeTranscendenceSkillDamageShare, normalizePortraitAwakeningSplit, parseTranscendenceSkillDamageShareInput, type LoadoutState } from './state.ts';
 import { parseLoadoutJson, serializeLoadout } from './loadout-transfer.ts';
-import { projectAttributes, projectCombatRates, projectDamage } from './projection.ts';
+import { evaluateLoadout, type projectDamage } from './projection.ts';
+import { createBaselineEvaluationCache } from './baseline-evaluation.ts';
 import { compareLoadoutResults } from './calculation-comparison.ts';
 import { createPicker, type PickerOption } from './picker.ts';
 import { GLOVE_CIRCUIT_ROWS_FIELD, readGloveCircuitRows, serializeGloveCircuitRows, gloveCircuitRowsTotal } from './circuit-board-rows.ts';
@@ -37,6 +38,10 @@ const ICE_EQUIPMENT_SHORT_NAMES: Record<string, string> = {
 
 async function start() {
   const data = await loadGameData();
+  // This page loads GameData once. Controls/import/history change state, never this data.
+  // A future in-session data/parameter refresh must replace this revision token.
+  const calculationDataRevision = Symbol('loaded-game-data');
+  const baselineEvaluationCache = createBaselineEvaluationCache();
   const sampleId = new URLSearchParams(location.search).get('sample');
   if (sampleId !== null && !/^[a-z0-9-]+$/.test(sampleId)) throw new RangeError('驗算範例名稱無效。');
   const sampleMode = sampleId !== null;
@@ -1602,24 +1607,13 @@ async function start() {
   }
   function renderResults() {
     const target = document.querySelector('#results')!;
-      let currentDamage: ReturnType<typeof projectDamage> | null = null;
-      let baselineDamage: ReturnType<typeof projectDamage> | null = null;
-      let baselineAttributes: ReturnType<typeof projectAttributes> | ReturnType<typeof projectDamage>['attributes'] | null = null;
-      let damageCalculationError: unknown;
-      try { currentDamage = projectDamage(data, state); } catch (error) { damageCalculationError = error; }
-      baselineIsValid = false;
-      if (baseline) {
-        try {
-          baselineDamage = projectDamage(data, baseline);
-          baselineAttributes = baselineDamage.attributes;
-          baselineIsValid = true;
-        } catch {
-          try {
-            baselineAttributes = projectAttributes(data, baseline);
-            baselineIsValid = true;
-          } catch { /* Keep current attributes visible if the saved build is stale. */ }
-        }
-      }
+      const currentEvaluation = evaluateLoadout(data, state);
+      const currentDamage = currentEvaluation.damage;
+      const damageCalculationError = currentEvaluation.damageError;
+      const baselineEvaluation = baselineEvaluationCache.get(data, baseline, calculationDataRevision);
+      const baselineDamage = baselineEvaluation?.damage ?? null;
+      const baselineAttributes = baselineEvaluation?.attributes ?? null;
+      baselineIsValid = baselineAttributes !== null;
       if (!currentDamage) renderCalculationComparison(undefined, baselineDamage?.result);
       const equipmentDamageSummary = document.querySelector<HTMLElement>('#equipment-damage-summary')!;
       const baselineFinalDamage = baselineDamage?.result.finalDamage.finalDamage;
@@ -1633,14 +1627,12 @@ async function start() {
       const damageGainClass = damageGainRatio === undefined || damageGainRatio === 0 ? '' : damageGainRatio > 0 ? 'gain-positive' : 'gain-negative';
       equipmentDamageSummary.innerHTML = '<div class="equipment-damage-card"><span>基準配置</span><strong>' + (baselineFinalDamage === undefined ? '—' : summaryDamageNumber(baselineFinalDamage)) + '</strong></div><div class="equipment-damage-card"><span>新配置</span><strong>' + (currentFinalDamage === undefined ? '—' : summaryDamageNumber(currentFinalDamage)) + '</strong></div><div class="equipment-damage-card equipment-damage-gain"><span>增幅</span><strong class="' + damageGainClass + '">' + damageGain + '</strong></div>';
     try {
-      const current = currentDamage?.attributes ?? projectAttributes(data, state);
+      if (!currentEvaluation.attributes) throw currentEvaluation.attributeError;
+      const current = currentEvaluation.attributes;
       const before = baselineAttributes;
     document.querySelector('#comparison-label')!.textContent = before ? '與已儲存配置比較' : baseline ? '比較基準已不適用目前資料，請重新設定' : '可儲存目前配置作為比較基準';
 
-      let currentCombatRates: ReturnType<typeof projectCombatRates> | null = currentDamage?.result.combatRates ?? null;
-      if (!currentCombatRates) {
-        try { currentCombatRates = projectCombatRates(data, state); } catch { /* Show other attributes even if rate inputs are incomplete. */ }
-      }
+      const currentCombatRates = currentEvaluation.combatRates;
     const currentClass = data.classes.classes.find(entry => entry.id === state.Job);
     const baselineClass = baseline ? data.classes.classes.find(entry => entry.id === baseline?.Job) : undefined;
     const critDamageSupplement = (damage: ReturnType<typeof projectDamage> | null) => damage
@@ -1854,8 +1846,10 @@ async function start() {
   });
   baselineButton.addEventListener('click', () => {
     try {
-      projectAttributes(data, state);
-      baseline = structuredClone(state);
+      const candidate = structuredClone(state);
+      const evaluation = baselineEvaluationCache.get(data, candidate, calculationDataRevision)!;
+      if (!evaluation.attributes) throw evaluation.attributeError;
+      baseline = candidate;
       baselineIsValid = true;
       const stored = sampleMode ? false : saveState(baseline, true);
       renderResults();

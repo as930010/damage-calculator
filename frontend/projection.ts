@@ -1,19 +1,17 @@
-import { aggregateCharacterAttributes, prepareCharacterAttributeInput } from "../calculation/attribute-aggregation.ts";
 import { resolveSimulatorEquipmentContributions } from "../calculation/equipment-catalog.ts";
 import { resolveInnerwearSources } from "../calculation/innerwear.ts";
 import { resolveNephronArmorSources } from "../calculation/nephron-armor.ts";
 import { resolveWeaponTransformationsFromCells } from "../calculation/weapon-transformations.ts";
 import { resolveAccessoryEffectOptions, resolveArmorAppraisals, resolveAtmaSetEffects, resolveChipContribution, resolveCircuitBoardEffects, resolveColorSetEffect, resolveMasterBeastEffects, resolveNamedStatOption, resolveRaidSetEffects, resolveResonanceEffects, resolveRightIceSetEffects, resolveSpiritRecordEffects, resolveSpiritRecordSelections, resolveWeaponGrowth } from "../calculation/equipment-effects.ts";
-import { calculateWeaponBaseAttack, resolveAttackParameters } from "../calculation/attack.ts";
-import type { AttributeRule, StatContribution } from "../calculation/types.ts";
-import { calculateLoadout, calculateLoadoutCombatRates } from "../calculation/loadout-engine.ts";
+import type { AttributeRule, CharacterAttributeResult, StatContribution } from "../calculation/types.ts";
+import { calculateLoadoutCombatRates, prepareLoadoutAttributes, evaluatePreparedLoadout } from "../calculation/loadout-engine.ts";
 import { resolveClassDamagePassiveContributions } from "../calculation/class-damage-passives.ts";
 import type { GameData } from "./data.ts";
 import { DEFAULT_TRANSCENDENCE_SKILL_DAMAGE_SHARE_PCT, normalizePortraitAwakeningSplit, type LoadoutState } from "./state.ts";
 import { readGloveCircuitRows, validateGloveCircuitRows } from "./circuit-board-rows.ts";
 
 /** UI state to supported stat sources; game arithmetic remains in calculation/. */
-export function projectAttributes(data: GameData, state: LoadoutState) {
+export function resolveLoadoutSources(data: GameData, state: LoadoutState) {
   const values = state.values;
   const characterBaseStats = { ...data.parameters.characterBase, ...data.parameters.characterBaseByClass?.[state.Job] };
   const text = (key: string) => String(values[key] ?? "");
@@ -254,25 +252,23 @@ export function projectAttributes(data: GameData, state: LoadoutState) {
   if (!state.lowerwearAlternativeEnabled) groups.lowerwearB = [];
   const rules: AttributeRule[] = data.attributes.attributes.filter((entry) => entry.active && entry.aggregation === "sum")
     .map((entry) => ({ key: entry.key, aggregation: "sum", cap: entry.cap }));
-  const aggregate = () => aggregateCharacterAttributes(prepareCharacterAttributeInput(rules, {
-    ...groups, lowerwearAlternativeEnabled: state.lowerwearAlternativeEnabled,
-  }).attributeInput);
-  const first = aggregate();
-  if (text("Weapon.ENHC")) {
-    const params = resolveAttackParameters(data.attack, state.Job, Number(text("Weapon.ENHC").match(/\d+/)?.[0]));
-    const stats = calculateWeaponBaseAttack({ ...params, attackLevel: first.stats.attackLevel?.finalTotal ?? 0 });
-    groups.shared.push({ sourceId: "weapon-base-attack", stats });
-  }
-  const result = aggregate();
   const calculationSources = {
     shared: groups.shared.filter(source => source.sourceId !== "character-base" && source.sourceId !== "weapon-base-attack"),
     lowerwearA: groups.lowerwearA, lowerwearB: groups.lowerwearB,
     lowerwearAlternativeEnabled: state.lowerwearAlternativeEnabled,
   };
-  return { ...result, calculationSources };
+  return { attributeRules: rules, characterBaseStats, sources: calculationSources,
+    attackParameters: data.attack, classId: state.Job,
+    weaponEnhancementLevel: text('Weapon.ENHC') ? Number(text('Weapon.ENHC').match(/\d+/)?.[0]) : undefined };
 }
 
-function combatRateInputs(data: GameData, state: LoadoutState, attributes: ReturnType<typeof projectAttributes>) {
+/** Attribute-only callers keep their existing result and incomplete-loadout contract. */
+export function projectAttributes(data: GameData, state: LoadoutState) {
+  const sources = resolveLoadoutSources(data, state);
+  return { ...prepareLoadoutAttributes(sources).attributes, calculationSources: sources.sources };
+}
+
+function combatRateInputs(data: GameData, state: LoadoutState, attributes: CharacterAttributeResult) {
   const job = data.classes.classes.find(entry => entry.id === state.Job);
   if (!job) throw new RangeError(`找不到職業設定：${state.Job}`);
   const percentage = (cell: string) => {
@@ -308,8 +304,8 @@ export function projectCombatRates(data: GameData, state: LoadoutState) {
 }
 
 /** Full formula path from the computed attack range through final damage. */
-export function projectDamage(data: GameData, state: LoadoutState) {
-  const attributes = projectAttributes(data, state);
+function damageInputs(data: GameData, state: LoadoutState, attributes: CharacterAttributeResult,
+  sources: ReturnType<typeof resolveLoadoutSources>) {
   const job = data.classes.classes.find(entry => entry.id === state.Job);
   if (!job) throw new RangeError(`找不到職業設定：${state.Job}`);
   const weaponText = String(state.values["Weapon.ENHC"] ?? "");
@@ -323,12 +319,11 @@ export function projectDamage(data: GameData, state: LoadoutState) {
     return parsed;
   };
   const rateInputs = combatRateInputs(data, state, attributes);
-  const result = calculateLoadout({
+  return {
     classId: job.id, attackType: job.attackType,
-    attributeRules: data.attributes.attributes.filter(entry => entry.active && entry.aggregation === "sum")
-      .map(entry => ({ key: entry.key, aggregation: "sum" as const, cap: entry.cap })),
-    characterBaseStats: { ...data.parameters.characterBase, ...data.parameters.characterBaseByClass?.[job.id] },
-    sources: attributes.calculationSources,
+    attributeRules: sources.attributeRules,
+    characterBaseStats: sources.characterBaseStats,
+    sources: sources.sources,
     attackParameters: data.attack,
     weaponEnhancementLevel: weaponLevel,
     classCombatEffects: data.classCombatEffects,
@@ -341,6 +336,42 @@ export function projectDamage(data: GameData, state: LoadoutState) {
     transcendenceSkillDamageSharePct: state.transcendenceSkillDamageSharePct ?? DEFAULT_TRANSCENDENCE_SKILL_DAMAGE_SHARE_PCT,
     critDamageProductBasePct: data.parameters.characterBaseByClass?.[job.id]?.critDamagePct === undefined ? data.parameters.critDamageProductBasePct : data.parameters.characterBaseByClass[job.id].critDamagePct - 100,
     critDamageProductBaselinePctToSubtract: data.parameters.characterBaseByClass?.[job.id]?.critDamagePct ?? data.parameters.critDamageProductBaselinePctToSubtract,
-  });
-  return { attributes: result.attributes, result };
+  };
+}
+
+/** One source preparation and one ordered attribute evaluation for all result views. */
+export function evaluateLoadout(data: GameData, state: LoadoutState, includeFallbackRates = true) {
+  let sources: ReturnType<typeof resolveLoadoutSources>;
+  let preparation: ReturnType<typeof prepareLoadoutAttributes>;
+  try {
+    sources = resolveLoadoutSources(data, state);
+    preparation = prepareLoadoutAttributes(sources);
+  } catch (error) {
+    return { attributes: null, damage: null, combatRates: null, damageError: error, attributeError: error };
+  }
+  let damageError: unknown;
+  let combatRates: ReturnType<typeof calculateLoadoutCombatRates> | null = null;
+  try {
+    const evaluation = evaluatePreparedLoadout(damageInputs(data, state, preparation.attributes, sources), preparation);
+    if (evaluation.result) {
+      const result = evaluation.result;
+      return { attributes: result.attributes, damage: { attributes: result.attributes, result },
+        combatRates: result.combatRates, damageError: undefined, attributeError: undefined };
+    }
+    damageError = evaluation.error;
+    combatRates = evaluation.combatRates;
+  } catch (error) { damageError = error; }
+  if (!combatRates && includeFallbackRates) {
+    try { combatRates = calculateLoadoutCombatRates(combatRateInputs(data, state, preparation.attributes)); }
+    catch { /* Preserve attribute display when independent rate inputs are incomplete. */ }
+  }
+  return { attributes: { ...preparation.attributes, calculationSources: sources.sources },
+    damage: null, combatRates, damageError, attributeError: undefined };
+}
+
+/** Full formula path; keep the existing throwing API for external callers. */
+export function projectDamage(data: GameData, state: LoadoutState) {
+  const evaluation = evaluateLoadout(data, state, false);
+  if (!evaluation.damage) throw evaluation.damageError;
+  return evaluation.damage;
 }

@@ -1,0 +1,3991 @@
+{
+  "referenceCommit": "65abe45e7fce266f8a4b8ffbd76b2b5169bd91b8",
+  "evaluations": {
+    "public-complete": {
+      "stats": {
+        "physicalAttack": {
+          "sharedTotal": 38751.3,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 38751.3,
+          "finalTotal": 38751.3
+        },
+        "magicalAttack": {
+          "sharedTotal": 53072.65,
+          "lowerwearA": 3206.1499999999996,
+          "lowerwearB": 3206.1499999999996,
+          "lowerwearAverage": 3206.1499999999996,
+          "totalBeforeCap": 56278.8,
+          "finalTotal": 56278.8
+        },
+        "doubleAttackPct": {
+          "sharedTotal": 89.64999999999999,
+          "lowerwearA": 2,
+          "lowerwearB": 2,
+          "lowerwearAverage": 2,
+          "totalBeforeCap": 91.64999999999999,
+          "finalTotal": 91.64999999999999
+        },
+        "critRatePct": {
+          "sharedTotal": 105.5,
+          "lowerwearA": 24,
+          "lowerwearB": 24,
+          "lowerwearAverage": 24,
+          "totalBeforeCap": 129.5,
+          "finalTotal": 129.5
+        },
+        "extremizationPct": {
+          "sharedTotal": 80,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 80,
+          "finalTotal": 80
+        },
+        "critDamagePct": {
+          "sharedTotal": 209.5,
+          "lowerwearA": 6,
+          "lowerwearB": 6,
+          "lowerwearAverage": 6,
+          "totalBeforeCap": 215.5,
+          "finalTotal": 215.5
+        },
+        "bossDamagePct": {
+          "sharedTotal": 180.5,
+          "lowerwearA": 5,
+          "lowerwearB": 5,
+          "lowerwearAverage": 5,
+          "totalBeforeCap": 185.5,
+          "finalTotal": 185.5
+        },
+        "polarizationPct": {
+          "sharedTotal": 59.20000000000001,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 59.20000000000001,
+          "cap": 60,
+          "finalTotal": 59.20000000000001
+        },
+        "allSkillDamagePct": {
+          "sharedTotal": 115.5,
+          "lowerwearA": 1,
+          "lowerwearB": 1,
+          "lowerwearAverage": 1,
+          "totalBeforeCap": 116.5,
+          "finalTotal": 116.5
+        },
+        "strongSkillDamagePct": {
+          "sharedTotal": 84,
+          "lowerwearA": 10,
+          "lowerwearB": 10,
+          "lowerwearAverage": 10,
+          "totalBeforeCap": 94,
+          "finalTotal": 94
+        },
+        "transcendenceSkillDamagePct": {
+          "sharedTotal": 114.7,
+          "lowerwearA": 10,
+          "lowerwearB": 10,
+          "lowerwearAverage": 10,
+          "totalBeforeCap": 124.7,
+          "finalTotal": 124.7
+        },
+        "bleedDamagePct": {
+          "sharedTotal": 54.5,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 54.5,
+          "finalTotal": 54.5
+        },
+        "strongerPct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "heatPct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "fullHealthKillDamagePct": {
+          "sharedTotal": 37.5,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 37.5,
+          "finalTotal": 37.5
+        },
+        "adaptabilityPct": {
+          "sharedTotal": 55,
+          "lowerwearA": 5,
+          "lowerwearB": 5,
+          "lowerwearAverage": 5,
+          "totalBeforeCap": 60,
+          "cap": 60,
+          "finalTotal": 60
+        },
+        "actionSpeedPct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "defenseIgnorePct": {
+          "sharedTotal": 7.7,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 7.7,
+          "finalTotal": 7.7
+        },
+        "attackLevel": {
+          "sharedTotal": 56.75,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 56.75,
+          "finalTotal": 56.75
+        },
+        "skillTypeAttackPct": {
+          "sharedTotal": 26.5,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 26.5,
+          "finalTotal": 26.5
+        },
+        "superAdaptabilityPct": {
+          "sharedTotal": 8,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 8,
+          "finalTotal": 8
+        }
+      },
+      "conditionalDamage": {
+        "strongerPct": 25.05,
+        "heatPct": 24,
+        "strongerSources": [
+          {
+            "sourceId": "right-ice-set-effects-cf29c386218b",
+            "valuePct": 5
+          },
+          {
+            "sourceId": "spirit-record:trait:巨人審判者",
+            "valuePct": 2
+          },
+          {
+            "sourceId": "chip:lowerwear",
+            "valuePct": 5
+          },
+          {
+            "sourceId": "circuit-board:lowerwear",
+            "valuePct": 13.05
+          }
+        ],
+        "heatSources": [
+          {
+            "sourceId": "right-ice-set-effects-cf29c386218b",
+            "valuePct": 5
+          },
+          {
+            "sourceId": "guild-fountain-4:GuildFountain.Stage4",
+            "valuePct": 3
+          },
+          {
+            "sourceId": "chip:lowerwearAlternative",
+            "valuePct": 4
+          },
+          {
+            "sourceId": "circuit-board:lowerwearAlternative",
+            "valuePct": 12
+          }
+        ]
+      },
+      "result": {
+        "attack": {
+          "attackType": "magical",
+          "selectedAttack": 56278.8,
+          "attackPower": 136440,
+          "c53": 31039.9,
+          "d53": 47881.450000000004,
+          "lowerDamage": 85970,
+          "upperDamage": 186911
+        },
+        "combatRates": {
+          "classId": "DaB",
+          "critRate": {
+            "baseRawStatPct": 129.5,
+            "diminishingAddedPct": 0,
+            "rawStatPct": 129.5,
+            "tierRate": 0.9579999999999999,
+            "multipliers": [
+              {
+                "sourceId": "combat-rate:yellow-beast-stone",
+                "valuePct": 8,
+                "factor": 1.08
+              },
+              {
+                "sourceId": "lowerwear-crit-rate-enhancement",
+                "valuePct": 13,
+                "factor": 1.13
+              }
+            ],
+            "multiplierProduct": 1.2204,
+            "nonDiminishingSources": [
+              {
+                "sourceId": "DaB:critRate:crit-1",
+                "valuePct": 15
+              }
+            ],
+            "nonDiminishingPct": 15,
+            "finalAdjustmentPct": -30,
+            "valueBeforeUpperCap": 1.0191431999999996,
+            "finalRate": 1
+          },
+          "extremization": {
+            "baseRawStatPct": 80,
+            "diminishingAddedPct": 0,
+            "rawStatPct": 80,
+            "tierRate": 0.7000000000000001,
+            "multipliers": [
+              {
+                "sourceId": "combat-rate:yellow-beast-stone",
+                "valuePct": 8,
+                "factor": 1.08
+              },
+              {
+                "sourceId": "shoes-extremization-enhancement",
+                "valuePct": 13,
+                "factor": 1.13
+              }
+            ],
+            "multiplierProduct": 1.2204,
+            "nonDiminishingSources": [
+              {
+                "sourceId": "DaB:extremization:ext-1",
+                "valuePct": 15
+              }
+            ],
+            "nonDiminishingPct": 15,
+            "finalAdjustmentPct": 0,
+            "valueBeforeUpperCap": 1.00428,
+            "finalRate": 1
+          }
+        },
+        "generalMultiplicativeDamage": {
+          "factors": [
+            {
+              "sourceId": "simulator:Accessory.FaceTop",
+              "valuePct": 10.25,
+              "factor": 1.1025
+            },
+            {
+              "sourceId": "simulator:Accessory.FaceBottom",
+              "valuePct": 5,
+              "factor": 1.05
+            },
+            {
+              "sourceId": "simulator:Accessory.Ring1",
+              "valuePct": 4,
+              "factor": 1.04
+            },
+            {
+              "sourceId": "innerwear:upper",
+              "valuePct": 13,
+              "factor": 1.13
+            },
+            {
+              "sourceId": "color-set:紅",
+              "valuePct": 20,
+              "factor": 1.2
+            },
+            {
+              "sourceId": "atma-water-fire-multiplicative-damage",
+              "valuePct": 20,
+              "factor": 1.2
+            },
+            {
+              "sourceId": "master-beast:armor-spirit-stone-set:S77",
+              "valuePct": 4,
+              "factor": 1.04
+            },
+            {
+              "sourceId": "title:Effect.Title",
+              "valuePct": 25,
+              "factor": 1.25
+            },
+            {
+              "sourceId": "consumable:Effect.Consumable",
+              "valuePct": 5,
+              "factor": 1.05
+            }
+          ],
+          "productBeforeBaseline": 2.6740826330400003,
+          "baselinePct": 0,
+          "value": 2.6740826330400003
+        },
+        "multiplicativeCritDamage": {
+          "factors": [
+            {
+              "sourceId": "fixed-effect:red-upper-crit-damage",
+              "valuePct": 10,
+              "factor": 1.1
+            },
+            {
+              "sourceId": "fixed-effect:maestro-aura",
+              "valuePct": 2,
+              "factor": 1.02
+            },
+            {
+              "sourceId": "character-base:crit-damage-product",
+              "valuePct": 50,
+              "factor": 1.5
+            }
+          ],
+          "productBeforeBaseline": 1.6830000000000003,
+          "baselinePct": 150,
+          "value": 0.18300000000000027
+        },
+        "classCritDamagePassivePct": 30,
+        "finalDamage": {
+          "extremizedBase": 186911,
+          "critFactor": 2.638,
+          "damageFactors": {
+            "bossDamage": 2.855,
+            "polarization": 1.592,
+            "skillDamage": 2.247,
+            "allSkillDamage": 2.165,
+            "bleedDamage": 1.545,
+            "fullHealthKillDamage": 1.375
+          },
+          "skillDamageWeighting": {
+            "transcendenceSharePct": 100,
+            "strongSharePct": 0,
+            "transcendenceFactor": 2.247,
+            "strongFactor": 1.94,
+            "combinedFactor": 2.247
+          },
+          "conditionalFactor": 1.2452278658903835,
+          "adaptationFactor": 0.73,
+          "defenseFactor": 1.0586249562787893,
+          "finalDamage": 59599089.577728055
+        }
+      },
+      "combatRates": {
+        "classId": "DaB",
+        "critRate": {
+          "baseRawStatPct": 129.5,
+          "diminishingAddedPct": 0,
+          "rawStatPct": 129.5,
+          "tierRate": 0.9579999999999999,
+          "multipliers": [
+            {
+              "sourceId": "combat-rate:yellow-beast-stone",
+              "valuePct": 8,
+              "factor": 1.08
+            },
+            {
+              "sourceId": "lowerwear-crit-rate-enhancement",
+              "valuePct": 13,
+              "factor": 1.13
+            }
+          ],
+          "multiplierProduct": 1.2204,
+          "nonDiminishingSources": [
+            {
+              "sourceId": "DaB:critRate:crit-1",
+              "valuePct": 15
+            }
+          ],
+          "nonDiminishingPct": 15,
+          "finalAdjustmentPct": -30,
+          "valueBeforeUpperCap": 1.0191431999999996,
+          "finalRate": 1
+        },
+        "extremization": {
+          "baseRawStatPct": 80,
+          "diminishingAddedPct": 0,
+          "rawStatPct": 80,
+          "tierRate": 0.7000000000000001,
+          "multipliers": [
+            {
+              "sourceId": "combat-rate:yellow-beast-stone",
+              "valuePct": 8,
+              "factor": 1.08
+            },
+            {
+              "sourceId": "shoes-extremization-enhancement",
+              "valuePct": 13,
+              "factor": 1.13
+            }
+          ],
+          "multiplierProduct": 1.2204,
+          "nonDiminishingSources": [
+            {
+              "sourceId": "DaB:extremization:ext-1",
+              "valuePct": 15
+            }
+          ],
+          "nonDiminishingPct": 15,
+          "finalAdjustmentPct": 0,
+          "valueBeforeUpperCap": 1.00428,
+          "finalRate": 1
+        }
+      },
+      "damageError": null,
+      "attributeError": null,
+      "completeEvaluationHash": "b6ab12695f5494c3887050cd52513f1f3efa5853c11882801051df933aa1fe27",
+      "attributeProjectionHash": "c6cf6645ad73730b04e832e07e18d7bb4a1aa4912f15badfc2993c2f449b9426",
+      "combatProjectionHash": "6484a907cf8ee66ab406370837fc429ac269eacdab376b46a6459d03b9251f30"
+    },
+    "minimal-complete": {
+      "stats": {
+        "physicalAttack": {
+          "sharedTotal": 21699.600000000002,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 21699.600000000002,
+          "finalTotal": 21699.600000000002
+        },
+        "magicalAttack": {
+          "sharedTotal": 14099.6,
+          "lowerwearA": 488,
+          "lowerwearB": 0,
+          "lowerwearAverage": 488,
+          "totalBeforeCap": 14587.6,
+          "finalTotal": 14587.6
+        },
+        "doubleAttackPct": {
+          "sharedTotal": 6.75,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 6.75,
+          "finalTotal": 6.75
+        },
+        "critRatePct": {
+          "sharedTotal": 5,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 5,
+          "finalTotal": 5
+        },
+        "extremizationPct": {
+          "sharedTotal": 5,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 5,
+          "finalTotal": 5
+        },
+        "critDamagePct": {
+          "sharedTotal": 151.5,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 151.5,
+          "finalTotal": 151.5
+        },
+        "bossDamagePct": {
+          "sharedTotal": 7.5,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 7.5,
+          "finalTotal": 7.5
+        },
+        "polarizationPct": {
+          "sharedTotal": 1.2,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 1.2,
+          "cap": 60,
+          "finalTotal": 1.2
+        },
+        "allSkillDamagePct": {
+          "sharedTotal": 41,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 41,
+          "finalTotal": 41
+        },
+        "strongSkillDamagePct": {
+          "sharedTotal": 3,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 3,
+          "finalTotal": 3
+        },
+        "transcendenceSkillDamagePct": {
+          "sharedTotal": 3,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 3,
+          "finalTotal": 3
+        },
+        "bleedDamagePct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "strongerPct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "heatPct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "fullHealthKillDamagePct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "adaptabilityPct": {
+          "sharedTotal": 19,
+          "lowerwearA": 2,
+          "lowerwearB": 0,
+          "lowerwearAverage": 2,
+          "totalBeforeCap": 21,
+          "cap": 60,
+          "finalTotal": 21
+        },
+        "actionSpeedPct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "defenseIgnorePct": {
+          "sharedTotal": 6.2,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 6.2,
+          "finalTotal": 6.2
+        },
+        "attackLevel": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "skillTypeAttackPct": {
+          "sharedTotal": 26.5,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 26.5,
+          "finalTotal": 26.5
+        },
+        "superAdaptabilityPct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        }
+      },
+      "conditionalDamage": {
+        "strongerPct": 0,
+        "heatPct": 0,
+        "strongerSources": [],
+        "heatSources": []
+      },
+      "result": {
+        "attack": {
+          "attackType": "physical",
+          "selectedAttack": 21699.600000000002,
+          "attackPower": 29302,
+          "c53": 18886.4,
+          "d53": 12204.800000000001,
+          "lowerDamage": 18214,
+          "upperDamage": 40391
+        },
+        "combatRates": {
+          "classId": "KE",
+          "critRate": {
+            "baseRawStatPct": 5,
+            "diminishingAddedPct": 0,
+            "rawStatPct": 5,
+            "tierRate": 0.05,
+            "multipliers": [
+              {
+                "sourceId": "KE:critRate:crit-1",
+                "valuePct": 20,
+                "factor": 1.2
+              },
+              {
+                "sourceId": "lowerwear-crit-rate-enhancement",
+                "valuePct": 10,
+                "factor": 1.1
+              }
+            ],
+            "multiplierProduct": 1.32,
+            "nonDiminishingSources": [],
+            "nonDiminishingPct": 0,
+            "finalAdjustmentPct": 0,
+            "valueBeforeUpperCap": 0.066,
+            "finalRate": 0.066
+          },
+          "extremization": {
+            "baseRawStatPct": 5,
+            "diminishingAddedPct": 0,
+            "rawStatPct": 5,
+            "tierRate": 0.05,
+            "multipliers": [
+              {
+                "sourceId": "KE:extremization:ext-1",
+                "valuePct": 20,
+                "factor": 1.2
+              },
+              {
+                "sourceId": "shoes-extremization-enhancement",
+                "valuePct": 10,
+                "factor": 1.1
+              }
+            ],
+            "multiplierProduct": 1.32,
+            "nonDiminishingSources": [],
+            "nonDiminishingPct": 0,
+            "finalAdjustmentPct": 0,
+            "valueBeforeUpperCap": 0.066,
+            "finalRate": 0.066
+          }
+        },
+        "generalMultiplicativeDamage": {
+          "factors": [
+            {
+              "sourceId": "innerwear:upper",
+              "valuePct": 10,
+              "factor": 1.1
+            },
+            {
+              "sourceId": "master-beast:armor-spirit-stone-set:S77",
+              "valuePct": 4,
+              "factor": 1.04
+            }
+          ],
+          "productBeforeBaseline": 1.1440000000000001,
+          "baselinePct": 0,
+          "value": 1.1440000000000001
+        },
+        "multiplicativeCritDamage": {
+          "factors": [
+            {
+              "sourceId": "fixed-effect:red-upper-crit-damage",
+              "valuePct": 10,
+              "factor": 1.1
+            },
+            {
+              "sourceId": "character-base:crit-damage-product",
+              "valuePct": 50,
+              "factor": 1.5
+            }
+          ],
+          "productBeforeBaseline": 1.6500000000000001,
+          "baselinePct": 150,
+          "value": 0.15000000000000013
+        },
+        "classCritDamagePassivePct": 8,
+        "finalDamage": {
+          "extremizedBase": 30034.341,
+          "critFactor": 1.04917,
+          "damageFactors": {
+            "bossDamage": 1.075,
+            "polarization": 1.012,
+            "skillDamage": 1.03,
+            "allSkillDamage": 1.41,
+            "bleedDamage": 1,
+            "fullHealthKillDamage": 1
+          },
+          "skillDamageWeighting": {
+            "transcendenceSharePct": 100,
+            "strongSharePct": 0,
+            "transcendenceFactor": 1.03,
+            "strongFactor": 1.03,
+            "combinedFactor": 1.03
+          },
+          "conditionalFactor": 1,
+          "adaptationFactor": 1.21,
+          "defenseFactor": 1,
+          "finalDamage": 68916.09802296222
+        }
+      },
+      "combatRates": {
+        "classId": "KE",
+        "critRate": {
+          "baseRawStatPct": 5,
+          "diminishingAddedPct": 0,
+          "rawStatPct": 5,
+          "tierRate": 0.05,
+          "multipliers": [
+            {
+              "sourceId": "KE:critRate:crit-1",
+              "valuePct": 20,
+              "factor": 1.2
+            },
+            {
+              "sourceId": "lowerwear-crit-rate-enhancement",
+              "valuePct": 10,
+              "factor": 1.1
+            }
+          ],
+          "multiplierProduct": 1.32,
+          "nonDiminishingSources": [],
+          "nonDiminishingPct": 0,
+          "finalAdjustmentPct": 0,
+          "valueBeforeUpperCap": 0.066,
+          "finalRate": 0.066
+        },
+        "extremization": {
+          "baseRawStatPct": 5,
+          "diminishingAddedPct": 0,
+          "rawStatPct": 5,
+          "tierRate": 0.05,
+          "multipliers": [
+            {
+              "sourceId": "KE:extremization:ext-1",
+              "valuePct": 20,
+              "factor": 1.2
+            },
+            {
+              "sourceId": "shoes-extremization-enhancement",
+              "valuePct": 10,
+              "factor": 1.1
+            }
+          ],
+          "multiplierProduct": 1.32,
+          "nonDiminishingSources": [],
+          "nonDiminishingPct": 0,
+          "finalAdjustmentPct": 0,
+          "valueBeforeUpperCap": 0.066,
+          "finalRate": 0.066
+        }
+      },
+      "damageError": null,
+      "attributeError": null,
+      "completeEvaluationHash": "221fba2d11a4df874efcb5507d24407778e4c565a59aedccf749a64aad1b06eb",
+      "attributeProjectionHash": "757c63e5e94c9ff730618c5c161213ced122fe40c1f8ff50e2625f73e19dd16f",
+      "combatProjectionHash": "566ef4cce4dd2b86bad472c56293ea7cf0ea99d2cf34985cc5017af11b8a5176"
+    },
+    "no-class": {
+      "stats": {},
+      "conditionalDamage": null,
+      "result": null,
+      "combatRates": null,
+      "damageError": {
+        "name": "RangeError",
+        "message": "職業係數未設定："
+      },
+      "attributeError": {
+        "name": "RangeError",
+        "message": "職業係數未設定："
+      },
+      "completeEvaluationHash": "3a3b1d8c832dfb01d8f93b622f48d92af30bc32b320f54c0e234cb50d24ee48d",
+      "attributeProjectionHash": "f0cf57e5e9b0046d79430208695736f1aa311e94fc1e735310a2dc60ba37d34a",
+      "combatProjectionHash": "f0cf57e5e9b0046d79430208695736f1aa311e94fc1e735310a2dc60ba37d34a"
+    },
+    "invalid-class": {
+      "stats": {},
+      "conditionalDamage": null,
+      "result": null,
+      "combatRates": null,
+      "damageError": {
+        "name": "RangeError",
+        "message": "職業係數未設定：unknown"
+      },
+      "attributeError": {
+        "name": "RangeError",
+        "message": "職業係數未設定：unknown"
+      },
+      "completeEvaluationHash": "6b8ab7b2c36b501f6225241835a76471ac4fad3a5b84d68dcfea8267958b40f3",
+      "attributeProjectionHash": "857388c4ebaeefbcac67166f970b6d9a1531c4802cbd5a5afb535a5f37185a09",
+      "combatProjectionHash": "857388c4ebaeefbcac67166f970b6d9a1531c4802cbd5a5afb535a5f37185a09"
+    },
+    "no-weapon-rates-fallback": {
+      "stats": {
+        "physicalAttack": {
+          "sharedTotal": 2813.2000000000003,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 2813.2000000000003,
+          "finalTotal": 2813.2000000000003
+        },
+        "magicalAttack": {
+          "sharedTotal": 1894.8,
+          "lowerwearA": 488,
+          "lowerwearB": 0,
+          "lowerwearAverage": 488,
+          "totalBeforeCap": 2382.8,
+          "finalTotal": 2382.8
+        },
+        "doubleAttackPct": {
+          "sharedTotal": 6.75,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 6.75,
+          "finalTotal": 6.75
+        },
+        "critRatePct": {
+          "sharedTotal": 5,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 5,
+          "finalTotal": 5
+        },
+        "extremizationPct": {
+          "sharedTotal": 5,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 5,
+          "finalTotal": 5
+        },
+        "critDamagePct": {
+          "sharedTotal": 151.5,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 151.5,
+          "finalTotal": 151.5
+        },
+        "bossDamagePct": {
+          "sharedTotal": 7.5,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 7.5,
+          "finalTotal": 7.5
+        },
+        "polarizationPct": {
+          "sharedTotal": 1.2,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 1.2,
+          "cap": 60,
+          "finalTotal": 1.2
+        },
+        "allSkillDamagePct": {
+          "sharedTotal": 41,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 41,
+          "finalTotal": 41
+        },
+        "strongSkillDamagePct": {
+          "sharedTotal": 3,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 3,
+          "finalTotal": 3
+        },
+        "transcendenceSkillDamagePct": {
+          "sharedTotal": 3,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 3,
+          "finalTotal": 3
+        },
+        "bleedDamagePct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "strongerPct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "heatPct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "fullHealthKillDamagePct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "adaptabilityPct": {
+          "sharedTotal": 19,
+          "lowerwearA": 2,
+          "lowerwearB": 0,
+          "lowerwearAverage": 2,
+          "totalBeforeCap": 21,
+          "cap": 60,
+          "finalTotal": 21
+        },
+        "actionSpeedPct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "defenseIgnorePct": {
+          "sharedTotal": 6.2,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 6.2,
+          "finalTotal": 6.2
+        },
+        "attackLevel": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "skillTypeAttackPct": {
+          "sharedTotal": 26.5,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 26.5,
+          "finalTotal": 26.5
+        },
+        "superAdaptabilityPct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        }
+      },
+      "conditionalDamage": {
+        "strongerPct": 0,
+        "heatPct": 0,
+        "strongerSources": [],
+        "heatSources": []
+      },
+      "result": null,
+      "combatRates": {
+        "classId": "KE",
+        "critRate": {
+          "baseRawStatPct": 5,
+          "diminishingAddedPct": 0,
+          "rawStatPct": 5,
+          "tierRate": 0.05,
+          "multipliers": [
+            {
+              "sourceId": "KE:critRate:crit-1",
+              "valuePct": 20,
+              "factor": 1.2
+            },
+            {
+              "sourceId": "lowerwear-crit-rate-enhancement",
+              "valuePct": 10,
+              "factor": 1.1
+            }
+          ],
+          "multiplierProduct": 1.32,
+          "nonDiminishingSources": [],
+          "nonDiminishingPct": 0,
+          "finalAdjustmentPct": 0,
+          "valueBeforeUpperCap": 0.066,
+          "finalRate": 0.066
+        },
+        "extremization": {
+          "baseRawStatPct": 5,
+          "diminishingAddedPct": 0,
+          "rawStatPct": 5,
+          "tierRate": 0.05,
+          "multipliers": [
+            {
+              "sourceId": "KE:extremization:ext-1",
+              "valuePct": 20,
+              "factor": 1.2
+            },
+            {
+              "sourceId": "shoes-extremization-enhancement",
+              "valuePct": 10,
+              "factor": 1.1
+            }
+          ],
+          "multiplierProduct": 1.32,
+          "nonDiminishingSources": [],
+          "nonDiminishingPct": 0,
+          "finalAdjustmentPct": 0,
+          "valueBeforeUpperCap": 0.066,
+          "finalRate": 0.066
+        }
+      },
+      "damageError": {
+        "name": "RangeError",
+        "message": "請先選擇武器強化等級。"
+      },
+      "attributeError": null,
+      "completeEvaluationHash": "4d33a2559264cd0c634ea61f406bba39c8ee714db2f79e8254d902cc7fc21167",
+      "attributeProjectionHash": "30f6a6dbfde4276023a40f8ea1b08cedf55fd0005c32b06280c42a394cab6ba7",
+      "combatProjectionHash": "566ef4cce4dd2b86bad472c56293ea7cf0ea99d2cf34985cc5017af11b8a5176"
+    },
+    "no-bottom-attributes-fallback": {
+      "stats": {},
+      "conditionalDamage": null,
+      "result": null,
+      "combatRates": null,
+      "damageError": {
+        "name": "RangeError",
+        "message": "請填完整下衣的強化與鍛造等級。"
+      },
+      "attributeError": {
+        "name": "RangeError",
+        "message": "請填完整下衣的強化與鍛造等級。"
+      },
+      "completeEvaluationHash": "65f6d011e831afc4581e833942218db16e51822fe4ba9126b9c9b0d27ed11075",
+      "attributeProjectionHash": "9397030ed71f4fdbfef818b48a8cc1a7e99b2ba08b72e898935c15aa44e3df68",
+      "combatProjectionHash": "9397030ed71f4fdbfef818b48a8cc1a7e99b2ba08b72e898935c15aa44e3df68"
+    },
+    "no-shoes-attributes-fallback": {
+      "stats": {},
+      "conditionalDamage": null,
+      "result": null,
+      "combatRates": null,
+      "damageError": {
+        "name": "RangeError",
+        "message": "請填完整鞋子的強化與鍛造等級。"
+      },
+      "attributeError": {
+        "name": "RangeError",
+        "message": "請填完整鞋子的強化與鍛造等級。"
+      },
+      "completeEvaluationHash": "55f6ab2ef52a19a14a05f94a58743b20a92563a77152922d4e0ae095e4ac8bf2",
+      "attributeProjectionHash": "ca8ae8767d1b975f1ca736f2c1e81938e2fd31051a5985585d9d8a405b877a1e",
+      "combatProjectionHash": "ca8ae8767d1b975f1ca736f2c1e81938e2fd31051a5985585d9d8a405b877a1e"
+    },
+    "invalid-weapon": {
+      "stats": {},
+      "conditionalDamage": null,
+      "result": null,
+      "combatRates": null,
+      "damageError": {
+        "name": "TypeError",
+        "message": "weaponEnhancementLevel must be an integer."
+      },
+      "attributeError": {
+        "name": "TypeError",
+        "message": "weaponEnhancementLevel must be an integer."
+      },
+      "completeEvaluationHash": "0da56e7af5d69e4ec8edc3964864abd5aeab5ba091956fc0c3266d4b38bc9df1",
+      "attributeProjectionHash": "cafd03000385ea434e6e7c61224156544d6f04c4da0eefc7adc1cbbb6a638d06",
+      "combatProjectionHash": "cafd03000385ea434e6e7c61224156544d6f04c4da0eefc7adc1cbbb6a638d06"
+    },
+    "invalid-boss-rates-fallback": {
+      "stats": {
+        "physicalAttack": {
+          "sharedTotal": 38751.3,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 38751.3,
+          "finalTotal": 38751.3
+        },
+        "magicalAttack": {
+          "sharedTotal": 53072.65,
+          "lowerwearA": 3206.1499999999996,
+          "lowerwearB": 3206.1499999999996,
+          "lowerwearAverage": 3206.1499999999996,
+          "totalBeforeCap": 56278.8,
+          "finalTotal": 56278.8
+        },
+        "doubleAttackPct": {
+          "sharedTotal": 89.64999999999999,
+          "lowerwearA": 2,
+          "lowerwearB": 2,
+          "lowerwearAverage": 2,
+          "totalBeforeCap": 91.64999999999999,
+          "finalTotal": 91.64999999999999
+        },
+        "critRatePct": {
+          "sharedTotal": 105.5,
+          "lowerwearA": 24,
+          "lowerwearB": 24,
+          "lowerwearAverage": 24,
+          "totalBeforeCap": 129.5,
+          "finalTotal": 129.5
+        },
+        "extremizationPct": {
+          "sharedTotal": 80,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 80,
+          "finalTotal": 80
+        },
+        "critDamagePct": {
+          "sharedTotal": 209.5,
+          "lowerwearA": 6,
+          "lowerwearB": 6,
+          "lowerwearAverage": 6,
+          "totalBeforeCap": 215.5,
+          "finalTotal": 215.5
+        },
+        "bossDamagePct": {
+          "sharedTotal": 180.5,
+          "lowerwearA": 5,
+          "lowerwearB": 5,
+          "lowerwearAverage": 5,
+          "totalBeforeCap": 185.5,
+          "finalTotal": 185.5
+        },
+        "polarizationPct": {
+          "sharedTotal": 59.20000000000001,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 59.20000000000001,
+          "cap": 60,
+          "finalTotal": 59.20000000000001
+        },
+        "allSkillDamagePct": {
+          "sharedTotal": 115.5,
+          "lowerwearA": 1,
+          "lowerwearB": 1,
+          "lowerwearAverage": 1,
+          "totalBeforeCap": 116.5,
+          "finalTotal": 116.5
+        },
+        "strongSkillDamagePct": {
+          "sharedTotal": 84,
+          "lowerwearA": 10,
+          "lowerwearB": 10,
+          "lowerwearAverage": 10,
+          "totalBeforeCap": 94,
+          "finalTotal": 94
+        },
+        "transcendenceSkillDamagePct": {
+          "sharedTotal": 114.7,
+          "lowerwearA": 10,
+          "lowerwearB": 10,
+          "lowerwearAverage": 10,
+          "totalBeforeCap": 124.7,
+          "finalTotal": 124.7
+        },
+        "bleedDamagePct": {
+          "sharedTotal": 54.5,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 54.5,
+          "finalTotal": 54.5
+        },
+        "strongerPct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "heatPct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "fullHealthKillDamagePct": {
+          "sharedTotal": 37.5,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 37.5,
+          "finalTotal": 37.5
+        },
+        "adaptabilityPct": {
+          "sharedTotal": 55,
+          "lowerwearA": 5,
+          "lowerwearB": 5,
+          "lowerwearAverage": 5,
+          "totalBeforeCap": 60,
+          "cap": 60,
+          "finalTotal": 60
+        },
+        "actionSpeedPct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "defenseIgnorePct": {
+          "sharedTotal": 7.7,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 7.7,
+          "finalTotal": 7.7
+        },
+        "attackLevel": {
+          "sharedTotal": 56.75,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 56.75,
+          "finalTotal": 56.75
+        },
+        "skillTypeAttackPct": {
+          "sharedTotal": 26.5,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 26.5,
+          "finalTotal": 26.5
+        },
+        "superAdaptabilityPct": {
+          "sharedTotal": 8,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 8,
+          "finalTotal": 8
+        }
+      },
+      "conditionalDamage": {
+        "strongerPct": 25.05,
+        "heatPct": 24,
+        "strongerSources": [
+          {
+            "sourceId": "right-ice-set-effects-cf29c386218b",
+            "valuePct": 5
+          },
+          {
+            "sourceId": "spirit-record:trait:巨人審判者",
+            "valuePct": 2
+          },
+          {
+            "sourceId": "chip:lowerwear",
+            "valuePct": 5
+          },
+          {
+            "sourceId": "circuit-board:lowerwear",
+            "valuePct": 13.05
+          }
+        ],
+        "heatSources": [
+          {
+            "sourceId": "right-ice-set-effects-cf29c386218b",
+            "valuePct": 5
+          },
+          {
+            "sourceId": "guild-fountain-4:GuildFountain.Stage4",
+            "valuePct": 3
+          },
+          {
+            "sourceId": "chip:lowerwearAlternative",
+            "valuePct": 4
+          },
+          {
+            "sourceId": "circuit-board:lowerwearAlternative",
+            "valuePct": 12
+          }
+        ]
+      },
+      "result": null,
+      "combatRates": {
+        "classId": "DaB",
+        "critRate": {
+          "baseRawStatPct": 129.5,
+          "diminishingAddedPct": 0,
+          "rawStatPct": 129.5,
+          "tierRate": 0.9579999999999999,
+          "multipliers": [
+            {
+              "sourceId": "combat-rate:yellow-beast-stone",
+              "valuePct": 8,
+              "factor": 1.08
+            },
+            {
+              "sourceId": "lowerwear-crit-rate-enhancement",
+              "valuePct": 13,
+              "factor": 1.13
+            }
+          ],
+          "multiplierProduct": 1.2204,
+          "nonDiminishingSources": [
+            {
+              "sourceId": "DaB:critRate:crit-1",
+              "valuePct": 15
+            }
+          ],
+          "nonDiminishingPct": 15,
+          "finalAdjustmentPct": -30,
+          "valueBeforeUpperCap": 1.0191431999999996,
+          "finalRate": 1
+        },
+        "extremization": {
+          "baseRawStatPct": 80,
+          "diminishingAddedPct": 0,
+          "rawStatPct": 80,
+          "tierRate": 0.7000000000000001,
+          "multipliers": [
+            {
+              "sourceId": "combat-rate:yellow-beast-stone",
+              "valuePct": 8,
+              "factor": 1.08
+            },
+            {
+              "sourceId": "shoes-extremization-enhancement",
+              "valuePct": 13,
+              "factor": 1.13
+            }
+          ],
+          "multiplierProduct": 1.2204,
+          "nonDiminishingSources": [
+            {
+              "sourceId": "DaB:extremization:ext-1",
+              "valuePct": 15
+            }
+          ],
+          "nonDiminishingPct": 15,
+          "finalAdjustmentPct": 0,
+          "valueBeforeUpperCap": 1.00428,
+          "finalRate": 1
+        }
+      },
+      "damageError": {
+        "name": "RangeError",
+        "message": "Stage.BossDEF 必須是數值。"
+      },
+      "attributeError": null,
+      "completeEvaluationHash": "f33788f3b4705925e56a409aed9b52539986797937c640770c4c9c2235be1b7a",
+      "attributeProjectionHash": "c6cf6645ad73730b04e832e07e18d7bb4a1aa4912f15badfc2993c2f449b9426",
+      "combatProjectionHash": "6484a907cf8ee66ab406370837fc429ac269eacdab376b46a6459d03b9251f30"
+    },
+    "invalid-rate-attributes-fallback": {
+      "stats": {
+        "physicalAttack": {
+          "sharedTotal": 38751.3,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 38751.3,
+          "finalTotal": 38751.3
+        },
+        "magicalAttack": {
+          "sharedTotal": 53072.65,
+          "lowerwearA": 3206.1499999999996,
+          "lowerwearB": 3206.1499999999996,
+          "lowerwearAverage": 3206.1499999999996,
+          "totalBeforeCap": 56278.8,
+          "finalTotal": 56278.8
+        },
+        "doubleAttackPct": {
+          "sharedTotal": 89.64999999999999,
+          "lowerwearA": 2,
+          "lowerwearB": 2,
+          "lowerwearAverage": 2,
+          "totalBeforeCap": 91.64999999999999,
+          "finalTotal": 91.64999999999999
+        },
+        "critRatePct": {
+          "sharedTotal": 105.5,
+          "lowerwearA": 24,
+          "lowerwearB": 24,
+          "lowerwearAverage": 24,
+          "totalBeforeCap": 129.5,
+          "finalTotal": 129.5
+        },
+        "extremizationPct": {
+          "sharedTotal": 80,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 80,
+          "finalTotal": 80
+        },
+        "critDamagePct": {
+          "sharedTotal": 209.5,
+          "lowerwearA": 6,
+          "lowerwearB": 6,
+          "lowerwearAverage": 6,
+          "totalBeforeCap": 215.5,
+          "finalTotal": 215.5
+        },
+        "bossDamagePct": {
+          "sharedTotal": 180.5,
+          "lowerwearA": 5,
+          "lowerwearB": 5,
+          "lowerwearAverage": 5,
+          "totalBeforeCap": 185.5,
+          "finalTotal": 185.5
+        },
+        "polarizationPct": {
+          "sharedTotal": 59.20000000000001,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 59.20000000000001,
+          "cap": 60,
+          "finalTotal": 59.20000000000001
+        },
+        "allSkillDamagePct": {
+          "sharedTotal": 115.5,
+          "lowerwearA": 1,
+          "lowerwearB": 1,
+          "lowerwearAverage": 1,
+          "totalBeforeCap": 116.5,
+          "finalTotal": 116.5
+        },
+        "strongSkillDamagePct": {
+          "sharedTotal": 84,
+          "lowerwearA": 10,
+          "lowerwearB": 10,
+          "lowerwearAverage": 10,
+          "totalBeforeCap": 94,
+          "finalTotal": 94
+        },
+        "transcendenceSkillDamagePct": {
+          "sharedTotal": 114.7,
+          "lowerwearA": 10,
+          "lowerwearB": 10,
+          "lowerwearAverage": 10,
+          "totalBeforeCap": 124.7,
+          "finalTotal": 124.7
+        },
+        "bleedDamagePct": {
+          "sharedTotal": 54.5,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 54.5,
+          "finalTotal": 54.5
+        },
+        "strongerPct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "heatPct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "fullHealthKillDamagePct": {
+          "sharedTotal": 37.5,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 37.5,
+          "finalTotal": 37.5
+        },
+        "adaptabilityPct": {
+          "sharedTotal": 55,
+          "lowerwearA": 5,
+          "lowerwearB": 5,
+          "lowerwearAverage": 5,
+          "totalBeforeCap": 60,
+          "cap": 60,
+          "finalTotal": 60
+        },
+        "actionSpeedPct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "defenseIgnorePct": {
+          "sharedTotal": 7.7,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 7.7,
+          "finalTotal": 7.7
+        },
+        "attackLevel": {
+          "sharedTotal": 56.75,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 56.75,
+          "finalTotal": 56.75
+        },
+        "skillTypeAttackPct": {
+          "sharedTotal": 26.5,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 26.5,
+          "finalTotal": 26.5
+        },
+        "superAdaptabilityPct": {
+          "sharedTotal": 8,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 8,
+          "finalTotal": 8
+        }
+      },
+      "conditionalDamage": {
+        "strongerPct": 25.05,
+        "heatPct": 24,
+        "strongerSources": [
+          {
+            "sourceId": "right-ice-set-effects-cf29c386218b",
+            "valuePct": 5
+          },
+          {
+            "sourceId": "spirit-record:trait:巨人審判者",
+            "valuePct": 2
+          },
+          {
+            "sourceId": "chip:lowerwear",
+            "valuePct": 5
+          },
+          {
+            "sourceId": "circuit-board:lowerwear",
+            "valuePct": 13.05
+          }
+        ],
+        "heatSources": [
+          {
+            "sourceId": "right-ice-set-effects-cf29c386218b",
+            "valuePct": 5
+          },
+          {
+            "sourceId": "guild-fountain-4:GuildFountain.Stage4",
+            "valuePct": 3
+          },
+          {
+            "sourceId": "chip:lowerwearAlternative",
+            "valuePct": 4
+          },
+          {
+            "sourceId": "circuit-board:lowerwearAlternative",
+            "valuePct": 12
+          }
+        ]
+      },
+      "result": null,
+      "combatRates": null,
+      "damageError": {
+        "name": "RangeError",
+        "message": "Stage.CritRatePenalty 必須是數值。"
+      },
+      "attributeError": null,
+      "completeEvaluationHash": "bf4fb84934fcf10e30fa54b03c8d0771e050c0e0cc644256f428c0f1e5e2dc0e",
+      "attributeProjectionHash": "c6cf6645ad73730b04e832e07e18d7bb4a1aa4912f15badfc2993c2f449b9426",
+      "combatProjectionHash": "975c1abaa46ae95881fd0dc0dc9cbaa805a7eb797e157415ee30baddf2f019c0"
+    },
+    "late-damage-failure-rates-fallback": {
+      "stats": {
+        "physicalAttack": {
+          "sharedTotal": 38751.3,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 38751.3,
+          "finalTotal": 38751.3
+        },
+        "magicalAttack": {
+          "sharedTotal": 53072.65,
+          "lowerwearA": 3206.1499999999996,
+          "lowerwearB": 3206.1499999999996,
+          "lowerwearAverage": 3206.1499999999996,
+          "totalBeforeCap": 56278.8,
+          "finalTotal": 56278.8
+        },
+        "doubleAttackPct": {
+          "sharedTotal": 89.64999999999999,
+          "lowerwearA": 2,
+          "lowerwearB": 2,
+          "lowerwearAverage": 2,
+          "totalBeforeCap": 91.64999999999999,
+          "finalTotal": 91.64999999999999
+        },
+        "critRatePct": {
+          "sharedTotal": 105.5,
+          "lowerwearA": 24,
+          "lowerwearB": 24,
+          "lowerwearAverage": 24,
+          "totalBeforeCap": 129.5,
+          "finalTotal": 129.5
+        },
+        "extremizationPct": {
+          "sharedTotal": 80,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 80,
+          "finalTotal": 80
+        },
+        "critDamagePct": {
+          "sharedTotal": 209.5,
+          "lowerwearA": 6,
+          "lowerwearB": 6,
+          "lowerwearAverage": 6,
+          "totalBeforeCap": 215.5,
+          "finalTotal": 215.5
+        },
+        "bossDamagePct": {
+          "sharedTotal": 180.5,
+          "lowerwearA": 5,
+          "lowerwearB": 5,
+          "lowerwearAverage": 5,
+          "totalBeforeCap": 185.5,
+          "finalTotal": 185.5
+        },
+        "polarizationPct": {
+          "sharedTotal": 59.20000000000001,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 59.20000000000001,
+          "cap": 60,
+          "finalTotal": 59.20000000000001
+        },
+        "allSkillDamagePct": {
+          "sharedTotal": 115.5,
+          "lowerwearA": 1,
+          "lowerwearB": 1,
+          "lowerwearAverage": 1,
+          "totalBeforeCap": 116.5,
+          "finalTotal": 116.5
+        },
+        "strongSkillDamagePct": {
+          "sharedTotal": 84,
+          "lowerwearA": 10,
+          "lowerwearB": 10,
+          "lowerwearAverage": 10,
+          "totalBeforeCap": 94,
+          "finalTotal": 94
+        },
+        "transcendenceSkillDamagePct": {
+          "sharedTotal": 114.7,
+          "lowerwearA": 10,
+          "lowerwearB": 10,
+          "lowerwearAverage": 10,
+          "totalBeforeCap": 124.7,
+          "finalTotal": 124.7
+        },
+        "bleedDamagePct": {
+          "sharedTotal": 54.5,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 54.5,
+          "finalTotal": 54.5
+        },
+        "strongerPct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "heatPct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "fullHealthKillDamagePct": {
+          "sharedTotal": 37.5,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 37.5,
+          "finalTotal": 37.5
+        },
+        "adaptabilityPct": {
+          "sharedTotal": 55,
+          "lowerwearA": 5,
+          "lowerwearB": 5,
+          "lowerwearAverage": 5,
+          "totalBeforeCap": 60,
+          "cap": 60,
+          "finalTotal": 60
+        },
+        "actionSpeedPct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "defenseIgnorePct": {
+          "sharedTotal": 7.7,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 7.7,
+          "finalTotal": 7.7
+        },
+        "attackLevel": {
+          "sharedTotal": 56.75,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 56.75,
+          "finalTotal": 56.75
+        },
+        "skillTypeAttackPct": {
+          "sharedTotal": 26.5,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 26.5,
+          "finalTotal": 26.5
+        },
+        "superAdaptabilityPct": {
+          "sharedTotal": 8,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 8,
+          "finalTotal": 8
+        }
+      },
+      "conditionalDamage": {
+        "strongerPct": 25.05,
+        "heatPct": 24,
+        "strongerSources": [
+          {
+            "sourceId": "right-ice-set-effects-cf29c386218b",
+            "valuePct": 5
+          },
+          {
+            "sourceId": "spirit-record:trait:巨人審判者",
+            "valuePct": 2
+          },
+          {
+            "sourceId": "chip:lowerwear",
+            "valuePct": 5
+          },
+          {
+            "sourceId": "circuit-board:lowerwear",
+            "valuePct": 13.05
+          }
+        ],
+        "heatSources": [
+          {
+            "sourceId": "right-ice-set-effects-cf29c386218b",
+            "valuePct": 5
+          },
+          {
+            "sourceId": "guild-fountain-4:GuildFountain.Stage4",
+            "valuePct": 3
+          },
+          {
+            "sourceId": "chip:lowerwearAlternative",
+            "valuePct": 4
+          },
+          {
+            "sourceId": "circuit-board:lowerwearAlternative",
+            "valuePct": 12
+          }
+        ]
+      },
+      "result": null,
+      "combatRates": {
+        "classId": "DaB",
+        "critRate": {
+          "baseRawStatPct": 129.5,
+          "diminishingAddedPct": 0,
+          "rawStatPct": 129.5,
+          "tierRate": 0.9579999999999999,
+          "multipliers": [
+            {
+              "sourceId": "combat-rate:yellow-beast-stone",
+              "valuePct": 8,
+              "factor": 1.08
+            },
+            {
+              "sourceId": "lowerwear-crit-rate-enhancement",
+              "valuePct": 13,
+              "factor": 1.13
+            }
+          ],
+          "multiplierProduct": 1.2204,
+          "nonDiminishingSources": [
+            {
+              "sourceId": "DaB:critRate:crit-1",
+              "valuePct": 15
+            }
+          ],
+          "nonDiminishingPct": 15,
+          "finalAdjustmentPct": -30,
+          "valueBeforeUpperCap": 1.0191431999999996,
+          "finalRate": 1
+        },
+        "extremization": {
+          "baseRawStatPct": 80,
+          "diminishingAddedPct": 0,
+          "rawStatPct": 80,
+          "tierRate": 0.7000000000000001,
+          "multipliers": [
+            {
+              "sourceId": "combat-rate:yellow-beast-stone",
+              "valuePct": 8,
+              "factor": 1.08
+            },
+            {
+              "sourceId": "shoes-extremization-enhancement",
+              "valuePct": 13,
+              "factor": 1.13
+            }
+          ],
+          "multiplierProduct": 1.2204,
+          "nonDiminishingSources": [
+            {
+              "sourceId": "DaB:extremization:ext-1",
+              "valuePct": 15
+            }
+          ],
+          "nonDiminishingPct": 15,
+          "finalAdjustmentPct": 0,
+          "valueBeforeUpperCap": 1.00428,
+          "finalRate": 1
+        }
+      },
+      "damageError": {
+        "name": "RangeError",
+        "message": "Transcendence skill damage share must be between 0 and 100."
+      },
+      "attributeError": null,
+      "completeEvaluationHash": "1945601d32760e70b090d1b2c6c1053f61145c1b22cfa162f49b037e56a09256",
+      "attributeProjectionHash": "c6cf6645ad73730b04e832e07e18d7bb4a1aa4912f15badfc2993c2f449b9426",
+      "combatProjectionHash": "6484a907cf8ee66ab406370837fc429ac269eacdab376b46a6459d03b9251f30"
+    },
+    "special-weapon-average": {
+      "stats": {
+        "physicalAttack": {
+          "sharedTotal": 42960.100000000006,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 42960.100000000006,
+          "finalTotal": 42960.100000000006
+        },
+        "magicalAttack": {
+          "sharedTotal": 59565.049999999996,
+          "lowerwearA": 3206.1499999999996,
+          "lowerwearB": 3206.1499999999996,
+          "lowerwearAverage": 3206.1499999999996,
+          "totalBeforeCap": 62771.2,
+          "finalTotal": 62771.2
+        },
+        "doubleAttackPct": {
+          "sharedTotal": 93.98333333289999,
+          "lowerwearA": 2,
+          "lowerwearB": 2,
+          "lowerwearAverage": 2,
+          "totalBeforeCap": 95.98333333289999,
+          "finalTotal": 95.98333333289999
+        },
+        "critRatePct": {
+          "sharedTotal": 105.5,
+          "lowerwearA": 24,
+          "lowerwearB": 24,
+          "lowerwearAverage": 24,
+          "totalBeforeCap": 129.5,
+          "finalTotal": 129.5
+        },
+        "extremizationPct": {
+          "sharedTotal": 80,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 80,
+          "finalTotal": 80
+        },
+        "critDamagePct": {
+          "sharedTotal": 209.5,
+          "lowerwearA": 6,
+          "lowerwearB": 6,
+          "lowerwearAverage": 6,
+          "totalBeforeCap": 215.5,
+          "finalTotal": 215.5
+        },
+        "bossDamagePct": {
+          "sharedTotal": 180.5,
+          "lowerwearA": 5,
+          "lowerwearB": 5,
+          "lowerwearAverage": 5,
+          "totalBeforeCap": 185.5,
+          "finalTotal": 185.5
+        },
+        "polarizationPct": {
+          "sharedTotal": 59.20000000000001,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 59.20000000000001,
+          "cap": 60,
+          "finalTotal": 59.20000000000001
+        },
+        "allSkillDamagePct": {
+          "sharedTotal": 115.5,
+          "lowerwearA": 1,
+          "lowerwearB": 1,
+          "lowerwearAverage": 1,
+          "totalBeforeCap": 116.5,
+          "finalTotal": 116.5
+        },
+        "strongSkillDamagePct": {
+          "sharedTotal": 84,
+          "lowerwearA": 10,
+          "lowerwearB": 10,
+          "lowerwearAverage": 10,
+          "totalBeforeCap": 94,
+          "finalTotal": 94
+        },
+        "transcendenceSkillDamagePct": {
+          "sharedTotal": 114.7,
+          "lowerwearA": 10,
+          "lowerwearB": 10,
+          "lowerwearAverage": 10,
+          "totalBeforeCap": 124.7,
+          "finalTotal": 124.7
+        },
+        "bleedDamagePct": {
+          "sharedTotal": 54.5,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 54.5,
+          "finalTotal": 54.5
+        },
+        "strongerPct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "heatPct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "fullHealthKillDamagePct": {
+          "sharedTotal": 37.5,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 37.5,
+          "finalTotal": 37.5
+        },
+        "adaptabilityPct": {
+          "sharedTotal": 55,
+          "lowerwearA": 5,
+          "lowerwearB": 5,
+          "lowerwearAverage": 5,
+          "totalBeforeCap": 60,
+          "cap": 60,
+          "finalTotal": 60
+        },
+        "actionSpeedPct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "defenseIgnorePct": {
+          "sharedTotal": 7.7,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 7.7,
+          "finalTotal": 7.7
+        },
+        "attackLevel": {
+          "sharedTotal": 56.75,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 56.75,
+          "finalTotal": 56.75
+        },
+        "skillTypeAttackPct": {
+          "sharedTotal": 26.5,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 26.5,
+          "finalTotal": 26.5
+        },
+        "superAdaptabilityPct": {
+          "sharedTotal": 8,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 8,
+          "finalTotal": 8
+        }
+      },
+      "conditionalDamage": {
+        "strongerPct": 25.05,
+        "heatPct": 24,
+        "strongerSources": [
+          {
+            "sourceId": "right-ice-set-effects-cf29c386218b",
+            "valuePct": 5
+          },
+          {
+            "sourceId": "spirit-record:trait:巨人審判者",
+            "valuePct": 2
+          },
+          {
+            "sourceId": "chip:lowerwear",
+            "valuePct": 5
+          },
+          {
+            "sourceId": "circuit-board:lowerwear",
+            "valuePct": 13.05
+          }
+        ],
+        "heatSources": [
+          {
+            "sourceId": "right-ice-set-effects-cf29c386218b",
+            "valuePct": 5
+          },
+          {
+            "sourceId": "guild-fountain-4:GuildFountain.Stage4",
+            "valuePct": 3
+          },
+          {
+            "sourceId": "chip:lowerwearAlternative",
+            "valuePct": 4
+          },
+          {
+            "sourceId": "circuit-board:lowerwearAlternative",
+            "valuePct": 12
+          }
+        ]
+      },
+      "result": {
+        "attack": {
+          "attackType": "magical",
+          "selectedAttack": 62771.2,
+          "attackPower": 155621,
+          "c53": 35248.700000000004,
+          "d53": 54373.85,
+          "lowerDamage": 97011,
+          "upperDamage": 214231
+        },
+        "combatRates": {
+          "classId": "DaB",
+          "critRate": {
+            "baseRawStatPct": 129.5,
+            "diminishingAddedPct": 0,
+            "rawStatPct": 129.5,
+            "tierRate": 0.9579999999999999,
+            "multipliers": [
+              {
+                "sourceId": "combat-rate:yellow-beast-stone",
+                "valuePct": 8,
+                "factor": 1.08
+              },
+              {
+                "sourceId": "lowerwear-crit-rate-enhancement",
+                "valuePct": 13,
+                "factor": 1.13
+              }
+            ],
+            "multiplierProduct": 1.2204,
+            "nonDiminishingSources": [
+              {
+                "sourceId": "DaB:critRate:crit-1",
+                "valuePct": 15
+              }
+            ],
+            "nonDiminishingPct": 15,
+            "finalAdjustmentPct": -30,
+            "valueBeforeUpperCap": 1.0191431999999996,
+            "finalRate": 1
+          },
+          "extremization": {
+            "baseRawStatPct": 80,
+            "diminishingAddedPct": 0,
+            "rawStatPct": 80,
+            "tierRate": 0.7000000000000001,
+            "multipliers": [
+              {
+                "sourceId": "combat-rate:yellow-beast-stone",
+                "valuePct": 8,
+                "factor": 1.08
+              },
+              {
+                "sourceId": "shoes-extremization-enhancement",
+                "valuePct": 13,
+                "factor": 1.13
+              }
+            ],
+            "multiplierProduct": 1.2204,
+            "nonDiminishingSources": [
+              {
+                "sourceId": "DaB:extremization:ext-1",
+                "valuePct": 15
+              }
+            ],
+            "nonDiminishingPct": 15,
+            "finalAdjustmentPct": 0,
+            "valueBeforeUpperCap": 1.00428,
+            "finalRate": 1
+          }
+        },
+        "generalMultiplicativeDamage": {
+          "factors": [
+            {
+              "sourceId": "simulator:Accessory.FaceTop",
+              "valuePct": 10.25,
+              "factor": 1.1025
+            },
+            {
+              "sourceId": "simulator:Accessory.FaceBottom",
+              "valuePct": 5,
+              "factor": 1.05
+            },
+            {
+              "sourceId": "simulator:Accessory.Ring1",
+              "valuePct": 4,
+              "factor": 1.04
+            },
+            {
+              "sourceId": "innerwear:upper",
+              "valuePct": 13,
+              "factor": 1.13
+            },
+            {
+              "sourceId": "color-set:紅",
+              "valuePct": 20,
+              "factor": 1.2
+            },
+            {
+              "sourceId": "atma-water-fire-multiplicative-damage",
+              "valuePct": 20,
+              "factor": 1.2
+            },
+            {
+              "sourceId": "master-beast:armor-spirit-stone-set:S77",
+              "valuePct": 4,
+              "factor": 1.04
+            },
+            {
+              "sourceId": "title:Effect.Title",
+              "valuePct": 25,
+              "factor": 1.25
+            },
+            {
+              "sourceId": "consumable:Effect.Consumable",
+              "valuePct": 5,
+              "factor": 1.05
+            }
+          ],
+          "productBeforeBaseline": 2.6740826330400003,
+          "baselinePct": 0,
+          "value": 2.6740826330400003
+        },
+        "multiplicativeCritDamage": {
+          "factors": [
+            {
+              "sourceId": "fixed-effect:red-upper-crit-damage",
+              "valuePct": 10,
+              "factor": 1.1
+            },
+            {
+              "sourceId": "fixed-effect:maestro-aura",
+              "valuePct": 2,
+              "factor": 1.02
+            },
+            {
+              "sourceId": "character-base:crit-damage-product",
+              "valuePct": 50,
+              "factor": 1.5
+            }
+          ],
+          "productBeforeBaseline": 1.6830000000000003,
+          "baselinePct": 150,
+          "value": 0.18300000000000027
+        },
+        "classCritDamagePassivePct": 30,
+        "finalDamage": {
+          "extremizedBase": 214231,
+          "critFactor": 2.638,
+          "damageFactors": {
+            "bossDamage": 2.855,
+            "polarization": 1.592,
+            "skillDamage": 2.247,
+            "allSkillDamage": 2.165,
+            "bleedDamage": 1.545,
+            "fullHealthKillDamage": 1.375
+          },
+          "skillDamageWeighting": {
+            "transcendenceSharePct": 100,
+            "strongSharePct": 0,
+            "transcendenceFactor": 2.247,
+            "strongFactor": 1.94,
+            "combinedFactor": 2.247
+          },
+          "conditionalFactor": 1.2452278658903835,
+          "adaptationFactor": 0.73,
+          "defenseFactor": 1.0586249562787893,
+          "finalDamage": 68310439.51038864
+        }
+      },
+      "combatRates": {
+        "classId": "DaB",
+        "critRate": {
+          "baseRawStatPct": 129.5,
+          "diminishingAddedPct": 0,
+          "rawStatPct": 129.5,
+          "tierRate": 0.9579999999999999,
+          "multipliers": [
+            {
+              "sourceId": "combat-rate:yellow-beast-stone",
+              "valuePct": 8,
+              "factor": 1.08
+            },
+            {
+              "sourceId": "lowerwear-crit-rate-enhancement",
+              "valuePct": 13,
+              "factor": 1.13
+            }
+          ],
+          "multiplierProduct": 1.2204,
+          "nonDiminishingSources": [
+            {
+              "sourceId": "DaB:critRate:crit-1",
+              "valuePct": 15
+            }
+          ],
+          "nonDiminishingPct": 15,
+          "finalAdjustmentPct": -30,
+          "valueBeforeUpperCap": 1.0191431999999996,
+          "finalRate": 1
+        },
+        "extremization": {
+          "baseRawStatPct": 80,
+          "diminishingAddedPct": 0,
+          "rawStatPct": 80,
+          "tierRate": 0.7000000000000001,
+          "multipliers": [
+            {
+              "sourceId": "combat-rate:yellow-beast-stone",
+              "valuePct": 8,
+              "factor": 1.08
+            },
+            {
+              "sourceId": "shoes-extremization-enhancement",
+              "valuePct": 13,
+              "factor": 1.13
+            }
+          ],
+          "multiplierProduct": 1.2204,
+          "nonDiminishingSources": [
+            {
+              "sourceId": "DaB:extremization:ext-1",
+              "valuePct": 15
+            }
+          ],
+          "nonDiminishingPct": 15,
+          "finalAdjustmentPct": 0,
+          "valueBeforeUpperCap": 1.00428,
+          "finalRate": 1
+        }
+      },
+      "damageError": null,
+      "attributeError": null,
+      "completeEvaluationHash": "37fa2b4ca10cbac7ab9520e3e7917ed80616dd1fecd177ac3756b855b007a6f1",
+      "attributeProjectionHash": "039f6b87b5a35b065daaf8df190c9bc55758ff2dcaa9a29778f67bac5c55329c",
+      "combatProjectionHash": "6484a907cf8ee66ab406370837fc429ac269eacdab376b46a6459d03b9251f30"
+    },
+    "passives-effects-decimals": {
+      "stats": {
+        "physicalAttack": {
+          "sharedTotal": 56278.8,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 56278.8,
+          "finalTotal": 56278.8
+        },
+        "magicalAttack": {
+          "sharedTotal": 35973.55,
+          "lowerwearA": 2777.75,
+          "lowerwearB": 2777.75,
+          "lowerwearAverage": 2777.75,
+          "totalBeforeCap": 38751.3,
+          "finalTotal": 38751.3
+        },
+        "doubleAttackPct": {
+          "sharedTotal": 89.64999999999999,
+          "lowerwearA": 2,
+          "lowerwearB": 2,
+          "lowerwearAverage": 2,
+          "totalBeforeCap": 91.64999999999999,
+          "finalTotal": 91.64999999999999
+        },
+        "critRatePct": {
+          "sharedTotal": 89.5,
+          "lowerwearA": 24,
+          "lowerwearB": 24,
+          "lowerwearAverage": 24,
+          "totalBeforeCap": 113.5,
+          "finalTotal": 113.5
+        },
+        "extremizationPct": {
+          "sharedTotal": 88,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 88,
+          "finalTotal": 88
+        },
+        "critDamagePct": {
+          "sharedTotal": 209.5,
+          "lowerwearA": 6,
+          "lowerwearB": 6,
+          "lowerwearAverage": 6,
+          "totalBeforeCap": 215.5,
+          "finalTotal": 215.5
+        },
+        "bossDamagePct": {
+          "sharedTotal": 180.5,
+          "lowerwearA": 5,
+          "lowerwearB": 5,
+          "lowerwearAverage": 5,
+          "totalBeforeCap": 185.5,
+          "finalTotal": 185.5
+        },
+        "polarizationPct": {
+          "sharedTotal": 56.20000000000001,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 56.20000000000001,
+          "cap": 60,
+          "finalTotal": 56.20000000000001
+        },
+        "allSkillDamagePct": {
+          "sharedTotal": 115.5,
+          "lowerwearA": 1,
+          "lowerwearB": 1,
+          "lowerwearAverage": 1,
+          "totalBeforeCap": 116.5,
+          "finalTotal": 116.5
+        },
+        "strongSkillDamagePct": {
+          "sharedTotal": 84,
+          "lowerwearA": 10,
+          "lowerwearB": 10,
+          "lowerwearAverage": 10,
+          "totalBeforeCap": 94,
+          "finalTotal": 94
+        },
+        "transcendenceSkillDamagePct": {
+          "sharedTotal": 114.7,
+          "lowerwearA": 10,
+          "lowerwearB": 10,
+          "lowerwearAverage": 10,
+          "totalBeforeCap": 124.7,
+          "finalTotal": 124.7
+        },
+        "bleedDamagePct": {
+          "sharedTotal": 54.5,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 54.5,
+          "finalTotal": 54.5
+        },
+        "strongerPct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "heatPct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "fullHealthKillDamagePct": {
+          "sharedTotal": 37.5,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 37.5,
+          "finalTotal": 37.5
+        },
+        "adaptabilityPct": {
+          "sharedTotal": 55,
+          "lowerwearA": 5,
+          "lowerwearB": 5,
+          "lowerwearAverage": 5,
+          "totalBeforeCap": 60,
+          "cap": 60,
+          "finalTotal": 60
+        },
+        "actionSpeedPct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "defenseIgnorePct": {
+          "sharedTotal": 7.7,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 7.7,
+          "finalTotal": 7.7
+        },
+        "attackLevel": {
+          "sharedTotal": 56.75,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 56.75,
+          "finalTotal": 56.75
+        },
+        "skillTypeAttackPct": {
+          "sharedTotal": 26.5,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 26.5,
+          "finalTotal": 26.5
+        },
+        "superAdaptabilityPct": {
+          "sharedTotal": 8,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 8,
+          "finalTotal": 8
+        }
+      },
+      "conditionalDamage": {
+        "strongerPct": 25.05,
+        "heatPct": 24,
+        "strongerSources": [
+          {
+            "sourceId": "right-ice-set-effects-cf29c386218b",
+            "valuePct": 5
+          },
+          {
+            "sourceId": "spirit-record:trait:巨人審判者",
+            "valuePct": 2
+          },
+          {
+            "sourceId": "chip:lowerwear",
+            "valuePct": 5
+          },
+          {
+            "sourceId": "circuit-board:lowerwear",
+            "valuePct": 13.05
+          }
+        ],
+        "heatSources": [
+          {
+            "sourceId": "right-ice-set-effects-cf29c386218b",
+            "valuePct": 5
+          },
+          {
+            "sourceId": "guild-fountain-4:GuildFountain.Stage4",
+            "valuePct": 3
+          },
+          {
+            "sourceId": "chip:lowerwearAlternative",
+            "valuePct": 4
+          },
+          {
+            "sourceId": "circuit-board:lowerwearAlternative",
+            "valuePct": 12
+          }
+        ]
+      },
+      "result": {
+        "attack": {
+          "attackType": "physical",
+          "selectedAttack": 56278.8,
+          "attackPower": 136440,
+          "c53": 47881.450000000004,
+          "d53": 31039.9,
+          "lowerDamage": 85970,
+          "upperDamage": 186911
+        },
+        "combatRates": {
+          "classId": "KE",
+          "critRate": {
+            "baseRawStatPct": 113.5,
+            "diminishingAddedPct": 0,
+            "rawStatPct": 113.5,
+            "tierRate": 0.8939999999999999,
+            "multipliers": [
+              {
+                "sourceId": "KE:critRate:crit-1",
+                "valuePct": 20,
+                "factor": 1.2
+              },
+              {
+                "sourceId": "combat-rate:yellow-beast-stone",
+                "valuePct": 8,
+                "factor": 1.08
+              },
+              {
+                "sourceId": "lowerwear-crit-rate-enhancement",
+                "valuePct": 13,
+                "factor": 1.13
+              }
+            ],
+            "multiplierProduct": 1.46448,
+            "nonDiminishingSources": [],
+            "nonDiminishingPct": 0,
+            "finalAdjustmentPct": -1e-12,
+            "valueBeforeUpperCap": 1.30924511999999,
+            "finalRate": 1
+          },
+          "extremization": {
+            "baseRawStatPct": 88,
+            "diminishingAddedPct": 0,
+            "rawStatPct": 88,
+            "tierRate": 0.74,
+            "multipliers": [
+              {
+                "sourceId": "KE:extremization:ext-1",
+                "valuePct": 20,
+                "factor": 1.2
+              },
+              {
+                "sourceId": "combat-rate:yellow-beast-stone",
+                "valuePct": 8,
+                "factor": 1.08
+              },
+              {
+                "sourceId": "shoes-extremization-enhancement",
+                "valuePct": 13,
+                "factor": 1.13
+              }
+            ],
+            "multiplierProduct": 1.46448,
+            "nonDiminishingSources": [],
+            "nonDiminishingPct": 0,
+            "finalAdjustmentPct": 0,
+            "valueBeforeUpperCap": 1.0837152,
+            "finalRate": 1
+          }
+        },
+        "generalMultiplicativeDamage": {
+          "factors": [
+            {
+              "sourceId": "simulator:Accessory.FaceTop",
+              "valuePct": 10.25,
+              "factor": 1.1025
+            },
+            {
+              "sourceId": "simulator:Accessory.FaceBottom",
+              "valuePct": 5,
+              "factor": 1.05
+            },
+            {
+              "sourceId": "simulator:Accessory.Ring1",
+              "valuePct": 4,
+              "factor": 1.04
+            },
+            {
+              "sourceId": "innerwear:upper",
+              "valuePct": 13,
+              "factor": 1.13
+            },
+            {
+              "sourceId": "color-set:紅",
+              "valuePct": 20,
+              "factor": 1.2
+            },
+            {
+              "sourceId": "atma-water-fire-multiplicative-damage",
+              "valuePct": 20,
+              "factor": 1.2
+            },
+            {
+              "sourceId": "master-beast:armor-spirit-stone-set:S77",
+              "valuePct": 4,
+              "factor": 1.04
+            },
+            {
+              "sourceId": "title:Effect.Title",
+              "valuePct": 25,
+              "factor": 1.25
+            },
+            {
+              "sourceId": "consumable:Effect.Consumable",
+              "valuePct": 5,
+              "factor": 1.05
+            }
+          ],
+          "productBeforeBaseline": 2.6740826330400003,
+          "baselinePct": 0,
+          "value": 2.6740826330400003
+        },
+        "multiplicativeCritDamage": {
+          "factors": [
+            {
+              "sourceId": "fixed-effect:red-upper-crit-damage",
+              "valuePct": 10,
+              "factor": 1.1
+            },
+            {
+              "sourceId": "fixed-effect:maestro-aura",
+              "valuePct": 2,
+              "factor": 1.02
+            },
+            {
+              "sourceId": "character-base:crit-damage-product",
+              "valuePct": 50,
+              "factor": 1.5
+            }
+          ],
+          "productBeforeBaseline": 1.6830000000000003,
+          "baselinePct": 150,
+          "value": 0.18300000000000027
+        },
+        "classCritDamagePassivePct": 8,
+        "finalDamage": {
+          "extremizedBase": 186911,
+          "critFactor": 2.418,
+          "damageFactors": {
+            "bossDamage": 2.855,
+            "polarization": 1.562,
+            "skillDamage": 2.0423333333333322,
+            "allSkillDamage": 2.165,
+            "bleedDamage": 1.545,
+            "fullHealthKillDamage": 1.375
+          },
+          "skillDamageWeighting": {
+            "transcendenceSharePct": 33.333333333333,
+            "strongSharePct": 66.666666666667,
+            "transcendenceFactor": 2.247,
+            "strongFactor": 1.94,
+            "combinedFactor": 2.0423333333333322
+          },
+          "conditionalFactor": 1.2452278658903835,
+          "adaptationFactor": 0.73,
+          "defenseFactor": 1.0834236186348853,
+          "finalDamage": 49858455.54073657
+        }
+      },
+      "combatRates": {
+        "classId": "KE",
+        "critRate": {
+          "baseRawStatPct": 113.5,
+          "diminishingAddedPct": 0,
+          "rawStatPct": 113.5,
+          "tierRate": 0.8939999999999999,
+          "multipliers": [
+            {
+              "sourceId": "KE:critRate:crit-1",
+              "valuePct": 20,
+              "factor": 1.2
+            },
+            {
+              "sourceId": "combat-rate:yellow-beast-stone",
+              "valuePct": 8,
+              "factor": 1.08
+            },
+            {
+              "sourceId": "lowerwear-crit-rate-enhancement",
+              "valuePct": 13,
+              "factor": 1.13
+            }
+          ],
+          "multiplierProduct": 1.46448,
+          "nonDiminishingSources": [],
+          "nonDiminishingPct": 0,
+          "finalAdjustmentPct": -1e-12,
+          "valueBeforeUpperCap": 1.30924511999999,
+          "finalRate": 1
+        },
+        "extremization": {
+          "baseRawStatPct": 88,
+          "diminishingAddedPct": 0,
+          "rawStatPct": 88,
+          "tierRate": 0.74,
+          "multipliers": [
+            {
+              "sourceId": "KE:extremization:ext-1",
+              "valuePct": 20,
+              "factor": 1.2
+            },
+            {
+              "sourceId": "combat-rate:yellow-beast-stone",
+              "valuePct": 8,
+              "factor": 1.08
+            },
+            {
+              "sourceId": "shoes-extremization-enhancement",
+              "valuePct": 13,
+              "factor": 1.13
+            }
+          ],
+          "multiplierProduct": 1.46448,
+          "nonDiminishingSources": [],
+          "nonDiminishingPct": 0,
+          "finalAdjustmentPct": 0,
+          "valueBeforeUpperCap": 1.0837152,
+          "finalRate": 1
+        }
+      },
+      "damageError": null,
+      "attributeError": null,
+      "completeEvaluationHash": "a8658a4e92ed94c7c255228c0f638ed4ba02e5bafc81c09af1aa84f3b3064c24",
+      "attributeProjectionHash": "73167f0156be91d3910301bbf77666887b70092702145aee0b0362e71ef917c2",
+      "combatProjectionHash": "cda33ae97deb5ec321e70a42a7460cb487d9fc26f7b5222f406a96b8330ae20e"
+    },
+    "empty-stage-boundaries": {
+      "stats": {
+        "physicalAttack": {
+          "sharedTotal": 21699.600000000002,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 21699.600000000002,
+          "finalTotal": 21699.600000000002
+        },
+        "magicalAttack": {
+          "sharedTotal": 14099.6,
+          "lowerwearA": 488,
+          "lowerwearB": 0,
+          "lowerwearAverage": 488,
+          "totalBeforeCap": 14587.6,
+          "finalTotal": 14587.6
+        },
+        "doubleAttackPct": {
+          "sharedTotal": 6.75,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 6.75,
+          "finalTotal": 6.75
+        },
+        "critRatePct": {
+          "sharedTotal": 5,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 5,
+          "finalTotal": 5
+        },
+        "extremizationPct": {
+          "sharedTotal": 5,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 5,
+          "finalTotal": 5
+        },
+        "critDamagePct": {
+          "sharedTotal": 151.5,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 151.5,
+          "finalTotal": 151.5
+        },
+        "bossDamagePct": {
+          "sharedTotal": 7.5,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 7.5,
+          "finalTotal": 7.5
+        },
+        "polarizationPct": {
+          "sharedTotal": 1.2,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 1.2,
+          "cap": 60,
+          "finalTotal": 1.2
+        },
+        "allSkillDamagePct": {
+          "sharedTotal": 41,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 41,
+          "finalTotal": 41
+        },
+        "strongSkillDamagePct": {
+          "sharedTotal": 3,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 3,
+          "finalTotal": 3
+        },
+        "transcendenceSkillDamagePct": {
+          "sharedTotal": 3,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 3,
+          "finalTotal": 3
+        },
+        "bleedDamagePct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "strongerPct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "heatPct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "fullHealthKillDamagePct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "adaptabilityPct": {
+          "sharedTotal": 19,
+          "lowerwearA": 2,
+          "lowerwearB": 0,
+          "lowerwearAverage": 2,
+          "totalBeforeCap": 21,
+          "cap": 60,
+          "finalTotal": 21
+        },
+        "actionSpeedPct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "defenseIgnorePct": {
+          "sharedTotal": 6.2,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 6.2,
+          "finalTotal": 6.2
+        },
+        "attackLevel": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        },
+        "skillTypeAttackPct": {
+          "sharedTotal": 26.5,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 26.5,
+          "finalTotal": 26.5
+        },
+        "superAdaptabilityPct": {
+          "sharedTotal": 0,
+          "lowerwearA": 0,
+          "lowerwearB": 0,
+          "lowerwearAverage": 0,
+          "totalBeforeCap": 0,
+          "finalTotal": 0
+        }
+      },
+      "conditionalDamage": {
+        "strongerPct": 0,
+        "heatPct": 0,
+        "strongerSources": [],
+        "heatSources": []
+      },
+      "result": {
+        "attack": {
+          "attackType": "physical",
+          "selectedAttack": 21699.600000000002,
+          "attackPower": 29302,
+          "c53": 18886.4,
+          "d53": 12204.800000000001,
+          "lowerDamage": 18214,
+          "upperDamage": 40391
+        },
+        "combatRates": {
+          "classId": "KE",
+          "critRate": {
+            "baseRawStatPct": 5,
+            "diminishingAddedPct": 0,
+            "rawStatPct": 5,
+            "tierRate": 0.05,
+            "multipliers": [
+              {
+                "sourceId": "KE:critRate:crit-1",
+                "valuePct": 20,
+                "factor": 1.2
+              },
+              {
+                "sourceId": "lowerwear-crit-rate-enhancement",
+                "valuePct": 10,
+                "factor": 1.1
+              }
+            ],
+            "multiplierProduct": 1.32,
+            "nonDiminishingSources": [],
+            "nonDiminishingPct": 0,
+            "finalAdjustmentPct": 0,
+            "valueBeforeUpperCap": 0.066,
+            "finalRate": 0.066
+          },
+          "extremization": {
+            "baseRawStatPct": 5,
+            "diminishingAddedPct": 0,
+            "rawStatPct": 5,
+            "tierRate": 0.05,
+            "multipliers": [
+              {
+                "sourceId": "KE:extremization:ext-1",
+                "valuePct": 20,
+                "factor": 1.2
+              },
+              {
+                "sourceId": "shoes-extremization-enhancement",
+                "valuePct": 10,
+                "factor": 1.1
+              }
+            ],
+            "multiplierProduct": 1.32,
+            "nonDiminishingSources": [],
+            "nonDiminishingPct": 0,
+            "finalAdjustmentPct": 0,
+            "valueBeforeUpperCap": 0.066,
+            "finalRate": 0.066
+          }
+        },
+        "generalMultiplicativeDamage": {
+          "factors": [
+            {
+              "sourceId": "innerwear:upper",
+              "valuePct": 10,
+              "factor": 1.1
+            },
+            {
+              "sourceId": "master-beast:armor-spirit-stone-set:S77",
+              "valuePct": 4,
+              "factor": 1.04
+            }
+          ],
+          "productBeforeBaseline": 1.1440000000000001,
+          "baselinePct": 0,
+          "value": 1.1440000000000001
+        },
+        "multiplicativeCritDamage": {
+          "factors": [
+            {
+              "sourceId": "fixed-effect:red-upper-crit-damage",
+              "valuePct": 10,
+              "factor": 1.1
+            },
+            {
+              "sourceId": "character-base:crit-damage-product",
+              "valuePct": 50,
+              "factor": 1.5
+            }
+          ],
+          "productBeforeBaseline": 1.6500000000000001,
+          "baselinePct": 150,
+          "value": 0.15000000000000013
+        },
+        "classCritDamagePassivePct": 8,
+        "finalDamage": {
+          "extremizedBase": 30034.341,
+          "critFactor": 1.04917,
+          "damageFactors": {
+            "bossDamage": 1.075,
+            "polarization": 1.012,
+            "skillDamage": 1.03,
+            "allSkillDamage": 1.41,
+            "bleedDamage": 1,
+            "fullHealthKillDamage": 1
+          },
+          "skillDamageWeighting": {
+            "transcendenceSharePct": 0,
+            "strongSharePct": 100,
+            "transcendenceFactor": 1.03,
+            "strongFactor": 1.03,
+            "combinedFactor": 1.03
+          },
+          "conditionalFactor": 1,
+          "adaptationFactor": 1.21,
+          "defenseFactor": 1,
+          "finalDamage": 68916.09802296222
+        }
+      },
+      "combatRates": {
+        "classId": "KE",
+        "critRate": {
+          "baseRawStatPct": 5,
+          "diminishingAddedPct": 0,
+          "rawStatPct": 5,
+          "tierRate": 0.05,
+          "multipliers": [
+            {
+              "sourceId": "KE:critRate:crit-1",
+              "valuePct": 20,
+              "factor": 1.2
+            },
+            {
+              "sourceId": "lowerwear-crit-rate-enhancement",
+              "valuePct": 10,
+              "factor": 1.1
+            }
+          ],
+          "multiplierProduct": 1.32,
+          "nonDiminishingSources": [],
+          "nonDiminishingPct": 0,
+          "finalAdjustmentPct": 0,
+          "valueBeforeUpperCap": 0.066,
+          "finalRate": 0.066
+        },
+        "extremization": {
+          "baseRawStatPct": 5,
+          "diminishingAddedPct": 0,
+          "rawStatPct": 5,
+          "tierRate": 0.05,
+          "multipliers": [
+            {
+              "sourceId": "KE:extremization:ext-1",
+              "valuePct": 20,
+              "factor": 1.2
+            },
+            {
+              "sourceId": "shoes-extremization-enhancement",
+              "valuePct": 10,
+              "factor": 1.1
+            }
+          ],
+          "multiplierProduct": 1.32,
+          "nonDiminishingSources": [],
+          "nonDiminishingPct": 0,
+          "finalAdjustmentPct": 0,
+          "valueBeforeUpperCap": 0.066,
+          "finalRate": 0.066
+        }
+      },
+      "damageError": null,
+      "attributeError": null,
+      "completeEvaluationHash": "958405a4d46599ab0c5af40c6563f19afa6a01fcada48d0221b756c69c3ce224",
+      "attributeProjectionHash": "757c63e5e94c9ff730618c5c161213ced122fe40c1f8ff50e2625f73e19dd16f",
+      "combatProjectionHash": "566ef4cce4dd2b86bad472c56293ea7cf0ea99d2cf34985cc5017af11b8a5176"
+    }
+  },
+  "pages": {
+    "same": "72675082f383d45ed79ea5fd6a3fa109ae364801673ad414924860333ceb2796",
+    "different": "7c78b64f47d579681bebf9a693269d3c7fe1d419944580f8985cd89555443d7c",
+    "invalid-baseline": "f8fa30ade3cb25d21a1afec27b561c0a2bee5637529ac0ca9022d4555d48dc38",
+    "fallback-baseline": "cd2ca6175ea4dcb9aa7a9f19bf62ec2be36c29103d380752af3bcd132bf6256b",
+    "fallback-current": "6bb0ec9c02bb019ba57433d3283405cebdd18e88f8a148f1794260fb752f3c0d"
+  },
+  "workload": {
+    "public-complete": {
+      "projectDamage": 1,
+      "projectAttributes": 1,
+      "prepareCharacterAttributeInput": 4,
+      "aggregateCharacterAttributes": 4,
+      "calculateLoadout": 1,
+      "calculateLoadoutCombatRates": 1
+    },
+    "minimal-complete": {
+      "projectDamage": 1,
+      "projectAttributes": 1,
+      "prepareCharacterAttributeInput": 4,
+      "aggregateCharacterAttributes": 4,
+      "calculateLoadout": 1,
+      "calculateLoadoutCombatRates": 1
+    },
+    "no-class": {
+      "projectDamage": 1,
+      "projectAttributes": 2
+    },
+    "invalid-class": {
+      "projectDamage": 1,
+      "projectAttributes": 2
+    },
+    "no-weapon-rates-fallback": {
+      "projectDamage": 1,
+      "projectAttributes": 3,
+      "prepareCharacterAttributeInput": 6,
+      "aggregateCharacterAttributes": 6,
+      "projectCombatRates": 1,
+      "calculateLoadoutCombatRates": 1
+    },
+    "no-bottom-attributes-fallback": {
+      "projectDamage": 1,
+      "projectAttributes": 2
+    },
+    "no-shoes-attributes-fallback": {
+      "projectDamage": 1,
+      "projectAttributes": 2
+    },
+    "invalid-weapon": {
+      "projectDamage": 1,
+      "projectAttributes": 2,
+      "prepareCharacterAttributeInput": 2,
+      "aggregateCharacterAttributes": 2
+    },
+    "invalid-boss-rates-fallback": {
+      "projectDamage": 1,
+      "projectAttributes": 3,
+      "prepareCharacterAttributeInput": 6,
+      "aggregateCharacterAttributes": 6,
+      "projectCombatRates": 1,
+      "calculateLoadoutCombatRates": 1
+    },
+    "invalid-rate-attributes-fallback": {
+      "projectDamage": 1,
+      "projectAttributes": 3,
+      "prepareCharacterAttributeInput": 6,
+      "aggregateCharacterAttributes": 6,
+      "projectCombatRates": 1
+    },
+    "late-damage-failure-rates-fallback": {
+      "projectDamage": 1,
+      "projectAttributes": 3,
+      "prepareCharacterAttributeInput": 8,
+      "aggregateCharacterAttributes": 8,
+      "calculateLoadout": 1,
+      "calculateLoadoutCombatRates": 2,
+      "projectCombatRates": 1
+    },
+    "special-weapon-average": {
+      "projectDamage": 1,
+      "projectAttributes": 1,
+      "prepareCharacterAttributeInput": 4,
+      "aggregateCharacterAttributes": 4,
+      "calculateLoadout": 1,
+      "calculateLoadoutCombatRates": 1
+    },
+    "passives-effects-decimals": {
+      "projectDamage": 1,
+      "projectAttributes": 1,
+      "prepareCharacterAttributeInput": 4,
+      "aggregateCharacterAttributes": 4,
+      "calculateLoadout": 1,
+      "calculateLoadoutCombatRates": 1
+    },
+    "empty-stage-boundaries": {
+      "projectDamage": 1,
+      "projectAttributes": 1,
+      "prepareCharacterAttributeInput": 4,
+      "aggregateCharacterAttributes": 4,
+      "calculateLoadout": 1,
+      "calculateLoadoutCombatRates": 1
+    },
+    "page:same": {
+      "renderResults": 1,
+      "projectDamage": 2,
+      "projectAttributes": 2,
+      "prepareCharacterAttributeInput": 8,
+      "aggregateCharacterAttributes": 8,
+      "calculateLoadout": 2,
+      "calculateLoadoutCombatRates": 2
+    },
+    "page:different": {
+      "renderResults": 1,
+      "projectDamage": 2,
+      "projectAttributes": 2,
+      "prepareCharacterAttributeInput": 8,
+      "aggregateCharacterAttributes": 8,
+      "calculateLoadout": 2,
+      "calculateLoadoutCombatRates": 2
+    },
+    "page:invalid-baseline": {
+      "renderResults": 1,
+      "projectDamage": 2,
+      "projectAttributes": 3,
+      "prepareCharacterAttributeInput": 4,
+      "aggregateCharacterAttributes": 4,
+      "calculateLoadout": 1,
+      "calculateLoadoutCombatRates": 1
+    },
+    "page:fallback-baseline": {
+      "renderResults": 1,
+      "projectDamage": 2,
+      "projectAttributes": 3,
+      "prepareCharacterAttributeInput": 8,
+      "aggregateCharacterAttributes": 8,
+      "calculateLoadout": 1,
+      "calculateLoadoutCombatRates": 1
+    },
+    "page:fallback-current": {
+      "renderResults": 1,
+      "projectDamage": 2,
+      "projectAttributes": 4,
+      "prepareCharacterAttributeInput": 10,
+      "aggregateCharacterAttributes": 10,
+      "calculateLoadout": 1,
+      "calculateLoadoutCombatRates": 2,
+      "projectCombatRates": 1
+    },
+    "page:unchanged-baseline-update": {
+      "renderResults": 1,
+      "projectDamage": 2,
+      "projectAttributes": 2,
+      "prepareCharacterAttributeInput": 8,
+      "aggregateCharacterAttributes": 8,
+      "calculateLoadout": 2,
+      "calculateLoadoutCombatRates": 2
+    }
+  },
+  "engine": {
+    "valid": {
+      "value": {
+        "attributes": {
+          "stats": {
+            "physicalAttack": {
+              "key": "physicalAttack",
+              "sharedSources": [
+                {
+                  "sourceId": "character-base",
+                  "valuePct": 1202
+                },
+                {
+                  "sourceId": "innerwear:upper",
+                  "valuePct": 454.40000000000003
+                },
+                {
+                  "sourceId": "innerwear:gloves",
+                  "valuePct": 756.8000000000001
+                },
+                {
+                  "sourceId": "spirit-record:default-maxed",
+                  "valuePct": 400
+                },
+                {
+                  "sourceId": "weapon-base-attack",
+                  "valuePct": 18886.4
+                }
+              ],
+              "sharedTotal": 21699.600000000002,
+              "lowerwearASources": [],
+              "lowerwearA": 0,
+              "lowerwearBSources": [],
+              "lowerwearB": 0,
+              "lowerwearAverage": 0,
+              "totalBeforeCap": 21699.600000000002,
+              "finalTotal": 21699.600000000002
+            },
+            "magicalAttack": {
+              "key": "magicalAttack",
+              "sharedSources": [
+                {
+                  "sourceId": "character-base",
+                  "valuePct": 1202
+                },
+                {
+                  "sourceId": "innerwear:shoes",
+                  "valuePct": 292.8
+                },
+                {
+                  "sourceId": "spirit-record:default-maxed",
+                  "valuePct": 400
+                },
+                {
+                  "sourceId": "weapon-base-attack",
+                  "valuePct": 12204.800000000001
+                }
+              ],
+              "sharedTotal": 14099.6,
+              "lowerwearASources": [
+                {
+                  "sourceId": "innerwear:lowerwear",
+                  "valuePct": 488
+                }
+              ],
+              "lowerwearA": 488,
+              "lowerwearBSources": [],
+              "lowerwearB": 0,
+              "lowerwearAverage": 488,
+              "totalBeforeCap": 14587.6,
+              "finalTotal": 14587.6
+            },
+            "doubleAttackPct": {
+              "key": "doubleAttackPct",
+              "sharedSources": [
+                {
+                  "sourceId": "fixed-effect:master-beast",
+                  "valuePct": 3
+                },
+                {
+                  "sourceId": "innerwear:upper",
+                  "valuePct": 0
+                },
+                {
+                  "sourceId": "innerwear:gloves",
+                  "valuePct": 0
+                },
+                {
+                  "sourceId": "innerwear:shoes",
+                  "valuePct": 0
+                },
+                {
+                  "sourceId": "spirit-record:default-maxed",
+                  "valuePct": 3.75
+                }
+              ],
+              "sharedTotal": 6.75,
+              "lowerwearASources": [
+                {
+                  "sourceId": "innerwear:lowerwear",
+                  "valuePct": 0
+                }
+              ],
+              "lowerwearA": 0,
+              "lowerwearBSources": [],
+              "lowerwearB": 0,
+              "lowerwearAverage": 0,
+              "totalBeforeCap": 6.75,
+              "finalTotal": 6.75
+            },
+            "critRatePct": {
+              "key": "critRatePct",
+              "sharedSources": [
+                {
+                  "sourceId": "spirit-record:default-maxed",
+                  "valuePct": 5
+                }
+              ],
+              "sharedTotal": 5,
+              "lowerwearASources": [],
+              "lowerwearA": 0,
+              "lowerwearBSources": [],
+              "lowerwearB": 0,
+              "lowerwearAverage": 0,
+              "totalBeforeCap": 5,
+              "finalTotal": 5
+            },
+            "extremizationPct": {
+              "key": "extremizationPct",
+              "sharedSources": [
+                {
+                  "sourceId": "spirit-record:default-maxed",
+                  "valuePct": 5
+                }
+              ],
+              "sharedTotal": 5,
+              "lowerwearASources": [],
+              "lowerwearA": 0,
+              "lowerwearBSources": [],
+              "lowerwearB": 0,
+              "lowerwearAverage": 0,
+              "totalBeforeCap": 5,
+              "finalTotal": 5
+            },
+            "critDamagePct": {
+              "key": "critDamagePct",
+              "sharedSources": [
+                {
+                  "sourceId": "character-base",
+                  "valuePct": 150
+                },
+                {
+                  "sourceId": "innerwear:upper",
+                  "valuePct": 0
+                },
+                {
+                  "sourceId": "innerwear:gloves",
+                  "valuePct": 0
+                },
+                {
+                  "sourceId": "innerwear:shoes",
+                  "valuePct": 0
+                },
+                {
+                  "sourceId": "spirit-record:default-maxed",
+                  "valuePct": 1.5
+                }
+              ],
+              "sharedTotal": 151.5,
+              "lowerwearASources": [
+                {
+                  "sourceId": "innerwear:lowerwear",
+                  "valuePct": 0
+                }
+              ],
+              "lowerwearA": 0,
+              "lowerwearBSources": [],
+              "lowerwearB": 0,
+              "lowerwearAverage": 0,
+              "totalBeforeCap": 151.5,
+              "finalTotal": 151.5
+            },
+            "bossDamagePct": {
+              "key": "bossDamagePct",
+              "sharedSources": [
+                {
+                  "sourceId": "hunter-instinct",
+                  "valuePct": 2.5
+                },
+                {
+                  "sourceId": "innerwear:upper",
+                  "valuePct": 0
+                },
+                {
+                  "sourceId": "innerwear:gloves",
+                  "valuePct": 0
+                },
+                {
+                  "sourceId": "innerwear:shoes",
+                  "valuePct": 0
+                },
+                {
+                  "sourceId": "spirit-record:default-maxed",
+                  "valuePct": 5
+                }
+              ],
+              "sharedTotal": 7.5,
+              "lowerwearASources": [
+                {
+                  "sourceId": "innerwear:lowerwear",
+                  "valuePct": 0
+                }
+              ],
+              "lowerwearA": 0,
+              "lowerwearBSources": [],
+              "lowerwearB": 0,
+              "lowerwearAverage": 0,
+              "totalBeforeCap": 7.5,
+              "finalTotal": 7.5
+            },
+            "polarizationPct": {
+              "key": "polarizationPct",
+              "sharedSources": [
+                {
+                  "sourceId": "spirit-record:default-maxed",
+                  "valuePct": 1.2
+                }
+              ],
+              "sharedTotal": 1.2,
+              "lowerwearASources": [],
+              "lowerwearA": 0,
+              "lowerwearBSources": [],
+              "lowerwearB": 0,
+              "lowerwearAverage": 0,
+              "totalBeforeCap": 1.2,
+              "cap": 60,
+              "finalTotal": 1.2
+            },
+            "allSkillDamagePct": {
+              "key": "allSkillDamagePct",
+              "sharedSources": [
+                {
+                  "sourceId": "innerwear:gloves",
+                  "valuePct": 40
+                },
+                {
+                  "sourceId": "spirit-record:default-maxed",
+                  "valuePct": 1
+                }
+              ],
+              "sharedTotal": 41,
+              "lowerwearASources": [],
+              "lowerwearA": 0,
+              "lowerwearBSources": [],
+              "lowerwearB": 0,
+              "lowerwearAverage": 0,
+              "totalBeforeCap": 41,
+              "finalTotal": 41
+            },
+            "strongSkillDamagePct": {
+              "key": "strongSkillDamagePct",
+              "sharedSources": [
+                {
+                  "sourceId": "innerwear:upper",
+                  "valuePct": 0
+                },
+                {
+                  "sourceId": "innerwear:gloves",
+                  "valuePct": 0
+                },
+                {
+                  "sourceId": "innerwear:shoes",
+                  "valuePct": 0
+                },
+                {
+                  "sourceId": "spirit-record:default-maxed",
+                  "valuePct": 3
+                }
+              ],
+              "sharedTotal": 3,
+              "lowerwearASources": [
+                {
+                  "sourceId": "innerwear:lowerwear",
+                  "valuePct": 0
+                }
+              ],
+              "lowerwearA": 0,
+              "lowerwearBSources": [],
+              "lowerwearB": 0,
+              "lowerwearAverage": 0,
+              "totalBeforeCap": 3,
+              "finalTotal": 3
+            },
+            "transcendenceSkillDamagePct": {
+              "key": "transcendenceSkillDamagePct",
+              "sharedSources": [
+                {
+                  "sourceId": "innerwear:upper",
+                  "valuePct": 0
+                },
+                {
+                  "sourceId": "innerwear:gloves",
+                  "valuePct": 0
+                },
+                {
+                  "sourceId": "innerwear:shoes",
+                  "valuePct": 0
+                },
+                {
+                  "sourceId": "spirit-record:default-maxed",
+                  "valuePct": 3
+                }
+              ],
+              "sharedTotal": 3,
+              "lowerwearASources": [
+                {
+                  "sourceId": "innerwear:lowerwear",
+                  "valuePct": 0
+                }
+              ],
+              "lowerwearA": 0,
+              "lowerwearBSources": [],
+              "lowerwearB": 0,
+              "lowerwearAverage": 0,
+              "totalBeforeCap": 3,
+              "finalTotal": 3
+            },
+            "bleedDamagePct": {
+              "key": "bleedDamagePct",
+              "sharedSources": [],
+              "sharedTotal": 0,
+              "lowerwearASources": [],
+              "lowerwearA": 0,
+              "lowerwearBSources": [],
+              "lowerwearB": 0,
+              "lowerwearAverage": 0,
+              "totalBeforeCap": 0,
+              "finalTotal": 0
+            },
+            "strongerPct": {
+              "key": "strongerPct",
+              "sharedSources": [],
+              "sharedTotal": 0,
+              "lowerwearASources": [],
+              "lowerwearA": 0,
+              "lowerwearBSources": [],
+              "lowerwearB": 0,
+              "lowerwearAverage": 0,
+              "totalBeforeCap": 0,
+              "finalTotal": 0
+            },
+            "heatPct": {
+              "key": "heatPct",
+              "sharedSources": [],
+              "sharedTotal": 0,
+              "lowerwearASources": [],
+              "lowerwearA": 0,
+              "lowerwearBSources": [],
+              "lowerwearB": 0,
+              "lowerwearAverage": 0,
+              "totalBeforeCap": 0,
+              "finalTotal": 0
+            },
+            "fullHealthKillDamagePct": {
+              "key": "fullHealthKillDamagePct",
+              "sharedSources": [],
+              "sharedTotal": 0,
+              "lowerwearASources": [],
+              "lowerwearA": 0,
+              "lowerwearBSources": [],
+              "lowerwearB": 0,
+              "lowerwearAverage": 0,
+              "totalBeforeCap": 0,
+              "finalTotal": 0
+            },
+            "adaptabilityPct": {
+              "key": "adaptabilityPct",
+              "sharedSources": [
+                {
+                  "sourceId": "fixed-effect:raid-set",
+                  "valuePct": 2
+                },
+                {
+                  "sourceId": "fixed-effect:weapon",
+                  "valuePct": 5
+                },
+                {
+                  "sourceId": "fixed-effect:title-adaptability",
+                  "valuePct": 5
+                },
+                {
+                  "sourceId": "innerwear:upper",
+                  "valuePct": 2
+                },
+                {
+                  "sourceId": "innerwear:gloves",
+                  "valuePct": 2
+                },
+                {
+                  "sourceId": "innerwear:shoes",
+                  "valuePct": 2
+                },
+                {
+                  "sourceId": "spirit-record:default-maxed",
+                  "valuePct": 1
+                }
+              ],
+              "sharedTotal": 19,
+              "lowerwearASources": [
+                {
+                  "sourceId": "innerwear:lowerwear",
+                  "valuePct": 2
+                }
+              ],
+              "lowerwearA": 2,
+              "lowerwearBSources": [],
+              "lowerwearB": 0,
+              "lowerwearAverage": 2,
+              "totalBeforeCap": 21,
+              "cap": 60,
+              "finalTotal": 21
+            },
+            "actionSpeedPct": {
+              "key": "actionSpeedPct",
+              "sharedSources": [],
+              "sharedTotal": 0,
+              "lowerwearASources": [],
+              "lowerwearA": 0,
+              "lowerwearBSources": [],
+              "lowerwearB": 0,
+              "lowerwearAverage": 0,
+              "totalBeforeCap": 0,
+              "finalTotal": 0
+            },
+            "defenseIgnorePct": {
+              "key": "defenseIgnorePct",
+              "sharedSources": [
+                {
+                  "sourceId": "fixed-effect:title-defense-ignore",
+                  "valuePct": 5
+                },
+                {
+                  "sourceId": "spirit-record:default-maxed",
+                  "valuePct": 1.2
+                }
+              ],
+              "sharedTotal": 6.2,
+              "lowerwearASources": [],
+              "lowerwearA": 0,
+              "lowerwearBSources": [],
+              "lowerwearB": 0,
+              "lowerwearAverage": 0,
+              "totalBeforeCap": 6.2,
+              "finalTotal": 6.2
+            },
+            "attackLevel": {
+              "key": "attackLevel",
+              "sharedSources": [],
+              "sharedTotal": 0,
+              "lowerwearASources": [],
+              "lowerwearA": 0,
+              "lowerwearBSources": [],
+              "lowerwearB": 0,
+              "lowerwearAverage": 0,
+              "totalBeforeCap": 0,
+              "finalTotal": 0
+            },
+            "skillTypeAttackPct": {
+              "key": "skillTypeAttackPct",
+              "sharedSources": [
+                {
+                  "sourceId": "character-base",
+                  "valuePct": 26.5
+                }
+              ],
+              "sharedTotal": 26.5,
+              "lowerwearASources": [],
+              "lowerwearA": 0,
+              "lowerwearBSources": [],
+              "lowerwearB": 0,
+              "lowerwearAverage": 0,
+              "totalBeforeCap": 26.5,
+              "finalTotal": 26.5
+            },
+            "superAdaptabilityPct": {
+              "key": "superAdaptabilityPct",
+              "sharedSources": [],
+              "sharedTotal": 0,
+              "lowerwearASources": [],
+              "lowerwearA": 0,
+              "lowerwearBSources": [],
+              "lowerwearB": 0,
+              "lowerwearAverage": 0,
+              "totalBeforeCap": 0,
+              "finalTotal": 0
+            }
+          },
+          "conditionalDamage": {
+            "strongerPct": 0,
+            "heatPct": 0,
+            "strongerSources": [],
+            "heatSources": []
+          }
+        },
+        "attack": {
+          "attackType": "physical",
+          "selectedAttack": 21699.600000000002,
+          "attackPower": 29302,
+          "c53": 18886.4,
+          "d53": 12204.800000000001,
+          "lowerDamage": 18214,
+          "upperDamage": 40391
+        },
+        "combatRates": {
+          "classId": "KE",
+          "critRate": {
+            "baseRawStatPct": 5,
+            "diminishingAddedPct": 0,
+            "rawStatPct": 5,
+            "tierRate": 0.05,
+            "multipliers": [
+              {
+                "sourceId": "KE:critRate:crit-1",
+                "valuePct": 20,
+                "factor": 1.2
+              },
+              {
+                "sourceId": "lowerwear-crit-rate-enhancement",
+                "valuePct": 10,
+                "factor": 1.1
+              }
+            ],
+            "multiplierProduct": 1.32,
+            "nonDiminishingSources": [],
+            "nonDiminishingPct": 0,
+            "finalAdjustmentPct": 0,
+            "valueBeforeUpperCap": 0.066,
+            "finalRate": 0.066
+          },
+          "extremization": {
+            "baseRawStatPct": 5,
+            "diminishingAddedPct": 0,
+            "rawStatPct": 5,
+            "tierRate": 0.05,
+            "multipliers": [
+              {
+                "sourceId": "KE:extremization:ext-1",
+                "valuePct": 20,
+                "factor": 1.2
+              },
+              {
+                "sourceId": "shoes-extremization-enhancement",
+                "valuePct": 10,
+                "factor": 1.1
+              }
+            ],
+            "multiplierProduct": 1.32,
+            "nonDiminishingSources": [],
+            "nonDiminishingPct": 0,
+            "finalAdjustmentPct": 0,
+            "valueBeforeUpperCap": 0.066,
+            "finalRate": 0.066
+          }
+        },
+        "generalMultiplicativeDamage": {
+          "factors": [
+            {
+              "sourceId": "innerwear:upper",
+              "valuePct": 10,
+              "factor": 1.1
+            },
+            {
+              "sourceId": "master-beast:armor-spirit-stone-set:S77",
+              "valuePct": 4,
+              "factor": 1.04
+            }
+          ],
+          "productBeforeBaseline": 1.1440000000000001,
+          "baselinePct": 0,
+          "value": 1.1440000000000001
+        },
+        "multiplicativeCritDamage": {
+          "factors": [
+            {
+              "sourceId": "fixed-effect:red-upper-crit-damage",
+              "valuePct": 10,
+              "factor": 1.1
+            },
+            {
+              "sourceId": "character-base:crit-damage-product",
+              "valuePct": 50,
+              "factor": 1.5
+            }
+          ],
+          "productBeforeBaseline": 1.6500000000000001,
+          "baselinePct": 150,
+          "value": 0.15000000000000013
+        },
+        "classCritDamagePassivePct": 8,
+        "finalDamage": {
+          "extremizedBase": 30034.341,
+          "critFactor": 1.04917,
+          "damageFactors": {
+            "bossDamage": 1.075,
+            "polarization": 1.012,
+            "skillDamage": 1.03,
+            "allSkillDamage": 1.41,
+            "bleedDamage": 1,
+            "fullHealthKillDamage": 1
+          },
+          "skillDamageWeighting": {
+            "transcendenceSharePct": 100,
+            "strongSharePct": 0,
+            "transcendenceFactor": 1.03,
+            "strongFactor": 1.03,
+            "combinedFactor": 1.03
+          },
+          "conditionalFactor": 1,
+          "adaptationFactor": 1.21,
+          "defenseFactor": 1,
+          "finalDamage": 68916.09802296222
+        }
+      }
+    },
+    "undefined-weapon": {
+      "error": {
+        "name": "TypeError",
+        "message": "weaponEnhancementLevel must be an integer."
+      }
+    },
+    "nan-weapon": {
+      "error": {
+        "name": "TypeError",
+        "message": "weaponEnhancementLevel must be an integer."
+      }
+    },
+    "negative-weapon": {
+      "error": {
+        "name": "Error",
+        "message": "No weapon enhancement factor is configured for Lv.-1."
+      }
+    },
+    "late-failure": {
+      "error": {
+        "name": "RangeError",
+        "message": "Transcendence skill damage share must be between 0 and 100."
+      }
+    }
+  }
+}
