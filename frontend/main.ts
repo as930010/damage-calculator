@@ -1900,14 +1900,10 @@ async function start() {
       Object.assign(state, imported.state);
       migrateLegacyPortraitAwakening(state);
       normalizePortraitAwakeningValues(state);
-      renderSkillDamageShare();
       const duplicateTransformationCells = clearDuplicateTransformationChoices(state);
       const duplicateNephronTransformationCells = clearDuplicateNephronTransformationChoices(state);
       applyWeaponMagicStonePreset(String(state.values[data.weaponGrades.settingKey] ?? ''));
-      renderClassPicker();
-      toggle.checked = state.lowerwearAlternativeEnabled;
-      update();
-      renderInspector(); renderTitleInput(); renderGlobalInputs(); renderWeaponMagicStones(); renderRightIceSetSelectors();
+      refreshConfigurationUi();
       const clearedFields = [...new Set([...imported.clearedFields, ...duplicateTransformationCells, ...duplicateNephronTransformationCells])];
       const partial = clearedFields.length ? `；${clearedFields.length} 個無法對應或重複的欄位已留空（${clearedFields.slice(0, 5).join('、')}${clearedFields.length > 5 ? '…' : ''}）` : '';
       document.querySelector<HTMLElement>('#transfer-status')!.textContent = `${sampleMode ? '配裝已匯入；範例模式不會儲存到此裝置' : '配裝已匯入並儲存於此裝置'}${partial}。`;
