@@ -202,10 +202,14 @@ test('actual import keeps baseline and save/export contracts; cleared storage ha
   const page = await createPage(sample, sample);
   try {
     const { serializeLoadout, parseLoadoutJson } = await page.runtime.load('frontend/loadout-transfer.ts');
+    const { createCatalogIndex } = await page.runtime.load('frontend/catalog-index.ts');
+    const { normalizeOptionalEffectValues } = await page.runtime.load('frontend/state.ts');
     const state = stateFor('special-weapon-average');
     const json = serializeLoadout(state, gameData).json;
     const imported = parseLoadoutJson(json, state, gameData).state;
-    assert.deepEqual(normalize(imported.values), normalize(state.values));
+    const expectedValues = structuredClone(state.values);
+    normalizeOptionalEffectValues(expectedValues, createCatalogIndex(gameData));
+    assert.deepEqual(normalize(imported.values), normalize(expectedValues));
     assert.equal(imported.Job, state.Job);
     assert.equal(imported.lowerwearAlternativeEnabled, state.lowerwearAlternativeEnabled);
     // Legacy samples omit optional settings; the existing importer fills their defaults.
