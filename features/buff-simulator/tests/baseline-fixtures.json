@@ -266,7 +266,7 @@
       }
     ],
     "resultHtmlHash": "03ace45205675450a6208ee68c836a5a7ae44b924ba1348b7924ce11b4c1ae62",
-    "skillHtmlHash": "7a415abaaf9e49969a39211a3227ec1d490978ee4af8cfbfecee040db00545b4",
+    "skillHtmlHash": "cdefb959a074877b20de7141dc3062b262951eb764bab20e532d964b9b379d99",
     "saved": null
   },
   "configuredSingle": {
@@ -1564,7 +1564,7 @@
   "invalidInputs": {
     "results": [],
     "resultHtmlHash": "1b123be7e6bdddadc6859c51663bdb40ca296fae66b3a3880fa389daab53477f",
-    "skillHtmlHash": "7a415abaaf9e49969a39211a3227ec1d490978ee4af8cfbfecee040db00545b4",
+    "skillHtmlHash": "cdefb959a074877b20de7141dc3062b262951eb764bab20e532d964b9b379d99",
     "saved": {
       "version": 1,
       "mode": "single",
