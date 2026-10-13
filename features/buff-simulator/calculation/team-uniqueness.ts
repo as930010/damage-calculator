@@ -7,7 +7,7 @@ export interface UniquenessResult {
 }
 
 /**
- * Mirrors the workbook's first-occurrence count rule within the supplied arena scope:
+ * Apply first-occurrence rules within the supplied arena scope:
  * a repeated class contributes once, and a uniqueness group contributes once total.
  */
 export function applyUniquenessScope(

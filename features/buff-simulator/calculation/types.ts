@@ -1,4 +1,4 @@
-/** The calculation source is mode-specific even when two values share a label. */
+/** Calculation profiles are mode-specific even when two values share a label. */
 export type TeamMode = "single" | "challenge";
 
 export type EffectKey =
@@ -128,9 +128,9 @@ export interface SkillReferenceCatalog {
 }
 
 export interface DefenseModel {
-  /** Single-team boss damage reduction parameter (Excel A2). */
+  /** Configurable boss damage reduction for single-team calculations. */
   bossDamageReduction?: number;
-  /** Challenge break-to-damage coefficient (Excel 96.01%). */
+  /** Default break-to-damage coefficient for challenge calculations. */
   challengeBreakCoefficient?: number;
 }
 
@@ -158,9 +158,9 @@ export interface TeamCalculationResult {
   mode: TeamMode;
   buffMultiplier: number;
   debuffMultiplier: number;
-  /** Multiplier minus one; challenge tables display this increment. */
+  /** Multiplier minus one; challenge results display this increment. */
   buffIncrease: number;
-  /** Multiplier minus one; challenge tables display this increment. */
+  /** Multiplier minus one; challenge results display this increment. */
   debuffIncrease: number;
   defenseBreak: number;
   defenseBreakDamageIncrease: number;

@@ -3,608 +3,368 @@
     "id": "ke",
     "code": "KE",
     "name": "KE",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C11",
-      "challenge": "'挑戰(雙隊)模式用表'!C19"
-    }
+    "enabled": true
   },
   {
     "id": "rm",
     "code": "RM",
     "name": "RM",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C12",
-      "challenge": "'挑戰(雙隊)模式用表'!C20"
-    }
+    "enabled": true
   },
   {
     "id": "im",
     "code": "IM",
     "name": "IM",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C13",
-      "challenge": "'挑戰(雙隊)模式用表'!C21"
-    }
+    "enabled": true
   },
   {
     "id": "ge",
     "code": "GE",
     "name": "GE",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C14",
-      "challenge": "'挑戰(雙隊)模式用表'!C22"
-    }
+    "enabled": true
   },
   {
     "id": "as",
     "code": "AS",
     "name": "AS",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C15",
-      "challenge": "'挑戰(雙隊)模式用表'!C23"
-    }
+    "enabled": true
   },
   {
     "id": "oz",
     "code": "OZ",
     "name": "OZ",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C16",
-      "challenge": "'挑戰(雙隊)模式用表'!C24"
-    }
+    "enabled": true
   },
   {
     "id": "mm",
     "code": "MM",
     "name": "MM",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C17",
-      "challenge": "'挑戰(雙隊)模式用表'!C25"
-    }
+    "enabled": true
   },
   {
     "id": "la",
     "code": "LA",
     "name": "LA",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C18",
-      "challenge": "'挑戰(雙隊)模式用表'!C26"
-    }
+    "enabled": true
   },
   {
     "id": "an",
     "code": "AN",
     "name": "AN",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C19",
-      "challenge": "'挑戰(雙隊)模式用表'!C27"
-    }
+    "enabled": true
   },
   {
     "id": "dab",
     "code": "DaB",
     "name": "DaB",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C20",
-      "challenge": "'挑戰(雙隊)模式用表'!C28"
-    }
+    "enabled": true
   },
   {
     "id": "tw",
     "code": "TW",
     "name": "TW",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C21",
-      "challenge": "'挑戰(雙隊)模式用表'!C29"
-    }
+    "enabled": true
   },
   {
     "id": "pr",
     "code": "PR",
     "name": "PR",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C22",
-      "challenge": "'挑戰(雙隊)模式用表'!C30"
-    }
+    "enabled": true
   },
   {
     "id": "fb",
     "code": "FB",
     "name": "FB",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C23",
-      "challenge": "'挑戰(雙隊)模式用表'!C31"
-    }
+    "enabled": true
   },
   {
     "id": "rh",
     "code": "RH",
     "name": "RH",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C24",
-      "challenge": "'挑戰(雙隊)模式用表'!C32"
-    }
+    "enabled": true
   },
   {
     "id": "ni",
     "code": "NI",
     "name": "NI",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C25",
-      "challenge": "'挑戰(雙隊)模式用表'!C33"
-    }
+    "enabled": true
   },
   {
     "id": "re",
     "code": "RE",
     "name": "RE",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C26",
-      "challenge": "'挑戰(雙隊)模式用表'!C34"
-    }
+    "enabled": true
   },
   {
     "id": "cu",
     "code": "CU",
     "name": "CU",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C27",
-      "challenge": "'挑戰(雙隊)模式用表'!C35"
-    }
+    "enabled": true
   },
   {
     "id": "ce",
     "code": "CE",
     "name": "CE",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C28",
-      "challenge": "'挑戰(雙隊)模式用表'!C36"
-    }
+    "enabled": true
   },
   {
     "id": "cs",
     "code": "CS",
     "name": "CS",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C29",
-      "challenge": "'挑戰(雙隊)模式用表'!C37"
-    }
+    "enabled": true
   },
   {
     "id": "ca",
     "code": "CA",
     "name": "CA",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C30",
-      "challenge": "'挑戰(雙隊)模式用表'!C38"
-    }
+    "enabled": true
   },
   {
     "id": "cc",
     "code": "CC",
     "name": "CC",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C31",
-      "challenge": "'挑戰(雙隊)模式用表'!C39"
-    }
+    "enabled": true
   },
   {
     "id": "fp",
     "code": "FP",
     "name": "FP",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C32",
-      "challenge": "'挑戰(雙隊)模式用表'!C40"
-    }
+    "enabled": true
   },
   {
     "id": "cet",
     "code": "CeT",
     "name": "CeT",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C33",
-      "challenge": "'挑戰(雙隊)模式用表'!C41"
-    }
+    "enabled": true
   },
   {
     "id": "dia",
     "code": "DiA",
     "name": "DiA",
     "enabled": true,
-    "uniquenessGroup": "green-control",
-    "sourceRanges": {
-      "single": "'單隊用表'!C34",
-      "challenge": "'挑戰(雙隊)模式用表'!C42"
-    }
+    "uniquenessGroup": "green-control"
   },
   {
     "id": "vi",
     "code": "VI",
     "name": "VI",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C35",
-      "challenge": "'挑戰(雙隊)模式用表'!C43"
-    }
+    "enabled": true
   },
   {
     "id": "br",
     "code": "BR",
     "name": "BR",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C36",
-      "challenge": "'挑戰(雙隊)模式用表'!C44"
-    }
+    "enabled": true
   },
   {
     "id": "sh",
     "code": "SH",
     "name": "SH",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C37",
-      "challenge": "'挑戰(雙隊)模式用表'!C45"
-    }
+    "enabled": true
   },
   {
     "id": "su",
     "code": "SU",
     "name": "SU",
     "enabled": true,
-    "uniquenessGroup": "green-control",
-    "sourceRanges": {
-      "single": "'單隊用表'!C38",
-      "challenge": "'挑戰(雙隊)模式用表'!C46"
-    }
+    "uniquenessGroup": "green-control"
   },
   {
     "id": "es",
     "code": "ES",
     "name": "ES",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C39",
-      "challenge": "'挑戰(雙隊)模式用表'!C47"
-    }
+    "enabled": true
   },
   {
     "id": "fl",
     "code": "FL",
     "name": "FL",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C40",
-      "challenge": "'挑戰(雙隊)模式用表'!C48"
-    }
+    "enabled": true
   },
   {
     "id": "bq",
     "code": "BQ",
     "name": "BQ",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C41",
-      "challenge": "'挑戰(雙隊)模式用表'!C49"
-    }
+    "enabled": true
   },
   {
     "id": "ad",
     "code": "AD",
     "name": "AD",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C42",
-      "challenge": "'挑戰(雙隊)模式用表'!C50"
-    }
+    "enabled": true
   },
   {
     "id": "db",
     "code": "DB",
     "name": "DB",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C43",
-      "challenge": "'挑戰(雙隊)模式用表'!C51"
-    }
+    "enabled": true
   },
   {
     "id": "dn",
     "code": "DN",
     "name": "DN",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C44",
-      "challenge": "'挑戰(雙隊)模式用表'!C52"
-    }
+    "enabled": true
   },
   {
     "id": "mp",
     "code": "MP",
     "name": "MP",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C45",
-      "challenge": "'挑戰(雙隊)模式用表'!C53"
-    }
+    "enabled": true
   },
   {
     "id": "om",
     "code": "OM",
     "name": "OM",
     "enabled": true,
-    "uniquenessGroup": "green-control",
-    "sourceRanges": {
-      "single": "'單隊用表'!C46",
-      "challenge": "'挑戰(雙隊)模式用表'!C54"
-    }
+    "uniquenessGroup": "green-control"
   },
   {
     "id": "ct",
     "code": "CT",
     "name": "CT",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C47",
-      "challenge": "'挑戰(雙隊)模式用表'!C55"
-    }
+    "enabled": true
   },
   {
     "id": "in",
     "code": "IN",
     "name": "IN",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C48",
-      "challenge": "'挑戰(雙隊)模式用表'!C56"
-    }
+    "enabled": true
   },
   {
     "id": "da",
     "code": "DA",
     "name": "DA",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C49",
-      "challenge": "'挑戰(雙隊)模式用表'!C57"
-    }
+    "enabled": true
   },
   {
     "id": "de",
     "code": "DE",
     "name": "DE",
     "enabled": true,
-    "uniquenessGroup": "green-control",
-    "sourceRanges": {
-      "single": "'單隊用表'!C50",
-      "challenge": "'挑戰(雙隊)模式用表'!C58"
-    }
+    "uniquenessGroup": "green-control"
   },
   {
     "id": "tb",
     "code": "TB",
     "name": "TB",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C51",
-      "challenge": "'挑戰(雙隊)模式用表'!C59"
-    }
+    "enabled": true
   },
   {
     "id": "bma",
     "code": "BMa",
     "name": "BMa",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C52",
-      "challenge": "'挑戰(雙隊)模式用表'!C60"
-    }
+    "enabled": true
   },
   {
     "id": "mn",
     "code": "MN",
     "name": "MN",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C53",
-      "challenge": "'挑戰(雙隊)模式用表'!C61"
-    }
+    "enabled": true
   },
   {
     "id": "po",
     "code": "PO",
     "name": "PO",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C54",
-      "challenge": "'挑戰(雙隊)模式用表'!C62"
-    }
+    "enabled": true
   },
   {
     "id": "ri",
     "code": "RI",
     "name": "RI",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C55",
-      "challenge": "'挑戰(雙隊)模式用表'!C63"
-    }
+    "enabled": true
   },
   {
     "id": "bl",
     "code": "BL",
     "name": "BL",
     "enabled": true,
-    "uniquenessGroup": "green-control",
-    "sourceRanges": {
-      "single": "'單隊用表'!C56",
-      "challenge": "'挑戰(雙隊)模式用表'!C64"
-    }
+    "uniquenessGroup": "green-control"
   },
   {
     "id": "he",
     "code": "HE",
     "name": "HE",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C57",
-      "challenge": "'挑戰(雙隊)模式用表'!C65"
-    }
+    "enabled": true
   },
   {
     "id": "bi",
     "code": "BI",
     "name": "BI",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C58",
-      "challenge": "'挑戰(雙隊)模式用表'!C66"
-    }
+    "enabled": true
   },
   {
     "id": "ew",
     "code": "EW",
     "name": "EW",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C59",
-      "challenge": "'挑戰(雙隊)模式用表'!C67"
-    }
+    "enabled": true
   },
   {
     "id": "rs",
     "code": "RS",
     "name": "RS",
     "enabled": true,
-    "uniquenessGroup": "green-control",
-    "sourceRanges": {
-      "single": "'單隊用表'!C60",
-      "challenge": "'挑戰(雙隊)模式用表'!C68"
-    }
+    "uniquenessGroup": "green-control"
   },
   {
     "id": "nl",
     "code": "NL",
     "name": "NL",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C61",
-      "challenge": "'挑戰(雙隊)模式用表'!C69"
-    }
+    "enabled": true
   },
   {
     "id": "tp",
     "code": "TP",
     "name": "TP",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C62",
-      "challenge": "'挑戰(雙隊)模式用表'!C70"
-    }
+    "enabled": true
   },
   {
     "id": "li",
     "code": "LI",
     "name": "LI",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C63",
-      "challenge": "'挑戰(雙隊)模式用表'!C71"
-    }
+    "enabled": true
   },
   {
     "id": "cel",
     "code": "CeL",
     "name": "CeL",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C64",
-      "challenge": "'挑戰(雙隊)模式用表'!C72"
-    }
+    "enabled": true
   },
   {
     "id": "np",
     "code": "NP",
     "name": "NP",
     "enabled": true,
-    "uniquenessGroup": "green-control",
-    "sourceRanges": {
-      "single": "'單隊用表'!C65",
-      "challenge": "'挑戰(雙隊)模式用表'!C73"
-    }
+    "uniquenessGroup": "green-control"
   },
   {
     "id": "mo",
     "code": "MO",
     "name": "MO",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C66",
-      "challenge": "'挑戰(雙隊)模式用表'!C74"
-    }
+    "enabled": true
   },
   {
     "id": "gb",
     "code": "GB",
     "name": "GB",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C67",
-      "challenge": "'挑戰(雙隊)模式用表'!C75"
-    }
+    "enabled": true
   },
   {
     "id": "av",
     "code": "AV",
     "name": "AV",
     "enabled": true,
-    "uniquenessGroup": "green-control",
-    "sourceRanges": {
-      "single": "'單隊用表'!C68",
-      "challenge": "'挑戰(雙隊)模式用表'!C76"
-    }
+    "uniquenessGroup": "green-control"
   },
   {
     "id": "ac",
     "code": "AC",
     "name": "AC",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C69",
-      "challenge": "'挑戰(雙隊)模式用表'!C77"
-    }
+    "enabled": true
   },
   {
     "id": "mi",
     "code": "MI",
     "name": "MI",
-    "enabled": true,
-    "sourceRanges": {
-      "single": "'單隊用表'!C70",
-      "challenge": "'挑戰(雙隊)模式用表'!C78"
-    }
+    "enabled": true
   }
 ]

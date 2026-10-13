@@ -1,32 +1,25 @@
 {
   "schemaVersion": 1,
   "challenge": {
-    "defenseBreakCoefficient": 0.9601,
-    "sourceRange": "挑戰(雙隊)模式用表!G3:G10"
+    "defenseBreakCoefficient": 0.9601
   },
   "criticalDamage": {
     "defaultPercent": 235,
-    "sourceRange": "係數調整!A1",
     "usedForTitleBonus": 15
   },
   "loadoutDefaults": {
     "movementSpeedShoePercent": 0.144,
-    "skillDamageGlovePercent": 0.18,
-    "sourceRange": "單隊用表!C9/E9；挑戰(雙隊)模式用表!C8/E8、C15/E15"
+    "skillDamageGlovePercent": 0.18
   },
   "bossDamage": {
-    "defaultPercent": 175,
-    "sourceRange": "係數調整!A2"
+    "defaultPercent": 175
   },
   "actionSpeed": {
-    "multiplicativeCap": 0.4,
-    "sourceNote": "上限依 Excel 乘算動速彙總公式確認。"
+    "multiplicativeCap": 0.4
   },
   "controlTime": {
     "capSeconds": 15,
     "secondsPerResistancePoint": 0.01,
-    "singleResistanceSource": "單隊用表!L2",
-    "challengeSharedResistanceSource": "挑戰(雙隊)模式用表!M17",
     "categories": [
       {
         "id": "de",
@@ -53,14 +46,10 @@
         "label": "南瓜妖精",
         "coefficient": 2.4
       }
-    ],
-    "formulaNote": "各類控場時間 = MIN(capSeconds, 降抗點數 × secondsPerResistancePoint × 類別係數)。"
+    ]
   },
   "single": {
-    "bossDamageReductionDefault": 0.7192,
-    "sourceRange": "單隊用表!A2",
-    "status": "workbook-default-configurable",
-    "note": "Excel A2 現值為 71.92%，可由單隊頁面設定；不可寫死到職業資料列。"
+    "bossDamageReductionDefault": 0.7192
   },
   "supportRank": {
     "thresholds": {
@@ -75,7 +64,6 @@
         "good": "不一定能常駐",
         "strong": "幾乎不會中斷"
       }
-    },
-    "sourceRange": "單隊用表!P:R / 挑戰(雙隊)模式用表!Q:S"
+    }
   }
 }

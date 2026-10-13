@@ -18,7 +18,7 @@ export function calculateDefenseDamageMultiplier(
   return 1 / remainingDamage;
 }
 
-/** Recover defense from damage reduction using the coefficient provided by the workbook author. */
+/** Recover defense from damage reduction using the supplied scaling coefficient. */
 export function defenseFromDamageReduction(
   damageReduction: number,
   defenseCoefficient: number,

@@ -1,6 +1,6 @@
 import type { ControlTimeParameters, ControlTimeResult } from "./types.ts";
 
-/** Mirrors the workbook's resistance-to-control-duration estimate, with its 15-second cap. */
+/** Estimate control duration from resistance reduction, category coefficients and the configured cap. */
 export function calculateControlTimes(
   resistanceReduction: number,
   parameters: ControlTimeParameters,
