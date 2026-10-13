@@ -147,7 +147,7 @@
       "defenseBreak": 0.1,
       "shield": 0.15039999999999998,
       "mpRecoveryPerSecond": 0.041477272727272724,
-      "actionSpeedMultiplicative": 0.1,
+      "actionSpeedDiminishing": 0.1,
       "debuffCleanse": 1,
       "superArmor": 1
     },
@@ -979,7 +979,7 @@
       "defenseBreak": 0.1,
       "shield": 0.15039999999999998,
       "mpRecoveryPerSecond": 0.041477272727272724,
-      "actionSpeedMultiplicative": 0.1,
+      "actionSpeedDiminishing": 0.1,
       "debuffCleanse": 2,
       "superArmor": 1
     },
