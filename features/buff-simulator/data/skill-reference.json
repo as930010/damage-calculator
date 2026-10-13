@@ -585,7 +585,7 @@
         {
           "name": "[轉換]滂沱之箭",
           "category": "Buff",
-          "description": "我方動作速度 +10%\n(動作速度為乘算)",
+          "description": "我方動作速度 +10%\n(動作速度為遞減加算)",
           "sourceRanges": [
             "'全角色BUFF參照表'!W25:X26"
           ],
