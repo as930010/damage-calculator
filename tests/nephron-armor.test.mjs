@@ -55,7 +55,7 @@ test('Nephron forge attack table and cumulative milestone bonuses match the supp
   }
 });
 
-test('Nephron transformation attributes cannot repeat within one armor item, but can repeat across items', () => {
+test('Nephron transformation attributes cannot repeat within one armor item, except unrelated damage', () => {
   const repeated = { attribute: '雙攻%（依強化等級）', value: 0.002 };
   const empty = { attribute: '', value: undefined };
   const selection = (slotId, transformations) => ({
@@ -64,6 +64,13 @@ test('Nephron transformation attributes cannot repeat within one armor item, but
   assert.throws(() => resolveNephronArmorSources(armor, [
     selection('upper', [repeated, repeated, empty]),
   ]), /變換屬性不可重複/);
+  assert.deepEqual(resolveNephronArmorSources(armor, [
+    selection('upper', [
+      { attribute: '無關傷害', value: 0 },
+      { attribute: '無關傷害', value: 0 },
+      { attribute: '無關傷害', value: 0 },
+    ]),
+  ]), []);
   const contributions = resolveNephronArmorSources(armor, [
     selection('upper', [repeated, empty, empty]),
     selection('gloves', [repeated, empty, empty]),
