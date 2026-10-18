@@ -1,5 +1,6 @@
 import { isFieldId, FIELD_ID_TO_CODE } from "./field-ids.ts";
 import type { CatalogIndex } from './catalog-index.ts';
+import { normalizeClassSkillVersions } from '../calculation/class-skill-versions.ts';
 import { circuitBoardRowsField, readCircuitBoardRows, serializeCircuitBoardRows, normalizeCircuitBoardRows, normalizeCircuitPercentage } from './circuit-board-rows.ts';
 import { isResonanceInputCell, parseResonancePoints } from "../calculation/resonance-input.ts";
 
@@ -112,6 +113,7 @@ export interface LoadoutState {
   masterBeastSpiritStoneColor: "黃" | "綠" | "";
   petSkillAttackEnabled: boolean;
   transcendenceSkillDamageSharePct: number;
+  classSkillVersions?: Record<string, boolean>;
 }
 const stateKey = "dab-loadout-v1";
 const baselineKey = "dab-baseline-v1";
@@ -187,6 +189,7 @@ function parseState(raw: string | null): LoadoutState | null {
       values[key] = item;
   }
   const stoneColor = candidate.masterBeastSpiritStoneColor;
+  const classSkillVersions = normalizeClassSkillVersions(candidate.classSkillVersions);
   return {
     schemaVersion: 3, Job: candidate.Job, values,
     lowerwearAlternativeEnabled: candidate.lowerwearAlternativeEnabled === true,
@@ -194,6 +197,7 @@ function parseState(raw: string | null): LoadoutState | null {
     // Missing toggle values preserve the previous always-on behavior.
     petSkillAttackEnabled: candidate.petSkillAttackEnabled !== false,
     transcendenceSkillDamageSharePct: normalizeTranscendenceSkillDamageShare(candidate.transcendenceSkillDamageSharePct),
+    ...(classSkillVersions ? { classSkillVersions } : {}),
   };
 }
 export function readState(defaultClass: string): LoadoutState {

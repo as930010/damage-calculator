@@ -6,6 +6,7 @@ import { codeForFieldId, fieldIdForCode, isFieldId } from './field-ids.ts';
 import { migrateLegacyEnvironmentSelection, migrateLegacyGloveCircuitSkillDamage, normalizePortraitAwakeningSplit, normalizeTranscendenceSkillDamageShare, type LoadoutState } from './state.ts';
 import { canonicalizeNumber } from './numeric-input.ts';
 import { normalizeOptionalEffectValues, isUnrelatedEffectValue } from './state.ts';
+import { normalizeClassSkillVersions } from '../calculation/class-skill-versions.ts';
 
 type TransferData = CatalogData;
 type JsonRecord = Record<string, unknown>;
@@ -104,6 +105,7 @@ export function serializeLoadout(state: LoadoutState, data: TransferData, suppli
     values[String(fieldCode)] = transferValue;
   }
 
+  const classSkillVersions = normalizeClassSkillVersions(state.classSkillVersions);
   const payload = {
     format: 'damage-calculator-loadout',
     formatVersion: 3,
@@ -118,6 +120,7 @@ export function serializeLoadout(state: LoadoutState, data: TransferData, suppli
     masterBeastSpiritStoneColor: state.masterBeastSpiritStoneColor,
     petSkillAttackEnabled: state.petSkillAttackEnabled,
     transcendenceSkillDamageSharePct: normalizeTranscendenceSkillDamageShare(state.transcendenceSkillDamageSharePct),
+    ...(classSkillVersions ? { classSkillVersions } : {}),
   };
   return { json: `${JSON.stringify(payload)}\n`, omittedFields };
 }
@@ -191,7 +194,8 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
       }
       const choices = index.resolveFieldChoices(fieldId, optionValues);
       if (choices) {
-        if (choices.some(option => String(option) === String(normalizedValue))) values[fieldId] = normalizedValue;
+        if (normalizedValue === 0 && isUnrelatedEffectValue(fieldId, optionValues, index)
+          || choices.some(option => String(option) === String(normalizedValue))) values[fieldId] = normalizedValue;
         else clearedFields.push(fieldId);
       } else values[fieldId] = normalizedValue;
     }
@@ -291,6 +295,14 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
   if (migrateLegacyEnvironmentSelection(values) === 'removed') clearedFields.push('Effect.Environment');
   normalizeOptionalEffectValues(values, index);
 
+  const classSkillVersions = normalizeClassSkillVersions(candidate.classSkillVersions);
+  if (candidate.classSkillVersions !== undefined) {
+    if (!isRecord(candidate.classSkillVersions)) clearedFields.push('職業技能版本');
+    else for (const [key, value] of Object.entries(candidate.classSkillVersions)) {
+      if (classSkillVersions?.[key] !== value) clearedFields.push('classSkillVersions.' + key);
+    }
+  }
+
   const uniqueCleared = [...new Set(clearedFields)];
   return {
     state: {
@@ -301,6 +313,7 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
       masterBeastSpiritStoneColor,
       petSkillAttackEnabled,
       transcendenceSkillDamageSharePct,
+      ...(classSkillVersions ? { classSkillVersions } : {}),
     },
     clearedFields: uniqueCleared,
   };

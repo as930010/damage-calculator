@@ -256,3 +256,31 @@ test("malformed JSON and unsupported format versions are rejected", () => {
   assert.throws(() => parseLoadoutJson("{broken", state, data), /不是有效的 JSON/);
   assert.throws(() => parseLoadoutJson(JSON.stringify({ format: "damage-calculator-loadout", formatVersion: 99 }), state, data), /不支援/);
 });
+
+test('unrelated effect zero values round-trip without false warnings while invalid values remain reported', () => {
+  const source = { ...state, Job: 'FP', values: {}, classSkillVersions: { 'FP.FatalShotConverted': false } };
+  normalizeOptionalEffectValues(source.values, catalogIndex);
+  const custom = 'MasterBeast.Head.CustomValue';
+  const transform = data.nephronArmor.fields[0].transformFields[0];
+  const validOption = data.nephronArmor.transformations.find(option => option.statKey);
+  source.values[transform.attributeCell] = validOption.name;
+  source.values[transform.valueCell] = validOption.tierValuesPct[0] / 100;
+  const exported = serializeLoadout(source, data, catalogIndex);
+  assert.deepEqual(exported.omittedFields, []);
+  const imported = parseLoadoutJson(exported.json, state, data, catalogIndex);
+  assert.deepEqual(imported.clearedFields, []);
+  assert.deepEqual(imported.state.values, source.values);
+  assert.deepEqual(imported.state.classSkillVersions, source.classSkillVersions);
+  assert.equal(serializeLoadout(imported.state, data, catalogIndex).json, exported.json);
+
+  const invalid = JSON.parse(exported.json);
+  invalid.values[String(codeForFieldId(custom))] = 0.5;
+  invalid.values[String(codeForFieldId(transform.valueCell))] = 999;
+  invalid.classSkillVersions.unknown = true;
+  const rejected = parseLoadoutJson(JSON.stringify(invalid), state, data, catalogIndex);
+  assert.ok(rejected.clearedFields.includes(custom));
+  assert.ok(rejected.clearedFields.includes(transform.valueCell));
+  assert.ok(rejected.clearedFields.includes('classSkillVersions.unknown'));
+  assert.equal(rejected.state.values[custom], 0);
+  assert.equal(rejected.state.values[transform.attributeCell], validOption.name);
+});

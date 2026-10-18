@@ -1,5 +1,6 @@
 import { getEquipmentOptionName } from '../calculation/equipment-catalog.ts';
 import { getClassEffects } from '../calculation/class-effects.ts';
+import { applyClassSkillVersions, getClassSkillVersionOptions, isClassSkillVersionEnabled } from '../calculation/class-skill-versions.ts';
 import { type AccessoryEffectOption } from '../calculation/equipment-effects.ts';
 import { loadGameData, readJson, escapeHtml as h, formatNumber as fmt } from './data.ts';
 import { readState, readBaseline, saveState, migrateLegacyEnvironmentSelection, migrateLegacyGloveCircuitSkillDamage as migrateGloveCircuit, migrateLegacyPortraitAwakening as migratePortrait, normalizePortraitAwakeningValues as normalizePortraitValues, normalizeTranscendenceSkillDamageShare, parseTranscendenceSkillDamageShareInput, type LoadoutState } from './state.ts';
@@ -1770,7 +1771,7 @@ async function start() {
       if (!currentCombatRates) return `<details class="stat"><summary><span>${h(label)}</span><strong>待補輸入</strong></summary><div class="stat-details"><p class="input-hint">${h(calculationIssue(damageCalculationError))}</p></div></details>`;
       const rate = currentCombatRates[attribute];
       const stat = current.stats[statKey];
-      const classDiminishing = getClassEffects(data.classCombatEffects, currentCombatRates.classId, attribute)
+      const classDiminishing = getClassEffects(applyClassSkillVersions(data.classCombatEffects, state.Job, state.classSkillVersions), currentCombatRates.classId, attribute)
         .filter(effect => effect.method === 'diminishing');
       const classRows = classDiminishing.map(effect =>
         `<p class="stat-source-row"><span>${h(sourceLabel(effect.sourceId))}（${h(effect.id)}）</span><strong>+${fmt(effect.valuePct)}%</strong></p>`,
@@ -1894,18 +1895,43 @@ async function start() {
   }
   let classPickerControl: HTMLElement | undefined;
   let classPickerError: HTMLElement | undefined;
+  const classSkillVersionRoot = document.createElement('div');
+  classSkillVersionRoot.className = 'class-skill-versions';
+  const renderClassSkillVersions = () => {
+    const options = getClassSkillVersionOptions(state.Job);
+    if (classSkillVersionRoot.dataset.classId !== state.Job) {
+      classSkillVersionRoot.dataset.classId = state.Job;
+      classSkillVersionRoot.replaceChildren();
+      for (const option of options) {
+        const label = document.createElement('label'); label.className = 'toggle';
+        const input = document.createElement('input'); input.type = 'checkbox';
+        input.dataset.classSkillVersion = option.id;
+        input.addEventListener('change', () => {
+          state.classSkillVersions = { ...state.classSkillVersions, [option.id]: input.checked };
+          update();
+        });
+        label.append(input, document.createTextNode(option.label));
+        classSkillVersionRoot.append(label);
+      }
+    }
+    classSkillVersionRoot.hidden = !options.length;
+    for (const option of options) {
+      classSkillVersionRoot.querySelector<HTMLInputElement>(`input[data-class-skill-version="${option.id}"]`)!.checked = isClassSkillVersionEnabled(option, state.classSkillVersions);
+    }
+  };
   const renderClassPicker = () => {
     const root = document.querySelector<HTMLElement>('#class-picker')!;
     if (classPickerControl && classPickerError) {
       updatePicker(classPickerControl, state.Job, true);
       classPickerError.textContent = ''; classPickerError.hidden = true;
+      renderClassSkillVersions();
       return;
     }
     const error = document.createElement('span');
     error.className = 'input-hint class-picker-error';
     error.hidden = true;
     error.setAttribute('role', 'alert');
-    const picker = createPicker('職業', classPickerChoices, state.Job, value => { state.Job = value; error.textContent = ''; error.hidden = true; update(); }, {
+    const picker = createPicker('職業', classPickerChoices, state.Job, value => { state.Job = value; error.textContent = ''; error.hidden = true; renderClassSkillVersions(); update(); }, {
       sanitize: sanitizeClassCode,
       resolve: catalogIndex.resolveActiveClassCode,
       onInvalid: value => { error.textContent = value ? '查無此職業代碼，請確認後再按 Enter。' : '請輸入職業代碼。'; error.hidden = false; },
@@ -1915,7 +1941,8 @@ async function start() {
     const input = picker.querySelector<HTMLInputElement>('input');
     if (input) input.placeholder = '輸入職業代碼（例如 DaB）';
     classPickerControl = picker; classPickerError = error;
-    root.replaceChildren(picker, error);
+    root.replaceChildren(picker, error, classSkillVersionRoot);
+    renderClassSkillVersions();
   };
   renderClassPicker();
   renderSkillDamageShare();
@@ -1965,7 +1992,7 @@ async function start() {
     Object.assign(state, snapshot);
     // Public/legacy samples may omit these settings. A complete snapshot restore
     // must not retain properties that a later import added to the same object.
-    for (const key of ['masterBeastSpiritStoneColor', 'petSkillAttackEnabled'] as const) {
+    for (const key of ['masterBeastSpiritStoneColor', 'petSkillAttackEnabled', 'classSkillVersions'] as const) {
       if (!Object.hasOwn(snapshot, key)) delete (state as Partial<LoadoutState>)[key];
     }
     refreshConfigurationUi();
@@ -2049,6 +2076,7 @@ async function start() {
       if (request !== importRequest) return;
       const imported = parseLoadoutJson(json, state, data, catalogIndex);
       Object.assign(state, imported.state);
+      if (!Object.hasOwn(imported.state, 'classSkillVersions')) delete state.classSkillVersions;
       migrateLegacyPortraitAwakening(state);
       normalizePortraitAwakeningValues(state);
       const duplicateTransformationCells = clearDuplicateTransformationChoices(state);

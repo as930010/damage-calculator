@@ -159,6 +159,7 @@ footer{position:relative; isolation:isolate; overflow:hidden; display:flex; flex
 .picker-control>.picker-list.opens-above{top:auto;bottom:100%}
 
 .class-picker-error[hidden]{display:none}
+.class-skill-versions .toggle{margin-top:4px;font-size:12px}
 
 /* Shared toolbar layout: controls and actions wrap as complete functional groups. */
 .toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;min-width:0;margin:0 0 22px;padding:8px 10px}

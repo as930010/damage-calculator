@@ -6,6 +6,7 @@ import { resolveAccessoryEffectOptions, resolveArmorAppraisals, resolveAtmaSetEf
 import type { AttributeRule, CharacterAttributeResult, StatContribution } from "../calculation/types.ts";
 import { calculateLoadoutCombatRates, prepareLoadoutAttributes, evaluatePreparedLoadout } from "../calculation/loadout-engine.ts";
 import { resolveClassDamagePassiveContributions } from "../calculation/class-damage-passives.ts";
+import { applyClassSkillVersions } from '../calculation/class-skill-versions.ts';
 import type { GameData } from "./data.ts";
 import { DEFAULT_TRANSCENDENCE_SKILL_DAMAGE_SHARE_PCT, normalizePortraitAwakeningSplit, type LoadoutState } from "./state.ts";
 import { readCircuitBoardRows, validateCircuitBoardRows, type CircuitBoardRow } from "./circuit-board-rows.ts";
@@ -284,7 +285,7 @@ function combatRateInputs(data: GameData, state: LoadoutState, attributes: Chara
   };
   return {
     classId: job.id,
-    classCombatEffects: data.classCombatEffects,
+    classCombatEffects: applyClassSkillVersions(data.classCombatEffects, job.id, state.classSkillVersions),
     baseCritRatePct: attributes.stats.critRatePct?.finalTotal ?? 0,
     baseExtremizationPct: attributes.stats.extremizationPct?.finalTotal ?? 0,
     combatRateSourceRules: data.combatRateSources,
@@ -322,7 +323,7 @@ function damageInputs(data: GameData, state: LoadoutState, attributes: Character
     sources: sources.sources,
     attackParameters: data.attack,
     weaponEnhancementLevel: weaponLevel,
-    classCombatEffects: data.classCombatEffects,
+    classCombatEffects: rateInputs.classCombatEffects,
     classDamagePassives: data.classDamagePassives,
     combatRateSourceRules: data.combatRateSources,
     combatRateSourceValues: rateInputs.combatRateSourceValues,

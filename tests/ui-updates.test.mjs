@@ -17,6 +17,65 @@ function selectPicker(page, label, value) {
   assert.ok(row, value); row.click();
 }
 
+test('FP skill versions change only the 10% diminishing crit effect and preserve legacy results', async () => {
+  const runtime = await createRuntime();
+  const { evaluateLoadout } = await runtime.load('frontend/projection.ts');
+  const { applyClassSkillVersions } = await runtime.load('calculation/class-skill-versions.ts');
+  const state = { ...structuredClone(stateA), Job: 'FP' };
+  const before = evaluateLoadout(gameData, state);
+  const enabled = evaluateLoadout(gameData, { ...state, classSkillVersions: { 'FP.FatalShotConverted': true } });
+  const disabled = evaluateLoadout(gameData, { ...state, classSkillVersions: { 'FP.FatalShotConverted': false } });
+  assert.deepEqual(JSON.parse(JSON.stringify(enabled)), JSON.parse(JSON.stringify(before)));
+  assert.ok(before.damage); assert.ok(disabled.damage);
+  assert.equal(before.combatRates.critRate.diminishingAddedPct - disabled.combatRates.critRate.diminishingAddedPct, 10);
+  for (const value of [before, enabled, disabled]) {
+    const passive = value.combatRates.critRate.nonDiminishingSources.find(source => source.sourceId === 'FP:critRate:crit-2');
+    assert.equal(passive.valuePct, 15);
+  }
+  assert.deepEqual(JSON.parse(JSON.stringify(before.combatRates.extremization)), JSON.parse(JSON.stringify(disabled.combatRates.extremization)));
+  assert.equal(gameData.classCombatEffects.classes.FP.critRate.length, 2, 'static class data is unchanged');
+  assert.equal(applyClassSkillVersions(gameData.classCombatEffects, 'KE', { 'FP.FatalShotConverted': false }), gameData.classCombatEffects);
+});
+
+test('FP skill checkbox preserves sources, history, baseline, JSON round-trip and reload', async () => {
+  const page = await uiPage({ ...structuredClone(stateA), Job: 'FP' });
+  let reloaded;
+  const checkbox = target => target.dom.window.document.querySelector('input[data-class-skill-version="FP.FatalShotConverted"]');
+  const critCard = () => page.dom.window.document.querySelector('.combat-rate-pair details');
+  try {
+    assert.equal(checkbox(page).checked, true);
+    assert.equal(checkbox(page).parentElement.textContent, '致命神槍是否轉換');
+    assert.equal(checkbox(page).closest('#class-picker') !== null, true);
+    assert.match(critCard().textContent, /crit-1/);
+    await workloadActions.baseline(page);
+    checkbox(page).checked = false;
+    checkbox(page).dispatchEvent(new page.dom.window.Event('change', { bubbles: true }));
+    assert.equal(page.readState().classSkillVersions['FP.FatalShotConverted'], false);
+    assert.doesNotMatch(critCard().textContent, /crit-1/);
+    assert.match(critCard().textContent, /\+15%/);
+    const disabledHtml = critCard().innerHTML;
+    await workloadActions.undo(page); assert.equal(checkbox(page).checked, true);
+    await workloadActions.redo(page); assert.equal(checkbox(page).checked, false);
+    await workloadActions.restore(page); assert.equal(checkbox(page).checked, true);
+    await workloadActions.undo(page); assert.equal(checkbox(page).checked, false);
+    const exported = await page.exportJson();
+    assert.equal(exported.classSkillVersions['FP.FatalShotConverted'], false);
+    await page.importJson(JSON.stringify(exported));
+    assert.doesNotMatch(page.dom.window.document.querySelector('#transfer-status').textContent, /已留空/);
+    assert.equal(checkbox(page).checked, false);
+    assert.equal(critCard().innerHTML, disabledHtml);
+    reloaded = await uiPage(page.readState());
+    assert.equal(checkbox(reloaded).checked, false);
+    assert.equal(reloaded.dom.window.document.querySelector('.combat-rate-pair details').innerHTML, disabledHtml);
+    selectPicker(page, '職業', 'KE'); assert.equal(checkbox(page), null);
+    selectPicker(page, '職業', 'FP'); assert.equal(checkbox(page).checked, false);
+    const legacy = { ...exported }; delete legacy.classSkillVersions;
+    await page.importJson(JSON.stringify(legacy));
+    assert.equal(checkbox(page).checked, true, 'legacy import replaces a prior unchecked setting with the default');
+    assert.match(critCard().textContent, /crit-1/);
+  } finally { page.close(); reloaded?.close(); }
+});
+
 const mirrorAttributeCell = 'MasterBeast.Head.Mirror.1.Attribute';
 const mirrorValueCell = 'MasterBeast.Head.Mirror.1.Value';
 const mirrorInput = page => page.dom.window.document.querySelector('.beast-mirror-grid .field > input');
