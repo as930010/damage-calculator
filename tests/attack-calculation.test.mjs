@@ -16,11 +16,11 @@ test('攻擊公式使用角色選擇的物／魔屬性，武器基值不再收�
     doubleAttackPct: 0, skillTypeAttackPct: 0, attackLevel: 0, ...resolved,
   });
   assert.equal(result.attackType, 'magical');
-  assert.equal(result.c53, Math.floor(0.85 * 400 - 0.7775 * 400 + (0.15 * 400 - 0.0225 * 400) * 149 + 0.5) * 3.35);
-  assert.equal(result.lowerDamage, Math.floor(1202 - 0.55 * result.d53));
-  assert.equal(result.upperDamage, Math.floor(1202 + 0.55 * result.d53));
+  assert.equal(result.weaponPhysicalAttack, Math.floor(0.85 * 400 - 0.7775 * 400 + (0.15 * 400 - 0.0225 * 400) * 149 + 0.5) * 3.35);
+  assert.equal(result.lowerDamage, Math.floor(1202 - 0.55 * result.weaponMagicalAttack));
+  assert.equal(result.upperDamage, Math.floor(1202 + 0.55 * result.weaponMagicalAttack));
 });
-test('B163 對倍率、關卡懲罰及 150% 暴傷基準逐因子保留計算', () => {
+test('最終傷害對倍率、關卡懲罰及 150% 暴傷基準逐因子保留計算', () => {
   const damage = calculateFinalDamage({
     lowerDamage: 10000, upperDamage: 12000, critRate: 0.5, extremizationRate: 0.25,
     critDamagePct: 150, classCritDamagePassivePct: 30, multiplicativeCritDamageOffset: 0.797295,
@@ -82,7 +82,7 @@ test('超越技傷占比輸入只接受 0–100、最多兩位小數的純數字
 
 test('150% 基底乘上暴上 +10% 後的乘算暴傷增幅為 15 個百分點', () => {
   const result = calculateProductStat([
-    { sourceId: 'sheet:計算機!T101', valuePct: 10 },
+    { sourceId: 'fixed-effect:red-upper-crit-damage', valuePct: 10 },
     { sourceId: 'character-base:crit-damage-product', valuePct: 50 },
   ], 150);
   assert.ok(Math.abs(result.value - 0.15) < 1e-12);

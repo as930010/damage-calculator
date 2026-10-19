@@ -35,9 +35,9 @@ async function loadData() {
 function enableSelectedAccessoryAppraisals(data, values) {
   const catalog = data.catalogs['equipment/accessories.json'];
   for (const group of data.accessoryEffects.groups) {
-    const name = values[group.selectionCell];
+    const name = values[group.selectionField];
     const item = catalog.items.find(entry => entry.slotId === group.slotId && entry.name === name);
-    if (item) item.appraisal = { canAppraise: true, effectCount: group.inputCells.length };
+    if (item) item.appraisal = { canAppraise: true, effectCount: group.inputFields.length };
   }
 }
 
@@ -100,7 +100,7 @@ test('內裝左四件強化 Lv.8 至 Lv.13 的四種效果正確套用', async (
   }
 });
 
-test('JSON 選擇的全域來源進入角色彙總與 B163 傷害流程', async () => {
+test('JSON 選擇的全域來源進入角色彙總與最終傷害流程', async () => {
   const data = await loadData();
   const baseValues = { "Weapon.ENHC": 'Lv.8', "Left.Armor.Upper.ENHC": 'Lv.8', "Left.Armor.Bottom.ENHC": 'Lv.8', "Left.Armor.Gloves.ENHC": 'Lv.8', "Left.Armor.Shoes.ENHC": 'Lv.8', "Left.Armor.Upper.FORGE": 0, "Left.Armor.Bottom.FORGE": 0, "Left.Armor.Gloves.FORGE": 0, "Left.Armor.Shoes.FORGE": 0 };
   const base = projectDamage(data, { schemaVersion: 2, Job: 'KE', values: baseValues, lowerwearAlternativeEnabled: false }).result;
@@ -309,7 +309,7 @@ test('戒指B的強烈技術戒指、通用技術戒指效果與互斥欄位正�
   });
 
   const ringBSelections = data.mapping.selections.filter(entry => entry.slotId === 'ringB');
-  assert.deepEqual(ringBSelections.map(entry => entry.selectionCell), ['Accessory.Ring2']);
+  assert.deepEqual(ringBSelections.map(entry => entry.selectionField), ['Accessory.Ring2']);
   const ringBInput = data.simulatorInputs.inputs.find(entry => entry.fieldIds.includes('Accessory.Ring2'));
   const ringBOptionCatalog = data.simulatorInputs.catalogs.find(entry => entry.id === ringBInput?.catalogId);
   assert.ok(ringBOptionCatalog?.options.some(option => option.value === '強烈的技術戒指'));
@@ -437,15 +437,15 @@ test('大師聖獸固定效果、各顏色的精靈石套效與五種潛力來�
   assert.equal(setStoneFactor(yellow), 1.04);
   assert.equal(setStoneFactor(green), 1.04);
   assert.equal(yellow.attributes.stats.doubleAttackPct.finalTotal - green.attributes.stats.doubleAttackPct.finalTotal, 0);
-  assert.equal(yellow.attributes.stats.doubleAttackPct.sharedSources.find(source => source.sourceId === 'sheet:計算機!E76').valuePct, 3);
+  assert.equal(yellow.attributes.stats.doubleAttackPct.sharedSources.find(source => source.sourceId === 'fixed-effect:master-beast').valuePct, 3);
   assert.equal(yellow.attributes.stats.bossDamagePct.finalTotal - green.attributes.stats.bossDamagePct.finalTotal, 0);
   assert.equal(yellow.attributes.stats.bossDamagePct.sharedSources.find(source => source.sourceId === 'master-beast-potential:bossDamagePct').valuePct, 15);
   assert.equal(green.attributes.stats.doubleAttackPct.finalTotal, empty.attributes.stats.doubleAttackPct.finalTotal);
   assert.equal(green.attributes.stats.bossDamagePct.finalTotal - empty.attributes.stats.bossDamagePct.finalTotal, 15);
-  assert.ok(yellow.combatRates.critRate.multipliers.some(source => source.sourceId === 'sheet:計算機!B77' && source.factor === 1.08));
-  assert.ok(yellow.combatRates.extremization.multipliers.some(source => source.sourceId === 'sheet:計算機!B77' && source.factor === 1.08));
-  assert.ok(!green.combatRates.critRate.multipliers.some(source => source.sourceId === 'sheet:計算機!B77'));
-  assert.ok(!green.combatRates.extremization.multipliers.some(source => source.sourceId === 'sheet:計算機!B77'));
+  assert.ok(yellow.combatRates.critRate.multipliers.some(source => source.sourceId === 'combat-rate:yellow-beast-stone' && source.factor === 1.08));
+  assert.ok(yellow.combatRates.extremization.multipliers.some(source => source.sourceId === 'combat-rate:yellow-beast-stone' && source.factor === 1.08));
+  assert.ok(!green.combatRates.critRate.multipliers.some(source => source.sourceId === 'combat-rate:yellow-beast-stone'));
+  assert.ok(!green.combatRates.extremization.multipliers.some(source => source.sourceId === 'combat-rate:yellow-beast-stone'));
   assert.ok(resolveMasterBeastEffects(data.masterBeast, { overallOption: 'Boss傷害+15%' })
     .some(source => source.sourceId === 'master-beast-potential:bossDamagePct' && source.stats.bossDamagePct === 15));
 });
@@ -516,14 +516,14 @@ test('單技傷電路板、芯片、武器變換、共鳴、聖獸與賦靈錄�
   const skillBoard = data.circuits.inputs.find(entry => entry.slot === 'gloves');
   assert.deepEqual(skillBoard.attributeOptions[0], '單技傷%');
   const boardResult = projectDamage(data, { ...baseState, values: {
-    ...baseValues, [skillBoard.attributeCell]: '單技傷%', [skillBoard.valueCell]: 0.05,
+    ...baseValues, [skillBoard.attributeField]: '單技傷%', [skillBoard.valueField]: 0.05,
   } }).result;
   assert.equal(boardResult.attributes.stats.strongSkillDamagePct.finalTotal - baseline.attributes.stats.strongSkillDamagePct.finalTotal, 5);
   assert.equal(boardResult.attributes.stats.transcendenceSkillDamagePct.finalTotal - baseline.attributes.stats.transcendenceSkillDamagePct.finalTotal, 5);
 
   const chipSlot = data.chipSlots.slots.find(entry => entry.id === 'upper');
   const chipResult = projectDamage(data, { ...baseState, values: {
-    ...baseValues, [chipSlot.attributeCell]: '強烈技傷%', [chipSlot.tuningCell]: '+8',
+    ...baseValues, [chipSlot.attributeField]: '強烈技傷%', [chipSlot.tuningField]: '+8',
   } }).result;
   assert.equal(chipResult.attributes.stats.strongSkillDamagePct.finalTotal - baseline.attributes.stats.strongSkillDamagePct.finalTotal, 9);
   const strongChip = data.chips.chips.find(entry => entry.name === '強烈技傷%');
@@ -532,7 +532,7 @@ test('單技傷電路板、芯片、武器變換、共鳴、聖獸與賦靈錄�
 
   const weaponTransform = data.transformations.slots[0];
   const weaponResult = projectDamage(data, { ...baseState, values: {
-    ...baseValues, [weaponTransform.choiceCell]: '強烈技傷%', [weaponTransform.valueCell]: 0.05,
+    ...baseValues, [weaponTransform.choiceField]: '強烈技傷%', [weaponTransform.valueField]: 0.05,
   } }).result;
   assert.equal(weaponResult.attributes.stats.strongSkillDamagePct.finalTotal - baseline.attributes.stats.strongSkillDamagePct.finalTotal, 5);
 
@@ -586,8 +586,8 @@ test('極度緩慢彈匣各等級獨立乘算、不增加加算技傷，並遵�
       'Weapon.ENHC': 'Lv.12',
       'Left.Armor.Bottom.ENHC': 'Lv.10', 'Left.Armor.Shoes.ENHC': 'Lv.10',
       'Left.Armor.Bottom.FORGE': 0, 'Left.Armor.Shoes.FORGE': 0,
-      [upper.typeCell]: '內布隆', [upper.enhancementCell]: 'Lv.10', [upper.forgingCell]: 0,
-      [gloves.typeCell]: '內布隆', [gloves.enhancementCell]: 'Lv.10', [gloves.forgingCell]: 0,
+      [upper.typeField]: '內布隆', [upper.enhancementField]: 'Lv.10', [upper.forgingField]: 0,
+      [gloves.typeField]: '內布隆', [gloves.enhancementField]: 'Lv.10', [gloves.forgingField]: 0,
     },
   };
   const base = projectDamage(data, baseState);
@@ -602,19 +602,19 @@ test('極度緩慢彈匣各等級獨立乘算、不增加加算技傷，並遵�
   };
   for (const [index, amount] of [0.5, 1, 1.5, 2, 2.5, 3].entries()) {
     const current = check({
-      [upperMagazine.magazineCell]: magazine.name,
-      [upperMagazine.magazineLevelCell]: 'Lv.' + (index + 1),
+      [upperMagazine.magazineField]: magazine.name,
+      [upperMagazine.magazineLevelField]: 'Lv.' + (index + 1),
     }, 1 + amount / 100);
     assert.equal(current.result.generalMultiplicativeDamage.factors.find(entry =>
       entry.sourceId === `nephron-magazine:upper:super-extreme-slow:Lv.${index + 1}`).valuePct, amount);
   }
   const duplicate = {
-    [upperMagazine.magazineCell]: magazine.name, [upperMagazine.magazineLevelCell]: 'Lv.5',
-    [glovesMagazine.magazineCell]: magazine.name, [glovesMagazine.magazineLevelCell]: 'Lv.6',
+    [upperMagazine.magazineField]: magazine.name, [upperMagazine.magazineLevelField]: 'Lv.5',
+    [glovesMagazine.magazineField]: magazine.name, [glovesMagazine.magazineLevelField]: 'Lv.6',
   };
   assert.throws(() => projectDamage(data, { ...baseState, values: { ...baseState.values, ...duplicate } }), /相同名稱的彈匣不可重複/);
-  check({ ...duplicate, [glovesMagazine.magazineCell]: '支援彈匣I', [glovesMagazine.magazineLevelCell]: 'Lv.1' }, 1.025);
-  check({ ...duplicate, [upperMagazine.magazineCell]: '', [upperMagazine.magazineLevelCell]: '' }, 1.03);
+  check({ ...duplicate, [glovesMagazine.magazineField]: '支援彈匣I', [glovesMagazine.magazineLevelField]: 'Lv.1' }, 1.025);
+  check({ ...duplicate, [upperMagazine.magazineField]: '', [upperMagazine.magazineLevelField]: '' }, 1.03);
 });
 
 test('Nephron selects independent armor types, fifth magic stone, conversion, and magazine in the computed source groups', async () => {
@@ -622,16 +622,16 @@ test('Nephron selects independent armor types, fifth magic stone, conversion, an
   const upper = data.innerwear.slots.find(entry => entry.id === 'upper');
   const lower = data.innerwear.slots.find(entry => entry.id === 'lowerwear');
   const innerwearLayout = data.layout.slots.filter(entry => entry.innerwearId);
-  const stoneCell = data.layout.slots.find(entry => entry.innerwearId === 'upper').stoneCells[4];
+  const stoneField = data.layout.slots.find(entry => entry.innerwearId === 'upper').stoneFields[4];
   const stone = data.catalogs['equipment/magic-stones.json'].items.find(entry => entry.active && entry.name === '狩獵 B傷');
   const transform = data.nephronArmor.transformations.find(entry => entry.id === 'enhancement-double-attack');
   const fields = data.nephronArmor.fields.find(entry => entry.slotId === 'upper');
   const values = {
-    [upper.typeCell]: '內布隆', [lower.typeCell]: '百億', [upper.enhancementCell]: 'Lv.10', [upper.forgingCell]: 21,
-    [fields.transformFields[0].attributeCell]: transform.name,
-    [fields.transformFields[0].valueCell]: String(transform.tierValuesPct[9] / 100),
-    [fields.magazineCell]: '戰鬥彈匣Type - I', [fields.magazineLevelCell]: 'Lv.3',
-    [stoneCell]: stone.targetApplications.armor.sourceName,
+    [upper.typeField]: '內布隆', [lower.typeField]: '百億', [upper.enhancementField]: 'Lv.10', [upper.forgingField]: 21,
+    [fields.transformFields[0].attributeField]: transform.name,
+    [fields.transformFields[0].valueField]: String(transform.tierValuesPct[9] / 100),
+    [fields.magazineField]: '戰鬥彈匣Type - I', [fields.magazineLevelField]: 'Lv.3',
+    [stoneField]: stone.targetApplications.armor.sourceName,
   };
   const state = { schemaVersion: 3, Job: 'KE', values, lowerwearAlternativeEnabled: false };
   const projected = projectAttributes(data, state);
@@ -639,15 +639,15 @@ test('Nephron selects independent armor types, fifth magic stone, conversion, an
   assert.ok(upperSource);
   assert.equal(upperSource.stats.bossDamagePct, 5);
   assert.equal(upperSource.stats.multiplicativeDamagePct, 12);
-  assert.equal(upperSource.stats.physicalAttack - resolveInnerwearSources(data.innerwear, data.attack, 'KE', { ...values, [upper.forgingCell]: 0 }, false).shared.find(entry => entry.sourceId === 'innerwear:upper').stats.physicalAttack, 2500);
+  assert.equal(upperSource.stats.physicalAttack - resolveInnerwearSources(data.innerwear, data.attack, 'KE', { ...values, [upper.forgingField]: 0 }, false).shared.find(entry => entry.sourceId === 'innerwear:upper').stats.physicalAttack, 2500);
   assert.deepEqual(projected.calculationSources.shared.find(entry => entry.sourceId === 'nephron-transform:upper:1').stats, { doubleAttackPct: 2 });
   assert.deepEqual(projected.calculationSources.shared.find(entry => entry.sourceId === 'nephron-magazine:upper:combat-type-i:Lv.3').stats, { bleedDamagePct: 1.5 });
-  assert.deepEqual(projected.calculationSources.shared.find(entry => entry.sourceId === `simulator:${stoneCell}`).stats, { bossDamagePct: 2.5 });
-  assert.equal(data.innerwear.slots.filter(entry => entry.typeCell).length, 5);
-  assert.equal(new Set(data.innerwear.slots.map(entry => entry.typeCell)).size, 5);
-  for (const layoutSlot of innerwearLayout) assert.equal(layoutSlot.stoneCells.length, 5, layoutSlot.innerwearId);
-  assert.equal(values[upper.typeCell], '內布隆');
-  assert.equal(values[lower.typeCell], '百億');
+  assert.deepEqual(projected.calculationSources.shared.find(entry => entry.sourceId === `simulator:${stoneField}`).stats, { bossDamagePct: 2.5 });
+  assert.equal(data.innerwear.slots.filter(entry => entry.typeField).length, 5);
+  assert.equal(new Set(data.innerwear.slots.map(entry => entry.typeField)).size, 5);
+  for (const layoutSlot of innerwearLayout) assert.equal(layoutSlot.stoneFields.length, 5, layoutSlot.innerwearId);
+  assert.equal(values[upper.typeField], '內布隆');
+  assert.equal(values[lower.typeField], '百億');
 });
 
 test('mixed Nephron and Billion keep shared innerwear bonuses, set effects, circuits, and chips', async () => {
@@ -656,25 +656,25 @@ test('mixed Nephron and Billion keep shared innerwear bonuses, set effects, circ
   const byId = Object.fromEntries(data.innerwear.slots.map(slot => [slot.id, slot]));
   for (const [id, type] of [['upper', '內布隆'], ['lowerwear', '百億'], ['gloves', '內布隆'], ['shoes', '百億']]) {
     const slot = byId[id];
-    values[slot.typeCell] = type;
-    values[slot.enhancementCell] = 'Lv.11';
-    values[slot.forgingCell] = id === 'upper' ? 21 : 0;
+    values[slot.typeField] = type;
+    values[slot.enhancementField] = 'Lv.11';
+    values[slot.forgingField] = id === 'upper' ? 21 : 0;
   }
   const upperCircuit = data.circuits.inputs.find(entry => entry.slot === 'upper');
-  values[upperCircuit.attributeCell] = '流血%';
-  values[upperCircuit.valueCell] = 0.01;
+  values[upperCircuit.attributeField] = '流血%';
+  values[upperCircuit.valueField] = 0.01;
   const upperChip = data.chipSlots.slots.find(entry => entry.id === 'upper');
   const bleedChip = data.chips.chips.find(entry => entry.name === '流血%');
-  values[upperChip.attributeCell] = bleedChip.name;
-  values[upperChip.tuningCell] = '+5';
+  values[upperChip.attributeField] = bleedChip.name;
+  values[upperChip.tuningField] = '+5';
 
   const state = { schemaVersion: 3, Job: 'KE', values, lowerwearAlternativeEnabled: false };
   const projection = projectAttributes(data, state);
   const shared = projection.calculationSources.shared;
-  assert.deepEqual(shared.find(entry => entry.sourceId === 'sheet:計算機!Q37').stats, { adaptabilityPct: 2 });
+  assert.deepEqual(shared.find(entry => entry.sourceId === 'fixed-effect:raid-set').stats, { adaptabilityPct: 2 });
   assert.equal(shared.find(entry => entry.sourceId === 'innerwear:upper').stats.adaptabilityPct, 4);
   assert.equal(shared.find(entry => entry.sourceId === 'innerwear:gloves').stats.adaptabilityPct, 2);
-  assert.deepEqual(shared.find(entry => entry.sourceId === 'sheet:計算機!T101').stats, { multiplicativeCritDamagePct: 10 });
+  assert.deepEqual(shared.find(entry => entry.sourceId === 'fixed-effect:red-upper-crit-damage').stats, { multiplicativeCritDamagePct: 10 });
   assert.deepEqual(shared.find(entry => entry.sourceId === 'color-set:紅').stats, { multiplicativeDamagePct: 20 });
   assert.deepEqual(shared.find(entry => entry.sourceId === 'circuit-board:upper').stats, { bleedDamagePct: 1 });
   assert.deepEqual(shared.find(entry => entry.sourceId === 'chip:upper').stats, { bleedDamagePct: 3.5 });
@@ -830,13 +830,13 @@ test('強/排褲不可將相同條件電路板效果重複計入，強者與排�
     'Left.Armor.Gloves.ENHC': 'Lv.8', 'Left.Armor.Shoes.ENHC': 'Lv.8',
     'Left.Armor.Upper.FORGE': 0, 'Left.Armor.Bottom.FORGE': 0,
     'Left.Armor.Gloves.FORGE': 0, 'Left.Armor.Shoes.FORGE': 0,
-    [lowerwear.attributeCell]: '強者%', [lowerwear.valueCell]: 0.05,
-    [alternative.attributeCell]: '強者%', [alternative.valueCell]: 0.03,
+    [lowerwear.attributeField]: '強者%', [lowerwear.valueField]: 0.05,
+    [alternative.attributeField]: '強者%', [alternative.valueField]: 0.03,
   };
   const invalidState = { schemaVersion: 3, Job: 'KE', values, lowerwearAlternativeEnabled: true };
   assert.throws(() => projectAttributes(data, invalidState), /不可同時使用「強者%」/);
 
-  const validValues = { ...values, [alternative.attributeCell]: '排熱%' };
+  const validValues = { ...values, [alternative.attributeField]: '排熱%' };
   const validState = { ...invalidState, values: validValues };
   const projected = projectDamage(data, validState).result;
   assert.ok(projected.attributes.conditionalDamage.strongerSources.some(source => source.sourceId === 'circuit-board:lowerwear' && source.valuePct === 5));
@@ -851,8 +851,8 @@ test('強/排褲不可將相同條件電路板效果重複計入，強者與排�
   const chipValues = { ...validValues };
   for (const slot of data.chipSlots.slots) {
     const attribute = slot.id === 'lowerwearAlternative' ? '排熱%' : '強者%';
-    chipValues[slot.attributeCell] = attribute;
-    chipValues[slot.tuningCell] = '+5';
+    chipValues[slot.attributeField] = attribute;
+    chipValues[slot.tuningField] = '+5';
   }
   const chipState = { ...validState, values: chipValues };
   const chipProjected = projectDamage(data, chipState).result;
@@ -866,6 +866,6 @@ test('強/排褲不可將相同條件電路板效果重複計入，強者與排�
   );
   assert.ok(Math.abs(chipProjected.finalDamage.conditionalFactor - expectedChipFactor) < 1e-12);
 
-  const invalidChipValues = { ...chipValues, [chipSlots.lowerwearAlternative.attributeCell]: '強者%' };
+  const invalidChipValues = { ...chipValues, [chipSlots.lowerwearAlternative.attributeField]: '強者%' };
   assert.throws(() => projectAttributes(data, { ...validState, values: invalidChipValues }), /下衣與強\/排褲不可同時使用.*芯片/);
 });

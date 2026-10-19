@@ -14,14 +14,14 @@ delete legacyStartup.values['Effect.PortraitAwakening.TranscendenceSkillDamagePc
 export function choiceContexts() {
   const contexts = [{ id: 'complete', values: complete.values }];
   for (const chip of [gameData.chips.chips[0], gameData.chips.chips.at(-1)]) {
-    contexts.push({ id: 'chip:' + chip.name, values: { [gameData.chipSlots.slots[0].attributeCell]: chip.name },
-      fields: [gameData.chipSlots.slots[0].tuningCell] });
+    contexts.push({ id: 'chip:' + chip.name, values: { [gameData.chipSlots.slots[0].attributeField]: chip.name },
+      fields: [gameData.chipSlots.slots[0].tuningField] });
   }
   const transform = gameData.nephronArmor.fields[0].transformFields[0];
   for (const option of gameData.nephronArmor.transformations) contexts.push({
-    id: 'nephron:' + option.name, values: { [transform.attributeCell]: option.name }, fields: [transform.valueCell],
+    id: 'nephron:' + option.name, values: { [transform.attributeField]: option.name }, fields: [transform.valueField],
   });
-  contexts.push({ id: 'no-dynamic-parent', values: {}, fields: [transform.valueCell, gameData.chipSlots.slots[0].tuningCell] });
+  contexts.push({ id: 'no-dynamic-parent', values: {}, fields: [transform.valueField, gameData.chipSlots.slots[0].tuningField] });
   return contexts;
 }
 
@@ -72,10 +72,6 @@ export function monitorCatalogData(data) {
 }
 
 export function candidateTransform(file, source) {
-  if (file === 'frontend/loadout-transfer.ts' && source.includes('function cellOptions(')) {
-    source += '\nexport { cellOptions };';
-    source = source.replace('if (address in direct)', "__count('staticChoiceArrays', Object.keys(direct).length); if (address in direct)");
-  }
   if (file === 'frontend/catalog-index.ts') source = source.replace('Object.freeze(factory())', "Object.freeze((__count('staticChoiceArrays'), factory()))");
   if (file === 'frontend/picker.ts') source = source.replace(/(function createPicker\([\s\S]*?\)\s*\{)/, '$1\n__captureChoices(label, options);');
   return source;

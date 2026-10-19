@@ -48,7 +48,7 @@ const requiredFields = {
   "data/equipment/left-ice.json": ["schemaVersion", "items"],
   "data/equipment/magic-stones.json": ["schemaVersion", "items"],
   "data/equipment/one-piece-costumes.json": ["schemaVersion", "items"],
-  "data/equipment/right-ice-set-effects.json": ["schemaVersion", "selectionCells", "maxSelectedSets", "effects"],
+  "data/equipment/right-ice-set-effects.json": ["schemaVersion", "selectionFields", "maxSelectedSets", "effects"],
   "data/equipment/right-ice.json": ["schemaVersion", "items"],
   "data/giant-magic-stones.json": ["schemaVersion", "settingKeys", "options"],
   "data/innerwear-rules.json": ["schemaVersion", "baseLevel", "slots", "enhancementStats", "forgingAttack", "forgingBonuses"],
@@ -61,7 +61,6 @@ const requiredFields = {
   "data/resonance-effects.json": ["schemaVersion", "effects"],
   "data/simulator-equipment-mapping.json": ["schemaVersion", "selections", "magicStoneSelections"],
   "data/simulator-input-options.json": ["schemaVersion", "catalogs", "inputs"],
-  "data/simulator-input-rules.json": ["schemaVersion", "innerwear", "lowerwearAlternatives", "circuitBoards", "chips", "weapon", "rightIceSetEffects"],
   "data/slots.json": ["schemaVersion", "slots"],
   "data/spirit-record-effects.json": ["schemaVersion", "classSelectors", "defaultMaxedStats", "branchBonuses", "traits"],
   "data/weapon-appraisals.json": ["schemaVersion", "groups"],
@@ -92,7 +91,7 @@ for (const [name, fields] of Object.entries(requiredFields)) {
     "data/slots.json", "data/spirit-record-effects.json", "data/weapon-appraisals.json",
     "data/weapon-grade-options.json", "data/weapon-growth.json", "data/weapon-transformations.json",
   ]);
-  const supportedSchemaVersion = name === "data/simulator-input-rules.json" ? 3 : schemaVersion2Files.has(name) ? 2 : 1;
+  const supportedSchemaVersion = schemaVersion2Files.has(name) ? 2 : 1;
   if (name.startsWith("data/") && !name.startsWith("data/examples/") && document.schemaVersion !== supportedSchemaVersion) {
     errors.push(`${name}: 不支援的資料結構版本 ${document.schemaVersion}，預期版本 ${supportedSchemaVersion}。`);
   }
@@ -188,14 +187,14 @@ if (classDamagePassives) {
 
 const mapping = documents.get("data/simulator-equipment-mapping.json");
 if (mapping) {
-  const selectionCells = new Set();
+  const selectionFields = new Set();
   const references = [
     ...(mapping.selections ?? []).map((entry) => ({ ...entry, source: "selections" })),
     ...((mapping.magicStoneSelections?.inputGroups ?? []).map((entry) => ({ ...entry, catalogFile: mapping.magicStoneSelections.catalogFile, slotId: mapping.magicStoneSelections.slotId, source: "magicStoneSelections" }))),
   ];
   for (const entry of references) {
-    if (selectionCells.has(entry.selectionCell)) errors.push(`data/simulator-equipment-mapping.json: 選擇儲存格重複 ${entry.selectionCell}。`);
-    selectionCells.add(entry.selectionCell);
+    if (selectionFields.has(entry.selectionField)) errors.push(`data/simulator-equipment-mapping.json: 選擇欄位重複 ${entry.selectionField}。`);
+    selectionFields.add(entry.selectionField);
     const catalogPath = `data/${entry.catalogFile}`.replaceAll("\\", "/");
     const catalog = documents.get(catalogPath);
     if (!catalog) errors.push(`data/simulator-equipment-mapping.json: 找不到目錄 ${catalogPath}。`);
@@ -235,8 +234,8 @@ if (weaponGrades) {
   const gradesByName = new Map((weaponGrades.options ?? []).map(option => [option.name, option]));
   const groups = weaponGrades.colorGroups ?? [];
   if (groups.length !== 3) errors.push("data/weapon-grade-options.json: 武器魔力石必須有紅、藍、黃三組。");
-  const allCells = groups.flatMap(group => group.settingKeys ?? []);
-  if (allCells.length !== 27 || new Set(allCells).size !== 27) errors.push("data/weapon-grade-options.json: 三色魔力石必須各有 9 個不重複欄位。");
+  const allFields = groups.flatMap(group => group.settingKeys ?? []);
+  if (allFields.length !== 27 || new Set(allFields).size !== 27) errors.push("data/weapon-grade-options.json: 三色魔力石必須各有 9 個不重複欄位。");
   for (const grade of gradesByName.keys()) {
     const totals = {};
     for (const group of groups) {
@@ -247,7 +246,7 @@ if (weaponGrades) {
     }
     const aggregate = gradesByName.get(grade)?.stats ?? {};
     for (const stat of new Set([...Object.keys(totals), ...Object.keys(aggregate)])) {
-      if (totals[stat] !== aggregate[stat]) errors.push(`data/weapon-grade-options.json: ${grade} 預設加總 ${stat} 與工作表彙總不一致。`);
+      if (totals[stat] !== aggregate[stat]) errors.push(`data/weapon-grade-options.json: ${grade} 預設加總 ${stat} 與設定彙總不一致。`);
     }
   }
 }

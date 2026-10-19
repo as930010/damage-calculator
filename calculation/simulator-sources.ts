@@ -71,8 +71,8 @@ export interface ChipSlotsDocument {
   lowerwearAlternativeEnabledBy: string;
   slots: readonly {
     id: string;
-    attributeCell: string;
-    tuningCell: string;
+    attributeField: string;
+    tuningField: string;
     wearSet: "shared" | "lowerwearA" | "lowerwearB";
     enabledBy?: string;
   }[];
@@ -88,7 +88,7 @@ export interface SelectedNamedOption {
 export interface SimulatorSourceSelections {
   classId: string;
   attackType: "physical" | "magical";
-  /** Selected searchable item names, keyed by 裝備模擬區 input cell. */
+  /** Selected searchable item names, keyed by semantic input field ID. */
   selectedItems: Readonly<Record<string, string | null | undefined>>;
   enabledValues?: Readonly<Record<string, boolean | undefined>>;
   rightIceEquippedSetNames: readonly (string | null | undefined)[];
@@ -120,7 +120,7 @@ const emptyGroups = (): Record<"shared" | "lowerwearA" | "lowerwearB", StatContr
 });
 
 /**
- * Resolve every already-mapped supplemental worksheet input into the same
+ * Resolve every configured supplemental input into the same
  * three contribution groups used by the calculation engine. UI code only
  * passes selected values; all option-to-stat rules remain in JSON and the
  * dedicated resolver functions.

@@ -4,9 +4,9 @@ import type { SimulatorEquipmentContributionGroups } from "./equipment-catalog.t
 export interface InnerwearSlot {
   id: string;
   name: string;
-  typeCell: string;
-  enhancementCell: string;
-  forgingCell: string;
+  typeField: string;
+  enhancementField: string;
+  forgingField: string;
   attackType: "physical" | "magical";
   attackFraction: number;
   wearSet: "shared" | "lowerwearA" | "lowerwearB";
@@ -26,7 +26,7 @@ export interface InnerwearRulesDocument {
   forgingBonuses: readonly {
     statKey: string;
     steps: readonly { minimum: number; value: number }[];
-    otherwise: number | "sheetError";
+    otherwise: number;
   }[];
   extraAdaptability: { forgingEquals: number; value: number };
   nephron: {
@@ -37,7 +37,7 @@ export interface InnerwearRulesDocument {
   };
 }
 
-/** C/D/E/H/I/K/Q38:42 plus gloves' enhancement contribution in L41. */
+/** Resolve equipped innerwear stats, enhancement bonuses and forging bonuses. */
 export function resolveInnerwearSources(
   rules: InnerwearRulesDocument,
   attackParameters: AttackParametersDocument,
@@ -52,14 +52,14 @@ export function resolveInnerwearSources(
   if (!coefficients) throw new RangeError(`職業係數未設定：${classId}`);
   for (const slot of rules.slots) {
     if (slot.enabledBy && !lowerwearAlternativeEnabled) continue;
-    const enhancement = values[slot.enhancementCell];
-    const forging = values[slot.forgingCell];
+    const enhancement = values[slot.enhancementField];
+    const forging = values[slot.forgingField];
     if ((enhancement == null || enhancement === "") && (forging == null || forging === "")) continue;
     if (enhancement == null || enhancement === "" || forging == null || forging === "") {
       throw new RangeError(`請填完整${slot.name}的強化與鍛造等級。`);
     }
     const level = Number(String(enhancement).match(/\d+/)?.[0]);
-    const nephron = String(values[slot.typeCell] ?? "百億") === "內布隆";
+    const nephron = String(values[slot.typeField] ?? "百億") === "內布隆";
     const factor = attackParameters.weaponEnhancementFactors[String(level)];
     const forgeLevel = Number(forging);
     const enhanceStats = (nephron ? rules.nephron.enhancementStats : rules.enhancementStats)[String(level)];
@@ -84,9 +84,6 @@ export function resolveInnerwearSources(
     } else {
       for (const bonus of rules.forgingBonuses) {
         const value = bonus.steps.find((step) => forgeLevel >= step.minimum)?.value ?? bonus.otherwise;
-        if (value === "sheetError") {
-          throw new RangeError(`${slot.name}鍛造 ${forgeLevel}：原試算表的 IFS 未定義此等級的效果，需確認後才能計算。`);
-        }
         stats[bonus.statKey] = value;
       }
       if (forgeLevel === rules.extraAdaptability.forgingEquals) stats.adaptabilityPct += rules.extraAdaptability.value;

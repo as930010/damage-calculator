@@ -76,7 +76,7 @@ function sumDetails(details: readonly EffectValueDetail[]): number {
 
 /**
  * Route stronger/heat stats out of ordinary gear totals before lowerwear averaging.
- * All conditional sources apply in both boss-health states; the B163 equation
+ * All conditional sources apply in both boss-health states; the final damage equation
  * combines their full totals independently of the ordinary lowerwear average.
  */
 export interface PreparedCharacterAttributeInput {
@@ -151,7 +151,7 @@ function aggregateConditionalSources(
 /**
  * Sum ordinary character stats, average the two mutually exclusive lowerwear
  * configurations, and only then apply any character-total caps from JSON rules.
- * Stronger/heat conditional bonuses stay separate for the B163 conditional factor.
+ * Stronger/heat conditional bonuses stay separate for the conditional damage factor.
  */
 export function aggregateCharacterAttributes(
   input: CharacterAttributeInput,

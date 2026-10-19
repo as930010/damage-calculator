@@ -1,7 +1,7 @@
 import { resolveSimulatorEquipmentContributions } from "../calculation/equipment-catalog.ts";
 import { resolveInnerwearSources } from "../calculation/innerwear.ts";
 import { resolveNephronArmorSources, resolveGrettMedalMagazineBonuses } from "../calculation/nephron-armor.ts";
-import { resolveWeaponTransformationsFromCells } from "../calculation/weapon-transformations.ts";
+import { resolveWeaponTransformationsFromFields } from "../calculation/weapon-transformations.ts";
 import { resolveAccessoryEffectOptions, resolveArmorAppraisals, resolveAtmaSetEffects, resolveChipContribution, resolveCircuitBoardEffects, resolveColorSetEffect, resolveMasterBeastEffects, resolveNamedStatOption, resolveRaidSetEffects, resolveResonanceEffects, resolveRightIceSetEffects, resolveSpiritRecordEffects, resolveSpiritRecordSelections, resolveWeaponGrowth } from "../calculation/equipment-effects.ts";
 import type { AttributeRule, CharacterAttributeResult, StatContribution } from "../calculation/types.ts";
 import { calculateLoadoutCombatRates, prepareLoadoutAttributes, evaluatePreparedLoadout, type LoadoutCalculationInput } from "../calculation/loadout-engine.ts";
@@ -70,21 +70,21 @@ export function resolveLoadoutSources(data: GameData, state: LoadoutState) {
   const nephronSelections = data.nephronArmor.fields.flatMap((field) => {
     if (field.enabledBy && !state.lowerwearAlternativeEnabled) return [];
     const slot = data.innerwear.slots.find((entry) => entry.id === field.slotId);
-    if (!slot || text(slot.typeCell) !== "內布隆") return [];
-    const active = [slot.enhancementCell, slot.forgingCell, field.magazineCell, field.magazineLevelCell,
-      ...field.transformFields.flatMap(({ attributeCell, valueCell }) => [attributeCell, valueCell])]
-      .some((cell) => values[cell] !== undefined && values[cell] !== "");
+    if (!slot || text(slot.typeField) !== "內布隆") return [];
+    const active = [slot.enhancementField, slot.forgingField, field.magazineField, field.magazineLevelField,
+      ...field.transformFields.flatMap(({ attributeField, valueField }) => [attributeField, valueField])]
+      .some((fieldId) => values[fieldId] !== undefined && values[fieldId] !== "");
     if (!active) return [];
     return [{
       field,
       selection: {
         slotId: field.slotId,
-        enhancement: values[slot.enhancementCell],
-        transformations: field.transformFields.map(({ attributeCell, valueCell }) => ({
-          attribute: text(attributeCell), value: number(valueCell),
+        enhancement: values[slot.enhancementField],
+        transformations: field.transformFields.map(({ attributeField, valueField }) => ({
+          attribute: text(attributeField), value: number(valueField),
         })),
-        magazine: text(field.magazineCell),
-        magazineLevel: values[field.magazineLevelCell],
+        magazine: text(field.magazineField),
+        magazineLevel: values[field.magazineLevelField],
       },
     }];
   });
@@ -107,13 +107,13 @@ export function resolveLoadoutSources(data: GameData, state: LoadoutState) {
   for (const entry of resolveArmorAppraisals(data.appraisals, {
     optionsBySlot: Object.fromEntries(data.appraisals.slots.map((slot) => [
       slot.id, text(`Innerwear.${slot.id === "lowerwearAlternative" ? "LowerwearAlternative" : slot.id === "lowerwear" ? "Lowerwear" : slot.id === "upper" ? "Upper" : slot.id === "gloves" ? "Gloves" : "Shoes"}.Type`) === "內布隆"
-        ? [] : slot.inputCells.map(text),
+        ? [] : slot.inputFields.map(text),
     ])),
     enabledInputs: { "Lowerwear.Alternative.Enabled": state.lowerwearAlternativeEnabled },
   })) groups[entry.wearSet].push(...entry.contributions);
   for (const slot of data.chipSlots.slots) {
     if (slot.enabledBy && !state.lowerwearAlternativeEnabled) continue;
-    const chipName = text(slot.attributeCell), tuning = text(slot.tuningCell);
+    const chipName = text(slot.attributeField), tuning = text(slot.tuningField);
     if (!chipName && !tuning) continue;
     const chip = data.chips.chips.find((entry) => entry.name === chipName);
     if (!chip || !tuning) throw new RangeError("請填完整系統芯片與芯片調校等級。");
@@ -122,18 +122,18 @@ export function resolveLoadoutSources(data: GameData, state: LoadoutState) {
   if (state.lowerwearAlternativeEnabled && !condition) {
     const lowerwearChip = data.chipSlots.slots.find(slot => slot.id === "lowerwear")!;
     const alternativeChip = data.chipSlots.slots.find(slot => slot.id === "lowerwearAlternative")!;
-    const lowerwearAttribute = text(lowerwearChip.attributeCell);
-    const alternativeAttribute = text(alternativeChip.attributeCell);
+    const lowerwearAttribute = text(lowerwearChip.attributeField);
+    const alternativeAttribute = text(alternativeChip.attributeField);
     const conditionalAttributes = new Set(["強者%", "排熱%"]);
     if (lowerwearAttribute && lowerwearAttribute === alternativeAttribute && conditionalAttributes.has(lowerwearAttribute)
-      && text(lowerwearChip.tuningCell) && text(alternativeChip.tuningCell)) {
+      && text(lowerwearChip.tuningField) && text(alternativeChip.tuningField)) {
       throw new RangeError("下衣與強/排褲不可同時使用「" + lowerwearAttribute + "」芯片。請讓兩套配置分別使用「強者%」與「排熱%」，以符合 Boss 體力切換條件。");
     }
   }
   const circuitRowsBySlot = new Map<string, CircuitBoardRow[]>();
   const activeCircuitSlots = data.circuits.inputs.filter(slot => state.lowerwearAlternativeEnabled || slot.wearSet !== "lowerwearB");
   for (const slot of activeCircuitSlots) {
-    const rows = readCircuitBoardRows(values, slot.attributeCell, slot.valueCell);
+    const rows = readCircuitBoardRows(values, slot.attributeField, slot.valueField);
     validateCircuitBoardRows(rows, slot.attributeOptions, slot.slot + "電路板");
     for (const row of rows) {
       if (row.attribute && row.percentageValue !== null && !data.circuits.statKeyByAttributeName[row.attribute] && row.attribute !== "無關傷害") {
@@ -166,23 +166,23 @@ export function resolveLoadoutSources(data: GameData, state: LoadoutState) {
     .reduce((total, row) => total + (row.percentageValue ?? 0), 0);
   const colorSet = resolveColorSetEffect(data.colorSetEffects, text(data.colorSetEffects.settingKey), requiredCircuitAttribute, requiredCircuitValue);
   if (colorSet) groups.shared.push(colorSet);
-  groups.shared.push(...resolveWeaponTransformationsFromCells(data.transformations, values));
+  groups.shared.push(...resolveWeaponTransformationsFromFields(data.transformations, values));
   const growth = resolveWeaponGrowth(data.growth, text(data.growth.settingKey));
   if (growth) groups.shared.push(growth);
   for (const group of Object.values(data.weaponAppraisals.groups)) {
     const source = resolveNamedStatOption(group.options, text(group.settingKey), `weapon-appraisal:${group.settingKey}`);
     if (source) groups.shared.push(source);
   }
-  for (const cell of data.giantStones.settingKeys) {
-    const source = resolveNamedStatOption(data.giantStones.options, text(cell), `giant-stone:${cell}`);
+  for (const fieldId of data.giantStones.settingKeys) {
+    const source = resolveNamedStatOption(data.giantStones.options, text(fieldId), `giant-stone:${fieldId}`);
     if (source) groups.shared.push(source);
   }
   for (const colorGroup of data.weaponGrades.colorGroups) {
     const presetId = colorGroup.presetByGrade[text(data.weaponGrades.settingKey)];
     const presetOption = colorGroup.options.find(option => option.id === presetId);
-    const hasSavedSlotSelection = colorGroup.settingKeys.some(cell => values[cell] !== undefined);
-    for (const [index, cell] of colorGroup.settingKeys.entries()) {
-      const selection = hasSavedSlotSelection ? text(cell) : presetOption?.name ?? "";
+    const hasSavedSlotSelection = colorGroup.settingKeys.some(fieldId => values[fieldId] !== undefined);
+    for (const [index, fieldId] of colorGroup.settingKeys.entries()) {
+      const selection = hasSavedSlotSelection ? text(fieldId) : presetOption?.name ?? "";
       const source = resolveNamedStatOption(colorGroup.options, selection, `weapon-magic-stone:${colorGroup.id}:${index + 1}`);
       if (source) groups.shared.push(source);
     }
@@ -190,33 +190,33 @@ export function resolveLoadoutSources(data: GameData, state: LoadoutState) {
   const accessoryAppraisalSelections: Record<string, string> = {};
   const accessoryAppraisalEquipment: Record<string, string> = {};
   for (const group of data.accessoryEffects.groups) {
-    const mapping = data.mapping.selections.find(entry => entry.selectionCell === group.selectionCell);
-    const itemName = text(group.selectionCell);
+    const mapping = data.mapping.selections.find(entry => entry.selectionField === group.selectionField);
+    const itemName = text(group.selectionField);
     if (!mapping || !itemName) continue;
     const item = data.catalogs[mapping.catalogFile]?.items.find(entry => entry.slotId === group.slotId && entry.name === itemName);
     const appraisal = item?.appraisal;
     if (!appraisal || appraisal.canAppraise === null || appraisal.effectCount === null) continue;
     if (appraisal.canAppraise) {
-      if (!Number.isInteger(appraisal.effectCount) || appraisal.effectCount < 1 || appraisal.effectCount > group.inputCells.length) {
-        throw new RangeError(`${itemName} 的鑑定條數必須介於 1 與 ${group.inputCells.length} 之間。`);
+      if (!Number.isInteger(appraisal.effectCount) || appraisal.effectCount < 1 || appraisal.effectCount > group.inputFields.length) {
+        throw new RangeError(`${itemName} 的鑑定條數必須介於 1 與 ${group.inputFields.length} 之間。`);
       }
-      for (const cell of group.inputCells.slice(0, appraisal.effectCount)) accessoryAppraisalSelections[cell] = text(cell);
-      accessoryAppraisalEquipment[group.selectionCell] = itemName;
+      for (const fieldId of group.inputFields.slice(0, appraisal.effectCount)) accessoryAppraisalSelections[fieldId] = text(fieldId);
+      accessoryAppraisalEquipment[group.selectionField] = itemName;
     } else if (appraisal.effectCount !== 0) {
       throw new RangeError(`${itemName} 不可鑑定時，鑑定條數必須設為 0。`);
     }
   }
   groups.shared.push(...resolveAccessoryEffectOptions(data.accessoryEffects, accessoryAppraisalSelections, accessoryAppraisalEquipment));
-  const accessoryCells = data.mapping.selections
+  const accessoryFields = data.mapping.selections
     .filter(entry => entry.catalogFile.endsWith("accessories.json"))
-    .map(entry => entry.selectionCell);
-  const rightIceCells = data.mapping.selections.filter(entry => entry.catalogFile.endsWith("right-ice.json")).map(entry => entry.selectionCell);
+    .map(entry => entry.selectionField);
+  const rightIceFields = data.mapping.selections.filter(entry => entry.catalogFile.endsWith("right-ice.json")).map(entry => entry.selectionField);
   groups.shared.push(
-    ...resolveRightIceSetEffects(data.rightIceSets, rightIceCells.map(text), data.rightIceSets.selectionCells.map(text)),
+    ...resolveRightIceSetEffects(data.rightIceSets, rightIceFields.map(text), data.rightIceSets.selectionFields.map(text)),
       ...resolveResonanceEffects(data.resonance, Object.fromEntries(data.resonance.effects.map(effect => [effect.settingKey, values[effect.settingKey]]))),
-    ...resolveRaidSetEffects(data.raidSets, accessoryCells.map(text)),
+    ...resolveRaidSetEffects(data.raidSets, accessoryFields.map(text)),
   );
-  const atmaPieces = accessoryCells.map(text).filter(name => name.includes("亞特瑪")).length;
+  const atmaPieces = accessoryFields.map(text).filter(name => name.includes("亞特瑪")).length;
   groups.shared.push(...resolveAtmaSetEffects(data.atma, atmaPieces, text("Atma.Element"), text("Atma.Color")));
   groups.shared.push(...resolveMasterBeastEffects(data.masterBeast, {
     overallOption: text("MasterBeast.OverallPotential"), headOptions: [text("MasterBeast.Head.Option1"), text("MasterBeast.Head.Option2")],
@@ -237,8 +237,8 @@ export function resolveLoadoutSources(data: GameData, state: LoadoutState) {
   const selectedSpiritClasses = data.spiritRecord.classSelectors.settingKeys.map(text);
   const selectedSpiritRecords = resolveSpiritRecordSelections(data.spiritRecord, selectedSpiritClasses);
   groups.shared.push(...resolveSpiritRecordEffects(data.spiritRecord, state.Job, data.classes.classes.find(entry => entry.id === state.Job)!.attackType, selectedSpiritRecords));
-  const addNamedOption = (catalog: readonly import("../calculation/equipment-effects.ts").NamedStatOption[], cell: string, source: string) => {
-    const contribution = resolveNamedStatOption(catalog, text(cell), `${source}:${cell}`);
+  const addNamedOption = (catalog: readonly import("../calculation/equipment-effects.ts").NamedStatOption[], fieldId: string, source: string) => {
+    const contribution = resolveNamedStatOption(catalog, text(fieldId), `${source}:${fieldId}`);
     if (contribution) groups.shared.push(contribution);
   };
   addNamedOption(data.otherEffects.titles, "Effect.Title", "title");
@@ -312,18 +312,18 @@ export function projectAttributes(data: GameData, state: LoadoutState) {
 function combatRateInputs(data: GameData, state: LoadoutState, attributes: CharacterAttributeResult) {
   const job = data.classes.classes.find(entry => entry.id === state.Job);
   if (!job) throw new RangeError(`找不到職業設定：${state.Job}`);
-  const percentage = (cell: string) => {
-    const value = state.values[cell];
+  const percentage = (fieldId: string) => {
+    const value = state.values[fieldId];
     if (value == null || value === "") return 0;
     const parsed = Number(value);
-    if (!Number.isFinite(parsed)) throw new RangeError(`${cell} 必須是數值。`);
+    if (!Number.isFinite(parsed)) throw new RangeError(`${fieldId} 必須是數值。`);
     return parsed;
   };
   const combatRateSourceValues = {
     parameters: { yellowBeastSpiritStoneRatePct: data.parameters.yellowBeastSpiritStoneRatePct },
     selections: {
       "Left.Armor.Bottom.ENHC": state.values[state.bossHealthCondition?.enabled && state.bossHealthCondition.lowerwear === 'lowerwearB'
-        ? data.innerwear.slots.find(slot => slot.id === 'lowerwearAlternative')!.enhancementCell : 'Left.Armor.Bottom.ENHC'],
+        ? data.innerwear.slots.find(slot => slot.id === 'lowerwearAlternative')!.enhancementField : 'Left.Armor.Bottom.ENHC'],
       "Left.Armor.Shoes.ENHC": state.values["Left.Armor.Shoes.ENHC"],
       masterBeastSpiritStoneColor: state.masterBeastSpiritStoneColor ?? data.masterBeast.spiritStoneColorSelector.defaultColor,
     },
@@ -353,11 +353,11 @@ function damageInputs(data: GameData, state: LoadoutState, attributes: Character
   const weaponText = String(state.values["Weapon.ENHC"] ?? "");
   const weaponLevel = Number(weaponText.match(/[0-9]+/)?.[0]);
   if (!Number.isSafeInteger(weaponLevel)) throw new RangeError("請先選擇武器強化等級。");
-  const percentage = (cell: string) => {
-    const value = state.values[cell];
+  const percentage = (fieldId: string) => {
+    const value = state.values[fieldId];
     if (value == null || value === "") return 0;
     const parsed = Number(value);
-    if (!Number.isFinite(parsed)) throw new RangeError(`${cell} 必須是數值。`);
+    if (!Number.isFinite(parsed)) throw new RangeError(`${fieldId} 必須是數值。`);
     return parsed;
   };
   const rateInputs = combatRateInputs(data, state, attributes);

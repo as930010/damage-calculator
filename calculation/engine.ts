@@ -9,14 +9,14 @@ import type {
 export interface CombatRateEngineInput {
   classId: string;
   classEffects: ClassCombatEffectsDocument;
-  /** Raw F1 contribution excluding the class effects in class-combat-effects.json. */
+  /** Base critical-hit percentage excluding separately resolved class effects. */
   baseCritRatePct: number;
-  /** Raw G1 contribution excluding the class effects in class-combat-effects.json. */
+  /** Base extremization percentage excluding separately resolved class effects. */
   baseExtremizationPct: number;
   /** Equipment, buffs, and other effects already classified by calculation method. */
   otherCritEffects?: readonly ResolvedPercentEffect[];
   otherExtremizationEffects?: readonly ResolvedPercentEffect[];
-  /** Y1, supplied as a positive percentage and subtracted after the crit additions. */
+  /** Target penalty, supplied as a positive percentage and subtracted after crit additions. */
   targetCritPenaltyPct?: number;
 }
 
@@ -25,8 +25,8 @@ export interface CombatRateEngineResult extends CombatRateResults {
 }
 
 /**
- * Calculate the spreadsheet's B159/B160 probability results from source groups.
- * Class diminishing entries are added to raw F1/G1 totals, multiplicative
+ * Calculate critical hit and extremization probabilities from source groups.
+ * Class diminishing entries are added to base percentages, multiplicative
  * entries join the factor product, and non-diminishing entries are added last.
  */
 export function calculateCombatRates(input: CombatRateEngineInput): CombatRateEngineResult {

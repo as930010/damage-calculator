@@ -1,3 +1,4 @@
+import { isPublishableDataFile, publicGameData } from './public-game-data.mjs';
 import { cleanOutput, minifyCss, productionAssets, writeProduction } from './production-assets.mjs';
 import { cp, mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
@@ -30,7 +31,7 @@ if (compilation.status !== 0) process.exit(compilation.status ?? 1);
 await mkdir(join(output, "frontend"), { recursive: true });
 await mkdir(join(output, "data", "examples"), { recursive: true });
 for (const file of await readdir(join(root, "data", "examples"))) {
-  if (file.endsWith(".json") && !file.endsWith("-expected.json")) {
+  if (file.endsWith(".json") && isPublishableDataFile(file)) {
     await cp(join(root, "data", "examples", file), join(output, "data", "examples", file));
   }
 }
@@ -45,53 +46,7 @@ bundledData.catalogs = Object.fromEntries(await Promise.all(catalogFiles.map(asy
   file,
   JSON.parse(await readFile(join(root, "data", file), "utf8")),
 ])));
-const sourceCellLabels = {
-  "E76": "fixed-effect:master-beast",
-  "E93": "fixed-effect:pet-skill",
-  "Q37": "fixed-effect:raid-set",
-  "Q53": "fixed-effect:weapon",
-  "Q86": "fixed-effect:title-adaptability",
-  "R86": "fixed-effect:title-defense-ignore",
-  "T101": "fixed-effect:red-upper-crit-damage",
-  "T102": "fixed-effect:maestro-aura",
-  "B77": "combat-rate:yellow-beast-stone",
-  "B103": "combat-rate:lowerwear-enhancement",
-  "B105": "combat-rate:shoes-enhancement",
-};
-const legacySourceProvenance = JSON.parse(await readFile(join(root, "docs/data-maintenance/legacy-source-provenance.json"), "utf8"));
-const overallPotentialSourceCells = legacySourceProvenance.sourceRecords.find(record =>
-  record.sourceDocument === "data/master-beast-effects.json" && record.path === "overallPotentialSourceCells",
-)?.value ?? {};
-for (const [statKey, cell] of Object.entries(overallPotentialSourceCells)) {
-  sourceCellLabels[cell] = `master-beast-potential:${statKey}`;
-}
-const anonymousSourceIds = new Map();
-const privateMetadataKeys = new Set([
-  "sourceSheet", "sourceSheets", "sourceCell", "notes", "note", "cells", "workbook", "sheet", "sheets",
-  "calculationSheet", "extractedAt", "overallPotentialSourceCells", "dataUpdatedAt", "yellowRateSourceCell",
-  "sourceRanges", "sourceCells", "sourceFormula", "optionSource", "effectOutputCells", "effectOutputRows",
-  "countedInputRange", "countFormulaCell", "pieceCountInput", "elementInput", "colorInput", "inputRules",
-  "selectorRange", "sourceRange", "calculationRow", "calculationRows", "formula",
-]);
-function publicData(value, key = "") {
-  if (privateMetadataKeys.has(key)) return undefined;
-  if (key === "source" && value && typeof value === "object") return undefined;
-  if (key === "source" && typeof value === "string") return "遊戲資料設定";
-  if ((key === "id" || key === "sourceId") && typeof value === "string" && value.startsWith("sheet:計算機!")) {
-    const cell = value.slice("sheet:計算機!".length);
-    if (sourceCellLabels[cell]) return sourceCellLabels[cell];
-    if (!anonymousSourceIds.has(value)) anonymousSourceIds.set(value, `configured-source:${anonymousSourceIds.size + 1}`);
-    return anonymousSourceIds.get(value);
-  }
-  if (Array.isArray(value)) return value.map(item => publicData(item)).filter(item => item !== undefined);
-  if (value && typeof value === "object") {
-    return Object.fromEntries(Object.entries(value)
-      .map(([childKey, child]) => [childKey, publicData(child, childKey)])
-      .filter(([, child]) => child !== undefined));
-  }
-  return value;
-}
-const bundledDataJson = `${JSON.stringify(publicData(bundledData))}\n`;
+const bundledDataJson = `${JSON.stringify(publicGameData(bundledData))}\n`;
 await writeFile(join(output, "data", "game-data.json"), bundledDataJson);
 const dataRevision = createHash("sha256").update(bundledDataJson).digest("hex").slice(0, 16);
 const revisionResult = spawnSync("git", ["rev-parse", "--short", "HEAD"], { cwd: root, encoding: "utf8" });

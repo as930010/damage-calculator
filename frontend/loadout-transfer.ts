@@ -1,7 +1,7 @@
 import { getEquipmentOptionName, type EquipmentCatalogItem, type SimulatorEquipmentSelectionMapping } from '../calculation/equipment-catalog.ts';
 import { createCatalogIndex, type CatalogData, type CatalogIndex } from './catalog-index.ts';
 export { equipmentTransferCode } from './catalog-index.ts';
-import { isResonanceInputCell, parseResonancePoints } from '../calculation/resonance-input.ts';
+import { isResonanceInputField, parseResonancePoints } from '../calculation/resonance-input.ts';
 import { codeForFieldId, fieldIdForCode, isFieldId } from './field-ids.ts';
 import { migrateLegacyEnvironmentSelection, migrateLegacyGloveCircuitSkillDamage, normalizePortraitAwakeningSplit, normalizeTranscendenceSkillDamageShare, type LoadoutState } from './state.ts';
 import { canonicalizeNumber } from './numeric-input.ts';
@@ -45,15 +45,15 @@ export function serializeLoadout(state: LoadoutState, data: TransferData, suppli
   const omittedFields: string[] = [];
   const fieldValues = { ...state.values };
   const portrait = data.otherEffects.portraitAwakening;
-  const portraitCells = [portrait.strongSettingKey, portrait.transcendenceSettingKey];
-  const hasPortraitValues = portraitCells.some(cell => fieldValues[cell] !== undefined && fieldValues[cell] !== '');
-  const invalidPortraitCells = new Set(portraitCells.filter(cell => {
-    const raw = fieldValues[cell];
+  const portraitFields = [portrait.strongSettingKey, portrait.transcendenceSettingKey];
+  const hasPortraitValues = portraitFields.some(fieldId => fieldValues[fieldId] !== undefined && fieldValues[fieldId] !== '');
+  const invalidPortraitFields = new Set(portraitFields.filter(fieldId => {
+    const raw = fieldValues[fieldId];
     if (raw === undefined || raw === '') return false;
     const value = typeof raw === 'number' ? raw : typeof raw === 'string' && /^\d+$/.test(raw.trim()) ? Number(raw) : Number.NaN;
     return !Number.isInteger(value) || value < 0 || value > portrait.maxPct;
   }));
-  if (hasPortraitValues && invalidPortraitCells.size === 0) {
+  if (hasPortraitValues && invalidPortraitFields.size === 0) {
     const split = normalizePortraitAwakeningSplit(
       fieldValues[portrait.strongSettingKey],
       fieldValues[portrait.transcendenceSettingKey],
@@ -64,7 +64,7 @@ export function serializeLoadout(state: LoadoutState, data: TransferData, suppli
   }
 
   for (const [key, value] of Object.entries(fieldValues)) {
-    if (invalidPortraitCells.has(key)) {
+    if (invalidPortraitFields.has(key)) {
       omittedFields.push(key);
       continue;
     }
@@ -79,7 +79,7 @@ export function serializeLoadout(state: LoadoutState, data: TransferData, suppli
       : value;
     if (typeof transferValue === 'string' && transferValue.trim() === '') continue;
 
-      if (isResonanceInputCell(fieldId)) {
+      if (isResonanceInputField(fieldId)) {
         const points = parseResonancePoints(fieldId, transferValue);
         if (points === null) { omittedFields.push(fieldId); continue; }
         values[String(fieldCode)] = points;
@@ -162,7 +162,7 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
         ? migrateLegacyEnvironmentSelection(candidateValue)
         : null;
       if (environmentMigration === 'removed') continue;
-      if (isResonanceInputCell(fieldId)) {
+      if (isResonanceInputField(fieldId)) {
         const points = parseResonancePoints(fieldId, candidateValue[fieldId]);
         if (points !== null) optionValuesById[fieldId] = points;
       } else optionValuesById[fieldId] = candidateValue[fieldId];
@@ -190,7 +190,7 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
         clearedFields.push(fieldId);
         continue;
       }
-      if (isResonanceInputCell(fieldId)) {
+      if (isResonanceInputField(fieldId)) {
         const points = parseResonancePoints(fieldId, normalizedValue);
         if (points === null) clearedFields.push(fieldId);
         else values[fieldId] = points;
@@ -222,17 +222,17 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
   }
 
   const portrait = data.otherEffects.portraitAwakening;
-  const portraitCells = [portrait.strongSettingKey, portrait.transcendenceSettingKey];
-  for (const cell of portraitCells) {
-    const value = values[cell];
+  const portraitFields = [portrait.strongSettingKey, portrait.transcendenceSettingKey];
+  for (const fieldId of portraitFields) {
+    const value = values[fieldId];
     if (value === undefined || value === '') continue;
     const parsed = typeof value === 'number' ? value : typeof value === 'string' && /^\d+$/.test(value.trim()) ? Number(value) : Number.NaN;
     if (!Number.isInteger(parsed) || parsed < 0 || parsed > portrait.maxPct) {
-      delete values[cell];
-      clearedFields.push(cell);
-    } else values[cell] = parsed;
+      delete values[fieldId];
+      clearedFields.push(fieldId);
+    } else values[fieldId] = parsed;
   }
-  const hasPortraitValues = portraitCells.some(cell => values[cell] !== undefined && values[cell] !== '');
+  const hasPortraitValues = portraitFields.some(fieldId => values[fieldId] !== undefined && values[fieldId] !== '');
   if (hasPortraitValues) {
     const strongValue = values[portrait.strongSettingKey];
     const transcendenceValue = values[portrait.transcendenceSettingKey];
@@ -250,10 +250,9 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
     }
   }
 
-  migrateLegacyGloveCircuitSkillDamage(values, index.gloveCircuit?.attributeCell);
+  migrateLegacyGloveCircuitSkillDamage(values, index.gloveCircuit?.attributeField);
 
-  for (const [cell, mapping] of mappings) {
-    const fieldId = cell;
+  for (const [fieldId, mapping] of mappings) {
     const fieldCode = codeForFieldId(fieldId)!;
     const selection = rawValues[String(fieldCode)];
     if (selection === undefined || selection === null || selection === '') continue;
@@ -270,7 +269,7 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
   if (candidate.transcendenceSkillDamageSharePct !== undefined && transcendenceSkillDamageSharePct !== candidate.transcendenceSkillDamageSharePct) {
     clearedFields.push('技傷占比');
   }
-  clearedFields.push(...normalizeNephronMagazineSelections(values, index).clearedCells);
+  clearedFields.push(...normalizeNephronMagazineSelections(values, index).clearedFields);
   const masterBeastSpiritStoneColor = color === '黃' || color === '綠' || color === '' ? color : fallbackColor;
   const petSkillAttackEnabled = typeof candidate.petSkillAttackEnabled === 'boolean' ? candidate.petSkillAttackEnabled : true;
   const nutProtectionPotionEnabled = candidate.nutProtectionPotionEnabled === true;

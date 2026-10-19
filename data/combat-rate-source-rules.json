@@ -3,7 +3,7 @@
   "dataUpdatedAt": "2026-09-25",
   "sources": [
     {
-      "id": "sheet:計算機!B77",
+      "id": "combat-rate:yellow-beast-stone",
       "attributes": [
         "critRate",
         "extremization"

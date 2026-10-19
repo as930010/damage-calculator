@@ -13,7 +13,7 @@ function expectedForSet(document, setName, count) {
   return eligible.sort((a, b) => b.requiredPieces.count - a.requiredPieces.count)[0] ?? null;
 }
 
-test('每套右冰的 0～4 件門檻各自對應目前試算表的 exactly／atLeast 規則', async () => {
+test('每套右冰的 0～4 件門檻各自對應資料定義的 exactly／atLeast 規則', async () => {
   const document = await readJson('equipment/right-ice-set-effects.json');
   const setNames = [...new Set(document.effects.map(effect => effect.setName))];
   for (const setName of setNames) {

@@ -31,7 +31,7 @@ export interface LoadoutCalculationInput {
   attackType: AttackType;
   attributeRules: readonly AttributeRule[];
   characterBaseStats: Readonly<Record<string, number>>;
-  /** All spreadsheet-mapped sources already resolved from data and user selections. */
+  /** All attribute sources resolved from game data and user selections. */
   sources: SimulatorEquipmentContributionGroups;
   /** Additional products counted separately for each actually worn lowerwear configuration. */
   lowerwearBonusSources?: Readonly<Record<'lowerwearA' | 'lowerwearB', readonly StatContribution[]>>;
@@ -42,7 +42,7 @@ export interface LoadoutCalculationInput {
   classDamagePassives: ClassDamagePassivesDocument;
   combatRateSourceRules: CombatRateSourceRulesDocument;
   combatRateSourceValues: CombatRateSourceValues;
-  /** Future or independently resolved sources, excluding the class profile and B77/B103/B105. */
+  /** Independent sources, excluding class effects, yellow spirit stones and armor enhancement. */
   additionalCritRateEffects?: readonly ResolvedPercentEffect[];
   additionalExtremizationEffects?: readonly ResolvedPercentEffect[];
   targetCritPenaltyPct: number;
@@ -160,7 +160,7 @@ export type LoadoutAttributeInput = Pick<LoadoutCalculationInput,
   'attributeRules' | 'sources' | 'characterBaseStats' | 'attackParameters' | 'classId'>
   & { weaponEnhancementLevel?: number };
 
-/** Keep the preliminary U1 pass and the final weapon-base pass in their original order. */
+/** Resolve preliminary attack modifiers before adding weapon-base attributes. */
 export function prepareLoadoutAttributes(input: LoadoutAttributeInput, requireWeapon = false) {
   const preliminaryPrepared = prepareCharacterAttributeInput(
     input.attributeRules,
@@ -176,7 +176,7 @@ export function prepareLoadoutAttributes(input: LoadoutAttributeInput, requireWe
     input.classId,
     input.weaponEnhancementLevel!,
   );
-  // C53/D53 depend on U1 (attack level), then C1/D1 include their values.
+  // Weapon base attacks depend on the total attack level before entering physical/magical totals.
   // Resolve this acyclic step before final aggregation so the attack formula consumes them.
   const weaponBase = calculateWeaponBaseAttack({
     attackLevel: statTotal(preliminaryAttributes, "attackLevel"),

@@ -6,8 +6,8 @@ export interface CircuitBoardRow {
 
 export const GLOVE_CIRCUIT_ROWS_FIELD = "Left.Armor.Gloves.Circuit.Rows";
 
-export function circuitBoardRowsField(attributeCell: string): string {
-  return attributeCell.replace(/\.Attribute$/, ".Rows");
+export function circuitBoardRowsField(attributeField: string): string {
+  return attributeField.replace(/\.Attribute$/, ".Rows");
 }
 
 /** Values are decimal ratios; each board has an independent 18% budget. */
@@ -60,10 +60,10 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 /** Read repeatable rows, or migrate the original single attribute/value pair in memory. */
 export function readCircuitBoardRows(
   values: Readonly<Record<string, string | number>>,
-  legacyAttributeCell: string,
-  legacyValueCell: string,
+  legacyAttributeField: string,
+  legacyValueField: string,
 ): CircuitBoardRow[] {
-  const savedRows = values[circuitBoardRowsField(legacyAttributeCell)];
+  const savedRows = values[circuitBoardRowsField(legacyAttributeField)];
   if (savedRows != null && savedRows !== "") {
     if (typeof savedRows !== "string") throw new TypeError("電路板列資料格式無效。");
     let parsed: unknown;
@@ -82,8 +82,8 @@ export function readCircuitBoardRows(
     });
   }
 
-  const attribute = String(values[legacyAttributeCell] ?? "");
-  const rawValue = values[legacyValueCell];
+  const attribute = String(values[legacyAttributeField] ?? "");
+  const rawValue = values[legacyValueField];
   const percentageValue = rawValue === undefined || rawValue === "" ? null : normalizeCircuitPercentage(rawValue);
   if (!attribute && percentageValue === null) return [{ attribute: "", percentageValue: null }];
   return [{ attribute, percentageValue }];
@@ -122,8 +122,8 @@ export function validateCircuitBoardRows(rows: readonly CircuitBoardRow[], optio
 export function normalizeGloveCircuitRows(rows: readonly CircuitBoardRow[], options: readonly string[], preferredIndex?: number): CircuitBoardRow[] {
   return normalizeCircuitBoardRows(rows, options, preferredIndex);
 }
-export function readGloveCircuitRows(values: Readonly<Record<string, string | number>>, legacyAttributeCell: string, legacyValueCell: string): CircuitBoardRow[] {
-  return readCircuitBoardRows(values, legacyAttributeCell, legacyValueCell);
+export function readGloveCircuitRows(values: Readonly<Record<string, string | number>>, legacyAttributeField: string, legacyValueField: string): CircuitBoardRow[] {
+  return readCircuitBoardRows(values, legacyAttributeField, legacyValueField);
 }
 export function serializeGloveCircuitRows(rows: readonly CircuitBoardRow[]): string {
   return serializeCircuitBoardRows(rows);

@@ -124,8 +124,8 @@ test('舊版配裝匯入保留有效共鳴值，清除負數、小數及超過�
 
 test('計算入口再次驗證共鳴輸入範圍，0 與空欄視為未分配', async () => {
   const document = await readJson('data/resonance-effects.json');
-  const pointCell = 'Resonance.TranscendenceSkillDMG.Points';
-  const input = value => ({ [pointCell]: value });
+  const pointField = 'Resonance.TranscendenceSkillDMG.Points';
+  const input = value => ({ [pointField]: value });
 
   assert.deepEqual(resolveResonanceEffects(document, input(0)), []);
   assert.deepEqual(resolveResonanceEffects(document, input('')), []);

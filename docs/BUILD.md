@@ -7,6 +7,8 @@
 - `pnpm run preview -- 4173 --base=/damage-calculator/` 可驗證 GitHub Pages 子路徑。
 - `pnpm run test:build` 驗證可重現性、版本更新、CSS 獨立失效與引用完整性。`pnpm run test:production` 使用既有 DOM Harness 執行兩頁打包產物。
 
+遊戲資料由專案內的 JSON 維護，來源識別碼與欄位映射直接使用語意名稱。`scripts/public-game-data.mjs` 排除維護檔案與內部註記，驗證來源識別碼及有限數值，並拒絕包含憑證的公開資料。主頁與 Buff 共用這個發布邊界。配裝 `values` 欄位 ID、compact v3 數字代碼及保存格式不變。
+
 JS 入口及 Chunk 由 esbuild 產生內容版本；各 CSS、公開 JSON 分別使用 SHA-256 的前 16 碼。活動 CSS 保留獨立連結，移除來源 HTML 的連結即可停用。Buff 技能 JSON 保持按需請求；主頁匯入／匯出 Chunk 在使用功能時載入。
 
 HTML 與 Manifest 包含匯入／匯出 Chunk 的相同內容版本 URL。首次載入失敗後，手動再次操作會在這個 URL 加上有上限的 retry 參數，以避開瀏覽器的失敗模組紀錄；最多三次重試，成功後共用同一模組。資源已在新部署被移除時，重試仍可能失敗，必須重新整理取得新版 HTML。此流程不會自動重新整理或覆寫目前配裝。

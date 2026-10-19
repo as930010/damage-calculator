@@ -23,9 +23,9 @@ export interface NephronMagazineOption {
 export interface NephronArmorFieldRules {
   part: string;
   slotId: string;
-  transformFields: readonly { attributeCell: string; valueCell: string }[];
-  magazineCell: string;
-  magazineLevelCell: string;
+  transformFields: readonly { attributeField: string; valueField: string }[];
+  magazineField: string;
+  magazineLevelField: string;
   wearSet: "shared" | "lowerwearA" | "lowerwearB";
   enabledBy?: string;
 }

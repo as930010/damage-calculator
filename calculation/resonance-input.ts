@@ -7,13 +7,13 @@ export const RESONANCE_INPUT_MAX_POINTS: Readonly<Record<string, number>> = Obje
   "Resonance.Adapt.Points": 100,
 });
 
-export function isResonanceInputCell(inputCell: string): boolean {
-  return Object.hasOwn(RESONANCE_INPUT_MAX_POINTS, inputCell);
+export function isResonanceInputField(fieldId: string): boolean {
+  return Object.hasOwn(RESONANCE_INPUT_MAX_POINTS, fieldId);
 }
 
 /** Return an integer point value, or null when the value is absent or invalid. */
-export function parseResonancePoints(inputCell: string, rawValue: unknown): number | null {
-  const maximum = RESONANCE_INPUT_MAX_POINTS[inputCell];
+export function parseResonancePoints(fieldId: string, rawValue: unknown): number | null {
+  const maximum = RESONANCE_INPUT_MAX_POINTS[fieldId];
   if (maximum === undefined || rawValue === undefined || rawValue === null || rawValue === "") return null;
 
   const value = typeof rawValue === "number"

@@ -18,24 +18,20 @@
   ],
   "slots": [
     {
-      "choiceCell": "Weapon.Transform.1.Stat",
-      "valueCell": "Weapon.Transform.1.Value",
-      "scalingTextCell": "Weapon.ENHC"
+      "choiceField": "Weapon.Transform.1.Stat",
+      "valueField": "Weapon.Transform.1.Value"
     },
     {
-      "choiceCell": "Weapon.Transform.2.Stat",
-      "valueCell": "Weapon.Transform.2.Value",
-      "scalingTextCell": "Weapon.ENHC"
+      "choiceField": "Weapon.Transform.2.Stat",
+      "valueField": "Weapon.Transform.2.Value"
     },
     {
-      "choiceCell": "Weapon.Transform.3.Stat",
-      "valueCell": "Weapon.Transform.3.Value",
-      "scalingTextCell": "Weapon.ENHC"
+      "choiceField": "Weapon.Transform.3.Stat",
+      "valueField": "Weapon.Transform.3.Value"
     },
     {
-      "choiceCell": "Weapon.Transform.4.Stat",
-      "valueCell": "Weapon.Transform.4.Value",
-      "scalingTextCell": "Weapon.ENHC"
+      "choiceField": "Weapon.Transform.4.Stat",
+      "valueField": "Weapon.Transform.4.Value"
     }
   ],
   "rules": [
@@ -48,25 +44,25 @@
       "choice": "雙攻% × 強化",
       "statKey": "doubleAttackPct",
       "valueMultiplier": 100,
-      "strengthenByFirstIntegerFrom": "correspondingEnhancementText"
+      "scaleByEnhancement": true
     },
     {
       "choice": "攻擊力等級 × 強化",
       "statKey": "attackLevel",
       "valueMultiplier": 1,
-      "strengthenByFirstIntegerFrom": "correspondingEnhancementText"
+      "scaleByEnhancement": true
     },
     {
       "choice": "技能傷害% × 強化",
       "statKey": "allSkillDamagePct",
       "valueMultiplier": 100,
-      "strengthenByFirstIntegerFrom": "correspondingEnhancementText"
+      "scaleByEnhancement": true
     },
     {
       "choice": "致命傷害% × 強化",
       "statKey": "critDamagePct",
       "valueMultiplier": 100,
-      "strengthenByFirstIntegerFrom": "correspondingEnhancementText"
+      "scaleByEnhancement": true
     },
     {
       "choice": "致命傷害%",
@@ -108,5 +104,6 @@
       "statKey": "attackLevel",
       "valueMultiplier": 1
     }
-  ]
+  ],
+  "enhancementField": "Weapon.ENHC"
 }

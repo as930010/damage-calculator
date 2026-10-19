@@ -66,7 +66,7 @@ test('百億內裝鍛造的強烈技傷與超越技傷門檻、數值相同', ()
   const slot = innerwear.slots.find(entry => entry.id === 'upper');
   for (const [forge, expected] of [[0, 0], [6, 3], [12, 6], [18, 10]]) {
     const groups = resolveInnerwearSources(innerwear, attack, 'KE', {
-      [slot.typeCell]: '百億', [slot.enhancementCell]: 'Lv.8', [slot.forgingCell]: forge,
+      [slot.typeField]: '百億', [slot.enhancementField]: 'Lv.8', [slot.forgingField]: forge,
     }, false);
     const source = groups.shared.find(entry => entry.sourceId === 'innerwear:upper');
     assert.equal(source.stats.strongSkillDamagePct, expected, 'strong forge ' + forge);
@@ -90,7 +90,7 @@ test('Nephron forge attack table and cumulative milestone bonuses match the supp
     [19, { critDamagePct: 3, transcendenceSkillDamagePct: 10, strongSkillDamagePct: 10, doubleAttackPct: 3, adaptabilityPct: 2 }],
     [21, { critDamagePct: 3, transcendenceSkillDamagePct: 10, strongSkillDamagePct: 10, doubleAttackPct: 3, adaptabilityPct: 2, superAdaptabilityPct: 2.5 }],
   ]) {
-    const values = { [slot.typeCell]: '內布隆', [slot.enhancementCell]: 'Lv.11', [slot.forgingCell]: forge };
+    const values = { [slot.typeField]: '內布隆', [slot.enhancementField]: 'Lv.11', [slot.forgingField]: forge };
     const groups = resolveInnerwearSources(innerwear, attack, 'KE', values, false);
     const source = groups.shared.find(entry => entry.sourceId === 'innerwear:upper');
     assert.ok(source, `forge ${forge}: upper source missing`);
@@ -255,9 +255,9 @@ test('Nephron and Billion share the attack enhancement formula for every innerwe
   for (const slot of innerwear.slots) {
     const attackKey = slot.attackType === 'physical' ? 'physicalAttack' : 'magicalAttack';
     for (let level = 8; level <= 13; level += 1) {
-      const input = { [slot.enhancementCell]: 'Lv.' + level, [slot.forgingCell]: 0 };
+      const input = { [slot.enhancementField]: 'Lv.' + level, [slot.forgingField]: 0 };
       const collect = type => {
-        const groups = resolveInnerwearSources(innerwear, attack, 'KE', { ...input, [slot.typeCell]: type }, true);
+        const groups = resolveInnerwearSources(innerwear, attack, 'KE', { ...input, [slot.typeField]: type }, true);
         return [...groups.shared, ...groups.lowerwearA, ...groups.lowerwearB]
           .find(source => source.sourceId === 'innerwear:' + slot.id);
       };
@@ -277,7 +277,7 @@ test('Nephron enhancement Lv.10 and Lv.11 bonuses persist at higher supported le
     [13, { bossDamagePct: 5, superAdaptabilityPct: 2 }],
   ]) {
     const source = resolveInnerwearSources(innerwear, attack, 'KE', {
-      [slot.typeCell]: '內布隆', [slot.enhancementCell]: 'Lv.' + level, [slot.forgingCell]: 0,
+      [slot.typeField]: '內布隆', [slot.enhancementField]: 'Lv.' + level, [slot.forgingField]: 0,
     }, false).shared.find(entry => entry.sourceId === 'innerwear:upper');
     for (const key of ['bossDamagePct', 'superAdaptabilityPct']) {
       assert.equal(source.stats[key] ?? 0, expected[key] ?? 0, 'Lv.' + level + ' ' + key);
@@ -298,9 +298,9 @@ test('Nephron armor intrinsic adaptability +2 applies to every slot and supporte
   for (const slot of innerwear.slots) {
     for (let level = 8; level <= 13; level += 1) {
       const groups = resolveInnerwearSources(innerwear, attack, 'KE', {
-        [slot.typeCell]: '內布隆',
-        [slot.enhancementCell]: 'Lv.' + level,
-        [slot.forgingCell]: 0,
+        [slot.typeField]: '內布隆',
+        [slot.enhancementField]: 'Lv.' + level,
+        [slot.forgingField]: 0,
       }, true);
       const source = [...groups.shared, ...groups.lowerwearA, ...groups.lowerwearB]
         .find(entry => entry.sourceId === 'innerwear:' + slot.id);

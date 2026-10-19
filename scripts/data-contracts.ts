@@ -37,7 +37,6 @@ import classes from '../data/classes.json';
 import equipmentLayout from '../data/equipment-layout.json';
 import slots from '../data/slots.json';
 import simulatorInputOptions from '../data/simulator-input-options.json';
-import simulatorInputRules from '../data/simulator-input-rules.json';
 import weaponAppraisals from '../data/weapon-appraisals.json';
 import giantMagicStones from '../data/giant-magic-stones.json';
 import weaponGrades from '../data/weapon-grade-options.json';
@@ -81,7 +80,6 @@ const _classes: Widen<{ schemaVersion: number; classes: readonly { id: string; n
 const _layout: Widen<{ schemaVersion: number; groups: readonly { id: string; name: string; color: string }[]; slots: readonly { id: string; label: string; group: string; x: number; y: number; icon: string }[] }> = equipmentLayout;
 const _slots: Widen<{ schemaVersion: number; slots: readonly { id: string; name: string; active: boolean }[] }> = slots;
 const _simulatorOptions: Widen<{ schemaVersion: number; catalogs: readonly { id: string; options: readonly { value: string | number }[] }[]; inputs: readonly { fieldIds: readonly string[]; inputType: string; catalogId: string }[] }> = simulatorInputOptions;
-const _simulatorRules: Widen<{ schemaVersion: number; innerwear: object; lowerwearAlternatives: object; circuitBoards: object; chips: object; weapon: object; rightIceSetEffects: object }> = simulatorInputRules;
 const _weaponAppraisals: Widen<{ schemaVersion: number; groups: Readonly<Record<string, { settingKey: string; options: readonly { id: string; name: string; stats: Readonly<Record<string, number | undefined>> }[] }>> }> = weaponAppraisals;
 const _giantStones: Widen<{ schemaVersion: number; settingKeys: readonly string[]; options: readonly { id: string; name: string; stats: Readonly<Record<string, number | undefined>> }[] }> = giantMagicStones;
 const _weaponGrades: Widen<{ schemaVersion: number; settingKey: string; options: readonly { id: string; name: string; stats: Readonly<Record<string, number | undefined>> }[]; colorGroups: readonly { id: string; name: string; settingKeys: readonly string[]; options: readonly { id: string; name: string; stats: Readonly<Record<string, number | undefined>> }[]; presetByGrade: Readonly<Record<string, string>> }[] }> = weaponGrades;

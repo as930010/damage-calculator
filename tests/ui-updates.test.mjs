@@ -22,18 +22,18 @@ function nephronMagazineState(selections = [], alternate = true) {
   state.lowerwearAlternativeEnabled = alternate;
   for (const field of gameData.nephronArmor.fields) {
     const armor = gameData.innerwear.slots.find(entry => entry.id === field.slotId);
-    state.values[armor.typeCell] = '內布隆';
-    state.values[armor.enhancementCell] = 'Lv.10';
+    state.values[armor.typeField] = '內布隆';
+    state.values[armor.enhancementField] = 'Lv.10';
     for (const transform of field.transformFields) {
-      state.values[transform.attributeCell] = '無關傷害';
-      state.values[transform.valueCell] = 0;
+      state.values[transform.attributeField] = '無關傷害';
+      state.values[transform.valueField] = 0;
     }
-    delete state.values[field.magazineCell]; delete state.values[field.magazineLevelCell];
+    delete state.values[field.magazineField]; delete state.values[field.magazineLevelField];
   }
   for (const [slotId, name, level] of selections) {
     const field = gameData.nephronArmor.fields.find(entry => entry.slotId === slotId);
-    state.values[field.magazineCell] = name;
-    if (level) state.values[field.magazineLevelCell] = level;
+    state.values[field.magazineField] = name;
+    if (level) state.values[field.magazineLevelField] = level;
   }
   return state;
 }
@@ -51,15 +51,15 @@ async function bossHealthFixture(runtime) {
     ['lowerwearAlternative', '戰鬥彈匣Type - I', 'Lv.2'], ['gloves', '經典彈匣Type - I', 'Lv.1'],
   ]);
   state.values['Accessory.Earring'] = '格雷特的勳章';
-  for (const chip of gameData.chipSlots.slots) { delete state.values[chip.attributeCell]; delete state.values[chip.tuningCell]; }
+  for (const chip of gameData.chipSlots.slots) { delete state.values[chip.attributeField]; delete state.values[chip.tuningField]; }
   for (const circuit of gameData.circuits.inputs) {
-    state.values[circuit.attributeCell] = '無關傷害'; state.values[circuit.valueCell] = 0;
-    delete state.values[circuitBoardRowsField(circuit.attributeCell)];
+    state.values[circuit.attributeField] = '無關傷害'; state.values[circuit.valueField] = 0;
+    delete state.values[circuitBoardRowsField(circuit.attributeField)];
   }
   const chip = (slotId, name) => {
     const slot = gameData.chipSlots.slots.find(entry => entry.id === slotId);
     const option = gameData.chips.chips.find(entry => entry.name === name);
-    state.values[slot.attributeCell] = name; state.values[slot.tuningCell] = option.tuningLevels[0].level;
+    state.values[slot.attributeField] = name; state.values[slot.tuningField] = option.tuningLevels[0].level;
     return option.tuningLevels[0].value;
   };
   chip('upper', '強者%'); chip('gloves', '排熱%');
@@ -68,9 +68,9 @@ async function bossHealthFixture(runtime) {
     ['lowerwear', '強者%', 0.1, 'Lv.10', 0], ['lowerwearAlternative', '排熱%', 0.14, 'Lv.12', 12],
   ]) {
     const slot = gameData.innerwear.slots.find(entry => entry.id === id);
-    state.values[slot.enhancementCell] = level; state.values[slot.forgingCell] = forging;
+    state.values[slot.enhancementField] = level; state.values[slot.forgingField] = forging;
     const circuit = gameData.circuits.inputs.find(entry => entry.slot === id);
-    state.values[circuitBoardRowsField(circuit.attributeCell)] = serializeCircuitBoardRows([{ attribute, percentageValue: value }]);
+    state.values[circuitBoardRowsField(circuit.attributeField)] = serializeCircuitBoardRows([{ attribute, percentageValue: value }]);
   }
   return { state, circuitBoardRowsField };
 }
@@ -120,15 +120,15 @@ test('Boss health mode applies only the selected pants and HP phase while disabl
     assert.deepEqual(normalized(noSwitch), normalized(evaluation), 'the selected single pants do not depend on the switching checkbox');
     const corrupt = structuredClone(current);
     const slot = gameData.innerwear.slots.find(entry => entry.id === excluded);
-    corrupt.values[slot.enhancementCell] = 'Lv.999'; corrupt.values[slot.forgingCell] = -99;
+    corrupt.values[slot.enhancementField] = 'Lv.999'; corrupt.values[slot.forgingField] = -99;
     const chip = gameData.chipSlots.slots.find(entry => entry.id === excluded);
-    corrupt.values[chip.attributeCell] = '無效芯片'; corrupt.values[chip.tuningCell] = '無效調校';
+    corrupt.values[chip.attributeField] = '無效芯片'; corrupt.values[chip.tuningField] = '無效調校';
     const circuit = gameData.circuits.inputs.find(entry => entry.slot === excluded);
-    corrupt.values[circuitBoardRowsField(circuit.attributeCell)] = '[{"attribute":"無效電路","percentageValue":9}]';
+    corrupt.values[circuitBoardRowsField(circuit.attributeField)] = '[{"attribute":"無效電路","percentageValue":9}]';
     const magazine = gameData.nephronArmor.fields.find(entry => entry.slotId === excluded);
-    corrupt.values[magazine.magazineCell] = '無效彈匣'; corrupt.values[magazine.magazineLevelCell] = 'Lv.99';
-    for (const entry of gameData.mapping.magicStoneSelections.inputGroups.filter(entry => entry.configuration === (excluded === 'lowerwear' ? 'lowerwearA' : 'lowerwearB'))) corrupt.values[entry.selectionCell] = '無效魔法石';
-    for (const cell of gameData.appraisals.slots.find(entry => entry.id === excluded).inputCells) corrupt.values[cell] = '無效鑑定';
+    corrupt.values[magazine.magazineField] = '無效彈匣'; corrupt.values[magazine.magazineLevelField] = 'Lv.99';
+    for (const entry of gameData.mapping.magicStoneSelections.inputGroups.filter(entry => entry.configuration === (excluded === 'lowerwear' ? 'lowerwearA' : 'lowerwearB'))) corrupt.values[entry.selectionField] = '無效魔法石';
+    for (const fieldId of gameData.appraisals.slots.find(entry => entry.id === excluded).inputFields) corrupt.values[fieldId] = '無效鑑定';
     assert.deepEqual(normalized(evaluateLoadout(gameData, corrupt, false, true)), normalized(evaluation), 'unused pants are excluded before validation and combat-rate resolution');
     const calculator = createAttributeEquivalenceCalculator(evaluation.comparisonInput, result, comparableAttributes(gameData.attributes.attributes));
     assert.equal(calculator.compare(comparison === 'above' ? 'heatPct' : 'strongerPct', 10).targetGainPct, null);
@@ -143,15 +143,15 @@ test('Boss health single-pants mode retains the selected ordinary armor appraisa
   const { evaluateLoadout, resolveLoadoutSources } = await runtime.load('frontend/projection.ts');
   for (const [index, id] of ['lowerwear', 'lowerwearAlternative'].entries()) {
     const armor = gameData.innerwear.slots.find(entry => entry.id === id);
-    state.values[armor.typeCell] = '百億';
+    state.values[armor.typeField] = '百億';
     const appraisals = gameData.appraisals.slots.find(entry => entry.id === id);
-    for (const cell of appraisals.inputCells) delete state.values[cell];
-    state.values[appraisals.inputCells[0]] = index ? '極大化+2%' : '致命一擊+1%';
+    for (const fieldId of appraisals.inputFields) delete state.values[fieldId];
+    state.values[appraisals.inputFields[0]] = index ? '極大化+2%' : '致命一擊+1%';
     const magicStones = gameData.mapping.magicStoneSelections.inputGroups.filter(entry => entry.configuration === (index ? 'lowerwearB' : 'lowerwearA'));
-    for (const entry of magicStones) delete state.values[entry.selectionCell];
+    for (const entry of magicStones) delete state.values[entry.selectionField];
     const stone = gameData.catalogs[gameData.mapping.magicStoneSelections.catalogFile].items
       .find(entry => entry.id === (index ? 'magic-stone-sage-extremization' : 'magic-stone-hunting-boss-damage'));
-    state.values[magicStones[0].selectionCell] = stone.targetApplications.armor.sourceName;
+    state.values[magicStones[0].selectionField] = stone.targetApplications.armor.sourceName;
   }
   for (const lowerwear of ['lowerwearA', 'lowerwearB']) {
     const selected = lowerwear === 'lowerwearA' ? 'lowerwear' : 'lowerwearAlternative';
@@ -164,8 +164,8 @@ test('Boss health single-pants mode retains the selected ordinary armor appraisa
     const appraisal = sources.lowerwearA.find(source => source.sourceId.startsWith('armor-appraisal:'));
     assert.ok(appraisal.sourceId.includes(`:${selected}:`));
     assert.deepEqual(JSON.parse(JSON.stringify(appraisal.stats)), lowerwear === 'lowerwearA' ? { critRatePct: 1 } : { extremizationPct: 2 });
-    const magicCell = gameData.mapping.magicStoneSelections.inputGroups.find(entry => entry.configuration === lowerwear).selectionCell;
-    const stone = sources.lowerwearA.find(source => source.sourceId.includes(magicCell));
+    const magicField = gameData.mapping.magicStoneSelections.inputGroups.find(entry => entry.configuration === lowerwear).selectionField;
+    const stone = sources.lowerwearA.find(source => source.sourceId.includes(magicField));
     assert.deepEqual(JSON.parse(JSON.stringify(stone.stats)), lowerwear === 'lowerwearA' ? { bossDamagePct: 2.5 } : { extremizationPct: 6 });
     assert.equal(evaluation.damage.result.generalMultiplicativeDamage.factors.some(effect => effect.sourceId === 'grett-medal:support-magazines'), false);
   }
@@ -234,16 +234,16 @@ test('support magazines default to locked level one and only affect damage throu
     const supportFactor = () => result().generalMultiplicativeDamage.factors.find(effect => effect.sourceId === 'grett-medal:support-magazines')?.factor;
     const baseDamage = result().finalDamage.finalDamage;
     openMagazineSlot(page, 'upper'); selectPicker(page, '彈匣種類', '支援彈匣I'); assertFixed(page);
-    assert.equal(page.readState().values[upper.magazineLevelCell], 'Lv.1');
+    assert.equal(page.readState().values[upper.magazineLevelField], 'Lv.1');
     assert.equal(result().finalDamage.finalDamage, baseDamage);
     openMagazineSlot(page, 'gloves');
     assert.ok(!magazineNames(page).includes('支援彈匣I')); assert.ok(magazineNames(page).includes('支援彈匣II'));
     selectPicker(page, '彈匣種類', '支援彈匣II'); assertFixed(page);
     assert.equal(result().finalDamage.finalDamage, baseDamage, 'neither support option has an intrinsic damage effect');
     const { createCatalogIndex } = await page.runtime.load('frontend/catalog-index.ts');
-    const levels = createCatalogIndex(gameData).resolveFieldChoices(gloves.magazineLevelCell, page.readState().values);
+    const levels = createCatalogIndex(gameData).resolveFieldChoices(gloves.magazineLevelField, page.readState().values);
     assert.deepEqual(Array.from(levels), ['Lv.1']); assert.ok(Object.isFrozen(levels));
-    page.dom.window.document.querySelector('button[data-slot-id="accessory-M6"]').click();
+    page.dom.window.document.querySelector('button[data-slot-id="Accessory.Earring"]').click();
     selectPicker(page, '選擇裝備', '格雷特的勳章'); assert.equal(supportFactor(), 1.015);
     openMagazineSlot(page, 'upper');
     page.dom.window.document.querySelector('input[aria-label="彈匣種類"]').closest('.picker').querySelector('.picker-clear').click();
@@ -255,10 +255,10 @@ test('support magazines default to locked level one and only affect damage throu
     assertFixed(page); assert.equal(supportFactor(), 1.015);
     assert.doesNotMatch(page.dom.window.document.querySelector('#transfer-status').textContent, /已留空/);
     const saved = page.readState();
-    saved.values[upper.magazineLevelCell] = 'Lv.6'; delete saved.values[gloves.magazineLevelCell];
+    saved.values[upper.magazineLevelField] = 'Lv.6'; delete saved.values[gloves.magazineLevelField];
     reloaded = await uiPage(saved);
-    assert.equal(reloaded.readState().values[upper.magazineLevelCell], 'Lv.1');
-    assert.equal(reloaded.readState().values[gloves.magazineLevelCell], 'Lv.1', 'normalization is persisted without requiring another edit');
+    assert.equal(reloaded.readState().values[upper.magazineLevelField], 'Lv.1');
+    assert.equal(reloaded.readState().values[gloves.magazineLevelField], 'Lv.1', 'normalization is persisted without requiring another edit');
     openMagazineSlot(reloaded, 'upper'); assertFixed(reloaded);
     selectPicker(reloaded, '彈匣種類', '戰鬥彈匣Type - I');
     assert.equal(levelInput(reloaded).disabled, false); assert.equal(levelInput(reloaded).value, '');
@@ -403,7 +403,7 @@ test('Grett medal magazine sources and factors update immediately when magazines
     assert.deepEqual(bonusFactors('經典／戰鬥彈匣'), [], 'disabled alternate lowerwear does not count');
     toggle.checked = true; toggle.dispatchEvent(new page.dom.window.Event('change'));
     assert.deepEqual(bonusFactors('經典／戰鬥彈匣'), ['×1.005']);
-    page.dom.window.document.querySelector('button[data-slot-id="accessory-M6"]').click();
+    page.dom.window.document.querySelector('button[data-slot-id="Accessory.Earring"]').click();
     selectPicker(page, '選擇裝備', '天線耳環');
     assert.deepEqual(bonusFactors('超級彈匣'), []); assert.deepEqual(bonusFactors('經典／戰鬥彈匣'), []);
   } finally { page.close(); }
@@ -453,8 +453,8 @@ test('Nephron magazines normalize legacy and imported duplicates in fixed slot o
   let reloaded;
   const assertSelections = (state, expected) => {
     for (const field of gameData.nephronArmor.fields) {
-      assert.equal(state.values[field.magazineCell], expected[field.slotId]?.[0], field.magazineCell);
-      assert.equal(state.values[field.magazineLevelCell], expected[field.slotId]?.[1], field.magazineLevelCell);
+      assert.equal(state.values[field.magazineField], expected[field.slotId]?.[0], field.magazineField);
+      assert.equal(state.values[field.magazineLevelField], expected[field.slotId]?.[1], field.magazineLevelField);
     }
   };
   const original = { upper: [slow, 'Lv.1'], gloves: [booster, 'Lv.2'], shoes: ['戰鬥彈匣Type - I', 'Lv.4'] };
@@ -541,8 +541,8 @@ test('FP skill checkbox preserves sources, history, baseline, JSON round-trip an
   } finally { page.close(); reloaded?.close(); }
 });
 
-const mirrorAttributeCell = 'MasterBeast.Head.Mirror.1.Attribute';
-const mirrorValueCell = 'MasterBeast.Head.Mirror.1.Value';
+const mirrorAttributeField = 'MasterBeast.Head.Mirror.1.Attribute';
+const mirrorValueField = 'MasterBeast.Head.Mirror.1.Value';
 const mirrorInput = page => page.dom.window.document.querySelector('.beast-mirror-grid .field > input');
 const openHeadMirrors = page => page.dom.window.document.querySelector('.beast-accessory-slot[data-beast-slot-id="headwear"]').click();
 
@@ -576,28 +576,28 @@ test('magazine kinds show their actual effects and chip tuning shows only percen
 
 test('unset mirrors default to unrelated damage and disabled zero without overwriting saved fields', async () => {
   const state = structuredClone(stateA);
-  delete state.values[mirrorAttributeCell]; delete state.values[mirrorValueCell];
+  delete state.values[mirrorAttributeField]; delete state.values[mirrorValueField];
   const page = await uiPage(state);
   try {
     openHeadMirrors(page);
     assert.equal(page.dom.window.document.querySelector('input[aria-label="迷鏡效果屬性"]').value, '無關傷害');
     assert.equal(mirrorInput(page).value, '0'); assert.equal(mirrorInput(page).disabled, true);
-    assert.equal(page.readState().values[mirrorAttributeCell], '無關傷害');
+    assert.equal(page.readState().values[mirrorAttributeField], '無關傷害');
     selectPicker(page, '迷鏡效果屬性', '致命一擊%');
     const input = mirrorInput(page);
     assert.equal(input.disabled, false);
     input.value = '0'; input.dispatchEvent(new page.dom.window.Event('input', { bubbles: true }));
-    assert.equal(page.readState().values[mirrorValueCell], 0);
+    assert.equal(page.readState().values[mirrorValueField], 0);
     const zeroJson = await page.exportJson();
     await page.importJson(JSON.stringify(zeroJson)); openHeadMirrors(page);
-    assert.equal(page.readState().values[mirrorValueCell], 0);
+    assert.equal(page.readState().values[mirrorValueField], 0);
     assert.equal(mirrorInput(page).disabled, false); assert.equal(mirrorInput(page).value, '0');
     const restoredInput = mirrorInput(page);
     restoredInput.value = '0.3'; restoredInput.dispatchEvent(new page.dom.window.Event('input', { bubbles: true }));
-    assert.equal(page.readState().values[mirrorValueCell], 0.003);
+    assert.equal(page.readState().values[mirrorValueField], 0.003);
     restoredInput.value = '0.1'; restoredInput.dispatchEvent(new page.dom.window.Event('input', { bubbles: true }));
     restoredInput.dispatchEvent(new page.dom.window.Event('blur'));
-    assert.equal(page.readState().values[mirrorValueCell], 0.003);
+    assert.equal(page.readState().values[mirrorValueField], 0.003);
     assert.equal(restoredInput.value, '0.3');
   } finally { page.close(); }
 });
@@ -609,8 +609,8 @@ test('unrelated mirror selection zeroes its value, survives export/reload and un
     openHeadMirrors(page);
     const beforeDamage = page.dom.window.document.querySelector('#damage-result').textContent;
     selectPicker(page, '迷鏡效果屬性', '無關傷害');
-    assert.equal(page.readState().values[mirrorAttributeCell], '無關傷害');
-    assert.equal(page.readState().values[mirrorValueCell], 0);
+    assert.equal(page.readState().values[mirrorAttributeField], '無關傷害');
+    assert.equal(page.readState().values[mirrorValueField], 0);
     assert.equal(mirrorInput(page).disabled, true); assert.equal(mirrorInput(page).value, '0');
     const afterDamage = page.dom.window.document.querySelector('#damage-result').textContent;
     assert.notEqual(afterDamage, beforeDamage);
@@ -622,7 +622,7 @@ test('unrelated mirror selection zeroes its value, survives export/reload and un
     assert.equal(page.dom.window.document.querySelector('#damage-result').textContent, afterDamage);
     const json = await page.exportJson();
     await page.importJson(JSON.stringify(json));
-    assert.equal(page.readState().values[mirrorValueCell], 0);
+    assert.equal(page.readState().values[mirrorValueField], 0);
     reloaded = await uiPage(page.readState()); openHeadMirrors(reloaded);
     assert.equal(mirrorInput(reloaded).disabled, true); assert.equal(mirrorInput(reloaded).value, '0');
     assert.equal(reloaded.dom.window.document.querySelector('#damage-result').textContent, afterDamage);
@@ -778,7 +778,7 @@ test('內布隆襲擊戰的3%乘算只在勾選且裝備格雷特的勳章時生
     const checkbox = document.querySelector('.battle-panel > .panel-heading input[type="checkbox"]');
     assert.ok(checkbox);
     const selectEarring = name => {
-      document.querySelector('button[data-slot-id="accessory-M6"]').click();
+      document.querySelector('button[data-slot-id="Accessory.Earring"]').click();
       selectPicker(page, '選擇裝備', name);
     };
     const { projectDamage } = await page.runtime.load('frontend/projection.ts');
@@ -871,11 +871,11 @@ test('stage undo/redo keep complex control subtrees and release no unrelated pic
 test('import/undo/redo dispose detached direct-entry controls immediately and retain one catalog index', async () => {
   const page = await uiPage();
   try {
-    const potentialCell = 'MasterBeast.OverallPotential';
-    const changedPotential = gameData.masterBeast.options.find(option => option.category === 'overall' && option.name !== stateA.values[potentialCell]);
+    const potentialField = 'MasterBeast.OverallPotential';
+    const changedPotential = gameData.masterBeast.options.find(option => option.category === 'overall' && option.name !== stateA.values[potentialField]);
     assert.ok(changedPotential);
     const alternateState = structuredClone(stateB);
-    alternateState.values[potentialCell] = changedPotential.name;
+    alternateState.values[potentialField] = changedPotential.name;
     const picker = await page.runtime.load('frontend/picker.ts');
     const count = picker.__pickerRegistrations().length;
     page.runtime.resetCounts();

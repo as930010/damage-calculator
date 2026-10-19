@@ -6,7 +6,7 @@ import { calculateCombatRates } from '../dist/calculation/engine.js';
 const readJson = async path => JSON.parse(await readFile(new URL(`../data/${path}`, import.meta.url), 'utf8'));
 const classes = ['ES', 'BQ', 'DE'];
 
-function spreadsheetCritTier(pct) {
+function referenceCritTier(pct) {
   const raw = pct / 100;
   return Math.min(Math.max(0, raw), 0.4)
     + 0.8 * Math.min(Math.max(0, raw - 0.4), 0.35)
@@ -14,7 +14,7 @@ function spreadsheetCritTier(pct) {
     + 0.4 * Math.min(Math.max(0, raw - 1.05), 0.35);
 }
 
-function spreadsheetExtremizationTier(pct) {
+function referenceExtremizationTier(pct) {
   const raw = pct / 100;
   return Math.min(Math.max(0, raw), 0.4)
     + 0.75 * Math.min(Math.max(0, raw - 0.4), 0.4)
@@ -40,8 +40,8 @@ test('ES、BQ、DE 被動方式與各自重複來源都保留', async () => {
 
     const actual = calculateCombatRates({ classId, classEffects: document, baseCritRatePct, baseExtremizationPct });
     for (const [attribute, rawBase, tierFn] of [
-      ['critRate', baseCritRatePct, spreadsheetCritTier],
-      ['extremization', baseExtremizationPct, spreadsheetExtremizationTier],
+      ['critRate', baseCritRatePct, referenceCritTier],
+      ['extremization', baseExtremizationPct, referenceExtremizationTier],
     ]) {
       const effects = expectedProfiles[classId][attribute];
       const diminishing = effects.filter(([method]) => method === 'diminishing').reduce((sum, [, value]) => sum + value, 0);

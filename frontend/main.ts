@@ -62,7 +62,7 @@ async function start() {
     target.values['MasterBeast.Head.CustomAttribute'] = '無關傷害';
     return true;
   };
-  const migrateLegacyGloveCircuitSkillDamage = (target: LoadoutState) => migrateGloveCircuit(target.values, catalogIndex.gloveCircuit?.attributeCell);
+  const migrateLegacyGloveCircuitSkillDamage = (target: LoadoutState) => migrateGloveCircuit(target.values, catalogIndex.gloveCircuit?.attributeField);
   const migrateLegacyPortraitAwakening = (target: LoadoutState) => migratePortrait(target.values, data.otherEffects.portraitAwakening);
   const normalizePortraitAwakeningValues = (target: LoadoutState) => normalizePortraitValues(target.values, data.otherEffects.portraitAwakening);
   const startupLegacyHeadStoneLabelMigrated = migrateLegacyHeadStoneLabel(state);
@@ -70,71 +70,71 @@ async function start() {
   const startupLegacyPortraitAwakeningMigrated = migrateLegacyPortraitAwakening(state);
   const startupPortraitAwakeningNormalized = normalizePortraitAwakeningValues(state);
   const clearInvalidAccessoryAppraisals = (target: LoadoutState) => {
-    const clearedCells: string[] = [];
+    const clearedFields: string[] = [];
     for (const group of data.accessoryEffects.groups) {
-      const mapping = data.mapping.selections.find(entry => entry.selectionCell === group.selectionCell);
-      const itemName = String(target.values[group.selectionCell] ?? '');
+      const mapping = data.mapping.selections.find(entry => entry.selectionField === group.selectionField);
+      const itemName = String(target.values[group.selectionField] ?? '');
       const item = mapping && itemName
         ? data.catalogs[mapping.catalogFile].items.find(entry => entry.slotId === group.slotId && entry.name === itemName)
         : undefined;
       const options = itemName ? group.optionsByEquipmentName?.[itemName] ?? group.options : group.options;
       const effectCount = item?.appraisal?.canAppraise && Number.isInteger(item.appraisal.effectCount)
-        && item.appraisal.effectCount! > 0 && item.appraisal.effectCount! <= group.inputCells.length
+        && item.appraisal.effectCount! > 0 && item.appraisal.effectCount! <= group.inputFields.length
         ? item.appraisal.effectCount!
         : 0;
-      for (const [index, cell] of group.inputCells.entries()) {
-        const value = String(target.values[cell] ?? '');
+      for (const [index, fieldId] of group.inputFields.entries()) {
+        const value = String(target.values[fieldId] ?? '');
         if (!value || (index < effectCount && options.some(option => option.name === value))) continue;
-        delete target.values[cell];
-        clearedCells.push(cell);
+        delete target.values[fieldId];
+        clearedFields.push(fieldId);
       }
     }
-    return clearedCells;
+    return clearedFields;
   };
-  const startupInvalidAccessoryAppraisalCells = clearInvalidAccessoryAppraisals(state);
+  const startupInvalidAccessoryAppraisalFields = clearInvalidAccessoryAppraisals(state);
   const clearDuplicateTransformationChoices = (target: LoadoutState) => {
     const seen = new Set<string>();
-    const clearedCells: string[] = [];
+    const clearedFields: string[] = [];
     for (const slot of data.transformations.slots) {
-      const choice = String(target.values[slot.choiceCell] ?? '');
+      const choice = String(target.values[slot.choiceField] ?? '');
       if (!choice) continue;
       if (seen.has(choice)) {
-        delete target.values[slot.choiceCell];
-        clearedCells.push(slot.choiceCell);
+        delete target.values[slot.choiceField];
+        clearedFields.push(slot.choiceField);
       } else seen.add(choice);
     }
-    return clearedCells;
+    return clearedFields;
   };
-  const startupDuplicateTransformationCells = clearDuplicateTransformationChoices(state);
+  const startupDuplicateTransformationFields = clearDuplicateTransformationChoices(state);
   const clearDuplicateNephronTransformationChoices = (target: LoadoutState) => {
-    const clearedCells: string[] = [];
+    const clearedFields: string[] = [];
     for (const field of data.nephronArmor.fields) {
       const seen = new Set<string>();
       for (const transform of field.transformFields) {
-        const choice = String(target.values[transform.attributeCell] ?? '');
+        const choice = String(target.values[transform.attributeField] ?? '');
         if (!choice || choice === '無關傷害') continue;
         if (seen.has(choice)) {
-          delete target.values[transform.attributeCell];
-          delete target.values[transform.valueCell];
-          clearedCells.push(transform.attributeCell, transform.valueCell);
+          delete target.values[transform.attributeField];
+          delete target.values[transform.valueField];
+          clearedFields.push(transform.attributeField, transform.valueField);
         } else seen.add(choice);
       }
     }
-    return clearedCells;
+    return clearedFields;
   };
-  const startupDuplicateNephronTransformationCells = clearDuplicateNephronTransformationChoices(state);
-  const startupDuplicateNephronMagazineCells = normalizeNephronMagazineSelections(state.values, catalogIndex);
+  const startupDuplicateNephronTransformationFields = clearDuplicateNephronTransformationChoices(state);
+  const startupDuplicateNephronMagazineFields = normalizeNephronMagazineSelections(state.values, catalogIndex);
   const startupOptionalEffectsNormalized = normalizeOptionalEffectValues(state.values, catalogIndex);
-  if ((startupLegacyEnvironmentMigrated || startupLegacyHeadStoneLabelMigrated || startupLegacyGloveCircuitMigrated || startupLegacyPortraitAwakeningMigrated || startupPortraitAwakeningNormalized || startupOptionalEffectsNormalized || startupDuplicateTransformationCells.length || startupDuplicateNephronTransformationCells.length || startupInvalidAccessoryAppraisalCells.length || startupDuplicateNephronMagazineCells.changed) && !sampleMode) saveState(state);
-  const weaponMagicStoneCells = data.weaponGrades.colorGroups.flatMap(group => group.settingKeys);
+  if ((startupLegacyEnvironmentMigrated || startupLegacyHeadStoneLabelMigrated || startupLegacyGloveCircuitMigrated || startupLegacyPortraitAwakeningMigrated || startupPortraitAwakeningNormalized || startupOptionalEffectsNormalized || startupDuplicateTransformationFields.length || startupDuplicateNephronTransformationFields.length || startupInvalidAccessoryAppraisalFields.length || startupDuplicateNephronMagazineFields.changed) && !sampleMode) saveState(state);
+  const weaponMagicStoneFields = data.weaponGrades.colorGroups.flatMap(group => group.settingKeys);
   const applyWeaponMagicStonePreset = (grade: string, overwrite = false) => {
     if (!grade) return;
-    if (!overwrite && weaponMagicStoneCells.some(cell => state.values[cell] !== undefined)) return;
+    if (!overwrite && weaponMagicStoneFields.some(fieldId => state.values[fieldId] !== undefined)) return;
     for (const colorGroup of data.weaponGrades.colorGroups) {
       const optionId = colorGroup.presetByGrade[grade];
       const option = colorGroup.options.find(entry => entry.id === optionId);
       if (!option) continue;
-      for (const cell of colorGroup.settingKeys) state.values[cell] = option.name;
+      for (const fieldId of colorGroup.settingKeys) state.values[fieldId] = option.name;
     }
   };
   applyWeaponMagicStonePreset(String(state.values[data.weaponGrades.settingKey] ?? ''));
@@ -159,14 +159,14 @@ async function start() {
   let selectedBeastSlotId: BeastAccessorySlotId | null = null;
   const beastAccessorySlots: readonly {
     id: BeastAccessorySlotId; label: string; icon: string;
-    fixedCells?: readonly [string, string]; stoneCells?: readonly [string, string]; stoneCategory?: BeastManualCategory;
-    mirrorCells: readonly (readonly [string, string])[];
+    fixedFields?: readonly [string, string]; stoneFields?: readonly [string, string]; stoneCategory?: BeastManualCategory;
+    mirrorFields: readonly (readonly [string, string])[];
   }[] = [
-    { id: 'headwear', label: '頭飾', icon: 'hair', fixedCells: ['MasterBeast.Head.Option1', 'MasterBeast.Head.Option2'], stoneCells: ['MasterBeast.Head.CustomAttribute', 'MasterBeast.Head.CustomValue'], stoneCategory: 'head', mirrorCells: [['MasterBeast.Head.Mirror.1.Attribute', 'MasterBeast.Head.Mirror.1.Value'], ['MasterBeast.Head.Mirror.2.Attribute', 'MasterBeast.Head.Mirror.2.Value'], ['MasterBeast.Head.Mirror.3.Attribute', 'MasterBeast.Head.Mirror.3.Value']] },
-    { id: 'armor', label: '盔甲', icon: 'upper', mirrorCells: [['MasterBeast.Armor.Mirror.1.Attribute', 'MasterBeast.Armor.Mirror.1.Value'], ['MasterBeast.Armor.Mirror.2.Attribute', 'MasterBeast.Armor.Mirror.2.Value'], ['MasterBeast.Armor.Mirror.3.Attribute', 'MasterBeast.Armor.Mirror.3.Value']] },
-    { id: 'necklace', label: '項鍊', icon: 'necklace', stoneCells: ['MasterBeast.Necklace.CustomAttribute', 'MasterBeast.Necklace.CustomValue'], stoneCategory: 'necklace', mirrorCells: [['MasterBeast.Necklace.Mirror.1.Attribute', 'MasterBeast.Necklace.Mirror.1.Value'], ['MasterBeast.Necklace.Mirror.2.Attribute', 'MasterBeast.Necklace.Mirror.2.Value'], ['MasterBeast.Necklace.Mirror.3.Attribute', 'MasterBeast.Necklace.Mirror.3.Value']] },
-    { id: 'ring-one', label: '指環 1', icon: 'ring', fixedCells: ['MasterBeast.Ring1.Option1', 'MasterBeast.Ring1.Option2'], stoneCells: ['MasterBeast.Ring1.CustomAttribute', 'MasterBeast.Ring1.CustomValue'], stoneCategory: 'ring', mirrorCells: [['MasterBeast.Ring1.Mirror.1.Attribute', 'MasterBeast.Ring1.Mirror.1.Value'], ['MasterBeast.Ring1.Mirror.2.Attribute', 'MasterBeast.Ring1.Mirror.2.Value'], ['MasterBeast.Ring1.Mirror.3.Attribute', 'MasterBeast.Ring1.Mirror.3.Value']] },
-    { id: 'ring-two', label: '指環 2', icon: 'ring', fixedCells: ['MasterBeast.Ring2.Option1', 'MasterBeast.Ring2.Option2'], stoneCells: ['MasterBeast.Ring2.CustomAttribute', 'MasterBeast.Ring2.CustomValue'], stoneCategory: 'ring', mirrorCells: [['MasterBeast.Ring2.Mirror.1.Attribute', 'MasterBeast.Ring2.Mirror.1.Value'], ['MasterBeast.Ring2.Mirror.2.Attribute', 'MasterBeast.Ring2.Mirror.2.Value'], ['MasterBeast.Ring2.Mirror.3.Attribute', 'MasterBeast.Ring2.Mirror.3.Value']] },
+    { id: 'headwear', label: '頭飾', icon: 'hair', fixedFields: ['MasterBeast.Head.Option1', 'MasterBeast.Head.Option2'], stoneFields: ['MasterBeast.Head.CustomAttribute', 'MasterBeast.Head.CustomValue'], stoneCategory: 'head', mirrorFields: [['MasterBeast.Head.Mirror.1.Attribute', 'MasterBeast.Head.Mirror.1.Value'], ['MasterBeast.Head.Mirror.2.Attribute', 'MasterBeast.Head.Mirror.2.Value'], ['MasterBeast.Head.Mirror.3.Attribute', 'MasterBeast.Head.Mirror.3.Value']] },
+    { id: 'armor', label: '盔甲', icon: 'upper', mirrorFields: [['MasterBeast.Armor.Mirror.1.Attribute', 'MasterBeast.Armor.Mirror.1.Value'], ['MasterBeast.Armor.Mirror.2.Attribute', 'MasterBeast.Armor.Mirror.2.Value'], ['MasterBeast.Armor.Mirror.3.Attribute', 'MasterBeast.Armor.Mirror.3.Value']] },
+    { id: 'necklace', label: '項鍊', icon: 'necklace', stoneFields: ['MasterBeast.Necklace.CustomAttribute', 'MasterBeast.Necklace.CustomValue'], stoneCategory: 'necklace', mirrorFields: [['MasterBeast.Necklace.Mirror.1.Attribute', 'MasterBeast.Necklace.Mirror.1.Value'], ['MasterBeast.Necklace.Mirror.2.Attribute', 'MasterBeast.Necklace.Mirror.2.Value'], ['MasterBeast.Necklace.Mirror.3.Attribute', 'MasterBeast.Necklace.Mirror.3.Value']] },
+    { id: 'ring-one', label: '指環 1', icon: 'ring', fixedFields: ['MasterBeast.Ring1.Option1', 'MasterBeast.Ring1.Option2'], stoneFields: ['MasterBeast.Ring1.CustomAttribute', 'MasterBeast.Ring1.CustomValue'], stoneCategory: 'ring', mirrorFields: [['MasterBeast.Ring1.Mirror.1.Attribute', 'MasterBeast.Ring1.Mirror.1.Value'], ['MasterBeast.Ring1.Mirror.2.Attribute', 'MasterBeast.Ring1.Mirror.2.Value'], ['MasterBeast.Ring1.Mirror.3.Attribute', 'MasterBeast.Ring1.Mirror.3.Value']] },
+    { id: 'ring-two', label: '指環 2', icon: 'ring', fixedFields: ['MasterBeast.Ring2.Option1', 'MasterBeast.Ring2.Option2'], stoneFields: ['MasterBeast.Ring2.CustomAttribute', 'MasterBeast.Ring2.CustomValue'], stoneCategory: 'ring', mirrorFields: [['MasterBeast.Ring2.Mirror.1.Attribute', 'MasterBeast.Ring2.Mirror.1.Value'], ['MasterBeast.Ring2.Mirror.2.Attribute', 'MasterBeast.Ring2.Mirror.2.Value'], ['MasterBeast.Ring2.Mirror.3.Attribute', 'MasterBeast.Ring2.Mirror.3.Value']] },
   ];
   const app = document.querySelector<HTMLElement>('#app')!;
     app.innerHTML = `<section class="workbench"><header class="workspace-heading"><div class="workspace-intro"><span class="eyebrow">EQUIPMENT SIMULATOR</span><h1>裝備傷害比較</h1><p class="workspace-summary">填入當前數值並設為比較基準，再調整配裝查看傷害差異。</p><ol class="workflow-steps" aria-label="比較流程"><li><span>01</span><span>填入當前數值</span></li><li><span>02</span><span>設為比較基準</span></li><li><span>03</span><span>填入新數值</span></li></ol></div></header><div class="toolbar"><div id="class-picker"></div><label class="toggle"><input id="alternate" type="checkbox">啟用強/排褲切換</label><div class="toolbar-actions"><button id="baseline" type="button">設為比較基準</button><div class="transfer-actions"><button id="import-loadout" type="button">匯入配裝</button><button id="export-loadout" type="button">匯出配裝</button></div></div><input id="loadout-file" type="file" accept="application/json,.json" hidden><span id="transfer-status" role="status" aria-live="polite"></span><span id="save-status" role="status"></span></div><section class="battle-panel"><div class="panel-heading"><h2>關卡設定</h2></div><div id="battle-settings" class="battle-fields"></div></section><div class="equipment-workspace"><section class="equipment-panel"><div class="panel-heading"><h2>裝備配置</h2><span>點選部位以編輯</span></div><div id="equipment-damage-summary" class="equipment-damage-summary" aria-live="polite"></div><div class="canvas-scroll"><div class="equipment-canvas"><span class="group-label costume-label">連身時裝</span><span class="group-label left-label">左冰</span><span class="group-label inner-label">內裝左四</span><span class="group-label weapon-label">冰武 / 武器</span><span class="group-label right-label">右冰</span><span class="group-label accessory-label">飾品</span><span class="group-label beast-label">聖獸飾品</span><div id="title-input" class="canvas-title-input"></div><div id="slots"></div><div id="beast-accessory-fields" class="beast-accessories-grid gear-beast-slots" aria-label="聖獸飾品配置"></div></div></div><p class="panel-note">左冰不支援混搭，但各部位魔法石仍須獨立設定。擁有強/排褲則褲子的傷害增幅會被平均計算。</p><section class="right-ice-set-area"><div class="beast-accessories-heading"><h3>右冰套效</h3><span>最多選擇 ${data.rightIceSets.maxSelectedSets} 套</span></div><p class="panel-note">選擇要啟用的套裝效果。</p><div id="right-ice-set-selectors" class="right-ice-set-selectors"></div></section><div class="beast-accessories-area"><div class="beast-accessories-heading"><h3>聖獸效果設定</h3><span>頭飾、盔甲、項鍊、指環 1、指環 2</span></div><p class="panel-note">共通顏色與潛力設定；各部位效果請使用裝備配置中的聖獸飾品欄位。</p><div id="master-beast-controls" class="master-beast-controls"></div></div></section><div id="inspector-backdrop" class="inspector-backdrop" aria-hidden="true"></div><aside id="inspector" class="inspector" aria-label="部位設定"></aside></div><details class="global-source-panel weapon-magic-stone-panel"><summary>武器魔力石</summary><div id="weapon-magic-stone-fields"></div></details><details class="global-source-panel"><summary>其他效果來源設定</summary><p class="panel-note">未列在此處的特殊條件或 Buff／Debuff 尚未納入計算。</p><div id="global-source-fields"></div></details><section class="results-panel"><div class="panel-heading"><h2>目前填寫的屬性</h2><span id="comparison-label"></span></div><p class="panel-note">已填入的屬性彙總，包含內裝、冰裝、武器、關卡與其他效果設定、需要特殊觸發條件的暫時沒有計入。</p><div id="results" aria-live="polite"></div><section class="damage-panel"><div class="panel-heading"><h2>攻擊與最終傷害</h2></div><p class="panel-note">此數值只反映已填寫的內容。</p><div id="damage-result" aria-live="polite"></div><details class="calculation-inspection-panel"><summary>計算結果驗算</summary><div class="calculation-inspection-content"><div id="calculation-comparison" class="calculation-comparison" aria-live="polite"><p>先點選「設為比較基準」保存目前配置，表格就會比較基準與目前配裝。</p></div><div id="calculation-details"></div></div></details></section></section></section>`;
@@ -404,11 +404,11 @@ async function start() {
     document.querySelector('footer')!.textContent = '這個分頁使用驗算範例；調整只保留至關閉或重新整理頁面。';
     document.querySelector('#save-status')!.textContent = '驗算範例模式';
   }
-  if (startupDuplicateTransformationCells.length) {
-    document.querySelector<HTMLElement>('#transfer-status')!.textContent = `已清除舊配裝中的重複武器變換詞條（${startupDuplicateTransformationCells.length} 個欄位）。`;
+  if (startupDuplicateTransformationFields.length) {
+    document.querySelector<HTMLElement>('#transfer-status')!.textContent = `已清除舊配裝中的重複武器變換詞條（${startupDuplicateTransformationFields.length} 個欄位）。`;
   }
-  if (startupInvalidAccessoryAppraisalCells.length) {
-    document.querySelector<HTMLElement>('#transfer-status')!.textContent = `已清除不符合目前裝備的鑑定選項（${startupInvalidAccessoryAppraisalCells.length} 個欄位）。`;
+  if (startupInvalidAccessoryAppraisalFields.length) {
+    document.querySelector<HTMLElement>('#transfer-status')!.textContent = `已清除不符合目前裝備的鑑定選項（${startupInvalidAccessoryAppraisalFields.length} 個欄位）。`;
   }
   const val = (fieldId: string) => String(state.values[fieldId] ?? '');
   const summary = (stats: Readonly<Record<string, number>>) => Object.entries(stats).filter(([, value]) => value !== 0).map(([key, value]) => `${data.attributes.attributes.find(a => a.key === key)?.name ?? key} ${fmt(value)}`).join(' · ');
@@ -456,9 +456,9 @@ async function start() {
     const alternative = data.circuits.inputs.find(slot => slot.slot === "lowerwearAlternative");
     if (!lowerwear || !alternative) return null;
     const conditionalAttributes = new Set(["強者%", "排熱%"]);
-    const lowerwearAttributes = new Set(readCircuitBoardRows(state.values, lowerwear.attributeCell, lowerwear.valueCell)
+    const lowerwearAttributes = new Set(readCircuitBoardRows(state.values, lowerwear.attributeField, lowerwear.valueField)
       .map(row => row.attribute).filter(attribute => conditionalAttributes.has(attribute)));
-    return readCircuitBoardRows(state.values, alternative.attributeCell, alternative.valueCell)
+    return readCircuitBoardRows(state.values, alternative.attributeField, alternative.valueField)
       .find(row => lowerwearAttributes.has(row.attribute))?.attribute ?? null;
   };
   const circuitAttributeOptions = (slot: (typeof data.circuits.inputs)[number], rows: ReturnType<typeof readCircuitBoardRows>, rowIndex: number) => {
@@ -467,7 +467,7 @@ async function start() {
     const peer = data.circuits.inputs.find(entry => entry.slot === peerSlot);
     const conditionalAttributes = new Set(["強者%", "排熱%"]);
     const peerAttributes = new Set(peer
-      ? readCircuitBoardRows(state.values, peer.attributeCell, peer.valueCell).map(row => row.attribute)
+      ? readCircuitBoardRows(state.values, peer.attributeField, peer.valueField).map(row => row.attribute)
       : []);
     const currentAttribute = rows[rowIndex]?.attribute;
     const names = slot.attributeOptions.filter(name =>
@@ -479,20 +479,20 @@ async function start() {
     const lowerwear = data.chipSlots.slots.find(slot => slot.id === "lowerwear");
     const alternative = data.chipSlots.slots.find(slot => slot.id === "lowerwearAlternative");
     if (!lowerwear || !alternative) return null;
-    const selected = val(lowerwear.attributeCell);
-    return selected === val(alternative.attributeCell) && (selected === "強者%" || selected === "排熱%") ? selected : null;
+    const selected = val(lowerwear.attributeField);
+    return selected === val(alternative.attributeField) && (selected === "強者%" || selected === "排熱%") ? selected : null;
   };
   const chipAttributeOptions = (slot: (typeof data.chipSlots.slots)[number]) => {
-    const chipNames = catalogIndex.resolveFieldChoices(slot.attributeCell, state.values) as readonly string[];
+    const chipNames = catalogIndex.resolveFieldChoices(slot.attributeField, state.values) as readonly string[];
     if (!isLowerwearAveraging() || (slot.id !== "lowerwear" && slot.id !== "lowerwearAlternative")) return options(chipNames);
     const peerId = slot.id === "lowerwear" ? "lowerwearAlternative" : "lowerwear";
     const peer = data.chipSlots.slots.find(entry => entry.id === peerId);
-    const peerAttribute = peer ? val(peer.attributeCell) : "";
+    const peerAttribute = peer ? val(peer.attributeField) : "";
     const blocked = peerAttribute === "強者%" || peerAttribute === "排熱%";
     return options(blocked ? chipNames.filter(name => name !== peerAttribute) : chipNames);
   };
-  const validationChoices = (cell: string, percentLabel = false): readonly PickerOption[] => {
-    const catalog = catalogIndex.validationCatalog(cell);
+  const validationChoices = (fieldId: string, percentLabel = false): readonly PickerOption[] => {
+    const catalog = catalogIndex.validationCatalog(fieldId);
     if (!catalog) return [];
     const key = JSON.stringify([catalog.id, percentLabel]);
     let choices = validationPickerChoices.get(key);
@@ -529,14 +529,14 @@ async function start() {
   const beastButtons = new Map<string, HTMLButtonElement>();
   let slotUiKey = '', beastUiKey = '', masterUiKey = '', rightIceUiKey = '';
   const slotSignature = () => JSON.stringify([selected.id, state.lowerwearAlternativeEnabled, state.bossHealthCondition,
-    data.layout.slots.map(slot => slot.selectionCell ? val(slot.selectionCell) : slot.weapon ? val('Weapon.ENHC')
-      : slot.innerwearId ? val(catalogIndex.innerwearById(slot.innerwearId)!.enhancementCell) : ''),
-    data.rightIceSets.selectionCells.map(val)]);
+    data.layout.slots.map(slot => slot.selectionField ? val(slot.selectionField) : slot.weapon ? val('Weapon.ENHC')
+      : slot.innerwearId ? val(catalogIndex.innerwearById(slot.innerwearId)!.enhancementField) : ''),
+    data.rightIceSets.selectionFields.map(val)]);
   const beastSignature = () => JSON.stringify([selectedBeastSlotId,
-    beastAccessorySlots.map(slot => [...(slot.fixedCells ?? []), ...(slot.stoneCells ?? []), ...slot.mirrorCells.flat()].map(val))]);
+    beastAccessorySlots.map(slot => [...(slot.fixedFields ?? []), ...(slot.stoneFields ?? []), ...slot.mirrorFields.flat()].map(val))]);
   const masterSignature = () => JSON.stringify([state.masterBeastSpiritStoneColor, val('MasterBeast.OverallPotential')]);
-  const rightIceSignature = () => JSON.stringify([data.rightIceSets.selectionCells.map(val),
-    data.mapping.selections.filter(selection => selection.catalogFile.endsWith('right-ice.json')).map(selection => val(selection.selectionCell))]);
+  const rightIceSignature = () => JSON.stringify([data.rightIceSets.selectionFields.map(val),
+    data.mapping.selections.filter(selection => selection.catalogFile.endsWith('right-ice.json')).map(selection => val(selection.selectionField))]);
   const refreshEquipmentUi = () => {
     if (slotUiKey !== slotSignature()) renderSlots();
     if (beastUiKey !== beastSignature()) renderBeastAccessories();
@@ -545,7 +545,7 @@ async function start() {
   // Conservative snapshot for complex controls: only Stage fields are excluded.
   // Their candidates/values never depend on Stage; all other changes may redraw them.
   const configurationControlSignature = () => JSON.stringify({ ...state,
-    values: Object.fromEntries(Object.keys(state.values).filter(cell => !cell.startsWith('Stage.')).sort().map(cell => [cell, state.values[cell]])) });
+    values: Object.fromEntries(Object.keys(state.values).filter(fieldId => !fieldId.startsWith('Stage.')).sort().map(fieldId => [fieldId, state.values[fieldId]])) });
   const configurationControlKeys = new Map<string, string>();
   const refreshRightIceSelectors = () => { if (rightIceUiKey !== rightIceSignature()) renderRightIceSetSelectors(); };
   const update = (force = false) => {
@@ -596,25 +596,25 @@ async function start() {
       }
     }
     if (sourceId.startsWith('simulator:')) {
-      const cell = sourceId.slice('simulator:'.length);
-      const stoneSlot = data.layout.slots.find(entry => entry.stoneCells?.includes(cell));
-      const selectedSlots = data.layout.slots.filter(entry => entry.selectionCell === cell);
+      const fieldId = sourceId.slice('simulator:'.length);
+      const stoneSlot = data.layout.slots.find(entry => entry.stoneFields?.includes(fieldId));
+      const selectedSlots = data.layout.slots.filter(entry => entry.selectionField === fieldId);
       const slot = stoneSlot ?? selectedSlots[0];
-      const selected = String(state.values[cell] ?? '').trim();
+      const selected = String(state.values[fieldId] ?? '').trim();
       if (stoneSlot) return `${stoneSlot.label}魔法石：${selected}`;
       if (selectedSlots.length > 1) {
         const group = data.layout.groups.find(entry => entry.id === selectedSlots[0].group);
         return `${group?.name ?? selectedSlots[0].group}套裝：${selected}`;
       }
       if (slot) return `${slot.label}：${selected}`;
-      return `裝備選擇（${cell}）${selected ? `：${selected}` : ''}`;
+      return `裝備選擇（${fieldId}）${selected ? `：${selected}` : ''}`;
     }
     if (sourceId.startsWith('nephron-transform:')) {
       const [, slotId, line] = sourceId.split(':');
       const field = data.nephronArmor.fields.find(entry => entry.slotId === slotId);
       const index = Number(line) - 1;
-      const attributeCell = field && index >= 0 ? field.transformFields[index]?.attributeCell : undefined;
-      const attribute = attributeCell ? String(state.values[attributeCell] ?? '') : '';
+      const attributeField = field && index >= 0 ? field.transformFields[index]?.attributeField : undefined;
+      const attribute = attributeField ? String(state.values[attributeField] ?? '') : '';
       const partNames: Record<string, string> = { Upper: '上衣', Lowerwear: '下衣', LowerwearAlternative: '強/排褲', Gloves: '手套', Shoes: '鞋子' };
       return '內布隆' + (partNames[field?.part ?? ''] ?? field?.part ?? '') + '變換：' + attribute;
     }
@@ -636,19 +636,19 @@ async function start() {
       const slotId = sourceId.slice('chip:'.length);
       const slot = data.chipSlots.slots.find(entry => entry.id === slotId);
       const slotNames: Record<string, string> = { upper: '上衣', lowerwear: '下衣', lowerwearAlternative: '強/排褲', gloves: '手套', shoes: '鞋子' };
-      return slot ? `${slotNames[slot.id] ?? slot.id}芯片：${String(state.values[slot.attributeCell] ?? '')}（調校 ${String(state.values[slot.tuningCell] ?? '')}）` : `芯片調校來源待確認（${sourceId}）`;
+      return slot ? `${slotNames[slot.id] ?? slot.id}芯片：${String(state.values[slot.attributeField] ?? '')}（調校 ${String(state.values[slot.tuningField] ?? '')}）` : `芯片調校來源待確認（${sourceId}）`;
     }
     if (sourceId.startsWith('circuit-board:')) {
       const [slotId, rowNumber] = sourceId.slice('circuit-board:'.length).split(':');
       const slot = data.circuits.inputs.find(entry => entry.slot === slotId);
       if (rowNumber && slot) {
-        const row = readCircuitBoardRows(state.values, slot.attributeCell, slot.valueCell)[Number(rowNumber) - 1];
+        const row = readCircuitBoardRows(state.values, slot.attributeField, slot.valueField)[Number(rowNumber) - 1];
         const slotNames: Record<string, string> = { upper: '上衣', lowerwear: '下衣', lowerwearAlternative: '強/排褲', gloves: '手套', shoes: '鞋子' };
         if (row) return (slotNames[slotId] ?? slotId) + '電路板第 ' + rowNumber + ' 列：' + row.attribute + ' ' + fmt((row.percentageValue ?? 0) * 100) + '%';
       }
       const slotNames: Record<string, string> = { upper: '上衣電路板', lowerwear: '下衣電路板', lowerwearAlternative: '強/排褲電路板', gloves: '手套電路板', shoes: '鞋子電路板' };
       if (slotNames[slotId] && !rowNumber) return slotNames[slotId];
-      return slot ? `電路板 ${slotId}：${String(state.values[slot.attributeCell] ?? '')} ${fmt(Number(state.values[slot.valueCell] ?? 0) * 100)}%` : `電路板來源待確認（${sourceId}）`;
+      return slot ? `電路板 ${slotId}：${String(state.values[slot.attributeField] ?? '')} ${fmt(Number(state.values[slot.valueField] ?? 0) * 100)}%` : `電路板來源待確認（${sourceId}）`;
     }
     if (sourceId === '立繪、覺醒:Effect.PortraitAwakening') return '立繪、覺醒';
     if (sourceId.startsWith('color-set:')) return `百億套效：${sourceId.slice('color-set:'.length)}`;
@@ -684,9 +684,9 @@ async function start() {
     if (atma) return atmaNames[atma.id] ?? `亞特瑪來源待確認（${atma.id}）`;
     if (sourceId.startsWith('weapon-growth')) return `武器成長：${String(state.values[data.growth.settingKey] ?? '')}`;
     if (sourceId.startsWith('weapon-appraisal:')) {
-      const cell = sourceId.slice('weapon-appraisal:'.length);
-      const group = Object.values(data.weaponAppraisals.groups).find(entry => entry.settingKey === cell);
-      return `武器鑑定${group ? `：${String(state.values[cell] ?? '')}` : ''}`;
+      const fieldId = sourceId.slice('weapon-appraisal:'.length);
+      const group = Object.values(data.weaponAppraisals.groups).find(entry => entry.settingKey === fieldId);
+      return `武器鑑定${group ? `：${String(state.values[fieldId] ?? '')}` : ''}`;
     }
     if (sourceId.startsWith('giant-stone:')) {
       return '巨型魔力石';
@@ -723,7 +723,7 @@ async function start() {
     }
     if (sourceId === 'lowerwear-crit-rate-enhancement') return '下衣強化階段+2';
     if (sourceId === 'shoes-extremization-enhancement') return '鞋子強化階段+2';
-    if (sourceId === 'master-beast:armor-spirit-stone-set:S77') return '聖獸精靈石套效';
+    if (sourceId === 'master-beast:armor-spirit-stone-set') return '聖獸精靈石套效';
     const classPassiveSource = sourceId.match(/^([^:]+):(critRate|extremization):(crit|ext)-\d+$/);
     if (classPassiveSource && data.classCombatEffects.classes[classPassiveSource[1]]) return classPassiveSource[1] + '自身技能';
     return `來源名稱待確認（${sourceId}）`;
@@ -749,15 +749,15 @@ async function start() {
       `<p class="stat-source-row"><span>${h(label)}</span><strong>${fmt(total)}${isPercent ? '%' : ''}</strong></p>`,
     ).join('');
   };
-  const field = (parent: HTMLElement, label: string, cell: string, choices: readonly PickerOption[], redraw = false, disabled = false, disabledHint = '請先選擇屬性') => {
-    const picker = createPicker(label, choices, val(cell), value => {
-      state.values[cell] = value;
+  const field = (parent: HTMLElement, label: string, fieldId: string, choices: readonly PickerOption[], redraw = false, disabled = false, disabledHint = '請先選擇屬性') => {
+    const picker = createPicker(label, choices, val(fieldId), value => {
+      state.values[fieldId] = value;
       for (const armor of data.nephronArmor.fields) {
-        const transform = armor.transformFields.find(entry => entry.attributeCell === cell);
-        if (transform) delete state.values[transform.valueCell];
-        if (armor.magazineCell === cell) delete state.values[armor.magazineLevelCell];
+        const transform = armor.transformFields.find(entry => entry.attributeField === fieldId);
+        if (transform) delete state.values[transform.valueField];
+        if (armor.magazineField === fieldId) delete state.values[armor.magazineLevelField];
       }
-      if (data.accessoryEffects.groups.some(group => group.selectionCell === cell)) {
+      if (data.accessoryEffects.groups.some(group => group.selectionField === fieldId)) {
         const cleared = clearInvalidAccessoryAppraisals(state);
         if (cleared.length) {
           if (!sampleMode) saveState(state);
@@ -779,14 +779,14 @@ async function start() {
       if (input) { input.disabled = true; input.placeholder = disabledHint; }
     }
     parent.append(picker);
-    if (isUnrelatedEffectValue(cell, state.values, catalogIndex)) updatePicker(picker, '0', true);
+    if (isUnrelatedEffectValue(fieldId, state.values, catalogIndex)) updatePicker(picker, '0', true);
     return picker;
   };
   function getEquippedRightIceSetCounts() {
     const counts = new Map<string, number>();
     for (const selection of data.mapping.selections) {
       if (!selection.catalogFile.endsWith('right-ice.json')) continue;
-      const setName = val(selection.selectionCell);
+      const setName = val(selection.selectionField);
       if (setName) counts.set(setName, (counts.get(setName) ?? 0) + 1);
     }
     return counts;
@@ -795,14 +795,14 @@ async function start() {
     const root = document.querySelector<HTMLElement>('#right-ice-set-selectors');
     if (!root) return;
     rightIceUiKey = rightIceSignature();
-    const cells = data.rightIceSets.selectionCells;
-    const availableNames = [...new Set(validationChoices(cells[0]).map(option => option.value))];
+    const fields = data.rightIceSets.selectionFields;
+    const availableNames = [...new Set(validationChoices(fields[0]).map(option => option.value))];
     const allowedNames = [...availableNames.filter(name => name !== '騎士團'), ...availableNames.filter(name => name === '騎士團')];
     const defaultOrder = new Map(allowedNames.map((name, index) => [name, index]));
     const equippedCounts = getEquippedRightIceSetCounts();
-    const selectedNames = cells.map(val);
+    const selectedNames = fields.map(val);
     disposePickers(root); root.replaceChildren();
-    cells.forEach((cell, index) => {
+    fields.forEach((fieldId, index) => {
       const usedElsewhere = new Set(selectedNames.filter((name, other) => other !== index && name !== ''));
       const choices = allowedNames
         .filter(name => !usedElsewhere.has(name) || name === selectedNames[index])
@@ -812,7 +812,7 @@ async function start() {
           return { value: name, label: name, ...(pieceCount > 0 ? { detail: `目前選擇 ${pieceCount} 件` } : {}) };
         });
       const picker = createPicker(`套效選擇 ${index + 1}`, choices, selectedNames[index], value => {
-        state.values[cell] = value;
+        state.values[fieldId] = value;
         update();
         renderRightIceSetSelectors();
       });
@@ -828,7 +828,7 @@ async function start() {
       root.append(warning);
     }
   }
-          const numeric = (parent: HTMLElement, label: string, cell: string, percentage = true, constraints?: { min?: number; max?: number; step?: number | 'any'; integer?: boolean }, disabled = false, editableDecimal = false) => {
+          const numeric = (parent: HTMLElement, label: string, fieldId: string, percentage = true, constraints?: { min?: number; max?: number; step?: number | 'any'; integer?: boolean }, disabled = false, editableDecimal = false) => {
     const wrapper = document.createElement('label'); wrapper.className = 'field'; wrapper.textContent = label;
             const integer = constraints?.integer === true;
             const input = document.createElement('input'); input.type = integer || editableDecimal ? 'text' : 'number'; input.step = integer ? '1' : 'any'; input.placeholder = disabled ? '請先選擇屬性' : '請填寫數值';
@@ -845,8 +845,8 @@ async function start() {
     if (constraints?.min !== undefined) input.min = String(constraints.min);
     if (constraints?.max !== undefined) input.max = String(constraints.max);
     if (constraints?.step !== undefined) input.step = String(constraints.step);
-    const initialValue = Number(val(cell)) * (percentage ? 100 : 1);
-    input.value = val(cell) === '' ? '' : String(editableDecimal ? canonicalizeNumber(initialValue) : initialValue);
+    const initialValue = Number(val(fieldId)) * (percentage ? 100 : 1);
+    input.value = val(fieldId) === '' ? '' : String(editableDecimal ? canonicalizeNumber(initialValue) : initialValue);
     if (disabled) { input.disabled = true; wrapper.classList.add('field-disabled'); wrapper.setAttribute('aria-disabled', 'true'); wrapper.title = '請先選擇屬性'; }
             if (integer) {
               const minimum = constraints?.min ?? 0;
@@ -896,7 +896,7 @@ async function start() {
                 input.setAttribute('aria-invalid', 'false');
                 if (input.value === '') return;
                 lastValidValue = input.value;
-                state.values[cell] = Number(input.value);
+                state.values[fieldId] = Number(input.value);
                 update();
               });
               input.addEventListener('blur', () => {
@@ -939,7 +939,7 @@ async function start() {
                 }
                 input.value = formatEditableDecimal(parsed);
                 lastValidValue = input.value;
-                state.values[cell] = storeEditableDecimal(parsed);
+                state.values[fieldId] = storeEditableDecimal(parsed);
                 input.setAttribute('aria-invalid', 'false');
                 update();
               };
@@ -966,7 +966,7 @@ async function start() {
                 input.setAttribute('aria-invalid', 'false');
                 if (raw === '') {
                   lastValidValue = '';
-                  state.values[cell] = '';
+                  state.values[fieldId] = '';
                   update();
                   return;
                 }
@@ -977,7 +977,7 @@ async function start() {
                   return;
                 }
                 lastValidValue = formatEditableDecimal(parsed);
-                state.values[cell] = storeEditableDecimal(parsed);
+                state.values[fieldId] = storeEditableDecimal(parsed);
                 update();
               });
               input.addEventListener('keydown', event => {
@@ -989,20 +989,20 @@ async function start() {
               input.addEventListener('blur', commitDecimal);
             } else {
               input.addEventListener('input', () => {
-                if (data.circuits.inputs.some(circuit => circuit.valueCell === cell)) {
+                if (data.circuits.inputs.some(circuit => circuit.valueField === fieldId)) {
                   if (input.validity.badInput) return;
                   const value = normalizeCircuitPercentage(Number(input.value) / 100);
-                  state.values[cell] = canonicalizeNumber(value);
+                  state.values[fieldId] = canonicalizeNumber(value);
                   if (input.value === '' || Number(input.value) !== canonicalizeNumber(value * 100)) input.value = String(canonicalizeNumber(value * 100));
                   update();
                   return;
                 }
                 if (input.value !== '' && constraints?.min !== undefined && Number(input.value) < constraints.min) {
-                  input.value = val(cell) === '' ? '' : String(Number(val(cell)) * (percentage ? 100 : 1));
+                  input.value = val(fieldId) === '' ? '' : String(Number(val(fieldId)) * (percentage ? 100 : 1));
                   return;
                 }
                 if (!input.validity.valid) return;
-                state.values[cell] = input.value === '' ? '' : Number(input.value) / (percentage ? 100 : 1);
+                state.values[fieldId] = input.value === '' ? '' : Number(input.value) / (percentage ? 100 : 1);
                 update();
               });
             }
@@ -1031,8 +1031,8 @@ async function start() {
       if (noteText) { const note = document.createElement('p'); note.className = 'global-input-note'; note.textContent = noteText; container.append(note); }
       const grid = document.createElement('div'); grid.className = 'global-input-grid'; container.append(grid); root.append(container); return grid;
     };
-    const pick = (container: HTMLElement, label: string, cell: string, entries: readonly { name: string }[]) =>
-      field(container, label, cell, options([...new Set(entries.map(entry => entry.name))]));
+    const pick = (container: HTMLElement, label: string, fieldId: string, entries: readonly { name: string }[]) =>
+      field(container, label, fieldId, options([...new Set(entries.map(entry => entry.name))]));
     const general = group('增益與環境');
     pick(general, '消耗品', 'Effect.Consumable', data.otherEffects.consumables);
     pick(general, '場地', 'Effect.Environment', data.otherEffects.environments);
@@ -1072,8 +1072,8 @@ async function start() {
     const portraitInputs = new Map<string, HTMLInputElement>();
     const portraitErrors = new Map<string, HTMLElement>();
     const portraitFields = [
-      { cell: portrait.strongSettingKey, otherCell: portrait.transcendenceSettingKey, label: '強烈技傷%' },
-      { cell: portrait.transcendenceSettingKey, otherCell: portrait.strongSettingKey, label: '超越技傷%' },
+      { fieldId: portrait.strongSettingKey, otherField: portrait.transcendenceSettingKey, label: '強烈技傷%' },
+      { fieldId: portrait.transcendenceSettingKey, otherField: portrait.strongSettingKey, label: '超越技傷%' },
     ] as const;
     for (const entry of portraitFields) {
       const wrapper = document.createElement('label');
@@ -1085,15 +1085,15 @@ async function start() {
       input.pattern = `[${portrait.minPct}-${portrait.maxPct}]`;
       input.maxLength = 1;
       input.placeholder = '';
-      input.value = String(state.values[entry.cell] ?? 0);
+      input.value = String(state.values[entry.fieldId] ?? 0);
       input.setAttribute('aria-label', `立繪、覺醒${entry.label}`);
       input.title = `只接受 ${portrait.minPct}–${portrait.maxPct} 的正整數；另一欄會自動補足至 ${portrait.maxTotalPct}%。`;
       const error = document.createElement('small');
       error.className = 'portrait-awakening-error';
       error.setAttribute('role', 'alert');
       error.hidden = true;
-      portraitInputs.set(entry.cell, input);
-      portraitErrors.set(entry.cell, error);
+      portraitInputs.set(entry.fieldId, input);
+      portraitErrors.set(entry.fieldId, error);
       const isManualValue = (raw: string) => /^\d$/.test(raw)
         && Number(raw) >= portrait.minPct && Number(raw) <= portrait.maxPct;
       const showError = (message: string) => {
@@ -1132,19 +1132,19 @@ async function start() {
       input.addEventListener('input', () => {
         const raw = input.value;
         if (!isManualValue(raw)) {
-          input.value = String(state.values[entry.cell] ?? 0);
+          input.value = String(state.values[entry.fieldId] ?? 0);
           showError(invalidEntryMessage);
           return;
         }
         const value = Number(raw);
         const otherValue = portrait.maxTotalPct - value;
-        state.values[entry.cell] = value;
-        state.values[entry.otherCell] = otherValue;
+        state.values[entry.fieldId] = value;
+        state.values[entry.otherField] = otherValue;
         for (const field of portraitFields) {
-          const fieldInput = portraitInputs.get(field.cell);
-          if (fieldInput) fieldInput.value = String(state.values[field.cell] ?? 0);
+          const fieldInput = portraitInputs.get(field.fieldId);
+          if (fieldInput) fieldInput.value = String(state.values[field.fieldId] ?? 0);
           fieldInput?.setAttribute('aria-invalid', 'false');
-          const fieldError = portraitErrors.get(field.cell);
+          const fieldError = portraitErrors.get(field.fieldId);
           if (fieldError) {
             fieldError.textContent = '';
             fieldError.hidden = true;
@@ -1153,7 +1153,7 @@ async function start() {
         update();
       });
       input.addEventListener('blur', () => {
-        input.value = String(state.values[entry.cell] ?? 0);
+        input.value = String(state.values[entry.fieldId] ?? 0);
         clearError();
       });
       wrapper.append(input, error);
@@ -1173,7 +1173,7 @@ async function start() {
     const spirit = group('賦靈錄');
     const spiritClassCodes = catalogIndex.spiritClassCodes;
     const selectedSpiritClassCodes = data.spiritRecord.classSelectors.settingKeys.map(val);
-    data.spiritRecord.classSelectors.settingKeys.forEach((cell, index) => {
+    data.spiritRecord.classSelectors.settingKeys.forEach((fieldId, index) => {
       const selectedElsewhere = selectedSpiritClassCodes.filter((_, otherIndex) => otherIndex !== index && selectedSpiritClassCodes[otherIndex] !== '');
       const usedElsewhere = new Set(selectedElsewhere.map(code => catalogIndex.resolveSpiritClassCode(code)?.toLocaleLowerCase()).filter((code): code is string => Boolean(code)));
       const currentCode = catalogIndex.resolveSpiritClassCode(selectedSpiritClassCodes[index]);
@@ -1186,8 +1186,8 @@ async function start() {
       const currentIsDuplicate = Boolean(currentCode && usedElsewhere.has(currentCode.toLocaleLowerCase()));
       error.textContent = currentIsDuplicate ? '職業「' + currentCode + '」已在其他欄位選擇。' : '';
       error.hidden = !currentIsDuplicate;
-      const picker = createPicker('職業 ' + (index + 1), choices, val(cell), value => {
-        state.values[cell] = value;
+      const picker = createPicker('職業 ' + (index + 1), choices, val(fieldId), value => {
+        state.values[fieldId] = value;
         update();
         renderGlobalInputs();
       }, {
@@ -1227,10 +1227,10 @@ async function start() {
     });
     gradePicker.classList.add('weapon-magic-stone-grade');
     grid.append(gradePicker);
-    data.giantStones.settingKeys.forEach((cell, index) => field(
+    data.giantStones.settingKeys.forEach((fieldId, index) => field(
       grid,
       `巨型魔力石 ${index + 1}`,
-      cell,
+      fieldId,
       data.giantStones.options.map(option => ({ value: option.name, label: option.name })),
     ));
     const colors = document.createElement('div'); colors.className = 'weapon-magic-stone-colors'; root.append(colors);
@@ -1238,10 +1238,10 @@ async function start() {
       const card = document.createElement('section'); card.className = `weapon-magic-stone-color weapon-magic-stone-${colorGroup.id}`;
       const heading = document.createElement('h3'); heading.textContent = `${colorGroup.name}（9 格）`; card.append(heading);
       const slots = document.createElement('div'); slots.className = 'weapon-magic-stone-slots'; card.append(slots);
-      colorGroup.settingKeys.forEach((cell, index) => field(
+      colorGroup.settingKeys.forEach((fieldId, index) => field(
         slots,
         `${index + 1}`,
-        cell,
+        fieldId,
         colorGroup.options.map(option => ({ value: option.name, label: option.name })),
       ));
       colors.append(card);
@@ -1278,12 +1278,12 @@ async function start() {
   function renderBeastAccessories() {
     const root = document.querySelector<HTMLElement>('#beast-accessory-fields')!;
     beastUiKey = beastSignature();
-    const rightIceEarring = data.layout.slots.find(slot => slot.selectionCell === 'Right.Ice.Earring');
-    const rightIceNecklace = data.layout.slots.find(slot => slot.selectionCell === 'Right.Ice.Necklace');
-    const rightIceSupport = data.layout.slots.find(slot => slot.selectionCell === 'Right.Ice.Support');
-    const accessoryWeapon = data.layout.slots.find(slot => slot.selectionCell === 'Accessory.WeaponAccessory');
-    const accessoryRingOne = data.layout.slots.find(slot => slot.selectionCell === 'Accessory.Ring1');
-    const accessoryRingTwo = data.layout.slots.find(slot => slot.selectionCell === 'Accessory.Ring2');
+    const rightIceEarring = data.layout.slots.find(slot => slot.selectionField === 'Right.Ice.Earring');
+    const rightIceNecklace = data.layout.slots.find(slot => slot.selectionField === 'Right.Ice.Necklace');
+    const rightIceSupport = data.layout.slots.find(slot => slot.selectionField === 'Right.Ice.Support');
+    const accessoryWeapon = data.layout.slots.find(slot => slot.selectionField === 'Accessory.WeaponAccessory');
+    const accessoryRingOne = data.layout.slots.find(slot => slot.selectionField === 'Accessory.Ring1');
+    const accessoryRingTwo = data.layout.slots.find(slot => slot.selectionField === 'Accessory.Ring2');
     if (!beastButtons.size && rightIceEarring && rightIceNecklace && rightIceSupport && accessoryWeapon && accessoryRingOne && accessoryRingTwo) {
       const rightIceToAccessoryGap = accessoryWeapon.x - rightIceSupport.x;
       const beastCenterX = rightIceEarring.x - rightIceToAccessoryGap;
@@ -1304,8 +1304,8 @@ async function start() {
         });
         beastButtons.set(slot.id, button); root.append(button);
       }
-      const cells = [...(slot.fixedCells ?? []), ...(slot.stoneCells ?? []), ...slot.mirrorCells.flat()];
-      const hasValue = cells.some(cell => val(cell) !== '');
+      const fields = [...(slot.fixedFields ?? []), ...(slot.stoneFields ?? []), ...slot.mirrorFields.flat()];
+      const hasValue = fields.some(fieldId => val(fieldId) !== '');
       toggleClass(button, 'configured', hasValue);
       toggleClass(button, 'selected', selectedBeastSlotId === slot.id);
       setAttribute(button, 'aria-label', `${slot.label}${hasValue ? '（已設定）' : ''}`);
@@ -1318,20 +1318,20 @@ async function start() {
     const slot = beastAccessorySlots.find(candidate => candidate.id === selectedBeastSlotId)!;
     panel.innerHTML = `<div class="inspector-title beast-inspector-title"><span class="beast-inspector-icon">${icon(slot.icon)}</span><div><small>聖獸飾品</small><h2>${h(slot.label)}</h2></div><button class="inspector-close" type="button" aria-label="關閉部位設定">×</button></div>`;
     const fixed = section(panel, '固定效果', true);
-    if (slot.fixedCells) slot.fixedCells.forEach((cell, index) => field(
+    if (slot.fixedFields) slot.fixedFields.forEach((fieldId, index) => field(
       fixed,
       `固定效果 ${index + 1}`,
-      cell,
-      validationChoices(cell),
+      fieldId,
+      validationChoices(fieldId),
     ));
     else fixed.insertAdjacentHTML('beforeend', `<p class="panel-note beast-mapping-note">${h(slot.label)}的鑑定效果與傷害無關，無需設定。</p>`);
 
     const stone = section(panel, '精靈石', true);
-    if (slot.stoneCells && slot.stoneCategory) {
-      const [attributeCell, valueCell] = slot.stoneCells;
+    if (slot.stoneFields && slot.stoneCategory) {
+      const [attributeField, valueField] = slot.stoneFields;
       const stoneGrid = attributeValueGrid(stone);
-      field(stoneGrid, '精靈石屬性', attributeCell, options(data.masterBeast.customAttributeOptions[slot.stoneCategory]), true);
-      field(stoneGrid, '精靈石數值（%）', valueCell, validationChoices(valueCell, true), false, val(attributeCell) === '' || val(attributeCell) === '無關傷害');
+      field(stoneGrid, '精靈石屬性', attributeField, options(data.masterBeast.customAttributeOptions[slot.stoneCategory]), true);
+      field(stoneGrid, '精靈石數值（%）', valueField, validationChoices(valueField, true), false, val(attributeField) === '' || val(attributeField) === '無關傷害');
     } else {
       stone.insertAdjacentHTML('beforeend', `<p class="panel-note beast-mapping-note">盔甲精靈石的個別屬性不影響傷害，無需設定。精靈石套裝增幅 ${fmt(data.masterBeast.armorSpiritStoneSetEffect.multiplicativeDamagePct)}% 已預設套用。</p>`);
     }
@@ -1339,15 +1339,15 @@ async function start() {
     const mirrorArea = section(panel, '迷鏡效果', true);
     mirrorArea.classList.add('beast-mirror-section');
     const mirrorGrid = attributeValueGrid(mirrorArea, 'beast-mirror-grid');
-    slot.mirrorCells.forEach(([attributeCell, valueCell]) => {
-      const attribute = val(attributeCell);
-      field(mirrorGrid, '迷鏡效果屬性', attributeCell, options(data.masterBeast.customAttributeOptions.mirror), true);
+    slot.mirrorFields.forEach(([attributeField, valueField]) => {
+      const attribute = val(attributeField);
+      field(mirrorGrid, '迷鏡效果屬性', attributeField, options(data.masterBeast.customAttributeOptions.mirror), true);
       const unrelated = attribute === '無關傷害';
       const valueRule = data.masterBeast.mirrorValueRules.byAttribute[attribute] ?? data.masterBeast.mirrorValueRules.default;
       const input = numeric(
         mirrorGrid,
         '迷鏡效果數值（%）',
-        valueCell,
+        valueField,
         true,
         { min: 0, max: valueRule.maxPct, step: valueRule.stepPct },
         unrelated,
@@ -1364,8 +1364,8 @@ async function start() {
     const container = document.querySelector('#slots')!;
     slotUiKey = slotSignature();
     const rightIceSetEffectIndexes = new Map<string, number>();
-    data.rightIceSets.selectionCells.forEach((cell, index) => {
-      const setName = val(cell);
+    data.rightIceSets.selectionFields.forEach((fieldId, index) => {
+      const setName = val(fieldId);
       if (setName && !rightIceSetEffectIndexes.has(setName)) rightIceSetEffectIndexes.set(setName, index + 1);
     });
     for (const slot of data.layout.slots) {
@@ -1377,13 +1377,13 @@ async function start() {
         button.addEventListener('click', () => { selected = slot; selectedBeastSlotId = null; renderSlots(); renderBeastAccessories(); renderInspector(); openMobileInspector(); });
         slotButtons.set(slot.id, button); container.append(button);
       }
-      const configured = slot.selectionCell ? val(slot.selectionCell) : slot.weapon ? val('Weapon.ENHC') : slot.innerwearId ? val(data.innerwear.slots.find(s => s.id === slot.innerwearId)!.enhancementCell) : '';
+      const configured = slot.selectionField ? val(slot.selectionField) : slot.weapon ? val('Weapon.ENHC') : slot.innerwearId ? val(data.innerwear.slots.find(s => s.id === slot.innerwearId)!.enhancementField) : '';
       const isAccessory = slot.group === 'accessories';
       const isIceEquipment = slot.group === 'leftIce' || slot.group === 'rightIce' || slot.group === 'iceWeapon';
-      const selectedItemName = slot.selectionCell && slot.group !== 'costume' && !isAccessory && configured
+      const selectedItemName = slot.selectionField && slot.group !== 'costume' && !isAccessory && configured
         ? isIceEquipment ? ICE_EQUIPMENT_SHORT_NAMES[configured] ?? configured : configured
         : '';
-      const isRightIceSetSlot = (slot.group === 'rightIce' || slot.group === 'iceWeapon') && !!slot.selectionCell && !!configured;
+      const isRightIceSetSlot = (slot.group === 'rightIce' || slot.group === 'iceWeapon') && !!slot.selectionField && !!configured;
       const rightIceEffectIndex = isRightIceSetSlot ? rightIceSetEffectIndexes.get(configured) : undefined;
       const rightIceSetHint = rightIceEffectIndex ? `；屬於套效 ${rightIceEffectIndex}` : '';
       toggleClass(button, 'configured', !!configured); toggleClass(button, 'selected', selected.id === slot.id);
@@ -1403,18 +1403,18 @@ async function start() {
     disposePickers(panel);
     const group = data.layout.groups.find(group => group.id === selected.group)!;
     const innerwearSlot = selected.innerwearId ? data.innerwear.slots.find(slot => slot.id === selected.innerwearId) : undefined;
-    const innerwearType = innerwearSlot && val(innerwearSlot.typeCell) === "內布隆" ? "內布隆" : "百億";
+    const innerwearType = innerwearSlot && val(innerwearSlot.typeField) === "內布隆" ? "內布隆" : "百億";
     const typeSwitch = innerwearSlot ? `<div class="innerwear-type-switch" role="group" aria-label="內裝防具類型"><button type="button" data-innerwear-type="百億" aria-pressed="${innerwearType === "百億"}">百億</button><button type="button" data-innerwear-type="內布隆" aria-pressed="${innerwearType === "內布隆"}">內布隆</button></div>` : "";
     panel.innerHTML = `<div class="inspector-title" style="--group-color:${group.color}">${icon(selected.icon)}<div class="inspector-title-copy"><small>${h(group.name)}</small><h2>${h(selected.label)}</h2></div>${typeSwitch}<button class="inspector-close" type="button" aria-label="關閉部位設定">×</button></div>`;
     if (innerwearSlot) panel.querySelectorAll<HTMLButtonElement>("[data-innerwear-type]").forEach(button => button.addEventListener("click", () => {
-      state.values[innerwearSlot.typeCell] = button.dataset.innerwearType!;
+      state.values[innerwearSlot.typeField] = button.dataset.innerwearType!;
       update(); renderInspector();
     }));
     if (selected.enabledBy && !alternateLowerwearAvailable()) { panel.insertAdjacentHTML('beforeend', '<p class="panel-note">請先啟用上方「強/排褲切換」，或在 Boss 體力條件中選用強/排褲。設定會保留於裝置，停用時不參與計算。</p>'); return; }
-    if (selected.selectionCell) {
-      const selectionCell = selected.selectionCell;
-      const mapping = catalogIndex.equipmentMappings.get(selectionCell)!;
-      let items = orderedEquipmentItems.get(selectionCell);
+    if (selected.selectionField) {
+      const selectionField = selected.selectionField;
+      const mapping = catalogIndex.equipmentMappings.get(selectionField)!;
+      let items = orderedEquipmentItems.get(selectionField);
       if (!items) {
         const slotItems = catalogIndex.equipmentItems(mapping);
         const isRightIceCatalog = mapping.catalogFile.endsWith('right-ice.json');
@@ -1423,15 +1423,15 @@ async function start() {
         items = isRightIceCatalog
           ? Object.freeze([...slotItems.filter(item => !isMysticSetName(item.name) && !isKnightSetName(item.name)), ...slotItems.filter(item => isMysticSetName(item.name)), ...slotItems.filter(item => isKnightSetName(item.name))])
           : slotItems;
-        orderedEquipmentItems.set(selectionCell, items);
+        orderedEquipmentItems.set(selectionField, items);
       }
       const isAccessory = mapping.catalogFile === 'equipment/accessories.json';
-      let choices = equipmentPickerChoices.get(selectionCell);
-      if (!choices) { choices = Object.freeze(items.map(item => Object.freeze({ value: item.name, label: item.name, detail: summary(item.stats ?? {}) }))); equipmentPickerChoices.set(selectionCell, choices); }
-      field(panel, selected.sharedSelection ? '左冰套裝（五部位共用）' : '選擇裝備', selectionCell, choices, isAccessory);
+      let choices = equipmentPickerChoices.get(selectionField);
+      if (!choices) { choices = Object.freeze(items.map(item => Object.freeze({ value: item.name, label: item.name, detail: summary(item.stats ?? {}) }))); equipmentPickerChoices.set(selectionField, choices); }
+      field(panel, selected.sharedSelection ? '左冰套裝（五部位共用）' : '選擇裝備', selectionField, choices, isAccessory);
       if (isAccessory) {
-        const appraisalGroup = data.accessoryEffects.groups.find(entry => entry.selectionCell === selectionCell);
-        const selectedItem = items.find(item => item.name === val(selectionCell));
+        const appraisalGroup = data.accessoryEffects.groups.find(entry => entry.selectionField === selectionField);
+        const selectedItem = items.find(item => item.name === val(selectionField));
         if (selectedItem?.description) {
           const description = document.createElement('p');
           description.className = 'panel-note accessory-item-description';
@@ -1445,11 +1445,11 @@ async function start() {
           const appraisal = selectedItem.appraisal;
           if (!appraisal || appraisal.canAppraise === null || appraisal.effectCount === null) {
             panel.insertAdjacentHTML('beforeend', '<p class="panel-note">此飾品的「是否可鑑定」與「鑑定效果條數」尚未設定；未確認前不會套用鑑定效果。更新 <code>data/equipment/accessories.json</code> 後即可啟用。</p>');
-          } else if (appraisal.canAppraise && Number.isInteger(appraisal.effectCount) && appraisal.effectCount > 0 && appraisal.effectCount <= appraisalGroup.inputCells.length) {
+          } else if (appraisal.canAppraise && Number.isInteger(appraisal.effectCount) && appraisal.effectCount > 0 && appraisal.effectCount <= appraisalGroup.inputFields.length) {
             const appraisalArea = section(panel, '飾品鑑定', true);
             const itemOptions = appraisalGroup.optionsByEquipmentName?.[selectedItem.name] ?? appraisalGroup.options;
             const choices: PickerOption[] = itemOptions.map((option: AccessoryEffectOption) => ({ value: option.name, label: option.name }));
-            appraisalGroup.inputCells.slice(0, appraisal.effectCount).forEach((cell, index) => field(appraisalArea, `鑑定效果 ${index + 1}`, cell, choices));
+            appraisalGroup.inputFields.slice(0, appraisal.effectCount).forEach((fieldId, index) => field(appraisalArea, `鑑定效果 ${index + 1}`, fieldId, choices));
           } else if (appraisal.canAppraise) {
             panel.insertAdjacentHTML('beforeend', '<p class="input-warning">此飾品的鑑定效果條數資料不正確，請檢查裝備 JSON。</p>');
           }
@@ -1458,25 +1458,25 @@ async function start() {
     }
     if (selected.innerwearId) {
       const slot = data.innerwear.slots.find(slot => slot.id === selected.innerwearId)!;
-      field(panel, '強化', slot.enhancementCell, options(Object.keys(data.innerwear.enhancementStats).map(level => 'Lv.' + level)));
-      field(panel, '鍛造', slot.forgingCell, options(Object.keys(data.innerwear.forgingAttack)));
+      field(panel, '強化', slot.enhancementField, options(Object.keys(data.innerwear.enhancementStats).map(level => 'Lv.' + level)));
+      field(panel, '鍛造', slot.forgingField, options(Object.keys(data.innerwear.forgingAttack)));
       if (innerwearType === '內布隆') {
         const nephronField = data.nephronArmor.fields.find(entry => entry.slotId === slot.id)!;
         const transformationArea = section(panel, '屬性變換', true);
         const transformationGrid = attributeValueGrid(transformationArea, 'nephron-transformation-grid');
         nephronField.transformFields.forEach((transform, index) => {
-          const selectedName = val(transform.attributeCell);
+          const selectedName = val(transform.attributeField);
           const attribute = data.nephronArmor.transformations.find(entry => entry.name === selectedName);
           const selectedElsewhere = new Set(nephronField.transformFields
-            .filter(other => other.attributeCell !== transform.attributeCell)
-            .map(other => val(other.attributeCell))
+            .filter(other => other.attributeField !== transform.attributeField)
+            .map(other => val(other.attributeField))
             .filter(Boolean));
           const availableAttributes = data.nephronArmor.transformations
             .filter(entry => entry.name === '無關傷害' || !selectedElsewhere.has(entry.name));
-          field(transformationGrid, '變換 ' + (index + 1) + ' 屬性', transform.attributeCell,
+          field(transformationGrid, '變換 ' + (index + 1) + ' 屬性', transform.attributeField,
             availableAttributes.map(entry => ({ value: entry.name, label: entry.name.replace('（依強化等級）', '(×強化)') })), true);
           const tiers = attribute?.tierValuesPct ?? [];
-          field(transformationGrid, '變換 ' + (index + 1) + ' 數值（%）', transform.valueCell,
+          field(transformationGrid, '變換 ' + (index + 1) + ' 數值（%）', transform.valueField,
             tiers.map(value => ({ value: String(value / 100), label: value + '%' })),
             true, !selectedName || !tiers.length,
             selectedName === '無關傷害' ? '此屬性無需數值' : '請先選擇屬性');
@@ -1486,11 +1486,11 @@ async function start() {
         const magazineGrid = attributeValueGrid(magazineArea, 'nephron-magazine-grid');
         const equippedNephronFields = data.nephronArmor.fields.filter(entry => {
           const armor = data.innerwear.slots.find(candidate => candidate.id === entry.slotId);
-          return !!armor && val(armor.typeCell) === '內布隆';
+          return !!armor && val(armor.typeField) === '內布隆';
         });
         const otherMagazineNames = new Set(equippedNephronFields.filter(entry => entry.slotId !== nephronField.slotId)
-          .map(entry => val(entry.magazineCell)).filter(Boolean));
-        const selectedMagazine = val(nephronField.magazineCell);
+          .map(entry => val(entry.magazineField)).filter(Boolean));
+        const selectedMagazine = val(nephronField.magazineField);
         const magazineChoices = data.nephronArmor.magazines
           .filter(magazine => !otherMagazineNames.has(magazine.name) || magazine.name === selectedMagazine)
           .map(magazine => {
@@ -1503,7 +1503,7 @@ async function start() {
             ].join(' · ') || (magazine.otherEffects ?? []).join('；');
             return { value: magazine.name, label: magazine.name, detail };
           });
-        field(magazineGrid, '彈匣種類', nephronField.magazineCell, magazineChoices, true);
+        field(magazineGrid, '彈匣種類', nephronField.magazineField, magazineChoices, true);
         const currentMagazine = data.nephronArmor.magazines.find(entry => entry.name === selectedMagazine);
         const fixedMagazineLevel = currentMagazine?.fixedLevel;
         const magazineLevelChoices = (fixedMagazineLevel === undefined ? data.nephronArmor.levelLabels : [`Lv.${fixedMagazineLevel}`]).map(level => {
@@ -1515,7 +1515,7 @@ async function start() {
               : (currentMagazine?.statKey === 'multiplicativeDamagePct' ? '乘算傷害增幅：' : '數值：') + amount + '%',
           };
         });
-        const magazineLevelPicker = field(magazineGrid, '彈匣等級', nephronField.magazineLevelCell,
+        const magazineLevelPicker = field(magazineGrid, '彈匣等級', nephronField.magazineLevelField,
           magazineLevelChoices, true, !selectedMagazine || fixedMagazineLevel !== undefined,
           fixedMagazineLevel === undefined ? '請先選擇彈匣' : `此彈匣固定為 Lv.${fixedMagazineLevel}`);
         if (fixedMagazineLevel !== undefined) magazineLevelPicker.querySelector<HTMLButtonElement>('.picker-clear')!.disabled = true;
@@ -1532,18 +1532,18 @@ async function start() {
       field(panel, '武器強化', 'Weapon.ENHC', options(Object.keys(data.attack.weaponEnhancementFactors).map(level => `Lv.${level}`)));
       field(panel, '武器成長', data.growth.settingKey, data.growth.levels.map(level => ({ value: level.name, label: level.name, detail: summary(level.stats) })));
     }
-    if (selected.stoneCells?.length) {
+    if (selected.stoneFields?.length) {
       const area = section(panel, '魔法石', true);
-      const visibleStoneCells = innerwearSlot && innerwearType === "百億" ? selected.stoneCells.slice(0, 4) : selected.stoneCells;
-      for (const [index, cell] of visibleStoneCells.entries()) {
-        const mapping = catalogIndex.equipmentMappings.get(cell)!;
-        field(area, `魔法石 ${index + 1}`, cell, magicStoneChoices(mapping.application!));
+      const visibleStoneFields = innerwearSlot && innerwearType === "百億" ? selected.stoneFields.slice(0, 4) : selected.stoneFields;
+      for (const [index, fieldId] of visibleStoneFields.entries()) {
+        const mapping = catalogIndex.equipmentMappings.get(fieldId)!;
+        field(area, `魔法石 ${index + 1}`, fieldId, magicStoneChoices(mapping.application!));
       }
     }
     if (selected.innerwearId) {
       if (innerwearType !== "內布隆") {
         const appraisal = data.appraisals.slots.find(slot => slot.id === selected.innerwearId)!;
-        const area = section(panel, '鑑定'); appraisal.inputCells.forEach((cell, i) => field(area, `鑑定 ${i + 1}`, cell, data.appraisals.options.map(option => ({ value: option.name, label: option.name }))));
+        const area = section(panel, '鑑定'); appraisal.inputFields.forEach((fieldId, i) => field(area, `鑑定 ${i + 1}`, fieldId, data.appraisals.options.map(option => ({ value: option.name, label: option.name }))));
       }
       const circuit = data.circuits.inputs.find(slot => slot.slot === selected.innerwearId)!;
       const board = section(panel, '電路板');
@@ -1564,11 +1564,11 @@ async function start() {
       actions.append(addRowButton);
       board.append(note, rowList, totalStatus, actions);
 
-      const readRows = () => readCircuitBoardRows(state.values, circuit.attributeCell, circuit.valueCell);
+      const readRows = () => readCircuitBoardRows(state.values, circuit.attributeField, circuit.valueField);
       const storeRows = (rows: ReturnType<typeof readRows>) => {
-        state.values[circuitBoardRowsField(circuit.attributeCell)] = serializeCircuitBoardRows(rows);
-        state.values[circuit.attributeCell] = rows[0].attribute;
-        state.values[circuit.valueCell] = normalizeCircuitPercentage(rows[0].percentageValue);
+        state.values[circuitBoardRowsField(circuit.attributeField)] = serializeCircuitBoardRows(rows);
+        state.values[circuit.attributeField] = rows[0].attribute;
+        state.values[circuit.valueField] = normalizeCircuitPercentage(rows[0].percentageValue);
       };
       const refreshTotal = (rows: ReturnType<typeof readRows>) => {
         const totalPct = canonicalizeNumber(circuitBoardRowsTotal(rows) * 100);
@@ -1668,14 +1668,14 @@ async function start() {
       const chip = data.chipSlots.slots.find(slot => slot.id === selected.innerwearId)!;
       const chipArea = section(panel, '芯片與芯片調校');
       const chipGrid = attributeValueGrid(chipArea);
-      field(chipGrid, '芯片屬性', chip.attributeCell, chipAttributeOptions(chip), true);
-      const chosen = data.chips.chips.find(entry => entry.name === val(chip.attributeCell));
+      field(chipGrid, '芯片屬性', chip.attributeField, chipAttributeOptions(chip), true);
+      const chosen = data.chips.chips.find(entry => entry.name === val(chip.attributeField));
       const tuningChoices: PickerOption[] = chosen?.tuningLevels.map(level => ({
         value: level.level,
         label: level.level,
         detail: `${fmt(level.value)}%`,
       })) ?? [];
-      field(chipGrid, '芯片調校等級', chip.tuningCell, tuningChoices, false, val(chip.attributeCell) === '');
+      field(chipGrid, '芯片調校等級', chip.tuningField, tuningChoices, false, val(chip.attributeField) === '');
       const conditionalChipConflict = lowerwearConditionalChipConflict();
       if (conditionalChipConflict && (chip.id === "lowerwear" || chip.id === "lowerwearAlternative")) {
         const warning = document.createElement("p");
@@ -1690,13 +1690,13 @@ async function start() {
       const transformationGrid = attributeValueGrid(transform, 'weapon-transformation-grid');
       data.transformations.slots.forEach((slot, i) => {
         const selectedElsewhere = new Set(data.transformations.slots
-          .filter(other => other.choiceCell !== slot.choiceCell)
-          .map(other => val(other.choiceCell))
+          .filter(other => other.choiceField !== slot.choiceField)
+          .map(other => val(other.choiceField))
           .filter(Boolean));
         const availableOptions = data.transformations.options.filter(option => !selectedElsewhere.has(option));
-        field(transformationGrid, `變換 ${i + 1}`, slot.choiceCell, options(availableOptions), true);
-        const percentage = data.transformations.rules.find(rule => rule.choice === val(slot.choiceCell))?.valueMultiplier !== 1;
-        numeric(transformationGrid, `變換 ${i + 1} 數值${percentage ? '（%）' : '（等級）'}`, slot.valueCell, percentage);
+        field(transformationGrid, `變換 ${i + 1}`, slot.choiceField, options(availableOptions), true);
+        const percentage = data.transformations.rules.find(rule => rule.choice === val(slot.choiceField))?.valueMultiplier !== 1;
+        numeric(transformationGrid, `變換 ${i + 1} 數值${percentage ? '（%）' : '（等級）'}`, slot.valueField, percentage);
       });
     }
   }
@@ -2046,8 +2046,8 @@ async function start() {
   const battlePickers = new Map<string, { picker: HTMLElement; error: HTMLElement }>();
   const renderBattleSettings = () => {
     if (battlePickers.size) {
-      for (const [cell, { picker, error }] of battlePickers) {
-        updatePicker(picker, val(cell), true); error.textContent = ''; error.hidden = true;
+      for (const [fieldId, { picker, error }] of battlePickers) {
+        updatePicker(picker, val(fieldId), true); error.textContent = ''; error.hidden = true;
       }
       return;
     }
@@ -2177,11 +2177,11 @@ async function start() {
       if (!Object.hasOwn(imported.state, 'bossHealthCondition')) delete state.bossHealthCondition;
       migrateLegacyPortraitAwakening(state);
       normalizePortraitAwakeningValues(state);
-      const duplicateTransformationCells = clearDuplicateTransformationChoices(state);
-      const duplicateNephronTransformationCells = clearDuplicateNephronTransformationChoices(state);
+      const duplicateTransformationFields = clearDuplicateTransformationChoices(state);
+      const duplicateNephronTransformationFields = clearDuplicateNephronTransformationChoices(state);
       applyWeaponMagicStonePreset(String(state.values[data.weaponGrades.settingKey] ?? ''));
       refreshConfigurationUi();
-      const clearedFields = [...new Set([...imported.clearedFields, ...duplicateTransformationCells, ...duplicateNephronTransformationCells])];
+      const clearedFields = [...new Set([...imported.clearedFields, ...duplicateTransformationFields, ...duplicateNephronTransformationFields])];
       const partial = clearedFields.length ? `；${clearedFields.length} 個無法對應或重複的欄位已留空（${clearedFields.slice(0, 5).join('、')}${clearedFields.length > 5 ? '…' : ''}）` : '';
       document.querySelector<HTMLElement>('#transfer-status')!.textContent = `${sampleMode ? '配裝已匯入；範例模式不會儲存到此裝置' : '配裝已匯入並儲存於此裝置'}${partial}。`;
     } catch (error) {

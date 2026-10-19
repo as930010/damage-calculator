@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "selectionCells": [
+  "selectionFields": [
     "Right.Ice.SetEffect.1",
     "Right.Ice.SetEffect.2",
     "Right.Ice.SetEffect.3"

@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "dataUpdatedAt": "2026-10-02",
   "armorSpiritStoneSetEffect": {
-    "id": "master-beast:armor-spirit-stone-set:S77",
+    "id": "master-beast:armor-spirit-stone-set",
     "multiplicativeDamagePct": 4
   },
   "spiritStoneColorSelector": {

@@ -5250,14 +5250,6 @@
   },
   "workload": {
     "export": {
-      "functions": {
-        "equipmentMappings": 1,
-        "cellOptions": 152,
-        "customOptions": 152,
-        "staticChoiceArrays": 1216,
-        "matchEquipment": 60,
-        "equipmentTransferCode": 60
-      },
       "scans": {
         "mapping.selections.map": 1,
         "elementReads": 43024,
@@ -5273,13 +5265,13 @@
         "weaponGrades.colorGroups.0.settingKeys.includes": 122,
         "weaponGrades.colorGroups.1.settingKeys.includes": 122,
         "weaponGrades.colorGroups.2.settingKeys.includes": 122,
-        "appraisals.slots.0.inputCells.some": 120,
-        "appraisals.slots.1.inputCells.some": 117,
-        "appraisals.slots.2.inputCells.some": 114,
-        "appraisals.slots.3.inputCells.some": 111,
-        "appraisals.slots.4.inputCells.some": 108,
+        "appraisals.slots.0.inputFields.some": 120,
+        "appraisals.slots.1.inputFields.some": 117,
+        "appraisals.slots.2.inputFields.some": 114,
+        "appraisals.slots.3.inputFields.some": 111,
+        "appraisals.slots.4.inputFields.some": 108,
         "giantStones.settingKeys.some": 87,
-        "rightIceSets.selectionCells.some": 80,
+        "rightIceSets.selectionFields.some": 80,
         "simulatorInputs.inputs.find": 58,
         "simulatorInputs.inputs.0.fieldIds.includes": 58,
         "simulatorInputs.inputs.1.fieldIds.includes": 58,
@@ -5396,17 +5388,10 @@
         "simulatorInputs.catalogs.21.options.map": 2,
         "giantStones.options.map": 3,
         "transformations.options.some": 4
-      }
+      },
+      "candidateQueries": 152
     },
     "import": {
-      "functions": {
-        "equipmentMappings": 1,
-        "cellOptions": 152,
-        "customOptions": 152,
-        "staticChoiceArrays": 1216,
-        "resolveEquipmentCode": 60,
-        "equipmentTransferCode": 438
-      },
       "scans": {
         "classes.classes.filter": 1,
         "elementReads": 43108,
@@ -5423,13 +5408,13 @@
         "weaponGrades.colorGroups.0.settingKeys.includes": 122,
         "weaponGrades.colorGroups.1.settingKeys.includes": 122,
         "weaponGrades.colorGroups.2.settingKeys.includes": 122,
-        "appraisals.slots.0.inputCells.some": 120,
-        "appraisals.slots.1.inputCells.some": 117,
-        "appraisals.slots.2.inputCells.some": 114,
-        "appraisals.slots.3.inputCells.some": 111,
-        "appraisals.slots.4.inputCells.some": 108,
+        "appraisals.slots.0.inputFields.some": 120,
+        "appraisals.slots.1.inputFields.some": 117,
+        "appraisals.slots.2.inputFields.some": 114,
+        "appraisals.slots.3.inputFields.some": 111,
+        "appraisals.slots.4.inputFields.some": 108,
         "giantStones.settingKeys.some": 87,
-        "rightIceSets.selectionCells.some": 80,
+        "rightIceSets.selectionFields.some": 80,
         "simulatorInputs.inputs.find": 58,
         "simulatorInputs.inputs.0.fieldIds.includes": 58,
         "simulatorInputs.inputs.1.fieldIds.includes": 58,
@@ -5547,7 +5532,8 @@
         "catalogs.equipment/right-ice.json.items.filter": 12,
         "catalogs.equipment/accessories.json.items.filter": 12,
         "catalogs.equipment/magic-stones.json.items.filter": 34
-      }
+      },
+      "candidateQueries": 152
     }
   }
 }

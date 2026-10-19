@@ -14,37 +14,37 @@
   },
   "fixedEffects": [
     {
-      "sourceId": "sheet:計算機!E76",
+      "sourceId": "fixed-effect:master-beast",
       "stats": {
         "doubleAttackPct": 3
       }
     },
     {
-      "sourceId": "sheet:計算機!Q37",
+      "sourceId": "fixed-effect:raid-set",
       "stats": {
         "adaptabilityPct": 2
       }
     },
     {
-      "sourceId": "sheet:計算機!Q53",
+      "sourceId": "fixed-effect:weapon",
       "stats": {
         "adaptabilityPct": 5
       }
     },
     {
-      "sourceId": "sheet:計算機!Q86",
+      "sourceId": "fixed-effect:title-adaptability",
       "stats": {
         "adaptabilityPct": 5
       }
     },
     {
-      "sourceId": "sheet:計算機!R86",
+      "sourceId": "fixed-effect:title-defense-ignore",
       "stats": {
         "defenseIgnorePct": 5
       }
     },
     {
-      "sourceId": "sheet:計算機!T101",
+      "sourceId": "fixed-effect:red-upper-crit-damage",
       "stats": {
         "multiplicativeCritDamagePct": 10
       }
@@ -58,7 +58,7 @@
   ],
   "optionalEffects": [
     {
-      "sourceId": "sheet:計算機!E93",
+      "sourceId": "fixed-effect:pet-skill",
       "stateKey": "petSkillAttackEnabled",
       "defaultEnabled": true,
       "stats": {
@@ -88,7 +88,7 @@
   ],
   "conditionalEffects": [
     {
-      "sourceId": "sheet:計算機!T102",
+      "sourceId": "fixed-effect:maestro-aura",
       "selectorValue": "MAESTRO光環",
       "stats": {
         "multiplicativeCritDamagePct": 2

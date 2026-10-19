@@ -448,20 +448,20 @@
       "part": "Upper",
       "transformFields": [
         {
-          "attributeCell": "Innerwear.Upper.Transform.1.Attribute",
-          "valueCell": "Innerwear.Upper.Transform.1.Value"
+          "attributeField": "Innerwear.Upper.Transform.1.Attribute",
+          "valueField": "Innerwear.Upper.Transform.1.Value"
         },
         {
-          "attributeCell": "Innerwear.Upper.Transform.2.Attribute",
-          "valueCell": "Innerwear.Upper.Transform.2.Value"
+          "attributeField": "Innerwear.Upper.Transform.2.Attribute",
+          "valueField": "Innerwear.Upper.Transform.2.Value"
         },
         {
-          "attributeCell": "Innerwear.Upper.Transform.3.Attribute",
-          "valueCell": "Innerwear.Upper.Transform.3.Value"
+          "attributeField": "Innerwear.Upper.Transform.3.Attribute",
+          "valueField": "Innerwear.Upper.Transform.3.Value"
         }
       ],
-      "magazineCell": "Innerwear.Upper.Magazine.Type",
-      "magazineLevelCell": "Innerwear.Upper.Magazine.Level",
+      "magazineField": "Innerwear.Upper.Magazine.Type",
+      "magazineLevelField": "Innerwear.Upper.Magazine.Level",
       "wearSet": "shared",
       "slotId": "upper"
     },
@@ -469,20 +469,20 @@
       "part": "Lowerwear",
       "transformFields": [
         {
-          "attributeCell": "Innerwear.Lowerwear.Transform.1.Attribute",
-          "valueCell": "Innerwear.Lowerwear.Transform.1.Value"
+          "attributeField": "Innerwear.Lowerwear.Transform.1.Attribute",
+          "valueField": "Innerwear.Lowerwear.Transform.1.Value"
         },
         {
-          "attributeCell": "Innerwear.Lowerwear.Transform.2.Attribute",
-          "valueCell": "Innerwear.Lowerwear.Transform.2.Value"
+          "attributeField": "Innerwear.Lowerwear.Transform.2.Attribute",
+          "valueField": "Innerwear.Lowerwear.Transform.2.Value"
         },
         {
-          "attributeCell": "Innerwear.Lowerwear.Transform.3.Attribute",
-          "valueCell": "Innerwear.Lowerwear.Transform.3.Value"
+          "attributeField": "Innerwear.Lowerwear.Transform.3.Attribute",
+          "valueField": "Innerwear.Lowerwear.Transform.3.Value"
         }
       ],
-      "magazineCell": "Innerwear.Lowerwear.Magazine.Type",
-      "magazineLevelCell": "Innerwear.Lowerwear.Magazine.Level",
+      "magazineField": "Innerwear.Lowerwear.Magazine.Type",
+      "magazineLevelField": "Innerwear.Lowerwear.Magazine.Level",
       "wearSet": "lowerwearA",
       "slotId": "lowerwear"
     },
@@ -490,20 +490,20 @@
       "part": "LowerwearAlternative",
       "transformFields": [
         {
-          "attributeCell": "Innerwear.LowerwearAlternative.Transform.1.Attribute",
-          "valueCell": "Innerwear.LowerwearAlternative.Transform.1.Value"
+          "attributeField": "Innerwear.LowerwearAlternative.Transform.1.Attribute",
+          "valueField": "Innerwear.LowerwearAlternative.Transform.1.Value"
         },
         {
-          "attributeCell": "Innerwear.LowerwearAlternative.Transform.2.Attribute",
-          "valueCell": "Innerwear.LowerwearAlternative.Transform.2.Value"
+          "attributeField": "Innerwear.LowerwearAlternative.Transform.2.Attribute",
+          "valueField": "Innerwear.LowerwearAlternative.Transform.2.Value"
         },
         {
-          "attributeCell": "Innerwear.LowerwearAlternative.Transform.3.Attribute",
-          "valueCell": "Innerwear.LowerwearAlternative.Transform.3.Value"
+          "attributeField": "Innerwear.LowerwearAlternative.Transform.3.Attribute",
+          "valueField": "Innerwear.LowerwearAlternative.Transform.3.Value"
         }
       ],
-      "magazineCell": "Innerwear.LowerwearAlternative.Magazine.Type",
-      "magazineLevelCell": "Innerwear.LowerwearAlternative.Magazine.Level",
+      "magazineField": "Innerwear.LowerwearAlternative.Magazine.Type",
+      "magazineLevelField": "Innerwear.LowerwearAlternative.Magazine.Level",
       "wearSet": "lowerwearB",
       "enabledBy": "Lowerwear.Alternative.Enabled",
       "slotId": "lowerwearAlternative"
@@ -512,20 +512,20 @@
       "part": "Gloves",
       "transformFields": [
         {
-          "attributeCell": "Innerwear.Gloves.Transform.1.Attribute",
-          "valueCell": "Innerwear.Gloves.Transform.1.Value"
+          "attributeField": "Innerwear.Gloves.Transform.1.Attribute",
+          "valueField": "Innerwear.Gloves.Transform.1.Value"
         },
         {
-          "attributeCell": "Innerwear.Gloves.Transform.2.Attribute",
-          "valueCell": "Innerwear.Gloves.Transform.2.Value"
+          "attributeField": "Innerwear.Gloves.Transform.2.Attribute",
+          "valueField": "Innerwear.Gloves.Transform.2.Value"
         },
         {
-          "attributeCell": "Innerwear.Gloves.Transform.3.Attribute",
-          "valueCell": "Innerwear.Gloves.Transform.3.Value"
+          "attributeField": "Innerwear.Gloves.Transform.3.Attribute",
+          "valueField": "Innerwear.Gloves.Transform.3.Value"
         }
       ],
-      "magazineCell": "Innerwear.Gloves.Magazine.Type",
-      "magazineLevelCell": "Innerwear.Gloves.Magazine.Level",
+      "magazineField": "Innerwear.Gloves.Magazine.Type",
+      "magazineLevelField": "Innerwear.Gloves.Magazine.Level",
       "wearSet": "shared",
       "slotId": "gloves"
     },
@@ -533,20 +533,20 @@
       "part": "Shoes",
       "transformFields": [
         {
-          "attributeCell": "Innerwear.Shoes.Transform.1.Attribute",
-          "valueCell": "Innerwear.Shoes.Transform.1.Value"
+          "attributeField": "Innerwear.Shoes.Transform.1.Attribute",
+          "valueField": "Innerwear.Shoes.Transform.1.Value"
         },
         {
-          "attributeCell": "Innerwear.Shoes.Transform.2.Attribute",
-          "valueCell": "Innerwear.Shoes.Transform.2.Value"
+          "attributeField": "Innerwear.Shoes.Transform.2.Attribute",
+          "valueField": "Innerwear.Shoes.Transform.2.Value"
         },
         {
-          "attributeCell": "Innerwear.Shoes.Transform.3.Attribute",
-          "valueCell": "Innerwear.Shoes.Transform.3.Value"
+          "attributeField": "Innerwear.Shoes.Transform.3.Attribute",
+          "valueField": "Innerwear.Shoes.Transform.3.Value"
         }
       ],
-      "magazineCell": "Innerwear.Shoes.Magazine.Type",
-      "magazineLevelCell": "Innerwear.Shoes.Magazine.Level",
+      "magazineField": "Innerwear.Shoes.Magazine.Type",
+      "magazineLevelField": "Innerwear.Shoes.Magazine.Level",
       "wearSet": "shared",
       "slotId": "shoes"
     }

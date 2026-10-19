@@ -2,14 +2,14 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { resolveInnerwearSources } from '../dist/calculation/innerwear.js';
-import { resolveWeaponTransformationsFromCells } from '../dist/calculation/weapon-transformations.js';
+import { resolveWeaponTransformationsFromFields } from '../dist/calculation/weapon-transformations.js';
 import { aggregateCharacterAttributes, prepareCharacterAttributeInput } from '../dist/calculation/attribute-aggregation.js';
 
 const json = async path => JSON.parse(await readFile(new URL(`../data/${path}`, import.meta.url), 'utf8'));
 const [rules, attack, transforms, layout, mapping] = await Promise.all(['innerwear-rules.json', 'attack-parameters.json', 'weapon-transformations.json', 'equipment-layout.json', 'simulator-equipment-mapping.json'].map(json));
 const resolve = (values, enabled = true) => resolveInnerwearSources(rules, attack, 'DaB', values, enabled);
 
-test('強/排褲魔攻取 H21，變動 H12 不會改變這件裝備', () => {
+test('強/排褲魔攻只取本身強化，一般下衣強化不影響它', () => {
   const first = resolve({ "Left.Armor.Bottom.ENHC": 'Lv.8', "Left.Armor.Bottom.FORGE": 21, "Left.Armor.SwitchBottom.ENHC": 'Lv.13', "Left.Armor.SwitchBottom.FORGE": 21 });
   const second = resolve({ "Left.Armor.Bottom.ENHC": 'Lv.10', "Left.Armor.Bottom.FORGE": 21, "Left.Armor.SwitchBottom.ENHC": 'Lv.13', "Left.Armor.SwitchBottom.FORGE": 21 });
   assert.deepEqual(first.lowerwearB, second.lowerwearB);
@@ -20,7 +20,7 @@ test('強/排褲魔攻取 H21，變動 H12 不會改變這件裝備', () => {
 });
 
 test('五個內裝配置的 Lv.13 均有 Boss 5、適應 3；鍛造 21 再加適應 2', () => {
-  const values = Object.fromEntries(rules.slots.flatMap(slot => [[slot.enhancementCell, 'Lv.13'], [slot.forgingCell, 0]]));
+  const values = Object.fromEntries(rules.slots.flatMap(slot => [[slot.enhancementField, 'Lv.13'], [slot.forgingField, 0]]));
   const source = resolve(values);
   for (const entry of [...source.shared, ...source.lowerwearA, ...source.lowerwearB]) {
     assert.equal(entry.stats.bossDamagePct, 5); assert.equal(entry.stats.adaptabilityPct, 3);
@@ -36,34 +36,34 @@ test('鍛造門檻取已達成的最高階，未達首個門檻為零，不累�
   }
 });
 
-test('四個武器變換共用 B32 強化，不受 "Weapon.Growth":B35 文字內數字影響', () => {
+test('四個武器變換共用武器強化等級，不受成長與鑑定文字內數字影響', () => {
   const values = { "Weapon.ENHC": 'Lv.13', "Weapon.Growth": '成長6', "Weapon.Appraisal.Primary": '3.5%', "Weapon.Appraisal.Additional1": '2.25%' };
-  for (const slot of transforms.slots) { values[slot.choiceCell] = '雙攻% × 強化'; values[slot.valueCell] = .01; }
-  const result = resolveWeaponTransformationsFromCells(transforms, values);
+  for (const slot of transforms.slots) { values[slot.choiceField] = '雙攻% × 強化'; values[slot.valueField] = .01; }
+  const result = resolveWeaponTransformationsFromFields(transforms, values);
   assert.equal(result.length, 4);
   for (const entry of result) assert.equal(entry.stats.doubleAttackPct, 13);
-  assert.deepEqual(resolveWeaponTransformationsFromCells(transforms, { ...values, "Weapon.Growth": '成長1', "Weapon.Appraisal.Primary": '9%', "Weapon.Appraisal.Additional1": '8%' }), result);
+  assert.deepEqual(resolveWeaponTransformationsFromFields(transforms, { ...values, "Weapon.Growth": '成長1', "Weapon.Appraisal.Primary": '9%', "Weapon.Appraisal.Additional1": '8%' }), result);
 });
 
-test('十二種武器變換都依自己的規則換算，所有「×強化」只讀取 B32', () => {
+test('十二種武器變換依各自規則換算，「×強化」只讀取武器強化等級', () => {
   const values = { "Weapon.ENHC": 'Lv.11', "Weapon.Growth": 'Lv.2', "Weapon.Appraisal.Primary": 'Lv.3', "Weapon.Appraisal.Additional1": 'Lv.4' };
   for (const slot of transforms.slots) {
-    values[slot.choiceCell] = '';
-    values[slot.valueCell] = 0.02;
+    values[slot.choiceField] = '';
+    values[slot.valueField] = 0.02;
   }
   for (const rule of transforms.rules) {
     for (const slot of transforms.slots) {
-      values[slot.choiceCell] = rule.choice;
-      const [actual] = resolveWeaponTransformationsFromCells(transforms, values).filter(entry => entry.sourceId === `weapon-transform:${slot.choiceCell}`);
-      const expected = 0.02 * rule.valueMultiplier * (rule.strengthenByFirstIntegerFrom ? 11 : 1);
-      assert.equal(actual.stats[rule.statKey], expected, `${slot.choiceCell}: ${rule.choice}`);
-      values[slot.choiceCell] = '';
+      values[slot.choiceField] = rule.choice;
+      const [actual] = resolveWeaponTransformationsFromFields(transforms, values).filter(entry => entry.sourceId === `weapon-transform:${slot.choiceField}`);
+      const expected = 0.02 * rule.valueMultiplier * (rule.scaleByEnhancement ? 11 : 1);
+      assert.equal(actual.stats[rule.statKey], expected, `${slot.choiceField}: ${rule.choice}`);
+      values[slot.choiceField] = '';
     }
   }
   const withoutEnhancement = { ...values, "Weapon.ENHC": '', "Weapon.Growth": 'Lv.13' };
   values["Weapon.Transform.1.Stat"] = '雙攻% × 強化';
   withoutEnhancement["Weapon.Transform.1.Stat"] = '雙攻% × 強化';
-  assert.equal(resolveWeaponTransformationsFromCells(transforms, withoutEnhancement)[0].stats.doubleAttackPct, 0);
+  assert.equal(resolveWeaponTransformationsFromFields(transforms, withoutEnhancement)[0].stats.doubleAttackPct, 0);
 });
 
 
@@ -77,9 +77,9 @@ test('兩極化／適應力上限在全角色彙總後套用，極大化無 60 �
 });
 
 test('部位圖涵蓋所有裝備選擇與魔法石，魔法石沒有重複或漏列', () => {
-  const equipment = new Set(layout.slots.map(slot => slot.selectionCell).filter(Boolean));
-  assert.deepEqual([...equipment].sort(), mapping.selections.map(entry => entry.selectionCell).sort());
-  const stones = layout.slots.flatMap(slot => slot.stoneCells ?? []);
+  const equipment = new Set(layout.slots.map(slot => slot.selectionField).filter(Boolean));
+  assert.deepEqual([...equipment].sort(), mapping.selections.map(entry => entry.selectionField).sort());
+  const stones = layout.slots.flatMap(slot => slot.stoneFields ?? []);
   assert.equal(stones.length, new Set(stones).size);
-  assert.deepEqual(stones.sort(), mapping.magicStoneSelections.inputGroups.map(entry => entry.selectionCell).sort());
+  assert.deepEqual(stones.sort(), mapping.magicStoneSelections.inputGroups.map(entry => entry.selectionField).sort());
 });

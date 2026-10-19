@@ -2,66 +2,66 @@ import { isFieldId, FIELD_ID_TO_CODE } from "./field-ids.ts";
 import type { CatalogIndex } from './catalog-index.ts';
 import { normalizeClassSkillVersions } from '../calculation/class-skill-versions.ts';
 import { circuitBoardRowsField, readCircuitBoardRows, serializeCircuitBoardRows, normalizeCircuitBoardRows, normalizeCircuitPercentage } from './circuit-board-rows.ts';
-import { isResonanceInputCell, parseResonancePoints } from "../calculation/resonance-input.ts";
+import { isResonanceInputField, parseResonancePoints } from "../calculation/resonance-input.ts";
 
 export const DEFAULT_TRANSCENDENCE_SKILL_DAMAGE_SHARE_PCT = 100;
 
 /** Keep the first valid full magazine name in catalog slot order, including the alternate lowerwear. */
-export function normalizeNephronMagazineSelections(values: Record<string, string | number>, index: CatalogIndex): { clearedCells: string[]; changed: boolean } {
+export function normalizeNephronMagazineSelections(values: Record<string, string | number>, index: CatalogIndex): { clearedFields: string[]; changed: boolean } {
   const seen = new Set<string>();
-  const clearedCells: string[] = [];
+  const clearedFields: string[] = [];
   let changed = false;
   const rules = index.data.nephronArmor;
   for (const field of rules.fields) {
     const armor = index.innerwearById(field.slotId);
-    if (!armor || values[armor.typeCell] !== '內布隆') continue;
-    const name = String(values[field.magazineCell] ?? '');
+    if (!armor || values[armor.typeField] !== '內布隆') continue;
+    const name = String(values[field.magazineField] ?? '');
     const magazine = rules.magazines.find(entry => entry.name === name);
-    const level = magazine?.fixedLevel === undefined ? String(values[field.magazineLevelCell] ?? '') : `Lv.${magazine.fixedLevel}`;
+    const level = magazine?.fixedLevel === undefined ? String(values[field.magazineLevelField] ?? '') : `Lv.${magazine.fixedLevel}`;
     if (!name && !level) continue;
     // A selected name reserves its slot while the user is still choosing a level.
     if (!magazine
       || (level !== '' && !rules.levelLabels.includes(level)) || seen.has(name)) {
-      delete values[field.magazineCell]; delete values[field.magazineLevelCell];
-      clearedCells.push(field.magazineCell, field.magazineLevelCell);
+      delete values[field.magazineField]; delete values[field.magazineLevelField];
+      clearedFields.push(field.magazineField, field.magazineLevelField);
       changed = true;
     } else {
       seen.add(name);
-      if (magazine.fixedLevel !== undefined && values[field.magazineLevelCell] !== level) {
-        values[field.magazineLevelCell] = level;
+      if (magazine.fixedLevel !== undefined && values[field.magazineLevelField] !== level) {
+        values[field.magazineLevelField] = level;
         changed = true;
       }
     }
   }
-  return { clearedCells, changed };
+  return { clearedFields, changed };
 }
 
 const optionalEffectsByCatalog = new WeakMap<CatalogIndex, {
   fields: string[]; choices: Map<string, readonly unknown[]>; circuitChoices: Map<string, readonly unknown[]>;
-  valueCells: Map<string, string>;
+  valueFields: Map<string, string>;
 }>();
 function optionalEffectFields(index: CatalogIndex) {
   let fields = optionalEffectsByCatalog.get(index);
   if (fields) return fields;
-  const valueCells = new Map<string, string>();
+  const valueFields = new Map<string, string>();
   const choices = new Map<string, readonly unknown[]>();
   const circuitChoices = new Map<string, readonly unknown[]>();
-  for (const input of index.data.circuits.inputs) valueCells.set(input.attributeCell, input.valueCell);
-  for (const input of index.data.circuits.inputs) circuitChoices.set(input.attributeCell, input.attributeOptions);
-  for (const armor of index.data.nephronArmor.fields) for (const input of armor.transformFields) valueCells.set(input.attributeCell, input.valueCell);
-  for (const cell of Object.keys(FIELD_ID_TO_CODE)) {
-    if (/^MasterBeast\..+\.(?:CustomAttribute|Mirror\.\d+\.Attribute)$/.test(cell)) {
-      valueCells.set(cell, cell.replace(/Attribute$/, 'Value'));
+  for (const input of index.data.circuits.inputs) valueFields.set(input.attributeField, input.valueField);
+  for (const input of index.data.circuits.inputs) circuitChoices.set(input.attributeField, input.attributeOptions);
+  for (const armor of index.data.nephronArmor.fields) for (const input of armor.transformFields) valueFields.set(input.attributeField, input.valueField);
+  for (const fieldId of Object.keys(FIELD_ID_TO_CODE)) {
+    if (/^MasterBeast\..+\.(?:CustomAttribute|Mirror\.\d+\.Attribute)$/.test(fieldId)) {
+      valueFields.set(fieldId, fieldId.replace(/Attribute$/, 'Value'));
     }
   }
   const optionalFields: string[] = [];
-  for (const cell of Object.keys(FIELD_ID_TO_CODE)) {
-    const fieldChoices = index.resolveFieldChoices(cell, {});
+  for (const fieldId of Object.keys(FIELD_ID_TO_CODE)) {
+    const fieldChoices = index.resolveFieldChoices(fieldId, {});
     if (!fieldChoices?.some(choice => String(choice) === '無關傷害')) continue;
-    optionalFields.push(cell);
-    choices.set(cell, fieldChoices);
+    optionalFields.push(fieldId);
+    choices.set(fieldId, fieldChoices);
   }
-  fields = { fields: optionalFields, choices, circuitChoices, valueCells };
+  fields = { fields: optionalFields, choices, circuitChoices, valueFields };
   optionalEffectsByCatalog.set(index, fields);
   return fields;
 }
@@ -69,31 +69,31 @@ function optionalEffectFields(index: CatalogIndex) {
 /** Shared by startup, import, history and controls; never replaces valid selections. */
 export function normalizeOptionalEffectValues(values: Record<string, string | number>, index: CatalogIndex): boolean {
   let changed = false;
-  const set = (cell: string, value: string | number) => {
-    if (values[cell] !== value) { values[cell] = value; changed = true; }
+  const set = (fieldId: string, value: string | number) => {
+    if (values[fieldId] !== value) { values[fieldId] = value; changed = true; }
   };
   const fields = optionalEffectFields(index);
-  for (const cell of fields.fields) {
-    const choices = fields.circuitChoices.get(cell) ?? fields.choices.get(cell);
-    if (!choices?.some(choice => String(choice) === String(values[cell] ?? ''))) set(cell, '無關傷害');
-    const valueCell = fields.valueCells.get(cell);
-    if (valueCell && values[cell] === '無關傷害') set(valueCell, 0);
+  for (const fieldId of fields.fields) {
+    const choices = fields.circuitChoices.get(fieldId) ?? fields.choices.get(fieldId);
+    if (!choices?.some(choice => String(choice) === String(values[fieldId] ?? ''))) set(fieldId, '無關傷害');
+    const valueField = fields.valueFields.get(fieldId);
+    if (valueField && values[fieldId] === '無關傷害') set(valueField, 0);
   }
   for (const circuit of index.data.circuits.inputs) {
     const rows = normalizeCircuitBoardRows(
-      readCircuitBoardRows(values, circuit.attributeCell, circuit.valueCell),
+      readCircuitBoardRows(values, circuit.attributeField, circuit.valueField),
       circuit.attributeOptions,
     );
-    set(circuitBoardRowsField(circuit.attributeCell), serializeCircuitBoardRows(rows));
-    // Keep the original single-row cells synchronized for old readers and transfers.
-    set(circuit.attributeCell, rows[0].attribute);
-    set(circuit.valueCell, normalizeCircuitPercentage(rows[0].percentageValue));
+    set(circuitBoardRowsField(circuit.attributeField), serializeCircuitBoardRows(rows));
+    // Keep the original single-row fields synchronized for old readers and transfers.
+    set(circuit.attributeField, rows[0].attribute);
+    set(circuit.valueField, normalizeCircuitPercentage(rows[0].percentageValue));
   }
   return changed;
 }
 
-export function isUnrelatedEffectValue(cell: string, values: Readonly<Record<string, string | number>>, index: CatalogIndex): boolean {
-  return [...optionalEffectFields(index).valueCells].some(([attribute, valueCell]) => valueCell === cell && values[attribute] === '無關傷害');
+export function isUnrelatedEffectValue(fieldId: string, values: Readonly<Record<string, string | number>>, index: CatalogIndex): boolean {
+  return [...optionalEffectFields(index).valueFields].some(([attribute, valueField]) => valueField === fieldId && values[attribute] === '無關傷害');
 }
 
 export interface PortraitAwakeningSplit {
@@ -188,9 +188,9 @@ export function migrateLegacyEnvironmentSelection(values: Record<string, string 
 }
 
 /** Shared migration only; callers retain their own validation and cleared-field policy. */
-export function migrateLegacyGloveCircuitSkillDamage(values: Record<string, string | number>, attributeCell: string | undefined): boolean {
-  if (!attributeCell || values[attributeCell] !== '超越技傷%') return false;
-  values[attributeCell] = '單技傷%';
+export function migrateLegacyGloveCircuitSkillDamage(values: Record<string, string | number>, attributeField: string | undefined): boolean {
+  if (!attributeField || values[attributeField] !== '超越技傷%') return false;
+  values[attributeField] = '單技傷%';
   return true;
 }
 
@@ -230,7 +230,7 @@ function parseState(raw: string | null): LoadoutState | null {
   const values: Record<string, string | number> = {};
     if (entries && typeof entries === "object") for (const [key, item] of Object.entries(entries)) {
       if (!isFieldId(key) || !(typeof item === "string" || typeof item === "number" && Number.isFinite(item))) continue;
-      if (isResonanceInputCell(key)) {
+      if (isResonanceInputField(key)) {
         const points = parseResonancePoints(key, item);
         if (points !== null) values[key] = points;
         continue;

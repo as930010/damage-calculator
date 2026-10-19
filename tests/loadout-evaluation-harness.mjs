@@ -55,7 +55,6 @@ export async function createRuntime({ dom, sourceReader, transformSource, global
         : file === 'calculation/loadout-engine.ts' ? ['calculateLoadout', 'calculateLoadoutCombatRates', 'prepareLoadoutAttributes', 'evaluatePreparedLoadout']
         : file === 'frontend/main.ts' ? ['renderResults']
         : file === 'frontend/catalog-index.ts' ? ['createCatalogIndex', 'equipmentTransferCode', 'resolveFieldChoices', 'matchEquipment', 'resolveEquipmentCode']
-        : file === 'frontend/loadout-transfer.ts' ? ['customOptions', 'cellOptions', 'equipmentMappings', 'equipmentTransferCode', 'matchEquipment', 'resolveEquipmentCode']
         : file === 'frontend/input-validation.ts' ? ['findValidationCatalog', 'createValidationCatalogIndex'] : [];
       for (const name of names) source = source.replace(new RegExp(`(function ${name}\\([\\s\\S]*?\\)\\s*\\{)`), `$1\n__count('${name}');`);
     }

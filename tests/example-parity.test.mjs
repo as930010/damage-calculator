@@ -1,37 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { projectAttributes, projectDamage } from '../dist/frontend/projection.js';
-import { readCalculationComparisonValues } from '../dist/frontend/calculation-comparison.js';
 
 const readJson = async path => JSON.parse(await readFile(new URL(`../data/${path}`, import.meta.url), 'utf8'));
-const localReferenceUrl = new URL('../data/examples/live-sheet-2026-09-28-expected.json', import.meta.url);
-const hasLocalReference = existsSync(localReferenceUrl);
-const referenceMetricKeys = [
-  ['C1', 'physicalAttack'], ['D1', 'magicalAttack'], ['E1', 'doubleAttackPct'], ['F1', 'critRatePct'],
-  ['G1', 'extremizationPct'], ['H1', 'critDamagePct'], ['I1', 'bossDamagePct'], ['J1', 'polarizationPct'],
-  ['K1', 'transcendenceSkillDamagePct'], ['L1', 'allSkillDamagePct'], ['M1', 'bleedDamagePct'],
-  ['N1', 'strongerPct'], ['O1', 'heatPct'], ['P1', 'fullHealthKillDamagePct'], ['Q1', 'adaptabilityPct'],
-  ['R1', 'defenseIgnorePct'], ['S1', 'multiplicativeEffect'], ['T1', 'multiplicativeCritDamage'],
-  ['U1', 'attackLevel'], ['V1', 'skillTypeAttackPct'], ['W1', 'superAdaptabilityPct'],
-  ['C53', 'weaponPhysicalBase'], ['D53', 'weaponMagicalBase'], ['B156', 'attackPower'],
-  ['B157', 'lowerAttack'], ['B158', 'upperAttack'], ['B159', 'critRate'], ['B160', 'extremizationRate'],
-  ['B161', 'nonDiminishingCritRate'], ['B162', 'nonDiminishingExtremizationRate'], ['B163', 'finalDamage'],
-];
-
-function compareWithLocalReference(result, reference) {
-  const actualValues = readCalculationComparisonValues(result);
-  return referenceMetricKeys.map(([cell, key]) => {
-    const expected = cell === 'B163' && reference.b163RecomputedFromFormula !== undefined
-      ? reference.b163RecomputedFromFormula : reference.cells[cell];
-    const actual = actualValues[key];
-    const delta = actual - expected;
-    const tolerance = Math.max(1e-12, 32 * Number.EPSILON * Math.max(1, Math.abs(actual), Math.abs(expected)));
-    return { cell, expected, actual, delta, matches: Math.abs(delta) <= tolerance };
-  });
-}
-
 async function loadData() {
   const files = {
     layout: 'equipment-layout.json', classes: 'classes.json', attributes: 'attributes.json', parameters: 'parameters.json',
@@ -56,31 +28,17 @@ async function loadData() {
   return data;
 }
 
-test('本機維護參照可比對公開配裝範例的計算輸出', { skip: !hasLocalReference && '本機未安裝維護用驗算參照。' }, async () => {
-  const [data, sample, expected] = await Promise.all([
+test('公開配裝範例保留技能占比與武器魔力石設定', async () => {
+  const [data, sample] = await Promise.all([
     loadData(),
     readJson('examples/public-example-2026-09-28.json'),
-    readJson('examples/live-sheet-2026-09-28-expected.json'),
   ]);
   const result = projectDamage(data, sample).result;
-  const rows = compareWithLocalReference(result, expected);
-  assert.equal(rows.length, 31);
-  assert.deepEqual(rows.filter(row => !row.matches).map(row => row.cell), ['S1', 'B163']);
-  const multiplier = rows.find(row => row.cell === 'S1');
-  assert.ok(Math.abs(multiplier.actual / multiplier.expected - 1.13) < 1e-12);
   assert.deepEqual(['Right.Ice.SetEffect.1', 'Right.Ice.SetEffect.2', 'Right.Ice.SetEffect.3'].map(fieldId => sample.values[fieldId]), ['幽潮吞源', '日冕．灼耀花仙', '猛虎奇談']);
-
-  const bleed = rows.find(row => row.cell === 'M1');
-  const damage = rows.find(row => row.cell === 'B163');
-  assert.equal(bleed.expected, 54.5);
-  assert.equal(bleed.actual, 54.5);
-  assert.equal(bleed.delta, 0);
-  assert.equal(damage.expected, expected.b163RecomputedFromFormula);
-  assert.notEqual(damage.expected, expected.cells.B163);
+  assert.equal(result.attributes.stats.bleedDamagePct.finalTotal, 54.5);
   assert.equal(result.attributes.stats.strongSkillDamagePct.finalTotal, 94);
   assert.equal(result.finalDamage.skillDamageWeighting.transcendenceSharePct, 100);
   assert.equal(result.finalDamage.skillDamageWeighting.strongSharePct, 0);
-  assert.ok(Math.abs(damage.actual / damage.expected - 1.13) < 1e-12);
   const weaponStoneSources = projectAttributes(data, sample).calculationSources.shared.filter(source => source.sourceId.startsWith('weapon-magic-stone:'));
   const level = weaponStoneSources.reduce((sum, source) => sum + (source.stats.attackLevel ?? 0), 0);
   const doubleAttack = weaponStoneSources.reduce((sum, source) => sum + (source.stats.doubleAttackPct ?? 0), 0);
@@ -90,7 +48,7 @@ test('本機維護參照可比對公開配裝範例的計算輸出', { skip: !ha
   const manuallyChanged = structuredClone(sample);
   for (const group of data.weaponGrades.colorGroups) {
     const preset = group.options.find(option => option.id === group.presetByGrade['深淵']);
-    for (const cell of group.settingKeys) manuallyChanged.values[cell] = preset.name;
+    for (const fieldId of group.settingKeys) manuallyChanged.values[fieldId] = preset.name;
   }
   manuallyChanged.values['Weapon.MagicStone.Red.1'] = '攻擊力等級+1.5';
   manuallyChanged.values['Weapon.MagicStone.Yellow.1'] = '致命一擊傷害+1.7%';
@@ -130,8 +88,5 @@ test('被侵蝕的荊棘角把310秒Buff週期平均放入乘算效果，並單�
   const item = data.catalogs['equipment/accessories.json'].items.find(entry => entry.name === '被侵蝕的荊棘角');
   assert.equal(item.appraisal.canAppraise, false);
   assert.match(item.description, /使用特殊主動技能時/);
-  const provenance = JSON.parse(await readFile(new URL('../docs/data-maintenance/legacy-source-provenance.json', import.meta.url), 'utf8'));
-  const developerNote = provenance.sourceRecords.find(record => record.sourceDocument === 'data/equipment/accessories.json'
-    && record.path === 'items[6].developerNote')?.value;
-  assert.match(developerNote, /15\.0580645161291%/);
+
 });

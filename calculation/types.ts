@@ -62,7 +62,7 @@ export interface RateCalculationResult {
   nonDiminishingPct: number;
   finalAdjustmentPct: number;
   valueBeforeUpperCap: number;
-  /** Mirrors the spreadsheet `MIN(1, ...)`; it intentionally has no lower clamp. */
+  /** Apply only an upper clamp of 1; negative values remain unchanged. */
   finalRate: number;
 }
 
@@ -148,16 +148,16 @@ export interface AttackCalculationInput {
   attackType: AttackType;
   physicalAttack: number;
   magicalAttack: number;
-  /** E1, percentage points. */
+  /** Additional attack, in percentage points. */
   doubleAttackPct: number;
-  /** V1, percentage points. */
+  /** Skill-type attack bonus, in percentage points. */
   skillTypeAttackPct: number;
-  /** U1, attack-power level contribution. */
+  /** Attack-level bonus. */
   attackLevel: number;
-  /** C53 looks up coefficient column 2; D53 looks up coefficient column 3. */
+  /** Class coefficients for physical and magical weapon base attack. */
   physicalClassCoefficient: number;
   magicalClassCoefficient: number;
-  /** VLOOKUP(裝備模擬區!B32, 係數區!G:H, 2, 0), supplied from JSON as a factor. */
+  /** Weapon enhancement multiplier resolved from game parameters. */
   weaponEnhancementFactor: number;
 }
 
@@ -165,8 +165,8 @@ export interface AttackCalculationResult {
   attackType: AttackType;
   selectedAttack: number;
   attackPower: number;
-  c53: number;
-  d53: number;
+  weaponPhysicalAttack: number;
+  weaponMagicalAttack: number;
   lowerDamage: number;
   upperDamage: number;
 }
@@ -193,17 +193,17 @@ export interface ProductStatResult {
 }
 
 export interface FinalDamageInput {
-  /** Spreadsheet B157 and B158, after their respective FLOOR.MATH operations. */
+  /** Damage bounds after rounding each bound down. */
   lowerDamage: number;
   upperDamage: number;
-  /** B159 and B160 are probability ratios, e.g. 0.75 means 75%. */
+  /** Combat probabilities, e.g. 0.75 means 75%. */
   critRate: number;
   extremizationRate: number;
-  /** H1, stored as percentage points. */
+  /** Critical damage, in percentage points. */
   critDamagePct: number;
   /** Per-class passive bonus, stored as percentage points and resolved from JSON. */
   classCritDamagePassivePct: number;
-  /** T1, already a ratio after its PRODUCT calculation and 150% baseline subtraction. */
+  /** Critical damage product offset after subtracting the configured baseline. */
   multiplicativeCritDamageOffset: number;
   bossDamagePct: number;
   polarizationPct: number;
@@ -218,7 +218,7 @@ export interface FinalDamageInput {
   heatPct: number;
   /** Select the existing high-HP (1) or low-HP (0) half; omission keeps the original 50/50 calculation. */
   bossHighHealthShare?: 0 | 1;
-  /** S1, already a multiplier product. */
+  /** Total damage multiplier product. */
   generalMultiplicativeDamage: number;
   adaptabilityPct: number;
   superAdaptabilityPct: number;

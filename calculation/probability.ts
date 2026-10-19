@@ -12,7 +12,7 @@ function requireFinite(value: number, label: string): void {
   }
 }
 
-/** Spreadsheet diminishing curve used by 計算機!B159. */
+/** Diminishing returns for critical hit chance. */
 export function criticalTierRate(rawCritPct: number): number {
   requireFinite(rawCritPct, "rawCritPct");
   const raw = rawCritPct / 100;
@@ -24,7 +24,7 @@ export function criticalTierRate(rawCritPct: number): number {
   );
 }
 
-/** Spreadsheet diminishing curve used by 計算機!B160. */
+/** Diminishing returns for extremization. */
 export function extremizationTierRate(rawExtremizationPct: number): number {
   requireFinite(rawExtremizationPct, "rawExtremizationPct");
   const raw = rawExtremizationPct / 100;

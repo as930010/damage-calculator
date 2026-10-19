@@ -33,7 +33,7 @@ export interface EquipmentCatalogDocument {
 }
 
 export interface SimulatorEquipmentSelectionMapping {
-  selectionCell: string;
+  selectionField: string;
   catalogFile: string;
   slotId: string;
   application?: EquipmentApplication;
@@ -42,7 +42,7 @@ export interface SimulatorEquipmentSelectionMapping {
 }
 
 export interface SimulatorMagicStoneSelectionMapping {
-  selectionCell: string;
+  selectionField: string;
   application: EquipmentApplication;
   enabledBy?: string;
   configuration?: "shared" | "lowerwearA" | "lowerwearB";
@@ -59,7 +59,7 @@ export interface SimulatorEquipmentMappingDocument {
 }
 
 export interface SimulatorEquipmentSelectionInput {
-  /** Selected visible item names, keyed by the original simulator cell. */
+  /** Selected visible item names, keyed by semantic selection field ID. */
   selectedItems: Readonly<Record<string, string | null | undefined>>;
   /** Named boolean switches such as Lowerwear.Alternative.Enabled. */
   enabledValues?: Readonly<Record<string, boolean | undefined>>;
@@ -74,7 +74,7 @@ export interface SimulatorEquipmentContributionGroups {
 
 /**
  * Resolve an item from a static JSON catalog. Magic stones require an explicit
- * application scope because the workbook assigns different values to armor and weapons.
+ * application scope because armor and weapon stones have different effects.
  */
 export function resolveEquipmentItemContribution(
   document: EquipmentCatalogDocument,
@@ -110,7 +110,7 @@ export function resolveEquipmentItemContribution(
   return { sourceId, stats };
 }
 
-/** Resolve a spreadsheet-style name selection to its unique item ID and contribution. */
+/** Resolve a selected equipment name to its unique item ID and contribution. */
 export function resolveEquipmentItemContributionByName(
   document: EquipmentCatalogDocument,
   itemName: string,
@@ -137,7 +137,7 @@ export function resolveEquipmentItemContributionByName(
   return resolveEquipmentItemContribution(document, matches[0].id, expectedSlotId, sourceId, application);
 }
 
-/** Return the source-sheet label for an application-specific option such as a magic stone. */
+/** Return the application-specific display name for an application-specific option such as a magic stone. */
 export function getEquipmentOptionName(
   item: EquipmentCatalogItem,
   application?: EquipmentApplication,
@@ -151,7 +151,7 @@ export function getEquipmentOptionName(
   return item.name;
 }
 
-/** Convert the spreadsheet's searchable-name selections into engine contributions. */
+/** Convert the searchable equipment selections into engine contributions. */
 export function resolveSimulatorEquipmentContributions(
   mapping: SimulatorEquipmentMappingDocument,
   catalogs: Readonly<Record<string, EquipmentCatalogDocument>>,
@@ -163,7 +163,7 @@ export function resolveSimulatorEquipmentContributions(
     lowerwearB: [],
   };
   const resolveOne = (
-    selectionCell: string,
+    selectionField: string,
     catalogFile: string,
     slotId: string,
     application?: EquipmentApplication,
@@ -171,7 +171,7 @@ export function resolveSimulatorEquipmentContributions(
     configuration: "shared" | "lowerwearA" | "lowerwearB" = "shared",
   ): void => {
     if (enabledBy && input.enabledValues?.[enabledBy] !== true) return;
-    const itemName = input.selectedItems[selectionCell];
+    const itemName = input.selectedItems[selectionField];
     if (itemName == null || itemName.trim() === "") return;
     const catalog = catalogs[catalogFile];
     if (!catalog) throw new RangeError("Missing equipment catalog: " + catalogFile);
@@ -180,7 +180,7 @@ export function resolveSimulatorEquipmentContributions(
         catalog,
         itemName,
         slotId,
-        "simulator:" + selectionCell,
+        "simulator:" + selectionField,
         application,
       ),
     );
@@ -188,7 +188,7 @@ export function resolveSimulatorEquipmentContributions(
 
   for (const selection of mapping.selections) {
     resolveOne(
-      selection.selectionCell,
+      selection.selectionField,
       selection.catalogFile,
       selection.slotId,
       selection.application,
@@ -199,7 +199,7 @@ export function resolveSimulatorEquipmentContributions(
   const magicStone = mapping.magicStoneSelections;
   for (const selection of magicStone.inputGroups) {
     resolveOne(
-      selection.selectionCell,
+      selection.selectionField,
       magicStone.catalogFile,
       magicStone.slotId,
       selection.application,

@@ -2,212 +2,134 @@
   "schemaVersion": 2,
   "selections": [
     {
-      "selectionCell": "Costume.OnePiece",
+      "selectionField": "Costume.OnePiece",
       "catalogFile": "equipment/one-piece-costumes.json",
-      "slotId": "one-piece-costumes",
-      "calculationRows": [
-        3
-      ]
+      "slotId": "one-piece-costumes"
     },
     {
-      "selectionCell": "Left.Ice.Set",
+      "selectionField": "Left.Ice.Set",
       "catalogFile": "equipment/left-ice.json",
-      "slotId": "left-ice",
-      "calculationRows": [
-        4
-      ]
+      "slotId": "left-ice"
     },
     {
-      "selectionCell": "Ice.Weapon.Set",
+      "selectionField": "Ice.Weapon.Set",
       "catalogFile": "equipment/right-ice.json",
-      "slotId": "weapon",
-      "calculationRows": [
-        5
-      ]
+      "slotId": "weapon"
     },
     {
-      "selectionCell": "Right.Ice.WeaponAccessory",
+      "selectionField": "Right.Ice.WeaponAccessory",
       "catalogFile": "equipment/right-ice.json",
-      "slotId": "weaponAccessory",
-      "calculationRows": [
-        6
-      ]
+      "slotId": "weaponAccessory"
     },
     {
-      "selectionCell": "Right.Ice.FaceTop",
+      "selectionField": "Right.Ice.FaceTop",
       "catalogFile": "equipment/right-ice.json",
-      "slotId": "faceTop",
-      "calculationRows": [
-        7
-      ]
+      "slotId": "faceTop"
     },
     {
-      "selectionCell": "Right.Ice.FaceMiddle",
+      "selectionField": "Right.Ice.FaceMiddle",
       "catalogFile": "equipment/right-ice.json",
-      "slotId": "faceMiddle",
-      "calculationRows": [
-        8
-      ]
+      "slotId": "faceMiddle"
     },
     {
-      "selectionCell": "Right.Ice.FaceBottom",
+      "selectionField": "Right.Ice.FaceBottom",
       "catalogFile": "equipment/right-ice.json",
-      "slotId": "faceBottom",
-      "calculationRows": [
-        9
-      ]
+      "slotId": "faceBottom"
     },
     {
-      "selectionCell": "Right.Ice.Earring",
+      "selectionField": "Right.Ice.Earring",
       "catalogFile": "equipment/right-ice.json",
-      "slotId": "earring",
-      "calculationRows": [
-        10
-      ]
+      "slotId": "earring"
     },
     {
-      "selectionCell": "Right.Ice.Support",
+      "selectionField": "Right.Ice.Support",
       "catalogFile": "equipment/right-ice.json",
-      "slotId": "support",
-      "calculationRows": [
-        11
-      ]
+      "slotId": "support"
     },
     {
-      "selectionCell": "Right.Ice.Top",
+      "selectionField": "Right.Ice.Top",
       "catalogFile": "equipment/right-ice.json",
-      "slotId": "top",
-      "calculationRows": [
-        12
-      ]
+      "slotId": "top"
     },
     {
-      "selectionCell": "Right.Ice.Bottom",
+      "selectionField": "Right.Ice.Bottom",
       "catalogFile": "equipment/right-ice.json",
-      "slotId": "bottom",
-      "calculationRows": [
-        13
-      ]
+      "slotId": "bottom"
     },
     {
-      "selectionCell": "Right.Ice.Arm",
+      "selectionField": "Right.Ice.Arm",
       "catalogFile": "equipment/right-ice.json",
-      "slotId": "arm",
-      "calculationRows": [
-        14
-      ]
+      "slotId": "arm"
     },
     {
-      "selectionCell": "Right.Ice.Necklace",
+      "selectionField": "Right.Ice.Necklace",
       "catalogFile": "equipment/right-ice.json",
-      "slotId": "necklace",
-      "calculationRows": [
-        15
-      ]
+      "slotId": "necklace"
     },
     {
-      "selectionCell": "Right.Ice.Ring",
+      "selectionField": "Right.Ice.Ring",
       "catalogFile": "equipment/right-ice.json",
-      "slotId": "ring",
-      "calculationRows": [
-        16
-      ]
+      "slotId": "ring"
     },
     {
-      "selectionCell": "Accessory.WeaponAccessory",
+      "selectionField": "Accessory.WeaponAccessory",
       "catalogFile": "equipment/accessories.json",
-      "slotId": "weaponAccessory",
-      "calculationRows": [
-        20
-      ]
+      "slotId": "weaponAccessory"
     },
     {
-      "selectionCell": "Accessory.FaceTop",
+      "selectionField": "Accessory.FaceTop",
       "catalogFile": "equipment/accessories.json",
-      "slotId": "faceTop",
-      "calculationRows": [
-        21
-      ]
+      "slotId": "faceTop"
     },
     {
-      "selectionCell": "Accessory.FaceMiddle",
+      "selectionField": "Accessory.FaceMiddle",
       "catalogFile": "equipment/accessories.json",
-      "slotId": "faceMiddle",
-      "calculationRows": [
-        22
-      ]
+      "slotId": "faceMiddle"
     },
     {
-      "selectionCell": "Accessory.FaceBottom",
+      "selectionField": "Accessory.FaceBottom",
       "catalogFile": "equipment/accessories.json",
-      "slotId": "faceBottom",
-      "calculationRows": [
-        23
-      ]
+      "slotId": "faceBottom"
     },
     {
-      "selectionCell": "Accessory.Earring",
+      "selectionField": "Accessory.Earring",
       "catalogFile": "equipment/accessories.json",
-      "slotId": "earring",
-      "calculationRows": [
-        25
-      ]
+      "slotId": "earring"
     },
     {
-      "selectionCell": "Accessory.Ring1",
+      "selectionField": "Accessory.Ring1",
       "catalogFile": "equipment/accessories.json",
-      "slotId": "ringA",
-      "calculationRows": [
-        26
-      ]
+      "slotId": "ringA"
     },
     {
-      "selectionCell": "Accessory.Support",
+      "selectionField": "Accessory.Support",
       "catalogFile": "equipment/accessories.json",
-      "slotId": "support",
-      "calculationRows": [
-        28
-      ]
+      "slotId": "support"
     },
     {
-      "selectionCell": "Accessory.Top",
+      "selectionField": "Accessory.Top",
       "catalogFile": "equipment/accessories.json",
-      "slotId": "top",
-      "calculationRows": [
-        29
-      ]
+      "slotId": "top"
     },
     {
-      "selectionCell": "Accessory.Bottom",
+      "selectionField": "Accessory.Bottom",
       "catalogFile": "equipment/accessories.json",
-      "slotId": "bottom",
-      "calculationRows": [
-        31
-      ]
+      "slotId": "bottom"
     },
     {
-      "selectionCell": "Accessory.Arm",
+      "selectionField": "Accessory.Arm",
       "catalogFile": "equipment/accessories.json",
-      "slotId": "arm",
-      "calculationRows": [
-        32
-      ]
+      "slotId": "arm"
     },
     {
-      "selectionCell": "Accessory.Necklace",
+      "selectionField": "Accessory.Necklace",
       "catalogFile": "equipment/accessories.json",
-      "slotId": "necklace",
-      "calculationRows": [
-        33
-      ]
+      "slotId": "necklace"
     },
     {
-      "selectionCell": "Accessory.Ring2",
+      "selectionField": "Accessory.Ring2",
       "catalogFile": "equipment/accessories.json",
-      "slotId": "ringB",
-      "calculationRows": [
-        34
-      ]
+      "slotId": "ringB"
     }
   ],
   "magicStoneSelections": {
@@ -215,217 +137,178 @@
     "slotId": "magicStone",
     "inputGroups": [
       {
-        "selectionCell": "Costume.MagicStone",
-        "application": "armor",
-        "calculationRow": 104
+        "selectionField": "Costume.MagicStone",
+        "application": "armor"
       },
       {
-        "selectionCell": "Left.Ice.Hair.MagicStone",
-        "application": "armor",
-        "calculationRow": 105
+        "selectionField": "Left.Ice.Hair.MagicStone",
+        "application": "armor"
       },
       {
-        "selectionCell": "Left.Ice.Upper.MagicStone",
-        "application": "armor",
-        "calculationRow": 106
+        "selectionField": "Left.Ice.Upper.MagicStone",
+        "application": "armor"
       },
       {
-        "selectionCell": "Left.Ice.Bottom.MagicStone",
-        "application": "armor",
-        "calculationRow": 107
+        "selectionField": "Left.Ice.Bottom.MagicStone",
+        "application": "armor"
       },
       {
-        "selectionCell": "Left.Ice.Gloves.MagicStone",
-        "application": "armor",
-        "calculationRow": 108
+        "selectionField": "Left.Ice.Gloves.MagicStone",
+        "application": "armor"
       },
       {
-        "selectionCell": "Left.Ice.Shoes.MagicStone",
-        "application": "armor",
-        "calculationRow": 109
+        "selectionField": "Left.Ice.Shoes.MagicStone",
+        "application": "armor"
       },
       {
-        "selectionCell": "Left.Armor.Upper.MagicStone.1",
-        "application": "armor",
-        "calculationRow": 110
+        "selectionField": "Left.Armor.Upper.MagicStone.1",
+        "application": "armor"
       },
       {
-        "selectionCell": "Left.Armor.Upper.MagicStone.2",
-        "application": "armor",
-        "calculationRow": 111
+        "selectionField": "Left.Armor.Upper.MagicStone.2",
+        "application": "armor"
       },
       {
-        "selectionCell": "Left.Armor.Upper.MagicStone.3",
-        "application": "armor",
-        "calculationRow": 112
+        "selectionField": "Left.Armor.Upper.MagicStone.3",
+        "application": "armor"
       },
       {
-        "selectionCell": "Left.Armor.Upper.MagicStone.4",
-        "application": "armor",
-        "calculationRow": 113
+        "selectionField": "Left.Armor.Upper.MagicStone.4",
+        "application": "armor"
       },
       {
-        "selectionCell": "Left.Armor.Bottom.MagicStone.1",
+        "selectionField": "Left.Armor.Bottom.MagicStone.1",
         "application": "armor",
-        "calculationRow": 114,
         "configuration": "lowerwearA"
       },
       {
-        "selectionCell": "Left.Armor.Bottom.MagicStone.2",
+        "selectionField": "Left.Armor.Bottom.MagicStone.2",
         "application": "armor",
-        "calculationRow": 115,
         "configuration": "lowerwearA"
       },
       {
-        "selectionCell": "Left.Armor.Bottom.MagicStone.3",
+        "selectionField": "Left.Armor.Bottom.MagicStone.3",
         "application": "armor",
-        "calculationRow": 116,
         "configuration": "lowerwearA"
       },
       {
-        "selectionCell": "Left.Armor.Bottom.MagicStone.4",
+        "selectionField": "Left.Armor.Bottom.MagicStone.4",
         "application": "armor",
-        "calculationRow": 117,
         "configuration": "lowerwearA"
       },
       {
-        "selectionCell": "Left.Armor.SwitchBottom.MagicStone.1",
+        "selectionField": "Left.Armor.SwitchBottom.MagicStone.1",
         "application": "armor",
-        "calculationRow": 118,
         "enabledBy": "Lowerwear.Alternative.Enabled",
         "configuration": "lowerwearB"
       },
       {
-        "selectionCell": "Left.Armor.SwitchBottom.MagicStone.2",
+        "selectionField": "Left.Armor.SwitchBottom.MagicStone.2",
         "application": "armor",
-        "calculationRow": 119,
         "enabledBy": "Lowerwear.Alternative.Enabled",
         "configuration": "lowerwearB"
       },
       {
-        "selectionCell": "Left.Armor.SwitchBottom.MagicStone.3",
+        "selectionField": "Left.Armor.SwitchBottom.MagicStone.3",
         "application": "armor",
-        "calculationRow": 120,
         "enabledBy": "Lowerwear.Alternative.Enabled",
         "configuration": "lowerwearB"
       },
       {
-        "selectionCell": "Left.Armor.SwitchBottom.MagicStone.4",
+        "selectionField": "Left.Armor.SwitchBottom.MagicStone.4",
         "application": "armor",
-        "calculationRow": 121,
         "enabledBy": "Lowerwear.Alternative.Enabled",
         "configuration": "lowerwearB"
       },
       {
-        "selectionCell": "Left.Armor.Gloves.MagicStone.1",
+        "selectionField": "Left.Armor.Gloves.MagicStone.1",
+        "application": "armor"
+      },
+      {
+        "selectionField": "Left.Armor.Gloves.MagicStone.2",
+        "application": "armor"
+      },
+      {
+        "selectionField": "Left.Armor.Gloves.MagicStone.3",
+        "application": "armor"
+      },
+      {
+        "selectionField": "Left.Armor.Gloves.MagicStone.4",
+        "application": "armor"
+      },
+      {
+        "selectionField": "Left.Armor.Shoes.MagicStone.1",
+        "application": "armor"
+      },
+      {
+        "selectionField": "Left.Armor.Shoes.MagicStone.2",
+        "application": "armor"
+      },
+      {
+        "selectionField": "Left.Armor.Shoes.MagicStone.3",
+        "application": "armor"
+      },
+      {
+        "selectionField": "Left.Armor.Shoes.MagicStone.4",
+        "application": "armor"
+      },
+      {
+        "selectionField": "Weapon.MagicStone.1",
+        "application": "weapon"
+      },
+      {
+        "selectionField": "Weapon.MagicStone.2",
+        "application": "weapon"
+      },
+      {
+        "selectionField": "Weapon.MagicStone.3",
+        "application": "weapon"
+      },
+      {
+        "selectionField": "Weapon.MagicStone.4",
+        "application": "weapon"
+      },
+      {
+        "selectionField": "Weapon.MagicStone.5",
+        "application": "weapon"
+      },
+      {
+        "selectionField": "Weapon.MagicStone.6",
+        "application": "weapon"
+      },
+      {
+        "selectionField": "Ice.Weapon.MagicStone.1",
+        "application": "weapon"
+      },
+      {
+        "selectionField": "Ice.Weapon.MagicStone.2",
+        "application": "weapon"
+      },
+      {
+        "selectionField": "Left.Armor.Upper.MagicStone.5",
         "application": "armor",
-        "calculationRow": 122
-      },
-      {
-        "selectionCell": "Left.Armor.Gloves.MagicStone.2",
-        "application": "armor",
-        "calculationRow": 123
-      },
-      {
-        "selectionCell": "Left.Armor.Gloves.MagicStone.3",
-        "application": "armor",
-        "calculationRow": 124
-      },
-      {
-        "selectionCell": "Left.Armor.Gloves.MagicStone.4",
-        "application": "armor",
-        "calculationRow": 125
-      },
-      {
-        "selectionCell": "Left.Armor.Shoes.MagicStone.1",
-        "application": "armor",
-        "calculationRow": 126
-      },
-      {
-        "selectionCell": "Left.Armor.Shoes.MagicStone.2",
-        "application": "armor",
-        "calculationRow": 127
-      },
-      {
-        "selectionCell": "Left.Armor.Shoes.MagicStone.3",
-        "application": "armor",
-        "calculationRow": 128
-      },
-      {
-        "selectionCell": "Left.Armor.Shoes.MagicStone.4",
-        "application": "armor",
-        "calculationRow": 129
-      },
-      {
-        "selectionCell": "Weapon.MagicStone.1",
-        "application": "weapon",
-        "calculationRow": 130
-      },
-      {
-        "selectionCell": "Weapon.MagicStone.2",
-        "application": "weapon",
-        "calculationRow": 131
-      },
-      {
-        "selectionCell": "Weapon.MagicStone.3",
-        "application": "weapon",
-        "calculationRow": 132
-      },
-      {
-        "selectionCell": "Weapon.MagicStone.4",
-        "application": "weapon",
-        "calculationRow": 133
-      },
-      {
-        "selectionCell": "Weapon.MagicStone.5",
-        "application": "weapon",
-        "calculationRow": 134
-      },
-      {
-        "selectionCell": "Weapon.MagicStone.6",
-        "application": "weapon",
-        "calculationRow": 135
-      },
-      {
-        "selectionCell": "Ice.Weapon.MagicStone.1",
-        "application": "weapon",
-        "calculationRow": 136
-      },
-      {
-        "selectionCell": "Ice.Weapon.MagicStone.2",
-        "application": "weapon",
-        "calculationRow": 137
-      },
-      {
-        "selectionCell": "Left.Armor.Upper.MagicStone.5",
-        "application": "armor",
-        "calculationRow": 138,
         "enabledBy": "Nephron.Innerwear.Upper"
       },
       {
-        "selectionCell": "Left.Armor.Bottom.MagicStone.5",
+        "selectionField": "Left.Armor.Bottom.MagicStone.5",
         "application": "armor",
-        "calculationRow": 139,
         "enabledBy": "Nephron.Innerwear.Lowerwear",
         "configuration": "lowerwearA"
       },
       {
-        "selectionCell": "Left.Armor.SwitchBottom.MagicStone.5",
+        "selectionField": "Left.Armor.SwitchBottom.MagicStone.5",
         "application": "armor",
-        "calculationRow": 140,
         "enabledBy": "Nephron.Innerwear.LowerwearAlternative",
         "configuration": "lowerwearB"
       },
       {
-        "selectionCell": "Left.Armor.Gloves.MagicStone.5",
+        "selectionField": "Left.Armor.Gloves.MagicStone.5",
         "application": "armor",
-        "calculationRow": 141,
         "enabledBy": "Nephron.Innerwear.Gloves"
       },
       {
-        "selectionCell": "Left.Armor.Shoes.MagicStone.5",
+        "selectionField": "Left.Armor.Shoes.MagicStone.5",
         "application": "armor",
-        "calculationRow": 142,
         "enabledBy": "Nephron.Innerwear.Shoes"
       }
     ]

@@ -4,36 +4,37 @@ export interface WeaponTransformationRule {
   choice: string;
   statKey: string;
   valueMultiplier: number;
-  strengthenByFirstIntegerFrom?: "correspondingEnhancementText";
+  scaleByEnhancement?: boolean;
 }
 
 export interface WeaponTransformationDocument {
   schemaVersion: 2;
   rules: readonly WeaponTransformationRule[];
-  slots: readonly { choiceCell: string; valueCell: string; scalingTextCell: string }[];
+  enhancementField: string;
+  slots: readonly { choiceField: string; valueField: string }[];
 }
 
 export interface WeaponTransformationInput {
   sourceId: string;
   choice: string | null | undefined;
   value: number | null | undefined;
-  /** Shared weapon enhancement text from 裝備模擬區!B32. */
-  scalingText?: string | null;
+  /** Weapon enhancement selection used by level-scaled transformations. */
+  enhancementText?: string | null;
 }
 
-/** Resolve all four transformations through the JSON cell mapping. */
-export function resolveWeaponTransformationsFromCells(
+/** Resolve all four transformations through the configured field mapping. */
+export function resolveWeaponTransformationsFromFields(
   document: WeaponTransformationDocument,
   values: Readonly<Record<string, string | number | null | undefined>>,
 ): StatContribution[] {
   return document.slots.flatMap((slot) => {
-    const choice = values[slot.choiceCell];
-    const value = values[slot.valueCell];
+    const choice = values[slot.choiceField];
+    const value = values[slot.valueField];
     const result = resolveWeaponTransformation(document, {
-      sourceId: `weapon-transform:${slot.choiceCell}`,
+      sourceId: `weapon-transform:${slot.choiceField}`,
       choice: choice == null ? null : String(choice),
       value: value == null || value === "" ? null : Number(value),
-      scalingText: String(values[slot.scalingTextCell] ?? ""),
+      enhancementText: String(values[document.enhancementField] ?? ""),
     });
     return result ? [result] : [];
   });
@@ -57,9 +58,9 @@ export function resolveWeaponTransformation(
   }
 
   let factor = 1;
-  if (rule.strengthenByFirstIntegerFrom) {
-    const firstInteger = input.scalingText?.match(/[0-9]+/)?.[0];
-    // Mirrors IFERROR(VALUE(REGEXEXTRACT(text, "[0-9]+")), 0) in Sheets.
+  if (rule.scaleByEnhancement) {
+    const firstInteger = input.enhancementText?.match(/[0-9]+/)?.[0];
+    // Missing enhancement digits preserve the existing zero scaling behavior.
     factor = firstInteger === undefined ? 0 : Number(firstInteger);
   }
 

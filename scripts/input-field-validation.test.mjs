@@ -28,7 +28,7 @@ test("semantic IDs resolve their exact option catalogs", () => {
   }
 });
 
-test("coordinate-like references no longer resolve as runtime fields", () => {
-  assert.equal(findValidationCatalog(simulatorInputs.inputs, simulatorInputs.catalogs, "D1"), undefined);
-  assert.equal(findValidationCatalog(simulatorInputs.inputs, simulatorInputs.catalogs, "計算機!D1"), undefined);
+test("unknown field IDs do not resolve an option catalog", () => {
+  assert.equal(findValidationCatalog(simulatorInputs.inputs, simulatorInputs.catalogs, "Unknown.Field"), undefined);
+  assert.equal(findValidationCatalog(simulatorInputs.inputs, simulatorInputs.catalogs, ""), undefined);
 });

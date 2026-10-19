@@ -15,7 +15,7 @@ function assertStoredStateMatches(actualJson, expectedJson) {
   const actual = JSON.parse(actualJson), expected = JSON.parse(expectedJson);
   normalizeOptionalEffectValues(expected.values, index);
   assert.equal(actual.Job, expected.Job);
-  for (const [cell, value] of Object.entries(expected.values)) assert.equal(actual.values[cell], value, cell);
+  for (const [fieldId, value] of Object.entries(expected.values)) assert.equal(actual.values[fieldId], value, fieldId);
   for (const key of ['lowerwearAlternativeEnabled', 'masterBeastSpiritStoneColor', 'petSkillAttackEnabled', 'transcendenceSkillDamageSharePct'])
     assert.equal(actual[key], expected[key], key);
 }
@@ -43,7 +43,7 @@ function expectedTransfer(snapshot) {
 for (const context of choiceContexts()) {
   test(`ordered field choices: ${context.id}`, () => {
     for (const field of Object.keys(fixture.choices[context.id])) {
-      const additions = gameData.nephronArmor.fields.some(entry => entry.magazineCell === field) ? ['支援彈匣I', '支援彈匣II'] : [];
+      const additions = gameData.nephronArmor.fields.some(entry => entry.magazineField === field) ? ['支援彈匣I', '支援彈匣II'] : [];
       const expected = fixture.choices[context.id][field];
       assert.deepEqual(normalize(index.resolveFieldChoices(field, context.values)), additions.length ? [...expected, ...additions] : expected, field);
     }
@@ -141,7 +141,7 @@ test('warm complete export/import reuse equipment, validation and candidate indi
   transfer.parseLoadoutJson(fixture.transfers.export.json, complete, observed.data, prepared);
   observed.reset(); runtime.resetCounts();
   assert.deepEqual(normalize(transfer.serializeLoadout(complete, observed.data, prepared)), expectedTransfer(fixture.transfers.export));
-  assert.equal(runtime.counts.resolveFieldChoices, fixture.workload.export.functions.cellOptions);
+  assert.equal(runtime.counts.resolveFieldChoices, fixture.workload.export.candidateQueries);
   assert.equal(observed.counts.elementReads ?? 0, 0);
   observed.reset(); runtime.resetCounts();
   const importedCall = captureCall(() => transfer.parseLoadoutJson(fixture.transfers.export.json, complete, observed.data, prepared));
@@ -151,7 +151,7 @@ test('warm complete export/import reuse equipment, validation and candidate indi
   const expectedImport = normalizeCapturedImport(fixture.transfers.importMonitored);
   assert.deepEqual(importedCall, expectedImport);
   // Import now also validates optional-effect fields to normalize missing values.
-  assert.ok(importChoiceLookups >= fixture.workload.import.functions.cellOptions);
+  assert.ok(importChoiceLookups >= fixture.workload.import.candidateQueries);
   assert.ok(importScans.elementReads >= gameData.nephronArmor.fields.length
     && importScans.elementReads <= gameData.nephronArmor.fields.length + 20);
   assert.equal(importScans['classes.classes.filter'] ?? 0, 0);
@@ -163,19 +163,19 @@ test('warm complete export/import reuse equipment, validation and candidate indi
 test('equipment label changes/removal remain local; ambiguous IDs/names remain invalid', () => {
   const data = structuredClone(gameData), mapping = data.mapping.selections[0];
   const item = data.catalogs[mapping.catalogFile].items.find(entry => entry.active && entry.slotId === mapping.slotId);
-  const state = { ...complete, values: { [mapping.selectionCell]: item.name } };
+  const state = { ...complete, values: { [mapping.selectionField]: item.name } };
   const json = transfer.serializeLoadout(state, data).json;
   item.name = 'renamed-item';
-  assert.equal(transfer.parseLoadoutJson(json, state, data).state.values[mapping.selectionCell], item.name);
+  assert.equal(transfer.parseLoadoutJson(json, state, data).state.values[mapping.selectionField], item.name);
   data.catalogs[mapping.catalogFile].items = data.catalogs[mapping.catalogFile].items.filter(entry => entry.id !== item.id);
   const removed = transfer.parseLoadoutJson(json, state, data);
-  assert.equal(removed.state.values[mapping.selectionCell], undefined);
-  assert.deepEqual(normalize(removed.clearedFields), [mapping.selectionCell]);
+  assert.equal(removed.state.values[mapping.selectionField], undefined);
+  assert.deepEqual(normalize(removed.clearedFields), [mapping.selectionField]);
   data.catalogs[mapping.catalogFile].items.push(item, { ...item });
   const duplicate = createCatalogIndex(data);
   assert.equal(duplicate.resolveEquipmentCode(mapping, transfer.equipmentTransferCode(item.id)), null);
   assert.equal(duplicate.matchEquipment(mapping, item.name).length, 2);
-  assert.ok(transfer.serializeLoadout({ ...state, values: { [mapping.selectionCell]: item.name } }, data, duplicate).omittedFields.includes(mapping.selectionCell));
+  assert.ok(transfer.serializeLoadout({ ...state, values: { [mapping.selectionField]: item.name } }, data, duplicate).omittedFields.includes(mapping.selectionField));
 });
 
 test('magic stone application labels and stats remain distinct; inactive items do not resolve', () => {
@@ -185,7 +185,7 @@ test('magic stone application labels and stats remain distinct; inactive items d
     for (const item of expected) assert.equal(index.resolveEquipmentCode(mapping, transfer.equipmentTransferCode(item.id)), item);
   }
   const data = structuredClone(gameData), mapping = data.mapping.magicStoneSelections.inputGroups[0];
-  const lookup = createCatalogIndex(data), full = lookup.equipmentMappings.get(mapping.selectionCell);
+  const lookup = createCatalogIndex(data), full = lookup.equipmentMappings.get(mapping.selectionField);
   const item = data.catalogs[full.catalogFile].items[0]; item.active = false;
   assert.equal(createCatalogIndex(data).resolveEquipmentCode(full, transfer.equipmentTransferCode(item.id)), null);
 });

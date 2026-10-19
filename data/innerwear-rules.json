@@ -7,55 +7,55 @@
     {
       "id": "upper",
       "name": "上衣",
-      "enhancementCell": "Left.Armor.Upper.ENHC",
-      "forgingCell": "Left.Armor.Upper.FORGE",
+      "enhancementField": "Left.Armor.Upper.ENHC",
+      "forgingField": "Left.Armor.Upper.FORGE",
       "attackType": "physical",
       "attackFraction": 0.03,
       "wearSet": "shared",
       "multiplicativeDamageEnhancementBonusPct": 2,
-      "typeCell": "Innerwear.Upper.Type"
+      "typeField": "Innerwear.Upper.Type"
     },
     {
       "id": "lowerwear",
       "name": "下衣",
-      "enhancementCell": "Left.Armor.Bottom.ENHC",
-      "forgingCell": "Left.Armor.Bottom.FORGE",
+      "enhancementField": "Left.Armor.Bottom.ENHC",
+      "forgingField": "Left.Armor.Bottom.FORGE",
       "attackType": "magical",
       "attackFraction": 0.05,
       "wearSet": "lowerwearA",
-      "typeCell": "Innerwear.Lowerwear.Type"
+      "typeField": "Innerwear.Lowerwear.Type"
     },
     {
       "id": "lowerwearAlternative",
       "name": "強/排褲",
-      "enhancementCell": "Left.Armor.SwitchBottom.ENHC",
-      "forgingCell": "Left.Armor.SwitchBottom.FORGE",
+      "enhancementField": "Left.Armor.SwitchBottom.ENHC",
+      "forgingField": "Left.Armor.SwitchBottom.FORGE",
       "attackType": "magical",
       "attackFraction": 0.05,
       "wearSet": "lowerwearB",
       "enabledBy": "Lowerwear.Alternative.Enabled",
-      "typeCell": "Innerwear.LowerwearAlternative.Type"
+      "typeField": "Innerwear.LowerwearAlternative.Type"
     },
     {
       "id": "gloves",
       "name": "手套",
-      "enhancementCell": "Left.Armor.Gloves.ENHC",
-      "forgingCell": "Left.Armor.Gloves.FORGE",
+      "enhancementField": "Left.Armor.Gloves.ENHC",
+      "forgingField": "Left.Armor.Gloves.FORGE",
       "attackType": "physical",
       "attackFraction": 0.05,
       "wearSet": "shared",
       "allSkillDamagePerEnhancement": 5,
-      "typeCell": "Innerwear.Gloves.Type"
+      "typeField": "Innerwear.Gloves.Type"
     },
     {
       "id": "shoes",
       "name": "鞋子",
-      "enhancementCell": "Left.Armor.Shoes.ENHC",
-      "forgingCell": "Left.Armor.Shoes.FORGE",
+      "enhancementField": "Left.Armor.Shoes.ENHC",
+      "forgingField": "Left.Armor.Shoes.FORGE",
       "attackType": "magical",
       "attackFraction": 0.03,
       "wearSet": "shared",
-      "typeCell": "Innerwear.Shoes.Type"
+      "typeField": "Innerwear.Shoes.Type"
     }
   ],
   "enhancementStats": {

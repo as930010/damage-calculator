@@ -12,7 +12,7 @@ function ratio(pct: number): number {
   return pct / 100;
 }
 
-/** Implements the B163 damage chain, weighting the two skill-damage multipliers by the selected share. */
+/** Evaluate the final damage chain, weighting the two skill-damage multipliers by the selected share. */
 export function calculateFinalDamage(input: FinalDamageInput): FinalDamageResult {
   requireFiniteInputs(input);
 
@@ -52,14 +52,14 @@ export function calculateFinalDamage(input: FinalDamageInput): FinalDamageResult
     throw new RangeError('Boss health condition must select the high or low HP range.');
   }
   if ((input.bossHighHealthShare !== 0 && strongerFactor === 0) || (input.bossHighHealthShare !== 1 && heatFactor === 0)) {
-    throw new RangeError("B163 conditional damage source denominator is zero.");
+    throw new RangeError("Conditional damage source denominator is zero.");
   }
   let conditionalFactor: number;
   if (input.bossHighHealthShare === 1) conditionalFactor = strongerFactor;
   else if (input.bossHighHealthShare === 0) conditionalFactor = heatFactor;
   else {
     const conditionalDenominator = 0.5 / strongerFactor + 0.5 / heatFactor;
-    if (conditionalDenominator === 0) throw new RangeError("B163 conditional damage denominator is zero.");
+    if (conditionalDenominator === 0) throw new RangeError("Conditional damage denominator is zero.");
     conditionalFactor = 1 / conditionalDenominator;
   }
 
@@ -70,7 +70,7 @@ export function calculateFinalDamage(input: FinalDamageInput): FinalDamageResult
   const defenseDenominator =
     1 - ratio(input.enemyDefensePct) * ratio(input.defenseIgnorePct);
   if (defenseDenominator === 0) {
-    throw new RangeError("B163 defense factor denominator is zero.");
+    throw new RangeError("Defense factor denominator is zero.");
   }
   const defenseFactor = 1 / defenseDenominator;
 
@@ -89,7 +89,7 @@ export function calculateFinalDamage(input: FinalDamageInput): FinalDamageResult
     defenseFactor;
 
   if (!Number.isFinite(finalDamage)) {
-    throw new RangeError("B163 produced a non-finite final damage value.");
+    throw new RangeError("Final damage produced a non-finite value.");
   }
 
   return {

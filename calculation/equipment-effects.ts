@@ -1,5 +1,5 @@
 import type { StatContribution } from "./types.ts";
-import { isResonanceInputCell, parseResonancePoints } from "./resonance-input.ts";
+import { isResonanceInputField, parseResonancePoints } from "./resonance-input.ts";
 
 export interface RightIceSetEffect {
   id: string;
@@ -11,7 +11,7 @@ export interface RightIceSetEffect {
 
 export interface RightIceSetEffectDocument {
   schemaVersion: 2;
-  selectionCells: readonly string[];
+  selectionFields: readonly string[];
   maxSelectedSets: number;
   effects: readonly RightIceSetEffect[];
 }
@@ -177,7 +177,7 @@ export interface SpiritRecordEffectDocument {
   traits: readonly SpiritRecordTrait[];
 }
 
-/** Convert the six selected class codes to the branch and trait values found in T4:V9. */
+/** Resolve branch and trait bonuses for the six selected spirit-record classes. */
 export function resolveSpiritRecordSelections(
   document: SpiritRecordEffectDocument,
   selectedClassCodes: readonly (string | null | undefined)[],
@@ -199,8 +199,8 @@ export function resolveSpiritRecordSelections(
 
 export interface CircuitBoardRule {
   slot: string;
-  attributeCell: string;
-  valueCell: string;
+  attributeField: string;
+  valueField: string;
   wearSet: "shared" | "lowerwearA" | "lowerwearB";
   attributeOptions: readonly string[];
 }
@@ -267,9 +267,9 @@ export interface AccessoryEffectOption {
 export interface AccessoryEffectGroup {
   id: string;
   label: string;
-  selectionCell: string;
+  selectionField: string;
   slotId: string;
-  inputCells: readonly string[];
+  inputFields: readonly string[];
   options: readonly AccessoryEffectOption[];
   optionsByEquipmentName?: Readonly<Record<string, readonly AccessoryEffectOption[]>>;
 }
@@ -303,7 +303,7 @@ function requireNonEmpty(value: string, label: string): void {
 /**
  * Resolve right-ice set bonuses from selected piece set names.
  * Higher satisfied tiers replace lower tiers of the same set, matching the
- * spreadsheet's T-column mutually-exclusive tier formulas.
+ * mutually-exclusive conditional damage tiers.
  */
 export function resolveRightIceSetEffects(
   document: RightIceSetEffectDocument,
@@ -314,8 +314,8 @@ export function resolveRightIceSetEffects(
   if (!Number.isSafeInteger(document.maxSelectedSets) || document.maxSelectedSets < 0) {
     throw new RangeError("右冰套效的可選套數設定無效。");
   }
-  if (document.selectionCells.length !== document.maxSelectedSets
-    || new Set(document.selectionCells).size !== document.selectionCells.length) {
+  if (document.selectionFields.length !== document.maxSelectedSets
+    || new Set(document.selectionFields).size !== document.selectionFields.length) {
     throw new RangeError("右冰套效選擇欄位與可選套數設定不一致。");
   }
   if (selected.length > document.maxSelectedSets) throw new RangeError(`右冰套效最多選擇${document.maxSelectedSets}套。`);
@@ -380,7 +380,7 @@ export function resolveChipContribution(
   return { sourceId, stats: { [chip.attributeKey]: level.value } };
 }
 
-/** Resolve the selected weapon growth level using the separate L64/U64 mappings. */
+/** Resolve the selected weapon growth level and its independent attribute bonuses. */
 export function resolveWeaponGrowth(
   document: WeaponGrowthDocument,
   levelName: string | null | undefined,
@@ -397,13 +397,13 @@ export function resolveWeaponGrowth(
   return { sourceId, stats: level.stats };
 }
 
-/** Resolve the five spreadsheet resonance selectors and their exact multipliers. */
+/** Resolve the five resonance selections and their exact multipliers. */
 export function resolveResonanceEffects(
   document: ResonanceEffectDocument,
     inputValues: Readonly<Record<string, unknown>>,
 ): StatContribution[] {
   return document.effects.flatMap((effect) => {
-      if (!isResonanceInputCell(effect.settingKey)) {
+      if (!isResonanceInputField(effect.settingKey)) {
         throw new RangeError(`${effect.id} 使用了未設定上限的共鳴欄位：${effect.settingKey}`);
       }
     const rawValue = inputValues[effect.settingKey];
@@ -652,7 +652,7 @@ export function resolveNamedStatOption(
   return { sourceId, stats: option.stats };
 }
 
-/** Resolve accessory special-effect dropdowns using their individual sheet multipliers. */
+/** Resolve accessory special-effect options using each group's configured multiplier. */
 export function resolveAccessoryEffectOptions(
   document: AccessoryEffectDocument,
   selections: Readonly<Record<string, string | null | undefined>>,
@@ -660,14 +660,14 @@ export function resolveAccessoryEffectOptions(
 ): StatContribution[] {
   const result: StatContribution[] = [];
   for (const group of document.groups) {
-    for (const cell of group.inputCells) {
-      const selectedName = selections[cell];
+    for (const fieldId of group.inputFields) {
+      const selectedName = selections[fieldId];
       if (selectedName == null || selectedName.trim() === "") continue;
-      const equipmentName = equipmentNames[group.selectionCell];
+      const equipmentName = equipmentNames[group.selectionField];
       const options = equipmentName ? group.optionsByEquipmentName?.[equipmentName] ?? group.options : group.options;
       const option = options.find((candidate) => candidate.name === selectedName);
       if (!option) throw new RangeError(`${group.label}「${selectedName}」沒有對應的計算資料。`);
-      result.push({ sourceId: `accessory-effect:${group.id}:${cell}`, stats: option.stats });
+      result.push({ sourceId: `accessory-effect:${group.id}:${fieldId}`, stats: option.stats });
     }
   }
   return result;

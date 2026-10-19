@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { createRuntime, gameData } from './loadout-evaluation-harness.mjs';
 import { uiPage, stateA, workloadActions } from './ui-update-harness.mjs';
 
-const rowsCell = 'Left.Armor.Gloves.Circuit.Rows';
+const rowsField = 'Left.Armor.Gloves.Circuit.Rows';
 const upperAttribute = 'Left.Armor.Upper.Circuit.Attribute';
 const upperValue = 'Left.Armor.Upper.Circuit.Value';
 const boards = [
@@ -14,7 +14,7 @@ const boards = [
   { slot: 'gloves', gear: 'inner-gloves', attribute: 'Left.Armor.Gloves.Circuit.Attribute', value: 'Left.Armor.Gloves.Circuit.Value', max: 3 },
   { slot: 'shoes', gear: 'inner-shoes', attribute: 'Left.Armor.Shoes.Circuit.Attribute', value: 'Left.Armor.Shoes.Circuit.Value', max: 2 },
 ];
-const rows = page => JSON.parse(page.readState().values[rowsCell]);
+const rows = page => JSON.parse(page.readState().values[rowsField]);
 const openGloves = page => page.dom.window.document.querySelector('.gear-slot[data-slot-id="inner-gloves"]').click();
 const openBoard = (page, board) => page.dom.window.document.querySelector(`.gear-slot[data-slot-id="${board.gear}"]`).click();
 const controls = page => [...page.dom.window.document.querySelectorAll('.circuit-board-row input[type="number"]')];
@@ -36,21 +36,21 @@ test('all unrelated-damage fields normalize empty/invalid values while valid sav
   const { normalizeOptionalEffectValues } = await runtime.load('frontend/state.ts');
   const { FIELD_ID_TO_CODE } = await runtime.load('frontend/field-ids.ts');
   const index = createCatalogIndex(gameData);
-  const fields = Object.keys(FIELD_ID_TO_CODE).filter(cell => index.resolveFieldChoices(cell, {})?.includes('無關傷害'));
+  const fields = Object.keys(FIELD_ID_TO_CODE).filter(fieldId => index.resolveFieldChoices(fieldId, {})?.includes('無關傷害'));
   for (const invalid of [undefined, null, '', 'not-a-valid-option']) {
-    const values = Object.fromEntries(fields.map(cell => [cell, invalid]));
+    const values = Object.fromEntries(fields.map(fieldId => [fieldId, invalid]));
     normalizeOptionalEffectValues(values, index);
-    for (const cell of fields) assert.equal(values[cell], '無關傷害', cell);
+    for (const fieldId of fields) assert.equal(values[fieldId], '無關傷害', fieldId);
     assert.equal(normalizeOptionalEffectValues(values, index), false, 'normalization is stable');
   }
-  for (const cell of fields) {
-    const choices = gameData.circuits.inputs.find(circuit => circuit.attributeCell === cell)?.attributeOptions
-      ?? index.resolveFieldChoices(cell, {});
+  for (const fieldId of fields) {
+    const choices = gameData.circuits.inputs.find(circuit => circuit.attributeField === fieldId)?.attributeOptions
+      ?? index.resolveFieldChoices(fieldId, {});
     const choice = choices.find(value => value !== '無關傷害');
     if (choice === undefined) continue;
-    const values = { [cell]: choice };
+    const values = { [fieldId]: choice };
     normalizeOptionalEffectValues(values, index);
-    assert.equal(values[cell], choice, cell);
+    assert.equal(values[fieldId], choice, fieldId);
   }
   const invalidCircuit = { [upperAttribute]: '物攻', [upperValue]: 0.11 };
   normalizeOptionalEffectValues(invalidCircuit, index);
@@ -92,7 +92,7 @@ test('unrelated-damage X resets paired inputs to disabled zero and survives impo
 
 test('glove circuit edits retain the last field, update peers, preserve focus and restore with history', async () => {
   const state = structuredClone(stateA);
-  state.values[rowsCell] = JSON.stringify([{ attribute: 'Boss傷害%', percentageValue: 0.11 }, { attribute: '單技傷%', percentageValue: 0.02 }]);
+  state.values[rowsField] = JSON.stringify([{ attribute: 'Boss傷害%', percentageValue: 0.11 }, { attribute: '單技傷%', percentageValue: 0.02 }]);
   const page = await uiPage(state);
   try {
     openGloves(page); const [a, b] = controls(page); b.focus(); input(page, b, '12.4');
@@ -116,7 +116,7 @@ test('glove circuit edits retain the last field, update peers, preserve focus an
 
 test('circuit row budget removes floating point residue from 18% minus 17%', async () => {
   const state = structuredClone(stateA);
-  state.values[rowsCell] = JSON.stringify([
+  state.values[rowsField] = JSON.stringify([
     { attribute: 'Boss傷害%', percentageValue: 0.18 },
     { attribute: '單技傷%', percentageValue: 0 },
   ]);
@@ -218,7 +218,7 @@ test('legacy circuit budgets normalize deterministically on import, save/reload,
   try {
     const exported = await page.exportJson();
     const { FIELD_ID_TO_CODE } = await page.runtime.load('frontend/field-ids.ts');
-    exported.values[FIELD_ID_TO_CODE[rowsCell]] = JSON.stringify([
+    exported.values[FIELD_ID_TO_CODE[rowsField]] = JSON.stringify([
       { attribute: 'Boss傷害%', percentageValue: 0.11 },
       { attribute: '單技傷%', percentageValue: 0.124 },
       { attribute: null, percentageValue: 0.1 },

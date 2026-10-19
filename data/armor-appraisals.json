@@ -60,7 +60,7 @@
   "slots": [
     {
       "id": "upper",
-      "inputCells": [
+      "inputFields": [
         "Left.Armor.Upper.Appraisal.1",
         "Left.Armor.Upper.Appraisal.2",
         "Left.Armor.Upper.Appraisal.3"
@@ -69,7 +69,7 @@
     },
     {
       "id": "lowerwear",
-      "inputCells": [
+      "inputFields": [
         "Left.Armor.Bottom.Appraisal.1",
         "Left.Armor.Bottom.Appraisal.2",
         "Left.Armor.Bottom.Appraisal.3"
@@ -78,7 +78,7 @@
     },
     {
       "id": "lowerwearAlternative",
-      "inputCells": [
+      "inputFields": [
         "Left.Armor.SwitchBottom.Appraisal.1",
         "Left.Armor.SwitchBottom.Appraisal.2",
         "Left.Armor.SwitchBottom.Appraisal.3"
@@ -88,7 +88,7 @@
     },
     {
       "id": "gloves",
-      "inputCells": [
+      "inputFields": [
         "Left.Armor.Gloves.Appraisal.1",
         "Left.Armor.Gloves.Appraisal.2",
         "Left.Armor.Gloves.Appraisal.3"
@@ -97,7 +97,7 @@
     },
     {
       "id": "shoes",
-      "inputCells": [
+      "inputFields": [
         "Left.Armor.Shoes.Appraisal.1",
         "Left.Armor.Shoes.Appraisal.2",
         "Left.Armor.Shoes.Appraisal.3"

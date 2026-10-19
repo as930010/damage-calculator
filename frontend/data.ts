@@ -10,7 +10,7 @@ import type { AccessoryEffectDocument, ArmorAppraisalDocument, AtmaEffectDocumen
 
 export interface LayoutSlot {
   id: string; label: string; group: string; x: number; y: number; icon: string;
-  selectionCell?: string; stoneCells?: string[]; innerwearId?: string;
+  selectionField?: string; stoneFields?: string[]; innerwearId?: string;
   sharedSelection?: boolean; enabledBy?: string; weapon?: boolean;
 }
 export interface LayoutDocument {
@@ -47,7 +47,7 @@ export interface GameData {
   attack: AttackParametersDocument;
   innerwear: InnerwearRulesDocument;
   nephronArmor: NephronArmorRulesDocument;
-  appraisals: Omit<ArmorAppraisalDocument, "slots"> & { slots: (ArmorAppraisalDocument["slots"][number] & { inputCells: string[] })[] };
+  appraisals: Omit<ArmorAppraisalDocument, "slots"> & { slots: (ArmorAppraisalDocument["slots"][number] & { inputFields: string[] })[] };
   chips: ChipCatalogDocument;
   chipSlots: ChipSlotsDocument;
   circuits: CircuitBoardRulesDocument;

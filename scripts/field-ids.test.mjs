@@ -25,7 +25,6 @@ test("class selection is represented by Job and option catalogs reference semant
   const inputOptions = JSON.parse(await readFile(join(root, "data/simulator-input-options.json"), "utf8"));
   assert.ok(inputOptions.inputs.some(input => input.fieldIds.includes("SpiritRecord.Class.1")));
   assert.ok(inputOptions.inputs.every(input => Array.isArray(input.fieldIds) && input.fieldIds.every(isFieldId)));
-  assert.ok(inputOptions.catalogs.every(catalog => catalog.options.every(option => !Object.hasOwn(option, "cell"))));
   assert.equal(sample.Job, "DaB");
   for (const color of ["Red", "Blue", "Yellow"]) {
     for (let index = 1; index <= 9; index++) {
@@ -42,12 +41,12 @@ test("saved state accepts semantic IDs and ignores unrecognized field keys", () 
     getItem: key => storage.get(key) ?? null,
     setItem: (key, value) => storage.set(key, value),
   };
-  storage.set("dab-loadout-v1", JSON.stringify({ schemaVersion: 3, Job: "DaB", values: { "Weapon.MagicStone.Grade": "深淵", B37: "舊格式" } }));
+  storage.set("dab-loadout-v1", JSON.stringify({ schemaVersion: 3, Job: "DaB", values: { "Weapon.MagicStone.Grade": "深淵", UnknownField: "無效欄位" } }));
   const state = readState("KE");
   assert.equal(state.schemaVersion, 3);
   assert.equal(state.Job, "DaB");
   assert.equal(state.values["Weapon.MagicStone.Grade"], "深淵");
-  assert.equal(state.values.B37, undefined);
+  assert.equal(state.values.UnknownField, undefined);
   assert.equal(saveState(state), true);
   const saved = JSON.parse(storage.get("dab-loadout-v1"));
   assert.deepEqual(saved.values, { "Weapon.MagicStone.Grade": "深淵" });

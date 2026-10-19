@@ -4,8 +4,8 @@
   "inputs": [
     {
       "slot": "upper",
-      "attributeCell": "Left.Armor.Upper.Circuit.Attribute",
-      "valueCell": "Left.Armor.Upper.Circuit.Value",
+      "attributeField": "Left.Armor.Upper.Circuit.Attribute",
+      "valueField": "Left.Armor.Upper.Circuit.Value",
       "wearSet": "shared",
       "attributeOptions": [
         "流血%",
@@ -16,8 +16,8 @@
     },
     {
       "slot": "lowerwear",
-      "attributeCell": "Left.Armor.Bottom.Circuit.Attribute",
-      "valueCell": "Left.Armor.Bottom.Circuit.Value",
+      "attributeField": "Left.Armor.Bottom.Circuit.Attribute",
+      "valueField": "Left.Armor.Bottom.Circuit.Value",
       "wearSet": "lowerwearA",
       "attributeOptions": [
         "強者%",
@@ -29,8 +29,8 @@
     },
     {
       "slot": "lowerwearAlternative",
-      "attributeCell": "Left.Armor.SwitchBottom.Circuit.Attribute",
-      "valueCell": "Left.Armor.SwitchBottom.Circuit.Value",
+      "attributeField": "Left.Armor.SwitchBottom.Circuit.Attribute",
+      "valueField": "Left.Armor.SwitchBottom.Circuit.Value",
       "wearSet": "lowerwearB",
       "attributeOptions": [
         "強者%",
@@ -42,8 +42,8 @@
     },
     {
       "slot": "gloves",
-      "attributeCell": "Left.Armor.Gloves.Circuit.Attribute",
-      "valueCell": "Left.Armor.Gloves.Circuit.Value",
+      "attributeField": "Left.Armor.Gloves.Circuit.Attribute",
+      "valueField": "Left.Armor.Gloves.Circuit.Value",
       "wearSet": "shared",
       "attributeOptions": [
         "單技傷%",
@@ -53,8 +53,8 @@
     },
     {
       "slot": "shoes",
-      "attributeCell": "Left.Armor.Shoes.Circuit.Attribute",
-      "valueCell": "Left.Armor.Shoes.Circuit.Value",
+      "attributeField": "Left.Armor.Shoes.Circuit.Attribute",
+      "valueField": "Left.Armor.Shoes.Circuit.Value",
       "wearSet": "shared",
       "attributeOptions": [
         "Boss傷害%",

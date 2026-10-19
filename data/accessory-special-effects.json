@@ -5,7 +5,7 @@
     {
       "id": "accessory-upper-clothing",
       "label": "飾品上衣",
-      "inputCells": [
+      "inputFields": [
         "Accessory.Top.Appraisal.1",
         "Accessory.Top.Appraisal.2",
         "Accessory.Top.Appraisal.3"
@@ -40,13 +40,13 @@
           "stats": {}
         }
       ],
-      "selectionCell": "Accessory.Top",
+      "selectionField": "Accessory.Top",
       "slotId": "top"
     },
     {
       "id": "accessory-face-middle",
       "label": "飾品臉中",
-      "inputCells": [
+      "inputFields": [
         "Accessory.FaceMiddle.Appraisal.1",
         "Accessory.FaceMiddle.Appraisal.2",
         "Accessory.FaceMiddle.Appraisal.3"
@@ -123,13 +123,13 @@
           "stats": {}
         }
       ],
-      "selectionCell": "Accessory.FaceMiddle",
+      "selectionField": "Accessory.FaceMiddle",
       "slotId": "faceMiddle"
     },
     {
       "id": "accessory-face-bottom",
       "label": "飾品臉下",
-      "inputCells": [
+      "inputFields": [
         "Accessory.FaceBottom.Appraisal.1",
         "Accessory.FaceBottom.Appraisal.2",
         "Accessory.FaceBottom.Appraisal.3"
@@ -206,13 +206,13 @@
           "stats": {}
         }
       ],
-      "selectionCell": "Accessory.FaceBottom",
+      "selectionField": "Accessory.FaceBottom",
       "slotId": "faceBottom"
     },
     {
       "id": "accessory-arm",
       "label": "飾品手臂",
-      "inputCells": [
+      "inputFields": [
         "Accessory.Arm.Appraisal.1",
         "Accessory.Arm.Appraisal.2",
         "Accessory.Arm.Appraisal.3"
@@ -289,13 +289,13 @@
           "stats": {}
         }
       ],
-      "selectionCell": "Accessory.Arm",
+      "selectionField": "Accessory.Arm",
       "slotId": "arm"
     },
     {
       "id": "accessory-necklace",
       "label": "飾品項鍊",
-      "inputCells": [
+      "inputFields": [
         "Accessory.Necklace.Appraisal.1",
         "Accessory.Necklace.Appraisal.2",
         "Accessory.Necklace.Appraisal.3"
@@ -372,7 +372,7 @@
           "stats": {}
         }
       ],
-      "selectionCell": "Accessory.Necklace",
+      "selectionField": "Accessory.Necklace",
       "slotId": "necklace",
       "optionsByEquipmentName": {
         "堅毅的鬥士項鍊": [
@@ -398,7 +398,7 @@
     {
       "id": "accessory-ring-one-special",
       "label": "飾品戒指1",
-      "inputCells": [
+      "inputFields": [
         "Accessory.Ring1.Appraisal.1",
         "Accessory.Ring1.Appraisal.2"
       ],
@@ -420,13 +420,13 @@
           "stats": {}
         }
       ],
-      "selectionCell": "Accessory.Ring1",
+      "selectionField": "Accessory.Ring1",
       "slotId": "ringA"
     },
     {
       "id": "accessory-ring-two-special",
       "label": "飾品戒指2",
-      "inputCells": [
+      "inputFields": [
         "Accessory.Ring2.Appraisal.1",
         "Accessory.Ring2.Appraisal.2"
       ],
@@ -448,7 +448,7 @@
           "stats": {}
         }
       ],
-      "selectionCell": "Accessory.Ring2",
+      "selectionField": "Accessory.Ring2",
       "slotId": "ringB"
     }
   ]

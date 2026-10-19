@@ -47,7 +47,7 @@ export function parseAttackParameters(value: unknown): AttackParametersDocument 
   return { schemaVersion: 2, classes, weaponEnhancementFactors };
 }
 
-/** Resolve C53/D53 class coefficients and B32 weapon enhancement factor from JSON. */
+/** Resolve class attack coefficients and the weapon enhancement multiplier. */
 export function resolveAttackParameters(
   document: AttackParametersDocument,
   classId: string,
@@ -91,7 +91,7 @@ export type WeaponBaseAttackInput = Pick<AttackCalculationInput,
   "attackLevel" | "physicalClassCoefficient" | "magicalClassCoefficient" | "weaponEnhancementFactor"
 >;
 
-/** C53/D53 weapon contributions, evaluated after all attack-level sources (U1). */
+/** Resolve weapon base attacks after all attack-level bonuses are accumulated. */
 export function calculateWeaponBaseAttack(input: WeaponBaseAttackInput): {
   physicalAttack: number;
   magicalAttack: number;
@@ -113,7 +113,7 @@ export function calculateWeaponBaseAttack(input: WeaponBaseAttackInput): {
   };
 }
 
-/** Implements 計算機!C53:D53 and B156:B158 using JSON-resolved inputs. */
+/** Calculate attack power and damage bounds from resolved game parameters. */
 export function calculateAttack(
   input: AttackCalculationInput,
 ): AttackCalculationResult {
@@ -124,38 +124,34 @@ export function calculateAttack(
   const doubleAttackFactor = 1 + input.doubleAttackPct / 100;
   const skillTypeAttackFactor = 1 + input.skillTypeAttackPct / 100;
 
-  // C53 uses lookup column 2 (physical); D53 uses column 3 (magical).
-  // Weapon enhancement is applied after FLOOR.MATH in each formula.
+  // Apply weapon enhancement after rounding down each class base attack.
   const weaponBase = calculateWeaponBaseAttack({
     attackLevel: input.attackLevel,
     physicalClassCoefficient: input.physicalClassCoefficient,
     magicalClassCoefficient: input.magicalClassCoefficient,
     weaponEnhancementFactor: input.weaponEnhancementFactor,
   });
-  const c53 = weaponBase.physicalAttack;
-  const d53 = weaponBase.magicalAttack;
-  // The attack range follows the active attack type: physical uses C53 and
-  // magical uses D53. Using D53 for physical classes understates the upper
-  // bound (and overstates the lower bound) for classes with a stronger
-  // physical coefficient.
-  const selectedAttackCoefficient = input.attackType === "physical" ? c53 : d53;
+  const weaponPhysicalAttack = weaponBase.physicalAttack;
+  const weaponMagicalAttack = weaponBase.magicalAttack;
+  // Damage bounds use the weapon base attack of the active attack type.
+  const selectedWeaponBaseAttack = input.attackType === "physical" ? weaponPhysicalAttack : weaponMagicalAttack;
 
   const attackPower = floorMath(
     selectedAttack * doubleAttackFactor * skillTypeAttackFactor,
   );
   const lowerDamage = floorMath(
-    (selectedAttack * skillTypeAttackFactor - 0.55 * selectedAttackCoefficient) *
+    (selectedAttack * skillTypeAttackFactor - 0.55 * selectedWeaponBaseAttack) *
       doubleAttackFactor,
   );
   const upperDamage = floorMath(
-    (selectedAttack * skillTypeAttackFactor + 0.55 * selectedAttackCoefficient) *
+    (selectedAttack * skillTypeAttackFactor + 0.55 * selectedWeaponBaseAttack) *
       doubleAttackFactor,
   );
 
   for (const [key, value] of Object.entries({
     selectedAttack,
-    c53,
-    d53,
+    weaponPhysicalAttack,
+    weaponMagicalAttack,
     attackPower,
     lowerDamage,
     upperDamage,
@@ -169,8 +165,8 @@ export function calculateAttack(
     attackType: input.attackType,
     selectedAttack,
     attackPower,
-    c53,
-    d53,
+    weaponPhysicalAttack,
+    weaponMagicalAttack,
     lowerDamage,
     upperDamage,
   };

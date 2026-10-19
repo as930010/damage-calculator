@@ -98,7 +98,7 @@ export type {
   WeaponGrowthDocument,
   WeaponGrowthLevel,
 } from "./equipment-effects.ts";
-export { resolveWeaponTransformation, resolveWeaponTransformationsFromCells } from "./weapon-transformations.ts";
+export { resolveWeaponTransformation, resolveWeaponTransformationsFromFields } from "./weapon-transformations.ts";
 export { resolveInnerwearSources } from "./innerwear.ts";
 export { resolveNephronArmorSources } from "./nephron-armor.ts";
 export type { NephronArmorInput, NephronArmorRulesDocument, NephronTransformationInput } from "./nephron-armor.ts";

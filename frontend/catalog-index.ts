@@ -44,8 +44,8 @@ export function createCatalogIndex(data: CatalogData, revision: unknown = Symbol
   const gloveCircuit = data.circuits.inputs.find(entry => entry.slot === 'gloves');
   const rightIceEffectById = firstBy(data.rightIceSets.effects, entry => entry.id);
   const mappings = new Map<string, SimulatorEquipmentSelectionMapping>();
-  for (const mapping of data.mapping.selections) mappings.set(mapping.selectionCell, mapping);
-  for (const mapping of data.mapping.magicStoneSelections.inputGroups) mappings.set(mapping.selectionCell, {
+  for (const mapping of data.mapping.selections) mappings.set(mapping.selectionField, mapping);
+  for (const mapping of data.mapping.magicStoneSelections.inputGroups) mappings.set(mapping.selectionField, {
     ...mapping, catalogFile: data.mapping.magicStoneSelections.catalogFile, slotId: data.mapping.magicStoneSelections.slotId,
   });
 
@@ -67,7 +67,7 @@ export function createCatalogIndex(data: CatalogData, revision: unknown = Symbol
   if (data.colorSetEffects.settingKey) register([data.colorSetEffects.settingKey], names(data.colorSetEffects.options));
   register(data.spiritRecord.classSelectors.settingKeys, () => spiritClassCodes);
   const armorTypes = memoizeChoices(() => ['百億', '內布隆']);
-  for (const slot of data.innerwear.slots) register([slot.typeCell], armorTypes);
+  for (const slot of data.innerwear.slots) register([slot.typeField], armorTypes);
   const transformNames = names(data.nephronArmor.transformations);
   const transformTiers = firstBy(data.nephronArmor.transformations, entry => entry.name);
   const tiersByName = new Map([...transformTiers].map(([name, entry]) => [name, memoizeChoices(() => entry.tierValuesPct.map(value => value / 100))]));
@@ -77,38 +77,38 @@ export function createCatalogIndex(data: CatalogData, revision: unknown = Symbol
     .map(entry => [entry.name, Object.freeze([`Lv.${entry.fixedLevel}`])] as const));
   for (const field of data.nephronArmor.fields) {
     for (const transform of field.transformFields) {
-      register([transform.attributeCell], transformNames);
-      register([transform.valueCell], values => tiersByName.get(values[transform.attributeCell] as string)?.() ?? emptyChoices);
+      register([transform.attributeField], transformNames);
+      register([transform.valueField], values => tiersByName.get(values[transform.attributeField] as string)?.() ?? emptyChoices);
     }
-    register([field.magazineCell], magazines);
-    register([field.magazineLevelCell], values => fixedMagazineLevels.get(String(values[field.magazineCell] ?? '')) ?? magazineLevels());
+    register([field.magazineField], magazines);
+    register([field.magazineLevelField], values => fixedMagazineLevels.get(String(values[field.magazineField] ?? '')) ?? magazineLevels());
   }
   const armorEnhancements = memoizeChoices(() => Object.keys(data.innerwear.enhancementStats).map(level => `Lv.${level}`));
   const forging = memoizeChoices(() => Object.keys(data.innerwear.forgingAttack));
   for (const slot of data.layout.slots) if (slot.innerwearId) {
     const innerwear = innerwearById.get(slot.innerwearId);
-    if (innerwear) { register([innerwear.enhancementCell], armorEnhancements); register([innerwear.forgingCell], forging); }
+    if (innerwear) { register([innerwear.enhancementField], armorEnhancements); register([innerwear.forgingField], forging); }
   }
   register([data.weaponGrades.settingKey], names(data.weaponGrades.options));
   for (const group of data.weaponGrades.colorGroups) register(group.settingKeys, names(group.options));
   register(['Weapon.ENHC'], memoizeChoices(() => Object.keys(data.attack.weaponEnhancementFactors).map(level => `Lv.${level}`)));
   register([data.growth.settingKey], names(data.growth.levels));
   const appraisals = names(data.appraisals.options);
-  for (const slot of data.appraisals.slots) register(slot.inputCells, appraisals);
+  for (const slot of data.appraisals.slots) register(slot.inputFields, appraisals);
   const circuits = memoizeChoices(() => [...Object.keys(data.circuits.statKeyByAttributeName), '無關傷害']);
-  for (const input of data.circuits.inputs) register([input.attributeCell], circuits);
+  for (const input of data.circuits.inputs) register([input.attributeField], circuits);
   const chipNames = names(data.chips.chips);
   const chipTunings = new Map([...firstBy(data.chips.chips, entry => entry.name)].map(([name, entry]) =>
     [name, memoizeChoices(() => entry.tuningLevels.map(level => level.level))]));
   for (const slot of data.chipSlots.slots) {
-    register([slot.attributeCell], chipNames);
-    register([slot.tuningCell], values => chipTunings.get(values[slot.attributeCell] as string)?.() ?? emptyChoices);
+    register([slot.attributeField], chipNames);
+    register([slot.tuningField], values => chipTunings.get(values[slot.attributeField] as string)?.() ?? emptyChoices);
   }
   for (const group of Object.values(data.weaponAppraisals.groups)) register([group.settingKey], names(group.options));
   register(data.giantStones.settingKeys, names(data.giantStones.options));
   const transformations = memoizeChoices(() => [...data.transformations.options]);
-  for (const slot of data.transformations.slots) register([slot.choiceCell], transformations);
-  register(data.rightIceSets.selectionCells, memoizeChoices(() => [...new Set(data.rightIceSets.effects.map(entry => entry.setName))]));
+  for (const slot of data.transformations.slots) register([slot.choiceField], transformations);
+  register(data.rightIceSets.selectionFields, memoizeChoices(() => [...new Set(data.rightIceSets.effects.map(entry => entry.setName))]));
   const attributes = data.masterBeast.customAttributeOptions;
   register(['MasterBeast.Head.CustomAttribute'], memoizeChoices(() => [...attributes.head]));
   register(['MasterBeast.Necklace.CustomAttribute'], memoizeChoices(() => [...attributes.necklace]));

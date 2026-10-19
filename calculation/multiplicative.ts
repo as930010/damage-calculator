@@ -7,9 +7,9 @@ function requireFinite(value: number, label: string): void {
 }
 
 /**
- * Mirrors the spreadsheet product columns: PRODUCT(1 + sourcePct / 100),
+ * Multiply each independent factor (1 + sourcePct / 100),
  * optionally followed by subtracting a percentage-point baseline as a ratio.
- * For example, T1 uses baselinePctToSubtract=150.
+ * Multiplicative critical damage uses baselinePctToSubtract=150.
  */
 export function calculateProductStat(
   effects: readonly ProductStatEffect[],

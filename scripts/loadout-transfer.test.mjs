@@ -39,15 +39,15 @@ const semanticState = (value) => {
   };
 };
 const firstMapping = mapping.selections.find((entry) => catalogs[entry.catalogFile].items.some((item) => item.active && item.slotId === entry.slotId));
-const firstMappingFieldId = firstMapping.selectionCell;
+const firstMappingFieldId = firstMapping.selectionField;
 const firstItem = catalogs[firstMapping.catalogFile].items.find((item) => item.active && item.slotId === firstMapping.slotId);
 const equipmentName = getEquipmentOptionName(firstItem, firstMapping.application);
-const mappedCells = new Set([
-  ...mapping.selections.map((entry) => entry.selectionCell),
-  ...mapping.magicStoneSelections.inputGroups.map((entry) => entry.selectionCell),
+const mappedFields = new Set([
+  ...mapping.selections.map((entry) => entry.selectionField),
+  ...mapping.magicStoneSelections.inputGroups.map((entry) => entry.selectionField),
 ]);
 const firstInputField = simulatorInputs.inputs.flatMap(input => input.fieldIds.map(fieldId => ({ input, fieldId })))
-  .find(({ input, fieldId }) => isFieldId(fieldId) && !mappedCells.has(fieldId)
+  .find(({ input, fieldId }) => isFieldId(fieldId) && !mappedFields.has(fieldId)
     && simulatorInputs.catalogs.find(catalog => catalog.id === input.catalogId)?.options.some(option => String(option.value).trim() !== ""));
 const firstInput = firstInputField?.input;
 const inputFieldId = firstInputField?.fieldId;
@@ -55,7 +55,7 @@ const firstOption = simulatorInputs.catalogs.find((catalog) => catalog.id === fi
 const state = {
   schemaVersion: 3,
   Job: classes.classes.find((entry) => entry.active).id,
-  values: { [firstMappingFieldId]: equipmentName, [inputFieldId]: String(firstOption.value), Z999: 123.45 },
+  values: { [firstMappingFieldId]: equipmentName, [inputFieldId]: String(firstOption.value), UnknownField: 123.45 },
   lowerwearAlternativeEnabled: true,
   masterBeastSpiritStoneColor: "綠",
   petSkillAttackEnabled: false,
@@ -70,9 +70,9 @@ test("numeric-code JSON export imports back to the same loadout", () => {
   assert.equal(envelope.transcendenceSkillDamageSharePct, 83);
   assert.equal(typeof envelope.values[String(codeForFieldId(firstMappingFieldId))], "number");
   assert.equal(envelope.values[String(codeForFieldId(inputFieldId))], String(firstOption.value));
-  assert.equal(envelope.values.Z999, undefined);
+  assert.equal(envelope.values.UnknownField, undefined);
   assert.deepEqual(parseLoadoutJson(exported.json, state, data).state, semanticState(state));
-  assert.deepEqual(exported.omittedFields, ["Z999"]);
+  assert.deepEqual(exported.omittedFields, ["UnknownField"]);
 });
 
 test("export visibly includes job and stage settings, and import accepts semantic stage fields", () => {
@@ -148,10 +148,10 @@ test("legacy venue names migrate on import without changing unrelated values", (
 
 test("legacy glove circuit Transcendence choice migrates to the combined single-skill option", () => {
   const gloveCircuit = circuits.inputs.find(entry => entry.slot === "gloves");
-  const legacyState = { ...state, values: { ...state.values, [gloveCircuit.attributeCell]: "超越技傷%" } };
+  const legacyState = { ...state, values: { ...state.values, [gloveCircuit.attributeField]: "超越技傷%" } };
   const exported = serializeLoadout(legacyState, data);
   const imported = parseLoadoutJson(exported.json, state, data);
-  assert.equal(imported.state.values[gloveCircuit.attributeCell], "單技傷%");
+  assert.equal(imported.state.values[gloveCircuit.attributeField], "單技傷%");
 });
 
 test("portrait awakening damage values round-trip and one-sided allocations complement to five", () => {
@@ -203,7 +203,7 @@ test("the complete saved example round-trips and stays smaller than the previous
   assert.ok(exported.json.length < previousFormat.length, `compact transfer is ${exported.json.length} bytes; previous format was ${previousFormat.length}`);
 });
 
-test("a removed equipment option clears only its cell and keeps the rest", () => {
+test("a removed equipment option clears only its fieldId and keeps the rest", () => {
   const exported = JSON.parse(serializeLoadout(state, data).json);
   const changedData = structuredClone(data);
   changedData.catalogs[firstMapping.catalogFile].items = changedData.catalogs[firstMapping.catalogFile].items.filter((item) => item.id !== firstItem.id);
@@ -211,7 +211,7 @@ test("a removed equipment option clears only its cell and keeps the rest", () =>
   const selectionFieldId = firstMappingFieldId;
   assert.equal(result.state.values[selectionFieldId], undefined);
   assert.equal(result.state.values[inputFieldId], String(firstOption.value));
-  assert.equal(result.state.values.Z999, undefined);
+  assert.equal(result.state.values.UnknownField, undefined);
   assert.ok(result.clearedFields.includes(selectionFieldId));
 });
 
@@ -226,7 +226,7 @@ test("a changed item label keeps the selected item by stable numeric ID", () => 
   assert.ok(!result.clearedFields.includes(selectionFieldId));
 });
 
-test("corrupted option codes and invalid cells are cleared without losing valid selections", () => {
+test("corrupted option codes and invalid fields are cleared without losing valid selections", () => {
   const exported = JSON.parse(serializeLoadout(state, data).json);
   exported.values[String(codeForFieldId(inputFieldId))] = "deleted-option";
   exported.values.BAD = {};
@@ -251,19 +251,19 @@ test("deleted custom dropdown options clear only the affected field", () => {
   assert.ok(result.clearedFields.includes("Effect.Title"));
 });
 
-test("previous name-based format is rejected because this site has not been released", () => {
+test("unsupported name-based format is rejected", () => {
   const previousFormat = {
     format: "damage-calculator-loadout",
     formatVersion: 1,
-    loadout: { ...state, values: { ...state.values, [firstMapping.selectionCell]: "已刪除裝備" } },
+    loadout: { ...state, values: { ...state.values, [firstMapping.selectionField]: "已刪除裝備" } },
   };
   assert.throws(() => parseLoadoutJson(JSON.stringify(previousFormat), state, data), /不支援/);
 });
 
-test("coordinate-keyed version-2 JSON is rejected and unknown numeric field codes stay empty", () => {
+test("unsupported version-2 JSON is rejected and unknown numeric field codes stay empty", () => {
   const oldPayload = {
     format: "damage-calculator-loadout", formatVersion: 2,
-    Job: state.Job, values: { B20: equipmentName },
+    Job: state.Job, values: { UnknownField: equipmentName },
   };
   assert.throws(() => parseLoadoutJson(JSON.stringify(oldPayload), state, data), /不支援/);
 
@@ -284,8 +284,8 @@ test('unrelated effect zero values round-trip without false warnings while inval
   const custom = 'MasterBeast.Head.CustomValue';
   const transform = data.nephronArmor.fields[0].transformFields[0];
   const validOption = data.nephronArmor.transformations.find(option => option.statKey);
-  source.values[transform.attributeCell] = validOption.name;
-  source.values[transform.valueCell] = validOption.tierValuesPct[0] / 100;
+  source.values[transform.attributeField] = validOption.name;
+  source.values[transform.valueField] = validOption.tierValuesPct[0] / 100;
   const exported = serializeLoadout(source, data, catalogIndex);
   assert.deepEqual(exported.omittedFields, []);
   const imported = parseLoadoutJson(exported.json, state, data, catalogIndex);
@@ -296,12 +296,12 @@ test('unrelated effect zero values round-trip without false warnings while inval
 
   const invalid = JSON.parse(exported.json);
   invalid.values[String(codeForFieldId(custom))] = 0.5;
-  invalid.values[String(codeForFieldId(transform.valueCell))] = 999;
+  invalid.values[String(codeForFieldId(transform.valueField))] = 999;
   invalid.classSkillVersions.unknown = true;
   const rejected = parseLoadoutJson(JSON.stringify(invalid), state, data, catalogIndex);
   assert.ok(rejected.clearedFields.includes(custom));
-  assert.ok(rejected.clearedFields.includes(transform.valueCell));
+  assert.ok(rejected.clearedFields.includes(transform.valueField));
   assert.ok(rejected.clearedFields.includes('classSkillVersions.unknown'));
   assert.equal(rejected.state.values[custom], 0);
-  assert.equal(rejected.state.values[transform.attributeCell], validOption.name);
+  assert.equal(rejected.state.values[transform.attributeField], validOption.name);
 });

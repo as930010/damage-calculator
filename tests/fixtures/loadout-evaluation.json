@@ -219,8 +219,8 @@
           "attackType": "magical",
           "selectedAttack": 56278.8,
           "attackPower": 136440,
-          "c53": 31039.9,
-          "d53": 47881.450000000004,
+          "weaponPhysicalAttack": 31039.9,
+          "weaponMagicalAttack": 47881.450000000004,
           "lowerDamage": 85970,
           "upperDamage": 186911
         },
@@ -318,7 +318,7 @@
               "factor": 1.2
             },
             {
-              "sourceId": "master-beast:armor-spirit-stone-set:S77",
+              "sourceId": "master-beast:armor-spirit-stone-set",
               "valuePct": 4,
               "factor": 1.04
             },
@@ -447,8 +447,8 @@
       },
       "damageError": null,
       "attributeError": null,
-      "completeEvaluationHash": "b6ab12695f5494c3887050cd52513f1f3efa5853c11882801051df933aa1fe27",
-      "attributeProjectionHash": "c6cf6645ad73730b04e832e07e18d7bb4a1aa4912f15badfc2993c2f449b9426",
+      "completeEvaluationHash": "31eeb2f39a66dcf50e4cfc963d1e549f4095f70ef12c8fa8180eb58b04d83f30",
+      "attributeProjectionHash": "9ace3cba94626cb5f8fb41474272b07c2fb07c08ebe49162137beae7d915df45",
       "combatProjectionHash": "6484a907cf8ee66ab406370837fc429ac269eacdab376b46a6459d03b9251f30"
     },
     "minimal-complete": {
@@ -635,8 +635,8 @@
           "attackType": "physical",
           "selectedAttack": 21699.600000000002,
           "attackPower": 29302,
-          "c53": 18886.4,
-          "d53": 12204.800000000001,
+          "weaponPhysicalAttack": 18886.4,
+          "weaponMagicalAttack": 12204.800000000001,
           "lowerDamage": 18214,
           "upperDamage": 40391
         },
@@ -699,7 +699,7 @@
               "factor": 1.1
             },
             {
-              "sourceId": "master-beast:armor-spirit-stone-set:S77",
+              "sourceId": "master-beast:armor-spirit-stone-set",
               "valuePct": 4,
               "factor": 1.04
             }
@@ -803,8 +803,8 @@
       },
       "damageError": null,
       "attributeError": null,
-      "completeEvaluationHash": "221fba2d11a4df874efcb5507d24407778e4c565a59aedccf749a64aad1b06eb",
-      "attributeProjectionHash": "757c63e5e94c9ff730618c5c161213ced122fe40c1f8ff50e2625f73e19dd16f",
+      "completeEvaluationHash": "af21cd555078f8a05c03696a878931e81e6b4ac0c21d2150ad46be574d1b79b8",
+      "attributeProjectionHash": "089b7fe22282cc7fd9ab34195eec632da6b2ac9ed9755dedeb05a960ede81e31",
       "combatProjectionHash": "566ef4cce4dd2b86bad472c56293ea7cf0ea99d2cf34985cc5017af11b8a5176"
     },
     "no-class": {
@@ -1077,8 +1077,8 @@
         "message": "請先選擇武器強化等級。"
       },
       "attributeError": null,
-      "completeEvaluationHash": "4d33a2559264cd0c634ea61f406bba39c8ee714db2f79e8254d902cc7fc21167",
-      "attributeProjectionHash": "30f6a6dbfde4276023a40f8ea1b08cedf55fd0005c32b06280c42a394cab6ba7",
+      "completeEvaluationHash": "3b8011c89393e6abbdbfb7018f916f38865aecb485c00632d235feab38baf79a",
+      "attributeProjectionHash": "29a03ab075234c1c15e0d8ecc25c754f2a915105549a0597ebc3f4bc4a3d59e1",
       "combatProjectionHash": "566ef4cce4dd2b86bad472c56293ea7cf0ea99d2cf34985cc5017af11b8a5176"
     },
     "no-bottom-attributes-fallback": {
@@ -1412,8 +1412,8 @@
         "message": "Stage.BossDEF 必須是數值。"
       },
       "attributeError": null,
-      "completeEvaluationHash": "f33788f3b4705925e56a409aed9b52539986797937c640770c4c9c2235be1b7a",
-      "attributeProjectionHash": "c6cf6645ad73730b04e832e07e18d7bb4a1aa4912f15badfc2993c2f449b9426",
+      "completeEvaluationHash": "1a513bf78005816561f8669e057cd5c1df5e1ab1c2eda80f31d07e8c8e715ffe",
+      "attributeProjectionHash": "9ace3cba94626cb5f8fb41474272b07c2fb07c08ebe49162137beae7d915df45",
       "combatProjectionHash": "6484a907cf8ee66ab406370837fc429ac269eacdab376b46a6459d03b9251f30"
     },
     "invalid-rate-attributes-fallback": {
@@ -1636,8 +1636,8 @@
         "message": "Stage.CritRatePenalty 必須是數值。"
       },
       "attributeError": null,
-      "completeEvaluationHash": "bf4fb84934fcf10e30fa54b03c8d0771e050c0e0cc644256f428c0f1e5e2dc0e",
-      "attributeProjectionHash": "c6cf6645ad73730b04e832e07e18d7bb4a1aa4912f15badfc2993c2f449b9426",
+      "completeEvaluationHash": "a67139d4c1e9659363702fe5adda6fec41035c920069985a1456deac31245561",
+      "attributeProjectionHash": "9ace3cba94626cb5f8fb41474272b07c2fb07c08ebe49162137beae7d915df45",
       "combatProjectionHash": "975c1abaa46ae95881fd0dc0dc9cbaa805a7eb797e157415ee30baddf2f019c0"
     },
     "late-damage-failure-rates-fallback": {
@@ -1920,8 +1920,8 @@
         "message": "Transcendence skill damage share must be between 0 and 100."
       },
       "attributeError": null,
-      "completeEvaluationHash": "1945601d32760e70b090d1b2c6c1053f61145c1b22cfa162f49b037e56a09256",
-      "attributeProjectionHash": "c6cf6645ad73730b04e832e07e18d7bb4a1aa4912f15badfc2993c2f449b9426",
+      "completeEvaluationHash": "c339f877d23059539b849008a0988cacb5d2ca9cda2d4f97c68272288c0bdfb9",
+      "attributeProjectionHash": "9ace3cba94626cb5f8fb41474272b07c2fb07c08ebe49162137beae7d915df45",
       "combatProjectionHash": "6484a907cf8ee66ab406370837fc429ac269eacdab376b46a6459d03b9251f30"
     },
     "special-weapon-average": {
@@ -2142,8 +2142,8 @@
           "attackType": "magical",
           "selectedAttack": 62771.2,
           "attackPower": 155621,
-          "c53": 35248.700000000004,
-          "d53": 54373.85,
+          "weaponPhysicalAttack": 35248.700000000004,
+          "weaponMagicalAttack": 54373.85,
           "lowerDamage": 97011,
           "upperDamage": 214231
         },
@@ -2241,7 +2241,7 @@
               "factor": 1.2
             },
             {
-              "sourceId": "master-beast:armor-spirit-stone-set:S77",
+              "sourceId": "master-beast:armor-spirit-stone-set",
               "valuePct": 4,
               "factor": 1.04
             },
@@ -2370,8 +2370,8 @@
       },
       "damageError": null,
       "attributeError": null,
-      "completeEvaluationHash": "37fa2b4ca10cbac7ab9520e3e7917ed80616dd1fecd177ac3756b855b007a6f1",
-      "attributeProjectionHash": "039f6b87b5a35b065daaf8df190c9bc55758ff2dcaa9a29778f67bac5c55329c",
+      "completeEvaluationHash": "6e7fb97afa837453ecddc8356f851adcc416fbde4d6bf0d154029d53d91086df",
+      "attributeProjectionHash": "92cfa35f059d526c4d2d69255764ff7eaed83ef3ed8310ddd01affdaf7fc8e5d",
       "combatProjectionHash": "6484a907cf8ee66ab406370837fc429ac269eacdab376b46a6459d03b9251f30"
     },
     "passives-effects-decimals": {
@@ -2592,8 +2592,8 @@
           "attackType": "physical",
           "selectedAttack": 56278.8,
           "attackPower": 136440,
-          "c53": 47881.450000000004,
-          "d53": 31039.9,
+          "weaponPhysicalAttack": 47881.450000000004,
+          "weaponMagicalAttack": 31039.9,
           "lowerDamage": 85970,
           "upperDamage": 186911
         },
@@ -2691,7 +2691,7 @@
               "factor": 1.2
             },
             {
-              "sourceId": "master-beast:armor-spirit-stone-set:S77",
+              "sourceId": "master-beast:armor-spirit-stone-set",
               "valuePct": 4,
               "factor": 1.04
             },
@@ -2820,8 +2820,8 @@
       },
       "damageError": null,
       "attributeError": null,
-      "completeEvaluationHash": "a8658a4e92ed94c7c255228c0f638ed4ba02e5bafc81c09af1aa84f3b3064c24",
-      "attributeProjectionHash": "73167f0156be91d3910301bbf77666887b70092702145aee0b0362e71ef917c2",
+      "completeEvaluationHash": "9475187765ea87d85b9bf0ff30728164ed00721bced40e5d49bdbec21c161f0d",
+      "attributeProjectionHash": "9c0ee3eedd86d36d463036f959a1677713e1dc95d2424ce418c0cc8a8140892c",
       "combatProjectionHash": "cda33ae97deb5ec321e70a42a7460cb487d9fc26f7b5222f406a96b8330ae20e"
     },
     "empty-stage-boundaries": {
@@ -3008,8 +3008,8 @@
           "attackType": "physical",
           "selectedAttack": 21699.600000000002,
           "attackPower": 29302,
-          "c53": 18886.4,
-          "d53": 12204.800000000001,
+          "weaponPhysicalAttack": 18886.4,
+          "weaponMagicalAttack": 12204.800000000001,
           "lowerDamage": 18214,
           "upperDamage": 40391
         },
@@ -3072,7 +3072,7 @@
               "factor": 1.1
             },
             {
-              "sourceId": "master-beast:armor-spirit-stone-set:S77",
+              "sourceId": "master-beast:armor-spirit-stone-set",
               "valuePct": 4,
               "factor": 1.04
             }
@@ -3176,8 +3176,8 @@
       },
       "damageError": null,
       "attributeError": null,
-      "completeEvaluationHash": "958405a4d46599ab0c5af40c6563f19afa6a01fcada48d0221b756c69c3ce224",
-      "attributeProjectionHash": "757c63e5e94c9ff730618c5c161213ced122fe40c1f8ff50e2625f73e19dd16f",
+      "completeEvaluationHash": "533723f3b45b9842d2e009880066abe77d2db6aa71834585fd9775446753dfcb",
+      "attributeProjectionHash": "089b7fe22282cc7fd9ab34195eec632da6b2ac9ed9755dedeb05a960ede81e31",
       "combatProjectionHash": "566ef4cce4dd2b86bad472c56293ea7cf0ea99d2cf34985cc5017af11b8a5176"
     }
   },
@@ -3847,8 +3847,8 @@
           "attackType": "physical",
           "selectedAttack": 21699.600000000002,
           "attackPower": 29302,
-          "c53": 18886.4,
-          "d53": 12204.800000000001,
+          "weaponPhysicalAttack": 18886.4,
+          "weaponMagicalAttack": 12204.800000000001,
           "lowerDamage": 18214,
           "upperDamage": 40391
         },
@@ -3911,7 +3911,7 @@
               "factor": 1.1
             },
             {
-              "sourceId": "master-beast:armor-spirit-stone-set:S77",
+              "sourceId": "master-beast:armor-spirit-stone-set",
               "valuePct": 4,
               "factor": 1.04
             }
