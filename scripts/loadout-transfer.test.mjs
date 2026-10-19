@@ -31,6 +31,8 @@ const semanticState = (value) => {
   return {
     ...value,
     schemaVersion: 3,
+    nutProtectionPotionEnabled: value.nutProtectionPotionEnabled === true,
+    nephronRaidEnabled: value.nephronRaidEnabled === true,
     transcendenceSkillDamageSharePct: Number.isInteger(value.transcendenceSkillDamageSharePct) && value.transcendenceSkillDamageSharePct >= 0 && value.transcendenceSkillDamageSharePct <= 100
       ? value.transcendenceSkillDamageSharePct : 100,
     values,
@@ -110,6 +112,25 @@ test("older loadout exports default skill damage share to 100% transcendence", (
   delete exported.transcendenceSkillDamageSharePct;
   const imported = parseLoadoutJson(JSON.stringify(exported), state, data).state;
   assert.equal(imported.transcendenceSkillDamageSharePct, 100);
+});
+
+test('new optional potion and raid settings normalize legacy omissions and retain explicit enabled values', () => {
+  const exported = serializeLoadout({ ...state, values: semanticState(state).values }, data);
+  const legacy = JSON.parse(exported.json);
+  assert.equal(legacy.nutProtectionPotionEnabled, false);
+  assert.equal(legacy.nephronRaidEnabled, false);
+  const normalized = parseLoadoutJson(exported.json, state, data);
+  assert.equal(serializeLoadout(normalized.state, data).json, exported.json);
+  delete legacy.nutProtectionPotionEnabled;
+  delete legacy.nephronRaidEnabled;
+  const missing = parseLoadoutJson(JSON.stringify(legacy), state, data);
+  assert.equal(missing.state.nutProtectionPotionEnabled, false);
+  assert.equal(missing.state.nephronRaidEnabled, false);
+  assert.deepEqual(missing.clearedFields, []);
+  const enabled = { ...state, nutProtectionPotionEnabled: true, nephronRaidEnabled: true };
+  const restored = parseLoadoutJson(serializeLoadout(enabled, data).json, state, data);
+  assert.equal(restored.state.nutProtectionPotionEnabled, true);
+  assert.equal(restored.state.nephronRaidEnabled, true);
 });
 
 test("legacy venue names migrate on import without changing unrelated values", () => {

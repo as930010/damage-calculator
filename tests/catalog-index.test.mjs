@@ -22,14 +22,30 @@ function assertStoredStateMatches(actualJson, expectedJson) {
 
 function normalizeCapturedImport(snapshot, catalogIndex = index) {
   const expected = structuredClone(snapshot);
-  if (expected.value?.state?.values) normalizeOptionalEffectValues(expected.value.state.values, catalogIndex);
+  if (expected.value?.state?.values) {
+    normalizeOptionalEffectValues(expected.value.state.values, catalogIndex);
+    expected.value.state.nutProtectionPotionEnabled = false;
+    expected.value.state.nephronRaidEnabled = false;
+  }
+  return expected;
+}
+
+// Extend the pre-feature transfer contract only by the two new default-off settings.
+// All original numeric field codes, values, omissions and their order stay fixed.
+function expectedTransfer(snapshot) {
+  const expected = structuredClone(snapshot);
+  const { transcendenceSkillDamageSharePct, ...payload } = JSON.parse(expected.json);
+  expected.json = JSON.stringify({ ...payload, nutProtectionPotionEnabled: false,
+    nephronRaidEnabled: false, transcendenceSkillDamageSharePct }) + '\n';
   return expected;
 }
 
 for (const context of choiceContexts()) {
   test(`ordered field choices: ${context.id}`, () => {
     for (const field of Object.keys(fixture.choices[context.id])) {
-      assert.deepEqual(normalize(index.resolveFieldChoices(field, context.values)), fixture.choices[context.id][field], field);
+      const additions = gameData.nephronArmor.fields.some(entry => entry.magazineCell === field) ? ['支援彈匣I', '支援彈匣II'] : [];
+      const expected = fixture.choices[context.id][field];
+      assert.deepEqual(normalize(index.resolveFieldChoices(field, context.values)), additions.length ? [...expected, ...additions] : expected, field);
     }
   });
 }
@@ -37,8 +53,8 @@ for (const context of choiceContexts()) {
 test('complete/incomplete exports retain exact compact v3 JSON, order and omissions', () => {
   for (const [state, expected] of [[complete, fixture.transfers.export], [incomplete, fixture.transfers.incompleteExport]]) {
     const before = digest(state);
-    assert.deepEqual(normalize(transfer.serializeLoadout(state, gameData, index)), expected);
-    assert.deepEqual(normalize(transfer.serializeLoadout(state, gameData)), expected);
+    assert.deepEqual(normalize(transfer.serializeLoadout(state, gameData, index)), expectedTransfer(expected));
+    assert.deepEqual(normalize(transfer.serializeLoadout(state, gameData)), expectedTransfer(expected));
     assert.equal(digest(state), before);
   }
 });
@@ -124,7 +140,7 @@ test('warm complete export/import reuse equipment, validation and candidate indi
   transfer.serializeLoadout(complete, observed.data, prepared);
   transfer.parseLoadoutJson(fixture.transfers.export.json, complete, observed.data, prepared);
   observed.reset(); runtime.resetCounts();
-  assert.deepEqual(normalize(transfer.serializeLoadout(complete, observed.data, prepared)), fixture.transfers.export);
+  assert.deepEqual(normalize(transfer.serializeLoadout(complete, observed.data, prepared)), expectedTransfer(fixture.transfers.export));
   assert.equal(runtime.counts.resolveFieldChoices, fixture.workload.export.functions.cellOptions);
   assert.equal(observed.counts.elementReads ?? 0, 0);
   observed.reset(); runtime.resetCounts();
