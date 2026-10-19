@@ -117,8 +117,10 @@ export function normalize(value) {
 }
 
 export function resultHtml(document) {
+  // Disclosure storage keys do not change the rendered result or comparison content.
   return Object.fromEntries(['results', 'damage-result', 'calculation-details', 'calculation-comparison',
-    'equipment-damage-summary', 'comparison-label'].map(id => [id, document.getElementById(id)?.innerHTML ?? null]));
+    'equipment-damage-summary', 'comparison-label'].map(id => [id,
+    document.getElementById(id)?.innerHTML.replace(/ data-disclosure-key="[^"]*"/g, '') ?? null]));
 }
 
 export function digest(value) {
