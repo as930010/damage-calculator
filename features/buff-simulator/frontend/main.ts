@@ -22,6 +22,9 @@ let membersByTeam: Record<string, string[]> = { single: [], first: [], second: [
 let optionsByTeam: Record<string, Record<string, boolean | number>> = { single: {}, first: {}, second: {} };
 let bossReductions: Partial<Record<TeamMode, number>> = {};
 let optionDisclosureOpen: Partial<Record<TeamKey, boolean>> = {};
+let skillReferenceOpen = false;
+let firstShell = true;
+let resultDisclosureOpen: Record<string, boolean> = {};
 let lastPersistedState: string | null = null;
 let inputValues = new WeakMap<HTMLInputElement, string>();
 const composingInputs = new WeakSet<HTMLInputElement>();
@@ -45,6 +48,62 @@ interface SavedSimulatorState {
 }
 
 const STORAGE_KEY = "buff-team-simulator.state.v1";
+const DISCLOSURE_STORAGE_KEY = "buff-team-simulator.disclosures.v1";
+
+function captureDisclosures(): void {
+  skillReferenceOpen = app.querySelector<HTMLDetailsElement>(".skill-reference")?.open ?? skillReferenceOpen;
+  app.querySelectorAll<HTMLElement>("#results .result-card").forEach((card, index) => {
+    for (const kind of ["control-times", "calculation-details"] as const) {
+      const detail = card.querySelector<HTMLDetailsElement>(`details.${kind}`);
+      if (detail) resultDisclosureOpen[`${mode}:${index}:${kind}`] = detail.open;
+    }
+  });
+}
+
+function restoreDisclosures(): void {
+  try {
+    const saved = JSON.parse(window.localStorage.getItem(DISCLOSURE_STORAGE_KEY) ?? '{}') as Record<string, unknown>;
+    if (!saved || typeof saved !== 'object' || Array.isArray(saved)) return;
+    if (typeof saved.skillReferenceOpen === 'boolean') skillReferenceOpen = saved.skillReferenceOpen;
+    const results = saved.resultDisclosureOpen;
+    if (results && typeof results === 'object' && !Array.isArray(results)) {
+      for (const [key, value] of Object.entries(results)) {
+        if (/^(single|challenge):[012]:(control-times|calculation-details)$/.test(key) && typeof value === 'boolean') {
+          resultDisclosureOpen[key] = value;
+        }
+      }
+    }
+  } catch { /* Invalid or unavailable storage keeps the existing defaults. */ }
+}
+
+function persistDisclosures(): void {
+  captureDisclosures();
+  try { window.localStorage.setItem(DISCLOSURE_STORAGE_KEY, JSON.stringify({ skillReferenceOpen, resultDisclosureOpen })); }
+  catch { /* Disclosure controls still work without persistent storage. */ }
+}
+
+window.addEventListener('pagehide', persistDisclosures);
+app.addEventListener('toggle', event => {
+  const detail = event.target;
+  if (!(detail instanceof window.HTMLDetailsElement) || !detail.isConnected) return;
+  const card = detail.closest<HTMLElement>('#results .result-card');
+  if (!card) return;
+  const kind = detail.classList.contains('control-times') ? 'control-times'
+    : detail.classList.contains('calculation-details') ? 'calculation-details' : null;
+  if (!kind) return;
+  const index = [...app.querySelectorAll('#results .result-card')].indexOf(card);
+  if (index >= 0) resultDisclosureOpen[`${mode}:${index}:${kind}`] = detail.open;
+}, true);
+
+function applyResultDisclosures(): void {
+  app.querySelectorAll<HTMLElement>("#results .result-card").forEach((card, index) => {
+    for (const kind of ["control-times", "calculation-details"] as const) {
+      const saved = resultDisclosureOpen[`${mode}:${index}:${kind}`];
+      const detail = card.querySelector<HTMLDetailsElement>(`details.${kind}`);
+      if (detail && typeof saved === 'boolean') detail.open = saved;
+    }
+  });
+}
 
 function restoreSavedState(): void {
   try {
@@ -201,7 +260,7 @@ function optionPanel(team: string): string {
 }
 
 function skillReferencePanel(): string {
-  return `<details class="panel skill-reference">
+  return `<details class="panel skill-reference" ${firstShell && skillReferenceOpen ? "open" : ""}>
     <summary><strong>技能效果參照</strong></summary>
     <div class="skill-search-controls">
       <label><span class="sr-only">搜尋已選職業的技能</span><input data-skill-query type="search" placeholder="搜尋技能或效果"></label>
@@ -321,10 +380,11 @@ function shell(): void {
   <section id="results" aria-live="polite"></section>
   ${skillReferencePanel()}`;
   const skillPanel = app.querySelector<HTMLDetailsElement>(".skill-reference")!;
-  let skillPanelOpen = false;
+  let skillPanelOpen = skillPanel.open;
   skillPanel.addEventListener("toggle", () => {
     if (skillPanel.open === skillPanelOpen) return;
     skillPanelOpen = skillPanel.open;
+    skillReferenceOpen = skillPanel.open;
     if (skillPanel.open) {
       if (skillReferenceRequest) showSkillReferenceStatus(false);
       ensureSkillReference();
@@ -343,6 +403,7 @@ function shell(): void {
     const nextMode = button.dataset.mode as TeamMode;
     if (nextMode === mode) return;
     saveCurrentInputs();
+    captureDisclosures();
     mode = nextMode;
     persistSavedState();
     shell();
@@ -353,6 +414,8 @@ function shell(): void {
   app.onchange = syncInputs;
   updateResults();
   updateSkillReference();
+  if (skillPanel.open) ensureSkillReference();
+  firstShell = false;
 }
 
 function saveCurrentInputs(): void {
@@ -441,6 +504,7 @@ function damagePanel(title: string, team: string, result: ReturnType<typeof calc
 function updateResults(): void {
   const results = app.querySelector<HTMLElement>("#results");
   if (!results || !catalog) return;
+  captureDisclosures();
   if (mode === "single") {
     const bossInput = app.querySelector<HTMLInputElement>("#boss-reduction");
     const bossDamageReduction = Number(bossInput?.value ?? catalog.parameters.bossDamageReduction * 100) / 100;
@@ -457,6 +521,7 @@ function updateResults(): void {
       actionSpeedCap: catalog.parameters.actionSpeedCap,
     });
     results.innerHTML = `${invalidMemberNote()}${emptyRosterNote()}<div class="results-heading"><div class="section-label"><strong>隊伍效益</strong></div></div>${damagePanel("單隊結果", "單隊", result)}`;
+    applyResultDisclosures();
     return;
   }
 
@@ -474,6 +539,7 @@ function updateResults(): void {
     actionSpeedCap: catalog.parameters.actionSpeedCap,
   });
   results.innerHTML = `${invalidMemberNote()}${emptyRosterNote()}<div class="results-heading"><div class="section-label"><strong>分路與八人同場</strong></div><span class="result-context">同場重複效果只計一次</span></div><div class="result-stack">${damagePanel("第一隊・分路", "ROUTE 01", challenge.firstTeam)}${damagePanel("第二隊・分路", "ROUTE 02", challenge.secondTeam)}${damagePanel("八人同場", "SHARED ARENA", challenge.sharedArena)}</div>`;
+  applyResultDisclosures();
 }
 
 async function start(): Promise<void> {
@@ -488,6 +554,7 @@ async function start(): Promise<void> {
     membersByTeam[team] = Array(team === "single" ? 6 : 4).fill("");
   }
   restoreSavedState();
+  restoreDisclosures();
   shell();
 }
 

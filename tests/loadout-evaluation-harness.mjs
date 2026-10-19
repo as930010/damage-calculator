@@ -90,6 +90,7 @@ export async function createPage(state, baseline, options = {}) {
   const dom = new JSDOM(html, { url: options.url ?? 'https://loadout.test/', pretendToBeVisual: true });
   dom.window.localStorage.setItem('dab-loadout-v1', JSON.stringify(state));
   if (baseline) dom.window.localStorage.setItem('dab-baseline-v1', JSON.stringify(baseline));
+  for (const [key, value] of Object.entries(options.storage ?? {})) dom.window.localStorage.setItem(key, value);
   const runtime = await createRuntime({ dom, ...options });
   await runtime.start();
   if (dom.window.document.querySelector('.error-card')) throw new Error(dom.window.document.querySelector('.error-card').textContent);

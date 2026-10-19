@@ -8,6 +8,8 @@ import { createTransferLoader } from './loadout-transfer-loader.ts';
 import { normalizeOptionalEffectValues, isUnrelatedEffectValue } from './state.ts';
 import { evaluateLoadout, type projectDamage } from './projection.ts';
 import { createBaselineEvaluationCache } from './baseline-evaluation.ts';
+import { createAttributeEquivalencePanel } from './attribute-equivalence-ui.ts';
+import { createDisclosurePreferences } from './disclosure-preferences.ts';
 import { compareLoadoutResults } from './calculation-comparison.ts';
 import { createPicker, updatePicker, disposePickers, type PickerOption } from './picker.ts';
 import { circuitBoardRowsField, readCircuitBoardRows, serializeCircuitBoardRows, circuitBoardRowsTotal, normalizeCircuitBoardRows, normalizeCircuitPercentage } from './circuit-board-rows.ts';
@@ -187,6 +189,32 @@ async function start() {
   ];
   const app = document.querySelector<HTMLElement>('#app')!;
     app.innerHTML = `<section class="workbench"><header class="workspace-heading"><div class="workspace-intro"><span class="eyebrow">EQUIPMENT SIMULATOR</span><h1>裝備傷害比較</h1><p class="workspace-summary">填入當前數值並設為比較基準，再調整配裝查看傷害差異。</p><ol class="workflow-steps" aria-label="比較流程"><li><span>01</span><span>填入當前數值</span></li><li><span>02</span><span>設為比較基準</span></li><li><span>03</span><span>填入新數值</span></li></ol></div></header><div class="toolbar"><div id="class-picker"></div><label class="toggle"><input id="alternate" type="checkbox">啟用強/排褲切換</label><div class="toolbar-actions"><button id="baseline" type="button">設為比較基準</button><div class="transfer-actions"><button id="import-loadout" type="button">匯入配裝</button><button id="export-loadout" type="button">匯出配裝</button></div></div><input id="loadout-file" type="file" accept="application/json,.json" hidden><span id="transfer-status" role="status" aria-live="polite"></span><span id="save-status" role="status"></span></div><section class="battle-panel"><div class="panel-heading"><h2>關卡設定</h2></div><div id="battle-settings" class="battle-fields"></div></section><div class="equipment-workspace"><section class="equipment-panel"><div class="panel-heading"><h2>裝備配置</h2><span>點選部位以編輯</span></div><div id="equipment-damage-summary" class="equipment-damage-summary" aria-live="polite"></div><div class="canvas-scroll"><div class="equipment-canvas"><span class="group-label costume-label">連身時裝</span><span class="group-label left-label">左冰</span><span class="group-label inner-label">內裝左四</span><span class="group-label weapon-label">冰武 / 武器</span><span class="group-label right-label">右冰</span><span class="group-label accessory-label">飾品</span><span class="group-label beast-label">聖獸飾品</span><div id="title-input" class="canvas-title-input"></div><div id="slots"></div><div id="beast-accessory-fields" class="beast-accessories-grid gear-beast-slots" aria-label="聖獸飾品配置"></div></div></div><p class="panel-note">左冰不支援混搭，但各部位魔法石仍須獨立設定。擁有強/排褲則褲子的傷害增幅會被平均計算。</p><section class="right-ice-set-area"><div class="beast-accessories-heading"><h3>右冰套效</h3><span>最多選擇 ${data.rightIceSets.maxSelectedSets} 套</span></div><p class="panel-note">選擇要啟用的套裝效果。</p><div id="right-ice-set-selectors" class="right-ice-set-selectors"></div></section><div class="beast-accessories-area"><div class="beast-accessories-heading"><h3>聖獸效果設定</h3><span>頭飾、盔甲、項鍊、指環 1、指環 2</span></div><p class="panel-note">共通顏色與潛力設定；各部位效果請使用裝備配置中的聖獸飾品欄位。</p><div id="master-beast-controls" class="master-beast-controls"></div></div></section><div id="inspector-backdrop" class="inspector-backdrop" aria-hidden="true"></div><aside id="inspector" class="inspector" aria-label="部位設定"></aside></div><details class="global-source-panel weapon-magic-stone-panel"><summary>武器魔力石</summary><div id="weapon-magic-stone-fields"></div></details><details class="global-source-panel"><summary>其他效果來源設定</summary><p class="panel-note">未列在此處的特殊條件或 Buff／Debuff 尚未納入計算。</p><div id="global-source-fields"></div></details><section class="results-panel"><div class="panel-heading"><h2>目前填寫的屬性</h2><span id="comparison-label"></span></div><p class="panel-note">已填入的屬性彙總，包含內裝、冰裝、武器、關卡與其他效果設定、需要特殊觸發條件的暫時沒有計入。</p><div id="results" aria-live="polite"></div><section class="damage-panel"><div class="panel-heading"><h2>攻擊與最終傷害</h2></div><p class="panel-note">此數值只反映已填寫的內容。</p><div id="damage-result" aria-live="polite"></div><details class="calculation-inspection-panel"><summary>計算結果驗算</summary><div class="calculation-inspection-content"><div id="calculation-comparison" class="calculation-comparison" aria-live="polite"><p>先點選「設為比較基準」保存目前配置，表格就會比較基準與目前配裝。</p></div><div id="calculation-details"></div></div></details></section></section></section>`;
+  const disclosurePreferences = createDisclosurePreferences(document);
+  const resultsPanel = app.querySelector<HTMLElement>('.results-panel')!;
+  const resultsDisclosure = document.createElement('details');
+  resultsDisclosure.className = resultsPanel.className;
+  resultsDisclosure.dataset.disclosureKey = 'filled-attributes';
+  resultsDisclosure.open = true;
+  const resultsSummary = document.createElement('summary');
+  resultsSummary.textContent = '目前填寫的屬性';
+  const resultsHeading = resultsPanel.querySelector<HTMLElement>(':scope > .panel-heading')!;
+  const comparisonLabel = resultsHeading.querySelector<HTMLElement>('#comparison-label')!;
+  resultsPanel.querySelector<HTMLElement>(':scope > .panel-note')!.append(' ', comparisonLabel);
+  resultsHeading.remove();
+  resultsDisclosure.append(resultsSummary, ...resultsPanel.childNodes);
+  resultsPanel.replaceWith(resultsDisclosure);
+  for (const [selector, key] of [
+    ['.weapon-magic-stone-panel', 'weapon-magic-stone'],
+    ['.global-source-panel:not(.weapon-magic-stone-panel)', 'global-sources'],
+    ['.calculation-inspection-panel', 'calculation-inspection'],
+    ['.site-credits-notes', 'site-credits'],
+  ] as const) document.querySelector<HTMLDetailsElement>(selector)!.dataset.disclosureKey = key;
+  const attributeEquivalence = createAttributeEquivalencePanel(data.attributes.attributes, () => {
+    const evaluation = evaluateLoadout(data, state, false, true);
+    attributeEquivalence.update('comparisonInput' in evaluation ? evaluation.comparisonInput : undefined,
+      evaluation.damage?.result);
+  });
+  app.querySelector<HTMLElement>('.results-panel')!.after(attributeEquivalence.root);
   const classPickerRoot = app.querySelector<HTMLElement>('#class-picker')!;
   const toolbar = app.querySelector<HTMLElement>('.toolbar')!;
   const toolbarSettings = document.createElement('div');
@@ -495,10 +523,16 @@ async function start() {
   const renderedHtml = new WeakMap<Element, string>();
   const writeHtml = (target: Element, html: string, preserveDetails = false) => {
     if (renderedHtml.get(target) === html) return;
-    const detailKey = (detail: HTMLDetailsElement) => detail.querySelector('summary span')?.textContent ?? detail.querySelector('summary')?.textContent ?? '';
-    const opened = preserveDetails ? new Set([...target.querySelectorAll<HTMLDetailsElement>('details[open]')].map(detailKey)) : null;
+    const detailKey = (detail: HTMLDetailsElement) => detail.dataset.disclosureKey
+      ?? detail.querySelector('summary span')?.textContent ?? detail.querySelector('summary')?.textContent ?? '';
+    const prior = preserveDetails ? new Map([...target.querySelectorAll<HTMLDetailsElement>('details')]
+      .map(detail => [detailKey(detail), detail.open] as const)) : null;
     target.innerHTML = html; renderedHtml.set(target, html);
-    if (opened) target.querySelectorAll<HTMLDetailsElement>('details').forEach(detail => { if (opened.has(detailKey(detail))) detail.open = true; });
+    if (html.includes('<details')) disclosurePreferences.restore(target);
+    if (prior) target.querySelectorAll<HTMLDetailsElement>('details').forEach(detail => {
+      const key = detailKey(detail);
+      if (prior.has(key)) detail.open = prior.get(key)!;
+    });
   };
   const setAttribute = (node: HTMLElement, name: string, value: string) => {
     if (node.getAttribute(name) !== value) node.setAttribute(name, value);
@@ -984,7 +1018,10 @@ async function start() {
     return input;
   };
   const section = (parent: HTMLElement, label: string, open = false) => {
-    const details = document.createElement('details'); details.className = 'editor-section'; details.open = open;
+    const details = document.createElement('details'); details.className = 'editor-section';
+    const key = `inspector:${selectedBeastSlotId ?? selected.id}:${label}`;
+    details.dataset.disclosureKey = key;
+    details.open = disclosurePreferences.preferredOpen(key, open);
     const title = document.createElement('summary'); title.textContent = label; details.append(title); parent.append(details); return details;
   };
   const attributeValueGrid = (parent: HTMLElement, extraClass = '') => {
@@ -1705,11 +1742,15 @@ async function start() {
       return `<tr class="${rowClass}"><th scope="row">${h(row.label)}</th><td>${displayComparisonValue(row, row.expected)}</td><td>${displayComparisonValue(row, row.actual)}</td><td class="${row.delta > 0 ? 'positive' : row.delta < 0 ? 'negative' : ''}">${displayComparisonDelta(row)}</td></tr>`;
     }).join('')}</tbody></table></div>`;
     const differences = mismatches.length ? table(mismatches) : '<p>目前配置與比較基準的計算值相同。</p>';
-    writeHtml(target, `<p>依比較基準與目前配裝的未格式化數值比對 ${visibleRows.length} 項：${visibleRows.length - mismatches.length} 項相同、${mismatches.length} 項不同。</p>${differences}<details><summary>查看全部比較值（${visibleRows.length} 項）</summary>${table(visibleRows)}</details>`, true);
+    writeHtml(target, `<p>依比較基準與目前配裝的未格式化數值比對 ${visibleRows.length} 項：${visibleRows.length - mismatches.length} 項相同、${mismatches.length} 項不同。</p>${differences}<details data-disclosure-key="comparison-all-values"><summary>查看全部比較值（${visibleRows.length} 項）</summary>${table(visibleRows)}</details>`, true);
   }
   function renderResults() {
     const target = document.querySelector('#results')!;
-      const currentEvaluation = evaluateLoadout(data, state);
+      const currentEvaluation = evaluateLoadout(data, state, true, attributeEquivalence.isOpen());
+      if (attributeEquivalence.isOpen()) attributeEquivalence.update(
+        'comparisonInput' in currentEvaluation ? currentEvaluation.comparisonInput : undefined,
+        currentEvaluation.damage?.result,
+      );
       const currentDamage = currentEvaluation.damage;
       const damageCalculationError = currentEvaluation.damageError;
       const baselineEvaluation = baselineEvaluationCache.get(data, baseline, calculationDataRevision);
@@ -1768,7 +1809,7 @@ async function start() {
       return overflow === null ? '' : `<small class="cap-overflow" role="status">超出上限 ${fmt(overflow)}%</small>`;
     };
     const combatRateCard = (label: string, attribute: 'critRate' | 'extremization', statKey: 'critRatePct' | 'extremizationPct') => {
-      if (!currentCombatRates) return `<details class="stat"><summary><span>${h(label)}</span><strong>待補輸入</strong></summary><div class="stat-details"><p class="input-hint">${h(calculationIssue(damageCalculationError))}</p></div></details>`;
+      if (!currentCombatRates) return `<details class="stat" data-disclosure-key="combat:${attribute}"><summary><span>${h(label)}</span><strong>待補輸入</strong></summary><div class="stat-details"><p class="input-hint">${h(calculationIssue(damageCalculationError))}</p></div></details>`;
       const rate = currentCombatRates[attribute];
       const stat = current.stats[statKey];
       const classDiminishing = getClassEffects(applyClassSkillVersions(data.classCombatEffects, state.Job, state.classSkillVersions), currentCombatRates.classId, attribute)
@@ -1786,7 +1827,7 @@ async function start() {
         ? `<p class="stat-detail-heading">強/排褲來源</p>${sourceRows(stat.lowerwearBSources, true)}<p class="stat-average">下衣與強/排褲平均 ${fmt(stat.lowerwearAverage)}%</p>` : ''}` : '';
       const finalAdjustment = rate.finalAdjustmentPct
         ? `<p class="stat-source-row"><span>${attribute === 'critRate' ? '關卡扣致命' : '最終調整'}</span><strong>${fmt(rate.finalAdjustmentPct)}%</strong></p>` : '';
-      return `<details class="stat"><summary><span>${h(label)}</span><strong>${fmt(rate.finalRate * 100)}%</strong>${probabilityCapWarning(rate.valueBeforeUpperCap)}</summary><div class="stat-details"><p class="stat-detail-heading">角色屬性來源</p>${baseRows || '<p class="stat-source-empty">目前沒有額外屬性來源</p>'}<p class="stat-average">角色屬性合計 ${fmt(rate.baseRawStatPct)}%</p>${classRows ? `<p class="stat-detail-heading">遞減來源</p>${classRows}` : ''}<p class="stat-average">遞減前 ${fmt(rate.rawStatPct)}% → 遞減後 ${fmt(rate.tierRate * 100)}%</p>${multiplierRows ? `<p class="stat-detail-heading">乘算來源</p>${multiplierRows}<p class="stat-average">乘算合計 ×${fmt(rate.multiplierProduct)}</p>` : ''}${nonDiminishingRows ? `<p class="stat-detail-heading">非遞減來源</p>${nonDiminishingRows}` : ''}${finalAdjustment}<p class="stat-average">上限前 ${fmt(rate.valueBeforeUpperCap * 100)}% → 實戰 ${fmt(rate.finalRate * 100)}%</p></div></details>`;
+      return `<details class="stat" data-disclosure-key="combat:${attribute}"><summary><span>${h(label)}</span><strong>${fmt(rate.finalRate * 100)}%</strong>${probabilityCapWarning(rate.valueBeforeUpperCap)}</summary><div class="stat-details"><p class="stat-detail-heading">角色屬性來源</p>${baseRows || '<p class="stat-source-empty">目前沒有額外屬性來源</p>'}<p class="stat-average">角色屬性合計 ${fmt(rate.baseRawStatPct)}%</p>${classRows ? `<p class="stat-detail-heading">遞減來源</p>${classRows}` : ''}<p class="stat-average">遞減前 ${fmt(rate.rawStatPct)}% → 遞減後 ${fmt(rate.tierRate * 100)}%</p>${multiplierRows ? `<p class="stat-detail-heading">乘算來源</p>${multiplierRows}<p class="stat-average">乘算合計 ×${fmt(rate.multiplierProduct)}</p>` : ''}${nonDiminishingRows ? `<p class="stat-detail-heading">非遞減來源</p>${nonDiminishingRows}` : ''}${finalAdjustment}<p class="stat-average">上限前 ${fmt(rate.valueBeforeUpperCap * 100)}% → 實戰 ${fmt(rate.finalRate * 100)}%</p></div></details>`;
     };
     const combatRateCards = `<div class="combat-rate-pair">${combatRateCard('實戰致命一擊機率', 'critRate', 'critRatePct')}${combatRateCard('實戰極大化', 'extremization', 'extremizationPct')}</div>`;
     const conditionalDamageCard = (label: string, valuePct: number, sources: readonly { sourceId: string; valuePct: number }[], previousValuePct: number | undefined) => {
@@ -1794,7 +1835,7 @@ async function start() {
       const deltaText = delta === null ? '' : signedDelta(delta, percentFormat, '%');
       const deltaClass = delta === null || delta === 0 ? '' : delta > 0 ? 'positive' : 'negative';
       const deltaBadge = deltaText ? '<small class="' + deltaClass + '">' + deltaText + '</small>' : '';
-      return '<details class="stat conditional-stat"><summary><span>' + h(label) + '</span><strong>' + fmt(valuePct) + '%</strong>' + deltaBadge + '</summary><div class="stat-details"><p class="stat-detail-heading">來源</p>' + (sourceRows(sources, true) || '<p class="stat-source-empty">目前沒有此條件的額外來源</p>') + '<p class="stat-average">來源合計 ' + fmt(valuePct) + '%</p></div></details>';
+      return '<details class="stat conditional-stat" data-disclosure-key="conditional:' + h(label) + '"><summary><span>' + h(label) + '</span><strong>' + fmt(valuePct) + '%</strong>' + deltaBadge + '</summary><div class="stat-details"><p class="stat-detail-heading">來源</p>' + (sourceRows(sources, true) || '<p class="stat-source-empty">目前沒有此條件的額外來源</p>') + '<p class="stat-average">來源合計 ' + fmt(valuePct) + '%</p></div></details>';
     };
     const baselineConditionalDamage = baselineDamage?.result.attributes.conditionalDamage;
     const conditionalDamageCards = '<div class="conditional-damage-pair">' + conditionalDamageCard('強者（Boss 體力 > 50%）', current.conditionalDamage.strongerPct, current.conditionalDamage.strongerSources, baselineConditionalDamage?.strongerPct) + conditionalDamageCard('排熱（Boss 體力 ≤ 50%）', current.conditionalDamage.heatPct, current.conditionalDamage.heatSources, baselineConditionalDamage?.heatPct) + '</div>';
@@ -1806,7 +1847,7 @@ async function start() {
       ? '<small class="' + (multiplicativeDeltaValue! > 0 ? 'positive' : 'negative') + '">' + multiplicativeDeltaText + '</small>'
       : '';
     const multiplicativeEffectCard = currentDamage
-      ? `<details class="stat"><summary><span>乘算效果</span><strong>×${fmt(currentDamage.result.generalMultiplicativeDamage.value)}</strong>${multiplicativeDeltaBadge}</summary><div class="stat-details">${currentDamage.result.generalMultiplicativeDamage.factors.length
+      ? `<details class="stat" data-disclosure-key="multiplicative-effect"><summary><span>乘算效果</span><strong>×${fmt(currentDamage.result.generalMultiplicativeDamage.value)}</strong>${multiplicativeDeltaBadge}</summary><div class="stat-details">${currentDamage.result.generalMultiplicativeDamage.factors.length
         ? currentDamage.result.generalMultiplicativeDamage.factors.map(effect => `<p class="stat-source-row"><span>${h(sourceLabel(effect.sourceId))}</span><strong>×${fmt(effect.factor)}</strong></p>`).join('')
         : '<p class="stat-source-empty">目前沒有額外乘算來源</p>'}<p class="stat-average">乘算效果總倍率 ×${fmt(currentDamage.result.generalMultiplicativeDamage.value)}</p></div></details>`
       : `<div class="stat"><p>乘算效果</p><strong>待補輸入</strong><small class="input-hint">${h(calculationIssue(damageCalculationError))}</small></div>`;
@@ -1850,7 +1891,7 @@ async function start() {
         ? `<p class="stat-detail-heading">乘算來源</p><p class="stat-source-row"><span>乘算暴傷增幅（角色基底 ${fmt(critDamageBaseFactor * 100)}% 扣除 ${fmt(critDamageBaselinePct)}% 基準後）</span><strong>+${fmt(currentDamage.result.multiplicativeCritDamage.value * 100)}%</strong></p>${currentDamage.result.multiplicativeCritDamage.factors.filter(effect => effect.sourceId !== 'character-base:crit-damage-product').map(effect => `<p class="stat-source-row"><span>${h(sourceLabel(effect.sourceId))}</span><strong>×${fmt(effect.factor)}</strong></p>`).join('')}`
         : '';
       const lowerwearBDetails = state.lowerwearAlternativeEnabled && stat.lowerwearBSources.length ? `<p class="stat-detail-heading">強/排褲來源</p>${sourceRows(stat.lowerwearBSources, isPercent)}` : '';
-      return `<details class="stat"><summary><span>${h(shownName)}</span><strong>${fmt(displayTotal)}${isPercent ? '%' : ''}</strong>${attributeCapWarning}${deltaBadge}</summary><div class="stat-details">${sharedDetails}${critDamageDetails}${lowerwearBDetails}<p class="stat-average">${lowerwearAverageLabel} ${fmt(lowerwearAverage)}${isPercent ? '%' : ''}</p>${comparison}</div></details>`;
+      return `<details class="stat" data-disclosure-key="stat:${h(key)}"><summary><span>${h(shownName)}</span><strong>${fmt(displayTotal)}${isPercent ? '%' : ''}</strong>${attributeCapWarning}${deltaBadge}</summary><div class="stat-details">${sharedDetails}${critDamageDetails}${lowerwearBDetails}<p class="stat-average">${lowerwearAverageLabel} ${fmt(lowerwearAverage)}${isPercent ? '%' : ''}</p>${comparison}</div></details>`;
     }).join('')}${conditionalDamageCards}${multiplicativeEffectCard}${combatRateCards}</div>`, true);
       const damageTarget = document.querySelector('#damage-result')!;
       try {
@@ -1879,7 +1920,7 @@ async function start() {
         const skillWeightingText = `超越 ${fmt(skillWeighting.transcendenceSharePct)}% ×${fmt(skillWeighting.transcendenceFactor)} + 強烈 ${fmt(skillWeighting.strongSharePct)}% ×${fmt(skillWeighting.strongFactor)} = ×${fmt(skillWeighting.combinedFactor)}`;
         const calculationDetailsTarget = document.querySelector<HTMLElement>("#calculation-details")!;
         const formulaWasOpen = calculationDetailsTarget.querySelector<HTMLDetailsElement>(".formula-detail")?.open ?? false;
-        writeHtml(calculationDetailsTarget, `<details class="formula-detail"${formulaWasOpen ? ' open' : ''}><summary>展開傷害計算明細</summary><p>強烈／超越技傷加權：${h(skillWeightingText)}</p><p>致命傷害被動：${fmt(result.classCritDamagePassivePct)}%　乘算暴傷增幅：+${fmt(result.multiplicativeCritDamage.value * 100)}%</p><p>乘算暴傷計算：${h(critDamageCalculation)}</p><p>乘算暴傷來源：${h(critDamageMultiplier)}</p><p>爆擊乘算來源：${h(rateSources(result.combatRates.critRate.multipliers))}</p><p>極大乘算來源：${h(rateSources(result.combatRates.extremization.multipliers))}</p><p>乘算傷害：${fmt(result.generalMultiplicativeDamage.value)} 倍　強者／排熱因子：${fmt(result.finalDamage.conditionalFactor)}</p><p>適應力因子：${fmt(result.finalDamage.adaptationFactor)}　防禦因子：${fmt(result.finalDamage.defenseFactor)}</p></details>`, true);
+        writeHtml(calculationDetailsTarget, `<details class="formula-detail" data-disclosure-key="formula-detail"${formulaWasOpen ? ' open' : ''}><summary>展開傷害計算明細</summary><p>強烈／超越技傷加權：${h(skillWeightingText)}</p><p>致命傷害被動：${fmt(result.classCritDamagePassivePct)}%　乘算暴傷增幅：+${fmt(result.multiplicativeCritDamage.value * 100)}%</p><p>乘算暴傷計算：${h(critDamageCalculation)}</p><p>乘算暴傷來源：${h(critDamageMultiplier)}</p><p>爆擊乘算來源：${h(rateSources(result.combatRates.critRate.multipliers))}</p><p>極大乘算來源：${h(rateSources(result.combatRates.extremization.multipliers))}</p><p>乘算傷害：${fmt(result.generalMultiplicativeDamage.value)} 倍　強者／排熱因子：${fmt(result.finalDamage.conditionalFactor)}</p><p>適應力因子：${fmt(result.finalDamage.adaptationFactor)}　防禦因子：${fmt(result.finalDamage.defenseFactor)}</p></details>`, true);
       } catch (error) {
         writeHtml(damageTarget, `<p class="input-warning">尚未計算：${h(calculationIssue(error))}請完成後再試。</p>`, true);
         const details = document.querySelector('#calculation-details')!;
@@ -2094,5 +2135,6 @@ async function start() {
     }
   });
   renderSlots(); renderInspector(); renderTitleInput(); renderBeastAccessories(); renderMasterBeastColorSelector(); renderGlobalInputs(); renderWeaponMagicStones(); renderRightIceSetSelectors(); renderResults(); refreshHistoryControls();
+  disclosurePreferences.restore(document);
 }
 start().catch(error => { document.querySelector('#app')!.innerHTML = `<section class="error-card"><h1>無法載入工具</h1><p>${h(error instanceof Error ? error.message : error)}</p></section>`; });

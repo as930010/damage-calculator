@@ -18,6 +18,7 @@ import type {
   CharacterAttributeResult,
   ClassCombatEffectsDocument,
   ClassDamagePassivesDocument,
+  FinalDamageInput,
   FinalDamageResult,
   ProductStatEffect,
   ProductStatResult,
@@ -70,6 +71,40 @@ export interface CombatRateCalculationInput {
   additionalCritRateEffects?: readonly ResolvedPercentEffect[];
   additionalExtremizationEffects?: readonly ResolvedPercentEffect[];
   targetCritPenaltyPct: number;
+}
+
+/** Use the same final-damage inputs for a loadout and for temporary comparisons. */
+export function finalDamageInputs(
+  input: LoadoutCalculationInput,
+  result: Pick<LoadoutCalculationResult,
+    'attributes' | 'attack' | 'combatRates' | 'generalMultiplicativeDamage' | 'multiplicativeCritDamage' | 'classCritDamagePassivePct'>,
+): FinalDamageInput {
+  const { attributes, attack, combatRates, generalMultiplicativeDamage, multiplicativeCritDamage, classCritDamagePassivePct } = result;
+  return {
+    lowerDamage: attack.lowerDamage,
+    upperDamage: attack.upperDamage,
+    critRate: combatRates.critRate.finalRate,
+    extremizationRate: combatRates.extremization.finalRate,
+    critDamagePct: statTotal(attributes, 'critDamagePct'),
+    classCritDamagePassivePct,
+    multiplicativeCritDamageOffset: multiplicativeCritDamage.value,
+    bossDamagePct: statTotal(attributes, 'bossDamagePct'),
+    polarizationPct: statTotal(attributes, 'polarizationPct'),
+    transcendenceSkillDamagePct: statTotal(attributes, 'transcendenceSkillDamagePct'),
+    strongSkillDamagePct: statTotal(attributes, 'strongSkillDamagePct'),
+    transcendenceSkillDamageSharePct: input.transcendenceSkillDamageSharePct ?? 100,
+    allSkillDamagePct: statTotal(attributes, 'allSkillDamagePct'),
+    bleedDamagePct: statTotal(attributes, 'bleedDamagePct'),
+    fullHealthKillDamagePct: statTotal(attributes, 'fullHealthKillDamagePct'),
+    strongerPct: attributes.conditionalDamage.strongerPct,
+    heatPct: attributes.conditionalDamage.heatPct,
+    generalMultiplicativeDamage: generalMultiplicativeDamage.value,
+    adaptabilityPct: statTotal(attributes, 'adaptabilityPct'),
+    superAdaptabilityPct: statTotal(attributes, 'superAdaptabilityPct'),
+    stageAdaptabilityPenaltyPct: input.stageAdaptabilityPenaltyPct,
+    enemyDefensePct: input.enemyDefensePct,
+    defenseIgnorePct: statTotal(attributes, 'defenseIgnorePct'),
+  };
 }
 
 function statTotal(result: CharacterAttributeResult, key: string): number {
@@ -205,31 +240,9 @@ export function evaluatePreparedLoadout(
       input.classDamagePassives,
       input.classId,
     );
-    const finalDamage = calculateFinalDamage({
-      lowerDamage: attack.lowerDamage,
-      upperDamage: attack.upperDamage,
-      critRate: combatRates.critRate.finalRate,
-      extremizationRate: combatRates.extremization.finalRate,
-      critDamagePct: statTotal(attributes, "critDamagePct"),
-      classCritDamagePassivePct,
-      multiplicativeCritDamageOffset: multiplicativeCritDamage.value,
-      bossDamagePct: statTotal(attributes, "bossDamagePct"),
-      polarizationPct: statTotal(attributes, "polarizationPct"),
-      transcendenceSkillDamagePct: statTotal(attributes, "transcendenceSkillDamagePct"),
-      strongSkillDamagePct: statTotal(attributes, "strongSkillDamagePct"),
-      transcendenceSkillDamageSharePct: input.transcendenceSkillDamageSharePct ?? 100,
-      allSkillDamagePct: statTotal(attributes, "allSkillDamagePct"),
-      bleedDamagePct: statTotal(attributes, "bleedDamagePct"),
-      fullHealthKillDamagePct: statTotal(attributes, "fullHealthKillDamagePct"),
-      strongerPct: attributes.conditionalDamage.strongerPct,
-      heatPct: attributes.conditionalDamage.heatPct,
-      generalMultiplicativeDamage: generalMultiplicativeDamage.value,
-      adaptabilityPct: statTotal(attributes, "adaptabilityPct"),
-      superAdaptabilityPct: statTotal(attributes, "superAdaptabilityPct"),
-      stageAdaptabilityPenaltyPct: input.stageAdaptabilityPenaltyPct,
-      enemyDefensePct: input.enemyDefensePct,
-      defenseIgnorePct: statTotal(attributes, "defenseIgnorePct"),
-    });
+    const finalDamage = calculateFinalDamage(finalDamageInputs(input, {
+      attributes, attack, combatRates, generalMultiplicativeDamage, multiplicativeCritDamage, classCritDamagePassivePct,
+    }));
 
     return { result: {
       attributes,

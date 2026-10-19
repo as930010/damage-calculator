@@ -60,6 +60,32 @@ test('stored settings reload with the same numeric results and formatted result 
   work(restored, { calculateTeam: 0, updateResults: 0, updateSkillReference: 0, storage: 1 });
 });
 
+test('skill and result disclosures resume their last state after leaving the page', async t => {
+  const h = await open(t);
+  await h.openSkills();
+  const single = h.query('#results .result-card');
+  single.querySelector('.control-times').open = true;
+  single.querySelector('.calculation-details').open = true;
+  h.clickMode('challenge');
+  await h.openSkills();
+  const cards = h.app.querySelectorAll('#results .result-card');
+  cards[0].querySelector('.control-times').open = true;
+  cards[2].querySelector('.calculation-details').open = true;
+  h.window.dispatchEvent(new h.window.Event('pagehide'));
+  const savedDisclosures = h.savedDisclosures();
+  assert.equal(savedDisclosures.skillReferenceOpen, true);
+
+  const restored = await open(t, { saved: h.saved(), savedDisclosures });
+  assert.equal(restored.query('.skill-reference').open, true);
+  await restored.settleSkills();
+  assert.equal(restored.requests.filter(path => path === 'skill-reference.json').length, 1);
+  assert.equal(restored.app.querySelectorAll('#results .result-card')[0].querySelector('.control-times').open, true);
+  assert.equal(restored.app.querySelectorAll('#results .result-card')[2].querySelector('.calculation-details').open, true);
+  restored.clickMode('single');
+  assert.equal(restored.query('#results .control-times').open, true);
+  assert.equal(restored.query('#results .calculation-details').open, true);
+});
+
 test('invalid storage and disabled storage leave the calculator usable', async t => {
   for (const saved of ['{', { version: 999 }, { version: 1, mode: 'bad', membersByTeam: { single: [null] }, bossReductions: { single: 1 } }]) {
     const h = await open(t, { saved });

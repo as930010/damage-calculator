@@ -337,7 +337,7 @@ function damageInputs(data: GameData, state: LoadoutState, attributes: Character
 }
 
 /** One source preparation and one ordered attribute evaluation for all result views. */
-export function evaluateLoadout(data: GameData, state: LoadoutState, includeFallbackRates = true) {
+export function evaluateLoadout(data: GameData, state: LoadoutState, includeFallbackRates = true, includeComparisonInput = false) {
   let sources: ReturnType<typeof resolveLoadoutSources>;
   let preparation: ReturnType<typeof prepareLoadoutAttributes>;
   try {
@@ -349,11 +349,13 @@ export function evaluateLoadout(data: GameData, state: LoadoutState, includeFall
   let damageError: unknown;
   let combatRates: ReturnType<typeof calculateLoadoutCombatRates> | null = null;
   try {
-    const evaluation = evaluatePreparedLoadout(damageInputs(data, state, preparation.attributes, sources), preparation);
+    const input = damageInputs(data, state, preparation.attributes, sources);
+    const evaluation = evaluatePreparedLoadout(input, preparation);
     if (evaluation.result) {
       const result = evaluation.result;
       return { attributes: result.attributes, damage: { attributes: result.attributes, result },
-        combatRates: result.combatRates, damageError: undefined, attributeError: undefined };
+        combatRates: result.combatRates, damageError: undefined, attributeError: undefined,
+        ...(includeComparisonInput ? { comparisonInput: input } : {}) };
     }
     damageError = evaluation.error;
     combatRates = evaluation.combatRates;

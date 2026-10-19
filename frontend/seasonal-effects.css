@@ -154,7 +154,8 @@
 .inspector,
 .weapon-magic-stone-panel,
 .global-source-panel,
-.results-panel {
+.results-panel,
+.attribute-equivalence-panel {
   background:linear-gradient(145deg,rgb(17 22 35 / 70%),rgb(12 16 26 / 70%));
 }
 
@@ -232,7 +233,7 @@ body{color:var(--text-main);background:transparent}
   background:linear-gradient(100deg,rgb(10 16 39 / 65%),rgb(8 13 31 / 65%));
 }
 .toolbar,.workflow-steps li,.panel-heading,.editor-section,.right-ice-set-area{border-color:rgb(137 139 184 / 32%)}
-.battle-panel,.damage-panel,.equipment-panel,.inspector,.weapon-magic-stone-panel,.global-source-panel,.results-panel{
+.battle-panel,.damage-panel,.equipment-panel,.inspector,.weapon-magic-stone-panel,.global-source-panel,.results-panel,.attribute-equivalence-panel{
   border-color:rgb(125 134 183 / 34%);
   background-color:transparent;
   background-image:
@@ -256,12 +257,12 @@ body{color:var(--text-main);background:transparent}
   background-clip:padding-box;
 }
 /* Keep battle and results panels consistent with the flat activity surfaces. */
-.battle-panel,.results-panel,.results-panel .damage-panel{
+.battle-panel,.results-panel,.attribute-equivalence-panel,.results-panel .damage-panel{
   background-image:
     repeating-linear-gradient(113deg,transparent 0 74px,rgb(191 174 225 / 1.2%) 75px,transparent 78px),
     linear-gradient(145deg,rgb(10 14 29 / 65%),rgb(7 9 20 / 65%));
 }
-.battle-panel .panel-heading,.results-panel .panel-heading{
+.battle-panel .panel-heading,.results-panel .panel-heading,.attribute-equivalence-panel .panel-heading{
   background:linear-gradient(90deg,rgb(15 18 29 / 65%),rgb(11 13 22 / 45%));
 }
 .results-panel .stat,.results-panel .equipment-damage-card,.results-panel .damage-summary>div{
@@ -433,7 +434,7 @@ footer::after{
 }
 @media (max-width:380px){.workspace-heading::after{display:none}}
 /* Panel and card hierarchy now comes from surface color and border definition. */
-.workspace-heading,.toolbar,.battle-panel,.equipment-panel,.inspector,.weapon-magic-stone-panel,.global-source-panel,.results-panel,.site-credits-notes{
+.workspace-heading,.toolbar,.battle-panel,.equipment-panel,.inspector,.weapon-magic-stone-panel,.global-source-panel,.results-panel,.attribute-equivalence-panel,.site-credits-notes{
   box-shadow:none;
 }
 .mobile-inspector-open #inspector{
@@ -441,10 +442,10 @@ footer::after{
 }
 
 /* Keep fills and warm light inside the rounded panel edges. */
-.workspace-heading,.toolbar,.battle-panel,.damage-panel,.equipment-panel,.inspector,.weapon-magic-stone-panel,.global-source-panel,.results-panel,.site-credits-notes,.stat,.equipment-damage-card,.damage-summary>div,.gear-slot,.beast-accessory-slot{
+.workspace-heading,.toolbar,.battle-panel,.damage-panel,.equipment-panel,.inspector,.weapon-magic-stone-panel,.global-source-panel,.results-panel,.attribute-equivalence-panel,.site-credits-notes,.stat,.equipment-damage-card,.damage-summary>div,.gear-slot,.beast-accessory-slot{
   background-clip:padding-box;
 }
-.battle-panel>.panel-heading:first-child,.damage-panel>.panel-heading:first-child,.equipment-panel>.panel-heading:first-child,.results-panel>.panel-heading:first-child{
+.battle-panel>.panel-heading:first-child,.damage-panel>.panel-heading:first-child,.equipment-panel>.panel-heading:first-child,.results-panel>.panel-heading:first-child,.attribute-equivalence-panel>.panel-heading:first-child{
   border-top-left-radius:inherit;
   border-top-right-radius:inherit;
   background-clip:padding-box;

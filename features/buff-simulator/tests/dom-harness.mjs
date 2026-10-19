@@ -7,6 +7,7 @@ import { JSDOM, VirtualConsole } from 'jsdom';
 const buildRoot = new URL('../dist/', import.meta.url);
 const sourceRoot = new URL('../', import.meta.url);
 export const storageKey = 'buff-team-simulator.state.v1';
+export const disclosureStorageKey = 'buff-team-simulator.disclosures.v1';
 
 // Instrument only the in-memory test copy. Production modules have no counters.
 function countFunction(source, name) {
@@ -15,7 +16,7 @@ function countFunction(source, name) {
   return source.replace(pattern, `$1 globalThis.__calls.${name}++;`);
 }
 
-export async function boot({ saved = null, storageThrows = false, compiled = false, production = false, fetchSkill } = {}) {
+export async function boot({ saved = null, savedDisclosures = null, storageThrows = false, compiled = false, production = false, fetchSkill } = {}) {
   // Run the real source without rebuilding during incremental work; compiled verifies release output.
   const root = production ? new URL('../site-dist/', import.meta.url) : compiled ? buildRoot : sourceRoot;
   const failures = [];
@@ -33,6 +34,8 @@ export async function boot({ saved = null, storageThrows = false, compiled = fal
   const requests = [];
   const tick = () => new Promise(resolve => window.setTimeout(resolve, 0));
   const savedValues = new Map(saved === null ? [] : [[storageKey, typeof saved === 'string' ? saved : JSON.stringify(saved)]]);
+  if (savedDisclosures !== null) savedValues.set(disclosureStorageKey,
+    typeof savedDisclosures === 'string' ? savedDisclosures : JSON.stringify(savedDisclosures));
   Object.defineProperty(window, 'localStorage', { value: {
     getItem: key => savedValues.get(key) ?? null,
     setItem(key, value) {
@@ -122,6 +125,7 @@ export async function boot({ saved = null, storageThrows = false, compiled = fal
     },
     async openSkills() { this.setSkillsOpen(true); await this.settleSkills(); },
     saved: () => savedValues.has(storageKey) ? JSON.parse(savedValues.get(storageKey)) : null,
+    savedDisclosures: () => savedValues.has(disclosureStorageKey) ? JSON.parse(savedValues.get(disclosureStorageKey)) : null,
     close() { dom.window.close(); assert.deepEqual(failures, [], 'no event handler may throw'); },
   };
 }
