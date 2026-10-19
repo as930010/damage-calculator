@@ -250,6 +250,17 @@ test('expanded result cards remain expanded and formula sources refresh after a 
   } finally { page.close(); }
 });
 
+test('MN second multiplicative crit source is labeled 硝基馬達 without changing either multiplier', async () => {
+  const page = await uiPage();
+  try {
+    selectPicker(page, '職業', 'MN');
+    const { document } = page.dom.window;
+    const rows = [...document.querySelectorAll('#results .stat-source-row')].map(node => node.textContent);
+    assert.ok(rows.some(text => text.includes('MN 爆發模式') && text.includes('×1.1')));
+    assert.ok(rows.some(text => text.includes('MN 硝基馬達') && text.includes('×1.15')));
+  } finally { page.close(); }
+});
+
 test('combat rate cards expand to show individual sources and keep their state after stage changes', async () => {
   const page = await uiPage();
   try {

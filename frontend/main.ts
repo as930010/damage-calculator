@@ -598,6 +598,7 @@ async function start() {
       const [, classId, kind] = sourceId.split(':');
       if (kind === 'boss-damage') return classId + '自身技能';
       if (kind === 'multiplicative-crit-damage') {
+        if (sourceId === 'class-passive:MN:multiplicative-crit-damage:2') return 'MN 硝基馬達';
         if (['TB', 'BMa', 'MN', 'PO'].includes(classId)) return classId + ' 爆發模式';
         if (['CT', 'IN', 'DA', 'DE'].includes(classId)) return classId + ' 懲戒紋章';
         return classId + '自身技能（乘算爆傷）';
