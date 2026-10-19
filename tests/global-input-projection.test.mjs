@@ -573,7 +573,7 @@ test('RM 致命傷害基底採 180%，乘算後扣除同一個 180% 基準', asy
   assert.ok(Math.abs(result.multiplicativeCritDamage.value - 0.18) < 1e-12);
 });
 
-test('極度緩慢彈匣各等級獨立乘算，且不同部位效果相乘而不增加加算技傷', async () => {
+test('極度緩慢彈匣各等級獨立乘算、不增加加算技傷，並遵守完整名稱唯一限制', async () => {
   const data = await loadData();
   const upper = data.innerwear.slots.find(entry => entry.id === 'upper');
   const gloves = data.innerwear.slots.find(entry => entry.id === 'gloves');
@@ -608,10 +608,13 @@ test('極度緩慢彈匣各等級獨立乘算，且不同部位效果相乘而�
     assert.equal(current.result.generalMultiplicativeDamage.factors.find(entry =>
       entry.sourceId === `nephron-magazine:upper:super-extreme-slow:Lv.${index + 1}`).valuePct, amount);
   }
-  check({
+  const duplicate = {
     [upperMagazine.magazineCell]: magazine.name, [upperMagazine.magazineLevelCell]: 'Lv.5',
     [glovesMagazine.magazineCell]: magazine.name, [glovesMagazine.magazineLevelCell]: 'Lv.6',
-  }, 1.025 * 1.03);
+  };
+  assert.throws(() => projectDamage(data, { ...baseState, values: { ...baseState.values, ...duplicate } }), /相同名稱的彈匣不可重複/);
+  check({ ...duplicate, [glovesMagazine.magazineCell]: '支援彈匣I', [glovesMagazine.magazineLevelCell]: 'Lv.1' }, 1.025);
+  check({ ...duplicate, [upperMagazine.magazineCell]: '', [upperMagazine.magazineLevelCell]: '' }, 1.03);
 });
 
 test('Nephron selects independent armor types, fifth magic stone, conversion, and magazine in the computed source groups', async () => {
