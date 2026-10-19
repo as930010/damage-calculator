@@ -415,6 +415,24 @@
       "otherEffects": [
         "兩極化%"
       ]
+    },
+    {
+      "id": "support-type-i",
+      "name": "支援彈匣I",
+      "fixedLevel": 1,
+      "levelValuesPct": [0, 0, 0, 0, 0, 0],
+      "otherEffects": [
+        "僅供格雷特的勳章效果計數，本身不提供傷害屬性"
+      ]
+    },
+    {
+      "id": "support-type-ii",
+      "name": "支援彈匣II",
+      "fixedLevel": 1,
+      "levelValuesPct": [0, 0, 0, 0, 0, 0],
+      "otherEffects": [
+        "僅供格雷特的勳章效果計數，本身不提供傷害屬性"
+      ]
     }
   ],
   "levelLabels": [

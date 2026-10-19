@@ -31,7 +31,13 @@ export interface GameData {
     characterBaseByClass?: Readonly<Record<string, Readonly<Record<string, number>>>>;
     fixedEffects: StatContribution[];
     conditionalEffects: { sourceId: string; settingKey: string; selectorValue: string; stats: Readonly<Record<string, number>> }[];
-    optionalEffects: { sourceId: string; stateKey: "petSkillAttackEnabled"; defaultEnabled: boolean; stats: Readonly<Record<string, number>> }[];
+    optionalEffects: {
+      sourceId: string;
+      stateKey: "petSkillAttackEnabled" | "nutProtectionPotionEnabled" | "nephronRaidEnabled";
+      defaultEnabled: boolean;
+      requiredSelection?: { settingKey: string; value: string };
+      stats: Readonly<Record<string, number>>;
+    }[];
     critDamageProductBasePct: number;
     critDamageProductBaselinePctToSubtract: number;
     yellowBeastSpiritStoneRatePct: number;

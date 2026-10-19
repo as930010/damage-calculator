@@ -5,7 +5,7 @@ import { type AccessoryEffectOption } from '../calculation/equipment-effects.ts'
 import { loadGameData, readJson, escapeHtml as h, formatNumber as fmt } from './data.ts';
 import { readState, readBaseline, saveState, migrateLegacyEnvironmentSelection, migrateLegacyGloveCircuitSkillDamage as migrateGloveCircuit, migrateLegacyPortraitAwakening as migratePortrait, normalizePortraitAwakeningValues as normalizePortraitValues, normalizeTranscendenceSkillDamageShare, parseTranscendenceSkillDamageShareInput, type LoadoutState } from './state.ts';
 import { createTransferLoader } from './loadout-transfer-loader.ts';
-import { normalizeOptionalEffectValues, isUnrelatedEffectValue } from './state.ts';
+import { normalizeOptionalEffectValues, isUnrelatedEffectValue, normalizeNephronMagazineSelections, normalizeBossHealthCondition, DEFAULT_BOSS_HEALTH_CONDITION } from './state.ts';
 import { evaluateLoadout, type projectDamage } from './projection.ts';
 import { createBaselineEvaluationCache } from './baseline-evaluation.ts';
 import { createAttributeEquivalencePanel } from './attribute-equivalence-ui.ts';
@@ -123,28 +123,9 @@ async function start() {
     return clearedCells;
   };
   const startupDuplicateNephronTransformationCells = clearDuplicateNephronTransformationChoices(state);
-  const clearDuplicateNephronMagazines = (target: LoadoutState) => {
-    const seen = new Set<string>();
-    const clearedCells: string[] = [];
-    for (const field of data.nephronArmor.fields) {
-      if (field.enabledBy && !target.lowerwearAlternativeEnabled) continue;
-      const armor = data.innerwear.slots.find(entry => entry.id === field.slotId);
-      if (!armor || target.values[armor.typeCell] !== '內布隆') continue;
-      const name = String(target.values[field.magazineCell] ?? '');
-      const level = String(target.values[field.magazineLevelCell] ?? '');
-      if (!name && !level) continue;
-      const magazine = data.nephronArmor.magazines.find(entry => entry.name === name);
-      const key = magazine ? magazine.id + '::' + level : '';
-      if (!magazine || !data.nephronArmor.levelLabels.includes(level) || seen.has(key)) {
-        delete target.values[field.magazineCell]; delete target.values[field.magazineLevelCell];
-        clearedCells.push(field.magazineCell, field.magazineLevelCell);
-      } else seen.add(key);
-    }
-    return clearedCells;
-  };
-  const startupDuplicateNephronMagazineCells = clearDuplicateNephronMagazines(state);
+  const startupDuplicateNephronMagazineCells = normalizeNephronMagazineSelections(state.values, catalogIndex);
   const startupOptionalEffectsNormalized = normalizeOptionalEffectValues(state.values, catalogIndex);
-  if ((startupLegacyEnvironmentMigrated || startupLegacyHeadStoneLabelMigrated || startupLegacyGloveCircuitMigrated || startupLegacyPortraitAwakeningMigrated || startupPortraitAwakeningNormalized || startupOptionalEffectsNormalized || startupDuplicateTransformationCells.length || startupDuplicateNephronTransformationCells.length || startupInvalidAccessoryAppraisalCells.length || startupDuplicateNephronMagazineCells.length) && !sampleMode) saveState(state);
+  if ((startupLegacyEnvironmentMigrated || startupLegacyHeadStoneLabelMigrated || startupLegacyGloveCircuitMigrated || startupLegacyPortraitAwakeningMigrated || startupPortraitAwakeningNormalized || startupOptionalEffectsNormalized || startupDuplicateTransformationCells.length || startupDuplicateNephronTransformationCells.length || startupInvalidAccessoryAppraisalCells.length || startupDuplicateNephronMagazineCells.changed) && !sampleMode) saveState(state);
   const weaponMagicStoneCells = data.weaponGrades.colorGroups.flatMap(group => group.settingKeys);
   const applyWeaponMagicStonePreset = (grade: string, overwrite = false) => {
     if (!grade) return;
@@ -166,10 +147,10 @@ async function start() {
     const migratedBaselineGloveCircuit = migrateLegacyGloveCircuitSkillDamage(baseline);
     const migratedBaselinePortraitAwakening = migrateLegacyPortraitAwakening(baseline);
     const normalizedBaselinePortraitAwakening = normalizePortraitAwakeningValues(baseline);
-    const clearedBaselineMagazines = clearDuplicateNephronMagazines(baseline);
+    const clearedBaselineMagazines = normalizeNephronMagazineSelections(baseline.values, catalogIndex);
     const clearedBaselineTransformations = clearDuplicateNephronTransformationChoices(baseline);
     const normalizedBaselineOptionalEffects = normalizeOptionalEffectValues(baseline.values, catalogIndex);
-    if (normalizedBaselineOptionalEffects || migratedBaselineEnvironment || migratedBaseline || migratedBaselineGloveCircuit || migratedBaselinePortraitAwakening || normalizedBaselinePortraitAwakening || clearedBaselineMagazines.length || clearedBaselineTransformations.length) saveState(baseline, true);
+    if (normalizedBaselineOptionalEffects || migratedBaselineEnvironment || migratedBaseline || migratedBaselineGloveCircuit || migratedBaselinePortraitAwakening || normalizedBaselinePortraitAwakening || clearedBaselineMagazines.changed || clearedBaselineTransformations.length) saveState(baseline, true);
   }
   const history = new LoadoutHistory(state);
   let selected = data.layout.slots.find(slot => slot.weapon)!;
@@ -465,8 +446,12 @@ async function start() {
         ? '已保存的基準配置無法套用目前資料，請重新設定基準'
       : canRestore ? '一鍵還原至比較基準（可用復原撤銷）' : '目前配置已與基準一致';
   };
+  const bossHealthCondition = () => state.bossHealthCondition ?? DEFAULT_BOSS_HEALTH_CONDITION;
+  const isLowerwearAveraging = () => state.lowerwearAlternativeEnabled && !bossHealthCondition().enabled;
+  const alternateLowerwearAvailable = () => state.lowerwearAlternativeEnabled
+    || bossHealthCondition().enabled && bossHealthCondition().lowerwear === 'lowerwearB';
   const lowerwearConditionalCircuitConflict = (): string | null => {
-    if (!state.lowerwearAlternativeEnabled) return null;
+    if (!isLowerwearAveraging()) return null;
     const lowerwear = data.circuits.inputs.find(slot => slot.slot === "lowerwear");
     const alternative = data.circuits.inputs.find(slot => slot.slot === "lowerwearAlternative");
     if (!lowerwear || !alternative) return null;
@@ -477,7 +462,7 @@ async function start() {
       .find(row => lowerwearAttributes.has(row.attribute))?.attribute ?? null;
   };
   const circuitAttributeOptions = (slot: (typeof data.circuits.inputs)[number], rows: ReturnType<typeof readCircuitBoardRows>, rowIndex: number) => {
-    if (!state.lowerwearAlternativeEnabled || (slot.slot !== "lowerwear" && slot.slot !== "lowerwearAlternative")) return options(slot.attributeOptions);
+    if (!isLowerwearAveraging() || (slot.slot !== "lowerwear" && slot.slot !== "lowerwearAlternative")) return options(slot.attributeOptions);
     const peerSlot = slot.slot === "lowerwear" ? "lowerwearAlternative" : "lowerwear";
     const peer = data.circuits.inputs.find(entry => entry.slot === peerSlot);
     const conditionalAttributes = new Set(["強者%", "排熱%"]);
@@ -490,7 +475,7 @@ async function start() {
     return options(names);
   };
   const lowerwearConditionalChipConflict = (): string | null => {
-    if (!state.lowerwearAlternativeEnabled) return null;
+    if (!isLowerwearAveraging()) return null;
     const lowerwear = data.chipSlots.slots.find(slot => slot.id === "lowerwear");
     const alternative = data.chipSlots.slots.find(slot => slot.id === "lowerwearAlternative");
     if (!lowerwear || !alternative) return null;
@@ -499,7 +484,7 @@ async function start() {
   };
   const chipAttributeOptions = (slot: (typeof data.chipSlots.slots)[number]) => {
     const chipNames = catalogIndex.resolveFieldChoices(slot.attributeCell, state.values) as readonly string[];
-    if (!state.lowerwearAlternativeEnabled || (slot.id !== "lowerwear" && slot.id !== "lowerwearAlternative")) return options(chipNames);
+    if (!isLowerwearAveraging() || (slot.id !== "lowerwear" && slot.id !== "lowerwearAlternative")) return options(chipNames);
     const peerId = slot.id === "lowerwear" ? "lowerwearAlternative" : "lowerwear";
     const peer = data.chipSlots.slots.find(entry => entry.id === peerId);
     const peerAttribute = peer ? val(peer.attributeCell) : "";
@@ -543,7 +528,7 @@ async function start() {
   const slotButtons = new Map<string, HTMLButtonElement>();
   const beastButtons = new Map<string, HTMLButtonElement>();
   let slotUiKey = '', beastUiKey = '', masterUiKey = '', rightIceUiKey = '';
-  const slotSignature = () => JSON.stringify([selected.id, state.lowerwearAlternativeEnabled,
+  const slotSignature = () => JSON.stringify([selected.id, state.lowerwearAlternativeEnabled, state.bossHealthCondition,
     data.layout.slots.map(slot => slot.selectionCell ? val(slot.selectionCell) : slot.weapon ? val('Weapon.ENHC')
       : slot.innerwearId ? val(catalogIndex.innerwearById(slot.innerwearId)!.enhancementCell) : ''),
     data.rightIceSets.selectionCells.map(val)]);
@@ -564,6 +549,7 @@ async function start() {
   const configurationControlKeys = new Map<string, string>();
   const refreshRightIceSelectors = () => { if (rightIceUiKey !== rightIceSignature()) renderRightIceSetSelectors(); };
   const update = (force = false) => {
+    normalizeNephronMagazineSelections(state.values, catalogIndex);
     normalizeOptionalEffectValues(state.values, catalogIndex);
     const changed = history.record(state);
     if (!changed && !force) {
@@ -589,8 +575,13 @@ async function start() {
       'fixed-effect:title-defense-ignore': '稱號',
       'fixed-effect:red-upper-crit-damage': '百億紅上衣、暴上',
       'fixed-effect:maestro-aura': 'MAESTRO光環',
+      'special-potion:nut-protection': '努特的庇護',
+      'nephron-raid:grett-medal': '內布隆襲擊戰',
+      'grett-medal:super-magazines': '格雷特的勳章：超級彈匣加成',
+      'grett-medal:support-magazines': '格雷特的勳章：支援彈匣加成',
+      'grett-medal:classic-combat-magazines': '格雷特的勳章：經典／戰鬥彈匣加成',
       'combat-rate:yellow-beast-stone': '黃色聖獸精靈石效果',
-      'combat-rate:lowerwear-enhancement': '下衣強化爆擊效果',
+      'combat-rate:lowerwear-enhancement': bossHealthCondition().enabled && bossHealthCondition().lowerwear === 'lowerwearB' ? '強/排褲強化爆擊效果' : '下衣強化爆擊效果',
       'combat-rate:shoes-enhancement': '鞋子強化極大效果',
     };
     if (configuredSourceLabels[sourceId]) return configuredSourceLabels[sourceId];
@@ -1057,6 +1048,16 @@ async function start() {
     petSkillLabel.textContent = '寵物具有 2% 雙攻';
     petSkillToggle.append(petSkillCheckbox, petSkillLabel);
     general.append(petSkillToggle);
+    const nutProtectionToggle = document.createElement('label');
+    nutProtectionToggle.className = 'pet-skill-toggle';
+    const nutProtectionCheckbox = document.createElement('input');
+    nutProtectionCheckbox.type = 'checkbox';
+    nutProtectionCheckbox.checked = state.nutProtectionPotionEnabled;
+    nutProtectionCheckbox.addEventListener('change', () => { state.nutProtectionPotionEnabled = nutProtectionCheckbox.checked; update(); });
+    const nutProtectionLabel = document.createElement('span');
+    nutProtectionLabel.textContent = '特殊靈藥：努特的庇護';
+    nutProtectionToggle.append(nutProtectionCheckbox, nutProtectionLabel);
+    general.append(nutProtectionToggle);
     for (const effect of data.otherEffects.binaryEffects) pick(general, effect.name, effect.settingKey, effect.options);
     const portrait = data.otherEffects.portraitAwakening;
     const portraitSection = document.createElement('section');
@@ -1386,7 +1387,7 @@ async function start() {
       const rightIceEffectIndex = isRightIceSetSlot ? rightIceSetEffectIndexes.get(configured) : undefined;
       const rightIceSetHint = rightIceEffectIndex ? `；屬於套效 ${rightIceEffectIndex}` : '';
       toggleClass(button, 'configured', !!configured); toggleClass(button, 'selected', selected.id === slot.id);
-      toggleClass(button, 'inactive', !!slot.enabledBy && !state.lowerwearAlternativeEnabled);
+      toggleClass(button, 'inactive', !!slot.enabledBy && !alternateLowerwearAvailable());
       toggleClass(button, 'right-ice-effect-1', rightIceEffectIndex === 1);
       toggleClass(button, 'right-ice-effect-2', rightIceEffectIndex === 2);
       toggleClass(button, 'right-ice-effect-3', rightIceEffectIndex === 3);
@@ -1409,7 +1410,7 @@ async function start() {
       state.values[innerwearSlot.typeCell] = button.dataset.innerwearType!;
       update(); renderInspector();
     }));
-    if (selected.enabledBy && !state.lowerwearAlternativeEnabled) { panel.insertAdjacentHTML('beforeend', '<p class="panel-note">請先啟用上方「強/排褲切換」。設定會保留於裝置，停用時不參與計算。</p>'); return; }
+    if (selected.enabledBy && !alternateLowerwearAvailable()) { panel.insertAdjacentHTML('beforeend', '<p class="panel-note">請先啟用上方「強/排褲切換」，或在 Boss 體力條件中選用強/排褲。設定會保留於裝置，停用時不參與計算。</p>'); return; }
     if (selected.selectionCell) {
       const selectionCell = selected.selectionCell;
       const mapping = catalogIndex.equipmentMappings.get(selectionCell)!;
@@ -1483,19 +1484,15 @@ async function start() {
 
         const magazineArea = section(panel, '彈匣', true);
         const magazineGrid = attributeValueGrid(magazineArea, 'nephron-magazine-grid');
-        const activeNephronFields = data.nephronArmor.fields.filter(entry => {
-          if (entry.enabledBy && !state.lowerwearAlternativeEnabled) return false;
+        const equippedNephronFields = data.nephronArmor.fields.filter(entry => {
           const armor = data.innerwear.slots.find(candidate => candidate.id === entry.slotId);
           return !!armor && val(armor.typeCell) === '內布隆';
         });
-        const otherSelections = activeNephronFields.filter(entry => entry.slotId !== nephronField.slotId)
-          .map(entry => ({ name: val(entry.magazineCell), level: val(entry.magazineLevelCell) }))
-          .filter(entry => entry.name && entry.level);
+        const otherMagazineNames = new Set(equippedNephronFields.filter(entry => entry.slotId !== nephronField.slotId)
+          .map(entry => val(entry.magazineCell)).filter(Boolean));
         const selectedMagazine = val(nephronField.magazineCell);
-        const selectedMagazineLevel = val(nephronField.magazineLevelCell);
         const magazineChoices = data.nephronArmor.magazines
-          .filter(magazine => !otherSelections.some(entry => entry.name === magazine.name
-            && entry.level === selectedMagazineLevel) || magazine.name === selectedMagazine)
+          .filter(magazine => !otherMagazineNames.has(magazine.name) || magazine.name === selectedMagazine)
           .map(magazine => {
             const attributeName = (key: string) => key === 'multiplicativeDamagePct'
               ? '乘算%' : data.attributes.attributes.find(attribute => attribute.key === key)?.name ?? key;
@@ -1503,15 +1500,13 @@ async function start() {
             const detail = magazine.id === 'combat-type-iii' ? '強烈、超越技傷%' : [
               ...levelKeys.filter((key): key is NonNullable<typeof key> => !!key).map(attributeName),
               ...Object.entries(magazine.baseStats ?? {}).map(([key, value]) => `${attributeName(key).replace(/%$/, '')}${fmt(value)}%`),
-            ].join(' · ');
+            ].join(' · ') || (magazine.otherEffects ?? []).join('；');
             return { value: magazine.name, label: magazine.name, detail };
           });
         field(magazineGrid, '彈匣種類', nephronField.magazineCell, magazineChoices, true);
         const currentMagazine = data.nephronArmor.magazines.find(entry => entry.name === selectedMagazine);
-        const availableLevels = data.nephronArmor.levelLabels.filter(level =>
-          !otherSelections.some(entry => entry.name === selectedMagazine && entry.level === level)
-          || level === selectedMagazineLevel);
-        const magazineLevelChoices = availableLevels.map(level => {
+        const fixedMagazineLevel = currentMagazine?.fixedLevel;
+        const magazineLevelChoices = (fixedMagazineLevel === undefined ? data.nephronArmor.levelLabels : [`Lv.${fixedMagazineLevel}`]).map(level => {
           const levelIndex = Number(level.match(/[0-9]+/)?.[0]) - 1;
           const amount = currentMagazine?.levelValuesPct[levelIndex];
           return {
@@ -1520,15 +1515,16 @@ async function start() {
               : (currentMagazine?.statKey === 'multiplicativeDamagePct' ? '乘算傷害增幅：' : '數值：') + amount + '%',
           };
         });
-        field(magazineGrid, '彈匣等級', nephronField.magazineLevelCell,
-          magazineLevelChoices, true, !selectedMagazine, '請先選擇彈匣');
+        const magazineLevelPicker = field(magazineGrid, '彈匣等級', nephronField.magazineLevelCell,
+          magazineLevelChoices, true, !selectedMagazine || fixedMagazineLevel !== undefined,
+          fixedMagazineLevel === undefined ? '請先選擇彈匣' : `此彈匣固定為 Lv.${fixedMagazineLevel}`);
+        if (fixedMagazineLevel !== undefined) magazineLevelPicker.querySelector<HTMLButtonElement>('.picker-clear')!.disabled = true;
         if (currentMagazine?.otherEffects?.length) {
           const note = document.createElement('p'); note.className = 'panel-note';
           note.textContent = currentMagazine.otherEffects.join('；'); magazineArea.append(note);
         }
-        if (selectedMagazine && selectedMagazineLevel && otherSelections.some(entry =>
-          entry.name === selectedMagazine && entry.level === selectedMagazineLevel)) {
-          magazineArea.insertAdjacentHTML('beforeend', '<p class="input-warning">相同種類與等級的彈匣不可重複裝備。</p>');
+        if (selectedMagazine && otherMagazineNames.has(selectedMagazine)) {
+          magazineArea.insertAdjacentHTML('beforeend', '<p class="input-warning">相同名稱的彈匣不可重複裝備。</p>');
         }
       }
     }
@@ -1824,7 +1820,7 @@ async function start() {
       const nonDiminishingRows = rate.nonDiminishingSources.map(effect =>
         `<p class="stat-source-row"><span>${h(sourceLabel(effect.sourceId))}</span><strong>+${fmt(effect.valuePct)}%</strong></p>`,
       ).join('');
-      const baseRows = stat ? `${sourceRows(stat.sharedSources, true)}${sourceRows(stat.lowerwearASources, true)}${state.lowerwearAlternativeEnabled
+      const baseRows = stat ? `${sourceRows(stat.sharedSources, true)}${sourceRows(stat.lowerwearASources, true)}${isLowerwearAveraging()
         ? `<p class="stat-detail-heading">強/排褲來源</p>${sourceRows(stat.lowerwearBSources, true)}<p class="stat-average">下衣與強/排褲平均 ${fmt(stat.lowerwearAverage)}%</p>` : ''}` : '';
       const finalAdjustment = rate.finalAdjustmentPct
         ? `<p class="stat-source-row"><span>${attribute === 'critRate' ? '關卡扣致命' : '最終調整'}</span><strong>${fmt(rate.finalAdjustmentPct)}%</strong></p>` : '';
@@ -1847,10 +1843,24 @@ async function start() {
     const multiplicativeDeltaBadge = multiplicativeDeltaText
       ? '<small class="' + (multiplicativeDeltaValue! > 0 ? 'positive' : 'negative') + '">' + multiplicativeDeltaText + '</small>'
       : '';
+    const productSourceRows = (kind: 'generalMultiplicativeDamage' | 'multiplicativeCritDamage', excludeBase = false) => {
+      if (!currentDamage) return '';
+      const result = currentDamage.result;
+      const rows = (effects: typeof result.generalMultiplicativeDamage.factors) => effects
+        .filter(effect => !excludeBase || effect.sourceId !== 'character-base:crit-damage-product')
+        .map(effect => `<p class="stat-source-row"><span>${h(sourceLabel(effect.sourceId))}</span><strong>×${fmt(effect.factor)}</strong></p>`).join('');
+      const commonIds = new Set(result[kind].factors.map(effect => effect.sourceId));
+      return rows(result[kind].factors) + (result.lowerwearConfigurations ?? []).map(({ configuration, result: variant }) => {
+        const effects = variant[kind].factors.filter(effect => !commonIds.has(effect.sourceId));
+        return `<p class="stat-detail-heading">${configuration === 'lowerwearA' ? '下衣配置' : '強/排褲配置'}</p>`
+          + (rows(effects) || '<p class="stat-source-empty">勳章在此配置沒有額外加成</p>');
+      }).join('');
+    };
+    const productAverageLabel = currentDamage?.result.lowerwearConfigurations ? '（兩套配置平均）' : '';
     const multiplicativeEffectCard = currentDamage
-      ? `<details class="stat" data-disclosure-key="multiplicative-effect"><summary><span>乘算效果</span><strong>×${fmt(currentDamage.result.generalMultiplicativeDamage.value)}</strong>${multiplicativeDeltaBadge}</summary><div class="stat-details">${currentDamage.result.generalMultiplicativeDamage.factors.length
-        ? currentDamage.result.generalMultiplicativeDamage.factors.map(effect => `<p class="stat-source-row"><span>${h(sourceLabel(effect.sourceId))}</span><strong>×${fmt(effect.factor)}</strong></p>`).join('')
-        : '<p class="stat-source-empty">目前沒有額外乘算來源</p>'}<p class="stat-average">乘算效果總倍率 ×${fmt(currentDamage.result.generalMultiplicativeDamage.value)}</p></div></details>`
+      ? `<details class="stat" data-disclosure-key="multiplicative-effect"><summary><span>乘算效果</span><strong>×${fmt(currentDamage.result.generalMultiplicativeDamage.value)}</strong>${multiplicativeDeltaBadge}</summary><div class="stat-details">${currentDamage.result.generalMultiplicativeDamage.factors.length || currentDamage.result.lowerwearConfigurations
+        ? productSourceRows('generalMultiplicativeDamage')
+        : '<p class="stat-source-empty">目前沒有額外乘算來源</p>'}<p class="stat-average">乘算效果總倍率${productAverageLabel} ×${fmt(currentDamage.result.generalMultiplicativeDamage.value)}</p></div></details>`
       : `<div class="stat"><p>乘算效果</p><strong>待補輸入</strong><small class="input-hint">${h(calculationIssue(damageCalculationError))}</small></div>`;
     writeHtml(target, `<div class="stat-list">${visibleStats.map(({ key, stat, previousStat }) => {
       const meta = data.attributes.attributes.find(entry => entry.key === key);
@@ -1870,7 +1880,9 @@ async function start() {
       const attributeCapWarning = attributeOverflow === null
         ? ''
         : `<small class="cap-overflow" role="status">超出上限 ${fmt(attributeOverflow)}%</small>`;
-      const lowerwearAverageLabel = state.lowerwearAlternativeEnabled ? '下衣+強/排褲平均' : '下衣配置';
+      const lowerwearAverageLabel = bossHealthCondition().enabled
+        ? bossHealthCondition().lowerwear === 'lowerwearB' ? '強/排褲配置' : '下衣配置'
+        : state.lowerwearAlternativeEnabled ? '下衣+強/排褲平均' : '下衣配置';
       const lowerwearAverage = stat.lowerwearAverage + currentSupplement;
       const allCommonSources = [...stat.sharedSources, ...stat.lowerwearASources];
       const firstInnerwearIndex = allCommonSources.findIndex(source => innerwearOrder.has(source.sourceId));
@@ -1889,9 +1901,9 @@ async function start() {
       const critDamageBaseFactor = currentDamage?.result.multiplicativeCritDamage.factors.find(effect => effect.sourceId === 'character-base:crit-damage-product')?.factor ?? 1.5;
       const critDamageBaselinePct = currentDamage?.result.multiplicativeCritDamage.baselinePct ?? 150;
       const critDamageDetails = isCritDamage && currentDamage
-        ? `<p class="stat-detail-heading">乘算來源</p><p class="stat-source-row"><span>乘算暴傷增幅（角色基底 ${fmt(critDamageBaseFactor * 100)}% 扣除 ${fmt(critDamageBaselinePct)}% 基準後）</span><strong>+${fmt(currentDamage.result.multiplicativeCritDamage.value * 100)}%</strong></p>${currentDamage.result.multiplicativeCritDamage.factors.filter(effect => effect.sourceId !== 'character-base:crit-damage-product').map(effect => `<p class="stat-source-row"><span>${h(sourceLabel(effect.sourceId))}</span><strong>×${fmt(effect.factor)}</strong></p>`).join('')}`
+        ? `<p class="stat-detail-heading">乘算來源</p><p class="stat-source-row"><span>乘算暴傷增幅${productAverageLabel}（角色基底 ${fmt(critDamageBaseFactor * 100)}% 扣除 ${fmt(critDamageBaselinePct)}% 基準後）</span><strong>+${fmt(currentDamage.result.multiplicativeCritDamage.value * 100)}%</strong></p>${productSourceRows('multiplicativeCritDamage', true)}`
         : '';
-      const lowerwearBDetails = state.lowerwearAlternativeEnabled && stat.lowerwearBSources.length ? `<p class="stat-detail-heading">強/排褲來源</p>${sourceRows(stat.lowerwearBSources, isPercent)}` : '';
+      const lowerwearBDetails = isLowerwearAveraging() && stat.lowerwearBSources.length ? `<p class="stat-detail-heading">強/排褲來源</p>${sourceRows(stat.lowerwearBSources, isPercent)}` : '';
       return `<details class="stat" data-disclosure-key="stat:${h(key)}"><summary><span>${h(shownName)}</span><strong>${fmt(displayTotal)}${isPercent ? '%' : ''}</strong>${attributeCapWarning}${deltaBadge}</summary><div class="stat-details">${sharedDetails}${critDamageDetails}${lowerwearBDetails}<p class="stat-average">${lowerwearAverageLabel} ${fmt(lowerwearAverage)}${isPercent ? '%' : ''}</p>${comparison}</div></details>`;
     }).join('')}${conditionalDamageCards}${multiplicativeEffectCard}${combatRateCards}</div>`, true);
       const damageTarget = document.querySelector('#damage-result')!;
@@ -1912,16 +1924,28 @@ async function start() {
           damageRatioHtml = '<div class="damage-ratio ' + damageRatioClass + '"><div class="damage-ratio-group"><span>新配置是舊配置的</span><strong>' + (damageRatio === null ? '無法計算' : percentFormat(damageRatio) + '%') + '</strong></div><div class="damage-ratio-group"><span>與基準差異</span><strong class="' + damageDifferenceClass + '">' + damageDifferenceLabel + '</strong></div></div>';
         }
         const rateSources = (effects: typeof result.combatRates.critRate.multipliers) => effects.map(effect => `${sourceLabel(effect.sourceId)} ×${fmt(effect.factor)}`).join(' · ') || '無';
-        const critDamageBaseFactor = result.multiplicativeCritDamage.factors.find(effect => effect.sourceId === 'character-base:crit-damage-product')?.factor ?? 1.5;
-        const critDamageFactors = result.multiplicativeCritDamage.factors.filter(effect => effect.sourceId !== 'character-base:crit-damage-product');
-        const critDamageMultiplier = critDamageFactors.map(effect => `×${fmt(effect.factor)}（${sourceLabel(effect.sourceId)}）`).join('、') || '無額外來源';
-        const critDamageCalculation = `角色基底 ${fmt(critDamageBaseFactor * 100)}%（×${fmt(critDamageBaseFactor)}）${critDamageFactors.map(effect => ` ×${fmt(effect.factor)}`).join('')} − ${fmt(result.multiplicativeCritDamage.baselinePct)}% 基準 = +${fmt(result.multiplicativeCritDamage.value * 100)}%`;
+        const critDamageText = (value: typeof result, calculation: boolean) => {
+          const product = value.multiplicativeCritDamage;
+          const baseFactor = product.factors.find(effect => effect.sourceId === 'character-base:crit-damage-product')?.factor ?? 1.5;
+          const effects = product.factors.filter(effect => effect.sourceId !== 'character-base:crit-damage-product');
+          return calculation
+            ? `角色基底 ${fmt(baseFactor * 100)}%（×${fmt(baseFactor)}）${effects.map(effect => ` ×${fmt(effect.factor)}`).join('')} − ${fmt(product.baselinePct)}% 基準 = +${fmt(product.value * 100)}%`
+            : effects.map(effect => `×${fmt(effect.factor)}（${sourceLabel(effect.sourceId)}）`).join('、') || '無額外來源';
+        };
+        const configuredCritText = (calculation: boolean) => result.lowerwearConfigurations
+          ? result.lowerwearConfigurations.map(({ configuration, result: variant }) => `${configuration === 'lowerwearA' ? '下衣配置' : '強/排褲配置'}：${critDamageText(variant, calculation)}`).join('；')
+          : critDamageText(result, calculation);
+        const critDamageMultiplier = configuredCritText(false);
+        const critDamageCalculation = configuredCritText(true);
+        const configurationDetails = result.lowerwearConfigurations
+          ? result.lowerwearConfigurations.map(({ configuration, result: variant }) => `<p>${configuration === 'lowerwearA' ? '下衣配置' : '強/排褲配置'}：乘算傷害 ×${fmt(variant.generalMultiplicativeDamage.value)}，最終傷害 ${finalDamageFormat(variant.finalDamage.finalDamage)}</p>`).join('')
+            + '<p>兩套配置分別套用勳章加成後，最終傷害取平均。</p>' : '';
         writeHtml(damageTarget, `<div class="damage-summary"><div><span>最小攻擊力</span><strong>${fmt(result.attack.lowerDamage)}</strong></div><div><span>最大攻擊力</span><strong>${fmt(result.attack.upperDamage)}</strong></div><div class="final-damage"><span>最終傷害</span><strong>${finalDamageFormat(result.finalDamage.finalDamage)}</strong></div></div>${damageRatioHtml}`, true);
         const skillWeighting = result.finalDamage.skillDamageWeighting;
         const skillWeightingText = `超越 ${fmt(skillWeighting.transcendenceSharePct)}% ×${fmt(skillWeighting.transcendenceFactor)} + 強烈 ${fmt(skillWeighting.strongSharePct)}% ×${fmt(skillWeighting.strongFactor)} = ×${fmt(skillWeighting.combinedFactor)}`;
         const calculationDetailsTarget = document.querySelector<HTMLElement>("#calculation-details")!;
         const formulaWasOpen = calculationDetailsTarget.querySelector<HTMLDetailsElement>(".formula-detail")?.open ?? false;
-        writeHtml(calculationDetailsTarget, `<details class="formula-detail" data-disclosure-key="formula-detail"${formulaWasOpen ? ' open' : ''}><summary>展開傷害計算明細</summary><p>強烈／超越技傷加權：${h(skillWeightingText)}</p><p>致命傷害被動：${fmt(result.classCritDamagePassivePct)}%　乘算暴傷增幅：+${fmt(result.multiplicativeCritDamage.value * 100)}%</p><p>乘算暴傷計算：${h(critDamageCalculation)}</p><p>乘算暴傷來源：${h(critDamageMultiplier)}</p><p>爆擊乘算來源：${h(rateSources(result.combatRates.critRate.multipliers))}</p><p>極大乘算來源：${h(rateSources(result.combatRates.extremization.multipliers))}</p><p>乘算傷害：${fmt(result.generalMultiplicativeDamage.value)} 倍　強者／排熱因子：${fmt(result.finalDamage.conditionalFactor)}</p><p>適應力因子：${fmt(result.finalDamage.adaptationFactor)}　防禦因子：${fmt(result.finalDamage.defenseFactor)}</p></details>`, true);
+        writeHtml(calculationDetailsTarget, `<details class="formula-detail" data-disclosure-key="formula-detail"${formulaWasOpen ? ' open' : ''}><summary>展開傷害計算明細</summary><p>強烈／超越技傷加權：${h(skillWeightingText)}</p><p>致命傷害被動：${fmt(result.classCritDamagePassivePct)}%　乘算暴傷增幅${productAverageLabel}：+${fmt(result.multiplicativeCritDamage.value * 100)}%</p><p>乘算暴傷計算：${h(critDamageCalculation)}</p><p>乘算暴傷來源：${h(critDamageMultiplier)}</p><p>爆擊乘算來源：${h(rateSources(result.combatRates.critRate.multipliers))}</p><p>極大乘算來源：${h(rateSources(result.combatRates.extremization.multipliers))}</p><p>乘算傷害${productAverageLabel}：${fmt(result.generalMultiplicativeDamage.value)} 倍　強者／排熱因子：${fmt(result.finalDamage.conditionalFactor)}</p>${configurationDetails}<p>適應力因子：${fmt(result.finalDamage.adaptationFactor)}　防禦因子：${fmt(result.finalDamage.defenseFactor)}</p></details>`, true);
       } catch (error) {
         writeHtml(damageTarget, `<p class="input-warning">尚未計算：${h(calculationIssue(error))}請完成後再試。</p>`, true);
         const details = document.querySelector('#calculation-details')!;
@@ -1989,6 +2013,35 @@ async function start() {
   renderClassPicker();
   renderSkillDamageShare();
   const toggle = document.querySelector<HTMLInputElement>('#alternate')!; toggle.checked = state.lowerwearAlternativeEnabled;
+  const nephronRaidLabel = document.createElement('label');
+  nephronRaidLabel.className = 'toggle';
+  const nephronRaidToggle = document.createElement('input');
+  nephronRaidToggle.type = 'checkbox';
+  nephronRaidToggle.checked = state.nephronRaidEnabled;
+  nephronRaidToggle.addEventListener('change', () => { state.nephronRaidEnabled = nephronRaidToggle.checked; update(); });
+  nephronRaidLabel.append(nephronRaidToggle, document.createTextNode('內布隆襲擊戰'));
+  const battleHeaderControls = document.createElement('div'); battleHeaderControls.className = 'battle-header-controls';
+  const bossHealthControls = document.createElement('div'); bossHealthControls.className = 'boss-health-controls';
+  bossHealthControls.innerHTML = '<div class="boss-health-condition"><label class="toggle"><input id="boss-health-enabled" type="checkbox">僅針對 Boss 體力</label><select id="boss-health-comparison" aria-label="Boss 體力條件"><option value="above">大於</option><option value="below">低於</option></select><span>50% 做計算</span></div><label class="boss-health-lowerwear">以<select id="boss-health-lowerwear" aria-label="Boss 體力條件使用下衣"><option value="lowerwearA">下衣</option><option value="lowerwearB">強／排褲</option></select>做計算</label>';
+  const bossHealthEnabled = bossHealthControls.querySelector<HTMLInputElement>('#boss-health-enabled')!;
+  const bossHealthComparison = bossHealthControls.querySelector<HTMLSelectElement>('#boss-health-comparison')!;
+  const bossHealthLowerwear = bossHealthControls.querySelector<HTMLSelectElement>('#boss-health-lowerwear')!;
+  const syncBossHealthControls = () => {
+    const condition = bossHealthCondition();
+    bossHealthEnabled.checked = condition.enabled;
+    bossHealthComparison.value = condition.comparison;
+    bossHealthLowerwear.value = condition.lowerwear;
+    bossHealthLowerwear.parentElement!.hidden = !condition.enabled;
+  };
+  const applyBossHealthControls = () => {
+    state.bossHealthCondition = normalizeBossHealthCondition({ enabled: bossHealthEnabled.checked,
+      comparison: bossHealthComparison.value, lowerwear: bossHealthLowerwear.value });
+    syncBossHealthControls(); update(); renderInspector();
+  };
+  for (const control of [bossHealthEnabled, bossHealthComparison, bossHealthLowerwear]) control.addEventListener('change', applyBossHealthControls);
+  syncBossHealthControls();
+  battleHeaderControls.append(nephronRaidLabel, bossHealthControls);
+  document.querySelector<HTMLElement>('.battle-panel > .panel-heading')!.append(battleHeaderControls);
   const battle = document.querySelector<HTMLElement>('#battle-settings')!;
   const battlePickers = new Map<string, { picker: HTMLElement; error: HTMLElement }>();
   const renderBattleSettings = () => {
@@ -2021,6 +2074,8 @@ async function start() {
     normalizeOptionalEffectValues(state.values, catalogIndex);
     renderClassPicker();
     toggle.checked = state.lowerwearAlternativeEnabled;
+    nephronRaidToggle.checked = state.nephronRaidEnabled;
+    syncBossHealthControls();
     renderBattleSettings();
     renderSkillDamageShare();
     update(true);
@@ -2034,7 +2089,7 @@ async function start() {
     Object.assign(state, snapshot);
     // Public/legacy samples may omit these settings. A complete snapshot restore
     // must not retain properties that a later import added to the same object.
-    for (const key of ['masterBeastSpiritStoneColor', 'petSkillAttackEnabled', 'classSkillVersions'] as const) {
+    for (const key of ['masterBeastSpiritStoneColor', 'petSkillAttackEnabled', 'nutProtectionPotionEnabled', 'nephronRaidEnabled', 'classSkillVersions', 'bossHealthCondition'] as const) {
       if (!Object.hasOwn(snapshot, key)) delete (state as Partial<LoadoutState>)[key];
     }
     refreshConfigurationUi();
@@ -2119,6 +2174,7 @@ async function start() {
       const imported = parseLoadoutJson(json, state, data, catalogIndex);
       Object.assign(state, imported.state);
       if (!Object.hasOwn(imported.state, 'classSkillVersions')) delete state.classSkillVersions;
+      if (!Object.hasOwn(imported.state, 'bossHealthCondition')) delete state.bossHealthCondition;
       migrateLegacyPortraitAwakening(state);
       normalizePortraitAwakeningValues(state);
       const duplicateTransformationCells = clearDuplicateTransformationChoices(state);

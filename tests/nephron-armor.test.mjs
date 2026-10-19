@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { resolveNephronArmorSources } from '../dist/calculation/nephron-armor.js';
+import { resolveNephronArmorSources, resolveGrettMedalMagazineBonuses } from '../dist/calculation/nephron-armor.js';
 import { resolveInnerwearSources } from '../dist/calculation/innerwear.js';
 
 const readJson = async path => JSON.parse(await readFile(new URL(`../data/${path}`, import.meta.url), 'utf8'));
@@ -9,6 +9,53 @@ const [armor, innerwear, attack] = await Promise.all([
   readJson('nephron-armor-rules.json'), readJson('innerwear-rules.json'), readJson('attack-parameters.json'),
 ]);
 const statsFor = sourceList => Object.assign({}, ...sourceList.map(source => source.stats));
+
+test('support magazines force level one without providing intrinsic damage stats', () => {
+  for (const name of ['支援彈匣I', '支援彈匣II']) {
+    const magazine = armor.magazines.find(entry => entry.name === name);
+    assert.ok(magazine); assert.equal(magazine.fixedLevel, 1);
+    for (const level of [undefined, '', 'Lv.1', 'Lv.6', 3]) {
+      const sources = resolveNephronArmorSources(armor, [{
+        slotId: 'upper', enhancement: 'Lv.10', transformations: [{},{},{}], magazine: name, magazineLevel: level,
+      }]);
+      assert.deepEqual(statsFor(sources), {});
+      assert.equal(sources[0].sourceId, `nephron-magazine:upper:${magazine.id}:Lv.1`);
+    }
+  }
+  assert.deepEqual(resolveGrettMedalMagazineBonuses(['支援彈匣I', '支援彈匣II']), [
+    { sourceId: 'grett-medal:support-magazines', stats: { multiplicativeDamagePct: 1.5 } },
+  ]);
+});
+
+test('Grett medal magazine bonuses use exactly one tier for 0, 1, 2 and 3 magazines', () => {
+  for (const [prefix, sourceId, statKey, tiers] of [
+    ['超級彈匣', 'super-magazines', 'multiplicativeDamagePct', [0, 0.5, 1, 1]],
+    ['支援彈匣', 'support-magazines', 'multiplicativeDamagePct', [0, 1, 1.5, 1.5]],
+    ['經典彈匣', 'classic-combat-magazines', 'multiplicativeCritDamagePct', [0, 0.5, 1, 1]],
+    ['戰鬥彈匣', 'classic-combat-magazines', 'multiplicativeCritDamagePct', [0, 0.5, 1, 1]],
+  ]) {
+    for (let count = 0; count <= 3; count++) {
+      // Synthetic full names exercise caps without adding equipment to the game catalog.
+      const names = Array.from({ length: count }, (_, index) => `${prefix}[測試${index + 1}]`);
+      assert.deepEqual(resolveGrettMedalMagazineBonuses(names), count === 0 ? []
+        : [{ sourceId: `grett-medal:${sourceId}`, stats: { [statKey]: tiers[count] } }]);
+    }
+  }
+});
+
+test('Grett medal magazine groups coexist and classic plus combat magazines share one capped bonus', () => {
+  const result = resolveGrettMedalMagazineBonuses([
+    '超級彈匣[極度緩慢]', '超級彈匣[推進器]',
+    '支援彈匣[測試1]', '支援彈匣[測試2]', '支援彈匣[測試3]',
+    '經典彈匣Type - I', '戰鬥彈匣Type - I', '戰鬥彈匣Type - II', '其他彈匣', '',
+  ]);
+  assert.deepEqual(result, [
+    { sourceId: 'grett-medal:super-magazines', stats: { multiplicativeDamagePct: 1 } },
+    { sourceId: 'grett-medal:support-magazines', stats: { multiplicativeDamagePct: 1.5 } },
+    { sourceId: 'grett-medal:classic-combat-magazines', stats: { multiplicativeCritDamagePct: 1 } },
+  ]);
+  assert.deepEqual(resolveGrettMedalMagazineBonuses(['經典彈匣Type - I', '戰鬥彈匣Type - I']), [result[2]]);
+});
 
 test('百億內裝鍛造的強烈技傷與超越技傷門檻、數值相同', () => {
   const transcendence = innerwear.forgingBonuses.find(entry => entry.statKey === 'transcendenceSkillDamagePct');
@@ -120,11 +167,12 @@ test('all Nephron transformations expose ten exact tiers and first three scale b
   }]), /十檔/);
 });
 
-test('all Nephron magazines have six specified levels and resolve the advertised stat', () => {
+test('all Nephron magazines retain their specified values and resolve the advertised stat', () => {
   const regular = [0.5,1,1.5,2,2.5,3];
-  assert.equal(armor.magazines.length, 8);
+  assert.equal(armor.magazines.length, 10);
   for (const magazine of armor.magazines) {
-    assert.deepEqual(magazine.levelValuesPct, magazine.id === 'super-booster' ? [0.5,1,1.5,2,3,4] : regular, magazine.name);
+    assert.deepEqual(magazine.levelValuesPct, magazine.fixedLevel === 1 ? [0,0,0,0,0,0]
+      : magazine.id === 'super-booster' ? [0.5,1,1.5,2,3,4] : regular, magazine.name);
   }
   const slow = resolveNephronArmorSources(armor, [{
     slotId:'upper', enhancement:'Lv.10', transformations:[{},{},{}], magazine:'超級彈匣[極度緩慢]', magazineLevel:'Lv.5',
@@ -193,9 +241,13 @@ test('every Nephron magazine level resolves to its mapped stat and duplicate rul
     { slotId:'upper', enhancement:'Lv.10', transformations:[{},{},{}], magazine:'戰鬥彈匣Type - I', magazineLevel:'Lv.4' },
     { slotId:'gloves', enhancement:'Lv.10', transformations:[{},{},{}], magazine:'戰鬥彈匣Type - I', magazineLevel:'Lv.4' },
   ]), /不可重複/);
-  assert.doesNotThrow(() => resolveNephronArmorSources(armor, [
+  assert.throws(() => resolveNephronArmorSources(armor, [
     { slotId:'upper', enhancement:'Lv.10', transformations:[{},{},{}], magazine:'戰鬥彈匣Type - I', magazineLevel:'Lv.4' },
     { slotId:'gloves', enhancement:'Lv.10', transformations:[{},{},{}], magazine:'戰鬥彈匣Type - I', magazineLevel:'Lv.5' },
+  ]), /相同名稱/);
+  assert.doesNotThrow(() => resolveNephronArmorSources(armor, [
+    { slotId:'upper', enhancement:'Lv.10', transformations:[{},{},{}], magazine:'超級彈匣[極度緩慢]', magazineLevel:'Lv.4' },
+    { slotId:'gloves', enhancement:'Lv.10', transformations:[{},{},{}], magazine:'超級彈匣[推進器]', magazineLevel:'Lv.4' },
   ]));
 });
 

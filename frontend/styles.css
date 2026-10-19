@@ -249,6 +249,15 @@ footer{position:relative; isolation:isolate; overflow:hidden; display:flex; flex
   body.mobile-inspector-open{overflow:hidden;overscroll-behavior:none}
 }
 
+/* Optional single-lowerwear Boss health calculation controls. */
+.battle-panel>.panel-heading{flex-wrap:wrap}
+.battle-header-controls{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:10px 16px;margin-left:auto;min-width:0;max-width:100%}
+.boss-health-controls,.boss-health-condition,.boss-health-lowerwear{display:flex;align-items:center;flex-wrap:wrap;gap:6px;min-width:0;max-width:100%;font-size:13px;color:var(--text-heading)}
+.boss-health-controls{gap:10px}
+.boss-health-controls select{width:auto;max-width:100%;min-height:34px;padding:5px 8px;border:1px solid var(--border-control);border-radius:8px;font:inherit;color:var(--text-input);background:var(--field)}
+.boss-health-lowerwear[hidden]{display:none}
+@media(max-width:700px){.battle-header-controls{width:100%;justify-content:flex-start;margin-left:0}}
+
 /* Independent damage attribute comparison, calculated only while expanded. */
 .attribute-equivalence-panel{margin-top:22px;border:1px solid var(--border);border-radius:14px;background:var(--panel)}
 .attribute-equivalence-content{padding:0 22px 20px}

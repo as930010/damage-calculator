@@ -73,12 +73,15 @@ export function createCatalogIndex(data: CatalogData, revision: unknown = Symbol
   const tiersByName = new Map([...transformTiers].map(([name, entry]) => [name, memoizeChoices(() => entry.tierValuesPct.map(value => value / 100))]));
   const magazines = names(data.nephronArmor.magazines);
   const magazineLevels = memoizeChoices(() => [...data.nephronArmor.levelLabels]);
+  const fixedMagazineLevels = new Map(data.nephronArmor.magazines.filter(entry => entry.fixedLevel !== undefined)
+    .map(entry => [entry.name, Object.freeze([`Lv.${entry.fixedLevel}`])] as const));
   for (const field of data.nephronArmor.fields) {
     for (const transform of field.transformFields) {
       register([transform.attributeCell], transformNames);
       register([transform.valueCell], values => tiersByName.get(values[transform.attributeCell] as string)?.() ?? emptyChoices);
     }
-    register([field.magazineCell], magazines); register([field.magazineLevelCell], magazineLevels);
+    register([field.magazineCell], magazines);
+    register([field.magazineLevelCell], values => fixedMagazineLevels.get(String(values[field.magazineCell] ?? '')) ?? magazineLevels());
   }
   const armorEnhancements = memoizeChoices(() => Object.keys(data.innerwear.enhancementStats).map(level => `Lv.${level}`));
   const forging = memoizeChoices(() => Object.keys(data.innerwear.forgingAttack));

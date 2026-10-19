@@ -5,7 +5,7 @@ import { isResonanceInputCell, parseResonancePoints } from '../calculation/reson
 import { codeForFieldId, fieldIdForCode, isFieldId } from './field-ids.ts';
 import { migrateLegacyEnvironmentSelection, migrateLegacyGloveCircuitSkillDamage, normalizePortraitAwakeningSplit, normalizeTranscendenceSkillDamageShare, type LoadoutState } from './state.ts';
 import { canonicalizeNumber } from './numeric-input.ts';
-import { normalizeOptionalEffectValues, isUnrelatedEffectValue } from './state.ts';
+import { normalizeOptionalEffectValues, isUnrelatedEffectValue, normalizeNephronMagazineSelections, normalizeBossHealthCondition } from './state.ts';
 import { normalizeClassSkillVersions } from '../calculation/class-skill-versions.ts';
 
 type TransferData = CatalogData;
@@ -106,6 +106,7 @@ export function serializeLoadout(state: LoadoutState, data: TransferData, suppli
   }
 
   const classSkillVersions = normalizeClassSkillVersions(state.classSkillVersions);
+  const bossHealthCondition = normalizeBossHealthCondition(state.bossHealthCondition);
   const payload = {
     format: 'damage-calculator-loadout',
     formatVersion: 3,
@@ -119,8 +120,11 @@ export function serializeLoadout(state: LoadoutState, data: TransferData, suppli
     lowerwearAlternativeEnabled: state.lowerwearAlternativeEnabled,
     masterBeastSpiritStoneColor: state.masterBeastSpiritStoneColor,
     petSkillAttackEnabled: state.petSkillAttackEnabled,
+    nutProtectionPotionEnabled: state.nutProtectionPotionEnabled,
+    nephronRaidEnabled: state.nephronRaidEnabled,
     transcendenceSkillDamageSharePct: normalizeTranscendenceSkillDamageShare(state.transcendenceSkillDamageSharePct),
     ...(classSkillVersions ? { classSkillVersions } : {}),
+    ...(bossHealthCondition ? { bossHealthCondition } : {}),
   };
   return { json: `${JSON.stringify(payload)}\n`, omittedFields };
 }
@@ -266,36 +270,27 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
   if (candidate.transcendenceSkillDamageSharePct !== undefined && transcendenceSkillDamageSharePct !== candidate.transcendenceSkillDamageSharePct) {
     clearedFields.push('技傷占比');
   }
-  const usedNephronMagazines = new Set<string>();
-  for (const field of data.nephronArmor.fields) {
-    if (field.enabledBy && !lowerwearAlternativeEnabled) continue;
-    const armor = index.innerwearById(field.slotId);
-    if (!armor || values[armor.typeCell] !== '內布隆') continue;
-    const magazineName = values[field.magazineCell];
-    const magazineLevel = values[field.magazineLevelCell];
-    if (magazineName === undefined && magazineLevel === undefined) continue;
-    const magazine = typeof magazineName === 'string'
-      ? data.nephronArmor.magazines.find(entry => entry.name === magazineName) : undefined;
-    if (!magazine || typeof magazineLevel !== 'string' || !data.nephronArmor.levelLabels.includes(magazineLevel)) {
-      delete values[field.magazineCell]; delete values[field.magazineLevelCell];
-      clearedFields.push(field.magazineCell, field.magazineLevelCell);
-      continue;
-    }
-    const key = magazine.id + '::' + magazineLevel;
-    if (usedNephronMagazines.has(key)) {
-      delete values[field.magazineCell]; delete values[field.magazineLevelCell];
-      clearedFields.push(field.magazineCell, field.magazineLevelCell);
-    } else usedNephronMagazines.add(key);
-  }
+  clearedFields.push(...normalizeNephronMagazineSelections(values, index).clearedCells);
   const masterBeastSpiritStoneColor = color === '黃' || color === '綠' || color === '' ? color : fallbackColor;
   const petSkillAttackEnabled = typeof candidate.petSkillAttackEnabled === 'boolean' ? candidate.petSkillAttackEnabled : true;
+  const nutProtectionPotionEnabled = candidate.nutProtectionPotionEnabled === true;
+  const nephronRaidEnabled = candidate.nephronRaidEnabled === true;
   if (typeof candidate.lowerwearAlternativeEnabled !== 'boolean') clearedFields.push('強／排褲切換');
   if (!(color === '黃' || color === '綠' || color === '')) clearedFields.push('聖獸精靈石顏色');
   if (typeof candidate.petSkillAttackEnabled !== 'boolean') clearedFields.push('寵物被動');
+  if (candidate.nutProtectionPotionEnabled !== undefined && typeof candidate.nutProtectionPotionEnabled !== 'boolean') clearedFields.push('特殊靈藥：努特的庇護');
+  if (candidate.nephronRaidEnabled !== undefined && typeof candidate.nephronRaidEnabled !== 'boolean') clearedFields.push('內布隆襲擊戰');
   if (migrateLegacyEnvironmentSelection(values) === 'removed') clearedFields.push('Effect.Environment');
   normalizeOptionalEffectValues(values, index);
 
   const classSkillVersions = normalizeClassSkillVersions(candidate.classSkillVersions);
+  const bossHealthCondition = normalizeBossHealthCondition(candidate.bossHealthCondition);
+  if (candidate.bossHealthCondition !== undefined) {
+    const condition = candidate.bossHealthCondition;
+    if (!isRecord(condition) || typeof condition.enabled !== 'boolean'
+      || !['above', 'below'].includes(String(condition.comparison))
+      || !['lowerwearA', 'lowerwearB'].includes(String(condition.lowerwear))) clearedFields.push('Boss 體力條件');
+  }
   if (candidate.classSkillVersions !== undefined) {
     if (!isRecord(candidate.classSkillVersions)) clearedFields.push('職業技能版本');
     else for (const [key, value] of Object.entries(candidate.classSkillVersions)) {
@@ -312,8 +307,11 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
       lowerwearAlternativeEnabled,
       masterBeastSpiritStoneColor,
       petSkillAttackEnabled,
+      nutProtectionPotionEnabled,
+      nephronRaidEnabled,
       transcendenceSkillDamageSharePct,
       ...(classSkillVersions ? { classSkillVersions } : {}),
+      ...(bossHealthCondition ? { bossHealthCondition } : {}),
     },
     clearedFields: uniqueCleared,
   };

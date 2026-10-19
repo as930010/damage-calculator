@@ -233,6 +233,24 @@
       }
     },
     {
+      "id": "accessories-grett-medal",
+      "name": "格雷特的勳章",
+      "slotId": "earring",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "stats": {
+        "adaptabilityPct": 2,
+        "critDamagePct": 3,
+        "multiplicativeDamagePct": 6
+      },
+      "effects": [],
+      "appraisal": {
+        "canAppraise": false,
+        "effectCount": 0
+      }
+    },
+    {
       "id": "accessories-7e998f1b36ba",
       "name": "憤怒戒指",
       "slotId": "ringA",

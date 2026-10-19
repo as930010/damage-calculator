@@ -11,6 +11,7 @@ export interface NephronTransformationOption {
 export interface NephronMagazineOption {
   id: string;
   name: string;
+  fixedLevel?: number;
   statKey?: string;
   additionalLevelStatKeys?: readonly string[];
   levelStatKey?: string;
@@ -48,6 +49,25 @@ export interface NephronArmorInput {
   transformations: readonly NephronTransformationInput[];
   magazine: string | null | undefined;
   magazineLevel: string | number | null | undefined;
+}
+
+const GRETT_MEDAL_MAGAZINE_BONUSES = [
+  { sourceId: 'grett-medal:super-magazines', prefixes: ['超級彈匣'], statKey: 'multiplicativeDamagePct', tiers: [0, 0.5, 1] },
+  { sourceId: 'grett-medal:support-magazines', prefixes: ['支援彈匣'], statKey: 'multiplicativeDamagePct', tiers: [0, 1, 1.5] },
+  { sourceId: 'grett-medal:classic-combat-magazines', prefixes: ['經典彈匣', '戰鬥彈匣'], statKey: 'multiplicativeCritDamagePct', tiers: [0, 0.5, 1] },
+] as const;
+
+/** Call only for an equipped medal, using the validated magazines of equipped Nephron armor. */
+export function resolveGrettMedalMagazineBonuses(magazineNames: readonly string[]): StatContribution[] {
+  const counts = GRETT_MEDAL_MAGAZINE_BONUSES.map(() => 0);
+  for (const name of magazineNames) {
+    const group = GRETT_MEDAL_MAGAZINE_BONUSES.findIndex(rule => rule.prefixes.some(prefix => name.startsWith(prefix)));
+    if (group !== -1) counts[group] += 1;
+  }
+  return GRETT_MEDAL_MAGAZINE_BONUSES.flatMap((rule, index) => {
+    const value = rule.tiers[Math.min(counts[index], 2)];
+    return value === 0 ? [] : [{ sourceId: rule.sourceId, stats: { [rule.statKey]: value } }];
+  });
 }
 
 function enhancementNumber(value: string | number | null | undefined, label: string): number {
@@ -104,13 +124,13 @@ export function resolveNephronArmorSources(
     const rawMagazineLevel = selection.magazineLevel;
     if (!magazineName && (rawMagazineLevel == null || rawMagazineLevel === "")) continue;
     if (!magazineName) throw new RangeError(selection.slotId + " 請先選擇彈匣。");
-    if (rawMagazineLevel == null || rawMagazineLevel === "") throw new RangeError(selection.slotId + " 請選擇彈匣等級。");
     const magazine = document.magazines.find((candidate) => candidate.name === magazineName);
     if (!magazine) throw new RangeError("未知的內布隆彈匣：" + magazineName);
-    const magazineLevelIndexValue = magazineLevelIndex(rawMagazineLevel);
-    const uniqueKey = magazine.id + "::" + (magazineLevelIndexValue + 1);
-    if (usedMagazines.has(uniqueKey)) throw new RangeError("相同種類與等級的彈匣不可重複裝備。");
-    usedMagazines.add(uniqueKey);
+    const effectiveLevel = magazine.fixedLevel ?? rawMagazineLevel;
+    if (effectiveLevel == null || effectiveLevel === "") throw new RangeError(selection.slotId + " 請選擇彈匣等級。");
+    const magazineLevelIndexValue = magazineLevelIndex(effectiveLevel);
+    if (usedMagazines.has(magazine.name)) throw new RangeError("相同名稱的彈匣不可重複裝備。");
+    usedMagazines.add(magazine.name);
     const levelValue = magazine.levelValuesPct[magazineLevelIndexValue];
     if (levelValue === undefined || !Number.isFinite(levelValue)) throw new RangeError(magazineName + "沒有此彈匣等級的數值。");
     const stats: Record<string, number> = { ...(magazine.baseStats ?? {}) };

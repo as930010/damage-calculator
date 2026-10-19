@@ -216,6 +216,8 @@ export interface FinalDamageInput {
   fullHealthKillDamagePct: number;
   strongerPct: number;
   heatPct: number;
+  /** Select the existing high-HP (1) or low-HP (0) half; omission keeps the original 50/50 calculation. */
+  bossHighHealthShare?: 0 | 1;
   /** S1, already a multiplier product. */
   generalMultiplicativeDamage: number;
   adaptabilityPct: number;

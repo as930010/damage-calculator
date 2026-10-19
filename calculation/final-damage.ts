@@ -48,14 +48,20 @@ export function calculateFinalDamage(input: FinalDamageInput): FinalDamageResult
 
   const strongerFactor = 1 + ratio(input.strongerPct);
   const heatFactor = 1 + ratio(input.heatPct);
-  if (strongerFactor === 0 || heatFactor === 0) {
+  if (input.bossHighHealthShare !== undefined && input.bossHighHealthShare !== 0 && input.bossHighHealthShare !== 1) {
+    throw new RangeError('Boss health condition must select the high or low HP range.');
+  }
+  if ((input.bossHighHealthShare !== 0 && strongerFactor === 0) || (input.bossHighHealthShare !== 1 && heatFactor === 0)) {
     throw new RangeError("B163 conditional damage source denominator is zero.");
   }
-  const conditionalDenominator = 0.5 / strongerFactor + 0.5 / heatFactor;
-  if (conditionalDenominator === 0) {
-    throw new RangeError("B163 conditional damage denominator is zero.");
+  let conditionalFactor: number;
+  if (input.bossHighHealthShare === 1) conditionalFactor = strongerFactor;
+  else if (input.bossHighHealthShare === 0) conditionalFactor = heatFactor;
+  else {
+    const conditionalDenominator = 0.5 / strongerFactor + 0.5 / heatFactor;
+    if (conditionalDenominator === 0) throw new RangeError("B163 conditional damage denominator is zero.");
+    conditionalFactor = 1 / conditionalDenominator;
   }
-  const conditionalFactor = 1 / conditionalDenominator;
 
   const adaptationFactor =
     1 - ratio(input.stageAdaptabilityPenaltyPct) +

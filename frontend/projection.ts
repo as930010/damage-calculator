@@ -1,18 +1,39 @@
 import { resolveSimulatorEquipmentContributions } from "../calculation/equipment-catalog.ts";
 import { resolveInnerwearSources } from "../calculation/innerwear.ts";
-import { resolveNephronArmorSources } from "../calculation/nephron-armor.ts";
+import { resolveNephronArmorSources, resolveGrettMedalMagazineBonuses } from "../calculation/nephron-armor.ts";
 import { resolveWeaponTransformationsFromCells } from "../calculation/weapon-transformations.ts";
 import { resolveAccessoryEffectOptions, resolveArmorAppraisals, resolveAtmaSetEffects, resolveChipContribution, resolveCircuitBoardEffects, resolveColorSetEffect, resolveMasterBeastEffects, resolveNamedStatOption, resolveRaidSetEffects, resolveResonanceEffects, resolveRightIceSetEffects, resolveSpiritRecordEffects, resolveSpiritRecordSelections, resolveWeaponGrowth } from "../calculation/equipment-effects.ts";
 import type { AttributeRule, CharacterAttributeResult, StatContribution } from "../calculation/types.ts";
-import { calculateLoadoutCombatRates, prepareLoadoutAttributes, evaluatePreparedLoadout } from "../calculation/loadout-engine.ts";
+import { calculateLoadoutCombatRates, prepareLoadoutAttributes, evaluatePreparedLoadout, type LoadoutCalculationInput } from "../calculation/loadout-engine.ts";
 import { resolveClassDamagePassiveContributions } from "../calculation/class-damage-passives.ts";
 import { applyClassSkillVersions } from '../calculation/class-skill-versions.ts';
 import type { GameData } from "./data.ts";
 import { DEFAULT_TRANSCENDENCE_SKILL_DAMAGE_SHARE_PCT, normalizePortraitAwakeningSplit, type LoadoutState } from "./state.ts";
 import { readCircuitBoardRows, validateCircuitBoardRows, type CircuitBoardRow } from "./circuit-board-rows.ts";
 
+/** A transient rules view excludes unused pants before any validation or source resolution. */
+function singleLowerwearData(data: GameData, selected: 'lowerwearA' | 'lowerwearB'): GameData {
+  const excluded = selected === 'lowerwearA' ? 'lowerwearB' : 'lowerwearA';
+  const slots = <T extends { wearSet: string }>(entries: readonly T[]) => entries.filter(entry => entry.wearSet !== excluded);
+  return { ...data,
+    mapping: { ...data.mapping, selections: data.mapping.selections.filter(entry => entry.configuration !== excluded),
+      magicStoneSelections: { ...data.mapping.magicStoneSelections,
+        inputGroups: data.mapping.magicStoneSelections.inputGroups.filter(entry => entry.configuration !== excluded) } },
+    innerwear: { ...data.innerwear, slots: slots(data.innerwear.slots) },
+    nephronArmor: { ...data.nephronArmor, fields: slots(data.nephronArmor.fields) },
+    appraisals: { ...data.appraisals, slots: slots(data.appraisals.slots) },
+    chipSlots: { ...data.chipSlots, slots: slots(data.chipSlots.slots) },
+    circuits: { ...data.circuits, inputs: slots(data.circuits.inputs) },
+  };
+}
+
 /** UI state to supported stat sources; game arithmetic remains in calculation/. */
 export function resolveLoadoutSources(data: GameData, state: LoadoutState) {
+  const condition = state.bossHealthCondition?.enabled ? state.bossHealthCondition : undefined;
+  if (condition) {
+    data = singleLowerwearData(data, condition.lowerwear);
+    state = { ...state, lowerwearAlternativeEnabled: condition.lowerwear === 'lowerwearB' };
+  }
   const values = state.values;
   const characterBaseStats = { ...data.parameters.characterBase, ...data.parameters.characterBaseByClass?.[state.Job] };
   const text = (key: string) => String(values[key] ?? "");
@@ -31,7 +52,8 @@ export function resolveLoadoutSources(data: GameData, state: LoadoutState) {
   const inner = resolveInnerwearSources(data.innerwear, data.attack, state.Job, values, state.lowerwearAlternativeEnabled);
   const configuredEffects: StatContribution[] = [
     ...data.parameters.optionalEffects
-      .filter(effect => state[effect.stateKey] ?? effect.defaultEnabled)
+      .filter(effect => (state[effect.stateKey] ?? effect.defaultEnabled)
+        && (!effect.requiredSelection || text(effect.requiredSelection.settingKey) === effect.requiredSelection.value))
       .map(({ sourceId, stats }) => ({ sourceId, stats })),
     ...data.parameters.conditionalEffects
       .filter(effect => text(effect.settingKey) === effect.selectorValue)
@@ -72,6 +94,16 @@ export function resolveLoadoutSources(data: GameData, state: LoadoutState) {
     const wearSet = nephronWearSetBySlot.get(slotId);
     if (wearSet) groups[wearSet].push(contribution);
   }
+  let lowerwearBonusSources: LoadoutCalculationInput['lowerwearBonusSources'];
+  if (text('Accessory.Earring') === '格雷特的勳章') {
+    const bonusesFor = (wearSet: 'lowerwearA' | 'lowerwearB') => resolveGrettMedalMagazineBonuses(nephronSelections
+      .filter(({ field }) => field.wearSet === 'shared' || field.wearSet === wearSet)
+      .map(({ selection }) => selection.magazine));
+    const lowerwearA = bonusesFor(condition?.lowerwear ?? 'lowerwearA');
+    const lowerwearB = !condition && state.lowerwearAlternativeEnabled ? bonusesFor('lowerwearB') : lowerwearA;
+    if (JSON.stringify(lowerwearA) === JSON.stringify(lowerwearB)) groups.shared.push(...lowerwearA);
+    else lowerwearBonusSources = { lowerwearA, lowerwearB };
+  }
   for (const entry of resolveArmorAppraisals(data.appraisals, {
     optionsBySlot: Object.fromEntries(data.appraisals.slots.map((slot) => [
       slot.id, text(`Innerwear.${slot.id === "lowerwearAlternative" ? "LowerwearAlternative" : slot.id === "lowerwear" ? "Lowerwear" : slot.id === "upper" ? "Upper" : slot.id === "gloves" ? "Gloves" : "Shoes"}.Type`) === "內布隆"
@@ -87,7 +119,7 @@ export function resolveLoadoutSources(data: GameData, state: LoadoutState) {
     if (!chip || !tuning) throw new RangeError("請填完整系統芯片與芯片調校等級。");
     groups[slot.wearSet].push(resolveChipContribution(data.chips, chip.id, tuning, `chip:${slot.id}`));
   }
-  if (state.lowerwearAlternativeEnabled) {
+  if (state.lowerwearAlternativeEnabled && !condition) {
     const lowerwearChip = data.chipSlots.slots.find(slot => slot.id === "lowerwear")!;
     const alternativeChip = data.chipSlots.slots.find(slot => slot.id === "lowerwearAlternative")!;
     const lowerwearAttribute = text(lowerwearChip.attributeCell);
@@ -116,7 +148,7 @@ export function resolveLoadoutSources(data: GameData, state: LoadoutState) {
     // until the user adds a second row.
     return [slot.slot, slot.slot === "gloves" || rows.length > 1 ? rows : rows[0]];
   }));
-  if (state.lowerwearAlternativeEnabled) {
+  if (state.lowerwearAlternativeEnabled && !condition) {
     const conditionalAttributes = new Set(["強者%", "排熱%"]);
     const lowerwearRows = circuitRowsBySlot.get("lowerwear") ?? [];
     const alternativeRows = circuitRowsBySlot.get("lowerwearAlternative") ?? [];
@@ -247,14 +279,26 @@ export function resolveLoadoutSources(data: GameData, state: LoadoutState) {
   }
   for (const stage of data.otherEffects.guildFountain) addNamedOption(stage.options, stage.settingKey, `guild-fountain-${stage.stage}`);
   if (!state.lowerwearAlternativeEnabled) groups.lowerwearB = [];
+  if (condition) {
+    groups.lowerwearA = condition.lowerwear === 'lowerwearB' ? groups.lowerwearB : groups.lowerwearA;
+    groups.lowerwearB = [];
+    const inactive = condition.comparison === 'above' ? 'heatPct' : 'strongerPct';
+    for (const group of ['shared', 'lowerwearA', 'lowerwearB'] as const) groups[group] = groups[group].map(source => {
+      if (source.stats[inactive] === undefined) return source;
+      const stats = { ...source.stats }; delete stats[inactive];
+      return { ...source, stats };
+    });
+  }
   const rules: AttributeRule[] = data.attributes.attributes.filter((entry) => entry.active && entry.aggregation === "sum")
     .map((entry) => ({ key: entry.key, aggregation: "sum", cap: entry.cap }));
   const calculationSources = {
     shared: groups.shared.filter(source => source.sourceId !== "character-base" && source.sourceId !== "weapon-base-attack"),
     lowerwearA: groups.lowerwearA, lowerwearB: groups.lowerwearB,
-    lowerwearAlternativeEnabled: state.lowerwearAlternativeEnabled,
+    lowerwearAlternativeEnabled: condition ? false : state.lowerwearAlternativeEnabled,
   };
   return { attributeRules: rules, characterBaseStats, sources: calculationSources,
+    ...(lowerwearBonusSources ? { lowerwearBonusSources } : {}),
+    ...(condition ? { bossHealthCondition: condition.comparison } : {}),
     attackParameters: data.attack, classId: state.Job,
     weaponEnhancementLevel: text('Weapon.ENHC') ? Number(text('Weapon.ENHC').match(/\d+/)?.[0]) : undefined };
 }
@@ -278,7 +322,8 @@ function combatRateInputs(data: GameData, state: LoadoutState, attributes: Chara
   const combatRateSourceValues = {
     parameters: { yellowBeastSpiritStoneRatePct: data.parameters.yellowBeastSpiritStoneRatePct },
     selections: {
-      "Left.Armor.Bottom.ENHC": state.values["Left.Armor.Bottom.ENHC"],
+      "Left.Armor.Bottom.ENHC": state.values[state.bossHealthCondition?.enabled && state.bossHealthCondition.lowerwear === 'lowerwearB'
+        ? data.innerwear.slots.find(slot => slot.id === 'lowerwearAlternative')!.enhancementCell : 'Left.Armor.Bottom.ENHC'],
       "Left.Armor.Shoes.ENHC": state.values["Left.Armor.Shoes.ENHC"],
       masterBeastSpiritStoneColor: state.masterBeastSpiritStoneColor ?? data.masterBeast.spiritStoneColorSelector.defaultColor,
     },
@@ -321,6 +366,8 @@ function damageInputs(data: GameData, state: LoadoutState, attributes: Character
     attributeRules: sources.attributeRules,
     characterBaseStats: sources.characterBaseStats,
     sources: sources.sources,
+    ...(sources.lowerwearBonusSources ? { lowerwearBonusSources: sources.lowerwearBonusSources } : {}),
+    ...(sources.bossHealthCondition ? { bossHealthCondition: sources.bossHealthCondition } : {}),
     attackParameters: data.attack,
     weaponEnhancementLevel: weaponLevel,
     classCombatEffects: rateInputs.classCombatEffects,

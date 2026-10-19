@@ -64,6 +64,26 @@
       "stats": {
         "doubleAttackPct": 2
       }
+    },
+    {
+      "sourceId": "special-potion:nut-protection",
+      "stateKey": "nutProtectionPotionEnabled",
+      "defaultEnabled": false,
+      "stats": {
+        "multiplicativeCritDamagePct": 33.33
+      }
+    },
+    {
+      "sourceId": "nephron-raid:grett-medal",
+      "stateKey": "nephronRaidEnabled",
+      "defaultEnabled": false,
+      "requiredSelection": {
+        "settingKey": "Accessory.Earring",
+        "value": "格雷特的勳章"
+      },
+      "stats": {
+        "multiplicativeDamagePct": 3
+      }
     }
   ],
   "conditionalEffects": [

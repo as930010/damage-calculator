@@ -33,6 +33,9 @@ export interface LoadoutCalculationInput {
   characterBaseStats: Readonly<Record<string, number>>;
   /** All spreadsheet-mapped sources already resolved from data and user selections. */
   sources: SimulatorEquipmentContributionGroups;
+  /** Additional products counted separately for each actually worn lowerwear configuration. */
+  lowerwearBonusSources?: Readonly<Record<'lowerwearA' | 'lowerwearB', readonly StatContribution[]>>;
+  bossHealthCondition?: 'above' | 'below';
   attackParameters: AttackParametersDocument;
   weaponEnhancementLevel: number;
   classCombatEffects: ClassCombatEffectsDocument;
@@ -59,6 +62,8 @@ export interface LoadoutCalculationResult {
   multiplicativeCritDamage: ProductStatResult;
   classCritDamagePassivePct: number;
   finalDamage: FinalDamageResult;
+  /** When present, summary product values are averages; factors on the summary contain common sources only. */
+  lowerwearConfigurations?: readonly { configuration: 'lowerwearA' | 'lowerwearB'; result: LoadoutCalculationResult }[];
 }
 
 export interface CombatRateCalculationInput {
@@ -98,6 +103,7 @@ export function finalDamageInputs(
     fullHealthKillDamagePct: statTotal(attributes, 'fullHealthKillDamagePct'),
     strongerPct: attributes.conditionalDamage.strongerPct,
     heatPct: attributes.conditionalDamage.heatPct,
+    ...(input.bossHealthCondition ? { bossHighHealthShare: (input.bossHealthCondition === 'above' ? 1 : 0) as 0 | 1 } : {}),
     generalMultiplicativeDamage: generalMultiplicativeDamage.value,
     adaptabilityPct: statTotal(attributes, 'adaptabilityPct'),
     superAdaptabilityPct: statTotal(attributes, 'superAdaptabilityPct'),
@@ -240,18 +246,44 @@ export function evaluatePreparedLoadout(
       input.classDamagePassives,
       input.classId,
     );
-    const finalDamage = calculateFinalDamage(finalDamageInputs(input, {
+    const common = {
       attributes, attack, combatRates, generalMultiplicativeDamage, multiplicativeCritDamage, classCritDamagePassivePct,
-    }));
-
-    return { result: {
-      attributes,
-      attack,
-      combatRates,
-      generalMultiplicativeDamage,
-      multiplicativeCritDamage,
-      classCritDamagePassivePct,
-      finalDamage,
+    };
+    if (!input.lowerwearBonusSources) {
+      return { result: { ...common, finalDamage: calculateFinalDamage(finalDamageInputs(input, common)) }, combatRates };
+    }
+    // Reuse the existing attributes, attack and rates. Only these new bonus products vary.
+    const configurations = input.sources.lowerwearAlternativeEnabled === false
+      ? ['lowerwearA'] as const : ['lowerwearA', 'lowerwearB'] as const;
+    const lowerwearConfigurations = configurations.map(configuration => {
+      const bonus = input.lowerwearBonusSources![configuration];
+      const variant = {
+        ...common,
+        generalMultiplicativeDamage: calculateProductStat([
+          ...prepared.generalMultiplicativeEffects, ...productEffectsFromSources(bonus, 'multiplicativeDamagePct'),
+        ]),
+        multiplicativeCritDamage: calculateProductStat([
+          ...prepared.multiplicativeCritDamageEffects, ...productEffectsFromSources(bonus, 'multiplicativeCritDamagePct'),
+          { sourceId: 'character-base:crit-damage-product', valuePct: input.critDamageProductBasePct },
+        ], input.critDamageProductBaselinePctToSubtract),
+      };
+      return { configuration, result: { ...variant, finalDamage: calculateFinalDamage(finalDamageInputs(input, variant)) } };
+    });
+    if (lowerwearConfigurations.length === 1) return { result: lowerwearConfigurations[0].result, combatRates };
+    const [a, b] = lowerwearConfigurations.map(entry => entry.result);
+    const averageProduct = (key: 'generalMultiplicativeDamage' | 'multiplicativeCritDamage'): ProductStatResult => ({
+      ...common[key],
+      productBeforeBaseline: (a[key].productBeforeBaseline + b[key].productBeforeBaseline) / 2,
+      value: (a[key].value + b[key].value) / 2,
+    });
+    const averaged = { ...common,
+      generalMultiplicativeDamage: averageProduct('generalMultiplicativeDamage'),
+      multiplicativeCritDamage: averageProduct('multiplicativeCritDamage'),
+    };
+    return { result: { ...averaged,
+      finalDamage: { ...calculateFinalDamage(finalDamageInputs(input, averaged)),
+        finalDamage: (a.finalDamage.finalDamage + b.finalDamage.finalDamage) / 2 },
+      lowerwearConfigurations,
     }, combatRates };
   } catch (error) {
     return { result: null, combatRates, error };

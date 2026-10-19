@@ -17,6 +17,471 @@ function selectPicker(page, label, value) {
   assert.ok(row, value); row.click();
 }
 
+function nephronMagazineState(selections = [], alternate = true) {
+  const state = structuredClone(stateA);
+  state.lowerwearAlternativeEnabled = alternate;
+  for (const field of gameData.nephronArmor.fields) {
+    const armor = gameData.innerwear.slots.find(entry => entry.id === field.slotId);
+    state.values[armor.typeCell] = '內布隆';
+    state.values[armor.enhancementCell] = 'Lv.10';
+    for (const transform of field.transformFields) {
+      state.values[transform.attributeCell] = '無關傷害';
+      state.values[transform.valueCell] = 0;
+    }
+    delete state.values[field.magazineCell]; delete state.values[field.magazineLevelCell];
+  }
+  for (const [slotId, name, level] of selections) {
+    const field = gameData.nephronArmor.fields.find(entry => entry.slotId === slotId);
+    state.values[field.magazineCell] = name;
+    if (level) state.values[field.magazineLevelCell] = level;
+  }
+  return state;
+}
+
+const openMagazineSlot = (page, slotId) => {
+  const slot = gameData.layout.slots.find(entry => entry.innerwearId === slotId);
+  page.dom.window.document.querySelector(`.gear-slot[data-slot-id="${slot.id}"]`).click();
+};
+const magazineNames = page => pickerRows(page, '彈匣種類').map(row => row.querySelector('span').textContent);
+
+async function bossHealthFixture(runtime) {
+  const { circuitBoardRowsField, serializeCircuitBoardRows } = await runtime.load('frontend/circuit-board-rows.ts');
+  const state = nephronMagazineState([
+    ['upper', '超級彈匣[極度緩慢]', 'Lv.1'], ['lowerwear', '支援彈匣I', 'Lv.1'],
+    ['lowerwearAlternative', '戰鬥彈匣Type - I', 'Lv.2'], ['gloves', '經典彈匣Type - I', 'Lv.1'],
+  ]);
+  state.values['Accessory.Earring'] = '格雷特的勳章';
+  for (const chip of gameData.chipSlots.slots) { delete state.values[chip.attributeCell]; delete state.values[chip.tuningCell]; }
+  for (const circuit of gameData.circuits.inputs) {
+    state.values[circuit.attributeCell] = '無關傷害'; state.values[circuit.valueCell] = 0;
+    delete state.values[circuitBoardRowsField(circuit.attributeCell)];
+  }
+  const chip = (slotId, name) => {
+    const slot = gameData.chipSlots.slots.find(entry => entry.id === slotId);
+    const option = gameData.chips.chips.find(entry => entry.name === name);
+    state.values[slot.attributeCell] = name; state.values[slot.tuningCell] = option.tuningLevels[0].level;
+    return option.tuningLevels[0].value;
+  };
+  chip('upper', '強者%'); chip('gloves', '排熱%');
+  chip('lowerwear', '流血%'); chip('lowerwearAlternative', '兩極化%');
+  for (const [id, attribute, value, level, forging] of [
+    ['lowerwear', '強者%', 0.1, 'Lv.10', 0], ['lowerwearAlternative', '排熱%', 0.14, 'Lv.12', 12],
+  ]) {
+    const slot = gameData.innerwear.slots.find(entry => entry.id === id);
+    state.values[slot.enhancementCell] = level; state.values[slot.forgingCell] = forging;
+    const circuit = gameData.circuits.inputs.find(entry => entry.slot === id);
+    state.values[circuitBoardRowsField(circuit.attributeCell)] = serializeCircuitBoardRows([{ attribute, percentageValue: value }]);
+  }
+  return { state, circuitBoardRowsField };
+}
+
+test('Boss health mode applies only the selected pants and HP phase while disabled mode stays identical', async () => {
+  const runtime = await createRuntime();
+  const { state, circuitBoardRowsField } = await bossHealthFixture(runtime);
+  const { evaluateLoadout, resolveLoadoutSources } = await runtime.load('frontend/projection.ts');
+  const { createAttributeEquivalenceCalculator, comparableAttributes } = await runtime.load('calculation/attribute-equivalence.ts');
+  const normalized = value => JSON.parse(JSON.stringify(value));
+  const ordinary = evaluateLoadout(gameData, state, false, true);
+  assert.ok(ordinary.damage, String(ordinary.damageError));
+  const commonSources = resolveLoadoutSources(gameData, state).sources.shared;
+  const sharedStrong = commonSources.reduce((sum, source) => sum + (source.stats.strongerPct ?? 0), 0);
+  const sharedHeat = commonSources.reduce((sum, source) => sum + (source.stats.heatPct ?? 0), 0);
+  assert.deepEqual(normalized(evaluateLoadout(gameData, { ...state,
+    bossHealthCondition: { enabled: false, comparison: 'below', lowerwear: 'lowerwearB' } }, false, true)), normalized(ordinary));
+  const original = JSON.stringify(state);
+  for (const lowerwear of ['lowerwearA', 'lowerwearB']) for (const comparison of ['above', 'below']) {
+    const selected = lowerwear === 'lowerwearA' ? 'lowerwear' : 'lowerwearAlternative';
+    const excluded = lowerwear === 'lowerwearA' ? 'lowerwearAlternative' : 'lowerwear';
+    const condition = { enabled: true, comparison, lowerwear };
+    const current = { ...state, bossHealthCondition: condition };
+    const evaluation = evaluateLoadout(gameData, current, false, true);
+    assert.ok(evaluation.damage, String(evaluation.damageError));
+    const result = evaluation.damage.result, attributes = result.attributes;
+    assert.equal(result.lowerwearConfigurations, undefined, 'a single pants calculation never averages medal bonuses');
+    const expectedStrong = comparison === 'above' ? sharedStrong + (selected === 'lowerwear' ? 10 : 0) : 0;
+    const expectedHeat = comparison === 'below' ? sharedHeat + (selected === 'lowerwearAlternative' ? 14 : 0) : 0;
+    assert.equal(attributes.conditionalDamage.strongerPct, expectedStrong, JSON.stringify(attributes.conditionalDamage.strongerSources));
+    assert.equal(attributes.conditionalDamage.heatPct, expectedHeat, JSON.stringify(attributes.conditionalDamage.heatSources));
+    assert.equal(result.finalDamage.conditionalFactor, 1 + (comparison === 'above' ? expectedStrong : expectedHeat) / 100);
+    const sources = resolveLoadoutSources(gameData, current).sources;
+    assert.equal(sources.lowerwearAlternativeEnabled, false); assert.equal(sources.lowerwearB.length, 0);
+    assert.ok(sources.lowerwearA.some(source => source.sourceId === `innerwear:${selected}`));
+    assert.ok(sources.lowerwearA.some(source => source.sourceId === `chip:${selected}`));
+    assert.ok(![...sources.shared, ...sources.lowerwearA].some(source => source.sourceId.endsWith(`:${excluded}`)
+      || source.sourceId.includes(`:${excluded}:`)));
+    for (const detail of Object.values(attributes.stats)) {
+      assert.equal(detail.lowerwearBSources.length, 0); assert.equal(detail.lowerwearAverage, detail.lowerwearA);
+    }
+    assert.equal(result.generalMultiplicativeDamage.factors.find(effect => effect.sourceId === 'grett-medal:support-magazines')?.factor,
+      selected === 'lowerwear' ? 1.01 : undefined);
+    assert.equal(result.multiplicativeCritDamage.factors.find(effect => effect.sourceId === 'grett-medal:classic-combat-magazines').factor,
+      selected === 'lowerwear' ? 1.005 : 1.01);
+    const noSwitch = evaluateLoadout(gameData, { ...current, lowerwearAlternativeEnabled: false }, false, true);
+    assert.deepEqual(normalized(noSwitch), normalized(evaluation), 'the selected single pants do not depend on the switching checkbox');
+    const corrupt = structuredClone(current);
+    const slot = gameData.innerwear.slots.find(entry => entry.id === excluded);
+    corrupt.values[slot.enhancementCell] = 'Lv.999'; corrupt.values[slot.forgingCell] = -99;
+    const chip = gameData.chipSlots.slots.find(entry => entry.id === excluded);
+    corrupt.values[chip.attributeCell] = '無效芯片'; corrupt.values[chip.tuningCell] = '無效調校';
+    const circuit = gameData.circuits.inputs.find(entry => entry.slot === excluded);
+    corrupt.values[circuitBoardRowsField(circuit.attributeCell)] = '[{"attribute":"無效電路","percentageValue":9}]';
+    const magazine = gameData.nephronArmor.fields.find(entry => entry.slotId === excluded);
+    corrupt.values[magazine.magazineCell] = '無效彈匣'; corrupt.values[magazine.magazineLevelCell] = 'Lv.99';
+    for (const entry of gameData.mapping.magicStoneSelections.inputGroups.filter(entry => entry.configuration === (excluded === 'lowerwear' ? 'lowerwearA' : 'lowerwearB'))) corrupt.values[entry.selectionCell] = '無效魔法石';
+    for (const cell of gameData.appraisals.slots.find(entry => entry.id === excluded).inputCells) corrupt.values[cell] = '無效鑑定';
+    assert.deepEqual(normalized(evaluateLoadout(gameData, corrupt, false, true)), normalized(evaluation), 'unused pants are excluded before validation and combat-rate resolution');
+    const calculator = createAttributeEquivalenceCalculator(evaluation.comparisonInput, result, comparableAttributes(gameData.attributes.attributes));
+    assert.equal(calculator.compare(comparison === 'above' ? 'heatPct' : 'strongerPct', 10).targetGainPct, null);
+    assert.ok(calculator.compare(comparison === 'above' ? 'strongerPct' : 'heatPct', 10).targetGainPct > 0);
+  }
+  assert.equal(JSON.stringify(state), original, 'selection does not rewrite saved equipment');
+});
+
+test('Boss health single-pants mode retains the selected ordinary armor appraisals and magic stones', async () => {
+  const runtime = await createRuntime();
+  const { state } = await bossHealthFixture(runtime);
+  const { evaluateLoadout, resolveLoadoutSources } = await runtime.load('frontend/projection.ts');
+  for (const [index, id] of ['lowerwear', 'lowerwearAlternative'].entries()) {
+    const armor = gameData.innerwear.slots.find(entry => entry.id === id);
+    state.values[armor.typeCell] = '百億';
+    const appraisals = gameData.appraisals.slots.find(entry => entry.id === id);
+    for (const cell of appraisals.inputCells) delete state.values[cell];
+    state.values[appraisals.inputCells[0]] = index ? '極大化+2%' : '致命一擊+1%';
+    const magicStones = gameData.mapping.magicStoneSelections.inputGroups.filter(entry => entry.configuration === (index ? 'lowerwearB' : 'lowerwearA'));
+    for (const entry of magicStones) delete state.values[entry.selectionCell];
+    const stone = gameData.catalogs[gameData.mapping.magicStoneSelections.catalogFile].items
+      .find(entry => entry.id === (index ? 'magic-stone-sage-extremization' : 'magic-stone-hunting-boss-damage'));
+    state.values[magicStones[0].selectionCell] = stone.targetApplications.armor.sourceName;
+  }
+  for (const lowerwear of ['lowerwearA', 'lowerwearB']) {
+    const selected = lowerwear === 'lowerwearA' ? 'lowerwear' : 'lowerwearAlternative';
+    const current = { ...state, lowerwearAlternativeEnabled: false,
+      bossHealthCondition: { enabled: true, comparison: 'above', lowerwear } };
+    const evaluation = evaluateLoadout(gameData, current);
+    assert.ok(evaluation.damage, String(evaluation.damageError));
+    const sources = resolveLoadoutSources(gameData, current).sources;
+    assert.equal(sources.lowerwearB.length, 0);
+    const appraisal = sources.lowerwearA.find(source => source.sourceId.startsWith('armor-appraisal:'));
+    assert.ok(appraisal.sourceId.includes(`:${selected}:`));
+    assert.deepEqual(JSON.parse(JSON.stringify(appraisal.stats)), lowerwear === 'lowerwearA' ? { critRatePct: 1 } : { extremizationPct: 2 });
+    const magicCell = gameData.mapping.magicStoneSelections.inputGroups.find(entry => entry.configuration === lowerwear).selectionCell;
+    const stone = sources.lowerwearA.find(source => source.sourceId.includes(magicCell));
+    assert.deepEqual(JSON.parse(JSON.stringify(stone.stats)), lowerwear === 'lowerwearA' ? { bossDamagePct: 2.5 } : { extremizationPct: 6 });
+    assert.equal(evaluation.damage.result.generalMultiplicativeDamage.factors.some(effect => effect.sourceId === 'grett-medal:support-magazines'), false);
+  }
+});
+
+test('Boss health controls preserve HP phase, selected pants and damage through history, baseline, JSON and reload', async () => {
+  const runtime = await createRuntime();
+  const { state } = await bossHealthFixture(runtime);
+  const page = await uiPage(state);
+  let reloaded;
+  const control = (target, id) => target.dom.window.document.getElementById(id);
+  const change = (id, value) => {
+    const input = control(page, id);
+    if (input.type === 'checkbox') input.checked = value; else input.value = value;
+    input.dispatchEvent(new page.dom.window.Event('change', { bubbles: true }));
+  };
+  try {
+    const { projectDamage } = await page.runtime.load('frontend/projection.ts');
+    const damage = target => projectDamage(gameData, target.readState()).result.finalDamage.finalDamage;
+    const before = damage(page);
+    assert.equal(control(page, 'boss-health-enabled').checked, false);
+    assert.equal(control(page, 'boss-health-lowerwear').parentElement.hidden, true);
+    await workloadActions.baseline(page);
+    change('boss-health-enabled', true);
+    assert.equal(control(page, 'boss-health-lowerwear').parentElement.hidden, false);
+    openMagazineSlot(page, 'lowerwearAlternative');
+    assert.ok(!magazineNames(page).includes('支援彈匣I'), 'magazine uniqueness still covers the unused pants');
+    change('boss-health-comparison', 'below'); change('boss-health-lowerwear', 'lowerwearB');
+    const expected = { enabled: true, comparison: 'below', lowerwear: 'lowerwearB' };
+    assert.deepEqual(page.readState().bossHealthCondition, expected);
+    assert.doesNotMatch(page.dom.window.document.querySelector('#results').textContent, /下衣\+強\/排褲平均/);
+    const activeDamage = damage(page);
+    await workloadActions.undo(page); assert.equal(control(page, 'boss-health-lowerwear').value, 'lowerwearA');
+    await workloadActions.redo(page); assert.equal(control(page, 'boss-health-lowerwear').value, 'lowerwearB'); assert.equal(damage(page), activeDamage);
+    const exported = await page.exportJson(); assert.deepEqual(exported.bossHealthCondition, expected);
+    await page.importJson(JSON.stringify(exported)); assert.deepEqual(page.readState().bossHealthCondition, expected);
+    assert.doesNotMatch(page.dom.window.document.querySelector('#transfer-status').textContent, /已留空/);
+    reloaded = await uiPage(page.readState());
+    assert.equal(control(reloaded, 'boss-health-enabled').checked, true);
+    assert.equal(control(reloaded, 'boss-health-comparison').value, 'below');
+    assert.equal(control(reloaded, 'boss-health-lowerwear').value, 'lowerwearB'); assert.equal(damage(reloaded), activeDamage);
+    await workloadActions.restore(page); assert.equal(control(page, 'boss-health-enabled').checked, false); assert.equal(damage(page), before);
+    await workloadActions.undo(page); assert.deepEqual(page.readState().bossHealthCondition, expected);
+    delete exported.bossHealthCondition;
+    await page.importJson(JSON.stringify(exported));
+    assert.equal(control(page, 'boss-health-enabled').checked, false);
+    assert.equal(page.readState().bossHealthCondition, undefined); assert.equal(damage(page), before);
+  } finally { page.close(); reloaded?.close(); }
+});
+
+test('support magazines default to locked level one and only affect damage through the medal across saves and restoration', async () => {
+  const initial = nephronMagazineState([], false);
+  initial.values['Accessory.Earring'] = '';
+  const page = await uiPage(initial);
+  let reloaded;
+  const upper = gameData.nephronArmor.fields.find(field => field.slotId === 'upper');
+  const gloves = gameData.nephronArmor.fields.find(field => field.slotId === 'gloves');
+  const levelInput = target => target.dom.window.document.querySelector('input[aria-label="彈匣等級"]');
+  const assertFixed = target => {
+    assert.equal(levelInput(target).value, 'Lv.1'); assert.equal(levelInput(target).disabled, true);
+    assert.equal(levelInput(target).closest('.picker').querySelector('.picker-clear').disabled, true);
+  };
+  try {
+    const { projectDamage } = await page.runtime.load('frontend/projection.ts');
+    const result = () => projectDamage(gameData, page.readState()).result;
+    const supportFactor = () => result().generalMultiplicativeDamage.factors.find(effect => effect.sourceId === 'grett-medal:support-magazines')?.factor;
+    const baseDamage = result().finalDamage.finalDamage;
+    openMagazineSlot(page, 'upper'); selectPicker(page, '彈匣種類', '支援彈匣I'); assertFixed(page);
+    assert.equal(page.readState().values[upper.magazineLevelCell], 'Lv.1');
+    assert.equal(result().finalDamage.finalDamage, baseDamage);
+    openMagazineSlot(page, 'gloves');
+    assert.ok(!magazineNames(page).includes('支援彈匣I')); assert.ok(magazineNames(page).includes('支援彈匣II'));
+    selectPicker(page, '彈匣種類', '支援彈匣II'); assertFixed(page);
+    assert.equal(result().finalDamage.finalDamage, baseDamage, 'neither support option has an intrinsic damage effect');
+    const { createCatalogIndex } = await page.runtime.load('frontend/catalog-index.ts');
+    const levels = createCatalogIndex(gameData).resolveFieldChoices(gloves.magazineLevelCell, page.readState().values);
+    assert.deepEqual(Array.from(levels), ['Lv.1']); assert.ok(Object.isFrozen(levels));
+    page.dom.window.document.querySelector('button[data-slot-id="accessory-M6"]').click();
+    selectPicker(page, '選擇裝備', '格雷特的勳章'); assert.equal(supportFactor(), 1.015);
+    openMagazineSlot(page, 'upper');
+    page.dom.window.document.querySelector('input[aria-label="彈匣種類"]').closest('.picker').querySelector('.picker-clear').click();
+    assert.equal(supportFactor(), 1.01);
+    await workloadActions.undo(page); assertFixed(page); assert.equal(supportFactor(), 1.015);
+    await workloadActions.redo(page); assert.equal(supportFactor(), 1.01);
+    await workloadActions.undo(page); assertFixed(page);
+    const exported = await page.exportJson(); await page.importJson(JSON.stringify(exported));
+    assertFixed(page); assert.equal(supportFactor(), 1.015);
+    assert.doesNotMatch(page.dom.window.document.querySelector('#transfer-status').textContent, /已留空/);
+    const saved = page.readState();
+    saved.values[upper.magazineLevelCell] = 'Lv.6'; delete saved.values[gloves.magazineLevelCell];
+    reloaded = await uiPage(saved);
+    assert.equal(reloaded.readState().values[upper.magazineLevelCell], 'Lv.1');
+    assert.equal(reloaded.readState().values[gloves.magazineLevelCell], 'Lv.1', 'normalization is persisted without requiring another edit');
+    openMagazineSlot(reloaded, 'upper'); assertFixed(reloaded);
+    selectPicker(reloaded, '彈匣種類', '戰鬥彈匣Type - I');
+    assert.equal(levelInput(reloaded).disabled, false); assert.equal(levelInput(reloaded).value, '');
+    selectPicker(reloaded, '彈匣等級', 'Lv.4');
+    selectPicker(reloaded, '彈匣種類', '支援彈匣I'); assertFixed(reloaded);
+  } finally { page.close(); reloaded?.close(); }
+});
+
+test('Grett medal magazine bonuses enter the existing damage products independently of basic medal and raid effects', async () => {
+  const runtime = await createRuntime();
+  const { evaluateLoadout } = await runtime.load('frontend/projection.ts');
+  const data = gameData;
+  const state = nephronMagazineState([
+    ['upper', '超級彈匣[極度緩慢]', 'Lv.1'], ['lowerwear', '超級彈匣[推進器]', 'Lv.1'],
+    ['lowerwearAlternative', '支援彈匣I', 'Lv.1'],
+    ['gloves', '經典彈匣Type - I', 'Lv.1'], ['shoes', '戰鬥彈匣Type - I', 'Lv.1'],
+  ]);
+  state.values['Accessory.Earring'] = '格雷特的勳章'; state.nephronRaidEnabled = true;
+  const evaluation = evaluateLoadout(data, state, false, true);
+  assert.ok(evaluation.damage, String(evaluation.damageError));
+  const result = evaluation.damage.result;
+  const general = result.generalMultiplicativeDamage.factors;
+  const { calculateLoadout } = await runtime.load('calculation/loadout-engine.ts');
+  const expectedBonuses = {
+    lowerwearA: [
+      { sourceId: 'grett-medal:super-magazines', stats: { multiplicativeDamagePct: 1 } },
+      { sourceId: 'grett-medal:classic-combat-magazines', stats: { multiplicativeCritDamagePct: 1 } },
+    ],
+    lowerwearB: [
+      { sourceId: 'grett-medal:super-magazines', stats: { multiplicativeDamagePct: 0.5 } },
+      { sourceId: 'grett-medal:support-magazines', stats: { multiplicativeDamagePct: 1 } },
+      { sourceId: 'grett-medal:classic-combat-magazines', stats: { multiplicativeCritDamagePct: 1 } },
+    ],
+  };
+  assert.equal(result.lowerwearConfigurations.length, 2);
+  for (const { configuration, result: variant } of result.lowerwearConfigurations) {
+    const expected = expectedBonuses[configuration];
+    assert.deepEqual(JSON.parse(JSON.stringify(evaluation.comparisonInput.lowerwearBonusSources[configuration])), expected);
+    const input = evaluation.comparisonInput;
+    const oracle = calculateLoadout({ ...input, lowerwearBonusSources: undefined,
+      sources: { ...input.sources, shared: [...input.sources.shared, ...expected] } });
+    assert.ok(Math.abs(variant.finalDamage.finalDamage - oracle.finalDamage.finalDamage)
+      <= oracle.finalDamage.finalDamage * 1e-12, configuration);
+  }
+  assert.equal(result.finalDamage.finalDamage,
+    result.lowerwearConfigurations.reduce((sum, entry) => sum + entry.result.finalDamage.finalDamage, 0) / 2);
+  const input = evaluation.comparisonInput;
+  const disabledInput = { ...input, sources: { ...input.sources, lowerwearAlternativeEnabled: false } };
+  const disabled = calculateLoadout(disabledInput);
+  const primaryOnly = calculateLoadout({ ...disabledInput, lowerwearBonusSources: undefined,
+    sources: { ...disabledInput.sources, shared: [...disabledInput.sources.shared, ...expectedBonuses.lowerwearA] } });
+  assert.equal(disabled.lowerwearConfigurations, undefined);
+  assert.ok(Math.abs(disabled.finalDamage.finalDamage - primaryOnly.finalDamage.finalDamage)
+    <= primaryOnly.finalDamage.finalDamage * 1e-12, 'disabling switching uses the primary configuration alone');
+  assert.equal(general.find(effect => effect.sourceId === 'nephron-raid:grett-medal').factor, 1.03);
+  const basicMedal = general.filter(effect => effect.sourceId === 'simulator:Accessory.Earring');
+  assert.equal(basicMedal.length, 1, 'basic medal effect remains a separate source');
+  assert.equal(basicMedal[0].factor, 1.06);
+  assert.equal(general.find(effect => effect.sourceId.includes('super-extreme-slow')).factor, 1.005, 'original magazine effect is unchanged');
+  const withoutAlternative = evaluateLoadout(data, { ...state, lowerwearAlternativeEnabled: false }).damage.result;
+  assert.ok(!withoutAlternative.generalMultiplicativeDamage.factors.some(effect => effect.sourceId === 'grett-medal:support-magazines'));
+  for (const earring of ['', '天線耳環']) {
+    const unequipped = evaluateLoadout(data, { ...state, values: { ...state.values, 'Accessory.Earring': earring } }).damage.result;
+    assert.ok(![...unequipped.generalMultiplicativeDamage.factors, ...unequipped.multiplicativeCritDamage.factors]
+      .some(effect => effect.sourceId.startsWith('grett-medal:')));
+  }
+});
+
+test('Grett medal lowerwear bonuses average final damages and keep equivalent comparisons on the same basis', async () => {
+  const runtime = await createRuntime();
+  const { evaluateLoadout } = await runtime.load('frontend/projection.ts');
+  const { finalDamageInputs, prepareLoadoutAttributes, evaluatePreparedLoadout } = await runtime.load('calculation/loadout-engine.ts');
+  const { calculateFinalDamage } = await runtime.load('calculation/final-damage.ts');
+  const { createAttributeEquivalenceCalculator, comparableAttributes } = await runtime.load('calculation/attribute-equivalence.ts');
+  const state = nephronMagazineState([
+    ['upper', '超級彈匣[極度緩慢]', 'Lv.1'], ['lowerwear', '超級彈匣[推進器]', 'Lv.1'],
+    ['lowerwearAlternative', '戰鬥彈匣Type - I', 'Lv.1'], ['gloves', '經典彈匣Type - I', 'Lv.1'],
+  ]);
+  state.values['Accessory.Earring'] = '格雷特的勳章';
+  const original = JSON.stringify(state);
+  const evaluation = evaluateLoadout(gameData, state, false, true);
+  assert.ok(evaluation.damage, String(evaluation.damageError));
+  assert.equal(runtime.counts.aggregateCharacterAttributes, 2, 'configuration bonuses reuse the prepared attributes');
+  const result = evaluation.damage.result, input = evaluation.comparisonInput;
+  assert.equal(result.lowerwearConfigurations.length, 2);
+  const averagedProducts = calculateFinalDamage(finalDamageInputs(input, result)).finalDamage;
+  assert.ok(Math.abs(averagedProducts - result.finalDamage.finalDamage) > 1e-6, 'average final damage, not the product of separately averaged bonuses');
+  const attributes = comparableAttributes(gameData.attributes.attributes);
+  const calculator = createAttributeEquivalenceCalculator(input, result, attributes);
+  assert.equal(calculator.baseDamage, result.finalDamage.finalDamage);
+  for (const key of ['doubleAttackPct', 'bleedDamagePct', 'multiplicativeDamagePct', 'multiplicativeCritDamagePct']) {
+    const changed = { ...input, sources: { ...input.sources, shared: [
+      ...input.sources.shared, { sourceId: 'equivalence:test', stats: { [key]: 10 } },
+    ] } };
+    const full = evaluatePreparedLoadout(changed, prepareLoadoutAttributes(changed)).result;
+    assert.ok(full, key);
+    assert.ok(Math.abs(calculator.damageWith(key, 10) - full.finalDamage.finalDamage)
+      <= full.finalDamage.finalDamage * 1e-12, key);
+  }
+  const comparison = calculator.compare('bleedDamagePct', 10);
+  const equivalent = comparison.rows.find(row => row.key === 'multiplicativeCritDamagePct');
+  assert.equal(equivalent.status, 'ok');
+  const actualGain = (calculator.damageWith(equivalent.key, equivalent.delta) / calculator.baseDamage - 1) * 100;
+  assert.ok(Math.abs(actualGain - comparison.targetGainPct) < 1e-6);
+  assert.equal(JSON.stringify(state), original, 'temporary configuration calculations do not change saved selections');
+  const matching = nephronMagazineState([
+    ['upper', '超級彈匣[極度緩慢]', 'Lv.1'], ['lowerwear', '戰鬥彈匣Type - I', 'Lv.1'],
+    ['lowerwearAlternative', '經典彈匣Type - I', 'Lv.1'],
+  ]);
+  matching.values['Accessory.Earring'] = '格雷特的勳章';
+  const same = evaluateLoadout(gameData, matching).damage.result;
+  assert.equal(same.lowerwearConfigurations, undefined, 'identical tiers use the existing single evaluation');
+  assert.equal(same.generalMultiplicativeDamage.factors.find(effect => effect.sourceId === 'grett-medal:super-magazines').factor, 1.005);
+  assert.equal(same.multiplicativeCritDamage.factors.find(effect => effect.sourceId === 'grett-medal:classic-combat-magazines').factor, 1.005);
+});
+
+test('Grett medal magazine sources and factors update immediately when magazines or the medal change', async () => {
+  const state = nephronMagazineState([
+    ['upper', '超級彈匣[極度緩慢]', 'Lv.1'], ['lowerwear', '超級彈匣[推進器]', 'Lv.1'],
+    ['lowerwearAlternative', '經典彈匣Type - I', 'Lv.1'], ['gloves', '戰鬥彈匣Type - I', 'Lv.1'],
+  ]);
+  state.values['Accessory.Earring'] = '格雷特的勳章';
+  const page = await uiPage(state);
+  const rows = () => [...page.dom.window.document.querySelectorAll('#results .stat-source-row')];
+  const bonusFactors = label => rows().filter(row => row.querySelector('span')?.textContent === `格雷特的勳章：${label}加成`)
+    .map(row => row.querySelector('strong').textContent);
+  const clearMagazine = slot => {
+    openMagazineSlot(page, slot);
+    page.dom.window.document.querySelector('input[aria-label="彈匣種類"]').closest('.picker').querySelector('.picker-clear').click();
+  };
+  try {
+    assert.deepEqual(bonusFactors('超級彈匣'), ['×1.01', '×1.005']);
+    assert.deepEqual(bonusFactors('經典／戰鬥彈匣'), ['×1.005', '×1.01']);
+    assert.match(page.dom.window.document.querySelector('#calculation-details').textContent, /兩套配置分別套用勳章加成後，最終傷害取平均/);
+    clearMagazine('upper');
+    assert.deepEqual(bonusFactors('超級彈匣'), ['×1.005']);
+    clearMagazine('lowerwear'); assert.deepEqual(bonusFactors('超級彈匣'), []);
+    clearMagazine('gloves');
+    assert.deepEqual(bonusFactors('經典／戰鬥彈匣'), ['×1.005'], 'enabled alternate lowerwear counts');
+    const toggle = page.dom.window.document.querySelector('#alternate');
+    toggle.checked = false; toggle.dispatchEvent(new page.dom.window.Event('change'));
+    assert.deepEqual(bonusFactors('經典／戰鬥彈匣'), [], 'disabled alternate lowerwear does not count');
+    toggle.checked = true; toggle.dispatchEvent(new page.dom.window.Event('change'));
+    assert.deepEqual(bonusFactors('經典／戰鬥彈匣'), ['×1.005']);
+    page.dom.window.document.querySelector('button[data-slot-id="accessory-M6"]').click();
+    selectPicker(page, '選擇裝備', '天線耳環');
+    assert.deepEqual(bonusFactors('超級彈匣'), []); assert.deepEqual(bonusFactors('經典／戰鬥彈匣'), []);
+  } finally { page.close(); }
+});
+
+test('Nephron magazines reserve each full name across every slot before choosing a level and release on change or clear', async () => {
+  const page = await uiPage(nephronMagazineState());
+  const slow = '超級彈匣[極度緩慢]', booster = '超級彈匣[推進器]';
+  try {
+    for (const magazine of gameData.nephronArmor.magazines) {
+      openMagazineSlot(page, 'upper'); selectPicker(page, '彈匣種類', magazine.name);
+      for (const field of gameData.nephronArmor.fields.filter(entry => entry.slotId !== 'upper')) {
+        openMagazineSlot(page, field.slotId);
+        assert.ok(!magazineNames(page).includes(magazine.name), `${field.slotId}: ${magazine.name}`);
+        assert.equal(magazineNames(page).length, gameData.nephronArmor.magazines.length - 1);
+      }
+    }
+    openMagazineSlot(page, 'upper'); selectPicker(page, '彈匣種類', slow);
+    assert.deepEqual(pickerRows(page, '彈匣等級').map(row => row.querySelector('span').textContent), gameData.nephronArmor.levelLabels);
+    selectPicker(page, '彈匣等級', 'Lv.1');
+    openMagazineSlot(page, 'lowerwear');
+    assert.ok(!magazineNames(page).includes(slow));
+    assert.ok(magazineNames(page).includes(booster), 'different full names of the same kind remain available');
+    openMagazineSlot(page, 'upper'); selectPicker(page, '彈匣種類', booster);
+    openMagazineSlot(page, 'lowerwear');
+    assert.ok(magazineNames(page).includes(slow)); assert.ok(!magazineNames(page).includes(booster));
+    openMagazineSlot(page, 'upper');
+    page.dom.window.document.querySelector('input[aria-label="彈匣種類"]').closest('.picker').querySelector('.picker-clear').click();
+    openMagazineSlot(page, 'lowerwear');
+    assert.ok(magazineNames(page).includes(slow)); assert.ok(magazineNames(page).includes(booster));
+    selectPicker(page, '彈匣種類', slow); selectPicker(page, '彈匣等級', 'Lv.6');
+    openMagazineSlot(page, 'upper'); assert.ok(!magazineNames(page).includes(slow));
+    await workloadActions.undo(page); assert.ok(!magazineNames(page).includes(slow), 'the name still reserves a slot without its level');
+    await workloadActions.undo(page); assert.ok(magazineNames(page).includes(slow));
+    await workloadActions.redo(page); assert.ok(!magazineNames(page).includes(slow));
+    await workloadActions.redo(page); assert.ok(!magazineNames(page).includes(slow));
+  } finally { page.close(); }
+});
+
+test('Nephron magazines normalize legacy and imported duplicates in fixed slot order and keep history, baseline and reload consistent', async () => {
+  const slow = '超級彈匣[極度緩慢]', booster = '超級彈匣[推進器]';
+  const legacy = nephronMagazineState([
+    ['upper', slow, 'Lv.1'], ['lowerwear', slow, 'Lv.6'], ['lowerwearAlternative', slow, 'Lv.2'],
+    ['gloves', booster, 'Lv.2'], ['shoes', '戰鬥彈匣Type - I', 'Lv.4'],
+  ], false);
+  const page = await uiPage(legacy, legacy);
+  let reloaded;
+  const assertSelections = (state, expected) => {
+    for (const field of gameData.nephronArmor.fields) {
+      assert.equal(state.values[field.magazineCell], expected[field.slotId]?.[0], field.magazineCell);
+      assert.equal(state.values[field.magazineLevelCell], expected[field.slotId]?.[1], field.magazineLevelCell);
+    }
+  };
+  const original = { upper: [slow, 'Lv.1'], gloves: [booster, 'Lv.2'], shoes: ['戰鬥彈匣Type - I', 'Lv.4'] };
+  const imported = { upper: [slow, 'Lv.1'], lowerwear: [booster, 'Lv.6'], lowerwearAlternative: ['戰鬥彈匣Type - II', 'Lv.2'] };
+  try {
+    assertSelections(page.readState(), original);
+    const { evaluateLoadout } = await page.runtime.load('frontend/projection.ts');
+    assert.ok(evaluateLoadout(gameData, page.readState()).damage, 'different magazine names remain calculable');
+    await page.importState(nephronMagazineState([
+      ['upper', slow, 'Lv.1'], ['lowerwear', booster, 'Lv.6'], ['lowerwearAlternative', '戰鬥彈匣Type - II', 'Lv.2'],
+      ['gloves', booster, 'Lv.3'], ['shoes', '戰鬥彈匣Type - II', 'Lv.5'],
+    ]));
+    assertSelections(page.readState(), imported);
+    assert.match(page.dom.window.document.querySelector('#transfer-status').textContent, /已留空/);
+    await workloadActions.undo(page); assertSelections(page.readState(), original);
+    await workloadActions.redo(page); assertSelections(page.readState(), imported);
+    await workloadActions.restore(page); assertSelections(page.readState(), original);
+    await workloadActions.undo(page); assertSelections(page.readState(), imported);
+    const json = await page.exportJson();
+    await page.importJson(JSON.stringify(json)); assertSelections(page.readState(), imported);
+    assert.doesNotMatch(page.dom.window.document.querySelector('#transfer-status').textContent, /已留空/);
+    reloaded = await uiPage(page.readState()); assertSelections(reloaded.readState(), imported);
+    openMagazineSlot(reloaded, 'shoes');
+    for (const name of [slow, booster, '戰鬥彈匣Type - II']) assert.ok(!magazineNames(reloaded).includes(name));
+  } finally { page.close(); reloaded?.close(); }
+});
+
 test('FP skill versions change only the 10% diminishing crit effect and preserve legacy results', async () => {
   const runtime = await createRuntime();
   const { evaluateLoadout } = await runtime.load('frontend/projection.ts');
@@ -97,6 +562,8 @@ test('magazine kinds show their actual effects and chip tuning shows only percen
       '戰鬥彈匣Type - IV': '致命傷害%',
       '戰鬥彈匣Type - V': 'Boss傷害%',
       '經典彈匣Type - I': '兩極化%',
+      '支援彈匣I': '僅供格雷特的勳章效果計數，本身不提供傷害屬性',
+      '支援彈匣II': '僅供格雷特的勳章效果計數，本身不提供傷害屬性',
     };
     assert.deepEqual(rows.map(row => row.querySelector('span').textContent), gameData.nephronArmor.magazines.map(item => item.name));
     for (const row of rows) assert.equal(row.querySelector('small').textContent, expected[row.querySelector('span').textContent]);
@@ -258,6 +725,96 @@ test('MN second multiplicative crit source is labeled 硝基馬達 without chang
     const rows = [...document.querySelectorAll('#results .stat-source-row')].map(node => node.textContent);
     assert.ok(rows.some(text => text.includes('MN 爆發模式') && text.includes('×1.1')));
     assert.ok(rows.some(text => text.includes('MN 硝基馬達') && text.includes('×1.15')));
+  } finally { page.close(); }
+});
+
+test('努特的庇護 toggles the 1.3333 crit multiplier and stays synchronized with save, history and JSON', async () => {
+  const page = await uiPage();
+  try {
+    const { document, Event } = page.dom.window;
+    const checkbox = () => [...document.querySelectorAll('#global-source-fields label.pet-skill-toggle')]
+      .find(label => label.textContent.trim() === '特殊靈藥：努特的庇護')?.querySelector('input');
+    const setCheckbox = value => { const input = checkbox(); assert.ok(input); input.checked = value; input.dispatchEvent(new Event('change')); };
+    assert.ok(checkbox());
+    const { projectDamage } = await page.runtime.load('frontend/projection.ts');
+    const damage = () => projectDamage(gameData, page.readState()).result;
+    const potionEffect = () => damage()?.multiplicativeCritDamage.factors.find(effect => effect.sourceId === 'special-potion:nut-protection');
+
+    assert.equal(checkbox()?.checked, false);
+    assert.equal(potionEffect(), undefined);
+    setCheckbox(true);
+    assert.equal(page.readState().nutProtectionPotionEnabled, true);
+    assert.equal(potionEffect()?.valuePct, 33.33);
+    assert.equal(potionEffect()?.factor, 1.3333);
+    assert.ok([...document.querySelectorAll('#results .stat-source-row span')].some(node => node.textContent === '努特的庇護'));
+    const exported = await page.exportJson();
+    assert.equal(exported.nutProtectionPotionEnabled, true);
+
+    setCheckbox(false);
+    assert.equal(page.readState().nutProtectionPotionEnabled, false);
+    assert.equal(potionEffect(), undefined);
+    assert.ok(![...document.querySelectorAll('#results .stat-source-row span')].some(node => node.textContent === '努特的庇護'));
+    document.querySelector('#undo').click();
+    assert.equal(page.readState().nutProtectionPotionEnabled, true);
+    assert.equal(checkbox()?.checked, true);
+    document.querySelector('#redo').click();
+    assert.equal(page.readState().nutProtectionPotionEnabled, false);
+    assert.equal(checkbox()?.checked, false);
+
+    await page.importJson(JSON.stringify(exported));
+    assert.equal(page.readState().nutProtectionPotionEnabled, true);
+    assert.equal(checkbox()?.checked, true);
+    assert.equal(potionEffect()?.factor, 1.3333);
+  } finally { page.close(); }
+});
+
+test('內布隆襲擊戰的3%乘算只在勾選且裝備格雷特的勳章時生效', async () => {
+  const initial = structuredClone(stateA);
+  initial.values['Accessory.Earring'] = '';
+  initial.nephronRaidEnabled = false;
+  const page = await uiPage(initial);
+  try {
+    const { document, Event } = page.dom.window;
+    const checkbox = document.querySelector('.battle-panel > .panel-heading input[type="checkbox"]');
+    assert.ok(checkbox);
+    const selectEarring = name => {
+      document.querySelector('button[data-slot-id="accessory-M6"]').click();
+      selectPicker(page, '選擇裝備', name);
+    };
+    const { projectDamage } = await page.runtime.load('frontend/projection.ts');
+    const damage = () => projectDamage(gameData, page.readState()).result;
+    const raidEffect = () => damage()?.generalMultiplicativeDamage.factors.find(effect => effect.sourceId === 'nephron-raid:grett-medal');
+    const setRaid = value => { checkbox.checked = value; checkbox.dispatchEvent(new Event('change')); };
+
+    assert.equal(checkbox.checked, false);
+    setRaid(true);
+    assert.equal(page.readState().nephronRaidEnabled, true);
+    assert.equal(raidEffect(), undefined);
+    selectEarring('格雷特的勳章');
+    assert.equal(raidEffect()?.valuePct, 3);
+    assert.equal(raidEffect()?.factor, 1.03);
+    assert.ok([...document.querySelectorAll('#results .stat-source-row span')].some(node => node.textContent === '內布隆襲擊戰'));
+    const exported = await page.exportJson();
+    assert.equal(exported.nephronRaidEnabled, true);
+
+    selectEarring('天線耳環');
+    assert.equal(raidEffect(), undefined);
+    selectEarring('格雷特的勳章');
+    setRaid(false);
+    assert.equal(page.readState().nephronRaidEnabled, false);
+    assert.equal(raidEffect(), undefined);
+    document.querySelector('#undo').click();
+    assert.equal(page.readState().nephronRaidEnabled, true);
+    assert.equal(checkbox.checked, true);
+    assert.equal(raidEffect()?.factor, 1.03);
+    document.querySelector('#redo').click();
+    assert.equal(page.readState().nephronRaidEnabled, false);
+    assert.equal(raidEffect(), undefined);
+
+    await page.importJson(JSON.stringify(exported));
+    assert.equal(page.readState().nephronRaidEnabled, true);
+    assert.equal(checkbox.checked, true);
+    assert.equal(raidEffect()?.factor, 1.03);
   } finally { page.close(); }
 });
 

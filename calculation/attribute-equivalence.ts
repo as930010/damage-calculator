@@ -21,6 +21,11 @@ export interface EquivalenceAttribute { key: EquivalenceKey; name: string }
 export type EquivalenceStatus = 'ok' | 'unreachable' | 'notApplicable';
 export interface EquivalenceRow { key: EquivalenceKey; delta: number | null; gainPct: number | null; status: EquivalenceStatus }
 export interface EquivalenceComparison { targetGainPct: number | null; rows: readonly EquivalenceRow[] }
+export interface AttributeEquivalenceCalculator {
+  baseDamage: number;
+  damageWith(key: EquivalenceKey, delta: number): number | null;
+  compare(baseKey: EquivalenceKey, delta: number): EquivalenceComparison;
+}
 
 const MAX_DELTA_PCT = 1_000_000;
 const isEquivalenceKey = (key: string): key is EquivalenceKey => Object.hasOwn(channels, key);
@@ -33,8 +38,10 @@ export function comparableAttributes(metadata: readonly { key: string; name: str
 
 /** Keep all hypothetical inputs outside the saved loadout and reuse the existing engine stages. */
 export function createAttributeEquivalenceCalculator(input: LoadoutCalculationInput, baseline: LoadoutCalculationResult,
-  attributes: readonly EquivalenceAttribute[]) {
+  attributes: readonly EquivalenceAttribute[]): AttributeEquivalenceCalculator {
   const baseDamage = baseline.finalDamage.finalDamage;
+  const configurations = baseline.lowerwearConfigurations?.map(({ result }) =>
+    createAttributeEquivalenceCalculator({ ...input, lowerwearBonusSources: undefined }, result, attributes));
   const baseFinalInput = finalDamageInputs(input, baseline);
   const attackParameters = resolveAttackParameters(input.attackParameters, input.classId, input.weaponEnhancementLevel);
   const generalFactors = baseline.generalMultiplicativeDamage.factors.map(({ sourceId, valuePct }) => ({ sourceId, valuePct }));
@@ -58,6 +65,10 @@ export function createAttributeEquivalenceCalculator(input: LoadoutCalculationIn
     if (delta === 0) return baseDamage;
     if (!Number.isFinite(delta) || delta < 0 || delta > MAX_DELTA_PCT
       || (key === 'defenseIgnorePct' && delta > maximumDelta(key))) return null;
+    if (configurations) {
+      const damages = configurations.map(calculator => calculator.damageWith(key, delta));
+      return damages.some(value => value === null) ? null : (damages[0]! + damages[1]!) / 2;
+    }
     const next = { ...baseFinalInput };
     try {
       switch (channels[key]) {

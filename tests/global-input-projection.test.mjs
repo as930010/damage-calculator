@@ -135,6 +135,36 @@ test('JSON 選擇的全域來源進入角色彙總與 B163 傷害流程', async 
   assert.ok(withEffects.finalDamage.finalDamage > base.finalDamage.finalDamage);
 });
 
+test('格雷特的勳章不可鑑定並正確套用及卸除基本屬性', async () => {
+  const data = await loadData();
+  const medal = data.catalogs['equipment/accessories.json'].items.find(item => item.name === '格雷特的勳章');
+  assert.ok(medal);
+  assert.equal(medal.slotId, 'earring');
+  assert.deepEqual(medal.stats, { adaptabilityPct: 2, critDamagePct: 3, multiplicativeDamagePct: 6 });
+  assert.deepEqual(medal.appraisal, { canAppraise: false, effectCount: 0 });
+
+  const baseValues = {
+    'Weapon.ENHC': 'Lv.8', 'Left.Armor.Upper.ENHC': 'Lv.8', 'Left.Armor.Bottom.ENHC': 'Lv.8',
+    'Left.Armor.Gloves.ENHC': 'Lv.8', 'Left.Armor.Shoes.ENHC': 'Lv.8',
+    'Left.Armor.Upper.FORGE': 0, 'Left.Armor.Bottom.FORGE': 0,
+    'Left.Armor.Gloves.FORGE': 0, 'Left.Armor.Shoes.FORGE': 0,
+  };
+  const stateFor = earring => ({ schemaVersion: 3, Job: 'KE', values: { ...baseValues, 'Accessory.Earring': earring }, lowerwearAlternativeEnabled: false });
+  const base = projectDamage(data, stateFor('')).result;
+  const equipped = projectDamage(data, stateFor(medal.name)).result;
+  const removed = projectDamage(data, stateFor('')).result;
+  assert.ok(base && equipped && removed);
+  assert.equal(equipped.attributes.stats.adaptabilityPct.finalTotal - base.attributes.stats.adaptabilityPct.finalTotal, 2);
+  assert.equal(equipped.attributes.stats.critDamagePct.finalTotal - base.attributes.stats.critDamagePct.finalTotal, 3);
+  const effect = equipped.generalMultiplicativeDamage.factors.find(entry => entry.sourceId === 'simulator:Accessory.Earring');
+  assert.equal(effect?.valuePct, 6);
+  assert.equal(effect?.factor, 1.06);
+  assert.equal(removed.generalMultiplicativeDamage.value, base.generalMultiplicativeDamage.value);
+  assert.equal(removed.attributes.stats.adaptabilityPct.finalTotal, base.attributes.stats.adaptabilityPct.finalTotal);
+  assert.equal(removed.attributes.stats.critDamagePct.finalTotal, base.attributes.stats.critDamagePct.finalTotal);
+  assert.equal(removed.generalMultiplicativeDamage.factors.some(entry => entry.sourceId === 'simulator:Accessory.Earring'), false);
+});
+
 test('立繪、覺醒輸入任一技傷比例後會互補至5%，並套用至正確屬性', async () => {
   const data = await loadData();
   const loadout = {

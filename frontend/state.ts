@@ -6,6 +6,36 @@ import { isResonanceInputCell, parseResonancePoints } from "../calculation/reson
 
 export const DEFAULT_TRANSCENDENCE_SKILL_DAMAGE_SHARE_PCT = 100;
 
+/** Keep the first valid full magazine name in catalog slot order, including the alternate lowerwear. */
+export function normalizeNephronMagazineSelections(values: Record<string, string | number>, index: CatalogIndex): { clearedCells: string[]; changed: boolean } {
+  const seen = new Set<string>();
+  const clearedCells: string[] = [];
+  let changed = false;
+  const rules = index.data.nephronArmor;
+  for (const field of rules.fields) {
+    const armor = index.innerwearById(field.slotId);
+    if (!armor || values[armor.typeCell] !== '內布隆') continue;
+    const name = String(values[field.magazineCell] ?? '');
+    const magazine = rules.magazines.find(entry => entry.name === name);
+    const level = magazine?.fixedLevel === undefined ? String(values[field.magazineLevelCell] ?? '') : `Lv.${magazine.fixedLevel}`;
+    if (!name && !level) continue;
+    // A selected name reserves its slot while the user is still choosing a level.
+    if (!magazine
+      || (level !== '' && !rules.levelLabels.includes(level)) || seen.has(name)) {
+      delete values[field.magazineCell]; delete values[field.magazineLevelCell];
+      clearedCells.push(field.magazineCell, field.magazineLevelCell);
+      changed = true;
+    } else {
+      seen.add(name);
+      if (magazine.fixedLevel !== undefined && values[field.magazineLevelCell] !== level) {
+        values[field.magazineLevelCell] = level;
+        changed = true;
+      }
+    }
+  }
+  return { clearedCells, changed };
+}
+
 const optionalEffectsByCatalog = new WeakMap<CatalogIndex, {
   fields: string[]; choices: Map<string, readonly unknown[]>; circuitChoices: Map<string, readonly unknown[]>;
   valueCells: Map<string, string>;
@@ -105,6 +135,22 @@ export function normalizePortraitAwakeningSplit(
   return { strongSkillDamagePct: 0, transcendenceSkillDamagePct: maxTotalPct };
 }
 
+export interface BossHealthCondition {
+  enabled: boolean;
+  comparison: 'above' | 'below';
+  lowerwear: 'lowerwearA' | 'lowerwearB';
+}
+export const DEFAULT_BOSS_HEALTH_CONDITION: Readonly<BossHealthCondition> = Object.freeze({
+  enabled: false, comparison: 'above', lowerwear: 'lowerwearA',
+});
+export function normalizeBossHealthCondition(value: unknown): BossHealthCondition | undefined {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return undefined;
+  const candidate = value as Record<string, unknown>;
+  return { enabled: candidate.enabled === true,
+    comparison: candidate.comparison === 'below' ? 'below' : 'above',
+    lowerwear: candidate.lowerwear === 'lowerwearB' ? 'lowerwearB' : 'lowerwearA' };
+}
+
 export interface LoadoutState {
   schemaVersion: 3;
   Job: string;
@@ -112,8 +158,11 @@ export interface LoadoutState {
   lowerwearAlternativeEnabled: boolean;
   masterBeastSpiritStoneColor: "黃" | "綠" | "";
   petSkillAttackEnabled: boolean;
+  nutProtectionPotionEnabled: boolean;
+  nephronRaidEnabled: boolean;
   transcendenceSkillDamageSharePct: number;
   classSkillVersions?: Record<string, boolean>;
+  bossHealthCondition?: BossHealthCondition;
 }
 const stateKey = "dab-loadout-v1";
 const baselineKey = "dab-baseline-v1";
@@ -190,19 +239,23 @@ function parseState(raw: string | null): LoadoutState | null {
   }
   const stoneColor = candidate.masterBeastSpiritStoneColor;
   const classSkillVersions = normalizeClassSkillVersions(candidate.classSkillVersions);
+  const bossHealthCondition = normalizeBossHealthCondition(candidate.bossHealthCondition);
   return {
     schemaVersion: 3, Job: candidate.Job, values,
     lowerwearAlternativeEnabled: candidate.lowerwearAlternativeEnabled === true,
     masterBeastSpiritStoneColor: stoneColor === "綠" || stoneColor === "" ? stoneColor : "黃",
     // Missing toggle values preserve the previous always-on behavior.
     petSkillAttackEnabled: candidate.petSkillAttackEnabled !== false,
+    nutProtectionPotionEnabled: candidate.nutProtectionPotionEnabled === true,
+    nephronRaidEnabled: candidate.nephronRaidEnabled === true,
     transcendenceSkillDamageSharePct: normalizeTranscendenceSkillDamageShare(candidate.transcendenceSkillDamageSharePct),
     ...(classSkillVersions ? { classSkillVersions } : {}),
+    ...(bossHealthCondition ? { bossHealthCondition } : {}),
   };
 }
 export function readState(defaultClass: string): LoadoutState {
   try { const stored = parseState(localStorage.getItem(stateKey)); if (stored) return stored; } catch { /* Storage is optional. */ }
-  return { schemaVersion: 3, Job: defaultClass, values: {}, lowerwearAlternativeEnabled: false, masterBeastSpiritStoneColor: "黃", petSkillAttackEnabled: true, transcendenceSkillDamageSharePct: DEFAULT_TRANSCENDENCE_SKILL_DAMAGE_SHARE_PCT };
+  return { schemaVersion: 3, Job: defaultClass, values: {}, lowerwearAlternativeEnabled: false, masterBeastSpiritStoneColor: "黃", petSkillAttackEnabled: true, nutProtectionPotionEnabled: false, nephronRaidEnabled: false, transcendenceSkillDamageSharePct: DEFAULT_TRANSCENDENCE_SKILL_DAMAGE_SHARE_PCT };
 }
 export function readBaseline(): LoadoutState | null {
   try { return parseState(localStorage.getItem(baselineKey)); } catch { return null; }
