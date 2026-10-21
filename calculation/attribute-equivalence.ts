@@ -1,6 +1,6 @@
 import { calculateAttack, resolveAttackParameters } from './attack.ts';
 import { calculateFinalDamage } from './final-damage.ts';
-import { finalDamageInputs, type LoadoutCalculationInput, type LoadoutCalculationResult } from './loadout-engine.ts';
+import { calculateLoadout, finalDamageInputs, type LoadoutCalculationInput, type LoadoutCalculationResult } from './loadout-engine.ts';
 import { calculateProductStat } from './multiplicative.ts';
 
 type Channel = 'attack' | 'final' | 'conditional' | 'product' | 'critProduct';
@@ -27,6 +27,12 @@ export interface AttributeEquivalenceCalculator {
   compare(baseKey: EquivalenceKey, delta: number): EquivalenceComparison;
 }
 
+export interface CombinedAttributeComparison {
+  baseDamage: number;
+  simulatedDamage: number;
+  gainPct: number;
+}
+
 const MAX_DELTA_PCT = 1_000_000;
 const isEquivalenceKey = (key: string): key is EquivalenceKey => Object.hasOwn(channels, key);
 
@@ -34,6 +40,28 @@ const isEquivalenceKey = (key: string): key is EquivalenceKey => Object.hasOwn(c
 export function comparableAttributes(metadata: readonly { key: string; name: string; unit: string; active: boolean }[]): EquivalenceAttribute[] {
   return metadata.filter(entry => entry.active && entry.unit === 'percent' && isEquivalenceKey(entry.key))
     .map(entry => ({ key: entry.key as EquivalenceKey, name: entry.name }));
+}
+
+/** Apply the complete set of temporary deltas in one ordinary engine evaluation. */
+export function calculateCombinedAttributeChange(input: LoadoutCalculationInput, baseline: LoadoutCalculationResult,
+  deltas: Readonly<Partial<Record<EquivalenceKey, number>>>): CombinedAttributeComparison | null {
+  const baseDamage = baseline.finalDamage.finalDamage;
+  if (!Number.isFinite(baseDamage) || baseDamage < 0) return null;
+  const stats: Partial<Record<EquivalenceKey, number>> = {};
+  for (const [key, value] of Object.entries(deltas)) {
+    if (!isEquivalenceKey(key) || !Number.isFinite(value) || Math.abs(value) > MAX_DELTA_PCT) return null;
+    if (value !== 0) stats[key] = value;
+  }
+  if (!Object.keys(stats).length) return { baseDamage, simulatedDamage: baseDamage, gainPct: 0 };
+  if (baseDamage === 0) return null;
+  try {
+    const temporary = { ...input, sources: { ...input.sources, shared: [...input.sources.shared,
+      { sourceId: 'attribute-equivalence:combined', stats }] } };
+    const simulatedDamage = calculateLoadout(temporary).finalDamage.finalDamage;
+    const gainPct = (simulatedDamage / baseDamage - 1) * 100;
+    return Number.isFinite(simulatedDamage) && simulatedDamage >= 0 && Number.isFinite(gainPct)
+      ? { baseDamage, simulatedDamage, gainPct } : null;
+  } catch { return null; }
 }
 
 /** Keep all hypothetical inputs outside the saved loadout and reuse the existing engine stages. */

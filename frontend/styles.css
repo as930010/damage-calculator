@@ -274,9 +274,22 @@ footer{position:relative; isolation:isolate; overflow:hidden; display:flex; flex
 .attribute-equivalence-scroll .attribute-equivalence-active{background:var(--accent-surface)}
 .attribute-equivalence-scroll .attribute-equivalence-active th{color:var(--accent)}
 .attribute-equivalence-status{margin-top:12px}
+.attribute-equivalence-modes{display:flex;flex-wrap:wrap;gap:8px;padding:0 22px 14px}
+.attribute-equivalence-modes button{min-height:40px;padding:8px 14px;font-size:13px}
+.attribute-equivalence-modes button[aria-pressed="true"]{border-color:var(--accent-border);background:var(--accent-surface);color:var(--accent)}
+.attribute-combined-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:14px 18px;margin-top:18px}
+.attribute-combined-fields .field{min-width:0}
+.attribute-combined-fields input{width:100%;font-variant-numeric:tabular-nums}
+.attribute-combined-fields input[aria-invalid="true"]{border-color:var(--negative)}
+.attribute-combined-results{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:20px}
+.attribute-combined-results strong.gain-positive{color:var(--positive)}
+.attribute-combined-results strong.gain-negative{color:var(--negative)}
 @media(max-width:600px){
   .attribute-equivalence-content{padding:0 12px 16px}
   .attribute-equivalence-scroll table{min-width:320px;font-size:11px}
   .attribute-equivalence-scroll th,.attribute-equivalence-scroll td{padding:8px 6px}
   .attribute-equivalence-scroll input{padding:6px;font-size:12px}
+  .attribute-equivalence-modes{padding:0 12px 12px}
+  .attribute-equivalence-modes button{flex:1;min-height:44px;padding-inline:8px;font-size:12px}
+  .attribute-combined-results{grid-template-columns:minmax(0,1fr);gap:8px}
 }
