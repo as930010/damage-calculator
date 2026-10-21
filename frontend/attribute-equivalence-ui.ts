@@ -29,7 +29,7 @@ export function createAttributeEquivalencePanel(metadata: readonly AttributeMeta
   const content = document.createElement('div');
   content.className = 'attribute-equivalence-content';
   const note = document.createElement('p');
-  note.textContent = '選擇任一屬性並輸入額外增加的百分點（最多小數後三位）；依目前配裝的最終傷害，反算其他屬性的等效增量。試算不會修改配裝；顯示值向上取至三位，攻擊類因整數取整，收益可能略高於目標。';
+  note.textContent = '在任一屬性處輸入增加的%數（最多採計到小數後三位）；依目前配裝的傷害反算其他屬性的增幅，此處試算不會修改配裝；顯示至小數後三位、攻擊力取整數，收益可能會有小數點後四位的細微誤差。';
   const scroll = document.createElement('div');
   scroll.className = 'attribute-equivalence-scroll';
   const table = document.createElement('table');

@@ -979,6 +979,71 @@ test('baseline restore synchronizes stage controls without altering the saved ba
   } finally { page.close(); }
 });
 
+for (const restoration of ['baseline', 'import']) test(`${restoration} restores edited global effect controls, calculation and history together`, async () => {
+  const initial = structuredClone(stateA);
+  initial.petSkillAttackEnabled = true;
+  initial.nutProtectionPotionEnabled = false;
+  Object.assign(initial.values, {
+    'Effect.Consumable': '適應靈藥', 'Effect.Environment': '小屋/溫泉', 'Peak.Option': '精神挑戰者',
+    'Pet.Passive': gameData.pets.options[0].name, 'Effect.Emblem': '沒有',
+    'Effect.PortraitAwakening.StrongSkillDamagePct': 1, 'Effect.PortraitAwakening.TranscendenceSkillDamagePct': 4,
+    'Left.Armor.SetColor': '紅', 'Atma.Element': '流水', 'Atma.Color': '米色',
+    'GuildFountain.Stage2': '致命一擊+1%', 'GuildFountain.Stage3': '攻擊力+40', 'GuildFountain.Stage4': '排熱+3%',
+  });
+  for (const effect of gameData.resonance.effects) initial.values[effect.settingKey] = effect.name === '兩極' || effect.name === 'B傷' ? 50 : 100;
+  const page = await uiPage(initial, initial);
+  let reloaded;
+  try {
+    const { document, Event } = page.dom.window;
+    const controls = target => [...target.dom.window.document.querySelectorAll('#global-source-fields input')]
+      .map(input => [input.getAttribute('aria-label'), input.type, input.value, input.checked, input.disabled]);
+    const damage = target => target.dom.window.document.querySelector('#damage-result').textContent;
+    document.querySelector('#baseline').click();
+    const original = { state: page.readState(), controls: controls(page), damage: damage(page), sources: document.querySelector('#results').textContent };
+    const originalJson = await page.exportJson();
+    const baselineJson = page.dom.window.localStorage.getItem('dab-baseline-v1');
+    for (const [label, value] of [
+      ['消耗品', '天上甜點'], ['場地', '集合地'], ['巔峰選項', '嗜肉骨斷'],
+      ['寵物', gameData.pets.options.find(option => option.name !== initial.values['Pet.Passive']).name],
+      ['標誌', '有'], ['百億/內布隆套效', '藍'], ['亞特瑪屬性', '草木'], ['亞特瑪顏色', '藍色'],
+      ['2階', '致命一擊+2%'], ['3階', '攻擊力+80'], ['4階', '所有技能傷害+0.6%'],
+    ]) selectPicker(page, label, value);
+    for (const checkbox of document.querySelectorAll('#global-source-fields input[type="checkbox"]')) {
+      checkbox.checked = !checkbox.checked; checkbox.dispatchEvent(new Event('change'));
+    }
+    enter(page, '立繪、覺醒強烈技傷%', '3');
+    const resonance = [...document.querySelectorAll('#global-source-fields .global-input-group')]
+      .find(group => group.querySelector('h3').textContent === '共鳴輸入');
+    for (const input of resonance.querySelectorAll('input')) {
+      input.value = '27'; input.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    const edited = { state: page.readState(), controls: controls(page), damage: damage(page) };
+    assert.notEqual(edited.damage, original.damage);
+    assert.notDeepEqual(edited.controls, original.controls);
+    const assertRestored = () => {
+      assert.deepEqual(page.readState(), original.state, 'saved configuration');
+      assert.deepEqual(page.evaluated.at(-1), original.state, 'calculation configuration');
+      assert.deepEqual(controls(page), original.controls, 'global controls');
+      assert.equal(damage(page), original.damage);
+      assert.equal(document.querySelector('#results').textContent, original.sources);
+      assert.equal(page.dom.window.localStorage.getItem('dab-baseline-v1'), baselineJson);
+    };
+    if (restoration === 'baseline') document.querySelector('#restore-baseline').click();
+    else await page.importJson(JSON.stringify(originalJson));
+    assertRestored();
+    document.querySelector('#undo').click();
+    assert.deepEqual(page.readState(), edited.state);
+    assert.deepEqual(controls(page), edited.controls);
+    assert.equal(damage(page), edited.damage);
+    document.querySelector('#redo').click(); assertRestored();
+    const exported = await page.exportJson();
+    assert.equal(exported.nutProtectionPotionEnabled, false);
+    reloaded = await uiPage(page.readState(), original.state);
+    assert.deepEqual(controls(reloaded), original.controls);
+    assert.equal(damage(reloaded), original.damage);
+  } finally { page.close(); reloaded?.close(); }
+});
+
 test('reload restores the imported stage and its damage, including legacy decimal boss defense', async () => {
   const page = await uiPage();
   let restored;
