@@ -3182,11 +3182,11 @@
     }
   },
   "pages": {
-    "same": "e6bcfd4523898a97ad7f2804fd5ae83fcea62132c5f1e538ea9b7fb5a21ca096",
-    "different": "840cd16f88c5c01d3177f55a57c206519a63622a9289ac47268bf14eb5fcc791",
+    "same": "74c4812710136bd92dcb2b991c84dd4b1cf7aeddf81fa2655e90d8cc89efcc72",
+    "different": "31483f798f918034caa1d11b7f09d946c62eeba56e98b9fe9a2ada8e2485a670",
     "invalid-baseline": "ca5cef544369d936c75cd734d0bc22316c48f93be27f8c279bef894b3f336727",
-    "fallback-baseline": "e5a7b13773ac96a323cd71c4338c9b2c971bb555639718e1f2d879e51b5d04d5",
-    "fallback-current": "7538ac9a6ad549afe96a7cf39e60b6fd582c3b219945dd1c86e124569ec371a2"
+    "fallback-baseline": "e5b4fa4f35bee3c68e6e61e25243a783e0fc47a197cf4e4c6ed2287f19e3a36d",
+    "fallback-current": "5e708248c891c6e74ee9b1fc75ba02358fd14880756d33f48db80aae50d8f7f5"
   },
   "workload": {
     "public-complete": {
