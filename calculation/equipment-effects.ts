@@ -673,17 +673,23 @@ export function resolveAccessoryEffectOptions(
   return result;
 }
 
-/** Resolve the color-dependent 百億套效, including its input-sensitive green formula. */
+/** Resolve 百億套效, including the blue earring bonus and input-sensitive green formula. */
 export function resolveColorSetEffect(
   document: ColorSetEffectDocument,
   selectedName: string | null | undefined,
   sourceAttribute: string | null | undefined,
   sourceValue: number | null | undefined,
+  equippedEarring?: string | null,
 ): StatContribution | null {
   if (selectedName == null || selectedName.trim() === "") return null;
   const option = document.options.find((candidate) => candidate.name === selectedName);
   if (!option) throw new RangeError(`百億/內布隆套效「${selectedName}」沒有對應的計算資料。`);
-  if (option.stats) return { sourceId: `color-set:${selectedName}`, stats: option.stats };
+  if (option.stats) {
+    const stats = selectedName === "藍" && equippedEarring === "天線耳環"
+      ? { ...option.stats, multiplicativeDamagePct: 12 }
+      : option.stats;
+    return { sourceId: `color-set:${selectedName}`, stats };
+  }
   if (!option.calculatedStat) throw new RangeError(`百億/內布隆套效「${selectedName}」沒有計算規則。`);
   const formula = option.calculatedStat;
   const rawValue = sourceAttribute === formula.requiredAttribute ? sourceValue ?? 0 : 0;
