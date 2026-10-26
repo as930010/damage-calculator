@@ -45,7 +45,14 @@ for (const context of choiceContexts()) {
     for (const field of Object.keys(fixture.choices[context.id])) {
       const additions = gameData.nephronArmor.fields.some(entry => entry.magazineField === field) ? ['支援彈匣I', '支援彈匣II'] : [];
       const expected = fixture.choices[context.id][field];
-      assert.deepEqual(normalize(index.resolveFieldChoices(field, context.values)), additions.length ? [...expected, ...additions] : expected, field);
+      const magicStoneMapping = index.equipmentMappings.get(field);
+      const stoneAdditions = magicStoneMapping?.catalogFile === gameData.mapping.magicStoneSelections.catalogFile
+        ? magicStoneMapping.application === 'armor'
+          ? { '亞特瑪2.5%超越': ['亞特瑪2.5%強烈', '亞特瑪2.5%超越', '亞特瑪2%強烈/超越'] }
+          : { '亞特瑪5%超越': ['亞特瑪5%強烈', '亞特瑪5%超越', '亞特瑪4%強烈/超越'] }
+        : {};
+      const currentExpected = Array.isArray(expected) ? expected.flatMap(choice => stoneAdditions[choice] ?? [choice]) : expected;
+      assert.deepEqual(normalize(index.resolveFieldChoices(field, context.values)), additions.length ? [...currentExpected, ...additions] : currentExpected, field);
     }
   });
 }
