@@ -728,6 +728,31 @@ test('MN second multiplicative crit source is labeled 硝基馬達 without chang
   } finally { page.close(); }
 });
 
+test('CU critical damage shows 解放意志 5% multiplicative and 精神集中 15% additive sources', async () => {
+  const page = await uiPage();
+  try {
+    selectPicker(page, '職業', 'CU');
+    const { document } = page.dom.window;
+    const rows = [...document.querySelectorAll('#results .stat-source-row')].map(node => node.textContent);
+    assert.ok(rows.some(text => text.includes('解放意志') && text.includes('×1.05')));
+    assert.ok(rows.some(text => text.includes('精神集中') && text.includes('+15%')));
+  } finally { page.close(); }
+});
+
+test('亞特瑪強烈／超越魔法石 can be selected and restored without reverting to 無關傷害', async () => {
+  const page = await uiPage();
+  try {
+    const fieldId = 'Left.Armor.Upper.MagicStone.1';
+    const slot = gameData.layout.slots.find(entry => entry.stoneFields?.includes(fieldId));
+    page.dom.window.document.querySelector(`.gear-slot[data-slot-id="${slot.id}"]`).click();
+    selectPicker(page, '魔法石 1', '亞特瑪2%強烈/超越');
+    assert.equal(page.readState().values[fieldId], '亞特瑪2%強烈/超越');
+    const restored = await uiPage(page.readState());
+    try { assert.equal(restored.readState().values[fieldId], '亞特瑪2%強烈/超越'); }
+    finally { restored.close(); }
+  } finally { page.close(); }
+});
+
 test('努特的庇護 toggles the 1.3333 crit multiplier and stays synchronized with save, history and JSON', async () => {
   const page = await uiPage();
   try {

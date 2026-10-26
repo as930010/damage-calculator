@@ -190,6 +190,25 @@ test('magic stone application labels and stats remain distinct; inactive items d
   assert.equal(createCatalogIndex(data).resolveEquipmentCode(full, transfer.equipmentTransferCode(item.id)), null);
 });
 
+test('every selectable magic stone remains valid after input normalization', () => {
+  const catalog = gameData.catalogs[gameData.mapping.magicStoneSelections.catalogFile].items.filter(item => item.active);
+  let validatedFields = 0;
+  for (const mapping of gameData.mapping.magicStoneSelections.inputGroups) {
+    const names = catalog.map(item => item.targetApplications?.[mapping.application]?.sourceName ?? item.name);
+    const choices = index.resolveFieldChoices(mapping.selectionField, {});
+    if (choices) {
+      validatedFields++;
+      for (const name of names) assert.ok(choices.includes(name), `${mapping.selectionField}: ${name}`);
+    }
+    for (const name of names.filter(name => name.startsWith('亞特瑪') && name.includes('強烈'))) {
+      const values = { [mapping.selectionField]: name };
+      normalizeOptionalEffectValues(values, index);
+      assert.equal(values[mapping.selectionField], name, mapping.selectionField);
+    }
+  }
+  assert.ok(validatedFields > 0, 'magic stone fields must exercise the validation catalog');
+});
+
 test('index queries and current normalization leave saved baseline and cached evaluation unchanged', async () => {
   const { createBaselineEvaluationCache } = await runtime.load('frontend/baseline-evaluation.ts');
   const { normalizePortraitAwakeningValues, migrateLegacyPortraitAwakening } = await runtime.load('frontend/state.ts');

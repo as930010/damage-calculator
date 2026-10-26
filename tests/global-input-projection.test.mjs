@@ -716,13 +716,14 @@ test('職業加算爆傷、乘算爆傷與 Boss 傷害按獨立公式投影', as
   const keWithoutPassive = projectDamage(noKeCritPassive, stateFor('KE')).result;
   assert.ok(Math.abs(ke.finalDamage.critFactor - keWithoutPassive.finalDamage.critFactor - ke.combatRates.critRate.finalRate * 0.08) < 1e-12);
 
-  for (const [classId, expectedValues] of [['LA', [5]], ['HE', [28]], ['EW', [20]], ['MN', [10, 15]]]) {
+  for (const [classId, expectedValues] of [['LA', [5]], ['HE', [28]], ['EW', [20]], ['MN', [10, 15]], ['CU', [5]]]) {
     const result = projectDamage(data, stateFor(classId)).result;
     const prefix = 'class-passive:' + classId + ':multiplicative-crit-damage:';
     const sources = result.multiplicativeCritDamage.factors.filter(effect => effect.sourceId.startsWith(prefix));
     assert.deepEqual(sources.map(effect => effect.valuePct), expectedValues, classId);
     if (classId === 'EW') assert.equal(result.classCritDamagePassivePct, 15);
     if (classId === 'MN') assert.equal(result.classCritDamagePassivePct, 0);
+    if (classId === 'CU') assert.equal(result.classCritDamagePassivePct, 15);
     const expectedProduct = result.multiplicativeCritDamage.factors.reduce((product, effect) => product * (1 + effect.valuePct / 100), 1);
     assert.equal(result.multiplicativeCritDamage.productBeforeBaseline, expectedProduct, classId);
     assert.ok(Math.abs(result.multiplicativeCritDamage.value - (expectedProduct - result.multiplicativeCritDamage.baselinePct / 100)) < 1e-12, classId);

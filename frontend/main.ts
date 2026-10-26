@@ -589,6 +589,7 @@ async function start() {
       const [, classId, kind] = sourceId.split(':');
       if (kind === 'boss-damage') return classId + '自身技能';
       if (kind === 'multiplicative-crit-damage') {
+        if (sourceId === 'class-passive:CU:multiplicative-crit-damage:1') return '解放意志';
         if (sourceId === 'class-passive:MN:multiplicative-crit-damage:2') return 'MN 硝基馬達';
         if (['TB', 'BMa', 'MN', 'PO'].includes(classId)) return classId + ' 爆發模式';
         if (['CT', 'IN', 'DA', 'DE'].includes(classId)) return classId + ' 懲戒紋章';
@@ -1893,7 +1894,7 @@ async function start() {
       if (firstInnerwearIndex >= 0) commonSources.splice(Math.min(firstInnerwearIndex, commonSources.length), 0, ...innerwearSources);
       else commonSources.push(...innerwearSources);
       const passiveSourceRow = isCritDamage && currentDamage && currentDamage.result.classCritDamagePassivePct > 0
-        ? `<p class="stat-source-row"><span>${h(currentClass?.id ?? state.Job)}自身技能</span><strong>+${fmt(currentDamage.result.classCritDamagePassivePct)}%</strong></p>`
+        ? `<p class="stat-source-row"><span>${state.Job === 'CU' ? '精神集中' : h(currentClass?.id ?? state.Job) + '自身技能'}</span><strong>+${fmt(currentDamage.result.classCritDamagePassivePct)}%</strong></p>`
         : '';
       const sharedDetails = commonSources.length || passiveSourceRow
         ? `<p class="stat-detail-heading">共同來源</p>${sourceRows(commonSources, isPercent)}${passiveSourceRow}`
