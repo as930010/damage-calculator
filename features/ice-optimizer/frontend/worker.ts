@@ -1,4 +1,4 @@
-import { rankIceRecommendations, searchIce } from './search.ts';
+import { isThreeSetIceCandidate, rankIceRecommendations, searchIce } from './search.ts';
 import type { IceResult, IceSearchResult, IceStrategyMetrics } from './search.ts';
 import type { GameData } from '../../../frontend/data.ts';
 import type { LoadoutState } from '../../../frontend/state.ts';
@@ -16,7 +16,10 @@ self.addEventListener('message', async (event: MessageEvent<{
     let mergeMs = 0;
     const merge = (groups: readonly IceResult[], baselineDamage: number) => {
       const before = performance.now();
-      merged = rankIceRecommendations([...merged, ...groups].flatMap(group => group.alternatives ?? [group]), baselineDamage);
+      const candidates = [...merged, ...groups].flatMap(group => group.alternatives ?? [group])
+        .filter(candidate => isThreeSetIceCandidate(event.data.data, candidate.choices, candidate.setNames,
+          event.data.constraints, event.data.state.values));
+      merged = rankIceRecommendations(candidates, baselineDamage);
       mergeMs += performance.now() - before;
       return merged;
     };

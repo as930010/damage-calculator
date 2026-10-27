@@ -143,7 +143,7 @@ for (const model of ['existing-slots', 'series']) test(`以合法關卡值重新
   assert.ok(verified.damage > earlierWinner.damage);
   const values = { ...state.values, ...witness.choices };
   game.rightIceSets.selectionFields.forEach((field, index) => { values[field] = witness.setNames[index] ?? ''; });
-  const kept = await searchIce(game, { ...state, values }, () => {}, { fixedFields: domains.map(domain => domain.field) });
+  const kept = await searchIce(game, { ...state, values }, () => {}, { fixedFields: domains.slice(0, 11).map(domain => domain.field) });
   assert.equal(kept.baselineInScope, true);
   assert.ok(kept.results[0].damage >= verified.damage);
   assert.equal(kept.globallyOptimalProven, false, '已知下界不等於真正最佳答案');

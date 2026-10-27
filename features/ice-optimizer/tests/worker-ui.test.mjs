@@ -113,5 +113,56 @@ test('即時排名、取消、過期訊息及套用要求均使用同一份搜�
       `${winner.choices[variantEntry.selectionField]} / ${replacement.name}`);
     assert.equal(tieDetails[0].querySelectorAll('.optimizer-apply').length, 2,
       'each alternative remains individually applicable');
+
+    const setSelect = document.querySelector('#required-set');
+    const requiredId = setSelect.value;
+    document.querySelector('#set-add').click();
+    assert.ok(document.querySelector('#optimizer-results').textContent.includes('目前配裝基準傷害'));
+    assert.ok([...document.querySelectorAll('.optimizer-apply')].every(button => button.disabled));
+    assert.equal(start.disabled, false);
+    start.click();
+    const constrained = workers.at(-1);
+    assert.deepEqual(constrained.request.constraints.requiredSetEffectIds, [requiredId]);
+    document.querySelector('#set-add').click();
+    assert.equal(constrained.terminated, true, 'changing conditions cancels the old worker');
+    constrained.send('complete', { result });
+    assert.equal(document.querySelector('#optimizer-results').childElementCount, 0);
+
+    document.querySelector('#constraint-clear').click();
+    const slotControl = document.querySelector('#fixed-slot');
+    const itemControl = document.querySelector('#fixed-item');
+    for (const entry of right.slice(0, 11)) {
+      slotControl.value = entry.selectionField;
+      slotControl.dispatchEvent(new dom.window.Event('change'));
+      itemControl.value = gameData.catalogs[entry.catalogFile].items.find(item =>
+        item.active && item.slotId === entry.slotId && item.name === '騎士團').id;
+      document.querySelector('#fixed-add').click();
+    }
+    assert.match(document.querySelector('#fixed-count').textContent, /11／11/);
+    assert.equal(document.querySelector('#fixed-add').disabled, true);
+    assert.equal(start.disabled, true);
+    assert.match(document.querySelector('#constraint-status').textContent, /無法同時達成/);
+
+    document.querySelector('#constraint-clear').click();
+    const rangeStart = document.querySelector('#range-start'), rangeEnd = document.querySelector('#range-end');
+    rangeStart.value = '紫霄花郎'; rangeStart.dispatchEvent(new dom.window.Event('change'));
+    assert.equal(start.disabled, true);
+    assert.match(document.querySelector('#constraint-status').textContent, /同時選擇/);
+    rangeEnd.value = '深淵的存在'; rangeEnd.dispatchEvent(new dom.window.Event('change'));
+    assert.equal(start.disabled, true);
+    assert.match(document.querySelector('#constraint-status').textContent, /不可位於/);
+    rangeEnd.value = '真理假面'; rangeEnd.dispatchEvent(new dom.window.Event('change'));
+    assert.equal(start.disabled, true, 'two set series cannot satisfy the three-set rule');
+    assert.match(document.querySelector('#constraint-status').textContent, /無法|沒有可用/);
+    rangeEnd.value = '幻影面紗'; rangeEnd.dispatchEvent(new dom.window.Event('change'));
+    assert.equal(start.disabled, false);
+    start.click();
+    const rangedWorker = workers.at(-1);
+    assert.equal(rangedWorker.request.constraints.rangeStart, '紫霄花郎');
+    assert.equal(rangedWorker.request.constraints.rangeEnd, '幻影面紗');
+    document.querySelector('#range-clear').click();
+    assert.equal(rangedWorker.terminated, true);
+    rangedWorker.send('complete', { result });
+    assert.equal(document.querySelector('#optimizer-results').childElementCount, 0);
   } finally { dom.window.close(); }
 });

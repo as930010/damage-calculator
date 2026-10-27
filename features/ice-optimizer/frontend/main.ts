@@ -5,17 +5,36 @@ import { stageIceOptimizerHandoff } from '../../../frontend/ice-optimizer-handof
 import type { GameData } from '../../../frontend/data.ts';
 import type { LoadoutState } from '../../../frontend/state.ts';
 import { attributeDifferences } from './attribute-differences.ts';
-import { describeIceSearchStatus, isThreeSetIceCandidate, sameDamage } from './search.ts';
+import { describeIceSearchStatus, generateThreeSetStructures, isThreeSetIceCandidate, sameDamage } from './search.ts';
 import type { IceProgress, IceResultAlternative, IceSearchResult } from './search.ts';
+import { iceRangeNames, iceSeriesOrder, requiredIceSetNames, snapshotIceSearchConstraints } from './search-policy.ts';
+import type { IceSearchConstraints } from './search-policy.ts';
 
 const savedStateKey = 'dab-loadout-v1';
 const savedSearchKey = 'dab-ice-optimizer-result-v1';
+const conditionsKey = 'dab-ice-optimizer-conditions-v1';
 const status = document.querySelector<HTMLElement>('#optimizer-status')!;
 const progress = document.querySelector<HTMLElement>('#optimizer-progress')!;
 const results = document.querySelector<HTMLElement>('#optimizer-results')!;
 const startButton = document.querySelector<HTMLButtonElement>('#optimizer-start')!;
 const cancelButton = document.querySelector<HTMLButtonElement>('#optimizer-cancel')!;
 const clearButton = document.querySelector<HTMLButtonElement>('#optimizer-clear')!;
+const fixedSlot = document.querySelector<HTMLSelectElement>('#fixed-slot')!;
+const fixedItem = document.querySelector<HTMLSelectElement>('#fixed-item')!;
+const fixedAdd = document.querySelector<HTMLButtonElement>('#fixed-add')!;
+const setSelect = document.querySelector<HTMLSelectElement>('#required-set')!;
+const setAdd = document.querySelector<HTMLButtonElement>('#set-add')!;
+const fixedList = document.querySelector<HTMLElement>('#fixed-list')!;
+const setList = document.querySelector<HTMLElement>('#set-list')!;
+const conditionStatus = document.querySelector<HTMLElement>('#constraint-status')!;
+const conditionClear = document.querySelector<HTMLButtonElement>('#constraint-clear')!;
+const rangeStart = document.querySelector<HTMLSelectElement>('#range-start')!;
+const rangeEnd = document.querySelector<HTMLSelectElement>('#range-end')!;
+const rangeClear = document.querySelector<HTMLButtonElement>('#range-clear')!;
+const rangeCount = document.querySelector<HTMLElement>('#range-count')!;
+const rangeExceptions = document.querySelector<HTMLElement>('#range-exceptions')!;
+let conditions: IceSearchConstraints = { requiredItemIds: {}, requiredSetEffectIds: [] };
+let conditionsValid = false;
 let worker: Worker | null = null;
 let gameData: GameData | null = null;
 let searchBaseRaw: string | null = null;
@@ -34,7 +53,7 @@ const dataRevision = () => {
 const workerUrl = () => document.querySelector<HTMLMetaElement>('meta[name="optimizer-worker-url"]')?.content ?? '';
 const searchRevision = () => `${dataRevision()}|${workerUrl()}`;
 const setRunning = (running: boolean) => {
-  startButton.disabled = running || !gameData;
+  startButton.disabled = running || !gameData || !conditionsValid;
   cancelButton.disabled = !running;
   clearButton.disabled = running || !results.childElementCount;
 };
@@ -45,6 +64,138 @@ const stopWorker = () => {
 };
 const relativeGain = (value: number, baseline: number) => baseline > 0
   ? ((value / baseline - 1) * 100).toFixed(3) + '%' : '—';
+
+const conditionKey = (value: IceSearchConstraints) => JSON.stringify(snapshotIceSearchConstraints(value));
+function refreshConditionOptions() {
+  if (!gameData) return;
+  const data = gameData;
+  const selections = data.mapping.selections.filter(entry => entry.catalogFile === 'equipment/right-ice.json');
+  const labels = new Map(data.layout.slots.filter(slot => slot.selectionField).map(slot => [slot.selectionField!, slot.label]));
+  const fixed = conditions.requiredItemIds ?? {};
+  const addOption = (select: HTMLSelectElement, label: string, value: string) => {
+    const option = document.createElement('option'); option.textContent = label; option.value = value; select.add(option);
+  };
+  let order: string[] = [];
+  let orderError = '';
+  try { order = iceSeriesOrder(data); }
+  catch (error) { orderError = error instanceof Error ? error.message : '無法讀取套裝順序。'; }
+  for (const [select, value] of [[rangeStart, conditions.rangeStart ?? ''], [rangeEnd, conditions.rangeEnd ?? '']] as const) {
+    select.replaceChildren(); addOption(select, '全部系列', '');
+    for (const name of select === rangeEnd ? [...order].reverse() : order) addOption(select, name, name);
+    if (value && !order.includes(value)) addOption(select, `無效套裝：${value}`, value);
+    select.value = value;
+    select.disabled = Boolean(orderError);
+  }
+  rangeClear.disabled = !conditions.rangeStart && !conditions.rangeEnd;
+  rangeExceptions.textContent = '';
+  try {
+    const range = iceRangeNames(data, conditions);
+    rangeCount.textContent = range ? `（${range.length} 個系列）` : '';
+    if (range) {
+      const exceptions: string[] = [];
+      for (const [field, id] of Object.entries(fixed)) {
+        const entry = selections.find(candidate => candidate.selectionField === field);
+        const item = entry && data.catalogs[entry.catalogFile]?.items.find(candidate => candidate.id === id && candidate.slotId === entry.slotId && candidate.active);
+        if (item && !range.includes(item.name)) exceptions.push(`固定單件：${item.name}・${labels.get(field) ?? field}`);
+      }
+      for (const name of requiredIceSetNames(data, conditions)) if (!range.includes(name)) exceptions.push(`必選套效：${name}・全系列`);
+      rangeExceptions.textContent = exceptions.length
+        ? `範圍外例外：${exceptions.join('；')}。例外不會改變起始及結束套裝。` : '指定範圍外的固定裝備或必選套效會自動加入例外，不改變範圍。';
+    }
+    if (orderError) rangeExceptions.textContent = orderError;
+  } catch { rangeCount.textContent = ''; }
+  const previousSlot = fixedSlot.value;
+  fixedSlot.replaceChildren();
+  for (const entry of selections.filter(entry => !(entry.selectionField in fixed))) {
+    addOption(fixedSlot, labels.get(entry.selectionField) ?? entry.selectionField, entry.selectionField);
+  }
+  if ([...fixedSlot.options].some(option => option.value === previousSlot)) fixedSlot.value = previousSlot;
+  const selection = selections.find(entry => entry.selectionField === fixedSlot.value);
+  fixedItem.replaceChildren();
+  if (selection) for (const item of data.catalogs[selection.catalogFile]?.items ?? []) {
+    if (item.active && item.slotId === selection.slotId) addOption(fixedItem, item.name, item.id);
+  }
+  fixedAdd.disabled = Object.keys(fixed).length >= 11 || !fixedItem.value;
+  document.querySelector<HTMLElement>('#fixed-count')!.textContent = `${Object.keys(fixed).length}／11`;
+  fixedList.replaceChildren();
+  for (const [field, id] of Object.entries(fixed)) {
+    const entry = selections.find(item => item.selectionField === field);
+    const item = entry && data.catalogs[entry.catalogFile]?.items.find(item => item.id === id && item.slotId === entry.slotId && item.active);
+    const row = document.createElement('li');
+    const label = document.createElement('span');
+    label.textContent = `${labels.get(field) ?? field}：${item?.name ?? '無效裝備 ' + id}`;
+    const remove = document.createElement('button');
+    remove.type = 'button'; remove.textContent = '解除';
+    remove.addEventListener('click', () => { const next = { ...conditions.requiredItemIds }; delete next[field]; conditions = { ...conditions, requiredItemIds: next }; conditionsChanged(); });
+    row.append(label, remove); fixedList.append(row);
+  }
+  const selected = conditions.requiredSetEffectIds ?? [];
+  const chosenNames = new Set(selected.map(id => data.rightIceSets.effects.find(effect => effect.id === id)?.setName).filter(Boolean));
+  const series = new Map<string, string>();
+  for (const effect of data.rightIceSets.effects) if (effect.active && !series.has(effect.setName)) series.set(effect.setName, effect.id);
+  const previousSet = setSelect.value;
+  setSelect.replaceChildren();
+  for (const [name, id] of series) if (!chosenNames.has(name)) addOption(setSelect, name, id);
+  if ([...setSelect.options].some(option => option.value === previousSet)) setSelect.value = previousSet;
+  setAdd.disabled = selected.length >= 3 || !setSelect.value;
+  document.querySelector<HTMLElement>('#set-count')!.textContent = `${selected.length}／3`;
+  setList.replaceChildren();
+  for (const id of selected) {
+    const name = data.rightIceSets.effects.find(effect => effect.id === id && effect.active)?.setName;
+    const row = document.createElement('li');
+    const label = document.createElement('span'); label.textContent = name ?? `無效套效 ${id}`;
+    const remove = document.createElement('button'); remove.type = 'button'; remove.textContent = '移除';
+    remove.addEventListener('click', () => { conditions = { ...conditions, requiredSetEffectIds: selected.filter(item => item !== id) }; conditionsChanged(); });
+    row.append(label, remove); setList.append(row);
+  }
+  conditionClear.disabled = !Object.keys(fixed).length && !selected.length && !conditions.rangeStart && !conditions.rangeEnd;
+}
+
+function validateConditions() {
+  if (!gameData) return;
+  try {
+    requiredIceSetNames(gameData, conditions);
+    const state = readState(gameData.classes.classes.find(entry => entry.active)?.id ?? 'DaB');
+    const choices = Object.fromEntries(gameData.mapping.selections.filter(entry => entry.catalogFile === 'equipment/right-ice.json')
+      .map(entry => [entry.selectionField, String(state.values[entry.selectionField] ?? '')]));
+    if (!generateThreeSetStructures(gameData, choices, conditions, 1).seeds.length) {
+      throw new RangeError('目前範圍、固定裝備與必選套效無法同時達成三組至少 3set，請調整搜尋條件。');
+    }
+    conditionsValid = true;
+    conditionStatus.textContent = '條件可成立';
+  } catch (error) {
+    conditionsValid = false;
+    conditionStatus.textContent = error instanceof Error ? error.message : '搜尋條件無法成立。';
+  }
+  conditionStatus.dataset.invalid = String(!conditionsValid);
+  setRunning(Boolean(worker));
+}
+
+function conditionsChanged() {
+  if (worker) stopWorker();
+  resultValid = false;
+  results.querySelectorAll<HTMLButtonElement>('.optimizer-apply').forEach(button => { button.disabled = true; });
+  try { sessionStorage.setItem(conditionsKey, JSON.stringify(conditions)); sessionStorage.removeItem(savedSearchKey); } catch { /* Storage is optional. */ }
+  refreshConditionOptions(); validateConditions();
+  status.textContent = '搜尋條件已變更；原結果僅供檢視，請重新搜尋後再套用。';
+}
+fixedSlot.addEventListener('change', refreshConditionOptions);
+rangeStart.addEventListener('change', () => { conditions = { ...conditions, rangeStart: rangeStart.value }; conditionsChanged(); });
+rangeEnd.addEventListener('change', () => { conditions = { ...conditions, rangeEnd: rangeEnd.value }; conditionsChanged(); });
+rangeClear.addEventListener('click', () => { conditions = { ...conditions, rangeStart: '', rangeEnd: '' }; conditionsChanged(); });
+fixedAdd.addEventListener('click', () => {
+  if (fixedAdd.disabled) return;
+  conditions = { ...conditions, requiredItemIds: { ...conditions.requiredItemIds, [fixedSlot.value]: fixedItem.value } };
+  conditionsChanged();
+});
+setAdd.addEventListener('click', () => {
+  if (setAdd.disabled) return;
+  conditions = { ...conditions, requiredSetEffectIds: [...(conditions.requiredSetEffectIds ?? []), setSelect.value] };
+  conditionsChanged();
+});
+conditionClear.addEventListener('click', () => {
+  conditions = { requiredItemIds: {}, requiredSetEffectIds: [] }; conditionsChanged();
+});
 
 interface AlternativeDisplayGroup {
   alternatives: IceResultAlternative[];
@@ -140,6 +291,11 @@ function renderResults(data: GameData,
       apply.addEventListener('click', () => {
         if (!resultValid || !searchBaseRaw || readSavedRaw() !== searchBaseRaw) {
           status.textContent = '主頁配裝已變更；請重新搜尋後再套用。';
+          return;
+        }
+        if (!searchBaseState || !isThreeSetIceCandidate(data, alternative.choices, alternative.setNames,
+          conditions, searchBaseState.values)) {
+          status.textContent = '此穿搭不符合目前搜尋條件，請重新搜尋。';
           return;
         }
         try {
@@ -318,6 +474,9 @@ function renderResults(data: GameData,
 
 function startSearch() {
   if (!gameData || worker) return;
+  validateConditions();
+  if (!conditionsValid) return;
+  const searchConditions = snapshotIceSearchConstraints(conditions);
   const raw = readSavedRaw();
   if (!raw) {
     status.textContent = '尚無已保存配裝。請先返回傷害計算機完成配置，並確認頁面顯示「已儲存於此裝置」。';
@@ -386,7 +545,7 @@ function startSearch() {
       stopWorker();
       status.textContent = '搜尋背景程式無法載入或執行，請重新整理後重試。';
     });
-    current.postMessage({ type: 'start', searchId, data: gameData, state });
+    current.postMessage({ type: 'start', searchId, data: gameData, state, constraints: searchConditions });
   } catch {
     stopWorker();
     status.textContent = '無法啟動背景搜尋；原配裝未變更。';
@@ -420,10 +579,24 @@ window.addEventListener('storage', event => {
   resultValid = false;
   results.querySelectorAll<HTMLButtonElement>('.optimizer-apply').forEach(button => { button.disabled = true; });
   status.textContent = '偵測到另一個分頁更新配裝。原試算仍可檢視，但需重新搜尋後才能套用。';
+  validateConditions();
 });
 
 loadGameData().then(data => {
   gameData = data;
+  try {
+    const savedConditions = JSON.parse(sessionStorage.getItem(conditionsKey) ?? 'null') as IceSearchConstraints | null;
+    if (savedConditions && savedConditions.requiredItemIds && typeof savedConditions.requiredItemIds === 'object'
+      && !Array.isArray(savedConditions.requiredItemIds)
+      && Object.values(savedConditions.requiredItemIds).every(value => typeof value === 'string')
+      && Array.isArray(savedConditions.requiredSetEffectIds)
+      && savedConditions.requiredSetEffectIds.every(value => typeof value === 'string')) {
+      conditions = { requiredItemIds: savedConditions.requiredItemIds, requiredSetEffectIds: savedConditions.requiredSetEffectIds,
+        rangeStart: savedConditions.rangeStart === undefined ? '' : String(savedConditions.rangeStart),
+        rangeEnd: savedConditions.rangeEnd === undefined ? '' : String(savedConditions.rangeEnd) };
+    }
+  } catch { /* Ignore malformed stored conditions. */ }
+  refreshConditionOptions(); validateConditions();
   setRunning(false);
   const raw = readSavedRaw();
   status.textContent = raw
@@ -440,6 +613,7 @@ loadGameData().then(data => {
       && saved.result.baseline && Number.isFinite(saved.result.baseline.damage)
       && typeof saved.result.baselineInScope === 'boolean'
       && saved.result.globallyOptimalProven === false
+      && conditionKey(saved.result.candidatePolicy ?? {}) === conditionKey(conditions)
       && Array.isArray(saved.result.results)
       && saved.result.results.every(item => Number.isFinite(item.damage)
         && Array.isArray(item.alternatives) && item.alternatives.length > 0

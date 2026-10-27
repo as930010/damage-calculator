@@ -1,6 +1,22 @@
 /* Ice optimizer content only; the website shell is shared with the other tools. */
 .optimizer-workspace .optimizer-caveat { margin: 12px 0 0; color: var(--site-muted); font-size: 12px; line-height: 1.6; }
 .optimizer-workspace { margin-top: 22px; padding: clamp(18px, 3vw, 30px); }
+.optimizer-constraints { margin-bottom: 18px; border: 1px solid var(--site-border); border-radius: 8px; }
+.optimizer-constraints summary { padding: 12px 14px; cursor: pointer; }
+.optimizer-constraint-body { display: grid; gap: 16px; padding: 0 14px 14px; }
+.optimizer-constraint-body h2 { font-size: 14px; margin: 0 0 8px; }
+.optimizer-constraint-controls { display: flex; flex-wrap: wrap; align-items: end; gap: 8px; }
+.optimizer-constraint-controls label { display: grid; gap: 4px; flex: 1 1 150px; min-width: 0; }
+.optimizer-constraint-controls select { width: 100%; min-width: 0; }
+.optimizer-constraint-body select, .optimizer-constraint-body button { min-height: 40px; border: 1px solid var(--site-border); border-radius: 8px; background: var(--site-card, #151d2b); color: var(--site-text); font: inherit; padding: 8px 10px; }
+.optimizer-constraint-body button { cursor: pointer; }
+.optimizer-constraint-body button:disabled { opacity: .48; cursor: not-allowed; }
+.optimizer-constraint-list { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 8px 0 0; }
+.optimizer-constraint-list li { display: flex; align-items: center; gap: 8px; max-width: 100%; overflow-wrap: anywhere; }
+.optimizer-constraint-list button { min-height: 36px; }
+#constraint-status { margin: 0; color: var(--site-muted); }
+#constraint-status[data-invalid="true"] { color: #ffb6a7; }
+#constraint-clear { justify-self: start; }
 .optimizer-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 .optimizer-actions button, .optimizer-apply { min-height: 44px; padding: 9px 16px; border: 1px solid var(--site-border); border-radius: 8px; font: inherit; cursor: pointer; }
 .optimizer-actions button:disabled { opacity: .48; cursor: not-allowed; }

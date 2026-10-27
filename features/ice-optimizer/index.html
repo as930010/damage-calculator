@@ -22,18 +22,38 @@
           <div class="site-tool-intro-body">
             <span class="site-tool-eyebrow">ICE EQUIPMENT OPTIMIZER</span>
             <h1>冰裝最佳化試算</h1>
-            <p class="site-tool-summary">根據已儲存的配裝與關卡設定，搜尋右冰（含冰裝武器）中三組各至少三件、且套效生效的高傷害組合。</p>
+            <p class="site-tool-summary">根據已儲存的配裝與關卡設定計算右冰傷害最高的組合，請注意僅計算理論最高傷害，並不考慮冷卻、MP消耗等問題。</p>
             <ol class="site-tool-steps" aria-label="最佳化流程"><li><span>01</span><span>使用已儲存配裝</span></li><li><span>02</span><span>開始搜尋冰裝</span></li><li><span>03</span><span>檢視並套用穿搭</span></li></ol>
           </div>
         </section>
         <section class="optimizer-workspace site-card" aria-label="冰裝搜尋">
+          <details class="optimizer-constraints">
+            <summary>自訂搜尋條件</summary>
+            <div class="optimizer-constraint-body">
+              <div><h2>試算範圍 <span id="range-count"></span></h2>
+                <div class="optimizer-constraint-controls"><label>起始套裝 <select id="range-start"></select></label><label>結束套裝 <select id="range-end"></select></label><button id="range-clear" type="button">全部系列</button></div>
+                <p id="range-exceptions" class="optimizer-caveat"></p>
+              </div>
+              <div><h2>固定裝備 <span id="fixed-count">0／11</span></h2>
+                <div class="optimizer-constraint-controls"><label>部位 <select id="fixed-slot"></select></label><label>裝備 <select id="fixed-item"></select></label><button id="fixed-add" type="button">新增固定</button></div>
+                <ul id="fixed-list" class="optimizer-constraint-list"></ul>
+              </div>
+              <div><h2>必選套效 <span id="set-count">0／3</span></h2>
+                <div class="optimizer-constraint-controls"><label>套裝 <select id="required-set"></select></label><button id="set-add" type="button">新增套效</button></div>
+                <ul id="set-list" class="optimizer-constraint-list"></ul>
+                <p class="optimizer-caveat">指定神埃或騎士團套效時，該系列的預設排除會在本次搜尋中解除。</p>
+              </div>
+              <p id="constraint-status" role="status" aria-live="polite">正在檢查條件…</p>
+              <button id="constraint-clear" type="button">清除全部條件</button>
+            </div>
+          </details>
           <div class="optimizer-actions"><button id="optimizer-start" class="site-button" type="button" disabled>開始搜尋</button><button id="optimizer-cancel" type="button" disabled>取消搜尋</button><button id="optimizer-clear" type="button" disabled>清空試算</button></div>
           <p id="optimizer-status" role="status" aria-live="polite">正在讀取遊戲資料…</p>
           <p id="optimizer-progress" aria-live="polite"></p>
           <div id="optimizer-results" class="optimizer-results" aria-live="polite"></div>
         </section>
       </main>
-      <footer class="site-footer"><span class="footer-product">裝備傷害計算機</span><span class="footer-version">版本 <bdi>v3.01.01</bdi></span><span class="footer-updated">更新日期：<time datetime="2026-10-28">2026-10-28</time></span></footer>
+      <footer class="site-footer"><span class="footer-product">裝備傷害計算機</span><span class="footer-version">版本 <bdi>v3.02.01</bdi></span><span class="footer-updated">更新日期：<time datetime="2026-10-28">2026-10-28</time></span></footer>
     </div>
     <script type="module" src="./frontend/main.js"></script>
   </body>

@@ -2,7 +2,7 @@ import { projectDamage } from '../../../frontend/projection.ts';
 import { resolveRightIceSetEffects } from '../../../calculation/equipment-effects.ts';
 import type { GameData } from '../../../frontend/data.ts';
 import type { LoadoutState } from '../../../frontend/state.ts';
-import { createIceSearchDomains, snapshotIceSearchConstraints } from './search-policy.ts';
+import { createIceSearchDomains, requiredIceSetNames, snapshotIceSearchConstraints } from './search-policy.ts';
 import type { IceSearchConstraints, IceSearchDomain } from './search-policy.ts';
 
 export interface IceResult {
@@ -111,6 +111,8 @@ export function isThreeSetIceCandidate(data: GameData, choices: Readonly<Record<
   selected: readonly string[], constraints: IceSearchConstraints = {},
   currentChoices: Readonly<Record<string, string | number>> = choices): boolean {
   if (selected.length !== 3 || new Set(selected).size !== 3) return false;
+  try { if (!requiredIceSetNames(data, constraints).every(name => selected.includes(name))) return false; }
+  catch { return false; }
   const fields = iceFields(data).right;
   const counts = new Map(selected.map(name => [name, 0]));
   let domains: IceSearchDomain[];
@@ -217,8 +219,8 @@ export function describeIceSearchStatus(search: Pick<IceSearchResult,
     return `${completion}；目前配裝僅作基準，尚無優於基準的合法推薦。`;
   }
   const local = search.localOptimality === 'single-local'
-    ? '第一名已檢查完整單部位鄰域' : '第一名尚未完成單部位鄰域檢查';
-  return `${completion}；已找到符合本次搜尋條件的更高傷害配置，${local}。尚未證明全域最佳。`;
+    ? '，第一名已檢查完整單部位鄰域。尚未證明全域最佳' : '';
+  return `${completion}；已找到符合本次搜尋條件的更高傷害配置${local}。`;
 }
 
 function choiceKey(choices: Record<string, string>, fields: readonly string[]): string {
@@ -362,6 +364,7 @@ export function generateThreeSetStructures(data: GameData,
   if (seedLimit !== Infinity && (!Number.isSafeInteger(seedLimit) || seedLimit < 1)) throw new RangeError('Invalid structural seed limit.');
   const steps = createIceSearchDomains(data, currentChoices, constraints);
   const suites = activeSetNames(data, steps);
+  const requiredSets = requiredIceSetNames(data, constraints);
   const supportMasks = setSupportMasks(steps, suites);
   const vectors = countVectors(steps.length, 3);
   const stats: IceStructureStats = { generationComplete: true, raw: 0, tierRejected: 0, infeasible: 0, feasible: 0, seedCandidates: 0,
@@ -369,6 +372,7 @@ export function generateThreeSetStructures(data: GameData,
     priorityThreeSetProfiles: 0, priorityThreeSetSeeds: 0, profilesBySelectedSetCount: [0, 0, 0, 0] };
   const seeds: StructureSeed[] = [];
   priorityProfiles: for (const setNames of combinations(suites, 3)) for (const counts of vectors) {
+    if (!requiredSets.every(name => setNames.includes(name))) continue;
     stats.raw += 1;
     if (!hasEffectiveTiers(data, setNames, counts)) { stats.tierRejected += 1; continue; }
     if (!structurallyFeasible(supportMasks, setNames, counts, steps.length)) {
@@ -431,6 +435,7 @@ export async function searchIce(data: GameData, base: LoadoutState,
   }
   const currentChoices = Object.fromEntries(fieldOrder.map(field => [field, String(base.values[field] ?? '')]));
   const allSuitNames = activeSetNames(data, steps);
+  const requiredSets = requiredIceSetNames(data, constraints);
   let evaluated = 1;
   // One shared candidate-attempt budget includes full engine calls and cheap invalid candidates.
   let budgetUsed = 1;
@@ -487,6 +492,7 @@ export async function searchIce(data: GameData, base: LoadoutState,
   };
   const meetsThreeSetPolicy = (choices: Record<string, string>, selected: readonly string[]) =>
     selected.length === 3 && new Set(selected).size === 3
+    && requiredSets.every(name => selected.includes(name))
     && selected.every(name => rightFieldOrder.filter(field => choices[field] === name).length >= 3);
   const baselineSetNames = fields.setFields.map(field => String(base.values[field] ?? ''))
     .filter(Boolean).sort((a, b) => a.localeCompare(b, 'zh-Hant'));
