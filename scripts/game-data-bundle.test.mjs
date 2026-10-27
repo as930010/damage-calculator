@@ -124,15 +124,24 @@ test("the built revision changes with game data so cached bundles cannot go stal
 });
 
 test("stylesheet cache keys cover exactly the CSS linked by the selected theme", async () => {
-  const html = await readFile(join(root, "site-dist/index.html"), "utf8");
-  const files = [...html.matchAll(/href="\.\/([^"?]+\.css)"/g)].map(match => match[1]);
-  assert.ok(files.length > 0); assert.equal(new Set(files).size, files.length);
+  const pages = ["index.html", "buff-simulator/index.html", "ice-optimizer/index.html"];
+  const linkedCss = [];
+  for (const page of pages) {
+    const html = await readFile(join(root, "site-dist", page), "utf8");
+    const files = [...html.matchAll(/href="([^"?]+\.css)"/g)].map(match => join(dirname(page), match[1]));
+    assert.ok(files.length > 0); assert.equal(new Set(files).size, files.length);
+    linkedCss.push(...files);
+    assert.doesNotMatch(html, /__STYLESHEET_REVISION__/u);
+  }
+  const files = [...new Set(linkedCss)];
   for (const file of files) {
     const content = await readFile(join(root, 'site-dist', file));
     const revision = createHash('sha256').update(content).digest('hex').slice(0, 16);
     assert.ok(file.endsWith('-' + revision + '.css'), 'each stylesheet URL covers its own content');
   }
-  const emittedCss = (await readdir(join(root, 'site-dist/assets'))).filter(file => file.endsWith('.css')).map(file => 'assets/' + file).sort();
+  const emittedCss = [
+    ...(await readdir(join(root, 'site-dist/assets'))).filter(file => file.endsWith('.css')).map(file => join('assets', file)),
+    ...(await readdir(join(root, 'site-dist/buff-simulator/assets'))).filter(file => file.endsWith('.css')).map(file => join('buff-simulator', 'assets', file)),
+  ].sort();
   assert.deepEqual(emittedCss, [...files].sort(), 'no unlinked or stale stylesheets');
-  assert.doesNotMatch(html, /__STYLESHEET_REVISION__/u);
 });
