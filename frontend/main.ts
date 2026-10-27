@@ -6,7 +6,7 @@ import { loadGameData, readJson, escapeHtml as h, formatNumber as fmt } from './
 import { readState, readBaseline, saveState, migrateLegacyEnvironmentSelection, migrateLegacyGloveCircuitSkillDamage as migrateGloveCircuit, migrateLegacyPortraitAwakening as migratePortrait, normalizePortraitAwakeningValues as normalizePortraitValues, normalizeTranscendenceSkillDamageShare, parseTranscendenceSkillDamageShareInput, type LoadoutState } from './state.ts';
 import { createTransferLoader } from './loadout-transfer-loader.ts';
 import { normalizeOptionalEffectValues, isUnrelatedEffectValue, normalizeNephronMagazineSelections, normalizeBossHealthCondition, DEFAULT_BOSS_HEALTH_CONDITION } from './state.ts';
-import { evaluateLoadout, type projectDamage } from './projection.ts';
+import { evaluateLoadout, projectDamage } from './projection.ts';
 import { createBaselineEvaluationCache } from './baseline-evaluation.ts';
 import { createAttributeEquivalencePanel } from './attribute-equivalence-ui.ts';
 import { createDisclosurePreferences } from './disclosure-preferences.ts';
@@ -20,6 +20,7 @@ import { canonicalizeNumber, preventScientificNotation } from './numeric-input.t
 import { sanitizeClassCode } from './class-code.ts';
 import { resolveUnsignedInteger, sanitizeUnsignedInteger } from './direct-input.ts';
 import { historyShortcutAction, LoadoutHistory } from './history.ts';
+import { takeIceOptimizerHandoff, type IceOptimizerHandoff } from './ice-optimizer-handoff.ts';
 
 const preciseNumberFormatter = new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 10 });
 const visibleNumberFormatter = new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 3 });
@@ -52,6 +53,9 @@ async function start() {
   const sampleId = new URLSearchParams(location.search).get('sample');
   if (sampleId !== null && !/^[a-z0-9-]+$/.test(sampleId)) throw new RangeError('驗算範例名稱無效。');
   const sampleMode = sampleId !== null;
+  const savedLoadoutAtStartup = sampleMode ? null : (() => {
+    try { return localStorage.getItem('dab-loadout-v1'); } catch { return null; }
+  })();
   const state: LoadoutState = sampleMode
     ? await readJson<LoadoutState>(`examples/${sampleId}.json`)
     : readState(catalogIndex.activeClasses[0]?.id ?? 'DaB');
@@ -153,6 +157,52 @@ async function start() {
     if (normalizedBaselineOptionalEffects || migratedBaselineEnvironment || migratedBaseline || migratedBaselineGloveCircuit || migratedBaselinePortraitAwakening || normalizedBaselinePortraitAwakening || clearedBaselineMagazines.changed || clearedBaselineTransformations.length) saveState(baseline, true);
   }
   const history = new LoadoutHistory(state);
+  let optimizerApplyMessage = '';
+  let optimizerApplied = false;
+  if (!sampleMode) {
+    const pending = (() => { try { return takeIceOptimizerHandoff(); } catch { return null; } })();
+    if (pending !== null) {
+      const request = pending as Partial<IceOptimizerHandoff>;
+      const selections = data.mapping.selections.filter(entry =>
+        entry.catalogFile === 'equipment/right-ice.json');
+      const fields = selections.map(entry => entry.selectionField);
+      const version = document.querySelector<HTMLMetaElement>('meta[name="game-data-url"]')?.content.split('/').pop() ?? '';
+      const validChoices = request.choices && typeof request.choices === 'object'
+        && Object.keys(request.choices).length === fields.length
+        && fields.every(field => typeof request.choices?.[field] === 'string')
+        && selections.every(entry => {
+          const choice = request.choices?.[entry.selectionField];
+          return choice === '' || data.catalogs[entry.catalogFile]?.items.some(item =>
+              item.active && item.slotId === entry.slotId && item.name === choice) === true;
+        });
+      const validSets = Array.isArray(request.setNames)
+        && request.setNames.length <= data.rightIceSets.maxSelectedSets
+        && request.setNames.every(name => typeof name === 'string'
+          && data.rightIceSets.effects.some(effect => effect.setName === name))
+        && new Set(request.setNames).size === request.setNames.length;
+      if (request.format !== 'ice-optimizer-selection' || request.version !== 1
+        || !savedLoadoutAtStartup || request.baseRaw !== savedLoadoutAtStartup
+        || !version || request.dataRevision !== version || !validChoices || !validSets
+        || typeof request.expectedDamage !== 'number' || !Number.isFinite(request.expectedDamage)) {
+        optimizerApplyMessage = '冰裝搜尋結果已過期或資料不完整；原配裝保持不變，請重新搜尋。';
+      } else {
+        const values = { ...state.values, ...request.choices };
+        for (const [index, field] of data.rightIceSets.selectionFields.entries()) values[field] = request.setNames![index] ?? '';
+        const candidate = { ...state, values };
+        try {
+          const actual = projectDamage(data, candidate).result.finalDamage.finalDamage;
+          if (Math.abs(actual - request.expectedDamage) > Math.max(1e-6, Math.abs(actual) * 1e-12)) {
+            optimizerApplyMessage = '冰裝結果與目前計算資料不一致；原配裝保持不變，請重新搜尋。';
+          } else {
+            Object.assign(state.values, values);
+            optimizerApplied = true;
+          }
+        } catch {
+          optimizerApplyMessage = '冰裝結果無法套用至目前配裝；原配裝保持不變。';
+        }
+      }
+    }
+  }
   let selected = data.layout.slots.find(slot => slot.weapon)!;
   type BeastAccessorySlotId = 'headwear' | 'armor' | 'necklace' | 'ring-one' | 'ring-two';
   type BeastManualCategory = keyof typeof data.masterBeast.customAttributeOptions;
@@ -2198,6 +2248,16 @@ async function start() {
     }
   });
   renderSlots(); renderInspector(); renderTitleInput(); renderBeastAccessories(); renderMasterBeastColorSelector(); renderGlobalInputs(); renderWeaponMagicStones(); renderRightIceSetSelectors(); renderResults(); refreshHistoryControls();
+  if (optimizerApplied) {
+    history.record(state);
+    const stored = saveState(state);
+    document.querySelector<HTMLElement>('#save-status')!.textContent = stored
+      ? '冰裝穿搭已套用並儲存；可以使用復原返回原配裝。'
+      : '冰裝穿搭已套用，但此瀏覽器無法儲存設定。';
+    refreshHistoryControls();
+  } else if (optimizerApplyMessage) {
+    document.querySelector<HTMLElement>('#save-status')!.textContent = optimizerApplyMessage;
+  }
   disclosurePreferences.restore(document);
 }
 start().catch(error => { document.querySelector('#app')!.innerHTML = `<section class="error-card"><h1>無法載入工具</h1><p>${h(error instanceof Error ? error.message : error)}</p></section>`; });

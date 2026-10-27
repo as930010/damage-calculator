@@ -366,7 +366,15 @@ function syncInputs(event: Event): void {
 }
 
 function shell(): void {
-  app.innerHTML = `<section class="hero">
+  app.innerHTML = `<section class="site-tool-intro" aria-labelledby="buff-intro-title">
+    <div class="site-tool-intro-body">
+      <span class="site-tool-eyebrow">TEAM BUFF SIMULATOR</span>
+      <h1 id="buff-intro-title">隊伍增益模擬</h1>
+      <p class="site-tool-summary">配置單隊或挑戰雙隊，查看 Buff、Debuff 與隊伍支援帶來的增益。</p>
+      <ol class="site-tool-steps" aria-label="模擬流程"><li><span>01</span><span>選擇隊伍模式</span></li><li><span>02</span><span>填入職業與效果</span></li><li><span>03</span><span>查看隊伍收益</span></li></ol>
+    </div>
+  </section>
+  <section class="hero">
     <div class="hero-console">
       <div class="mode-switch" role="tablist" aria-label="隊伍模式">
         <button data-mode="single" role="tab" aria-selected="${mode === "single"}">單隊 <small>6 人</small></button>

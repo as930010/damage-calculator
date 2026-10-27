@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { resolveInnerwearSources } from '../dist/calculation/innerwear.js';
 import { resolveWeaponTransformationsFromFields } from '../dist/calculation/weapon-transformations.js';
-import { aggregateCharacterAttributes, prepareCharacterAttributeInput } from '../dist/calculation/attribute-aggregation.js';
+import { aggregateCharacterAttributes, aggregatePreliminaryAttackLevel, prepareCharacterAttributeInput } from '../dist/calculation/attribute-aggregation.js';
 
 const json = async path => JSON.parse(await readFile(new URL(`../data/${path}`, import.meta.url), 'utf8'));
 const [rules, attack, transforms, layout, mapping] = await Promise.all(['innerwear-rules.json', 'attack-parameters.json', 'weapon-transformations.json', 'equipment-layout.json', 'simulator-equipment-mapping.json'].map(json));
@@ -74,6 +74,24 @@ test('兩極化／適應力上限在全角色彙總後套用，極大化無 60 �
   assert.equal(result.stats.polarizationPct.finalTotal,60);
   assert.equal(result.stats.adaptabilityPct.finalTotal,60);
   assert.equal(result.stats.extremizationPct.finalTotal,90);
+});
+
+test('武器基礎攻擊預備計算沿用完整彙總的攻擊力等級與下衣平均規則', () => {
+  const rules = [
+    { key: 'attackLevel', aggregation: 'sum', cap: { value: 30, scope: 'characterTotal' } },
+    { key: 'physicalAttack', aggregation: 'sum' },
+  ];
+  for (const lowerwearAlternativeEnabled of [false, true]) {
+    const prepared = prepareCharacterAttributeInput(rules, {
+      shared: [{ sourceId: 'base', stats: { attackLevel: 12, physicalAttack: 100 } },
+        { sourceId: 'gear', stats: { attackLevel: 8, strongerPct: 2 } }],
+      lowerwearA: [{ sourceId: 'a', stats: { attackLevel: 16 } }],
+      lowerwearB: [{ sourceId: 'b', stats: { attackLevel: 4 } }],
+      lowerwearAlternativeEnabled,
+    });
+    assert.equal(aggregatePreliminaryAttackLevel(prepared.attributeInput),
+      aggregateCharacterAttributes(prepared.attributeInput).stats.attackLevel.finalTotal);
+  }
 });
 
 test('部位圖涵蓋所有裝備選擇與魔法石，魔法石沒有重複或漏列', () => {

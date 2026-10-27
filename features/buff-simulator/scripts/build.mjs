@@ -41,7 +41,18 @@ async function compactRuntimeJson(directory) {
 }
 await compactRuntimeJson(join(output, "data"));
 await cp(join(root, "frontend", "styles.css"), join(output, "frontend", "styles.css"));
+const sharedShellCss = await readFile(join(root, '..', '..', 'frontend', 'site-shell.css'), 'utf8');
+await writeFile(join(output, 'frontend', 'site-shell.css'), sharedShellCss);
+const buffHtml = await readFile(join(root, 'index.html'), 'utf8');
+const hasSeasonalLink = buffHtml.includes('href="./frontend/seasonal-effects.css"');
+const cssOverrides = { 'site-shell.css': sharedShellCss };
+if (hasSeasonalLink) {
+  const sharedSeasonalCss = await readFile(join(root, '..', '..', 'frontend', 'seasonal-effects.css'), 'utf8');
+  await writeFile(join(output, 'frontend', 'seasonal-effects.css'), sharedSeasonalCss);
+  cssOverrides['seasonal-effects.css'] = sharedSeasonalCss;
+}
 await cp(join(root, "index.html"), join(output, "index.html"));
 await writeFile(join(output, ".nojekyll"), "");
-await writeProduction(root, (await productionAssets({ root, compiled: output, buff: true })).files);
+await writeProduction(root, (await productionAssets({ root, compiled: output, buff: true,
+  cssOverrides })).files);
 console.log('Buff deployment built in site-dist/; Node modules in dist/.');

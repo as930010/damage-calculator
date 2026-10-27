@@ -341,7 +341,7 @@ test('Grett medal lowerwear bonuses average final damages and keep equivalent co
   const original = JSON.stringify(state);
   const evaluation = evaluateLoadout(gameData, state, false, true);
   assert.ok(evaluation.damage, String(evaluation.damageError));
-  assert.equal(runtime.counts.aggregateCharacterAttributes, 2, 'configuration bonuses reuse the prepared attributes');
+  assert.equal(runtime.counts.aggregateCharacterAttributes, 1, 'configuration bonuses reuse the prepared attributes');
   const result = evaluation.damage.result, input = evaluation.comparisonInput;
   assert.equal(result.lowerwearConfigurations.length, 2);
   const averagedProducts = calculateFinalDamage(finalDamageInputs(input, result)).finalDamage;
@@ -665,7 +665,7 @@ for (const operation of ['stage', 'percentage']) test(`${operation} keeps unrela
     ids.forEach((id, i) => assert.equal(document.getElementById(id).firstElementChild, children[i], id));
     for (const name of ['renderSlots', 'renderBeastAccessories', 'renderMasterBeastColorSelector', 'renderInspector', 'renderGlobalInputs', 'createPicker', 'createCatalogIndex'])
       assert.equal(work.calls[name] ?? 0, 0, name);
-    assert.equal(work.calls.evaluateLoadout, 1); assert.equal(work.calls.aggregateCharacterAttributes, 2);
+    assert.equal(work.calls.evaluateLoadout, 1); assert.equal(work.calls.aggregateCharacterAttributes, 1);
     assert.equal(work.calls.renderResults, 1);
     assert.ok(work.added < 500); assert.ok(work.removed < 500); assert.ok(work.innerHTML <= 5);
   } finally { page.close(); }
@@ -888,7 +888,7 @@ test('stage undo/redo keep complex control subtrees and release no unrelated pic
       const work = await measureDom(page, () => workloadActions[name](page));
       roots.forEach(([id, node]) => assert.equal(document.getElementById(id).firstElementChild, node, id));
       assert.equal(work.calls.createPicker ?? 0, 0); assert.equal(work.calls.disposePicker ?? 0, 0);
-      assert.equal(work.calls.evaluateLoadout, 1); assert.equal(work.calls.aggregateCharacterAttributes, 2);
+      assert.equal(work.calls.evaluateLoadout, 1); assert.equal(work.calls.aggregateCharacterAttributes, 1);
     }
   } finally { page.close(); }
 });

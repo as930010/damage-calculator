@@ -196,8 +196,8 @@ body::before {
 
 /* Coexistence night theme: midnight blue and violet with restrained campfire warmth. */
 :root{color-scheme:dark}
-body{color:var(--text-main);background:transparent}
-.topbar{
+body.site-page-main{color:var(--text-main);background:transparent}
+.site-header{
   border-color:rgb(116 126 171 / 27%);
   background:linear-gradient(90deg,rgb(7 12 32 / 65%),rgb(10 16 43 / 65%) 58%,rgb(17 14 34 / 65%));
   box-shadow:none;
@@ -289,6 +289,8 @@ body{color:var(--text-main);background:transparent}
   background:linear-gradient(145deg,rgb(11 17 42 / 65%),rgb(7 11 27 / 65%));
   box-shadow:none;
 }
+.skill-damage-share-control{background:linear-gradient(145deg,rgb(11 17 42 / 65%),rgb(7 11 27 / 65%))}
+.boss-control .percent-input{background:linear-gradient(145deg,rgb(11 17 42 / 65%),rgb(7 11 27 / 65%))}
 .stat:hover{border-color:#7374a2;box-shadow:none}
 .stat[open]{border-color:#a48abb;background:linear-gradient(145deg,rgb(47 41 70 / 65%),rgb(31 35 63 / 65%))}
 .stat-details{border-top-color:rgb(157 145 190 / 28%)}
@@ -400,7 +402,7 @@ body::before{
 .site-release-list time{color:#a9a4b3}
 
 /* A small CSS-only campfire anchors the page footer; no particles or animation. */
-footer{
+.site-page .site-footer{
   border-top-color:rgb(164 129 99 / 24%);
 }
 footer::before,footer::after{
@@ -494,4 +496,310 @@ footer::after{
 .app-shell :is([class*="panel"], [class*="card"], .workspace-heading, .stat, .gear-slot, .beast-accessory-slot)::after {
   box-shadow: none !important;
   filter: none !important;
+}
+
+/* Apply the same seasonal palette and surfaces to the other two tools. */
+body.site-page-buff,
+body.site-page-optimizer {
+  background: transparent;
+  color: var(--text-main);
+}
+
+body.site-page-buff {
+  --bg: var(--page-bg);
+  --panel: #0a1027;
+  --panel-strong: var(--surface-raised);
+  --line: var(--border);
+  --text: var(--text-main);
+  --muted: var(--text-muted);
+  --accent: var(--lantern-gold);
+  --accent-soft: var(--accent-surface);
+  --gold: var(--lantern-gold);
+}
+
+.site-page-buff .app-shell,
+.site-page-optimizer .app-shell { background: transparent; }
+
+.site-page-buff .site-tool-intro,
+.site-page-optimizer .site-tool-intro {
+  border-color: rgb(139 139 191 / 35%);
+  background:
+    radial-gradient(ellipse 410px 185px at 87% 100%, rgb(215 136 74 / 14%) 0%, rgb(179 102 67 / 6%) 48%, transparent 100%),
+    linear-gradient(112deg, rgb(10 16 39 / 65%), rgb(8 13 31 / 65%) 55%, rgb(22 17 39 / 65%));
+  background-clip: padding-box;
+  box-shadow: none;
+}
+
+.site-page-buff .site-tool-intro::after,
+.site-page-optimizer .site-tool-intro::after {
+  right: 3%; bottom: -24px; width: 130px; height: 205px;
+  border: 0; border-radius: 0; box-shadow: none; opacity: .2; transform: none;
+  background: linear-gradient(180deg, rgb(75 77 139 / 82%), rgb(27 31 69 / 84%));
+  clip-path: polygon(50% 0,63% 25%,56% 25%,75% 48%,65% 48%,91% 77%,62% 77%,62% 100%,38% 100%,38% 77%,9% 77%,35% 48%,25% 48%,44% 25%,37% 25%);
+}
+
+.site-page-buff .site-tool-eyebrow,
+.site-page-optimizer .site-tool-eyebrow { color: #bdb9d3; }
+.site-page-buff .site-tool-eyebrow::before,
+.site-page-optimizer .site-tool-eyebrow::before { background: #9a9bc8; }
+.site-page-buff .site-tool-intro h1,
+.site-page-optimizer .site-tool-intro h1 { color: var(--text-heading); }
+.site-page-buff .site-tool-summary,
+.site-page-optimizer .site-tool-summary { color: #c6c4dc; }
+.site-page-buff .site-tool-steps li,
+.site-page-optimizer .site-tool-steps li { border-color: rgb(145 141 187 / 28%); background: rgb(12 20 55 / 65%); color: #e2deef; }
+.site-page-buff .site-tool-steps li span:first-child,
+.site-page-optimizer .site-tool-steps li span:first-child { background: rgb(143 126 192 / 23%); color: #c5b9de; }
+
+.site-page-buff .team-panel,
+.site-page-buff .result-card,
+.site-page-buff .skill-reference,
+.site-page-optimizer .optimizer-workspace,
+.site-page-optimizer .optimizer-result {
+  border-color: rgb(125 134 183 / 34%);
+  background-color: transparent;
+  background-image:
+    repeating-linear-gradient(113deg, transparent 0 74px, rgb(191 174 225 / 1.2%) 75px, transparent 78px),
+    linear-gradient(145deg, rgb(10 16 39 / 65%), rgb(7 11 27 / 65%));
+  box-shadow: none;
+}
+
+.site-page-buff .result-heading,
+.site-page-buff .result-stack .result-heading { background: linear-gradient(90deg, rgb(16 22 48 / 65%), rgb(11 15 34 / 45%)); }
+.site-page-buff .member-slot,
+.site-page-buff .option-editor,
+.site-page-buff .option-chip,
+.site-page-buff .skill-result,
+.site-page-buff .primary-grid .metric,
+.site-page-buff .support-grid .metric,
+.site-page-buff .control-time-grid div { border-color: rgb(137 139 184 / 32%); background-color: rgb(12 16 26 / 65%); }
+.site-page-buff .mode-switch { border-color: rgb(137 139 184 / 32%); background: rgb(10 16 39 / 78%); }
+.site-page-buff .mode-switch button[aria-selected="true"] { border-color: var(--warm-wood); background: var(--accent-surface); color: var(--text-heading); }
+.site-page-buff .total-multiplier strong { color: #f0b66d; }
+
+@media (max-width: 700px) {
+  .site-page-buff .site-tool-intro::after,
+  .site-page-optimizer .site-tool-intro::after { right: 1%; width: 86px; height: 150px; opacity: .12; }
+}
+
+/* Keep shared navigation, disclosures and tool controls visually consistent. */
+.site-page .site-tabs{
+  border-color:rgb(137 139 184 / 35%);
+  background:rgb(10 14 31 / 82%);
+}
+.site-page .site-tabs a{
+  border-color:transparent;
+  color:#c6c3d4;
+}
+.site-page .site-tabs a:hover{
+  border-color:rgb(161 138 187 / 58%);
+  background:linear-gradient(180deg,#302d49,#22243e);
+  color:#f5edfa;
+}
+.site-page .site-tabs a[aria-current="page"]{
+  border-color:rgb(210 174 111 / 74%);
+  background:linear-gradient(180deg,#463b2b,#302d27);
+  color:#ffe5aa;
+}
+.site-page .site-tabs a:focus-visible{outline-color:#c4a8e7}
+
+/* Match the calculator's custom stat disclosure chevron to the shared arrow. */
+.site-page details:not(.stat):not(.site-credits-notes) > summary::before{border-color:#b89361}
+.site-page-main .stat summary::after{border-color:#b89361;transform:rotate(-45deg)}
+.site-page-main .stat[open] summary::after{transform:rotate(45deg)}
+
+/* Seasonal controls used by the Buff simulator and optimizer. */
+.site-page-buff .result-context{
+  border-color:rgb(164 147 126 / 28%);
+  background:linear-gradient(145deg,rgb(38 34 45 / 70%),rgb(20 22 36 / 72%));
+  color:#c6c3d4;
+}
+.site-page-buff .skill-reference > summary{color:#d4ccda}
+.site-page-buff .skill-reference > summary::before{border-color:#b89361}
+.site-page-buff .skill-search-controls input{
+  border-color:#4a5274;
+  border-radius:8px;
+  background:#0e1429;
+  color:var(--text-input,#eee8f6);
+}
+.site-page-buff .skill-search-controls input::placeholder{color:#9ba3c0}
+
+.site-page-optimizer .optimizer-workspace,
+.site-page-optimizer #optimizer-status,
+.site-page-optimizer #optimizer-progress,
+.site-page-optimizer .optimizer-caveat{color:#c6c3d4}
+.site-page-optimizer .optimizer-result{color:#e7e3f2}
+.site-page-optimizer .optimizer-result h2,
+.site-page-optimizer .optimizer-result h3,
+.site-page-optimizer .optimizer-result summary{color:#d4ccda}
+.site-page-optimizer .optimizer-result-header span{color:#d3c39e}
+.site-page-optimizer .optimizer-result-state small,
+.site-page-optimizer .optimizer-result dt{color:#a9a4b3}
+.site-page-optimizer .optimizer-actions button,
+.site-page-optimizer .optimizer-result .optimizer-apply{
+  border-color:var(--violet-control-edge);
+  border-radius:8px;
+  background:linear-gradient(180deg,#282d50,#1b2140);
+  color:#e7e3f2;
+}
+.site-page-optimizer .optimizer-actions button:not(:disabled):hover,
+.site-page-optimizer .optimizer-result .optimizer-apply:hover{
+  border-color:#a18abb;
+  background:linear-gradient(180deg,#393654,#292d50);
+  color:#f5edfa;
+}
+.site-page-optimizer .optimizer-actions button:focus-visible,
+.site-page-optimizer .optimizer-result summary:focus-visible{outline-color:#c4a8e7}
+.site-page-optimizer .optimizer-actions #optimizer-cancel,
+.site-page-optimizer .optimizer-actions #optimizer-clear{
+  border-color:var(--violet-control-edge);
+  border-radius:8px;
+  background:linear-gradient(180deg,#282d50,#1b2140);
+  color:#e7e3f2;
+}
+.site-page-optimizer .optimizer-actions #optimizer-cancel:not(:disabled):hover,
+.site-page-optimizer .optimizer-actions #optimizer-clear:not(:disabled):hover{
+  border-color:#a18abb;
+  background:linear-gradient(180deg,#393654,#292d50);
+  color:#f5edfa;
+}
+
+/* Preserve the credits card's original compact plus/minus disclosure control. */
+.site-page-main .site-credits-notes > summary::before{
+  display:inline-grid;
+  flex:0 0 1em;
+  width:1em;
+  height:1.3em;
+  place-items:center;
+  content:"＋";
+  color:#b89361;
+  font-size:13px;
+  text-align:center;
+}
+.site-page-main .site-credits-notes[open] > summary::before{content:"−"}
+
+/* Match calculation inspection surfaces and disclosure arrows to the seasonal UI. */
+.site-page-main .calculation-inspection-panel{
+  border-color:rgb(145 143 189 / 33%);
+  background:linear-gradient(145deg,rgb(15 19 39 / 76%),rgb(10 14 30 / 78%));
+  color:#c6c3d4;
+}
+.site-page-main .calculation-inspection-panel > summary,
+.site-page-main .calculation-inspection-panel .formula-detail summary{
+  background:transparent;
+  color:#d4ccda;
+}
+.site-page-main .calculation-inspection-panel > summary::before,
+.site-page-main .calculation-inspection-panel .formula-detail summary::before,
+.site-page-main .calculation-comparison details summary::before{border-color:#b89361}
+.site-page-main .calculation-inspection-panel .calculation-comparison h3{color:#e7ddc9}
+.site-page-main .calculation-inspection-panel .calculation-comparison p,
+.site-page-main .calculation-inspection-panel .formula-detail p{color:#b8b5c5}
+.site-page-main .calculation-inspection-panel .calculation-comparison-scroll{
+  border-color:rgb(145 143 189 / 33%);
+  background:rgb(10 14 30 / 52%);
+}
+.site-page-main .calculation-inspection-panel .calculation-comparison thead th{
+  background:rgb(40 39 66 / 88%);
+  color:#ded9ef;
+}
+.site-page-main .calculation-inspection-panel .calculation-comparison th,
+.site-page-main .calculation-inspection-panel .calculation-comparison td{
+  border-bottom-color:rgb(145 143 189 / 25%);
+  color:#d4d0df;
+}
+.site-page-main .calculation-inspection-panel .calculation-comparison tbody th{color:#c6c3d4}
+.site-page-main .calculation-inspection-panel .formula-detail{border-top-color:rgb(145 143 189 / 25%)}
+
+/* Complete the seasonal palette on Buff fields and explanatory copy. */
+.site-page-buff .metric-section-heading > span{
+  border-color:rgb(161 138 187 / 48%);
+  background:rgb(38 38 67 / 76%);
+  color:#d4ccda;
+}
+.site-page-buff .metric-section-heading strong,
+.site-page-buff .result-heading,
+.site-page-buff .team-panel h2,
+.site-page-buff .result-card h2{color:#e7ddc9}
+.site-page-buff .primary-grid .metric span,
+.site-page-buff .support-grid .metric span,
+.site-page-buff .member-slot,
+.site-page-buff .option-editor,
+.site-page-buff .option-chip,
+.site-page-buff .roster-note,
+.site-page-buff .background-option-note,
+.site-page-buff .control-times,
+.site-page-buff .calculation-details,
+.site-page-buff .detail-row{color:#c6c3d4}
+.site-page-buff .primary-grid .metric strong,
+.site-page-buff .support-grid .metric strong{color:#e7e3f2}
+.site-page-buff .primary-grid .metric:nth-child(1) strong,
+.site-page-buff .primary-grid .metric:nth-child(2) strong{color:#d4ccda}
+.site-page-buff .support-grid .metric:nth-child(3) strong,
+.site-page-buff .support-grid .metric:nth-child(4) strong,
+.site-page-buff .total-multiplier strong{color:#f0b66d}
+.site-page-buff .background-option-note strong,
+.site-page-buff .detail-row b{color:#e7ddc9}
+.site-page-buff .background-option-note{
+  border-left-color:#b89361;
+  background:linear-gradient(145deg,rgb(39 35 43 / 78%),rgb(22 22 35 / 78%));
+}
+.site-page-buff .member-count{
+  border-color:rgb(145 143 189 / 33%);
+  background:rgb(27 30 48 / 86%);
+  color:#c6c3d4;
+}
+.site-page-buff .slot-index,
+.site-page-buff .member-count small,
+.site-page-buff .option-editor-heading small,
+.site-page-buff .metric-section-heading small,
+.site-page-buff .result-title > small,
+.site-page-buff .skill-result span,
+.site-page-buff .skill-empty,
+.site-page-buff .inline-input span{color:#a9a4b3}
+.site-page-buff .member-slot input,
+.site-page-buff .option-editor-input input,
+.site-page-buff .inline-input input,
+.site-page-buff .skill-search-controls input{
+  border-color:#4a5274;
+  background:#0e1429;
+  color:#eee8f6;
+  caret-color:#d4b9ed;
+}
+.site-page-buff .member-slot input{background:transparent;border-color:transparent}
+.site-page-buff .member-slot input::placeholder,
+.site-page-buff .skill-search-controls input::placeholder{color:#9ba3c0}
+.site-page-buff .option-chip:has(input:checked),
+.site-page-buff .option-editor-chip:has(input:checked){
+  border-color:rgb(184 147 97 / 70%);
+  background:linear-gradient(145deg,rgb(53 44 37 / 82%),rgb(34 31 37 / 82%));
+  color:#f0e2c5;
+}
+.site-page-buff .skill-result p{color:#d4ccda}
+.site-page-buff .skill-role-heading span{border-color:rgb(145 143 189 / 35%);color:#b8b5c5}
+.site-page-buff .skill-reference > summary::before{
+  width:9px;
+  height:9px;
+  flex-basis:9px;
+  border-width:2px;
+  border-color:#e0bd79;
+}
+.site-page-buff .control-times summary{color:#d4ccda}
+.site-page-buff .control-times summary small{color:#a9a4b3}
+.site-page-buff .detail-row code{color:#c6c3d4}
+.site-page-buff .skill-reference > summary{
+  color:#e7ddc9;
+}
+.site-page-buff .skill-reference > summary::before{
+  width:8px;
+  height:8px;
+  flex-basis:8px;
+  border-color:#e0bd79;
+  background:transparent;
+}
+body.site-page-buff p.roster-note{
+  border-color:rgb(184 147 97 / 58%);
+  border-left-color:#d0a96b;
+  background:linear-gradient(145deg,rgb(45 38 42 / 88%),rgb(24 24 38 / 88%));
+  color:#e7ddc9;
 }

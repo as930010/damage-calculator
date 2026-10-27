@@ -75,6 +75,18 @@ test("numeric-code JSON export imports back to the same loadout", () => {
   assert.deepEqual(exported.omittedFields, ["UnknownField"]);
 });
 
+test('exporting an older sample fills optional defaults before a JSON round trip', async () => {
+  const sample = await read('data/examples/public-example-2026-09-28.json');
+  const exported = serializeLoadout(sample, data);
+  const payload = JSON.parse(exported.json);
+  assert.equal(payload.masterBeastSpiritStoneColor, masterBeast.spiritStoneColorSelector.defaultColor);
+  assert.equal(payload.petSkillAttackEnabled, true);
+  const imported = parseLoadoutJson(exported.json, state, data);
+  assert.deepEqual(imported.clearedFields, []);
+  assert.equal(imported.state.masterBeastSpiritStoneColor, payload.masterBeastSpiritStoneColor);
+  assert.equal(imported.state.petSkillAttackEnabled, true);
+});
+
 test("export visibly includes job and stage settings, and import accepts semantic stage fields", () => {
   const configured = {
     ...state,

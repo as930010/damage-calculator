@@ -8,18 +8,16 @@
     <title>配裝模擬器</title>
     <link rel="stylesheet" href="./frontend/styles.css?v=__STYLESHEET_REVISION__" />
     <link rel="stylesheet" href="./frontend/polish.css?v=__STYLESHEET_REVISION__" />
+    <link rel="stylesheet" href="./frontend/site-shell.css?v=__STYLESHEET_REVISION__" />
     <link rel="stylesheet" href="./frontend/seasonal-effects.css?v=__STYLESHEET_REVISION__" />
-</head>
-  <body>
+  </head>
+  <body class="site-page site-page-main">
     <div class="app-shell">
-      <header class="topbar">
-        <div class="brand">
-          <span><strong>裝備傷害模擬計算機</strong><small>比較兩套配裝的輸出能力<br>不考慮動速與冷卻</small></span>
-        </div>
-        <div class="developer-info" aria-label="開發者資訊"><span class="developer-desktop">開發者：八雲雲OuO</span><span class="developer-desktop">Discord：yakumo_1231</span><span class="developer-desktop">E-Mail：as930010@gmail.com</span><span class="developer-support">有任何問題回報或建議歡迎透過Discord訊息，也歡迎各類贊助支持</span><span class="developer-mobile"><span>開發者：八雲雲OuO</span><span>Discord：yakumo_1231</span></span></div>
-        <div class="top-meta"><a class="buff-simulator-link" href="./buff-simulator/">隊伍增益模擬器</a><span class="live-dot" aria-label="計算工具已就緒"></span></div>
+      <header class="site-header">
+        <div class="site-developer" aria-label="開發者資訊"><span class="developer-desktop">開發者：八雲雲OuO</span><span class="developer-desktop">Discord：yakumo_1231</span><span class="developer-desktop">E-Mail：as930010@gmail.com</span><span class="developer-support">有任何問題回報或建議歡迎透過Discord訊息，也歡迎各類贊助支持</span><span class="developer-mobile"><span>開發者：八雲雲OuO</span><span>Discord：yakumo_1231</span></span></div>
+        <div class="site-nav-wrap"><nav class="site-tabs" aria-label="功能頁面"><a href="./" aria-current="page">傷害計算機</a><a href="./ice-optimizer/">冰裝最佳化試算</a><a href="./buff-simulator/">隊伍增益模擬</a></nav><span class="live-dot" aria-label="計算工具已就緒"></span></div>
       </header>
-      <main id="app" class="layout">
+      <main id="app" class="layout site-main">
         <section class="loading-card"><div class="spinner"></div><h1>正在載入遊戲資料</h1><p>讀取裝備目錄與計算參數…</p></section>
       </main>
       <details class="site-credits-notes">
@@ -56,6 +54,10 @@
           <section class="site-credits-block" aria-labelledby="site-updates-heading">
             <h2 id="site-updates-heading">更新紀錄</h2>
             <ol class="site-release-list">
+              <li>
+                <time datetime="2026-10-28">2026-10-28</time>
+                <div><strong>v3.01.01</strong><p>大規模優化UI界面、運算邏輯；新增冰裝最高傷害試算功能</p></div>
+              </li>
               <li>
                 <time datetime="2026-10-26">2026-10-26</time>
                 <div><strong>v2.08.04</strong><p>修正CU被動致命傷害算法以及亞特瑪全單技魔法石無法被識別的Bug</p></div>
@@ -100,7 +102,7 @@
           </section>
         </div>
       </details>
-      <footer><span class="footer-product">裝備傷害計算機</span><span class="footer-version">版本 <bdi>v2.08.04</bdi></span><span class="footer-updated">更新日期：<time datetime="2026-10-26">2026-10-26</time></span></footer>
+      <footer class="site-footer"><span class="footer-product">裝備傷害計算機</span><span class="footer-version">版本 <bdi>v3.01.01</bdi></span><span class="footer-updated">更新日期：<time datetime="2026-10-28">2026-10-28</time></span></footer>
     </div>
     <script type="module" src="./frontend/main.js?v=__BUILD_REVISION__"></script>
   </body>

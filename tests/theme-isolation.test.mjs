@@ -108,7 +108,7 @@ test("activity theme is optional and its complete removal leaves a buildable cor
   assert.equal(hasThemeLink, seasonalCss !== null, "theme CSS presence and its explicit stylesheet link must match");
   assert.doesNotMatch(indexHtml, /syncSeasonalAnimation|seasonal-page-hidden/);
   assert.match(buildScript, /sourceIndexHtml\.matchAll/);
-  assert.doesNotMatch(buildScript, /seasonal-effects\.css/);
+  assert.match(buildScript, /seasonalCssPath\s*\?/);
 });
 
 test("activity CSS changes only visual properties on non-decorative selectors", () => {
@@ -128,6 +128,8 @@ test("activity CSS changes only visual properties on non-decorative selectors", 
           violations.push(selector + " hides its focus indicator");
         }
         if (property.startsWith("--") && selector === ":root") continue;
+        if (selector === "body.site-page-buff"
+          && /^--(?:bg|panel|panel-strong|line|text|muted|accent|accent-soft|gold)$/.test(property)) continue;
         if (property.startsWith("--") || !allowedThemeProperties.has(property)) {
           violations.push(selector + " sets " + property);
         }

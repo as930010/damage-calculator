@@ -18,6 +18,7 @@ try {
 
 const base = args.find(arg => arg.startsWith('--base='))?.slice(7) ?? '/';
 if (!/^\/(?:[a-zA-Z0-9_-]+\/)*$/.test(base)) throw new Error('Invalid preview base path');
+const withoutSeasonal = args.includes('--without-seasonal');
 const contentTypes = {
   ".html": "text/html; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
@@ -44,7 +45,14 @@ const server = createServer(async (request, response) => {
       return;
     }
     if ((await stat(file)).isDirectory()) file = join(file, "index.html");
-    const body = await readFile(file);
+    let body = await readFile(file);
+    // Local comparison only: both previews use the same production files, but
+    // this view never includes the removable seasonal stylesheet link.
+    if (withoutSeasonal && extname(file) === '.html') {
+      body = Buffer.from(body.toString('utf8').replace(
+        /^[ \t]*<link rel="stylesheet" href="\.\.?\/assets\/seasonal-effects-[^"/]+\.css" \/>\r?\n?/gm, '',
+      ));
+    }
     response.writeHead(200, {
       "Content-Type": contentTypes[extname(file)] ?? "application/octet-stream",
       "Cache-Control": "no-store",
@@ -59,5 +67,5 @@ const server = createServer(async (request, response) => {
 });
 
 server.listen(port, "127.0.0.1", () => {
-  console.log(`Preview: http://127.0.0.1:${port}${base}`);
+  console.log(`Preview${withoutSeasonal ? ' without seasonal CSS' : ''}: http://127.0.0.1:${port}${base}`);
 });

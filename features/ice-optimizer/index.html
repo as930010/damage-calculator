@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#111318" />
+    <meta name="game-data-url" content="__OPTIMIZER_GAME_DATA_URL__" />
+    <meta name="optimizer-worker-url" content="__OPTIMIZER_WORKER_URL__" />
+    <title>冰裝最佳化試算</title>
+    <link rel="stylesheet" href="./frontend/site-shell.css" />
+    <link rel="stylesheet" href="./frontend/styles.css" />
+    <link rel="stylesheet" href="__OPTIMIZER_SEASONAL_CSS_URL__" />
+  </head>
+  <body class="site-page site-page-optimizer">
+    <div class="app-shell">
+      <header class="site-header">
+        <div class="site-developer" aria-label="開發者資訊"><span class="developer-desktop">開發者：八雲雲OuO</span><span class="developer-desktop">Discord：yakumo_1231</span><span class="developer-desktop">E-Mail：as930010@gmail.com</span><span class="developer-support">有任何問題回報或建議歡迎透過Discord訊息，也歡迎各類贊助支持</span><span class="developer-mobile"><span>開發者：八雲雲OuO</span><span>Discord：yakumo_1231</span></span></div>
+        <div class="site-nav-wrap"><nav class="site-tabs" aria-label="功能頁面"><a href="../">傷害計算機</a><a href="./" aria-current="page">冰裝最佳化試算</a><a href="../buff-simulator/">隊伍增益模擬</a></nav></div>
+      </header>
+      <main id="app" class="site-main">
+        <section class="optimizer-intro site-tool-intro">
+          <div class="site-tool-intro-body">
+            <span class="site-tool-eyebrow">ICE EQUIPMENT OPTIMIZER</span>
+            <h1>冰裝最佳化試算</h1>
+            <p class="site-tool-summary">根據已儲存的配裝與關卡設定，搜尋右冰（含冰裝武器）中三組各至少三件、且套效生效的高傷害組合。</p>
+            <ol class="site-tool-steps" aria-label="最佳化流程"><li><span>01</span><span>使用已儲存配裝</span></li><li><span>02</span><span>開始搜尋冰裝</span></li><li><span>03</span><span>檢視並套用穿搭</span></li></ol>
+          </div>
+        </section>
+        <section class="optimizer-workspace site-card" aria-label="冰裝搜尋">
+          <div class="optimizer-actions"><button id="optimizer-start" class="site-button" type="button" disabled>開始搜尋</button><button id="optimizer-cancel" type="button" disabled>取消搜尋</button><button id="optimizer-clear" type="button" disabled>清空試算</button></div>
+          <p id="optimizer-status" role="status" aria-live="polite">正在讀取遊戲資料…</p>
+          <p id="optimizer-progress" aria-live="polite"></p>
+          <div id="optimizer-results" class="optimizer-results" aria-live="polite"></div>
+        </section>
+      </main>
+      <footer class="site-footer"><span class="footer-product">裝備傷害計算機</span><span class="footer-version">版本 <bdi>v3.01.01</bdi></span><span class="footer-updated">更新日期：<time datetime="2026-10-28">2026-10-28</time></span></footer>
+    </div>
+    <script type="module" src="./frontend/main.js"></script>
+  </body>
+</html>

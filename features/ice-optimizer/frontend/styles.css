@@ -1,0 +1,37 @@
+/* Ice optimizer content only; the website shell is shared with the other tools. */
+.optimizer-workspace .optimizer-caveat { margin: 12px 0 0; color: var(--site-muted); font-size: 12px; line-height: 1.6; }
+.optimizer-workspace { margin-top: 22px; padding: clamp(18px, 3vw, 30px); }
+.optimizer-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.optimizer-actions button, .optimizer-apply { min-height: 44px; padding: 9px 16px; border: 1px solid var(--site-border); border-radius: 8px; font: inherit; cursor: pointer; }
+.optimizer-actions button:disabled { opacity: .48; cursor: not-allowed; }
+.optimizer-actions #optimizer-cancel, .optimizer-actions #optimizer-clear { border: 1px solid var(--site-border); border-radius: 8px; background: #242a34; color: var(--site-text); }
+.optimizer-actions #optimizer-cancel:not(:disabled):hover, .optimizer-actions #optimizer-clear:not(:disabled):hover { background: #303b4b; }
+#optimizer-status, #optimizer-progress { margin: 14px 0 0; color: var(--site-muted); line-height: 1.6; }
+#optimizer-progress:empty { display: none; }
+.optimizer-results { display: grid; gap: 12px; margin-top: 22px; }
+.optimizer-results:empty { display: none; }
+.optimizer-result { padding: 18px; }
+.optimizer-result-header { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 5px 14px; }
+.optimizer-result h2 { margin: 0; font-size: 17px; }
+.optimizer-result-header span { color: #a9d8bc; font-size: 13px; }
+.optimizer-result-state { display: grid; gap: 2px; text-align: right; max-width: 100%; }
+.optimizer-result-state small { color: var(--site-muted); font-size: 12px; }
+@media (max-width: 600px) { .optimizer-result-state { text-align: left; } }
+.optimizer-result details { margin: 14px 0; }
+.optimizer-result summary { width: fit-content; color: #c8d7ed; cursor: pointer; }
+.optimizer-result summary:focus-visible, .optimizer-actions button:focus-visible { outline: 2px solid #b6c3ff; outline-offset: 3px; }
+.optimizer-result dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 7px 6px; margin: 14px 0 0; font-size: 13px; }
+.optimizer-result dt { color: var(--site-muted); }
+.optimizer-result dd { min-width: 0; margin: 0; overflow-wrap: anywhere; }
+.optimizer-result h3 { margin: 18px 0 8px; font-size: 13px; color: #c8d7ed; }
+.optimizer-result .optimizer-apply { margin-block-start: clamp(1.25rem, 2vw, 1.75rem); }
+.optimizer-alternative-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-block-start: clamp(1.25rem, 2vw, 1.75rem); }
+.optimizer-alternative-actions .optimizer-apply { margin-block-start: 0; }
+.optimizer-variant-differences { margin: 0; padding-inline-start: 1.25rem; }
+.optimizer-variant-differences li + li { margin-block-start: 6px; }
+@media (max-width: 700px) {
+  .optimizer-workspace { margin-top: 14px; }
+  .optimizer-actions button { flex: 1 1 120px; }
+  .optimizer-result { padding: 14px; }
+  .optimizer-result dl { column-gap: 6px; }
+}

@@ -1,0 +1,197 @@
+/* Shared website shell. Tool components remain in page stylesheets. */
+html { overflow-y: scroll; scrollbar-gutter: stable; }
+body.site-page {
+  --site-border: #344153;
+  --site-text: #e8edf5;
+  --site-muted: #a9b7cc;
+  --site-surface: #191f29;
+  margin: 0;
+  min-width: 320px;
+  background: #10141b;
+  color: var(--site-text);
+  font-family: Inter, "Segoe UI", "Microsoft JhengHei", sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.site-page *, .site-page *::before, .site-page *::after { box-sizing: border-box; }
+.site-page .app-shell { display: flex; flex-direction: column; min-height: 100vh; }
+.site-page-buff .app-shell, .site-page-optimizer .app-shell { width: 100%; max-width: none; padding: 0; background: transparent; }
+
+.site-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(290px, 420px);
+  align-items: center;
+  gap: 14px;
+  min-height: 72px;
+  padding: 12px clamp(18px, 4vw, 58px);
+  border-bottom: 1px solid rgb(120 145 180 / 18%);
+  background: rgb(18 23 31 / 88%);
+  font-size: 15px;
+  line-height: 1.55;
+  letter-spacing: .012em;
+}
+.site-developer { display: flex; flex-direction: column; width: min(100%, 390px); min-width: 0; justify-self: start; color: #929baa; font-size: 12px; line-height: 1.55; }
+.site-developer > .developer-mobile { display: none; }
+.site-nav-wrap { position: relative; justify-self: end; width: 100%; min-width: 0; }
+.site-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 3px;
+  width: 100%;
+  padding: 3px;
+  border: 1px solid #3c4a5e;
+  border-radius: 11px;
+  background: rgb(13 19 29 / 78%);
+}
+.site-tabs a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 44px;
+  padding: 6px 7px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: #b7c7dc;
+  font: 600 12px/1.35 Inter, "Segoe UI", "Microsoft JhengHei", sans-serif;
+  text-align: center;
+  text-decoration: none;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  transition: background-color .15s, border-color .15s, color .15s;
+}
+.site-tabs a:hover { border-color: #526681; background: #263449; color: #f2f6fc; }
+.site-tabs a[aria-current="page"] { border-color: #6c91c5; background: #263c59; color: #f2f6fc; }
+.site-tabs a:focus-visible { outline: 2px solid #b6c3ff; outline-offset: 2px; }
+.site-nav-wrap > .live-dot { position: absolute; right: calc(100% + 12px); top: 50%; transform: translateY(-50%); }
+
+.site-page .site-main { flex: 1 0 auto; width: min(100%, 1440px); min-width: 0; margin-inline: auto; padding: clamp(12px, 2.5vw, 34px) clamp(16px, 3.4vw, 48px) 20px; }
+/* The main calculator's workbench already owns the full content inset. */
+.site-page-main .site-main { padding: 0; }
+.site-footer {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 3px 8px;
+  min-height: 156px;
+  margin-top: auto;
+  padding: 20px 24px 96px;
+  border-top: 1px solid #303c4b;
+  color: #91a1b6;
+  font-size: 11px;
+  line-height: 1.6;
+  text-align: center;
+}
+.site-footer .footer-product, .site-footer .footer-version, .site-footer .footer-updated { flex: none; white-space: nowrap; }
+.site-footer .footer-updated::before { content: "｜"; margin-inline-end: 6px; }
+
+/* Shared website-level controls; form components remain page-specific. */
+.site-button { border: 1px solid #526681; border-radius: 8px; background: #263c59; color: var(--site-text); }
+.site-button:hover { background: #315075; }
+.site-button:focus-visible { outline: 2px solid #b6c3ff; outline-offset: 2px; }
+.site-card { border: 1px solid var(--site-border); border-radius: 18px; background: var(--site-surface); }
+
+/* Shared control typography and disclosure geometry; tool styles keep their own sizing. */
+.site-page :is(button, input, select, textarea) { font-family: inherit; }
+.site-page button { line-height: 1.4; }
+.site-page details:not(.stat):not(.site-credits-notes) > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  list-style: none;
+  line-height: 1.5;
+}
+.site-page details:not(.stat):not(.site-credits-notes) > summary::-webkit-details-marker { display: none; }
+.site-page details:not(.stat):not(.site-credits-notes) > summary::before {
+  content: "";
+  display: block;
+  flex: 0 0 7px;
+  width: 7px;
+  height: 7px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  border-radius: 0;
+  background: transparent;
+  font-size: 0;
+  transform: rotate(-45deg);
+  transition: transform .16s ease;
+}
+.site-page details:not(.stat):not(.site-credits-notes)[open] > summary::before { transform: rotate(45deg); }
+
+/* The three tools share the same opening card and short workflow layout. */
+:is(.workspace-heading, .site-tool-intro) {
+  position: relative;
+  isolation: isolate;
+  display: block;
+  min-height: 234px;
+  margin: 0 0 20px;
+  padding: clamp(16px, 2.6vw, 30px) clamp(20px, 3vw, 36px);
+  overflow: hidden;
+  border: 1px solid rgb(119 151 194 / 26%);
+  border-radius: 18px;
+  background: linear-gradient(112deg, rgb(35 49 68 / 94%), rgb(25 32 43 / 94%) 56%, rgb(27 34 46 / 82%)), var(--site-surface);
+  box-shadow: 0 18px 48px rgb(0 0 0 / 16%);
+  font-size: 15px;
+  line-height: 1.55;
+  letter-spacing: .012em;
+}
+:is(.workspace-heading, .site-tool-intro)::after {
+  position: absolute;
+  z-index: -1;
+  right: -64px;
+  bottom: -138px;
+  width: 360px;
+  height: 250px;
+  border: 1px solid rgb(156 190 238 / 14%);
+  border-radius: 50%;
+  box-shadow: 0 0 0 24px rgb(156 190 238 / 3%), 0 0 0 50px rgb(156 190 238 / 3%);
+  content: "";
+  transform: rotate(-18deg);
+  pointer-events: none;
+}
+.site-tool-intro-body { width: min(100%, 1040px); }
+.site-tool-eyebrow { display: inline-flex; align-items: center; gap: 9px; color: #a9c8f4; font-size: 10px; font-weight: 700; letter-spacing: .22em; }
+.site-tool-eyebrow::before { width: 19px; height: 1px; background: #8bb4ec; content: ""; }
+:is(.workspace-heading, .site-tool-intro) h1 { max-width: none; margin: 12px 0 6px; color: #f3f6fc; font-size: clamp(25px, 3vw, 36px); font-weight: 650; letter-spacing: .02em; line-height: 1.2; }
+.site-tool-summary { max-width: 680px; margin: 0; color: #b1c0d4; font-size: 14px; line-height: 1.6; }
+:is(.workflow-steps, .site-tool-steps) { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; max-width: 860px; margin: 15px 0 0; padding: 0; list-style: none; }
+:is(.workflow-steps, .site-tool-steps) li { display: flex; align-items: center; gap: 10px; min-width: 0; min-height: 48px; padding: 10px 13px; border: 1px solid rgb(145 170 206 / 21%); border-radius: 11px; background: rgb(13 19 28 / 24%); color: #d7e2f2; font-size: 13px; font-weight: 600; }
+:is(.workflow-steps, .site-tool-steps) li span:first-child { display: grid; place-items: center; flex: 0 0 25px; width: 25px; height: 25px; border-radius: 50%; background: rgb(137 173 221 / 15%); color: #b8d1f4; font-size: 10px; font-weight: 700; }
+
+@media (max-width: 700px) {
+  .site-header { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: calc(10px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) 10px calc(14px + env(safe-area-inset-left)); }
+  .site-developer { grid-column: 1; grid-row: 1; font-size: 10px; line-height: 1.35; overflow-wrap: anywhere; }
+  .site-developer > .developer-desktop, .site-developer > .developer-support { display: none; }
+  .site-developer > .developer-mobile { display: flex; flex-direction: column; align-items: flex-start; }
+  .site-nav-wrap { grid-column: 1; grid-row: 2; width: 100%; }
+  .site-nav-wrap > .live-dot { display: none; }
+  .site-tabs a { font-size: clamp(10px, 2.8vw, 12px); }
+  .site-footer { padding-inline: 12px; }
+  .site-footer .footer-updated::before { content: none; }
+  .site-page .site-main { padding: 18px 12px 20px; }
+  :is(.workspace-heading, .site-tool-intro) { min-height: 13rem; padding: 16px; border-radius: 15px; }
+  :is(.workspace-heading, .site-tool-intro) h1 { margin: 10px 0 5px; font-size: clamp(23px, 6vw, 29px); }
+  .site-tool-summary { font-size: 12px; }
+  :is(.workflow-steps, .site-tool-steps) { gap: 6px; margin-top: 12px; }
+  :is(.workflow-steps, .site-tool-steps) li { min-height: 56px; flex-direction: column; justify-content: center; gap: 5px; padding: 7px 3px; text-align: center; font-size: 11px; line-height: 1.35; }
+  :is(.workflow-steps, .site-tool-steps) li span:first-child { flex-basis: 22px; width: 22px; height: 22px; }
+}
+@media (min-width: 701px) and (max-width: 1240px) {
+  .site-page .site-main { padding-inline: clamp(16px, 3vw, 28px); }
+}
+@media (max-width: 380px) {
+  .site-page .site-main { padding-inline: 9px; }
+}
+@media (max-width: 700px) {
+  .site-page-main .site-main { padding: 0; }
+  .site-page-main .workbench { padding-top: 18px; }
+}
+@media (min-width: 701px) and (max-width: 1240px) {
+  .site-page-main .site-main { padding-inline: 0; }
+}
+@media (max-width: 360px) {
+  :is(.workflow-steps, .site-tool-steps) li { font-size: 10px; }
+}

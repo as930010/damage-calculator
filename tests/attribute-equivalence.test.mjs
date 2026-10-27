@@ -132,7 +132,7 @@ test('combined signed changes use one complete engine evaluation, caps and merge
   assert.equal(expected.attributes.stats.defenseIgnorePct.totalBeforeCap, baseline.attributes.stats.defenseIgnorePct.totalBeforeCap + 1.25);
   assert.equal(expected.attributes.stats.adaptabilityPct.finalTotal, 60);
   assert.equal(expected.attributes.stats.polarizationPct.finalTotal, 60);
-  assert.equal(runtime.counts.calculateLoadout, 1); assert.equal(runtime.counts.aggregateCharacterAttributes, 2);
+  assert.equal(runtime.counts.calculateLoadout, 1); assert.equal(runtime.counts.aggregateCharacterAttributes, 1);
   assert.equal(JSON.stringify({ input, baseline }), saved);
   const both = calculateCombinedAttributeChange(input, baseline, { bossDamagePct: 10, bleedDamagePct: 10 });
   const separateGains = calculateCombinedAttributeChange(input, baseline, { bossDamagePct: 10 }).gainPct
@@ -205,7 +205,7 @@ test('combined UI preserves independent drafts, accepts signed decimals and foll
     page.runtime.resetCounts(); set('bossDamagePct', '10');
     assert.equal(page.runtime.counts.calculateLoadout, 1);
     assert.equal(page.runtime.counts.evaluateLoadout ?? 0, 0);
-    assert.equal(page.runtime.counts.aggregateCharacterAttributes, 2);
+    assert.equal(page.runtime.counts.aggregateCharacterAttributes, 1);
     assert.deepEqual(page.readState(), saved); assert.equal(document.querySelector('#undo').disabled, true);
     assert.equal(page.dom.window.localStorage.getItem('dab-baseline-v1'), baselineJson);
     assert.equal(document.querySelector('#damage-result').innerHTML, damageHtml);

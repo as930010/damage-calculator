@@ -189,7 +189,7 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
 @media(min-width:701px) and (max-width:1240px){.site-credits-notes{width:min(calc(100% - clamp(32px,6vw,56px)),1384px);max-width:1384px}}
 @media(min-width:701px){.workbench{padding-bottom:20px}}
 
-.skill-damage-share-control{border:1px solid rgb(117 139 171 / 18%);border-radius:10px;background:rgb(15 21 29 / 48%);color:#aab8cb;font-size:10px}
+.skill-damage-share-control{border:1px solid rgb(117 139 171 / 18%);border-radius:10px;background:linear-gradient(145deg,#19212b,#151c25);color:#aab8cb;font-size:10px}
 .skill-damage-share-control output{color:#d5e3f7;font-size:10px}
 .skill-damage-share-number-wrap{border:1px solid #39485d;border-radius:7px;background:#151c25;color:#aab8cb}
 .skill-damage-share-number-wrap input{border:0;outline:0;background:transparent;color:#e2ecfa;text-align:right;font-family:inherit;font-weight:600}

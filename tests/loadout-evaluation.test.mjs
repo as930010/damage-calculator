@@ -26,12 +26,12 @@ test('public calculation API retains its complete output and original invalid-in
 });
 
 const expectedWork = {
-  'public-complete': [2, 1], 'minimal-complete': [2, 1], 'no-class': [0, 0], 'invalid-class': [0, 0],
+  'public-complete': [1, 1], 'minimal-complete': [1, 1], 'no-class': [0, 0], 'invalid-class': [0, 0],
   'no-weapon-rates-fallback': [1, 1], 'no-bottom-attributes-fallback': [0, 0],
-  'no-shoes-attributes-fallback': [0, 0], 'invalid-weapon': [1, 0],
-  'invalid-boss-rates-fallback': [2, 1], 'invalid-rate-attributes-fallback': [2, 0],
-  'late-damage-failure-rates-fallback': [2, 1], 'special-weapon-average': [2, 1],
-  'passives-effects-decimals': [2, 1], 'empty-stage-boundaries': [2, 1],
+  'no-shoes-attributes-fallback': [0, 0], 'invalid-weapon': [0, 0],
+  'invalid-boss-rates-fallback': [1, 1], 'invalid-rate-attributes-fallback': [1, 0],
+  'late-damage-failure-rates-fallback': [1, 1], 'special-weapon-average': [1, 1],
+  'passives-effects-decimals': [1, 1], 'empty-stage-boundaries': [1, 1],
 };
 for (const { id, state } of scenarios) {
   test(`evaluation: ${id} keeps exact pre-refactor values, ordered sources and errors`, () => {
@@ -126,7 +126,7 @@ test('invalid baselines are cached and corrected contents recover without stale 
   assert.equal(evaluations(), 0);
   state.Job = 'KE';
   assert.ok(cache.get(gameData, state, revision).damage);
-  assert.equal(aggregations(), 2);
+  assert.equal(aggregations(), 1);
 });
 
 test('cached sources are detached and frozen; current evaluations remain independent', () => {
@@ -165,7 +165,7 @@ test('actual main events: current changes reuse baseline; replacement/restore/un
     page.runtime.resetCounts(); enter(page, 'Boss防禦', '60');
     assert.equal(fixture.workload['page:unchanged-baseline-update'].aggregateCharacterAttributes, 8);
     assert.equal(page.runtime.counts.evaluateLoadout, 1);
-    assert.equal(page.runtime.counts.aggregateCharacterAttributes, 2);
+    assert.equal(page.runtime.counts.aggregateCharacterAttributes, 1);
     assert.notEqual(document.querySelector('#equipment-damage-summary').innerHTML, original);
     assert.equal(document.querySelector('#calculation-details details').open, true);
     const modified = document.querySelector('#equipment-damage-summary').innerHTML;
@@ -175,7 +175,7 @@ test('actual main events: current changes reuse baseline; replacement/restore/un
     assert.equal(document.querySelector('#equipment-damage-summary').innerHTML, modified);
     page.runtime.resetCounts(); document.querySelector('#baseline').click();
     assert.equal(page.runtime.counts.evaluateLoadout, 2); // New baseline once, current once.
-    assert.equal(page.runtime.counts.aggregateCharacterAttributes, 4);
+    assert.equal(page.runtime.counts.aggregateCharacterAttributes, 2);
     assert.equal(JSON.parse(page.dom.window.localStorage.getItem('dab-baseline-v1')).values['Stage.BossDEF'], '60');
     assert.match(document.querySelector('#equipment-damage-summary').textContent, /0.00%/);
     enter(page, 'Boss防禦', '30');
@@ -221,7 +221,7 @@ test('actual import keeps baseline and save/export contracts; cleared storage ha
     await new Promise(resolve => setTimeout(resolve, 0));
     assert.match(page.dom.window.document.querySelector('#transfer-status').textContent, /已匯入/);
     assert.equal(page.runtime.counts.evaluateLoadout, 1);
-    assert.equal(page.runtime.counts.aggregateCharacterAttributes, 2);
+    assert.equal(page.runtime.counts.aggregateCharacterAttributes, 1);
     assert.equal(page.dom.window.localStorage.getItem('dab-baseline-v1'), baselineBefore);
   } finally { page.close(); }
   const cleared = await createPage(sample, null);

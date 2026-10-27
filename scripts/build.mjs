@@ -1,10 +1,11 @@
 import { isPublishableDataFile, publicGameData } from './public-game-data.mjs';
-import { cleanOutput, minifyCss, productionAssets, writeProduction } from './production-assets.mjs';
+import { cleanOutput, contentHash, minifyCss, productionAssets, writeProduction } from './production-assets.mjs';
 import { cp, mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
+import { build as bundle } from "esbuild";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -93,6 +94,70 @@ async function includeSimulator(dir, prefix) {
   }
 }
 await includeSimulator(simulatorRoot, 'buff-simulator/');
+const shellCssPath = optimized.manifest.css.find(item => item.source === 'site-shell.css')?.path;
+const seasonalCssPath = optimized.manifest.css.find(item => item.source === 'seasonal-effects.css')?.path;
+if (!shellCssPath || !optimized.files.has(shellCssPath)) throw new Error('Missing shared site shell CSS');
+const optimizerTemplate = await readFile(join(root, 'features', 'ice-optimizer', 'index.html'), 'utf8');
+const shellLink = 'href="./frontend/site-shell.css"';
+const optimizerStyleLink = 'href="./frontend/styles.css"';
+const optimizerSeasonalLink = '<link rel="stylesheet" href="__OPTIMIZER_SEASONAL_CSS_URL__" />';
+if (optimizerTemplate.split(shellLink).length !== 2 || optimizerTemplate.split(optimizerStyleLink).length !== 2
+  || optimizerTemplate.split(optimizerSeasonalLink).length !== 2) {
+  throw new Error('Invalid optimizer CSS references');
+}
+const optimizerCss = Buffer.from(minifyCss(await readFile(join(root, 'features', 'ice-optimizer', 'frontend', 'styles.css'), 'utf8')));
+const optimizerCssPath = `assets/ice-optimizer-styles-${contentHash(optimizerCss)}.css`;
+optimized.files.set(optimizerCssPath, optimizerCss);
+optimized.manifest.css.push({ source: 'ice-optimizer/styles.css', path: optimizerCssPath });
+optimized.manifest.files[optimizerCssPath] = { bytes: optimizerCss.length, hash: contentHash(optimizerCss) };
+const siteRoot = join(root, 'site-dist');
+const optimizerEntryPath = join(output, 'features', 'ice-optimizer', 'frontend', 'main.js');
+const workerEntryPath = join(output, 'features', 'ice-optimizer', 'frontend', 'worker.js');
+const optimizerBundle = await bundle({
+  absWorkingDir: root,
+  entryPoints: { 'ice-optimizer': optimizerEntryPath, 'ice-worker': workerEntryPath },
+  outdir: join(siteRoot, 'assets'),
+  entryNames: '[name]-[hash]',
+  chunkNames: 'chunks/ice-[name]-[hash]',
+  bundle: true, splitting: true, minify: true, treeShaking: true,
+  format: 'esm', platform: 'browser', target: 'es2022', charset: 'utf8',
+  metafile: true, write: false,
+});
+const slash = value => value.replaceAll('\\', '/');
+let optimizerEntryPathHashed, optimizerWorkerPathHashed;
+for (const file of optimizerBundle.outputFiles) {
+  const asset = slash(relative(siteRoot, file.path));
+  optimized.files.set(asset, file.contents);
+  optimized.manifest.files[asset] = { bytes: file.contents.length, hash: contentHash(file.contents) };
+  const metadata = optimizerBundle.metafile.outputs[slash(relative(root, file.path))];
+  if (!metadata) throw new Error('Missing optimizer bundle metadata');
+  optimized.manifest.js[asset] = {
+    imports: metadata.imports.filter(item => !item.external).map(item => ({
+      path: slash(relative(siteRoot, resolve(root, item.path))), kind: item.kind,
+    })),
+  };
+  const entry = metadata.entryPoint && slash(metadata.entryPoint);
+  if (entry === slash(relative(root, optimizerEntryPath))) optimizerEntryPathHashed = asset;
+  if (entry === slash(relative(root, workerEntryPath))) optimizerWorkerPathHashed = asset;
+}
+const gameDataPath = optimized.manifest.data['data/game-data.json'];
+if (!optimizerEntryPathHashed || !optimizerWorkerPathHashed || !gameDataPath) {
+  throw new Error('Missing optimizer entry, worker, or game data');
+}
+const optimizerHtml = Buffer.from(optimizerTemplate
+  .replace(shellLink, `href="../${shellCssPath}"`)
+  .replace(optimizerStyleLink, `href="../${optimizerCssPath}"`)
+  .replace(optimizerSeasonalLink, seasonalCssPath
+    ? `<link rel="stylesheet" href="../${seasonalCssPath}" />` : '')
+  .replace('content="__OPTIMIZER_GAME_DATA_URL__"', `content="../${gameDataPath}"`)
+  .replace('content="__OPTIMIZER_WORKER_URL__"', `content="../${optimizerWorkerPathHashed}"`)
+  .replace('src="./frontend/main.js"', `src="../${optimizerEntryPathHashed}"`));
+if (optimizerHtml.includes('__OPTIMIZER_') || [shellCssPath, optimizerCssPath, optimizerEntryPathHashed,
+  optimizerWorkerPathHashed, gameDataPath].some(asset => !optimized.files.has(asset))) {
+  throw new Error('Optimizer deployment references are incomplete');
+}
+optimized.files.set('ice-optimizer/index.html', optimizerHtml);
+optimized.manifest.files['ice-optimizer/index.html'] = { bytes: optimizerHtml.length, hash: contentHash(optimizerHtml) };
 optimized.manifest.pages = ['buff-simulator/asset-manifest.json'];
 optimized.files.set('asset-manifest.json', Buffer.from(JSON.stringify(optimized.manifest, null, 2)+'\n'));
 await writeProduction(root, optimized.files);

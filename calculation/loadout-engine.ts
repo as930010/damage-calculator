@@ -1,4 +1,4 @@
-import { aggregateCharacterAttributes, prepareCharacterAttributeInput } from "./attribute-aggregation.ts";
+import { aggregateCharacterAttributes, aggregatePreliminaryAttackLevel, prepareCharacterAttributeInput } from "./attribute-aggregation.ts";
 import { calculateAttack, calculateWeaponBaseAttack, resolveAttackParameters } from "./attack.ts";
 import { calculateCombatRates } from "./engine.ts";
 import type { CombatRateEngineResult } from "./engine.ts";
@@ -166,11 +166,12 @@ export function prepareLoadoutAttributes(input: LoadoutAttributeInput, requireWe
     input.attributeRules,
     withCharacterBaseStats(input.sources, input.characterBaseStats),
   );
-  const preliminaryAttributes = aggregateCharacterAttributes(preliminaryPrepared.attributeInput);
-  // Without a weapon selection both attribute passes have identical inputs.
+  // Without a weapon selection, only the ordinary attribute pass is needed.
   if (input.weaponEnhancementLevel === undefined && !requireWeapon) {
-    return { attributes: preliminaryAttributes, prepared: preliminaryPrepared, resolvedAttack: undefined };
+    return { attributes: aggregateCharacterAttributes(preliminaryPrepared.attributeInput),
+      prepared: preliminaryPrepared, resolvedAttack: undefined };
   }
+  const attackLevel = aggregatePreliminaryAttackLevel(preliminaryPrepared.attributeInput);
   const resolvedAttack = resolveAttackParameters(
     input.attackParameters,
     input.classId,
@@ -179,25 +180,19 @@ export function prepareLoadoutAttributes(input: LoadoutAttributeInput, requireWe
   // Weapon base attacks depend on the total attack level before entering physical/magical totals.
   // Resolve this acyclic step before final aggregation so the attack formula consumes them.
   const weaponBase = calculateWeaponBaseAttack({
-    attackLevel: statTotal(preliminaryAttributes, "attackLevel"),
+    attackLevel,
     ...resolvedAttack,
   });
-  const prepared = prepareCharacterAttributeInput(
-    input.attributeRules,
-    withCharacterBaseStats(
-      {
-        ...input.sources,
-        shared: [
-          ...input.sources.shared,
-          {
-            sourceId: "weapon-base-attack",
-            stats: { physicalAttack: weaponBase.physicalAttack, magicalAttack: weaponBase.magicalAttack },
-          },
-        ],
-      },
-      input.characterBaseStats,
-    ),
-  );
+  // The added weapon source contains only ordinary attack stats. Conditional and
+  // product sources are identical to the already prepared preliminary input.
+  const prepared = { ...preliminaryPrepared,
+    attributeInput: { ...preliminaryPrepared.attributeInput,
+      sharedSources: [...preliminaryPrepared.attributeInput.sharedSources, {
+        sourceId: "weapon-base-attack",
+        stats: { physicalAttack: weaponBase.physicalAttack, magicalAttack: weaponBase.magicalAttack },
+      }],
+    },
+  };
   const attributes = aggregateCharacterAttributes(prepared.attributeInput);
   return { attributes, prepared, resolvedAttack };
 }

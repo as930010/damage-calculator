@@ -162,35 +162,7 @@ export function aggregateCharacterAttributes(
   validateSources(input.lowerwearB, rules, "lowerwearB");
 
   const stats: Record<string, AggregatedAttributeDetail> = {};
-  for (const [key, rule] of rules) {
-    const sharedSources = detailsFor(input.sharedSources, key);
-    const lowerwearASources = detailsFor(input.lowerwearA, key);
-    const lowerwearBSources = detailsFor(input.lowerwearAlternativeEnabled === false ? [] : input.lowerwearB, key);
-    const sharedTotal = sumDetails(sharedSources);
-    const lowerwearA = sumDetails(lowerwearASources);
-    const lowerwearB = sumDetails(lowerwearBSources);
-    const lowerwearAverage = input.lowerwearAlternativeEnabled === false
-      ? lowerwearA
-      : (lowerwearA + lowerwearB) / 2;
-    const totalBeforeCap = sharedTotal + lowerwearAverage;
-    const finalTotal = rule.cap
-      ? Math.min(rule.cap.value, totalBeforeCap)
-      : totalBeforeCap;
-
-    stats[key] = {
-      key,
-      sharedSources,
-      sharedTotal,
-      lowerwearASources,
-      lowerwearA,
-      lowerwearBSources,
-      lowerwearB,
-      lowerwearAverage,
-      totalBeforeCap,
-      ...(rule.cap ? { cap: rule.cap.value } : {}),
-      finalTotal,
-    };
-  }
+  for (const [key, rule] of rules) stats[key] = aggregateStat(input, key, rule);
 
   const stronger = aggregateConditionalSources(
     input.conditionalDamage?.stronger ?? [],
@@ -210,4 +182,34 @@ export function aggregateCharacterAttributes(
       heatSources: heat.sources,
     },
   };
+}
+
+function aggregateStat(input: CharacterAttributeInput, key: string, rule: AttributeRule): AggregatedAttributeDetail {
+  const sharedSources = detailsFor(input.sharedSources, key);
+  const lowerwearASources = detailsFor(input.lowerwearA, key);
+  const lowerwearBSources = detailsFor(input.lowerwearAlternativeEnabled === false ? [] : input.lowerwearB, key);
+  const sharedTotal = sumDetails(sharedSources);
+  const lowerwearA = sumDetails(lowerwearASources);
+  const lowerwearB = sumDetails(lowerwearBSources);
+  const lowerwearAverage = input.lowerwearAlternativeEnabled === false
+    ? lowerwearA : (lowerwearA + lowerwearB) / 2;
+  const totalBeforeCap = sharedTotal + lowerwearAverage;
+  const finalTotal = rule.cap ? Math.min(rule.cap.value, totalBeforeCap) : totalBeforeCap;
+  return {
+    key, sharedSources, sharedTotal, lowerwearASources, lowerwearA,
+    lowerwearBSources, lowerwearB, lowerwearAverage, totalBeforeCap,
+    ...(rule.cap ? { cap: rule.cap.value } : {}), finalTotal,
+  };
+}
+
+/** Validate the ordinary inputs, then resolve only the preliminary stat required by weapon-base attack. */
+export function aggregatePreliminaryAttackLevel(input: CharacterAttributeInput): number {
+  const rules = validateRules(input.rules);
+  validateSources(input.sharedSources, rules, "sharedSources");
+  validateSources(input.lowerwearA, rules, "lowerwearA");
+  validateSources(input.lowerwearB, rules, "lowerwearB");
+  aggregateConditionalSources(input.conditionalDamage?.stronger ?? [], "conditionalDamage.stronger");
+  aggregateConditionalSources(input.conditionalDamage?.heat ?? [], "conditionalDamage.heat");
+  const rule = rules.get("attackLevel");
+  return rule ? aggregateStat(input, "attackLevel", rule).finalTotal : 0;
 }

@@ -12,5 +12,5 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true
   },
-  "include": ["calculation/**/*.ts", "frontend/**/*.ts"]
+  "include": ["calculation/**/*.ts", "frontend/**/*.ts", "features/ice-optimizer/frontend/**/*.ts"]
 }
