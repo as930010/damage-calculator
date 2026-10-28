@@ -945,8 +945,8 @@
       "level": null,
       "active": true,
       "stats": {
-        "physicalAttack": 30.0,
-        "magicalAttack": 30.0,
+        "physicalAttack": 50.0,
+        "magicalAttack": 50.0,
         "doubleAttackPct": 2.0,
         "adaptabilityPct": 2.0
       },
