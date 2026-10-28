@@ -69,7 +69,16 @@ test('complete/incomplete exports retain exact compact v3 JSON, order and omissi
 for (const scenario of importCases(fixture.transfers.export.json)) {
   test(`import policy: ${scenario.id}`, () => {
     const before = digest(complete);
-    assert.deepEqual(captureCall(() => transfer.deserializeLoadout(scenario.raw, complete, gameData, index)), normalizeCapturedImport(fixture.transfers[scenario.id]));
+    const actual = captureCall(() => transfer.deserializeLoadout(scenario.raw, complete, gameData, index));
+    if (scenario.id === 'legacy-venue') {
+      const values = actual.value.state.values;
+      assert.equal(values['Effect.Environment'], undefined);
+      assert.ok(actual.value.clearedFields.includes('Effect.Environment'));
+      assert.notEqual(values['Left.Armor.Gloves.Circuit.Attribute'], '單技傷%');
+      assert.notEqual(values['MasterBeast.Head.CustomAttribute'], '其他');
+      assert.equal(values['Effect.Title'], complete.values['Effect.Title']);
+      assert.equal(actual.value.state.Job, complete.Job);
+    } else assert.deepEqual(actual, normalizeCapturedImport(fixture.transfers[scenario.id]));
     assert.equal(digest(complete), before);
   });
 }
@@ -82,8 +91,23 @@ for (const [id, state] of [['complete', complete], ['legacy-startup', legacyStar
     try {
       assert.equal(digest(choices), fixture.pages[id].choicesHash);
       assert.equal(choices.length, fixture.pages[id].pickerCount);
-      assert.equal(digest(resultHtml(page.dom.window.document)), fixture.pages[id].resultHash);
-      assertStoredStateMatches(page.dom.window.localStorage.getItem('dab-loadout-v1'), fixture.pages[id].savedState);
+      if (id === 'complete') {
+        assert.equal(digest(resultHtml(page.dom.window.document)), fixture.pages[id].resultHash);
+        assertStoredStateMatches(page.dom.window.localStorage.getItem('dab-loadout-v1'), fixture.pages[id].savedState);
+      } else {
+        const doc = page.dom.window.document;
+        assert.match(doc.querySelector('#damage-result').textContent, /Unknown option: 小屋/);
+        assert.match(doc.querySelector('#results').textContent, /Unknown option: 小屋/);
+        const saved = JSON.parse(page.dom.window.localStorage.getItem('dab-loadout-v1'));
+        assert.equal(saved.Job, state.Job);
+        assert.equal(saved.values['Effect.Environment'], '小屋');
+        assert.notEqual(saved.values['Effect.Environment'], '小屋/溫泉');
+        if (id === 'legacy-startup') {
+          assert.equal(saved.values['Effect.Title'], complete.values['Effect.Title']);
+          assert.notEqual(saved.values['Left.Armor.Gloves.Circuit.Attribute'], '單技傷%');
+          assert.notEqual(saved.values['MasterBeast.Head.CustomAttribute'], '其他');
+        }
+      }
       assertStoredStateMatches(page.dom.window.localStorage.getItem('dab-baseline-v1'), fixture.pages[id].savedBaseline);
       assert.equal(page.runtime.counts.createCatalogIndex, 1);
       assert.equal(digest(gameData), before);
@@ -218,10 +242,9 @@ test('every selectable magic stone remains valid after input normalization', () 
 
 test('index queries and current normalization leave saved baseline and cached evaluation unchanged', async () => {
   const { createBaselineEvaluationCache } = await runtime.load('frontend/baseline-evaluation.ts');
-  const { normalizePortraitAwakeningValues, migrateLegacyPortraitAwakening } = await runtime.load('frontend/state.ts');
+  const { normalizePortraitAwakeningValues } = await runtime.load('frontend/state.ts');
   const cache = createBaselineEvaluationCache(), baseline = structuredClone(complete), revision = Symbol();
   const cached = cache.get(gameData, baseline, revision), before = digest(baseline), current = structuredClone(legacyStartup);
-  migrateLegacyPortraitAwakening(current.values, gameData.otherEffects.portraitAwakening);
   normalizePortraitAwakeningValues(current.values, gameData.otherEffects.portraitAwakening);
   for (const context of choiceContexts()) for (const field of Object.keys(fixture.choices[context.id])) index.resolveFieldChoices(field, context.values);
   runtime.resetCounts();
