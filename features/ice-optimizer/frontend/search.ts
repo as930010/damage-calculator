@@ -52,7 +52,7 @@ export interface IceSearchResult {
   baselineInScope: boolean;
   /** Game legality is separate from this run's candidate policy and explicit constraints. */
   baselineGameLegal: boolean;
-  candidatePolicy: Required<IceSearchConstraints>;
+  candidatePolicy: IceSearchConstraints;
   bestSearchDomainDamage: number | null;
   belowBaselineEvaluated: number;
   evaluated: number;
@@ -501,7 +501,7 @@ export async function searchIce(data: GameData, base: LoadoutState,
   };
   const baselineInScope = meetsThreeSetPolicy(currentChoices, baselineSetNames)
     && validSelectedEffects(currentChoices, baselineSetNames);
-  const gameAllowedNames = new Map(createIceSearchDomains(data, currentChoices, { excludedSeries: [] })
+  const gameAllowedNames = new Map(createIceSearchDomains(data, currentChoices)
     .map(step => [step.field, new Set(step.names)]));
   const baselineGameLegal = validSelectedEffects(currentChoices, baselineSetNames, gameAllowedNames);
   const progress = (phase: string, force = false) => {

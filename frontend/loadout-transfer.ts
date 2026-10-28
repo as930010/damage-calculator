@@ -3,7 +3,7 @@ import { createCatalogIndex, type CatalogData, type CatalogIndex } from './catal
 export { equipmentTransferCode } from './catalog-index.ts';
 import { isResonanceInputField, parseResonancePoints } from '../calculation/resonance-input.ts';
 import { codeForFieldId, fieldIdForCode, isFieldId } from './field-ids.ts';
-import { migrateLegacyEnvironmentSelection, migrateLegacyGloveCircuitSkillDamage, normalizePortraitAwakeningSplit, normalizeTranscendenceSkillDamageShare, type LoadoutState } from './state.ts';
+import { normalizePortraitAwakeningSplit, normalizeTranscendenceSkillDamageShare, type LoadoutState } from './state.ts';
 import { canonicalizeNumber } from './numeric-input.ts';
 import { normalizeOptionalEffectValues, isUnrelatedEffectValue, normalizeNephronMagazineSelections, normalizeBossHealthCondition } from './state.ts';
 import { normalizeClassSkillVersions } from '../calculation/class-skill-versions.ts';
@@ -158,10 +158,6 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
         ? canonicalizeNumber(value)
         : value;
       const candidateValue: Record<string, string | number> = { [fieldId]: importedValue };
-      const environmentMigration = fieldId === 'Effect.Environment'
-        ? migrateLegacyEnvironmentSelection(candidateValue)
-        : null;
-      if (environmentMigration === 'removed') continue;
       if (isResonanceInputField(fieldId)) {
         const points = parseResonancePoints(fieldId, candidateValue[fieldId]);
         if (points !== null) optionValuesById[fieldId] = points;
@@ -182,14 +178,7 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
       if (mappings.has(fieldId)) continue;
       if (typeof importedValue === 'string' && importedValue.trim() === '') continue;
       const candidateValue: Record<string, string | number> = { [fieldId]: importedValue };
-      const environmentMigration = fieldId === 'Effect.Environment'
-        ? migrateLegacyEnvironmentSelection(candidateValue)
-        : null;
       const normalizedValue = candidateValue[fieldId];
-      if (environmentMigration === 'removed') {
-        clearedFields.push(fieldId);
-        continue;
-      }
       if (isResonanceInputField(fieldId)) {
         const points = parseResonancePoints(fieldId, normalizedValue);
         if (points === null) clearedFields.push(fieldId);
@@ -250,7 +239,6 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
     }
   }
 
-  migrateLegacyGloveCircuitSkillDamage(values, index.gloveCircuit?.attributeField);
 
   for (const [fieldId, mapping] of mappings) {
     const fieldCode = codeForFieldId(fieldId)!;
@@ -279,7 +267,6 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
   if (typeof candidate.petSkillAttackEnabled !== 'boolean') clearedFields.push('寵物被動');
   if (candidate.nutProtectionPotionEnabled !== undefined && typeof candidate.nutProtectionPotionEnabled !== 'boolean') clearedFields.push('特殊靈藥：努特的庇護');
   if (candidate.nephronRaidEnabled !== undefined && typeof candidate.nephronRaidEnabled !== 'boolean') clearedFields.push('內布隆襲擊戰');
-  if (migrateLegacyEnvironmentSelection(values) === 'removed') clearedFields.push('Effect.Environment');
   normalizeOptionalEffectValues(values, index);
 
   const classSkillVersions = normalizeClassSkillVersions(candidate.classSkillVersions);

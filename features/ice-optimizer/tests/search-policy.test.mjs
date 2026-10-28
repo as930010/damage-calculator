@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { createIceSearchDomains, iceRangeNames, snapshotIceSearchConstraints } from '../../../dist/features/ice-optimizer/frontend/search-policy.js';
+import { createIceSearchDomains, iceSelectedSeries, iceSeriesOrder, snapshotIceSearchConstraints } from '../../../dist/features/ice-optimizer/frontend/search-policy.js';
 import { generateIceSearchStructures, isThreeSetIceCandidate, searchIce } from '../../../dist/features/ice-optimizer/frontend/search.js';
 import { resolveRightIceSetEffects } from '../../../dist/calculation/equipment-effects.js';
 import { projectDamage } from '../../../dist/frontend/projection.js';
@@ -11,16 +11,17 @@ const sample = JSON.parse(readFileSync('data/examples/public-example-2026-09-28.
 const right = data.mapping.selections.filter(entry => entry.catalogFile === 'equipment/right-ice.json');
 const items = data.catalogs['equipment/right-ice.json'].items;
 const excluded = new Set(['神埃', '騎士團']);
+const defaultSeries = iceSeriesOrder(data).filter(name => name !== '騎士團');
 const choices = Object.fromEntries(right.map(entry => [entry.selectionField, String(sample.values[entry.selectionField] ?? '')]));
 const equipped = Object.fromEntries(right.map(entry => {
   const names = items.filter(item => item.active && item.slotId === entry.slotId && !excluded.has(item.name)).map(item => item.name);
   return [entry.selectionField, names.includes(choices[entry.selectionField]) ? choices[entry.selectionField] : names[0]];
 }));
 
-test('預設政策精確排除兩系列，保留原始資料與舊版完整候選政策', () => {
+test('勾選系列決定一般候選，完整資料仍可用於基準驗證', () => {
   const original = JSON.stringify(data);
-  const all = createIceSearchDomains(data, choices, { excludedSeries: [] });
-  const defaults = createIceSearchDomains(data, choices);
+  const all = createIceSearchDomains(data, choices);
+  const defaults = createIceSearchDomains(data, choices, { allowedSeries: defaultSeries });
   assert.equal(all.reduce((sum, domain) => sum + domain.names.length, 0)
     - defaults.reduce((sum, domain) => sum + domain.names.length, 0), 19);
   assert.equal(defaults.length, 12);
@@ -29,7 +30,7 @@ test('預設政策精確排除兩系列，保留原始資料與舊版完整候�
   assert.ok(all.some(domain => domain.names.includes('神埃')));
   assert.ok(all.every(domain => domain.names.includes('騎士團')));
   assert.equal(JSON.stringify(data), original);
-  for (const seed of generateIceSearchStructures(data, choices).seeds) {
+  for (const seed of generateIceSearchStructures(data, choices, { allowedSeries: defaultSeries }).seeds) {
     assert.ok(Object.values(seed.choices).every(name => !excluded.has(name)));
     assert.ok(seed.setNames.every(name => !excluded.has(name)));
   }
@@ -38,7 +39,7 @@ test('預設政策精確排除兩系列，保留原始資料與舊版完整候�
 test('指定裝備以穩定 ID 只覆寫該部位的預設排除，固定部位亦可保留排除裝備', () => {
   const field = right.find(entry => entry.slotId === 'top');
   const item = items.find(item => item.slotId === 'top' && item.name === '神埃');
-  const required = { requiredItemIds: { [field.selectionField]: item.id } };
+  const required = { allowedSeries: defaultSeries, requiredItemIds: { [field.selectionField]: item.id } };
   const domains = createIceSearchDomains(data, choices, required);
   assert.deepEqual(domains.find(domain => domain.field === field.selectionField).names, ['神埃']);
   assert.ok(domains.filter(domain => domain.field !== field.selectionField)
@@ -142,10 +143,10 @@ test('排除裝備可作外部基準，但不會自行回到正式推薦或重�
   const state = { ...sample, values: { ...sample.values, ...equipped } };
   for (const field of data.rightIceSets.selectionFields) state.values[field] = '';
   state.values['Ice.Weapon.Set'] = '騎士團';
-  const seed = generateIceSearchStructures(data, state.values).seeds[0];
+  const seed = generateIceSearchStructures(data, state.values, { allowedSeries: defaultSeries }).seeds[0];
   assert.ok(seed);
   for (const entry of right) if (entry.selectionField !== 'Ice.Weapon.Set') state.values[entry.selectionField] = seed.choices[entry.selectionField];
-  const constraints = { fixedFields: right.filter(entry => entry.selectionField !== 'Ice.Weapon.Set').map(entry => entry.selectionField) };
+  const constraints = { allowedSeries: defaultSeries, fixedFields: right.filter(entry => entry.selectionField !== 'Ice.Weapon.Set').map(entry => entry.selectionField) };
   const updates = [];
   const result = await searchIce(data, state, update => { if (update.results) updates.push(update); }, constraints);
   assert.equal(result.baselineGameLegal, true);
@@ -208,7 +209,7 @@ test('必選三套與固定 11 件同時生效，A、C 搜尋及候選檢查保�
 
 test('必選排除系列只開放指定系列，重複或無法成立的條件被拒絕', () => {
   const knight = data.rightIceSets.effects.find(effect => effect.active && effect.setName === '騎士團').id;
-  const constraints = { requiredSetEffectIds: [knight] };
+  const constraints = { allowedSeries: defaultSeries, requiredSetEffectIds: [knight] };
   const domains = createIceSearchDomains(data, equipped, constraints);
   assert.ok(domains.some(domain => domain.names.includes('騎士團')));
   assert.ok(domains.every(domain => !domain.names.includes('神埃')));
@@ -222,7 +223,7 @@ test('必選排除系列只開放指定系列，重複或無法成立的條件�
 });
 
 test('A＋C Worker 合併結果仍符合固定裝備與必選套效', async () => {
-  const range = { rangeStart: '深淵的存在', rangeEnd: '幻影面紗' };
+  const range = { allowedSeries: iceSeriesOrder(data).slice(2) };
   const seed = generateIceSearchStructures(data, equipped, range, 1).seeds[0];
   const constraints = {
     ...range,
@@ -250,12 +251,13 @@ test('A＋C Worker 合併結果仍符合固定裝備與必選套效', async () =
 });
 
 test('正式資料的範圍順序與排除政策套用於所有部位', () => {
-  const range = { rangeStart: '深淵的存在', rangeEnd: '紫霄花郎' };
-  assert.deepEqual(iceRangeNames(data, range), ['深淵的存在', '薇塔芳塔娜', '厄瑞玻斯的哀歌', '猛虎奇談',
+  const range = { allowedSeries: iceSeriesOrder(data).slice(2, 10) };
+  assert.deepEqual(iceSelectedSeries(data, range), ['深淵的存在', '薇塔芳塔娜', '厄瑞玻斯的哀歌', '猛虎奇談',
     '幽潮吞源', '日冕．灼耀花仙', '星辰牧者', '紫霄花郎']);
-  const allRange = { rangeStart: '騎士團', rangeEnd: '幻影面紗' };
+  const allRange = { allowedSeries: iceSeriesOrder(data) };
   const allDomains = createIceSearchDomains(data, equipped, allRange);
-  assert.ok(allDomains.every(domain => !domain.names.includes('騎士團') && !domain.names.includes('神埃')));
+  assert.ok(allDomains.some(domain => domain.names.includes('騎士團')));
+  assert.ok(allDomains.every(domain => !domain.names.includes('神埃')));
   assert.ok(createIceSearchDomains(data, equipped, range).every(domain => !domain.names.includes('幻影面紗')));
   const weapon = right.find(entry => entry.slotId === 'weapon');
   const phantomItem = items.find(item => item.active && item.slotId === 'weapon' && item.name === '幻影面紗');
@@ -279,10 +281,8 @@ test('試算範圍包含端點，固定單件及必選套效各依其例外範�
   game.mapping.selections = game.mapping.selections.filter(entry => entry.catalogFile !== 'equipment/right-ice.json' || slots.includes(entry.slotId));
   game.catalogs['equipment/right-ice.json'].items = items.filter(item => names.includes(item.name) && slots.includes(item.slotId));
   game.rightIceSets.effects = game.rightIceSets.effects.filter(effect => names.includes(effect.setName));
-  const range = { rangeStart: names[0], rangeEnd: names[1] };
-  assert.deepEqual(iceRangeNames(game, { rangeStart: names[0], rangeEnd: names[2] }), names);
-  assert.throws(() => iceRangeNames(game, { rangeStart: names[0] }), /同時選擇/);
-  assert.throws(() => iceRangeNames(game, { rangeStart: names[2], rangeEnd: names[0] }), /不可位於/);
+  const range = { allowedSeries: names.slice(0, 2) };
+  assert.deepEqual(iceSelectedSeries(game, { allowedSeries: names }), names);
   const weapon = right.find(entry => entry.slotId === 'weapon');
   const face = right.find(entry => entry.slotId === 'faceMiddle');
   const purple = items.find(item => item.slotId === 'weapon' && item.name === names[2]);
@@ -293,7 +293,7 @@ test('試算範圍包含端點，固定單件及必選套效各依其例外範�
   const setId = game.rightIceSets.effects.find(effect => effect.active && effect.setName === names[2]).id;
   const withSet = { ...fixed, requiredSetEffectIds: [setId] };
   assert.ok(createIceSearchDomains(game, choices, withSet).find(domain => domain.field === face.selectionField).names.includes(names[2]));
-  assert.deepEqual(snapshotIceSearchConstraints(withSet).rangeStart, names[0]);
+  assert.deepEqual(snapshotIceSearchConstraints(withSet).allowedSeries, names.slice(0, 2));
   game.catalogs['equipment/right-ice.json'].items.push({ ...purple, name: '未設定順序的系列' });
-  assert.throws(() => iceRangeNames(game, range), /尚未設定試算順序/);
+  assert.throws(() => iceSeriesOrder(game), /尚未設定試算順序/);
 });

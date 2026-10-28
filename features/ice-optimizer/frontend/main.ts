@@ -7,7 +7,7 @@ import type { LoadoutState } from '../../../frontend/state.ts';
 import { attributeDifferences } from './attribute-differences.ts';
 import { describeIceSearchStatus, generateThreeSetStructures, isThreeSetIceCandidate, sameDamage } from './search.ts';
 import type { IceProgress, IceResultAlternative, IceSearchResult } from './search.ts';
-import { iceRangeNames, iceSeriesOrder, requiredIceSetNames, snapshotIceSearchConstraints } from './search-policy.ts';
+import { iceSeriesOrder, requiredIceSetNames, snapshotIceSearchConstraints } from './search-policy.ts';
 import type { IceSearchConstraints } from './search-policy.ts';
 
 const savedStateKey = 'dab-loadout-v1';
@@ -28,11 +28,9 @@ const fixedList = document.querySelector<HTMLElement>('#fixed-list')!;
 const setList = document.querySelector<HTMLElement>('#set-list')!;
 const conditionStatus = document.querySelector<HTMLElement>('#constraint-status')!;
 const conditionClear = document.querySelector<HTMLButtonElement>('#constraint-clear')!;
-const rangeStart = document.querySelector<HTMLSelectElement>('#range-start')!;
-const rangeEnd = document.querySelector<HTMLSelectElement>('#range-end')!;
+const seriesOptions = document.querySelector<HTMLElement>('#series-options')!;
 const rangeClear = document.querySelector<HTMLButtonElement>('#range-clear')!;
 const rangeCount = document.querySelector<HTMLElement>('#range-count')!;
-const rangeExceptions = document.querySelector<HTMLElement>('#range-exceptions')!;
 let conditions: IceSearchConstraints = { requiredItemIds: {}, requiredSetEffectIds: [] };
 let conditionsValid = false;
 let worker: Worker | null = null;
@@ -76,34 +74,25 @@ function refreshConditionOptions() {
     const option = document.createElement('option'); option.textContent = label; option.value = value; select.add(option);
   };
   let order: string[] = [];
-  let orderError = '';
-  try { order = iceSeriesOrder(data); }
-  catch (error) { orderError = error instanceof Error ? error.message : '無法讀取套裝順序。'; }
-  for (const [select, value] of [[rangeStart, conditions.rangeStart ?? ''], [rangeEnd, conditions.rangeEnd ?? '']] as const) {
-    select.replaceChildren(); addOption(select, '全部系列', '');
-    for (const name of select === rangeEnd ? [...order].reverse() : order) addOption(select, name, name);
-    if (value && !order.includes(value)) addOption(select, `無效套裝：${value}`, value);
-    select.value = value;
-    select.disabled = Boolean(orderError);
+  try { order = iceSeriesOrder(data); } catch { /* Validation reports invalid data. */ }
+  const available = order.filter(name => data.rightIceSets.effects.some(effect => effect.active && effect.setName === name)).reverse();
+  const defaults = available.filter(name => name !== '騎士團');
+  const checked = conditions.allowedSeries ?? defaults;
+  seriesOptions.replaceChildren();
+  for (const name of available) {
+    const label = document.createElement('label');
+    const input = document.createElement('input'); input.type = 'checkbox'; input.value = name; input.checked = checked.includes(name);
+    input.addEventListener('change', () => {
+      const next = new Set(conditions.allowedSeries ?? defaults);
+      if (input.checked) next.add(name); else next.delete(name);
+      conditions = { ...conditions, allowedSeries: available.filter(item => next.has(item)) }; conditionsChanged();
+    });
+    label.append(input, document.createTextNode(name)); seriesOptions.append(label);
   }
-  rangeClear.disabled = !conditions.rangeStart && !conditions.rangeEnd;
-  rangeExceptions.textContent = '';
-  try {
-    const range = iceRangeNames(data, conditions);
-    rangeCount.textContent = range ? `（${range.length} 個系列）` : '';
-    if (range) {
-      const exceptions: string[] = [];
-      for (const [field, id] of Object.entries(fixed)) {
-        const entry = selections.find(candidate => candidate.selectionField === field);
-        const item = entry && data.catalogs[entry.catalogFile]?.items.find(candidate => candidate.id === id && candidate.slotId === entry.slotId && candidate.active);
-        if (item && !range.includes(item.name)) exceptions.push(`固定單件：${item.name}・${labels.get(field) ?? field}`);
-      }
-      for (const name of requiredIceSetNames(data, conditions)) if (!range.includes(name)) exceptions.push(`必選套效：${name}・全系列`);
-      rangeExceptions.textContent = exceptions.length
-        ? `範圍外例外：${exceptions.join('；')}。例外不會改變起始及結束套裝。` : '指定範圍外的固定裝備或必選套效會自動加入例外，不改變範圍。';
-    }
-    if (orderError) rangeExceptions.textContent = orderError;
-  } catch { rangeCount.textContent = ''; }
+  const allSelected = available.length > 0 && available.every(name => checked.includes(name));
+  rangeClear.disabled = !available.length;
+  rangeClear.textContent = allSelected ? '取消全選' : '全選';
+  rangeCount.textContent = `（已選 ${checked.length} 組）`;
   const previousSlot = fixedSlot.value;
   fixedSlot.replaceChildren();
   for (const entry of selections.filter(entry => !(entry.selectionField in fixed))) {
@@ -125,6 +114,9 @@ function refreshConditionOptions() {
     row.append(label, remove); fixedList.append(row);
   }
   const selected = conditions.requiredSetEffectIds ?? [];
+  const autoSets = selected.map(id => data.rightIceSets.effects.find(effect => effect.active && effect.id === id)?.setName).filter((name): name is string => Boolean(name) && !checked.includes(name!));
+  const notice = document.querySelector<HTMLElement>('#required-series-notice')!;
+  notice.textContent = autoSets.length ? `必選套效納入：${autoSets.join('、')}` : '';
   const chosenNames = new Set(selected.map(id => data.rightIceSets.effects.find(effect => effect.id === id)?.setName).filter(Boolean));
   const series = new Map<string, string>();
   for (const effect of data.rightIceSets.effects) if (effect.active && !series.has(effect.setName)) series.set(effect.setName, effect.id);
@@ -143,7 +135,7 @@ function refreshConditionOptions() {
     remove.addEventListener('click', () => { conditions = { ...conditions, requiredSetEffectIds: selected.filter(item => item !== id) }; conditionsChanged(); });
     row.append(label, remove); setList.append(row);
   }
-  conditionClear.disabled = !Object.keys(fixed).length && !selected.length && !conditions.rangeStart && !conditions.rangeEnd;
+  conditionClear.disabled = !Object.keys(fixed).length && !selected.length && (conditions.allowedSeries === undefined || (conditions.allowedSeries.length === defaults.length && defaults.every(name => conditions.allowedSeries!.includes(name))));
 }
 
 function refreshFixedItems() {
@@ -167,7 +159,7 @@ function validateConditions() {
     const choices = Object.fromEntries(gameData.mapping.selections.filter(entry => entry.catalogFile === 'equipment/right-ice.json')
       .map(entry => [entry.selectionField, String(state.values[entry.selectionField] ?? '')]));
     if (!generateThreeSetStructures(gameData, choices, conditions, 1).seeds.length) {
-      throw new RangeError('目前範圍、固定裝備與必選套效無法同時達成三組至少 3set，請調整搜尋條件。');
+      throw new RangeError('目前勾選系列、固定裝備與必選套效無法同時達成三組至少 3set，請調整搜尋條件。');
     }
     conditionsValid = true;
     conditionStatus.textContent = '條件可成立';
@@ -188,9 +180,12 @@ function conditionsChanged() {
   status.textContent = '搜尋條件已變更；原結果僅供檢視，請重新搜尋後再套用。';
 }
 fixedSlot.addEventListener('change', refreshFixedItems);
-rangeStart.addEventListener('change', () => { conditions = { ...conditions, rangeStart: rangeStart.value }; conditionsChanged(); });
-rangeEnd.addEventListener('change', () => { conditions = { ...conditions, rangeEnd: rangeEnd.value }; conditionsChanged(); });
-rangeClear.addEventListener('click', () => { conditions = { ...conditions, rangeStart: '', rangeEnd: '' }; conditionsChanged(); });
+rangeClear.addEventListener('click', () => {
+  if (!gameData) return;
+  const available = iceSeriesOrder(gameData).filter(name => gameData!.rightIceSets.effects.some(effect => effect.active && effect.setName === name));
+  const checked = conditions.allowedSeries ?? available.filter(name => name !== '騎士團');
+  conditions = { ...conditions, allowedSeries: available.every(name => checked.includes(name)) ? [] : available }; conditionsChanged();
+});
 fixedAdd.addEventListener('click', () => {
   if (fixedAdd.disabled) return;
   conditions = { ...conditions, requiredItemIds: { ...conditions.requiredItemIds, [fixedSlot.value]: fixedItem.value } };
@@ -202,7 +197,7 @@ setAdd.addEventListener('click', () => {
   conditionsChanged();
 });
 conditionClear.addEventListener('click', () => {
-  conditions = { requiredItemIds: {}, requiredSetEffectIds: [] }; conditionsChanged();
+  conditions = { requiredItemIds: {}, requiredSetEffectIds: [], allowedSeries: gameData ? iceSeriesOrder(gameData).filter(name => name !== '騎士團' && gameData!.rightIceSets.effects.some(effect => effect.active && effect.setName === name)).reverse() : undefined }; conditionsChanged();
 });
 
 interface AlternativeDisplayGroup {
@@ -557,15 +552,17 @@ loadGameData().then(data => {
       && Array.isArray(savedConditions.requiredSetEffectIds)
       && savedConditions.requiredSetEffectIds.every(value => typeof value === 'string')) {
       conditions = { requiredItemIds: savedConditions.requiredItemIds, requiredSetEffectIds: savedConditions.requiredSetEffectIds,
-        rangeStart: savedConditions.rangeStart === undefined ? '' : String(savedConditions.rangeStart),
-        rangeEnd: savedConditions.rangeEnd === undefined ? '' : String(savedConditions.rangeEnd) };
+        allowedSeries: Array.isArray(savedConditions.allowedSeries)
+          ? savedConditions.allowedSeries.filter(name => typeof name === 'string' && data.rightIceSets.effects.some(effect => effect.active && effect.setName === name))
+          : undefined };
     }
-  } catch { /* Ignore malformed stored conditions. */ }
+  } catch { /* 無效的搜尋條件使用預設值。 */ }
+  if (conditions.allowedSeries === undefined) conditions = { ...conditions, allowedSeries: iceSeriesOrder(data).filter(name => name !== '騎士團' && data.rightIceSets.effects.some(effect => effect.active && effect.setName === name)).reverse() };
   refreshConditionOptions(); validateConditions();
   setRunning(false);
   const raw = readSavedRaw();
   status.textContent = raw
-    ? '已讀取目前儲存在此裝置的配裝。預設排除神埃、騎士團；左冰維持目前設定。'
+    ? '已讀取目前儲存在此裝置的配裝；左冰維持目前設定。'
     : '尚無已保存配裝。請先在傷害計算機完成配置並儲存。';
   try {
     const saved = JSON.parse(sessionStorage.getItem(savedSearchKey) ?? 'null') as {

@@ -145,12 +145,13 @@ test('new optional potion and raid settings normalize legacy omissions and retai
   assert.equal(restored.state.nephronRaidEnabled, true);
 });
 
-test("legacy venue names migrate on import without changing unrelated values", () => {
+test("retired venue names are cleared on import", () => {
   const legacyHut = JSON.parse(serializeLoadout(state, data).json);
   const environmentCode = String(codeForFieldId("Effect.Environment"));
   legacyHut.values[environmentCode] = "小屋";
   const migrated = parseLoadoutJson(JSON.stringify(legacyHut), state, data);
-  assert.equal(migrated.state.values["Effect.Environment"], "小屋/溫泉");
+  assert.equal(migrated.state.values["Effect.Environment"], undefined);
+  assert.ok(migrated.clearedFields.includes("Effect.Environment"));
 
   legacyHut.values[environmentCode] = "其他";
   const cleared = parseLoadoutJson(JSON.stringify(legacyHut), state, data);
@@ -158,12 +159,12 @@ test("legacy venue names migrate on import without changing unrelated values", (
   assert.ok(cleared.clearedFields.includes("Effect.Environment"));
 });
 
-test("legacy glove circuit Transcendence choice migrates to the combined single-skill option", () => {
+test("retired glove circuit choice is not converted into another attribute", () => {
   const gloveCircuit = circuits.inputs.find(entry => entry.slot === "gloves");
-  const legacyState = { ...state, values: { ...state.values, [gloveCircuit.attributeField]: "超越技傷%" } };
-  const exported = serializeLoadout(legacyState, data);
-  const imported = parseLoadoutJson(exported.json, state, data);
-  assert.equal(imported.state.values[gloveCircuit.attributeField], "單技傷%");
+  const exported = JSON.parse(serializeLoadout(state, data).json);
+  exported.values[String(codeForFieldId(gloveCircuit.attributeField))] = "超越技傷%";
+  const imported = parseLoadoutJson(JSON.stringify(exported), state, data);
+  assert.notEqual(imported.state.values[gloveCircuit.attributeField], "單技傷%");
 });
 
 test("portrait awakening damage values round-trip and one-sided allocations complement to five", () => {

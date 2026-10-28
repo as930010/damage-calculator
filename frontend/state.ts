@@ -173,38 +173,7 @@ export function normalizeTranscendenceSkillDamageShare(value: unknown): number {
     : DEFAULT_TRANSCENDENCE_SKILL_DAMAGE_SHARE_PCT;
 }
 
-/** Preserve saved venue choices when legacy labels are replaced in the catalog. */
-export function migrateLegacyEnvironmentSelection(values: Record<string, string | number>): "renamed" | "removed" | null {
-  const value = values["Effect.Environment"];
-  if (value === "小屋") {
-    values["Effect.Environment"] = "小屋/溫泉";
-    return "renamed";
-  }
-  if (value === "其他") {
-    delete values["Effect.Environment"];
-    return "removed";
-  }
-  return null;
-}
-
-/** Shared migration only; callers retain their own validation and cleared-field policy. */
-export function migrateLegacyGloveCircuitSkillDamage(values: Record<string, string | number>, attributeField: string | undefined): boolean {
-  if (!attributeField || values[attributeField] !== '超越技傷%') return false;
-  values[attributeField] = '單技傷%';
-  return true;
-}
-
 type PortraitFields = { legacySettingKey: string; strongSettingKey: string; transcendenceSettingKey: string; maxTotalPct: number };
-export function migrateLegacyPortraitAwakening(values: Record<string, string | number>, portrait: PortraitFields): boolean {
-  const legacyValue = values[portrait.legacySettingKey];
-  if (legacyValue === undefined) return false;
-  if (legacyValue === '有' && values[portrait.strongSettingKey] === undefined && values[portrait.transcendenceSettingKey] === undefined) {
-    values[portrait.transcendenceSettingKey] = portrait.maxTotalPct;
-  }
-  delete values[portrait.legacySettingKey];
-  return true;
-}
-
 /** Startup/restore policy; imports still report invalid and corrected fields separately. */
 export function normalizePortraitAwakeningValues(values: Record<string, string | number>, portrait: PortraitFields): boolean {
   const split = normalizePortraitAwakeningSplit(values[portrait.strongSettingKey], values[portrait.transcendenceSettingKey], portrait.maxTotalPct);

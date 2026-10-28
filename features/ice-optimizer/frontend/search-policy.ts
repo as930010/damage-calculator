@@ -1,20 +1,14 @@
 import type { GameData } from '../../../frontend/data.ts';
 import { ICE_SERIES_ORDER, ICE_UNORDERED_EXCLUDED_ITEMS } from './series-order.ts';
 
-/** Exact catalog names are the right-ice series keys; the catalog has no separate series ID. */
-export const DEFAULT_EXCLUDED_ICE_SERIES = ['神埃', '騎士團'] as const;
-
 export interface IceSearchConstraints {
-  /** Replace the default policy. An empty list is useful for an unrestricted comparison. */
-  excludedSeries?: readonly string[];
   /** Keep these semantic selection fields at their current equipped values. */
   fixedFields?: readonly string[];
   /** Catalog item IDs, keyed by semantic selection field. Overrides exclusion for this field only. */
   requiredItemIds?: Readonly<Record<string, string>>;
   /** IDs of active effects identifying required set series. */
   requiredSetEffectIds?: readonly string[];
-  rangeStart?: string;
-  rangeEnd?: string;
+  allowedSeries?: readonly string[];
 }
 
 export function iceSeriesOrder(data: GameData): string[] {
@@ -29,15 +23,11 @@ export function iceSeriesOrder(data: GameData): string[] {
   return ICE_SERIES_ORDER.filter(name => available.has(name));
 }
 
-export function iceRangeNames(data: GameData, constraints: IceSearchConstraints = {}): string[] | null {
-  const start = constraints.rangeStart ?? '', end = constraints.rangeEnd ?? '';
-  if (!start && !end) return null;
-  if (!start || !end) throw new RangeError('請同時選擇試算範圍的起始與結束套裝。');
-  const order = iceSeriesOrder(data);
-  const from = order.indexOf(start), to = order.indexOf(end);
-  if (from < 0 || to < 0) throw new RangeError('試算範圍包含不存在或未設定順序的套裝。');
-  if (from > to) throw new RangeError('試算範圍的起始套裝不可位於結束套裝之後。');
-  return order.slice(from, to + 1);
+export function iceSelectedSeries(data: GameData, constraints: IceSearchConstraints = {}): string[] | null {
+  if (constraints.allowedSeries === undefined) return null;
+  const valid = new Set(data.rightIceSets.effects.filter(effect => effect.active).map(effect => effect.setName));
+  if (constraints.allowedSeries.some(name => !valid.has(name))) throw new RangeError('選取的套裝系列已不存在或無法使用。');
+  return [...constraints.allowedSeries];
 }
 
 export function requiredIceSetNames(data: GameData, constraints: IceSearchConstraints = {}): string[] {
@@ -66,12 +56,11 @@ export function createIceSearchDomains(data: GameData, currentChoices: Readonly<
   const required = constraints.requiredItemIds ?? {};
   if (new Set([...fixed, ...Object.keys(required)]).size > 11) throw new RangeError('最多固定 11 個右冰部位。');
   const requiredSets = new Set(requiredIceSetNames(data, constraints));
-  const range = iceRangeNames(data, constraints);
+  const range = iceSelectedSeries(data, constraints);
   const rangeNames = range ? new Set(range) : null;
   for (const field of [...fixed, ...Object.keys(required)]) {
     if (!fields.has(field)) throw new RangeError(`搜尋約束無可行解：未知的右冰部位 ${field}。`);
   }
-  const excluded = new Set(constraints.excludedSeries ?? DEFAULT_EXCLUDED_ICE_SERIES);
   return selections.map(selection => {
     const catalog = data.catalogs[selection.catalogFile];
     if (!catalog) throw new RangeError('找不到冰裝候選資料：' + selection.catalogFile);
@@ -93,16 +82,15 @@ export function createIceSearchDomains(data: GameData, currentChoices: Readonly<
       return { field: selection.selectionField, names: [current] };
     }
     const names = [...new Set(items.filter(item => requiredSets.has(item.name)
-      || (!excluded.has(item.name) && (!rangeNames || rangeNames.has(item.name)))).map(item => item.name))];
+      || (!rangeNames || rangeNames.has(item.name))).map(item => item.name))];
     if (!names.length) throw new RangeError(`搜尋約束無可行解：${selection.selectionField} 沒有可用裝備。`);
     return { field: selection.selectionField, names };
   }).sort((a, b) => a.names.length - b.names.length || a.field.localeCompare(b.field, 'en'));
 }
 
 /** Keeps the policy snapshot serializable and detached from a caller's mutable constraints. */
-export function snapshotIceSearchConstraints(constraints: IceSearchConstraints = {}): Required<IceSearchConstraints> {
-  return { excludedSeries: [...(constraints.excludedSeries ?? DEFAULT_EXCLUDED_ICE_SERIES)],
-    fixedFields: [...(constraints.fixedFields ?? [])], requiredItemIds: { ...constraints.requiredItemIds },
+export function snapshotIceSearchConstraints(constraints: IceSearchConstraints = {}): IceSearchConstraints {
+  return { fixedFields: [...(constraints.fixedFields ?? [])], requiredItemIds: { ...constraints.requiredItemIds },
     requiredSetEffectIds: [...(constraints.requiredSetEffectIds ?? [])],
-    rangeStart: constraints.rangeStart ?? '', rangeEnd: constraints.rangeEnd ?? '' };
+    allowedSeries: constraints.allowedSeries === undefined ? undefined : [...constraints.allowedSeries] };
 }

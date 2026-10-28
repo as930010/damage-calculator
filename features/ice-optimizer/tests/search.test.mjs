@@ -44,7 +44,7 @@ test('部位遮罩前置篩選與小型完整指派枚舉一致', () => {
 test('結構產生器完整涵蓋目前可行的三套效件數並排除部位衝突', () => {
   const current = Object.fromEntries(right.map(entry => [entry.selectionField,
     String(base.values[entry.selectionField] ?? '')]));
-  const generated = generateThreeSetStructures(data, current, { excludedSeries: [] });
+  const generated = generateThreeSetStructures(data, current, {});
   assert.equal(generated.stats.raw, 4400);
   assert.equal(generated.stats.feasible, 1141);
   assert.equal(generated.stats.infeasible, 3259);
@@ -72,7 +72,7 @@ test('結構產生器完整涵蓋目前可行的三套效件數並排除部位�
 test('正式結構產生器僅涵蓋完整十二部位的三組有效 3set', () => {
   const current = Object.fromEntries(right.map(entry => [entry.selectionField,
     String(base.values[entry.selectionField] ?? '')]));
-  const generated = generateIceSearchStructures(data, current, { excludedSeries: [] });
+  const generated = generateIceSearchStructures(data, current, {});
   assert.deepEqual(iceFields(data).right.map(entry => entry.selectionField), right.map(entry => entry.selectionField));
   assert.deepEqual(generated.stats.profilesBySelectedSetCount.slice(0, 4), [0, 0, 0, 1141]);
   assert.ok(generated.stats.priorityThreeSetProfiles > 0);
@@ -97,7 +97,7 @@ test('正式結構產生器僅涵蓋完整十二部位的三組有效 3set', () 
       return effect ? [effect.setName] : [];
     }));
     assert.ok(seed.setNames.every(name => resolvedNames.has(name)));
-    assert.ok(isThreeSetIceCandidate(data, seed.choices, seed.setNames, { excludedSeries: [] }));
+    assert.ok(isThreeSetIceCandidate(data, seed.choices, seed.setNames, {}));
     for (const entry of right) {
       const choice = seed.choices[entry.selectionField];
       assert.ok(choice && data.catalogs[entry.catalogFile].items.some(item => item.active
