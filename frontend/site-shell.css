@@ -120,6 +120,8 @@ body.site-page {
   transition: transform .16s ease;
 }
 .site-page details:not(.stat):not(.site-credits-notes)[open] > summary::before { transform: rotate(45deg); }
+.site-page-buff .skill-reference > summary::before { width: 8px; height: 8px; flex-basis: 8px; border-width: 2px; }
+.site-page-main .site-credits-notes > summary::before { display: inline-grid; flex: 0 0 1em; width: 1em; height: 1.3em; place-items: center; text-align: center; }
 
 /* The three tools share the same opening card and short workflow layout. */
 :is(.workspace-heading, .site-tool-intro) {

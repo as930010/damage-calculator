@@ -357,8 +357,7 @@ button:active,.pet-skill-toggle:active{filter:brightness(1.08)}
 .site-credits-notes{border-color:rgb(131 137 181 / 28%);background:rgb(12 18 44 / 65%);color:#aeb4cf}
 .site-credits-block h2,.site-release-list strong,.site-thanks-list strong{color:#e8def2}
 .site-credits-block p,.site-thanks-list li,.site-release-list p{color:#b1b5cf}
-.buff-simulator-link{border-color:#5a5b7e;background:rgb(17 20 42 / 82%);color:#e6e2f1}
-.buff-simulator-link:hover{border-color:#a18abb;background:#292d50}
+
 .live-dot{background:#b6a3dc;box-shadow:0 0 9px rgb(182 163 220 / 48%)}
 .inspector-backdrop{background:rgb(4 6 16 / 80%);backdrop-filter:none}
 .mobile-inspector-open #inspector{border-color:#9c8150;box-shadow:none}
@@ -605,8 +604,8 @@ body.site-page-buff {
 
 /* Match the calculator's custom stat disclosure chevron to the shared arrow. */
 .site-page details:not(.stat):not(.site-credits-notes) > summary::before{border-color:#b89361}
-.site-page-main .stat summary::after{border-color:#b89361;transform:rotate(-45deg)}
-.site-page-main .stat[open] summary::after{transform:rotate(45deg)}
+.site-page-main .stat summary::after{border-color:#b89361}
+
 
 /* Seasonal controls used by the Buff simulator and optimizer. */
 .site-page-buff .result-context{
@@ -615,7 +614,7 @@ body.site-page-buff {
   color:#c6c3d4;
 }
 .site-page-buff .skill-reference > summary{color:#d4ccda}
-.site-page-buff .skill-reference > summary::before{border-color:#b89361}
+
 .site-page-buff .skill-search-controls input{
   border-color:#4a5274;
   border-radius:8px;
@@ -663,20 +662,6 @@ body.site-page-buff {
   background:linear-gradient(180deg,#393654,#292d50);
   color:#f5edfa;
 }
-
-/* Preserve the credits card's original compact plus/minus disclosure control. */
-.site-page-main .site-credits-notes > summary::before{
-  display:inline-grid;
-  flex:0 0 1em;
-  width:1em;
-  height:1.3em;
-  place-items:center;
-  content:"＋";
-  color:#b89361;
-  font-size:13px;
-  text-align:center;
-}
-.site-page-main .site-credits-notes[open] > summary::before{content:"−"}
 
 /* Match calculation inspection surfaces and disclosure arrows to the seasonal UI. */
 .site-page-main .calculation-inspection-panel{
@@ -744,22 +729,15 @@ body.site-page-buff {
   border-left-color:#b89361;
   background:linear-gradient(145deg,rgb(39 35 43 / 78%),rgb(22 22 35 / 78%));
 }
-.site-page-buff .member-count{
-  border-color:rgb(145 143 189 / 33%);
-  background:rgb(27 30 48 / 86%);
-  color:#c6c3d4;
-}
+
 .site-page-buff .slot-index,
-.site-page-buff .member-count small,
 .site-page-buff .option-editor-heading small,
 .site-page-buff .metric-section-heading small,
 .site-page-buff .result-title > small,
 .site-page-buff .skill-result span,
-.site-page-buff .skill-empty,
-.site-page-buff .inline-input span{color:#a9a4b3}
+.site-page-buff .skill-empty{color:#a9a4b3}
 .site-page-buff .member-slot input,
 .site-page-buff .option-editor-input input,
-.site-page-buff .inline-input input,
 .site-page-buff .skill-search-controls input{
   border-color:#4a5274;
   background:#0e1429;
@@ -777,29 +755,19 @@ body.site-page-buff {
 }
 .site-page-buff .skill-result p{color:#d4ccda}
 .site-page-buff .skill-role-heading span{border-color:rgb(145 143 189 / 35%);color:#b8b5c5}
-.site-page-buff .skill-reference > summary::before{
-  width:9px;
-  height:9px;
-  flex-basis:9px;
-  border-width:2px;
-  border-color:#e0bd79;
-}
+
 .site-page-buff .control-times summary{color:#d4ccda}
 .site-page-buff .control-times summary small{color:#a9a4b3}
 .site-page-buff .detail-row code{color:#c6c3d4}
 .site-page-buff .skill-reference > summary{
   color:#e7ddc9;
 }
-.site-page-buff .skill-reference > summary::before{
-  width:8px;
-  height:8px;
-  flex-basis:8px;
-  border-color:#e0bd79;
-  background:transparent;
-}
+
 body.site-page-buff p.roster-note{
   border-color:rgb(184 147 97 / 58%);
   border-left-color:#d0a96b;
   background:linear-gradient(145deg,rgb(45 38 42 / 88%),rgb(24 24 38 / 88%));
   color:#e7ddc9;
 }
+
+.site-page-buff .skill-reference > summary::before{border-color:#e0bd79}

@@ -110,12 +110,7 @@ function refreshConditionOptions() {
     addOption(fixedSlot, labels.get(entry.selectionField) ?? entry.selectionField, entry.selectionField);
   }
   if ([...fixedSlot.options].some(option => option.value === previousSlot)) fixedSlot.value = previousSlot;
-  const selection = selections.find(entry => entry.selectionField === fixedSlot.value);
-  fixedItem.replaceChildren();
-  if (selection) for (const item of data.catalogs[selection.catalogFile]?.items ?? []) {
-    if (item.active && item.slotId === selection.slotId) addOption(fixedItem, item.name, item.id);
-  }
-  fixedAdd.disabled = Object.keys(fixed).length >= 11 || !fixedItem.value;
+  refreshFixedItems();
   document.querySelector<HTMLElement>('#fixed-count')!.textContent = `${Object.keys(fixed).length}／11`;
   fixedList.replaceChildren();
   for (const [field, id] of Object.entries(fixed)) {
@@ -151,6 +146,19 @@ function refreshConditionOptions() {
   conditionClear.disabled = !Object.keys(fixed).length && !selected.length && !conditions.rangeStart && !conditions.rangeEnd;
 }
 
+function refreshFixedItems() {
+  if (!gameData) return;
+  const selection = gameData.mapping.selections.find(entry => entry.selectionField === fixedSlot.value);
+  fixedItem.replaceChildren();
+  if (selection) for (const item of gameData.catalogs[selection.catalogFile].items) {
+    if (item.active && item.slotId === selection.slotId) {
+      const option = document.createElement('option');
+      option.textContent = item.name; option.value = item.id; fixedItem.add(option);
+    }
+  }
+  fixedAdd.disabled = Object.keys(conditions.requiredItemIds ?? {}).length >= 11 || !fixedItem.value;
+}
+
 function validateConditions() {
   if (!gameData) return;
   try {
@@ -179,7 +187,7 @@ function conditionsChanged() {
   refreshConditionOptions(); validateConditions();
   status.textContent = '搜尋條件已變更；原結果僅供檢視，請重新搜尋後再套用。';
 }
-fixedSlot.addEventListener('change', refreshConditionOptions);
+fixedSlot.addEventListener('change', refreshFixedItems);
 rangeStart.addEventListener('change', () => { conditions = { ...conditions, rangeStart: rangeStart.value }; conditionsChanged(); });
 rangeEnd.addEventListener('change', () => { conditions = { ...conditions, rangeEnd: rangeEnd.value }; conditionsChanged(); });
 rangeClear.addEventListener('click', () => { conditions = { ...conditions, rangeStart: '', rangeEnd: '' }; conditionsChanged(); });
@@ -312,151 +320,108 @@ function renderResults(data: GameData,
       });
       return apply;
     };
-    const compactGroups = alternatives.length > 1
-      ? groupSameSlotAlternatives(alternatives, ice.map(entry => entry.selectionField)) : [];
-    const canCompact = compactGroups.some(group => group.alternatives.length > 1);
-    if (canCompact) {
-      for (const group of compactGroups) {
-        const grouped = group.alternatives;
-        const alternative = grouped[0];
-        const detail = document.createElement('details');
-        const summary = document.createElement('summary');
-        const list = document.createElement('dl');
-        const add = (label: string, value: string) => {
-          const term = document.createElement('dt');
-          term.textContent = label;
-          const description = document.createElement('dd');
-          description.textContent = value || '未裝備';
-          list.append(term, description);
-        };
-        if (group.differingField) {
-          const changedLabel = labels.get(group.differingField) ?? group.differingField;
-          summary.textContent = `查看穿搭（${changedLabel}有 ${grouped.length} 種等傷害替代）`;
-          for (const entry of ice) {
-            const value = entry.selectionField === group.differingField
-              ? grouped.map(item => `${item.choices[entry.selectionField] || '未裝備'}${item.isBaseline ? '（目前配裝）' : ''}`).join(' / ')
-              : alternative.choices[entry.selectionField];
-            add(labels.get(entry.selectionField) ?? entry.selectionField, value);
-          }
-          add('啟用右冰套效', alternative.setNames.length ? alternative.setNames.join('、') : '無');
-          detail.append(summary, list);
-
-          const differenceRows = baselineProjection
-            ? grouped.filter(item => !item.isBaseline).map(item => {
-              const values = { ...base.values, ...item.choices };
-              data.rightIceSets.selectionFields.forEach((field, setIndex) => {
-                values[field] = item.setNames[setIndex] ?? '';
-              });
-              return {
-                item,
-                changes: attributeDifferences(data, base.Job, baselineProjection,
-                  projectDamage(data, { ...base, values })),
-              };
-            }).filter(row => row.changes.length) : [];
-          if (differenceRows.length) {
-            const heading = document.createElement('h3');
-            heading.textContent = '與比較基準的屬性差異';
-            detail.append(heading);
-            const uniqueChanges = new Set(differenceRows.map(row => row.changes.join('、')));
-            if (uniqueChanges.size === 1) {
-              const differenceText = document.createElement('p');
-              differenceText.className = 'optimizer-caveat';
-              differenceText.textContent = differenceRows[0].changes.join('、');
-              detail.append(differenceText);
-            } else {
-              const differences = document.createElement('ul');
-              differences.className = 'optimizer-variant-differences';
-              for (const row of differenceRows) {
-                const item = document.createElement('li');
-                item.textContent = `${row.item.choices[group.differingField] || '未裝備'}：${row.changes.join('、')}`;
-                differences.append(item);
-              }
-              detail.append(differences);
-            }
-          }
-          const applicable = grouped.filter(item => !item.isBaseline);
-          if (applicable.length) {
-            const actions = document.createElement('div');
-            actions.className = 'optimizer-alternative-actions';
-            for (const item of applicable) {
-              const label = applicable.length > 1
-                ? `套用「${item.choices[group.differingField] || '未裝備'}」` : '套用此穿搭';
-              actions.append(createApplyButton(item, label));
-            }
-            detail.append(actions);
-          }
-          card.append(detail);
-          continue;
+    const displayGroups = groupSameSlotAlternatives(alternatives, ice.map(entry => entry.selectionField));
+    for (const group of displayGroups) {
+      const grouped = group.alternatives;
+      const alternative = grouped[0];
+      const detail = document.createElement('details');
+      const summary = document.createElement('summary');
+      const list = document.createElement('dl');
+      const add = (label: string, value: string) => {
+        const term = document.createElement('dt');
+        term.textContent = label;
+        const description = document.createElement('dd');
+        description.textContent = value || '未裝備';
+        list.append(term, description);
+      };
+      if (group.differingField) {
+        const changedLabel = labels.get(group.differingField) ?? group.differingField;
+        summary.textContent = `查看穿搭（${changedLabel}有 ${grouped.length} 種等傷害替代）`;
+        for (const entry of ice) {
+          const value = entry.selectionField === group.differingField
+            ? grouped.map(item => `${item.choices[entry.selectionField] || '未裝備'}${item.isBaseline ? '（目前配裝）' : ''}`).join(' / ')
+            : alternative.choices[entry.selectionField];
+          add(labels.get(entry.selectionField) ?? entry.selectionField, value);
         }
-
-        const alternativeIndex = alternatives.indexOf(alternative);
-        summary.textContent = `方案 ${alternativeIndex + 1}${alternative.isBaseline ? '（目前配裝）' : ''} · 查看完整穿搭`;
-        for (const entry of ice) add(labels.get(entry.selectionField) ?? entry.selectionField,
-          alternative.choices[entry.selectionField]);
         add('啟用右冰套效', alternative.setNames.length ? alternative.setNames.join('、') : '無');
         detail.append(summary, list);
-        const values = { ...base.values, ...alternative.choices };
-        data.rightIceSets.selectionFields.forEach((field, setIndex) => {
-          values[field] = alternative.setNames[setIndex] ?? '';
-        });
-        const changes = baselineProjection && !alternative.isBaseline
-          ? attributeDifferences(data, base.Job, baselineProjection,
-            projectDamage(data, { ...base, values })) : [];
-        if (changes.length) {
+
+        const differenceRows = baselineProjection
+          ? grouped.filter(item => !item.isBaseline).map(item => {
+            const values = { ...base.values, ...item.choices };
+            data.rightIceSets.selectionFields.forEach((field, setIndex) => {
+              values[field] = item.setNames[setIndex] ?? '';
+            });
+            return {
+              item,
+              changes: attributeDifferences(data, base.Job, baselineProjection,
+                projectDamage(data, { ...base, values })),
+            };
+          }).filter(row => row.changes.length) : [];
+        if (differenceRows.length) {
           const heading = document.createElement('h3');
           heading.textContent = '與比較基準的屬性差異';
-          const differenceText = document.createElement('p');
-          differenceText.className = 'optimizer-caveat';
-          differenceText.textContent = changes.join('、');
-          detail.append(heading, differenceText);
+          detail.append(heading);
+          const uniqueChanges = new Set(differenceRows.map(row => row.changes.join('、')));
+          if (uniqueChanges.size === 1) {
+            const differenceText = document.createElement('p');
+            differenceText.className = 'optimizer-caveat';
+            differenceText.textContent = differenceRows[0].changes.join('、');
+            detail.append(differenceText);
+          } else {
+            const differences = document.createElement('ul');
+            differences.className = 'optimizer-variant-differences';
+            for (const row of differenceRows) {
+              const item = document.createElement('li');
+              item.textContent = `${row.item.choices[group.differingField] || '未裝備'}：${row.changes.join('、')}`;
+              differences.append(item);
+            }
+            detail.append(differences);
+          }
         }
+        const applicable = grouped.filter(item => !item.isBaseline);
+        if (applicable.length) {
+          const actions = document.createElement('div');
+          actions.className = 'optimizer-alternative-actions';
+          for (const item of applicable) {
+            const label = applicable.length > 1
+              ? `套用「${item.choices[group.differingField] || '未裝備'}」` : '套用此穿搭';
+            actions.append(createApplyButton(item, label));
+          }
+          detail.append(actions);
+        }
+        card.append(detail);
+        continue;
+      }
+
+      const alternativeIndex = alternatives.indexOf(alternative);
+      summary.textContent = alternatives.length > 1
+        ? `方案 ${alternativeIndex + 1}${alternative.isBaseline ? '（目前配裝）' : ''} · 查看完整穿搭`
+        : alternative.isBaseline ? '查看目前配裝' : '查看完整穿搭';
+      for (const entry of ice) add(labels.get(entry.selectionField) ?? entry.selectionField,
+        alternative.choices[entry.selectionField]);
+      add('啟用右冰套效', alternative.setNames.length ? alternative.setNames.join('、') : '無');
+      detail.append(summary, list);
+      const values = { ...base.values, ...alternative.choices };
+      data.rightIceSets.selectionFields.forEach((field, setIndex) => {
+        values[field] = alternative.setNames[setIndex] ?? '';
+      });
+      const changes = baselineProjection && !alternative.isBaseline
+        ? attributeDifferences(data, base.Job, baselineProjection,
+          projectDamage(data, { ...base, values })) : [];
+      if (changes.length) {
+        const heading = document.createElement('h3');
+        heading.textContent = '與比較基準的屬性差異';
+        const differenceText = document.createElement('p');
+        differenceText.className = 'optimizer-caveat';
+        differenceText.textContent = changes.join('、');
+        detail.append(heading, differenceText);
+      }
+      if (!alternative.isBaseline && alternatives.length === 1) {
+        card.append(detail, createApplyButton(alternative, '套用此穿搭'));
+      } else {
         if (!alternative.isBaseline) detail.append(createApplyButton(alternative, '套用此穿搭'));
         card.append(detail);
-      }
-    } else {
-      for (const [alternativeIndex, alternative] of alternatives.entries()) {
-        const detail = document.createElement('details');
-        const summary = document.createElement('summary');
-        summary.textContent = alternatives.length > 1
-          ? `方案 ${alternativeIndex + 1}${alternative.isBaseline ? '（目前配裝）' : ''} · 查看完整穿搭`
-          : alternative.isBaseline ? '查看目前配裝' : '查看完整穿搭';
-        const list = document.createElement('dl');
-        const add = (label: string, value: string) => {
-          const term = document.createElement('dt');
-          term.textContent = label;
-          const description = document.createElement('dd');
-          description.textContent = value || '未裝備';
-          list.append(term, description);
-        };
-        for (const entry of ice) add(labels.get(entry.selectionField) ?? entry.selectionField,
-          alternative.choices[entry.selectionField]);
-        add('啟用右冰套效', alternative.setNames.length ? alternative.setNames.join('、') : '無');
-        detail.append(summary, list);
-        const values = { ...base.values, ...alternative.choices };
-        data.rightIceSets.selectionFields.forEach((field, setIndex) => {
-          values[field] = alternative.setNames[setIndex] ?? '';
-        });
-        const changes = baselineProjection && !alternative.isBaseline
-          ? attributeDifferences(data, base.Job, baselineProjection,
-            projectDamage(data, { ...base, values }))
-          : [];
-        if (changes.length) {
-          const heading = document.createElement('h3');
-          heading.textContent = '與比較基準的屬性差異';
-          const differenceText = document.createElement('p');
-          differenceText.className = 'optimizer-caveat';
-          differenceText.textContent = changes.join('、');
-          detail.append(heading, differenceText);
-        }
-        if (!alternative.isBaseline) {
-          const apply = createApplyButton(alternative, '套用此穿搭');
-          if (alternatives.length === 1) {
-            card.append(detail, apply);
-            continue;
-          }
-          detail.append(apply);
-        }
-        if (alternatives.length > 1 || alternative.isBaseline) card.append(detail);
       }
     }
     results.append(card);

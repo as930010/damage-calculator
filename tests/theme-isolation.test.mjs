@@ -177,11 +177,7 @@ function cssAtWidth(sources, width) {
   return active.join("\n");
 }
 
-const componentMarkup = `<div class="app-shell"><header class="topbar">
-  <div class="brand"><span><strong>模擬器</strong><small>說明</small></span></div>
-  <div class="developer-info"><span class="developer-mobile">開發者資訊</span></div>
-  <div class="top-meta"><a class="buff-simulator-link" href="#">另一頁</a></div>
-</header><main class="workbench"><div class="canvas-title-input"><div class="field">
+const componentMarkup = `<div class="app-shell"><main class="workbench"><div class="canvas-title-input"><div class="field">
   <label>稱號</label><div class="picker-control"><input></div>
 </div></div><section class="results-panel"><section class="damage-panel"><div class="damage-summary">
   <div>最小</div><div>最大</div><div class="final-damage">最終</div>
@@ -202,26 +198,31 @@ test("core CSS owns damage-summary and title layout without activity CSS", async
       assert.equal(style(".canvas-title-input").left, width <= 700 ? "110px" : "max(82px, 19% - 62.5px)");
       assert.equal(style(".canvas-title-input .field").display, "grid");
       assert.equal(style(".canvas-title-input .field").gap, "8px");
-      assert.equal(style(".buff-simulator-link").minHeight, width <= 600 ? "44px" : "34px");
     } finally { dom.window.close(); }
   }
 });
 
-test("Buff header retains its final relative geometry and distinct mobile navigation", async () => {
-  const buff = await readFile(resolve(root, "features/buff-simulator/frontend/styles.css"), "utf8");
+test("Buff uses the current shared header and mobile navigation without activity CSS", async () => {
+  const [buff, shell, html] = await Promise.all([
+    readFile(resolve(root, "features/buff-simulator/frontend/styles.css"), "utf8"),
+    readFile(resolve(root, "frontend/site-shell.css"), "utf8"),
+    readFile(resolve(root, "features/buff-simulator/index.html"), "utf8"),
+  ]);
   for (const width of widths) {
-    const dom = new JSDOM(`<!doctype html><style>${cssAtWidth([buff], width)}</style>${componentMarkup}`);
+    const dom = new JSDOM(html);
     try {
+      const element = dom.window.document.createElement("style");
+      element.textContent = cssAtWidth([buff, shell], width);
+      dom.window.document.head.append(element);
       const style = selector => dom.window.getComputedStyle(dom.window.document.querySelector(selector));
-      assert.equal(style(".topbar").position, "relative", `position at ${width}`);
-      assert.equal(style(".topbar").top, "auto");
-      assert.equal(style(".topbar").zIndex, "auto");
-      assert.equal(style(".topbar").height, "auto");
-      assert.equal(style(".topbar").minHeight, "72px");
-      assert.equal(style(".topbar").width, "100%");
-      assert.equal(style(".topbar").display, width <= 700 ? "grid" : "flex");
-      assert.equal(style(".topbar").gap, width <= 700 ? "8px" : "14px");
-      assert.equal(style(".buff-simulator-link").minHeight, width <= 600 ? "32px" : "34px");
+      assert.equal(style(".site-header").minHeight, "72px");
+      assert.equal(style(".site-header").display, "grid");
+      assert.equal(style(".site-header").gridTemplateColumns, width <= 700 ? "minmax(0, 1fr)" : "minmax(0, 1fr) minmax(290px, 420px)");
+      assert.equal(style(".site-header").gap, width <= 700 ? "8px" : "14px");
+      assert.equal(style(".site-tabs").gridTemplateColumns, "repeat(3, minmax(0, 1fr))");
+      assert.equal(dom.window.document.querySelectorAll(".site-tabs a").length, 3);
+      assert.equal(style(".site-tabs a").minHeight, "44px");
+      assert.equal(style(".site-developer > .developer-mobile").display, width <= 700 ? "flex" : "none");
     } finally { dom.window.close(); }
   }
 });

@@ -17,22 +17,3 @@ export function calculateDefenseDamageMultiplier(
   }
   return 1 / remainingDamage;
 }
-
-/** Recover defense from damage reduction using the supplied scaling coefficient. */
-export function defenseFromDamageReduction(
-  damageReduction: number,
-  defenseCoefficient: number,
-): number {
-  if (damageReduction === 1) {
-    throw new RangeError("A 100% damage reduction has no finite defense value");
-  }
-  return (damageReduction * defenseCoefficient) / (1 - damageReduction);
-}
-
-export function calculateResistanceControlSeconds(
-  resistanceReduction: number,
-  coefficient: number,
-  capSeconds = 15,
-): number {
-  return Math.min(capSeconds, resistanceReduction * 0.01 * coefficient);
-}

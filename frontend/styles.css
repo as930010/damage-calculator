@@ -4,7 +4,7 @@
 *{box-sizing:border-box} body{margin:0} button,input{font:inherit} button{cursor:pointer} button,input{border:1px solid var(--border-control); border-radius:8px; color:inherit; background:var(--control)} button:hover{background:var(--control-hover)} input{width:100%; padding:11px 12px; min-height:42px} button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid #b6c3ff; outline-offset:3px}
 button{padding:10px 15px} h1,h2,p{margin:0} h1{font-size:27px; letter-spacing:.02em; margin:7px 0 10px} h2{font-size:16px} p{line-height:1.7} small{font-size:12px}
 /* 2. App shell and primary layout */
-.topbar{height:68px; border-bottom:1px solid var(--border-topbar); display:flex; align-items:center; padding:0 34px; background:#1b1e24; gap:14px} .brand{display:flex; align-items:center; gap:12px; font-weight:700} .brand-icon,.logo{color:#a7b7ff} .brand-subtitle,.topbar .subtitle,.topbar .tagline{font-size:12px; color:#929baa} .workbench{max-width:1440px; margin:auto; padding:32px}
+    .workbench{max-width:1440px; margin:auto; padding:32px}
 .workspace-heading{display:flex; justify-content:space-between; align-items:center; margin-bottom:24px} .workspace-heading p{color:#959dac; font-size:14px} .eyebrow{font-size:10px; letter-spacing:.2em; color:#aab8d7} .toolbar{display:flex; align-items:center; gap:20px; flex-wrap:wrap; margin-bottom:24px} .toolbar .field{margin:0} .toolbar .field label{display:none} #class-picker{width:230px}
 .toggle{display:flex; align-items:center; gap:9px; font-size:13px; color:#bec4ce} .toggle input{width:16px; min-height:16px; accent-color:#99acfa} #baseline{font-size:13px} #save-status{color:var(--text-status); font-size:12px; margin-left:auto}
 /* 3. Equipment canvas and inspector layout */
@@ -29,9 +29,9 @@ footer{position:relative; isolation:isolate; overflow:hidden; display:flex; flex
   .equipment-workspace{grid-template-columns:minmax(0,1fr)} .inspector{min-height:0} .workbench{padding:22px} .equipment-canvas{height:650px} .stat-list{grid-template-columns:repeat(2,minmax(0,1fr))} .inspector .field{max-width:540px}
 }
 @media(max-width:600px) {
-  .workbench{padding:16px 10px} .workspace-heading{align-items:flex-start} h1{font-size:21px} .workspace-heading p{font-size:12px} .toolbar{gap:14px} #save-status{margin-left:0} .equipment-canvas{height:640px} .panel-heading{padding:17px} .panel-heading>span{font-size:10px} .stat-list{grid-template-columns:1fr; padding:0 14px 14px} .topbar{padding:0 18px} .panel-note{padding:14px 17px}
+  .workbench{padding:16px 10px} .workspace-heading{align-items:flex-start} h1{font-size:21px} .workspace-heading p{font-size:12px} .toolbar{gap:14px} #save-status{margin-left:0} .equipment-canvas{height:640px} .panel-heading{padding:17px} .panel-heading>span{font-size:10px} .stat-list{grid-template-columns:1fr; padding:0 14px 14px}  .panel-note{padding:14px 17px}
 }
-.brand{text-decoration:none; color:#e3e8f2} .brand-mark{display:grid; place-items:center; background:#424f70; width:32px; height:32px; border-radius:9px} .brand small{display:block; font-size:10px; color:#8d9bb3; margin-top:3px} .top-meta{margin-left:auto; font-size:11px; color:#8e9bb0} .loading-card{padding:60px; text-align:center}
+    .loading-card{padding:60px; text-align:center}
 .battle-panel,.damage-panel{margin:0 0 20px; border:1px solid var(--border); border-radius:12px; background:var(--panel-alt)} .battle-panel .panel-heading,.damage-panel .panel-heading{padding:15px 19px} .battle-fields{padding:16px 19px 2px; display:grid; grid-template-columns:repeat(3,minmax(130px,1fr)); gap:14px} .battle-fields .field{margin-bottom:14px}
 .damage-panel{margin:22px 0 0; border-radius:0 0 12px 12px; border-left:0; border-right:0; border-bottom:0} .damage-summary{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; padding:16px 22px 22px} .damage-summary>div{display:flex; flex-direction:column; justify-content:center; gap:9px; min-height:88px; padding:15px; border:1px solid var(--border-strong); border-radius:11px; background:var(--surface)}
 .damage-summary span{font-size:12px; color:var(--text-label)} .damage-summary strong{font-size:17px; font-variant-numeric:tabular-nums} .damage-summary .final-damage{border-color:var(--accent-border); background:var(--accent-surface)} .damage-summary .final-damage strong{font-size:24px; color:var(--accent)} .formula-detail{margin:0 22px 18px; border-top:1px solid var(--border-strong); padding:13px 0}
@@ -84,12 +84,7 @@ footer{position:relative; isolation:isolate; overflow:hidden; display:flex; flex
 @media(max-width:700px) {
   .calculation-comparison{padding:16px 14px}
 }
-.damage-comparison{padding:0 22px 18px} .damage-comparison h3{margin:0 0 10px; color:var(--text-strong); font-size:13px} .damage-comparison-scroll{overflow-x:auto; border:1px solid var(--border-strong); border-radius:8px} .damage-comparison table{width:100%; min-width:610px; border-collapse:collapse; font-variant-numeric:tabular-nums}
-.damage-comparison th,.damage-comparison td{padding:10px 12px; border-bottom:1px solid var(--border-strong); text-align:right; white-space:nowrap; font-size:12px} .damage-comparison th:first-child{text-align:left} .damage-comparison thead th{color:#9da9bb; background:var(--surface-raised); font-weight:500} .damage-comparison tbody th{color:var(--text-strong); font-weight:500}
-.damage-comparison tr:last-child th,.damage-comparison tr:last-child td{border-bottom:0} .damage-comparison-note{margin:0 22px 18px; padding:12px; border:1px solid #6d5940; border-radius:8px; color:#e7bf86; font-size:12px}
-@media(max-width:700px) {
-  .damage-comparison{padding:0 14px 14px} .damage-comparison-note{margin:0 14px 14px}
-}
+
 .master-beast-color-selector{padding:0 22px 14px; max-width:360px} .master-beast-color-selector .field{margin:0} .master-beast-controls{padding:0 22px 14px} .master-beast-control-inputs{display:grid; grid-template-columns:repeat(2,minmax(180px,1fr)); gap:12px 16px; max-width:740px} .master-beast-control-inputs .field{margin:0}
 @media(max-width:560px) {
   .master-beast-control-inputs{grid-template-columns:1fr}
@@ -115,21 +110,15 @@ footer{position:relative; isolation:isolate; overflow:hidden; display:flex; flex
 @media(max-width:560px) {
   .weapon-magic-stone-grid,.weapon-magic-stone-slots{grid-template-columns:1fr} .weapon-magic-stone-colors{padding-inline:12px}
 }
-.transfer-actions{display:flex; align-items:center; gap:12px; margin-left:auto} #save-status{margin-left:0} .picker-clear{top:0; bottom:0; margin-block:auto; display:grid; place-items:center; transform:none} .developer-info{display:flex; flex-direction:column; gap:2px; margin-left:auto; margin-right:18px; color:#929baa; font-size:11px; line-height:1.35; white-space:nowrap} .top-meta{flex:none}
-@media(max-width:600px) {
-  .developer-info{margin-right:8px; font-size:10px; gap:1px} .topbar{gap:10px}
-}
-.developer-info{margin-left:0; margin-right:auto}
-@media(max-width:600px) {
-  .developer-info{flex:1; min-width:0; white-space:normal; overflow-wrap:anywhere; margin-right:8px}
-}
+.transfer-actions{display:flex; align-items:center; gap:12px; margin-left:auto} #save-status{margin-left:0} .picker-clear{top:0; bottom:0; margin-block:auto; display:grid; place-items:center; transform:none}
+
 .beast-label{left:var(--beast-accessory-center-x); top:25%; color:#c095ee} .gear-beast-slots{position:absolute; inset:0; z-index:4; display:block; padding:0; pointer-events:none} .gear-beast-slots .beast-accessory-slot{position:absolute; width:55px; height:59px; transform:translate(-50%,-50%); pointer-events:auto} .gear-beast-slots .beast-accessory-slot-headwear{left:var(--beast-accessory-center-x); top:35%} .gear-beast-slots .beast-accessory-slot-armor{left:var(--beast-accessory-center-x); top:46%} .gear-beast-slots .beast-accessory-slot-necklace{left:var(--beast-accessory-center-x); top:57%} .gear-beast-slots .beast-accessory-slot-ring-one{left:calc(var(--beast-ring-one-x) - 1px); top:68%} .gear-beast-slots .beast-accessory-slot-ring-two{left:var(--beast-ring-two-x); top:68%} .left-label{top:22%} .inner-label{left:calc(18% - 1px)} .beast-label{left:var(--beast-accessory-center-x)}
 /* UX polish preview: strengthen hierarchy and make dense controls easier to scan. */
-:root{--space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-5:24px} body{font-size:15px; line-height:1.55} .topbar{height:auto; min-height:68px; padding-block:10px} .developer-info{font-size:12px; line-height:1.45; gap:3px} .brand small{font-size:11px} .top-meta{font-size:12px} .panel-heading{padding:18px 22px} .panel-heading>span,.beast-accessories-heading span{font-size:12px}
+:root{--space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-5:24px} body{font-size:15px; line-height:1.55}     .panel-heading{padding:18px 22px} .panel-heading>span,.beast-accessories-heading span{font-size:12px}
 .panel-note{font-size:13px; line-height:1.6; padding:15px 22px} .inspector .panel-note{font-size:12px} .group-label{font-size:12px; letter-spacing:.04em} .gear-slot span,.beast-accessory-slot span{font-size:11px} .field{font-size:13px; line-height:1.45} .field input{min-height:44px; font-size:14px; padding:11px 13px} .picker-list button{font-size:14px} .picker-list small{font-size:12px}
 .global-input-group h3{font-size:13px} .stat summary{font-size:13px} .stat p{font-size:12px; line-height:1.55} .damage-summary span{font-size:13px} .damage-summary .final-damage strong{display:flex; align-items:baseline; white-space:nowrap} .damage-summary .damage-integer{font-size:24px} .damage-summary .damage-decimal{font-size:16px} .footer,footer{font-size:12px; line-height:1.6}
 @media(max-width:600px) {
-  .topbar{align-items:flex-start} .developer-info{font-size:11px; line-height:1.4} .panel-heading{padding:16px 17px} .panel-note{font-size:12px; padding:13px 17px} .inspector .panel-note{font-size:12px} .gear-slot span,.beast-accessory-slot span{font-size:11px} .field{font-size:12px} .field input{font-size:13px}
+    .panel-heading{padding:16px 17px} .panel-note{font-size:12px; padding:13px 17px} .inspector .panel-note{font-size:12px} .gear-slot span,.beast-accessory-slot span{font-size:11px} .field{font-size:12px} .field input{font-size:13px}
 }
 /* Requested readability and responsive layout refinements. */
 .weapon-magic-stone-color.weapon-magic-stone-red{border-color:#b97878} .weapon-magic-stone-color.weapon-magic-stone-blue{border-color:#718fb8} .weapon-magic-stone-color.weapon-magic-stone-yellow{border-color:#b9a36c}
@@ -194,7 +183,7 @@ footer{position:relative; isolation:isolate; overflow:hidden; display:flex; flex
   .toolbar .baseline-actions{justify-content:flex-start;margin-left:0}
 }
 @media(max-width:900px){
-  button,.buff-simulator-link{min-height:44px}
+  button{min-height:44px}
   .field input,.picker-control>input,.global-input-group input,.attribute-value-grid input,.circuit-board-row .field input,.beast-accessory-controls .field input,.beast-mirror-grid input{min-height:44px;font-size:16px}
   .picker-control>input{padding-right:52px}
   .picker-control>.picker-clear{right:0;width:44px;min-width:44px;min-height:44px}
@@ -210,11 +199,7 @@ footer{position:relative; isolation:isolate; overflow:hidden; display:flex; flex
 }
 @media(max-width:700px){
   .app-shell,#app.layout,.workbench{width:100%;max-width:100vw;min-width:0}
-  .topbar{box-sizing:border-box;display:grid;width:100%;max-width:100vw;grid-template-columns:minmax(0,1fr);align-items:start;overflow:hidden}
-  .topbar>.brand{grid-column:1;grid-row:1;width:100%;min-width:0;flex-wrap:wrap}
-  .topbar>.developer-info{grid-column:1;grid-row:2;width:100%;min-width:0}
-  .topbar>.top-meta{grid-column:1;grid-row:3;width:max-content;max-width:100%;justify-self:end;align-self:start;margin:0}
-  .top-meta .buff-simulator-link{max-width:100%;white-space:normal}
+
   .workspace-heading{display:block;width:100%;min-width:0}
   .workspace-intro,.workspace-summary,.workflow-steps{width:100%;max-width:100%;min-width:0}
   .workspace-summary{overflow-wrap:anywhere}
