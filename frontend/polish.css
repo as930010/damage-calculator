@@ -159,7 +159,7 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
 .site-support-qr>a:hover .site-support-qr-label{color:var(--text-heading);text-decoration-color:currentColor}
 .site-support-qr figcaption{margin-top:4px;color:var(--text-soft);font-size:10px;line-height:1.6}
 @media(max-width:700px){.site-support{gap:16px;margin-top:18px;padding:16px}.site-support-copy{flex-basis:100%}.site-support-button{width:100%}.site-support-qr{flex-basis:144px}}
-.site-release-list{display:grid;gap:10px;max-height:360px;overflow-y:auto;overscroll-behavior:contain;margin:0;padding:0 10px 0 0;list-style:none;scrollbar-color:#8191a8 transparent;scrollbar-width:thin}
+.site-release-list{display:grid;gap:10px;max-height:440px;overflow-y:auto;overscroll-behavior:contain;margin:0;padding:0 10px 0 0;list-style:none;scrollbar-color:#8191a8 transparent;scrollbar-width:thin}
 .site-release-list li{display:grid;grid-template-columns:1fr;gap:3px;align-items:start;text-align:center;color:#95a4b8;font-size:11px;line-height:1.6}.site-release-list li>div{display:flex;justify-content:center;flex-wrap:wrap;gap:3px 8px;align-items:baseline;min-width:0;text-align:left}
 .site-release-list time{color:#8191a8;font-size:10px;white-space:nowrap;text-align:center}
 .site-release-list strong{color:#c6d4e8;font-size:11px;font-weight:650;white-space:nowrap}
