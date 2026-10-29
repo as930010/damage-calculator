@@ -47,12 +47,18 @@
 .optimizer-variant-differences li + li { margin-block-start: 6px; }
 @media (max-width: 700px) {
   .optimizer-workspace { margin-top: 14px; }
+  .optimizer-constraints summary,
+  .optimizer-constraint-body select,
+  .optimizer-constraint-body button,
+  .optimizer-series-options label { box-sizing: border-box; min-height: 44px; }
   .optimizer-actions button { flex: 1 1 120px; }
   .optimizer-result { padding: 14px; }
   .optimizer-result dl { column-gap: 6px; }
 }
 .optimizer-series-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0}
 .optimizer-series-options label{display:flex;align-items:center;gap:8px;min-width:0;padding:8px;border:1px solid var(--site-border);border-radius:8px;cursor:pointer;overflow-wrap:anywhere}
+.optimizer-series-options label:has(input:checked){border-color:#8da6c8;background-color:rgb(141 166 200 / 12%)}
+.optimizer-series-options label:has(input:focus-visible){outline:2px solid #b6c3ff;outline-offset:2px}
 
 @media(max-width:700px){.optimizer-series-options{grid-template-columns:repeat(2,minmax(0,1fr))}}
 

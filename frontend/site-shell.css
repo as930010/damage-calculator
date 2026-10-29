@@ -165,7 +165,7 @@ body.site-page {
 
 @media (max-width: 700px) {
   .site-header { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: calc(10px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) 10px calc(14px + env(safe-area-inset-left)); }
-  .site-developer { grid-column: 1; grid-row: 1; font-size: 10px; line-height: 1.35; overflow-wrap: anywhere; }
+  .site-developer { grid-column: 1; grid-row: 1; font-size: 12px; line-height: 1.35; overflow-wrap: anywhere; }
   .site-developer > .developer-desktop, .site-developer > .developer-support { display: none; }
   .site-developer > .developer-mobile { display: flex; flex-direction: column; align-items: flex-start; }
   .site-nav-wrap { grid-column: 1; grid-row: 2; width: 100%; }

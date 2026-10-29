@@ -2142,11 +2142,21 @@ async function start() {
     const next = history.redo();
     if (next) applyHistorySnapshot(next);
   };
-  undoButton.addEventListener('click', undo);
-  redoButton.addEventListener('click', redo);
+  undoButton.addEventListener('click', () => {
+    const hadFocus = document.activeElement === undoButton;
+    undo();
+    if (hadFocus && undoButton.disabled && !redoButton.disabled) redoButton.focus();
+  });
+  redoButton.addEventListener('click', () => {
+    const hadFocus = document.activeElement === redoButton;
+    redo();
+    if (hadFocus && redoButton.disabled && !undoButton.disabled) undoButton.focus();
+  });
   restoreBaselineButton.addEventListener('click', () => {
     if (!baseline || !baselineIsValid || history.matches(baseline)) return;
+    const hadFocus = document.activeElement === restoreBaselineButton;
     applyHistorySnapshot(structuredClone(baseline));
+    if (hadFocus && restoreBaselineButton.disabled) baselineButton.focus();
   });
   baselineButton.addEventListener('click', () => {
     try {

@@ -68,11 +68,11 @@ input::placeholder { color: #9cabb8; font-weight: 400; }
 .option-editor { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 6px 9px; border: 1px solid #354552; border-radius: 8px; background: #121a22; }
 .option-editor-heading { min-width: 0; display: grid; line-height: 1.25; }
 .option-editor-heading strong { font-size: 12px; font-weight: 650; }
-.option-editor-heading small { margin-top: 3px; color: var(--muted); font-size: 10px; white-space: nowrap; }
+.option-editor-heading small { margin-top: 3px; color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
 .option-editor-input { display: flex; align-items: center; gap: 4px; color: var(--muted); font-size: 12px; }
 .option-editor-input input { width: 5.2em; min-width: 0; padding: 4px 5px; color: var(--text); background: #0d151d; border: 1px solid #3b5262; border-radius: 5px; font: inherit; text-align: right; font-variant-numeric: tabular-nums; }
 .option-editor-input input:focus { outline: 2px solid #76d6c455; border-color: var(--accent); }
-.background-option-note { margin: 0; padding: 7px 9px; color: #d7e4e8; background: #14252a; border-left: 2px solid var(--accent); border-radius: 0 6px 6px 0; font-size: 11px; line-height: 1.45; }
+.background-option-note { margin: 0; padding: 7px 9px; color: #d7e4e8; background: #14252a; border-left: 2px solid var(--accent); border-radius: 0 6px 6px 0; font-size: 12px; line-height: 1.45; }
 .background-option-note strong { color: var(--accent); }
 .option-list { display: flex; flex-wrap: wrap; gap: 7px; }
 .option-chip { display: flex; align-items: center; gap: 7px; color: #d1dbe2; background: #121a22; border: 1px solid #354552; border-radius: 7px; padding: 7px 9px; font-size: 12px; cursor: pointer; }
@@ -303,7 +303,7 @@ body::before {
   font-size: 12px;
   transition: color .18s ease, background .18s ease, transform .18s ease;
 }
-.mode-switch button small { color: inherit; font-size: 10px; }
+.mode-switch button small { color: inherit; font-size: 12px; }
 .mode-switch button[aria-selected="true"] {
   color: #071c18;
   background: var(--accent);

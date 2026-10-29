@@ -83,9 +83,11 @@ function refreshConditionOptions() {
     const label = document.createElement('label');
     const input = document.createElement('input'); input.type = 'checkbox'; input.value = name; input.checked = checked.includes(name);
     input.addEventListener('change', () => {
+      const hadFocus = document.activeElement === input;
       const next = new Set(conditions.allowedSeries ?? defaults);
       if (input.checked) next.add(name); else next.delete(name);
       conditions = { ...conditions, allowedSeries: available.filter(item => next.has(item)) }; conditionsChanged();
+      if (hadFocus) [...seriesOptions.querySelectorAll<HTMLInputElement>('input')].find(option => option.value === name)?.focus();
     });
     label.append(input, document.createTextNode(name)); seriesOptions.append(label);
   }

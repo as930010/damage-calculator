@@ -410,11 +410,13 @@ function shell(): void {
   app.querySelectorAll<HTMLButtonElement>("[data-mode]").forEach((button) => button.addEventListener("click", () => {
     const nextMode = button.dataset.mode as TeamMode;
     if (nextMode === mode) return;
+    const hadFocus = document.activeElement === button;
     saveCurrentInputs();
     captureDisclosures();
     mode = nextMode;
     persistSavedState();
     shell();
+    if (hadFocus) app.querySelector<HTMLButtonElement>(`[data-mode="${nextMode}"]`)?.focus();
   }));
   inputValues = new WeakMap();
   app.querySelectorAll<HTMLInputElement>("input").forEach(input => inputValues.set(input, inputValue(input)));
