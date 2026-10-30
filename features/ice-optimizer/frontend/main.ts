@@ -39,6 +39,15 @@ let searchBaseRaw: string | null = null;
 let searchBaseState: LoadoutState | null = null;
 let resultValid = false;
 let searchSequence = 0;
+startButton.innerHTML = '<span class="optimizer-start-label">開始搜尋</span><span class="optimizer-start-feedback" aria-hidden="true"></span>';
+const startFeedback = startButton.querySelector<HTMLElement>('.optimizer-start-feedback')!;
+const setStartState = (state: 'idle' | 'running') => {
+  startButton.dataset.searchState = state;
+  startButton.setAttribute('aria-label', state === 'running' ? '搜尋中' : '開始搜尋');
+  startFeedback.innerHTML = state === 'running'
+    ? '<span class="optimizer-spinner"></span>搜尋中' : '';
+};
+const resetStartState = () => setStartState('idle');
 
 const readSavedRaw = () => {
   try { return localStorage.getItem(savedStateKey); }
@@ -51,6 +60,8 @@ const dataRevision = () => {
 const workerUrl = () => document.querySelector<HTMLMetaElement>('meta[name="optimizer-worker-url"]')?.content ?? '';
 const searchRevision = () => `${dataRevision()}|${workerUrl()}`;
 const setRunning = (running: boolean) => {
+  if (running && startButton.dataset.searchState !== 'running') setStartState('running');
+  else if (!running && startButton.dataset.searchState === 'running') setStartState('idle');
   startButton.disabled = running || !gameData || !conditionsValid;
   cancelButton.disabled = !running;
   clearButton.disabled = running || !results.childElementCount;
@@ -175,6 +186,7 @@ function validateConditions() {
 
 function conditionsChanged() {
   if (worker) stopWorker();
+  resetStartState();
   resultValid = false;
   results.querySelectorAll<HTMLButtonElement>('.optimizer-apply').forEach(button => { button.disabled = true; });
   try { sessionStorage.setItem(conditionsKey, JSON.stringify(conditions)); sessionStorage.removeItem(savedSearchKey); } catch { /* Storage is optional. */ }
@@ -436,6 +448,7 @@ function renderResults(data: GameData,
 
 function startSearch() {
   if (!gameData || worker) return;
+  resetStartState();
   validateConditions();
   if (!conditionsValid) return;
   const searchConditions = snapshotIceSearchConstraints(conditions);
@@ -538,6 +551,7 @@ clearButton.addEventListener('click', () => {
 window.addEventListener('storage', event => {
   if (event.key !== savedStateKey) return;
   if (worker) stopWorker();
+  resetStartState();
   resultValid = false;
   results.querySelectorAll<HTMLButtonElement>('.optimizer-apply').forEach(button => { button.disabled = true; });
   status.textContent = '偵測到另一個分頁更新配裝。原試算仍可檢視，但需重新搜尋後才能套用。';

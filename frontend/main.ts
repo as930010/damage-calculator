@@ -2190,9 +2190,21 @@ async function start() {
   refreshHistoryControls();
   const loadTransfer = createTransferLoader();
   let exporting = false;
-  document.querySelector<HTMLButtonElement>('#export-loadout')!.addEventListener('click', async () => {
-    if (exporting) return;
+  const exportButton = document.querySelector<HTMLButtonElement>('#export-loadout')!;
+  exportButton.innerHTML = '<span class="export-label">匯出配裝</span><span class="export-feedback" aria-hidden="true"></span>';
+  const exportFeedback = exportButton.querySelector<HTMLElement>('.export-feedback')!;
+  let exportResetTimer: ReturnType<typeof setTimeout> | undefined;
+  const setExportState = (value: 'idle' | 'working' | 'success') => {
+    exportButton.dataset.exportState = value;
+    exportButton.setAttribute('aria-label', value === 'working' ? '正在準備匯出' : value === 'success' ? '開始下載' : '匯出配裝');
+    exportButton.disabled = value === 'working' || value === 'success';
+    exportFeedback.textContent = value === 'working' ? '準備中…' : value === 'success' ? '開始下載' : '';
+  };
+  exportButton.addEventListener('click', async () => {
+    if (exporting || exportButton.dataset.exportState === 'success') return;
+    clearTimeout(exportResetTimer);
     exporting = true;
+    setExportState('working');
     document.querySelector<HTMLElement>('#transfer-status')!.textContent = '正在載入配裝匯出功能…';
     try {
       const exportState = structuredClone(state);
@@ -2206,7 +2218,10 @@ async function start() {
       URL.revokeObjectURL(blobUrl);
       const details = exported.omittedFields.length ? `；${exported.omittedFields.length} 個無法識別欄位已留空` : '';
       document.querySelector<HTMLElement>('#transfer-status')!.textContent = `配裝 JSON 已匯出${details}。`;
+      setExportState('success');
+      exportResetTimer = setTimeout(() => setExportState('idle'), 1000);
     } catch (error) {
+      setExportState('idle');
       document.querySelector<HTMLElement>('#transfer-status')!.textContent = `匯出失敗：${error instanceof Error ? error.message : '功能無法載入。'}；可重試，若頁面版本已更新請重新載入。`;
     } finally { exporting = false; }
   });

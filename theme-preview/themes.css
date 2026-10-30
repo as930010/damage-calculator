@@ -11,7 +11,9 @@
 @media(max-width:900px){.site-header.theme-header-ready{grid-template-columns:minmax(0,1fr) auto}.site-header.theme-header-ready .site-nav-wrap{grid-column:1 / -1;grid-row:2}.theme-trigger{grid-column:2;grid-row:1;min-height:44px}}
 
 .theme-popover{position:fixed;inset:auto;width:min(416px,calc(100vw - 24px));max-width:none;margin:0;padding:0;overflow:hidden;border:1px solid var(--border-control,var(--site-border));border-radius:15px;background:var(--panel,var(--site-surface));color:var(--text-main,var(--site-text));box-shadow:0 16px 42px rgb(0 0 0 / 32%);font-family:Inter,"Segoe UI","Microsoft JhengHei",sans-serif}
-.theme-popover:popover-open{display:flex;flex-direction:column}
+.theme-popover:popover-open{display:flex;flex-direction:column;animation:theme-popover-enter .3s ease-out}
+@keyframes theme-popover-enter{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.theme-popover:popover-open{animation:none}}
 .theme-popover-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex:none;padding:15px 16px 11px;border-bottom:1px solid var(--border,var(--site-border))}
 .theme-popover-top h2{margin:0;color:var(--text-heading,var(--site-text));font-size:16px;font-weight:650;line-height:1.3}
 .theme-applied-label{margin:4px 0 0;color:var(--text-muted,var(--site-muted));font-size:11px;line-height:1.4}

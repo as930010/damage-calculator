@@ -43,6 +43,7 @@ async function productionPage({ reader, search = '' } = {}) {
     readState: () => JSON.parse(dom.window.localStorage.getItem('dab-loadout-v1')) };
   page.exportJson = async (doubleClick = false) => {
     const before = blobs.length;
+    await waitFor(() => !dom.window.document.querySelector('#export-loadout').disabled, 'export button ready');
     dom.window.document.querySelector('#export-loadout').click();
     if (doubleClick) dom.window.document.querySelector('#export-loadout').click();
     await waitFor(() => blobs.length === before + 1, 'one export completes');

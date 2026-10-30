@@ -15,10 +15,11 @@ test('即時排名、取消、過期訊息及套用要求均使用同一份搜�
   const state = iceScenario(gameData, sample, 17), raw = JSON.stringify(state);
   dom.window.localStorage.setItem('dab-loadout-v1', raw);
   const workers = [];
+  let failNextWorker = false;
   class Worker {
     listeners = new Map();
     terminated = false;
-    constructor() { workers.push(this); }
+    constructor() { if (failNextWorker) { failNextWorker = false; throw new Error('worker unavailable'); } workers.push(this); }
     addEventListener(type, callback) { this.listeners.set(type, callback); }
     postMessage(value) { this.request = structuredClone(value); }
     terminate() { this.terminated = true; }
@@ -55,13 +56,19 @@ test('即時排名、取消、過期訊息及套用要求均使用同一份搜�
       bestSearchDomainDamage: winner.damage, termination: 'budget-exhausted', localOptimality: 'current-best' };
 
     assert.equal(start.disabled, false);
+    failNextWorker = true;
+    start.click();
+    assert.equal(start.dataset.searchState, 'idle');
+    assert.match(document.querySelector('#optimizer-status').textContent, /無法啟動背景搜尋/);
     start.click();
     const first = workers.at(-1);
+    assert.equal(start.dataset.searchState, 'running');
     first.send('progress', { progress: progress([baseline]) });
     assert.match(document.querySelector('#optimizer-results').textContent, /當前配裝為目前已知最佳解/);
     first.send('progress', { progress: progress([winner]) });
     assert.ok(document.querySelector('.optimizer-apply'));
     cancel.click();
+    assert.equal(start.dataset.searchState, 'idle');
     assert.equal(first.terminated, true);
     first.send('complete', { result });
     assert.equal(document.querySelector('#optimizer-results').childElementCount, 0);
@@ -72,6 +79,7 @@ test('即時排名、取消、過期訊息及套用要求均使用同一份搜�
     first.send('progress', { progress: progress([winner]) });
     assert.equal(document.querySelector('#optimizer-results').childElementCount, 0);
     second.send('complete', { result });
+    assert.equal(start.dataset.searchState, 'idle');
     const completed = document.querySelector('#optimizer-results').innerHTML;
     second.send('progress', { progress: progress([baseline]) });
     assert.equal(document.querySelector('#optimizer-results').innerHTML, completed);
@@ -83,6 +91,7 @@ test('即時排名、取消、過期訊息及套用要求均使用同一份搜�
     dom.window.localStorage.setItem('dab-loadout-v1', raw);
     start.click();
     const third = workers.at(-1);
+    assert.equal(start.dataset.searchState, 'running');
     third.send('progress', { progress: progress([winner]) });
     document.querySelector('.optimizer-apply').click();
     assert.equal(third.terminated, true);

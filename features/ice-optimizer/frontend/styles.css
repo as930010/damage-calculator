@@ -23,6 +23,12 @@
 .optimizer-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 .optimizer-actions button, .optimizer-apply { min-height: 44px; padding: 9px 16px; border: 1px solid var(--site-border); border-radius: 8px; font: inherit; cursor: pointer; }
 .optimizer-actions button:disabled { opacity: .48; cursor: not-allowed; }
+#optimizer-start { position: relative; }
+#optimizer-start[data-search-state="running"] .optimizer-start-label { visibility: hidden; }
+.optimizer-start-feedback { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 2px; white-space: nowrap; font-size: inherit; }
+.optimizer-spinner { width: 10px; height: 10px; box-sizing: border-box; border: 1.5px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: optimizer-spin .8s linear infinite; }
+@keyframes optimizer-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .optimizer-spinner { animation: none; } }
 .optimizer-actions #optimizer-cancel, .optimizer-actions #optimizer-clear { border: 1px solid var(--site-border); border-radius: 8px; background: #242a34; color: var(--site-text); }
 .optimizer-actions #optimizer-cancel:not(:disabled):hover, .optimizer-actions #optimizer-clear:not(:disabled):hover { background: #303b4b; }
 #optimizer-status, #optimizer-progress { margin: 14px 0 0; color: var(--site-muted); line-height: 1.6; }

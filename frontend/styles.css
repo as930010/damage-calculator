@@ -99,6 +99,9 @@ footer{position:relative; isolation:isolate; overflow:hidden; display:flex; flex
   .combat-rate-pair{grid-column:span 1; grid-template-columns:1fr} .conditional-damage-pair{grid-column:span 1; grid-template-columns:1fr} .damage-ratio{padding:0 14px 14px}
 }
 #transfer-status{color:var(--text-status); font-size:12px} #export-loadout,#import-loadout{font-size:13px}
+#export-loadout{position:relative}
+#export-loadout:is([data-export-state="working"],[data-export-state="success"]) .export-label{visibility:hidden}
+#export-loadout .export-feedback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:2px;white-space:nowrap;font-size:inherit}
 .weapon-magic-stone-grid{display:grid; grid-template-columns:repeat(4,minmax(150px,1fr)); gap:12px 15px; padding:16px 20px} .weapon-magic-stone-grid .field{margin:0}
 .weapon-magic-stone-colors{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; padding:0 20px 20px} .weapon-magic-stone-color{min-width:0; padding:14px; border:1px solid var(--border); border-radius:9px; background:var(--panel)} .weapon-magic-stone-color h3{margin:0 0 12px; color:var(--text-heading); font-size:13px} .weapon-magic-stone-slots{display:grid; grid-template-columns:1fr; gap:8px}
 .weapon-magic-stone-slots .field{display:grid; grid-template-columns:26px minmax(0,1fr); align-items:center; gap:8px; margin:0} .weapon-magic-stone-slots .field>label{margin:0; color:var(--text-muted); font-size:11px} .weapon-magic-stone-slots .picker-control input{min-height:35px; padding:7px 30px 7px 9px; font-size:12px}
