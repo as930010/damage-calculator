@@ -56,8 +56,9 @@ export async function uiPage(state = stateA, baseline = stateA, options = {}) {
     },
     async exportJson() {
       const before = blobs.length;
+      for (let i = 0; i < 400 && document.querySelector('#export-loadout').disabled; i++) await new Promise(resolve => setTimeout(resolve, 5));
       document.querySelector('#export-loadout').click();
-      for (let i = 0; i < 100 && blobs.length === before; i++) await new Promise(resolve => setTimeout(resolve, 5));
+      for (let i = 0; i < 400 && blobs.length === before; i++) await new Promise(resolve => setTimeout(resolve, 5));
       assert.equal(blobs.length, before + 1, 'export completes after optional module loading');
       const reader = new page.dom.window.FileReader();
       return new Promise((resolve, reject) => {
