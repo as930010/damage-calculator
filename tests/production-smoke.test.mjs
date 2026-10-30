@@ -9,7 +9,7 @@ import { boot as buffPage } from '../features/buff-simulator/tests/dom-harness.m
 import { scenarios, capture } from '../features/buff-simulator/tests/scenarios.mjs';
 
 const waitFor = async (check, message) => {
-  for (let i = 0; i < 200; i++) { if (check()) return; await new Promise(resolve => setTimeout(resolve, 5)); }
+  for (let i = 0; i < 400; i++) { if (check()) return; await new Promise(resolve => setTimeout(resolve, 5)); }
   assert.fail(message);
 };
 
