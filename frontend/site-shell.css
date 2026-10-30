@@ -97,6 +97,12 @@ body.site-page {
 /* Shared control typography and disclosure geometry; tool styles keep their own sizing. */
 .site-page :is(button, input, select, textarea) { font-family: inherit; }
 .site-page button { line-height: 1.4; }
+.site-page input[type="checkbox"]{appearance:none;flex:none;width:16px;height:16px;min-height:16px;padding:0;border:1px solid #718099;border-radius:3px;background:#242a34;cursor:pointer;vertical-align:middle}
+.site-page input[type="checkbox"]:checked{border-color:var(--checkbox-accent,#8b7cff);background:var(--checkbox-accent,#8b7cff)}
+.site-page input[type="checkbox"]:not(:disabled):hover{border-color:var(--checkbox-accent,#8b7cff)}
+.site-page input[type="checkbox"]:checked::after{content:"";display:block;width:5px;height:9px;margin:1px auto 0;border:solid #15171c;border-width:0 2px 2px 0;transform:rotate(45deg)}
+.site-page input[type="checkbox"]:disabled{opacity:.45;cursor:not-allowed}
+.site-page input[type="checkbox"]:focus-visible{outline:2px solid #b6c3ff;outline-offset:3px}
 .site-page details:not(.stat):not(.site-credits-notes) > summary {
   display: flex;
   align-items: center;

@@ -8,6 +8,9 @@
 .optimizer-constraint-controls { display: flex; flex-wrap: wrap; align-items: end; gap: 8px; }
 .optimizer-constraint-controls label { display: grid; gap: 4px; flex: 1 1 150px; min-width: 0; }
 .optimizer-constraint-controls select { width: 100%; min-width: 0; }
+.optimizer-constraint-controls label:has(> select){position:relative}
+.optimizer-constraint-controls label:has(> select)::after{content:"";position:absolute;right:19px;bottom:17px;width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);pointer-events:none;opacity:.7}
+.optimizer-constraint-controls select{appearance:none;padding-right:38px}
 .optimizer-constraint-body select, .optimizer-constraint-body button { min-height: 40px; border: 1px solid var(--site-border); border-radius: 8px; background: var(--site-card, #151d2b); color: var(--site-text); font: inherit; padding: 8px 10px; }
 .optimizer-constraint-body button { cursor: pointer; }
 .optimizer-constraint-body button:disabled { opacity: .48; cursor: not-allowed; }

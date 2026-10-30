@@ -158,6 +158,44 @@ if (optimizerHtml.includes('__OPTIMIZER_') || [shellCssPath, optimizerCssPath, o
 }
 optimized.files.set('ice-optimizer/index.html', optimizerHtml);
 optimized.manifest.files['ice-optimizer/index.html'] = { bytes: optimizerHtml.length, hash: contentHash(optimizerHtml) };
+
+// Publish the tested five-theme selector once, shared by the three pages.
+if (seasonalCssPath) {
+let themeCss = await readFile(join(root, 'theme-preview', 'themes.css'), 'utf8');
+for (const name of ['original', 'seasonal', 'harbor', 'forest', 'ember']) {
+  const bytes = await readFile(join(root, 'theme-preview', 'cards', `__theme-card-${name}.svg`));
+  const path = `assets/theme-card-${name}-${contentHash(bytes)}.svg`;
+  optimized.files.set(path, bytes);
+  optimized.manifest.files[path] = { bytes: bytes.length, hash: contentHash(bytes) };
+  themeCss = themeCss.replace(`./__theme-card-${name}.svg`, `./${path.slice('assets/'.length)}`);
+}
+const themeCssBytes = Buffer.from(minifyCss(themeCss));
+const themeCssPath = `assets/themes-${contentHash(themeCssBytes)}.css`;
+const themeJsBytes = await readFile(join(root, 'theme-preview', 'themes.js'));
+const themeJsPath = `assets/themes-${contentHash(themeJsBytes)}.js`;
+for (const [path, bytes] of [[themeCssPath, themeCssBytes], [themeJsPath, themeJsBytes]]) {
+  optimized.files.set(path, bytes);
+  optimized.manifest.files[path] = { bytes: bytes.length, hash: contentHash(bytes) };
+}
+const themeBootstrap = `<!-- theme-bootstrap:start --><script>try{const k='damage-calculator-preview-theme',v=new URL(location.href).searchParams.get('preview-theme')||sessionStorage.getItem(k)||'seasonal';if(['original','harbor','forest','ember'].includes(v)){document.querySelector('link[data-theme-seasonal]').media='not all';if(v!=='original')document.documentElement.dataset.previewTheme=v}}catch{}</script><!-- theme-bootstrap:end -->`;
+for (const [page, prefix] of [['index.html', './'], ['ice-optimizer/index.html', '../'], ['buff-simulator/index.html', '../']]) {
+  let html = optimized.files.get(page).toString();
+  const seasonalLink = /<link rel="stylesheet" href="([^"]*seasonal-effects-[^"]+\.css)"\s*\/>/g;
+  if ([...html.matchAll(seasonalLink)].length !== 1) throw new Error(`Expected one seasonal stylesheet in ${page}`);
+  html = html.replace(seasonalLink, '<link rel="stylesheet" href="$1" data-theme-seasonal />' + themeBootstrap);
+  html = html.replace('</head>', `<!-- theme-control:start --><link rel="stylesheet" href="${prefix}${themeCssPath}"><script defer src="${prefix}${themeJsPath}"></script><!-- theme-control:end -->\n</head>`);
+  const bytes = Buffer.from(html);
+  optimized.files.set(page, bytes);
+  if (page === 'buff-simulator/index.html') {
+    const manifestPath = 'buff-simulator/asset-manifest.json';
+    const manifest = JSON.parse(optimized.files.get(manifestPath));
+    manifest.files['index.html'] = { bytes: bytes.length, hash: contentHash(bytes) };
+    optimized.files.set(manifestPath, Buffer.from(JSON.stringify(manifest, null, 2) + '\n'));
+  } else {
+    optimized.manifest.files[page] = { bytes: bytes.length, hash: contentHash(bytes) };
+  }
+}
+}
 optimized.manifest.pages = ['buff-simulator/asset-manifest.json'];
 optimized.files.set('asset-manifest.json', Buffer.from(JSON.stringify(optimized.manifest, null, 2)+'\n'));
 await writeProduction(root, optimized.files);

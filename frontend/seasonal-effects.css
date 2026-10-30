@@ -334,13 +334,14 @@ button:active,.pet-skill-toggle:active{filter:brightness(1.08)}
 .picker-list button[aria-selected=true]{box-shadow:inset 3px 0 #c5a6e6}
 .picker-list small{color:#b8bdd5}
 .picker-clear:hover{background:#303251;color:#fff0f5}
+.picker-control{--picker-clear-color:#b9bdd3;--picker-clear-hover-color:#eee8f6}
 .picker-control .picker-clear,.picker-control .picker-clear:hover{
   border-color:transparent;
   background:transparent;
-  color:#b9bdd3;
+  color:var(--picker-clear-color);
   box-shadow:none;
 }
-.picker-control .picker-clear:hover{color:#eee8f6}
+.picker-control .picker-clear:hover{color:var(--picker-clear-hover-color)}
 .innerwear-type-switch,.mobile-picker-actions{border-color:#5a587c;background:#171b34}
 .innerwear-type-switch button[aria-pressed=true],button[aria-selected=true],[role=tab][aria-selected=true]{border-color:#bd9655;background:linear-gradient(180deg,#453a25,#302d20);color:#ffe5aa}
 .mobile-picker-dialog{border-color:#71698d;background:#0d132b;color:var(--text-main);box-shadow:none}

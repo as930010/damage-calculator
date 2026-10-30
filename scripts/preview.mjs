@@ -19,6 +19,8 @@ try {
 const base = args.find(arg => arg.startsWith('--base='))?.slice(7) ?? '/';
 if (!/^\/(?:[a-zA-Z0-9_-]+\/)*$/.test(base)) throw new Error('Invalid preview base path');
 const withoutSeasonal = args.includes('--without-seasonal');
+// Seasonal styling is a separate theme, never layered with local palettes.
+const themes = withoutSeasonal && args.includes('--themes');
 const contentTypes = {
   ".html": "text/html; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
@@ -38,6 +40,13 @@ const server = createServer(async (request, response) => {
   try {
     const pathname = decodeURIComponent(new URL(request.url, "http://localhost").pathname);
     if (!pathname.startsWith(base)) { response.writeHead(404); response.end('Not found'); return; }
+    if (themes && (pathname === `${base}__theme-preview.css` || pathname === `${base}__theme-preview.js` || /^__theme-card-(original|seasonal|harbor|forest|ember)\.svg$/.test(pathname.slice(base.length)))) {
+      const file = pathname.endsWith('.css') ? 'themes.css' : pathname.endsWith('.js') ? 'themes.js' : `cards/${pathname.slice(base.length)}`;
+      const body = await readFile(join(root, '..', 'theme-preview', file));
+      response.writeHead(200, { 'Content-Type': contentTypes[extname(file)], 'Cache-Control': 'no-store', 'Content-Length': body.length });
+      response.end(request.method === 'HEAD' ? undefined : body);
+      return;
+    }
     let file = resolve(root, './'+pathname.slice(base.length));
     if (file !== root && !file.startsWith(`${root}${sep}`)) {
       response.writeHead(403);
@@ -46,12 +55,18 @@ const server = createServer(async (request, response) => {
     }
     if ((await stat(file)).isDirectory()) file = join(file, "index.html");
     let body = await readFile(file);
-    // Local comparison only: both previews use the same production files, but
-    // this view never includes the removable seasonal stylesheet link.
-    if (withoutSeasonal && extname(file) === '.html') {
+    const integratedThemes = extname(file) === '.html' && body.includes('<!-- theme-control:start -->');
+    // Keep the seasonal sheet in its production position for the local theme
+    // switcher, but leave it inactive until the seasonal option is selected.
+    if (withoutSeasonal && extname(file) === '.html' && (!themes || !integratedThemes)) {
       body = Buffer.from(body.toString('utf8').replace(
-        /^[ \t]*<link rel="stylesheet" href="\.\.?\/assets\/seasonal-effects-[^"/]+\.css" \/>\r?\n?/gm, '',
-      ));
+        /<link rel="stylesheet" href="(\.\.?\/assets\/seasonal-effects-[^"/]+\.css)"(?: data-theme-seasonal)?\s*\/>/gm,
+        themes ? `<link rel="stylesheet" href="$1" media="all" data-theme-seasonal />\n<script>try{const k='damage-calculator-preview-theme',v=new URL(location.href).searchParams.get('preview-theme')||sessionStorage.getItem(k)||'seasonal';if(v!=='seasonal'){document.querySelector('link[data-theme-seasonal]').media='not all';if(['harbor','forest','ember'].includes(v))document.documentElement.dataset.previewTheme=v}}catch{}</script>\n` : '',
+      ).replace(/<!-- theme-bootstrap:start -->[\s\S]*?<!-- theme-bootstrap:end -->/g, '')
+        .replace(/<!-- theme-control:start -->[\s\S]*?<!-- theme-control:end -->/g, ''));
+    }
+    if (themes && extname(file) === '.html' && !integratedThemes) {
+      body = Buffer.from(body.toString('utf8').replace('</head>', `<link rel="stylesheet" href="${base}__theme-preview.css"><script defer src="${base}__theme-preview.js"></script></head>`));
     }
     response.writeHead(200, {
       "Content-Type": contentTypes[extname(file)] ?? "application/octet-stream",

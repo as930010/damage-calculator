@@ -1,0 +1,151 @@
+/* Local theme selector. Site colour roles follow the currently applied theme. */
+.site-header.theme-header-ready{grid-template-columns:minmax(0,1fr) minmax(290px,420px) auto}
+.theme-trigger{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-width:86px;min-height:52px;padding:6px 9px;border:1px solid var(--border-control,var(--site-border));border-radius:9px;background:var(--control,var(--site-surface));color:var(--text-main,var(--site-text));font:600 12px/1.3 Inter,"Segoe UI","Microsoft JhengHei",sans-serif;cursor:pointer;white-space:nowrap}
+.theme-trigger:hover,.theme-trigger[aria-expanded=true]{border-color:var(--accent-border,var(--site-border));background:var(--control-hover,var(--site-surface));color:var(--text-main,var(--site-text))}
+.theme-trigger:focus-visible{outline:2px solid var(--accent,var(--site-text));outline-offset:3px}
+.theme-trigger-swatch{width:12px;height:12px;border:1px solid currentColor;border-radius:50%;background:#496286}
+.theme-trigger[data-theme=seasonal] .theme-trigger-swatch{background:#a895bd}
+.theme-trigger[data-theme=harbor] .theme-trigger-swatch{background:#a8cecb}
+.theme-trigger[data-theme=forest] .theme-trigger-swatch{background:#bfd0a9}
+.theme-trigger[data-theme=ember] .theme-trigger-swatch{background:#dfb998}
+@media(max-width:900px){.site-header.theme-header-ready{grid-template-columns:minmax(0,1fr) auto}.site-header.theme-header-ready .site-nav-wrap{grid-column:1 / -1;grid-row:2}.theme-trigger{grid-column:2;grid-row:1;min-height:44px}}
+
+.theme-popover{position:fixed;inset:auto;width:min(416px,calc(100vw - 24px));max-width:none;margin:0;padding:0;overflow:hidden;border:1px solid var(--border-control,var(--site-border));border-radius:15px;background:var(--panel,var(--site-surface));color:var(--text-main,var(--site-text));box-shadow:0 16px 42px rgb(0 0 0 / 32%);font-family:Inter,"Segoe UI","Microsoft JhengHei",sans-serif}
+.theme-popover:popover-open{display:flex;flex-direction:column}
+.theme-popover-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex:none;padding:15px 16px 11px;border-bottom:1px solid var(--border,var(--site-border))}
+.theme-popover-top h2{margin:0;color:var(--text-heading,var(--site-text));font-size:16px;font-weight:650;line-height:1.3}
+.theme-applied-label{margin:4px 0 0;color:var(--text-muted,var(--site-muted));font-size:11px;line-height:1.4}
+.theme-popover-close{display:grid;place-items:center;flex:none;width:30px;height:30px;padding:0;border:1px solid transparent;border-radius:7px;background:transparent;color:var(--text-muted,var(--site-muted));font-size:22px;line-height:1;cursor:pointer}
+.theme-popover-close svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.theme-popover-close:hover{border-color:var(--border-control,var(--site-border));background:var(--control-hover,var(--site-surface));color:var(--text-main,var(--site-text))}
+.theme-popover :is(.theme-popover-close,.theme-card):focus-visible{outline:2px solid var(--accent,var(--site-text));outline-offset:2px}
+.theme-popover-scroll{min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:13px 16px 16px;scrollbar-color:var(--border-control,var(--site-border)) transparent;scrollbar-width:thin}
+.theme-group+.theme-group{margin-top:17px}
+.theme-group h3{margin:0 0 8px;color:var(--text-muted,var(--site-muted));font-size:12px;font-weight:650;line-height:1.4}
+.theme-card-grid{display:grid;gap:9px}
+.theme-card-grid-basic{grid-template-columns:repeat(2,minmax(0,1fr))}
+.theme-card-grid-palette{grid-template-columns:repeat(3,minmax(0,1fr))}
+.theme-card{position:relative;display:block;min-width:0;padding:0;overflow:hidden;border:1px solid var(--card-edge);border-radius:10px;background:#101831;color:#fff;text-align:left;cursor:pointer;isolation:isolate;box-shadow:none;transition:border-color .16s,box-shadow .16s}
+.theme-card-grid-basic .theme-card{aspect-ratio:1.9}
+.theme-card-grid-palette .theme-card{aspect-ratio:1.25}
+.theme-card:hover{border-color:var(--card-select)}
+.theme-card.is-selected,html[data-preview-theme] body.site-page .theme-popover .theme-card.is-selected{border-color:var(--card-select);box-shadow:inset 0 0 0 1px var(--card-select),0 0 0 2px var(--card-ring)}
+.theme-card-original{--card-edge:#576681;--card-select:#b9cce9;--card-ring:rgb(155 183 221 / 40%)}
+.theme-card-seasonal{--card-edge:#65658c;--card-select:#d5e2ff;--card-ring:rgb(192 211 255 / 46%)}
+.theme-card-harbor{--card-edge:#52777a;--card-select:#a8cecb;--card-ring:rgb(168 206 203 / 40%)}
+.theme-card-forest{--card-edge:#607962;--card-select:#bfd0a9;--card-ring:rgb(191 208 169 / 40%)}
+.theme-card-ember{--card-edge:#846b69;--card-select:#dfb998;--card-ring:rgb(223 185 152 / 40%)}
+.theme-card-art{position:absolute;inset:0;background-size:cover;background-position:center}
+.theme-card-original .theme-card-art{background-color:#111a30;background-image:url('./__theme-card-original.svg')}
+.theme-card-seasonal .theme-card-art{background-color:#1e214c;background-image:url('./__theme-card-seasonal.svg')}
+.theme-card-harbor .theme-card-art{background-color:#18303b;background-image:url('./__theme-card-harbor.svg')}
+.theme-card-forest .theme-card-art{background-color:#203329;background-image:url('./__theme-card-forest.svg')}
+.theme-card-ember .theme-card-art{background-color:#36252a;background-image:url('./__theme-card-ember.svg')}
+.theme-card::after{position:absolute;z-index:0;inset:32% 0 0;background:linear-gradient(transparent,rgb(5 8 22 / 78%));content:'';pointer-events:none}
+.theme-card-name{position:absolute;z-index:1;left:9px;bottom:8px;max-width:calc(100% - 35px);color:#fff;font-size:12px;font-weight:700;line-height:1.2;text-shadow:0 1px 4px rgb(0 0 0 / 70%)}
+.theme-card-check{position:absolute;z-index:1;right:7px;bottom:7px;display:none;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--card-select);color:#1a2752}
+.theme-card-check svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.theme-card.is-selected .theme-card-check{display:grid}
+@media(max-width:700px){.theme-popover{border-radius:12px}.theme-popover-top{padding:13px 13px 9px}.theme-popover-scroll{padding:12px 13px 14px}.theme-card-grid{gap:7px}.theme-card-name{font-size:11px}.theme-group+.theme-group{margin-top:15px}}
+@media(prefers-reduced-motion:reduce){.theme-card{transition:none}}
+/* Quiet long-session palettes. The three themes differ through their material and lightness,
+   while accent colour stays on decisions and numbers rather than entire panels. */
+html[data-preview-theme="harbor"]{--p-ground:#141d21;--p-surface:#1e2b30;--p-raised:#2a393e;--p-input:#182429;--p-edge:#52666b;--p-ink:#e7eeed;--p-muted:#b5c6c6;--p-accent:#a8cecb;--p-active:#293a40;--p-focus:#d9c69d;--p-line:#394a4e;--p-positive:#a6cfbb;--p-negative:#e2aba9;--p-warning:#dfc39b}
+html[data-preview-theme="forest"]{--p-ground:#1b201a;--p-surface:#272f25;--p-raised:#364033;--p-input:#202920;--p-edge:#64725e;--p-ink:#ebede6;--p-muted:#bfcbba;--p-accent:#bfd0a9;--p-active:#344330;--p-focus:#e0c79f;--p-line:#465243;--p-positive:#b7d1af;--p-negative:#e3b0a4;--p-warning:#dfc79d}
+html[data-preview-theme="ember"]{--p-ground:#211c1b;--p-surface:#302825;--p-raised:#413630;--p-input:#291f1e;--p-edge:#79675f;--p-ink:#eee9e3;--p-muted:#d0c0b6;--p-accent:#dfb998;--p-active:#40322e;--p-focus:#b8d3c7;--p-line:#574841;--p-positive:#b8d3bf;--p-negative:#e5b1a9;--p-warning:#e0c19b}
+html[data-preview-theme] body.site-page{
+  --site-border:var(--p-edge);--site-text:var(--p-ink);--site-muted:var(--p-muted);--site-surface:var(--p-surface);
+  --page-bg:var(--p-ground);--bg:var(--p-ground);--panel:var(--p-surface);--panel-alt:var(--p-input);--panel-strong:var(--p-raised);--surface:var(--p-input);--surface-raised:var(--p-raised);--control:var(--p-raised);--control-hover:var(--p-active);--field:var(--p-input);
+  --border:var(--p-edge);--border-strong:var(--p-edge);--border-mid:var(--p-edge);--border-row:var(--p-edge);--border-dim:var(--p-edge);--border-control:var(--p-edge);--line:var(--p-edge);
+  --text:var(--p-ink);--text-main:var(--p-ink);--text-input:var(--p-ink);--text-heading:var(--p-ink);--text-strong:var(--p-ink);--text-status:var(--p-muted);--text-label:var(--p-muted);--text-muted:var(--p-muted);--text-source:var(--p-muted);--text-soft:var(--p-muted);--muted:var(--p-muted);
+  --accent:var(--p-accent);--accent-surface:var(--p-active);--accent-soft:var(--p-active);--accent-border:var(--p-edge);--positive:var(--p-positive);--negative:var(--p-negative);--warning:var(--p-warning);--checkbox-accent:var(--p-accent);--positive-bg:color-mix(in srgb,var(--p-positive) 13%,var(--p-input));--negative-bg:color-mix(in srgb,var(--p-negative) 13%,var(--p-input));--sample-surface:var(--p-active);
+  background:var(--p-ground);color:var(--p-ink);accent-color:var(--p-accent);color-scheme:dark
+}
+/* Hard-coded surfaces in the three tools share the same semantic layers. */
+html[data-preview-theme] body.site-page :is(.site-header,.site-footer){background:var(--p-input);border-color:var(--p-line)}
+html[data-preview-theme] body.site-page .site-tabs{background:var(--p-ground);border-color:var(--p-edge)}
+html[data-preview-theme] body.site-page :is(.toolbar,.battle-panel,.damage-panel,.equipment-panel,.inspector,.weapon-magic-stone-panel,.global-source-panel,.results-panel,.attribute-equivalence-panel,.team-panel,.result-card,.skill-reference,.optimizer-workspace,.optimizer-result,.site-credits-notes,.mobile-picker-dialog){background:var(--p-surface);border-color:var(--p-line);color:var(--p-ink)}
+html[data-preview-theme] body.site-page :is(.workspace-heading,.site-tool-intro){background:linear-gradient(105deg,var(--p-raised),var(--p-surface));border-color:var(--p-edge)}
+html[data-preview-theme] body.site-page :is(.battle-panel,.damage-panel){background:var(--p-input)}
+html[data-preview-theme] body.site-page :is(.stat,.member-slot,.option-editor,.option-chip,.skill-result,.primary-grid .metric,.support-grid .metric,.control-time-grid div){background:var(--p-input);border-color:var(--p-line);color:var(--p-ink)}
+html[data-preview-theme] body.site-page .primary-grid .metric{background:color-mix(in srgb,var(--p-input) 58%,var(--p-surface))}
+html[data-preview-theme] body.site-page :is(.mode-switch,.optimizer-constraints,.calculation-inspection-panel){background:var(--p-input);border-color:var(--p-line)}
+html[data-preview-theme] body.site-page :is(.panel-heading,.configuration-heading){background:transparent;color:var(--p-ink)}
+html[data-preview-theme] body.site-page :is(.result-heading,.result-stack .result-heading){background:linear-gradient(105deg,var(--p-raised),var(--p-surface));border-color:var(--p-line)}
+html[data-preview-theme] body.site-page :is(input:not([type=checkbox]):not([type=radio]),select,textarea,.picker-list,.skill-damage-share-number-wrap,.percent-input){background:var(--field);border-color:var(--border-control);color:var(--text-input)}
+html[data-preview-theme] body.site-page input::placeholder{color:var(--p-muted);opacity:1}
+html[data-preview-theme] body.site-page :is(.site-tabs a,.mode-switch button){background:transparent;border-color:transparent;color:var(--p-muted)}
+html[data-preview-theme] body.site-page :is(.site-tabs a:hover,.mode-switch button:hover){background:var(--p-raised);color:var(--p-ink)}
+html[data-preview-theme] body.site-page :is(.site-tabs a[aria-current=page],.mode-switch button[aria-selected=true],.optimizer-series-options label:has(input:checked),.option-chip:has(input:checked),button[aria-pressed=true]){background:var(--p-active);border-color:var(--p-edge);color:var(--p-ink)}
+html[data-preview-theme] body.site-page :is(.site-button,.optimizer-actions button,.optimizer-constraint-body button,.optimizer-apply){background:var(--p-raised);border-color:var(--p-edge);color:var(--p-ink)}
+html[data-preview-theme] body.site-page :is(.site-developer,.site-footer,.site-tool-summary,.workspace-summary,.optimizer-caveat,#optimizer-status,#optimizer-progress,.panel-note,.field,.metric span,.optimizer-result dt,.optimizer-result-state small,.roster-note){color:var(--p-muted)}
+html[data-preview-theme] body.site-page :is(h1,h2,h3,.optimizer-result summary){color:var(--p-ink)}
+html[data-preview-theme] body.site-page :is(.eyebrow,.site-tool-eyebrow,.total-multiplier strong,.optimizer-result-header span){color:var(--p-accent)}
+html[data-preview-theme] body.site-page :is(.eyebrow,.panel-heading h2)::before{background:var(--p-accent)}
+html[data-preview-theme] body.site-page :is(button,input,select,summary,a):focus-visible{outline-color:var(--p-focus)}
+/* Keep nested surfaces visually continuous inside their existing controls. */
+html[data-preview-theme] body.site-page .member-slot input{background:transparent;border-color:transparent}
+html[data-preview-theme] body.site-page .canvas-title-input{background:var(--p-surface);border-color:var(--p-edge)}
+html[data-preview-theme] body.site-page .optimizer-actions :is(#optimizer-cancel,#optimizer-clear){background:var(--p-raised);border-color:var(--p-edge);color:var(--p-ink)}
+html[data-preview-theme] body.site-page .optimizer-actions :is(#optimizer-cancel,#optimizer-clear):not(:disabled):hover{background:var(--p-active)}
+/* The picker is one control: input and clear share a surface; only the floating list is raised. */
+html[data-preview-theme] body.site-page .picker-control>input{caret-color:var(--p-accent)}
+html[data-preview-theme] body.site-page .picker-control{--picker-clear-color:var(--p-muted);--picker-clear-hover-color:var(--p-ink)}
+html[data-preview-theme] body.site-page .picker-control>.picker-clear,
+html[data-preview-theme] body.site-page .picker-control>.picker-clear:hover{background:transparent;border:0;color:var(--picker-clear-color);box-shadow:none}
+html[data-preview-theme] body.site-page .picker-control>.picker-clear:hover{color:var(--picker-clear-hover-color)}
+html[data-preview-theme] body.site-page .picker-control>.picker-list{background:var(--p-raised);border-color:var(--p-edge);box-shadow:0 14px 28px rgb(0 0 0 / 27%);scrollbar-color:var(--p-edge) var(--p-raised)}
+html[data-preview-theme] body.site-page .picker-list button{background:transparent;border:0;color:var(--p-ink)}
+html[data-preview-theme] body.site-page .picker-list button:hover,
+html[data-preview-theme] body.site-page .picker-list button[aria-selected=true]{background:var(--p-active);color:var(--p-ink)}
+html[data-preview-theme] body.site-page .picker-list button[aria-selected=true]{box-shadow:inset 2px 0 var(--p-accent)}
+html[data-preview-theme] body.site-page .picker-list small{color:var(--p-muted)}
+html[data-preview-theme] body.site-page ::selection{background:var(--p-active);color:var(--p-ink)}
+/* Hard-coded legacy blue surfaces in dynamic calculator and Buff panels. */
+html[data-preview-theme] body.site-page :is(.pet-skill-toggle,.global-input-group){background:var(--p-input);border-color:var(--p-line);color:var(--p-ink)}
+html[data-preview-theme] body.site-page .pet-skill-toggle:has(input:checked){background:var(--p-active);border-color:var(--p-edge)}
+html[data-preview-theme] body.site-page .pet-skill-toggle input{accent-color:var(--p-accent)}
+html[data-preview-theme] body.site-page :is(.section-label,.metric-section-heading)>span{background:var(--p-raised);border-color:var(--p-edge);color:var(--p-accent)}
+html[data-preview-theme] body.site-page :is(.primary-grid .metric:nth-child(1) strong,.primary-grid .metric:nth-child(2) strong,.metric-emphasis strong,.control-time-grid strong,.metric-section-heading strong,.calculation-comparison h3,.stat-source-row strong){color:var(--p-ink)}
+html[data-preview-theme] body.site-page :is(.metric-section-heading small,.control-times summary small,.calculation-comparison p,.formula-detail p,.stat-source-row span,.global-input-note){color:var(--p-muted)}
+html[data-preview-theme] body.site-page :is(.calculation-comparison thead th,.damage-summary>div){background:var(--p-input);border-color:var(--p-line)}
+html[data-preview-theme] body.site-page :is(.formula-detail,.optimizer-result details){background:transparent;border-color:var(--p-line)}
+html[data-preview-theme] body.site-page :is(.damage-summary .final-damage strong,.control-time-grid strong,.total-multiplier strong){color:var(--p-accent)}
+html[data-preview-theme] body.site-page .damage-summary .final-damage{background:var(--p-active);border-color:var(--p-edge)}
+/* Shared wayfinding and Buff's formerly blue badges use the current material. */
+html[data-preview-theme] body.site-page :is(.workflow-steps,.site-tool-steps) li{background:var(--p-input);border-color:var(--p-line);color:var(--p-ink)}
+html[data-preview-theme] body.site-page :is(.workflow-steps,.site-tool-steps) li span:first-child{background:var(--p-active);color:var(--p-accent)}
+html[data-preview-theme] body.site-page :is(.section-label,.roster-note){border-left-color:var(--p-accent)}
+html[data-preview-theme] body.site-page :is(.results-heading,.metric-section,.support-grid,.primary-grid){border-color:var(--p-line)}
+html[data-preview-theme] body.site-page :is(.boss-control .percent-input span,.option-editor-input span){color:var(--p-accent)}
+html[data-preview-theme] body.site-page .background-option-note{background:var(--p-active);border-color:var(--p-edge);color:var(--p-ink)}
+html[data-preview-theme] body.site-page :is(.primary-grid .metric,.support-grid .metric):hover{border-color:var(--p-edge)}
+html[data-preview-theme] body.site-page :is(.skill-role-heading strong,.background-option-note strong,.support-grid .metric:nth-child(5) strong){color:var(--p-accent)}
+html[data-preview-theme] body.site-page .skill-reference>summary::before{background:var(--p-active);color:var(--p-accent)}
+html[data-preview-theme] body.site-page :is(.team-panel,.result-card):hover{border-color:var(--p-edge)}
+/* Expanded verification and comparison keep the same reading contrast as result cards. */
+html[data-preview-theme] body.site-page :is(.calculation-inspection-content,.calculation-comparison-scroll){background:transparent;border-color:var(--p-line)}
+html[data-preview-theme] body.site-page .attribute-equivalence-scroll{border-color:var(--p-line)}
+html[data-preview-theme] body.site-page :is(.calculation-inspection-panel>summary,.formula-detail summary,.calculation-comparison summary,.attribute-equivalence-scroll tbody th){color:var(--p-muted)}
+html[data-preview-theme] body.site-page .calculation-inspection-panel>summary::before{color:var(--p-accent)}
+html[data-preview-theme] body.site-page :is(.calculation-inspection-panel .formula-detail,.calculation-comparison th,.calculation-comparison td,.attribute-equivalence-scroll th,.attribute-equivalence-scroll td){border-color:var(--p-line)}
+html[data-preview-theme] body.site-page :is(.calculation-comparison thead th,.attribute-equivalence-scroll thead th){background:var(--p-input);color:var(--p-muted)}
+html[data-preview-theme] body.site-page :is(.attribute-equivalence-active,.calculation-comparison-positive){background:var(--p-active)}
+html[data-preview-theme] body.site-page .calculation-comparison-negative{background:color-mix(in srgb,var(--p-negative) 12%,var(--p-surface))}
+html[data-preview-theme] body.site-page input[type=checkbox]{background:var(--p-raised);border-color:var(--p-edge)}
+html[data-preview-theme] body.site-page input[type=checkbox]:checked{background:var(--p-accent);border-color:var(--p-accent)}
+html[data-preview-theme] body.site-page input[type=checkbox]:checked::after{border-color:var(--p-ground)}
+html[data-preview-theme] body.site-page .picker-control>.picker-clear:hover::before{background:var(--p-line)}
+/* Polish-layer colors that were still bypassing the palette on the calculator. */
+html[data-preview-theme] body.site-page .skill-damage-share-control{background:linear-gradient(145deg,var(--p-input),var(--p-surface));border-color:var(--p-line);color:var(--p-muted)}
+html[data-preview-theme] body.site-page .skill-damage-share-control output{color:var(--p-ink)}
+html[data-preview-theme] body.site-page .toolbar-actions button:disabled{background:var(--p-input);border-color:var(--p-edge);color:var(--p-muted)}
+html[data-preview-theme] body.site-page .stat{background:linear-gradient(145deg,var(--p-input),var(--p-surface));border-color:var(--p-line)}
+html[data-preview-theme] body.site-page .stat[open]{background:var(--p-raised);border-color:var(--p-edge)}
+html[data-preview-theme] body.site-page .equipment-damage-card{background:linear-gradient(145deg,var(--p-input),var(--p-surface));border-color:var(--p-line)}
+html[data-preview-theme] body.site-page .equipment-damage-card span{color:var(--p-muted)}
+html[data-preview-theme] body.site-page .equipment-damage-card strong{color:var(--p-ink)}
+html[data-preview-theme] body.site-page .gear-slot{background:var(--p-raised)}
+html[data-preview-theme] body.site-page .gear-slot:is(:hover,.selected){background:color-mix(in srgb,var(--group-color) 14%,var(--p-raised))}
+html[data-preview-theme] body.site-page .beast-accessory-slot{background:var(--p-raised)}
+html[data-preview-theme] body.site-page .sample-banner{border-color:var(--p-edge);color:var(--p-ink)}

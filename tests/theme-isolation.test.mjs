@@ -128,6 +128,9 @@ test("activity CSS changes only visual properties on non-decorative selectors", 
           violations.push(selector + " hides its focus indicator");
         }
         if (property.startsWith("--") && selector === ":root") continue;
+        // These component-scoped tokens only supply the existing clear-button text colors.
+        if (selector === ".picker-control" && /^--picker-clear(?:-hover)?-color$/.test(property)
+          && /^#[\da-f]{3,8}$/i.test(value)) continue;
         if (selector === "body.site-page-buff"
           && /^--(?:bg|panel|panel-strong|line|text|muted|accent|accent-soft|gold)$/.test(property)) continue;
         if (property.startsWith("--") || !allowedThemeProperties.has(property)) {
