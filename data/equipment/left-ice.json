@@ -12,7 +12,7 @@
         "physicalAttack": 250.0,
         "magicalAttack": 250.0,
         "critRatePct": 14.0,
-        "extremizationPct": 20.0,
+        "extremizationPct": 15.0,
         "polarizationPct": 10.0,
         "strongerPct": 10.0,
         "heatPct": 10.0
