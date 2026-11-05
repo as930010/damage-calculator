@@ -1,3 +1,5 @@
+import { JSDOM } from 'jsdom';
+import { shareSimulatorCss, integrateThemes } from '../scripts/site-resources.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, readdir, mkdtemp, rmdir } from 'node:fs/promises';
@@ -147,4 +149,74 @@ test('production manifest covers exact emitted files, both pages, and GitHub Pag
   assert.match(preview, /\.\.\/site-dist/);
   const { loadGameData } = await import('../dist/frontend/data.js');
   assert.equal(typeof loadGameData, 'function', 'Node test ESM contract remains available');
+});
+
+async function integratedFixture(seasonal) {
+  const omitSeasonal = html => html.replace(/\s*<link[^>]+seasonal-effects\.css[^>]+>/, '');
+  const mainHtml = await readFile(join(root, 'index.html'), 'utf8');
+  const main = await productionAssets({ ...options, html: seasonal ? mainHtml : omitSeasonal(mainHtml) });
+  const buffRoot = join(root, 'features/buff-simulator');
+  const buffHtml = await readFile(join(buffRoot, 'index.html'), 'utf8');
+  const cssOverrides = Object.fromEntries(await Promise.all(['site-shell.css', 'seasonal-effects.css'].map(async name =>
+    [name, await readFile(join(root, 'frontend', name), 'utf8')])));
+  const buff = await productionAssets({ root: buffRoot, compiled: join(buffRoot, 'dist'), buff: true,
+    html: seasonal ? buffHtml : omitSeasonal(buffHtml), cssOverrides });
+  for (const [name, bytes] of buff.files) main.files.set('buff-simulator/' + name, bytes);
+  const cssLinks = main.manifest.css.filter(item => ['site-shell.css', 'seasonal-effects.css'].includes(item.source))
+    .map(item => `<link rel="stylesheet" href="../${item.path}" />`).join('');
+  const ice = Buffer.from(`<head>${cssLinks}</head><body><header class="site-header"></header></body>`);
+  main.files.set('ice-optimizer/index.html', ice);
+  main.manifest.files['ice-optimizer/index.html'] = { bytes: ice.length, hash: contentHash(ice) };
+  return main;
+}
+
+test('integrated themes survive optional seasonal resources and preserve shared URLs', async t => {
+  for (const seasonal of [true, false]) await t.test(seasonal ? 'five themes' : 'four themes without seasonal CSS', async () => {
+    const integrated = await integratedFixture(seasonal);
+    shareSimulatorCss(integrated);
+    await integrateThemes(root, integrated);
+    const buff = JSON.parse(integrated.files.get('buff-simulator/asset-manifest.json'));
+    validateAssets(integrated.files, integrated.manifest);
+    validateAssets(integrated.files, buff, 'buff-simulator/');
+    for (const source of ['site-shell.css', ...(seasonal ? ['seasonal-effects.css'] : [])]) {
+      const path = integrated.manifest.css.find(item => item.source === source).path;
+      assert.equal(buff.css.find(item => item.source === source).path, '../' + path);
+      assert.ok(!integrated.files.has('buff-simulator/' + path));
+      const missing = new Map(integrated.files); missing.delete(path);
+      assert.throws(() => validateAssets(missing, buff, 'buff-simulator/'), /Unresolved/);
+    }
+    assert.equal([...integrated.files.keys()].filter(name => /theme-card-.*\.svg$/.test(name)).length, 5);
+    const themeScript = integrated.files.get([...integrated.files.keys()].find(name => /assets\/themes-.*\.js$/.test(name))).toString();
+    for (const page of ['index.html', 'ice-optimizer/index.html', 'buff-simulator/index.html']) {
+      const html = integrated.files.get(page).toString();
+      assert.equal((html.match(/data-theme-seasonal/g) ?? []).length, seasonal ? 2 : 1, 'one link when available plus bootstrap lookup');
+      assert.equal((html.match(/theme-control:start/g) ?? []).length, 1);
+      const dom = new JSDOM(html, { url: 'https://example.test/damage-calculator/' + page, runScripts: 'outside-only' });
+      try {
+        dom.window.sessionStorage.setItem('damage-calculator-preview-theme', 'seasonal');
+        const bootstrap = html.match(/<!-- theme-bootstrap:start --><script>([\s\S]*?)<\/script>/)[1];
+        dom.window.eval(bootstrap);
+        dom.window.eval(themeScript);
+        const { document } = dom.window;
+        assert.equal(document.querySelectorAll('.theme-trigger').length, 1);
+        assert.equal(document.querySelectorAll('.theme-card').length, seasonal ? 5 : 4);
+        assert.equal(document.querySelector('.theme-trigger').dataset.theme, seasonal ? 'seasonal' : 'original');
+        for (const id of ['harbor', 'forest', 'ember', 'original', ...(seasonal ? ['seasonal'] : [])]) {
+          document.querySelector(`.theme-card[data-theme="${id}"]`).click();
+          assert.equal(dom.window.sessionStorage.getItem('damage-calculator-preview-theme'), id);
+          assert.equal(document.documentElement.dataset.previewTheme, ['original', 'seasonal'].includes(id) ? undefined : id);
+          if (seasonal) assert.equal(document.querySelector('link[data-theme-seasonal]').media, id === 'seasonal' ? 'all' : 'not all');
+        }
+        if (!seasonal) assert.ok(!/seasonal-effects/.test(html));
+      } finally { dom.window.close(); }
+    }
+  });
+});
+
+test('shared CSS integration rejects differing content rather than silently changing visuals', async () => {
+  const integrated = await integratedFixture(true);
+  const manifest = JSON.parse(integrated.files.get('buff-simulator/asset-manifest.json'));
+  const path = manifest.css.find(item => item.source === 'site-shell.css').path;
+  integrated.files.set('buff-simulator/' + path, Buffer.from('different CSS'));
+  assert.throws(() => shareSimulatorCss(integrated), /content differs/);
 });

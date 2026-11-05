@@ -201,3 +201,61 @@ test('Buff production skill failure is retryable and does not disable core calcu
     assert.equal(page.requests.filter(path => path.startsWith('skill-reference')).length, 2);
   } finally { page.close(); }
 });
+
+test('three source and production pages retain unique metadata and current footer version', async () => {
+  const pages = [
+    ['index.html', 'index.html', '', '配裝模擬器', /艾爾之光.*配裝/],
+    ['features/ice-optimizer/index.html', 'ice-optimizer/index.html', 'ice-optimizer/', '冰裝最佳化試算', /冰裝.*理論傷害/],
+    ['features/buff-simulator/index.html', 'buff-simulator/index.html', 'buff-simulator/', '隊伍增益模擬', /Buff／DeBuff/],
+  ];
+  for (const production of [false, true]) {
+    const descriptions = [];
+    for (const [source, output, path, title, purpose] of pages) {
+      const dom = new JSDOM(await readFile(join(root, production ? 'site-dist/' + output : source), 'utf8'));
+      try {
+        const doc = dom.window.document;
+        assert.equal(doc.title, title);
+        const description = doc.querySelectorAll('head meta[name="description"]');
+        assert.equal(description.length, 1);
+        assert.match(description[0].content, purpose);
+        descriptions.push(description[0].content);
+        const canonical = doc.querySelectorAll('head link[rel="canonical"]');
+        assert.equal(canonical.length, 1);
+        assert.equal(canonical[0].href, 'https://as930010.github.io/damage-calculator/' + path);
+        assert.equal(doc.querySelector('.footer-version bdi').textContent, 'v3.04.19');
+      } finally { dom.window.close(); }
+    }
+    assert.equal(new Set(descriptions).size, 3);
+  }
+});
+
+test('release history preserves published entries and prepends new versions without replacing history', async () => {
+  const { createHash } = await import('node:crypto');
+  for (const path of ['index.html', 'site-dist/index.html']) {
+    const dom = new JSDOM(await readFile(join(root, path), 'utf8'));
+    try {
+      const list = dom.window.document.querySelector('ol.site-release-list');
+      assert.ok(list);
+      const entries = [...list.children].map(li => [
+        li.querySelector('strong').textContent, li.querySelector('time').dateTime, li.querySelector('p').textContent,
+      ]);
+      const versions = entries.map(entry => entry[0]);
+      assert.equal(new Set(versions).size, versions.length, 'versions are unique within release history');
+      const current = versions.indexOf('v3.04.19'), previous = versions.indexOf('v3.04.18');
+      assert.ok(current >= 0 && previous > current);
+      assert.deepEqual(entries[previous], ['v3.04.18', '2026-10-30', '新增切換佈景主題功能、按鈕反應與視覺效果優化']);
+      assert.deepEqual(entries[current], ['v3.04.19', '2026-11-04', '修正幻影面紗左五數值錯誤的問題']);
+      for (let i = 1; i < entries.length; i++) {
+        assert.ok(entries[i - 1][1] >= entries[i][1], 'dates descend');
+        const newer = versions[i - 1].slice(1).split('.').map(Number);
+        const older = versions[i].slice(1).split('.').map(Number);
+        const part = newer.findIndex((value, j) => value !== older[j]);
+        assert.ok(part >= 0 && newer[part] > older[part], 'versions descend');
+      }
+      // Frozen published history from v3.03.01 down; new releases may be prepended.
+      const historical = entries.slice(versions.indexOf('v3.03.01'));
+      assert.equal(historical.length, 38);
+      assert.equal(createHash('sha256').update(JSON.stringify(historical)).digest('hex'), 'f83af82e996813c1d7da64004c06d98d91fea9e4fc0c8bf03b5d37fa278ba206');
+    } finally { dom.window.close(); }
+  }
+});

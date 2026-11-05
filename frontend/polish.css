@@ -76,7 +76,7 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
 }
 
 /* Follow-up preview refinements. */
-.stat summary::after{align-self:center;transition:none}
+.stat summary::after{transition:none}
 
 .equipment-damage-gain strong.gain-positive{color:#7FE0B6}
 .equipment-damage-gain strong.gain-negative{color:#FF9EAA}

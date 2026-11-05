@@ -1,7 +1,7 @@
 import { build } from 'esbuild';
 import { createHash } from 'node:crypto';
 import { readFile, readdir, mkdir, writeFile, rm, lstat } from 'node:fs/promises';
-import { dirname, resolve, relative, join } from 'node:path';
+import { dirname, resolve, relative, join, posix } from 'node:path';
 
 export const contentHash = bytes => createHash('sha256').update(bytes).digest('hex').slice(0, 16);
 const slash = path => path.replaceAll('\\', '/');
@@ -104,8 +104,18 @@ export function validateAssets(files, manifest, prefix = '') {
     if (!bytes || bytes.length !== info.bytes || contentHash(bytes) !== info.hash) throw new Error(`Invalid asset: ${prefix}${name}`);
   }
   const html = files.get(prefix + 'index.html').toString();
-  for (const match of html.matchAll(/(?:src|href)="\.\/([^"?#]+\.(?:js|css))"/g)) {
-    if (!files.has(prefix + match[1])) throw new Error(`Unresolved HTML asset: ${match[1]}`);
+  const hasAsset = path => {
+    const resolved = posix.normalize(prefix + path);
+    return !resolved.startsWith('../') && files.has(resolved);
+  };
+  for (const name of Object.keys(manifest.files).filter(name => name.endsWith('.html'))) {
+    const document = files.get(prefix + name).toString();
+    for (const match of document.matchAll(/(?:src|href)="(\.\.?\/[^"?#]+\.(?:js|css))"/g)) {
+      if (!hasAsset(posix.dirname(name) + '/' + match[1])) throw new Error(`Unresolved HTML asset: ${match[1]}`);
+    }
+  }
+  for (const { path } of manifest.css) {
+    if (!hasAsset(path)) throw new Error(`Unresolved CSS asset: ${path}`);
   }
   for (const item of Object.values(manifest.js)) for (const dependency of item.imports) {
     if (!files.has(prefix + dependency.path)) throw new Error(`Unresolved JS dependency: ${dependency.path}`);

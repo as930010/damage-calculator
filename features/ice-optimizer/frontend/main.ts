@@ -246,9 +246,64 @@ function groupSameSlotAlternatives(
   return groups;
 }
 
+// UI identity uses outfit content, never its rank, damage or display label.
+// Keep this separate from search ranking and persisted result data.
+const resultControlKeys = new WeakMap<HTMLElement, string[]>();
+const outfitUiKey = (item: IceResultAlternative) => JSON.stringify([
+  Object.entries(item.choices).sort(([a], [b]) => a.localeCompare(b, 'en')),
+  [...item.setNames].sort((a, b) => a.localeCompare(b, 'zh-Hant')),
+]);
+
+function preserveResultView() {
+  const summaries = [...results.querySelectorAll<HTMLElement>('details > summary')];
+  const openKeys = new Set(summaries.filter(summary => (summary.parentElement as HTMLDetailsElement).open)
+    .flatMap(summary => resultControlKeys.get(summary) ?? []));
+  const active = document.activeElement;
+  const focused = active instanceof HTMLElement && results.contains(active) ? active : null;
+  const focusKeys = focused ? resultControlKeys.get(focused) : undefined;
+  // Anchor only a visible control or an expanded outfit being read. Geometry
+  // reads stay before/after rendering, never interleaved with building cards.
+  const visible = (element: HTMLElement) => {
+    const rect = element.getBoundingClientRect();
+    return rect.bottom > 0 && rect.top < window.innerHeight;
+  };
+  const anchor = focused && visible(focused) ? focused : summaries.find(summary =>
+    (summary.parentElement as HTMLDetailsElement).open && visible(summary.parentElement!));
+  const anchorKeys = anchor && resultControlKeys.get(anchor);
+  const anchorTop = anchor?.getBoundingClientRect().top;
+  return () => {
+    const controls = [...results.querySelectorAll<HTMLElement>('summary, .optimizer-apply')];
+    for (const summary of controls.filter(control => control.tagName === 'SUMMARY')) {
+      (summary.parentElement as HTMLDetailsElement).open =
+        (resultControlKeys.get(summary) ?? []).some(key => openKeys.has(key));
+    }
+    const counterpart = (keys: string[] | undefined, tag: string | undefined) => {
+      for (const key of keys ?? []) {
+        const control = controls.find(control => control.tagName === tag
+          && resultControlKeys.get(control)?.includes(key));
+        if (control) return control;
+      }
+    };
+    if (focused) {
+      const target = counterpart(focusKeys, focused.tagName);
+      if (target) target.focus({ preventScroll: true });
+      else {
+        status.tabIndex = -1;
+        status.focus({ preventScroll: true });
+      }
+    }
+    const nextAnchor = counterpart(anchorKeys, anchor?.tagName);
+    if (nextAnchor && anchorTop !== undefined) {
+      const delta = nextAnchor.getBoundingClientRect().top - anchorTop;
+      if (delta) window.scrollBy({ top: delta, behavior: 'instant' });
+    }
+  };
+}
+
 function renderResults(data: GameData,
   search: Pick<IceSearchResult, 'baselineDamage' | 'baselineInScope' | 'results'>,
   base: LoadoutState, running = false) {
+  const restoreView = preserveResultView();
   results.replaceChildren();
   const ice = data.mapping.selections.filter(entry => entry.catalogFile === 'equipment/right-ice.json');
   const labels = new Map(data.layout.slots
@@ -305,6 +360,7 @@ function renderResults(data: GameData,
       apply.type = 'button';
       apply.className = 'site-button optimizer-apply';
       apply.textContent = text;
+      resultControlKeys.set(apply, [outfitUiKey(alternative)]);
       apply.addEventListener('click', () => {
         if (!resultValid || !searchBaseRaw || readSavedRaw() !== searchBaseRaw) {
           status.textContent = '主頁配裝已變更；請重新搜尋後再套用。';
@@ -335,6 +391,7 @@ function renderResults(data: GameData,
       const alternative = grouped[0];
       const detail = document.createElement('details');
       const summary = document.createElement('summary');
+      resultControlKeys.set(summary, grouped.map(outfitUiKey));
       const list = document.createElement('dl');
       const add = (label: string, value: string) => {
         const term = document.createElement('dt');
@@ -444,6 +501,7 @@ function renderResults(data: GameData,
     results.append(note);
   }
   setRunning(Boolean(worker));
+  restoreView();
 }
 
 function startSearch() {

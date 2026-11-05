@@ -228,3 +228,33 @@ test('actual import keeps baseline and save/export contracts; cleared storage ha
   try { assert.match(cleared.dom.window.document.querySelector('#comparison-label').textContent, /可儲存目前配置/); }
   finally { cleared.close(); }
 });
+
+for (const attackType of ['physical', 'magical', undefined]) {
+  test(`comparison view: ${attackType ?? 'unspecified'} preserves filtering, precision, signs and escaping`, async () => {
+    const { renderCalculationComparisonHtml } = await runtime.load('frontend/calculation-comparison-view.ts');
+    const row = (key, label, expected, actual) => ({ key, label, expected, actual, delta: actual - expected, matches: actual === expected });
+    const rows = [row('physicalAttack', '物攻', 1000, 1200), row('magicalAttack', '魔攻', 2000, 1900),
+      row('weaponPhysicalBase', '物理基值', 100, 100), row('weaponMagicalBase', '魔法基值', 200, 200),
+      row('critRate', '<測試&"\'>', 0.5, 0.625), row('extremizationRate', '極大化', 0.8, 0.75),
+      row('finalDamage', '傷害', 1234, 1234.123456)];
+    const html = renderCalculationComparisonHtml(rows, attackType, new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 3 }));
+    assert.equal(html.includes('物攻'), attackType === 'physical');
+    assert.equal(html.includes('物理基值'), attackType === 'physical');
+    assert.equal(html.includes('魔攻'), attackType !== 'physical');
+    assert.equal(html.includes('魔法基值'), attackType !== 'physical');
+    assert.ok(html.includes('&lt;測試&amp;&quot;&#39;&gt;'));
+    assert.ok(html.includes('<td>50%</td><td>62.5%</td><td class="positive">+12.5%</td>'));
+    assert.ok(html.includes('<td class="negative">-5%</td>'));
+    assert.ok(html.includes('<td>1,234</td><td>1,234.123</td><td class="positive">+0.123</td>'));
+    assert.ok(html.includes('data-disclosure-key="comparison-all-values"'));
+  });
+}
+
+test('comparison empty states retain missing-baseline and invalid-current messages', async () => {
+  for (const [state, message] of [[sample, '先點選「設為比較基準」保存目前配置，表格就會比較基準與目前配裝。'],
+    [stateFor('no-class'), '目前配裝的輸入尚未完成或無法計算，修正後即可與比較基準對照。']]) {
+    const page = await createPage(state);
+    try { assert.equal(page.dom.window.document.querySelector('#calculation-comparison').innerHTML, `<p>${message}</p>`); }
+    finally { page.close(); }
+  }
+});

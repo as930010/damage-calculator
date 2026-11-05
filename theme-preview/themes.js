@@ -1,19 +1,20 @@
 (() => {
   const key = 'damage-calculator-preview-theme';
+  const seasonal = document.querySelector('link[data-theme-seasonal]');
+  const fallback = seasonal ? 'seasonal' : 'original';
   const themes = [
     { id: 'original', name: '預設', group: 'basic' },
     { id: 'seasonal', name: '共存節', group: 'basic' },
     { id: 'harbor', name: '薄霧', group: 'palette' },
     { id: 'forest', name: '森林', group: 'palette' },
     { id: 'ember', name: '夕陽', group: 'palette' },
-  ];
+  ].filter(theme => seasonal || theme.id !== 'seasonal');
   const valid = value => themes.some(theme => theme.id === value);
-  let applied = 'seasonal';
+  let applied = fallback;
   try { applied = sessionStorage.getItem(key) || applied; } catch {}
   const requested = new URL(location.href).searchParams.get('preview-theme');
   if (valid(requested)) applied = requested;
-  if (!valid(applied)) applied = 'seasonal';
-  const seasonal = document.querySelector('link[data-theme-seasonal]');
+  if (!valid(applied)) applied = fallback;
   const header = document.querySelector('.site-header');
   if (!header) return;
 

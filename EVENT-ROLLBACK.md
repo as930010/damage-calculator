@@ -1,31 +1,39 @@
 # 共存節活動主題
 
-## 架構原則
+## 現行架構
 
-main 是唯一長期維護的核心。它包含計算、狀態、本機資料、選項、匯入匯出、Undo／Redo、基準、UI/UX、RWD、無障礙及常規主題；main 不載入或打包共存節樣式。
+main 是唯一長期維護基準。目前正式網站三頁均提供五個互斥選項：預設、共存節、薄霧、森林、夕陽；沒有工作階段偏好時預設共存節。
 
-活動分支從最新 main 建立，只增加 frontend/seasonal-effects.css 與 index.html 中明確的樣式表連結。活動樣式可以改色彩、背景、光暈、陰影、邊框裝飾與動畫，不可改共用元件的尺寸、間距、定位、排列、DOM 或功能。活動主題目前只用 CSS，不需要 JavaScript 生命週期程式。
+共用選擇器位於 theme-preview/themes.js，卡片及常規配色位於 theme-preview/themes.css，縮圖位於 theme-preview/cards/。名稱雖保留 preview，scripts/build.mjs 已將這些資源正式輸出至 site-dist/assets/，三頁共用同一組資源。
 
-建置器只打包 index.html 引用的 frontend 樣式表，未引用的活動檔不會進入正式輸出。test:theme-isolation 會在 main 檢查主題資產與載入入口已移除，也會在活動分支檢查活動 CSS 未控制共用布局。
+共存節是 frontend/seasonal-effects.css 的獨立純視覺模組，目前沒有專屬 JavaScript 生命週期。功能、資料、共同 UI/UX、無障礙與 RWD 必須留在核心程式，不能移入活動資源。
 
-## 三種驗收模式
+## 載入順序與隔離
 
-1. 常規主題：在 main 執行資料檢核、建置、功能測試與跨尺寸視覺測試。
-2. 活動主題：從 main 建立活動分支，只加入活動 CSS 和一行 link；執行相同測試，並確認分支差異僅有 CSS 與載入入口。
-3. 活動完整移除：在隔離副本刪除活動 CSS 和 link，執行建置及同一套測試；輸出 CSS 集合、布局、計算與互動應與 main 相同。
+首頁先載入 styles.css、polish.css、site-shell.css，再載入 seasonal-effects.css；冰裝使用 site-shell.css 與自身 styles.css，Buff 使用自身 styles.css 與共用 site-shell.css，活動表在各頁基礎樣式之後。整站建置最後加入 themes.css 與 defer 的 themes.js。
 
-目前的 main 即為完整移除活動主題的模式。活動 CSS 不存在，HTML 沒有活動連結，建置輸出也不含活動資源。
+建置會標記唯一活動連結為 data-theme-seasonal，並插入首次繪製前的主題 bootstrap。選擇共存節時活動表 media 為 all，其他選項為 not all；薄霧、森林、夕陽使用根元素 data-preview-theme，預設與共存節清除此屬性。常規配色不能與活動樣式疊加。最終規則仍依 CSS Cascade、選擇器權重、來源順序及作用域決定，不代表最後一份檔案的所有規則一律勝出。
 
-## 新增與啟用活動主題
+偏好沿用 sessionStorage 的 damage-calculator-preview-theme；preview-theme URL 參數優先於工作階段偏好。不得把視覺停用變成清除配裝或回滾功能提交。
 
-1. 從最新 main 建立新的活動分支，不把功能、資料或共用布局提交放在活動分支。
-2. 新增純視覺的活動 CSS，並在 index.html 的共用樣式連結之後加入一行 stylesheet link。
-3. 執行 test:theme-isolation、全部功能測試與 build。
-4. 比較一般主題與活動主題在手機、平板及桌面尺寸的元素位置與尺寸；只有視覺屬性可以不同。
-5. 檢查 Git 差異，預期只有活動 CSS 與其載入入口。
+## 現在可用的停用程序
 
-## 停用與移除活動主題
+1. 使用頁首主題入口選擇「預設」或其他常規主題。這會停用活動表並保留完整選擇器，工作階段內跨頁、重新整理保持選擇。
+2. 本機檢查可用 ?preview-theme=original，或以 node scripts/preview.mjs 4178 --base=/damage-calculator/ 啟動正式產物。
+3. 只為檢查無活動資源的輸出時，可使用 preview 的 --without-seasonal；此模式會移除活動連結及整合的選擇器注入，不適合作為保留五主題功能的正式停用方案。
 
-停用活動時以 main 的一般版本作為正式版本，不回滾功能提交、不重設 main，也不需要修改核心元件。若需清理活動分支，移除活動 stylesheet link 與活動 CSS，然後在該分支重新執行建置與回歸測試。main 已沒有這些檔案，因此活動資源拔除後會自然恢復常規主題。
+## 永久停用活動資源
 
-每次活動期間新增的功能、資料或 UI/UX 改善都先提交至 main，再由活動分支合併 main 更新。不得把主線更新永久留在活動分支。
+在首頁與 Buff 來源 HTML 同時移除 seasonal-effects.css 的 link，再執行整站建置；冰裝活動連結由根建置器依首頁是否提供活動資源決定。先移除所有來源引用，才可移除活動 CSS 檔案。不可只刪除仍被 HTML 引用的來源檔。
+
+scripts/site-resources.mjs 無條件整合共用選擇器及常規配色，活動 link 存在時才標記及啟停活動表。活動缺席時不顯示共存節卡片，初始主題及舊 seasonal 工作階段偏好回退至「預設」；其餘四款及工作階段保存繼續正常運作。正常版本仍預設共存節。本機 preview 的 --without-seasonal 是舊診斷模式，不代表這個正式建置流程。
+
+整站整合只在共用 CSS 內容完全相同時，把 Buff 的 Site Shell／活動資源引用改為根目錄雜湊 URL；Buff 獨立建置仍輸出自己的完整資源。兩頁活動引用不一致時建置會拒絕整合，避免發布殘缺主題。
+
+## 驗證
+
+執行 pnpm run test:theme-isolation、pnpm run build、pnpm run test:build、pnpm run test:production。另以三頁實際切換預設 → 共存節 → 常規配色，檢查活動裝飾完全啟停、工作階段保存、配裝與焦點操作不變。視覺模組調整需比較手機與桌面的元件尺寸與位置，保留活動專屬背景、偽元素及動畫。
+
+## 發布紀錄維護
+
+新版本必須在 index.html 的 site-release-list 前方追加 li，不可取代第一筆歷史。只更新三頁當前 Footer 版本；既有歷史日期與說明保留。test:production 會檢查版本唯一性、排序、v3.04.18／v3.04.19 及更早歷史內容，升版時應更新當前 Footer 預期而保留歷史保護。
