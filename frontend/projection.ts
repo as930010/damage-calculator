@@ -136,7 +136,9 @@ export function resolveLoadoutSources(data: GameData, state: LoadoutState) {
     const rows = readCircuitBoardRows(values, slot.attributeField, slot.valueField);
     validateCircuitBoardRows(rows, slot.attributeOptions, slot.slot + "電路板");
     for (const row of rows) {
-      if (row.attribute && row.percentageValue !== null && !data.circuits.statKeyByAttributeName[row.attribute] && row.attribute !== "無關傷害") {
+      // Reset chance is retained for in-game reference only, like unrelated damage.
+      if (row.attribute && row.percentageValue !== null && !data.circuits.statKeyByAttributeName[row.attribute]
+        && row.attribute !== "無關傷害" && row.attribute !== "重置機率%") {
         throw new RangeError("電路板「" + row.attribute + "」尚未有屬性對應，請使用已定義的屬性名稱。");
       }
     }

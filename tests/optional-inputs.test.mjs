@@ -30,6 +30,55 @@ function select(page, label, value) {
   assert.ok(option, value); option.click();
 }
 
+test('upper circuit reset chance preserves reference percentages without contributing damage', async () => {
+  const runtime = await createRuntime();
+  const { projectAttributes, evaluateLoadout } = await runtime.load('frontend/projection.ts');
+  const rowField = upperAttribute.replace(/\.Attribute$/, '.Rows');
+  for (const multiple of [false, true]) {
+    const state = structuredClone(stateA);
+    delete state.values[rowField];
+    state.values[upperAttribute] = '重置機率%'; state.values[upperValue] = 0.12;
+    if (multiple) state.values[rowField] = JSON.stringify([
+      { attribute: '重置機率%', percentageValue: 0.12 },
+      { attribute: 'Boss傷害%', percentageValue: 0.06 },
+    ]);
+    const reference = structuredClone(state);
+    reference.values[upperAttribute] = '無關傷害'; reference.values[upperValue] = 0;
+    if (multiple) reference.values[rowField] = JSON.stringify([
+      { attribute: '無關傷害', percentageValue: 0 },
+      { attribute: 'Boss傷害%', percentageValue: 0.06 },
+    ]);
+    assert.deepEqual(projectAttributes(gameData, state), projectAttributes(gameData, reference));
+    assert.deepEqual(evaluateLoadout(gameData, state), evaluateLoadout(gameData, reference));
+    assert.equal(state.values[upperAttribute], '重置機率%');
+    assert.equal(state.values[upperValue], 0.12);
+  }
+});
+
+test('upper circuit reset chance can be edited and survives export, import and reload', async () => {
+  const page = await uiPage(); let reload;
+  try {
+    const { document } = page.dom.window;
+    openBoard(page, boards[0]);
+    select(page, '電路板項目 1', '無關傷害');
+    const result = document.querySelector('#damage-result').innerHTML;
+    select(page, '電路板項目 1', '重置機率%');
+    assert.equal(controls(page)[0].disabled, false);
+    input(page, controls(page)[0], '12');
+    assert.equal(controls(page)[0].value, '12');
+    assert.equal(document.querySelector('#damage-result').innerHTML, result);
+    assert.doesNotMatch(document.body.textContent, /尚未有屬性對應/);
+    const exported = await page.exportJson();
+    await page.importJson(JSON.stringify(exported));
+    reload = await uiPage(page.readState());
+    openBoard(reload, boards[0]);
+    assert.equal(reload.dom.window.document.querySelector('input[aria-label="電路板項目 1"]').value, '重置機率%');
+    assert.equal(controls(reload)[0].value, '12');
+    assert.equal(controls(reload)[0].disabled, false);
+    assert.doesNotMatch(reload.dom.window.document.body.textContent, /尚未有屬性對應/);
+  } finally { page.close(); reload?.close(); }
+});
+
 test('all unrelated-damage fields normalize empty/invalid values while valid saved choices survive', async () => {
   const runtime = await createRuntime();
   const { createCatalogIndex } = await runtime.load('frontend/catalog-index.ts');
