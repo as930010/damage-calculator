@@ -1,9 +1,14 @@
-import { getEquipmentOptionName } from '../calculation/equipment-catalog.ts';
-import { getClassEffects } from '../calculation/class-effects.ts';
-import { applyClassSkillVersions, getClassSkillVersionOptions, isClassSkillVersionEnabled } from '../calculation/class-skill-versions.ts';
+import { mountCircuitBoardEditor } from './circuit-board-editor.ts';
+import { createSkillShareControl } from './skill-share-control.ts';
+import { createPickerChoices } from './picker-choices.ts';
+import * as normalization from './loadout-normalization.ts';
+import { createResultCardsView, renderDamageFormula } from './result-cards-view.ts';
+import { sourceLabel as resolveSourceLabel } from './source-labels.ts';
+import { renderEquipmentDamageSummary, renderFinalDamageNumber, renderDamageRatio } from './damage-summary-view.ts';
+import { getClassSkillVersionOptions, isClassSkillVersionEnabled } from '../calculation/class-skill-versions.ts';
 import { type AccessoryEffectOption } from '../calculation/equipment-effects.ts';
 import { loadGameData, readJson, escapeHtml as h, formatNumber as fmt } from './data.ts';
-import { readState, readBaseline, saveState, normalizePortraitAwakeningValues as normalizePortraitValues, normalizeTranscendenceSkillDamageShare, parseTranscendenceSkillDamageShareInput, type LoadoutState } from './state.ts';
+import { readState, readBaseline, saveState, normalizePortraitAwakeningValues as normalizePortraitValues, normalizeTranscendenceSkillDamageShare, type LoadoutState } from './state.ts';
 import { createTransferLoader } from './loadout-transfer-loader.ts';
 import { normalizeOptionalEffectValues, isUnrelatedEffectValue, normalizeNephronMagazineSelections, normalizeBossHealthCondition, DEFAULT_BOSS_HEALTH_CONDITION } from './state.ts';
 import { evaluateLoadout, projectDamage } from './projection.ts';
@@ -13,9 +18,8 @@ import { createDisclosurePreferences } from './disclosure-preferences.ts';
 import { compareLoadoutResults } from './calculation-comparison.ts';
 import { renderCalculationComparisonHtml } from './calculation-comparison-view.ts';
 import { createPicker, updatePicker, disposePickers, type PickerOption } from './picker.ts';
-import { circuitBoardRowsField, readCircuitBoardRows, serializeCircuitBoardRows, circuitBoardRowsTotal, normalizeCircuitBoardRows, normalizeCircuitPercentage } from './circuit-board-rows.ts';
+import { circuitBoardRowsField, readCircuitBoardRows, serializeCircuitBoardRows, normalizeCircuitPercentage } from './circuit-board-rows.ts';
 import { icon } from './icons.ts';
-import { capOverflowPercentage } from './cap-warnings.ts';
 import { createCatalogIndexScope } from './catalog-index.ts';
 import { canonicalizeNumber, preventScientificNotation } from './numeric-input.ts';
 import { sanitizeClassCode } from './class-code.ts';
@@ -48,7 +52,7 @@ async function start() {
   // A future in-session data/parameter refresh must replace this revision token.
   const calculationDataRevision = Symbol('loaded-game-data');
   const catalogIndex = createCatalogIndexScope().get(data, calculationDataRevision);
-  const innerwearOrder = new Map(data.innerwear.slots.map((slot, index) => [`innerwear:${slot.id}`, index]));
+  const renderResultCards = createResultCardsView(data, visibleNumberFormatter, catalogIndex.classById, calculationIssue);
   const baselineEvaluationCache = createBaselineEvaluationCache();
   const sampleId = new URLSearchParams(location.search).get('sample');
   if (sampleId !== null && !/^[a-z0-9-]+$/.test(sampleId)) throw new RangeError('驗算範例名稱無效。');
@@ -62,74 +66,16 @@ async function start() {
   state.transcendenceSkillDamageSharePct = normalizeTranscendenceSkillDamageShare(state.transcendenceSkillDamageSharePct);
   const normalizePortraitAwakeningValues = (target: LoadoutState) => normalizePortraitValues(target.values, data.otherEffects.portraitAwakening);
   const startupPortraitAwakeningNormalized = normalizePortraitAwakeningValues(state);
-  const clearInvalidAccessoryAppraisals = (target: LoadoutState) => {
-    const clearedFields: string[] = [];
-    for (const group of data.accessoryEffects.groups) {
-      const mapping = data.mapping.selections.find(entry => entry.selectionField === group.selectionField);
-      const itemName = String(target.values[group.selectionField] ?? '');
-      const item = mapping && itemName
-        ? data.catalogs[mapping.catalogFile].items.find(entry => entry.slotId === group.slotId && entry.name === itemName)
-        : undefined;
-      const options = itemName ? group.optionsByEquipmentName?.[itemName] ?? group.options : group.options;
-      const effectCount = item?.appraisal?.canAppraise && Number.isInteger(item.appraisal.effectCount)
-        && item.appraisal.effectCount! > 0 && item.appraisal.effectCount! <= group.inputFields.length
-        ? item.appraisal.effectCount!
-        : 0;
-      for (const [index, fieldId] of group.inputFields.entries()) {
-        const value = String(target.values[fieldId] ?? '');
-        if (!value || (index < effectCount && options.some(option => option.name === value))) continue;
-        delete target.values[fieldId];
-        clearedFields.push(fieldId);
-      }
-    }
-    return clearedFields;
-  };
+  const clearInvalidAccessoryAppraisals = (target: LoadoutState) => normalization.clearInvalidAccessoryAppraisals(data, target);
   const startupInvalidAccessoryAppraisalFields = clearInvalidAccessoryAppraisals(state);
-  const clearDuplicateTransformationChoices = (target: LoadoutState) => {
-    const seen = new Set<string>();
-    const clearedFields: string[] = [];
-    for (const slot of data.transformations.slots) {
-      const choice = String(target.values[slot.choiceField] ?? '');
-      if (!choice) continue;
-      if (seen.has(choice)) {
-        delete target.values[slot.choiceField];
-        clearedFields.push(slot.choiceField);
-      } else seen.add(choice);
-    }
-    return clearedFields;
-  };
+  const clearDuplicateTransformationChoices = (target: LoadoutState) => normalization.clearDuplicateTransformationChoices(data, target);
   const startupDuplicateTransformationFields = clearDuplicateTransformationChoices(state);
-  const clearDuplicateNephronTransformationChoices = (target: LoadoutState) => {
-    const clearedFields: string[] = [];
-    for (const field of data.nephronArmor.fields) {
-      const seen = new Set<string>();
-      for (const transform of field.transformFields) {
-        const choice = String(target.values[transform.attributeField] ?? '');
-        if (!choice || choice === '無關傷害') continue;
-        if (seen.has(choice)) {
-          delete target.values[transform.attributeField];
-          delete target.values[transform.valueField];
-          clearedFields.push(transform.attributeField, transform.valueField);
-        } else seen.add(choice);
-      }
-    }
-    return clearedFields;
-  };
+  const clearDuplicateNephronTransformationChoices = (target: LoadoutState) => normalization.clearDuplicateNephronTransformationChoices(data, target);
   const startupDuplicateNephronTransformationFields = clearDuplicateNephronTransformationChoices(state);
   const startupDuplicateNephronMagazineFields = normalizeNephronMagazineSelections(state.values, catalogIndex);
   const startupOptionalEffectsNormalized = normalizeOptionalEffectValues(state.values, catalogIndex);
   if ((startupPortraitAwakeningNormalized || startupOptionalEffectsNormalized || startupDuplicateTransformationFields.length || startupDuplicateNephronTransformationFields.length || startupInvalidAccessoryAppraisalFields.length || startupDuplicateNephronMagazineFields.changed) && !sampleMode) saveState(state);
-  const weaponMagicStoneFields = data.weaponGrades.colorGroups.flatMap(group => group.settingKeys);
-  const applyWeaponMagicStonePreset = (grade: string, overwrite = false) => {
-    if (!grade) return;
-    if (!overwrite && weaponMagicStoneFields.some(fieldId => state.values[fieldId] !== undefined)) return;
-    for (const colorGroup of data.weaponGrades.colorGroups) {
-      const optionId = colorGroup.presetByGrade[grade];
-      const option = colorGroup.options.find(entry => entry.id === optionId);
-      if (!option) continue;
-      for (const fieldId of colorGroup.settingKeys) state.values[fieldId] = option.name;
-    }
-  };
+  const applyWeaponMagicStonePreset = (grade: string, overwrite = false) => normalization.applyWeaponMagicStonePreset(data, state, grade, overwrite);
   applyWeaponMagicStonePreset(String(state.values[data.weaponGrades.settingKey] ?? ''));
   if (startupOptionalEffectsNormalized && !sampleMode) saveState(state);
   let baseline = sampleMode ? null : readBaseline();
@@ -241,118 +187,13 @@ async function start() {
   toolbarSettings.append(classSettings);
   classSettings.append(classPickerRoot);
   toolbarSettings.append(toolbar.querySelector<HTMLElement>('.toggle')!);
-  const skillShareControl = document.createElement('div');
-  skillShareControl.className = 'skill-damage-share-control';
-  const skillShareLabel = document.createElement('span');
-  skillShareLabel.className = 'skill-damage-share-label';
-  skillShareLabel.textContent = '超越占比';
-  const skillShareOutput = document.createElement('output');
-  skillShareOutput.id = 'skill-damage-share-output';
-  skillShareOutput.setAttribute('aria-live', 'polite');
-  const skillShareOutputLabel = document.createElement('span');
-  skillShareOutputLabel.textContent = '強烈';
-  const skillShareOutputValue = document.createElement('span');
-  skillShareOutputValue.className = 'skill-damage-share-complement';
-  const skillShareOutputPercent = document.createElement('span');
-  skillShareOutputPercent.textContent = '%';
-  skillShareOutput.append(skillShareOutputLabel, skillShareOutputValue, skillShareOutputPercent);
-  const skillShareNumberWrap = document.createElement('div');
-  skillShareNumberWrap.className = 'skill-damage-share-number-wrap';
-  const skillShareNumberInput = document.createElement('input');
-  skillShareNumberInput.id = 'transcendence-skill-share-number';
-  skillShareNumberInput.type = 'text';
-  skillShareNumberInput.inputMode = 'decimal';
-  skillShareNumberInput.autocomplete = 'off';
-  skillShareNumberInput.spellcheck = false;
-  skillShareNumberInput.maxLength = 6;
-  skillShareNumberInput.pattern = '(?:0|[1-9]\\d{0,2})(?:\\.\\d{0,2})?';
-  skillShareNumberInput.setAttribute('aria-label', '超越技傷占比百分比');
-  skillShareNumberInput.setAttribute('aria-describedby', 'skill-damage-share-output');
-  skillShareNumberInput.title = '只接受 0–100 的數字，最多兩位小數。';
-  const skillSharePercent = document.createElement('span');
-  skillSharePercent.textContent = '%';
-  skillShareNumberWrap.append(skillShareNumberInput, skillSharePercent);
-  skillShareOutput.setAttribute('aria-label', '強烈技傷占比，自動補足至100%');
-  skillShareControl.append(skillShareLabel, skillShareNumberWrap, skillShareOutput);
-  classSettings.append(skillShareControl);
-  const renderSkillDamageShare = (syncNumberInput = true) => {
-    const share = normalizeTranscendenceSkillDamageShare(state.transcendenceSkillDamageSharePct);
-    state.transcendenceSkillDamageSharePct = share;
-    skillShareOutputValue.textContent = String(Math.round((100 - share) * 100) / 100);
-    if (syncNumberInput) skillShareNumberInput.value = String(share);
-  };
-  const setSkillShareInputInvalid = (invalid: boolean) => {
-    skillShareNumberInput.setAttribute('aria-invalid', invalid ? 'true' : 'false');
-    skillShareNumberWrap.classList.toggle('is-invalid', invalid);
-  };
-  const parseSkillShareInput = parseTranscendenceSkillDamageShareInput;
-  const isSkillShareDraftValid = (raw: string) => raw === '' || parseSkillShareInput(raw) !== null;
-  const isSkillShareInsertionValid = (inserted: string) => {
-    const start = skillShareNumberInput.selectionStart ?? skillShareNumberInput.value.length;
-    const end = skillShareNumberInput.selectionEnd ?? start;
-    const nextValue = skillShareNumberInput.value.slice(0, start) + inserted + skillShareNumberInput.value.slice(end);
-    return nextValue.length <= skillShareNumberInput.maxLength && isSkillShareDraftValid(nextValue);
-  };
-  skillShareNumberInput.addEventListener('focus', () => skillShareNumberInput.select());
-  skillShareNumberInput.addEventListener('input', () => {
-    const raw = skillShareNumberInput.value;
-    if (raw === '') {
-      setSkillShareInputInvalid(false);
-      return;
-    }
-    const value = parseSkillShareInput(raw);
-    if (value === null) {
-      setSkillShareInputInvalid(true);
-      renderSkillDamageShare();
-      return;
-    }
-    setSkillShareInputInvalid(false);
-    state.transcendenceSkillDamageSharePct = normalizeTranscendenceSkillDamageShare(value);
-    renderSkillDamageShare(false);
-    update();
-  });
-  const commitSkillShareNumberInput = () => {
-    const value = parseSkillShareInput(skillShareNumberInput.value);
-    if (value === null) {
-      setSkillShareInputInvalid(true);
-      renderSkillDamageShare();
-      setSkillShareInputInvalid(false);
-      return;
-    }
-    setSkillShareInputInvalid(false);
-    state.transcendenceSkillDamageSharePct = normalizeTranscendenceSkillDamageShare(value);
-    renderSkillDamageShare();
-    update();
-  };
-  skillShareNumberInput.addEventListener('blur', commitSkillShareNumberInput);
-  skillShareNumberInput.addEventListener('keydown', event => {
-    if (!event.ctrlKey && !event.metaKey && !event.altKey && event.key.length === 1
-      && !isSkillShareInsertionValid(event.key)) {
-      event.preventDefault();
-      setSkillShareInputInvalid(true);
-      return;
-    }
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      skillShareNumberInput.blur();
-    }
-  });
-  skillShareNumberInput.addEventListener('beforeinput', event => {
-    const inputEvent = event as InputEvent;
-    if (inputEvent.inputType.startsWith('insert') && inputEvent.data !== null
-      && !isSkillShareInsertionValid(inputEvent.data)) {
-      event.preventDefault();
-      setSkillShareInputInvalid(true);
-    }
-  });
-  skillShareNumberInput.addEventListener('paste', event => {
-    const pasted = event.clipboardData?.getData('text') ?? '';
-    if (!isSkillShareInsertionValid(pasted)) {
-      event.preventDefault();
-      setSkillShareInputInvalid(true);
-    }
-  });
-  renderSkillDamageShare();
+  const skillShareControl = createSkillShareControl(
+    () => state.transcendenceSkillDamageSharePct,
+    value => { state.transcendenceSkillDamageSharePct = value; },
+    () => update(),
+  );
+  classSettings.append(skillShareControl.root);
+  const renderSkillDamageShare = skillShareControl.render;
   const inspectorPanel = document.querySelector<HTMLElement>('#inspector')!;
   const inspectorBackdrop = document.querySelector<HTMLElement>('#inspector-backdrop')!;
   const mobileInspectorQuery = window.matchMedia('(max-width: 700px)');
@@ -447,29 +288,12 @@ async function start() {
   }
   const val = (fieldId: string) => String(state.values[fieldId] ?? '');
   const summary = (stats: Readonly<Record<string, number>>) => Object.entries(stats).filter(([, value]) => value !== 0).map(([key, value]) => `${data.attributes.attributes.find(a => a.key === key)?.name ?? key} ${fmt(value)}`).join(' · ');
-  const pickerOptionsByNames = new WeakMap<readonly string[], readonly PickerOption[]>();
-  const options = (names: readonly string[]): readonly PickerOption[] => {
-    let choices = pickerOptionsByNames.get(names);
-    if (!choices) { choices = Object.freeze(names.map(name => Object.freeze({ value: name, label: name }))); pickerOptionsByNames.set(names, choices); }
-    return choices;
-  };
+  const pickerChoices = createPickerChoices(catalogIndex, data.mapping.magicStoneSelections.catalogFile, summary);
+  const { options, magicStoneChoices, validationChoices } = pickerChoices;
   const titleChoices = options([...new Set(catalogIndex.resolveFieldChoices('Effect.Title', state.values) as readonly string[])]);
-  const validationPickerChoices = new Map<string, readonly PickerOption[]>();
   const classPickerChoices = Object.freeze(catalogIndex.activeClasses.map(entry => Object.freeze({ value: entry.id, label: entry.name })));
   const equipmentPickerChoices = new Map<string, readonly PickerOption[]>();
   const orderedEquipmentItems = new Map<string, ReturnType<typeof catalogIndex.equipmentItems>>();
-  const stonePickerChoices = new Map<'armor' | 'weapon', readonly PickerOption[]>();
-  const magicStoneChoices = (application: 'armor' | 'weapon'): readonly PickerOption[] => {
-    let choices = stonePickerChoices.get(application);
-    if (!choices) {
-      choices = Object.freeze(catalogIndex.activeCatalogItems(data.mapping.magicStoneSelections.catalogFile).map(item => {
-        const name = getEquipmentOptionName(item, application);
-        return Object.freeze({ value: name, label: name, detail: summary(item.targetApplications?.[application]?.stats ?? item.stats ?? {}) });
-      }));
-      stonePickerChoices.set(application, choices);
-    }
-    return choices;
-  };
   const refreshHistoryControls = () => {
     undoButton.disabled = !history.canUndo;
     redoButton.disabled = !history.canRedo;
@@ -526,20 +350,6 @@ async function start() {
     const blocked = peerAttribute === "強者%" || peerAttribute === "排熱%";
     return options(blocked ? chipNames.filter(name => name !== peerAttribute) : chipNames);
   };
-  const validationChoices = (fieldId: string, percentLabel = false): readonly PickerOption[] => {
-    const catalog = catalogIndex.validationCatalog(fieldId);
-    if (!catalog) return [];
-    const key = JSON.stringify([catalog.id, percentLabel]);
-    let choices = validationPickerChoices.get(key);
-    if (!choices) {
-      choices = Object.freeze(catalog.options.map(option => {
-        const value = String(option.value);
-        return Object.freeze({ value, label: percentLabel && typeof option.value === 'number' ? value + '%' : value });
-      }));
-      validationPickerChoices.set(key, choices);
-    }
-    return choices;
-  };
   const renderedHtml = new WeakMap<Element, string>();
   const writeHtml = (target: Element, html: string, preserveDetails = false) => {
     if (renderedHtml.get(target) === html) return;
@@ -595,175 +405,7 @@ async function start() {
     refreshEquipmentUi(); renderResults();
     refreshHistoryControls();
   };
-  function sourceLabel(sourceId: string): string {
-    if (sourceId === 'character-base') return '角色基礎係數';
-    if (sourceId === 'character-base:crit-damage-product') return '角色原始乘算爆傷基準';
-    if (sourceId === 'weapon-base-attack') return '武器基礎攻擊力';
-    if (sourceId === 'hunter-instinct') return '獵人的本能';
-    if (sourceId.startsWith('master-beast-potential:')) return '聖獸潛力';
-    const configuredSourceLabels: Readonly<Record<string, string>> = {
-      'fixed-effect:master-beast': '大師聖獸固定效果',
-      'fixed-effect:pet-skill': '寵物被動',
-      'fixed-effect:raid-set': '百億／內布隆套效',
-      'fixed-effect:weapon': '武器',
-      'fixed-effect:title-adaptability': '稱號',
-      'fixed-effect:title-defense-ignore': '稱號',
-      'fixed-effect:red-upper-crit-damage': '百億紅上衣、暴上',
-      'fixed-effect:maestro-aura': 'MAESTRO光環',
-      'special-potion:nut-protection': '努特的庇護',
-      'nephron-raid:grett-medal': '內布隆襲擊戰',
-      'grett-medal:super-magazines': '格雷特的勳章：超級彈匣加成',
-      'grett-medal:support-magazines': '格雷特的勳章：支援彈匣加成',
-      'grett-medal:classic-combat-magazines': '格雷特的勳章：經典／戰鬥彈匣加成',
-      'combat-rate:yellow-beast-stone': '黃色聖獸精靈石效果',
-      'combat-rate:lowerwear-enhancement': bossHealthCondition().enabled && bossHealthCondition().lowerwear === 'lowerwearB' ? '強/排褲強化爆擊效果' : '下衣強化爆擊效果',
-      'combat-rate:shoes-enhancement': '鞋子強化極大效果',
-    };
-    if (configuredSourceLabels[sourceId]) return configuredSourceLabels[sourceId];
-    if (sourceId.startsWith('class-passive:')) {
-      const [, classId, kind] = sourceId.split(':');
-      if (kind === 'boss-damage') return classId + '自身技能';
-      if (kind === 'multiplicative-crit-damage') {
-        if (sourceId === 'class-passive:CU:multiplicative-crit-damage:1') return '解放意志';
-        if (sourceId === 'class-passive:MN:multiplicative-crit-damage:2') return 'MN 硝基馬達';
-        if (['TB', 'BMa', 'MN', 'PO'].includes(classId)) return classId + ' 爆發模式';
-        if (['CT', 'IN', 'DA', 'DE'].includes(classId)) return classId + ' 懲戒紋章';
-        return classId + '自身技能（乘算爆傷）';
-      }
-    }
-    if (sourceId.startsWith('simulator:')) {
-      const fieldId = sourceId.slice('simulator:'.length);
-      const stoneSlot = data.layout.slots.find(entry => entry.stoneFields?.includes(fieldId));
-      const selectedSlots = data.layout.slots.filter(entry => entry.selectionField === fieldId);
-      const slot = stoneSlot ?? selectedSlots[0];
-      const selected = String(state.values[fieldId] ?? '').trim();
-      if (stoneSlot) return `${stoneSlot.label}魔法石：${selected}`;
-      if (selectedSlots.length > 1) {
-        const group = data.layout.groups.find(entry => entry.id === selectedSlots[0].group);
-        return `${group?.name ?? selectedSlots[0].group}套裝：${selected}`;
-      }
-      if (slot) return `${slot.label}：${selected}`;
-      return `裝備選擇（${fieldId}）${selected ? `：${selected}` : ''}`;
-    }
-    if (sourceId.startsWith('nephron-transform:')) {
-      const [, slotId, line] = sourceId.split(':');
-      const field = data.nephronArmor.fields.find(entry => entry.slotId === slotId);
-      const index = Number(line) - 1;
-      const attributeField = field && index >= 0 ? field.transformFields[index]?.attributeField : undefined;
-      const attribute = attributeField ? String(state.values[attributeField] ?? '') : '';
-      const partNames: Record<string, string> = { Upper: '上衣', Lowerwear: '下衣', LowerwearAlternative: '強/排褲', Gloves: '手套', Shoes: '鞋子' };
-      return '內布隆' + (partNames[field?.part ?? ''] ?? field?.part ?? '') + '變換：' + attribute;
-    }
-    if (sourceId.startsWith('nephron-magazine:')) {
-      const [, slotId, magazineId, level] = sourceId.split(':');
-      const field = data.nephronArmor.fields.find(entry => entry.slotId === slotId);
-      const magazine = data.nephronArmor.magazines.find(entry => entry.id === magazineId);
-      const partNames: Record<string, string> = { Upper: '上衣', Lowerwear: '下衣', LowerwearAlternative: '強/排褲', Gloves: '手套', Shoes: '鞋子' };
-      return '內布隆' + (partNames[field?.part ?? ''] ?? field?.part ?? '') + '彈匣：' + (magazine?.name ?? magazineId) + ' ' + level;
-    }
-    if (sourceId.startsWith('innerwear:')) {
-      const slot = data.innerwear.slots.find(entry => entry.id === sourceId.slice('innerwear:'.length));
-      return slot ? `內裝${slot.name}（強化／鍛造）` : `內裝來源待確認（${sourceId}）`;
-    }
-    if (sourceId === 'spirit-record:default-maxed') return '賦靈錄';
-    if (sourceId.startsWith('spirit-record:branch:')) return `賦靈錄：${sourceId.slice('spirit-record:branch:'.length)}`;
-    if (sourceId.startsWith('spirit-record:trait:')) return `賦靈錄特性：${sourceId.slice('spirit-record:trait:'.length)}`;
-    if (sourceId.startsWith('chip:')) {
-      const slotId = sourceId.slice('chip:'.length);
-      const slot = data.chipSlots.slots.find(entry => entry.id === slotId);
-      const slotNames: Record<string, string> = { upper: '上衣', lowerwear: '下衣', lowerwearAlternative: '強/排褲', gloves: '手套', shoes: '鞋子' };
-      return slot ? `${slotNames[slot.id] ?? slot.id}芯片：${String(state.values[slot.attributeField] ?? '')}（調校 ${String(state.values[slot.tuningField] ?? '')}）` : `芯片調校來源待確認（${sourceId}）`;
-    }
-    if (sourceId.startsWith('circuit-board:')) {
-      const [slotId, rowNumber] = sourceId.slice('circuit-board:'.length).split(':');
-      const slot = data.circuits.inputs.find(entry => entry.slot === slotId);
-      if (rowNumber && slot) {
-        const row = readCircuitBoardRows(state.values, slot.attributeField, slot.valueField)[Number(rowNumber) - 1];
-        const slotNames: Record<string, string> = { upper: '上衣', lowerwear: '下衣', lowerwearAlternative: '強/排褲', gloves: '手套', shoes: '鞋子' };
-        if (row) return (slotNames[slotId] ?? slotId) + '電路板第 ' + rowNumber + ' 列：' + row.attribute + ' ' + fmt((row.percentageValue ?? 0) * 100) + '%';
-      }
-      const slotNames: Record<string, string> = { upper: '上衣電路板', lowerwear: '下衣電路板', lowerwearAlternative: '強/排褲電路板', gloves: '手套電路板', shoes: '鞋子電路板' };
-      if (slotNames[slotId] && !rowNumber) return slotNames[slotId];
-      return slot ? `電路板 ${slotId}：${String(state.values[slot.attributeField] ?? '')} ${fmt(Number(state.values[slot.valueField] ?? 0) * 100)}%` : `電路板來源待確認（${sourceId}）`;
-    }
-    if (sourceId === '立繪、覺醒:Effect.PortraitAwakening') return '立繪、覺醒';
-    if (sourceId.startsWith('color-set:')) return `百億套效：${sourceId.slice('color-set:'.length)}`;
-    if (sourceId.startsWith('master-beast:')) {
-      const [, part, detail] = sourceId.split(':');
-      const partNames: Record<string, string> = { head: '頭飾', ring: '指環' };
-      if (part === 'mirror') {
-        return '聖獸迷鏡效果';
-      }
-      if (part === 'head-manual') return `聖獸頭飾精靈石：${String(state.values['MasterBeast.Head.CustomAttribute'] ?? '')}`;
-      if (part === 'necklace-manual') return `聖獸項鍊精靈石：${String(state.values['MasterBeast.Necklace.CustomAttribute'] ?? '')}`;
-      if (part === 'ring-manual') {
-        const fieldId = detail === '1' ? 'MasterBeast.Ring1.CustomAttribute' : 'MasterBeast.Ring2.CustomAttribute';
-        return `聖獸指環精靈石：${String(state.values[fieldId] ?? '')}`;
-      }
-      if (partNames[part]) {
-        const fieldId = part === 'head' ? detail === '1' ? 'MasterBeast.Head.Option1' : 'MasterBeast.Head.Option2' : detail === '1' ? 'MasterBeast.Ring1.Option1' : 'MasterBeast.Ring2.Option1';
-        return `聖獸${partNames[part]}固定效果：${String(state.values[fieldId] ?? '')}`;
-      }
-    }
-    const rightIce = data.rightIceSets.effects.find(entry => entry.id === sourceId);
-    if (rightIce) return `右冰套效：${rightIce.setName}`;
-    const resonance = data.resonance.effects.find(entry => entry.id === sourceId);
-    if (resonance) return `共鳴：${resonance.name}`;
-    const raid = data.raidSets.sets.find(entry => sourceId.startsWith(`${entry.id}:`));
-    if (raid) return `襲擊套效：${raid.name}（${sourceId.slice(raid.id.length + 1)}）`;
-    const atma = data.atma.rules.find(entry => entry.id === sourceId);
-    const atmaNames: Record<string, string> = {
-      'atma-wood-crit-rate': '草木亞特瑪致命一擊',
-      'atma-water-fire-multiplicative-damage': '流水 / 火焰亞特瑪套效',
-      'atma-wood-multiplicative-crit-damage': '草木亞特瑪乘算致命傷害',
-    };
-    if (atma) return atmaNames[atma.id] ?? `亞特瑪來源待確認（${atma.id}）`;
-    if (sourceId.startsWith('weapon-growth')) return `武器成長：${String(state.values[data.growth.settingKey] ?? '')}`;
-    if (sourceId.startsWith('weapon-appraisal:')) {
-      const fieldId = sourceId.slice('weapon-appraisal:'.length);
-      const group = Object.values(data.weaponAppraisals.groups).find(entry => entry.settingKey === fieldId);
-      return `武器鑑定${group ? `：${String(state.values[fieldId] ?? '')}` : ''}`;
-    }
-    if (sourceId.startsWith('giant-stone:')) {
-      return '巨型魔力石';
-    }
-    if (sourceId.startsWith('weapon-magic-stone:')) {
-      const colorId = sourceId.split(':')[1];
-      return `${data.weaponGrades.colorGroups.find(group => group.id === colorId)?.name ?? '武器魔力石'}效果`;
-    }
-    if (sourceId.startsWith('weapon-grade:')) return '武器魔力石';
-    if (sourceId.startsWith('weapon-transform:')) {
-      return '武器變換';
-    }
-    if (sourceId.startsWith('armor-appraisal:')) {
-      const slotId = sourceId.split(':')[1];
-      const slot = data.appraisals.slots.find(entry => entry.id === slotId);
-      const slotNames: Record<string, string> = { upper: '上衣', lowerwear: '下衣', lowerwearAlternative: '強/排褲', gloves: '手套', shoes: '鞋子' };
-      return slot ? `內裝${slotNames[slot.id] ?? slot.id}鑑定` : `防具鑑定來源待確認（${sourceId}）`;
-    }
-    if (sourceId.startsWith('accessory-effect:')) {
-      const groupId = sourceId.split(':')[1];
-      const group = data.accessoryEffects.groups.find(entry => entry.id === groupId);
-      return group ? `${group.label}鑑定` : `飾品效果來源待確認（${sourceId}）`;
-    }
-    if (sourceId.startsWith('title:')) return `稱號：${String(state.values['Effect.Title'] ?? '')}`;
-    if (sourceId.startsWith('consumable:')) return `消耗品：${String(state.values['Effect.Consumable'] ?? '')}`;
-    if (sourceId.startsWith('environment:')) return `場地：${String(state.values['Effect.Environment'] ?? '')}`;
-    if (sourceId.startsWith('peak-option:')) return `巔峰選項：${String(state.values['Peak.Option'] ?? '')}`;
-    if (sourceId.startsWith('pet:')) return `寵物：${String(state.values['Pet.Passive'] ?? '')}`;
-    if (sourceId === '標誌:Effect.Emblem') return '標誌';
-    const binaryEffect = data.otherEffects.binaryEffects.find(entry => entry.name === sourceId);
-    if (binaryEffect) return `${binaryEffect.name}：${String(state.values[binaryEffect.settingKey] ?? '')}`;
-    if (sourceId.startsWith('guild-fountain-')) {
-      return '公會噴泉';
-    }
-    if (sourceId === 'lowerwear-crit-rate-enhancement') return '下衣強化階段+2';
-    if (sourceId === 'shoes-extremization-enhancement') return '鞋子強化階段+2';
-    if (sourceId === 'master-beast:armor-spirit-stone-set') return '聖獸精靈石套效';
-    const classPassiveSource = sourceId.match(/^([^:]+):(critRate|extremization):(crit|ext)-\d+$/);
-    if (classPassiveSource && data.classCombatEffects.classes[classPassiveSource[1]]) return classPassiveSource[1] + '自身技能';
-    return `來源名稱待確認（${sourceId}）`;
-  }
+  const sourceLabel = (sourceId: string) => resolveSourceLabel(sourceId, data, state);
   function calculationIssue(error: unknown): string {
     const message = error instanceof Error ? error.message : String(error ?? '未知錯誤');
     const missingEnhancement = message.match(/Missing enhancement selection: (\S+)/);
@@ -775,16 +417,6 @@ async function start() {
     }
     return message;
   }
-  const sourceRows = (sources: readonly { sourceId: string; valuePct: number }[], isPercent: boolean) => {
-    const totals = new Map<string, number>();
-    for (const source of sources) {
-      const label = sourceLabel(source.sourceId);
-      totals.set(label, (totals.get(label) ?? 0) + source.valuePct);
-    }
-    return [...totals].map(([label, total]) =>
-      `<p class="stat-source-row"><span>${h(label)}</span><strong>${fmt(total)}${isPercent ? '%' : ''}</strong></p>`,
-    ).join('');
-  };
   const field = (parent: HTMLElement, label: string, fieldId: string, choices: readonly PickerOption[], redraw = false, disabled = false, disabledHint = '請先選擇屬性') => {
     const picker = createPicker(label, choices, val(fieldId), value => {
       state.values[fieldId] = value;
@@ -1349,6 +981,7 @@ async function start() {
       writeHtml(button, `${icon(slot.icon)}<span>${h(slot.label)}</span>${hasValue ? '<i></i>' : ''}`);
     }
   }
+  let circuitEditor: ReturnType<typeof mountCircuitBoardEditor> | undefined;
   function renderBeastInspector(panel: HTMLElement) {
     disposePickers(panel);
     const slot = beastAccessorySlots.find(candidate => candidate.id === selectedBeastSlotId)!;
@@ -1433,6 +1066,8 @@ async function start() {
     }
   }
   function renderInspector() {
+    circuitEditor?.dispose();
+    circuitEditor = undefined;
     const panel = document.querySelector<HTMLElement>('#inspector')!;
     configurationControlKeys.set('inspector', JSON.stringify([selected.id, selectedBeastSlotId, configurationControlSignature()]));
     if (selectedBeastSlotId) { renderBeastInspector(panel); return; }
@@ -1583,117 +1218,14 @@ async function start() {
       }
       const circuit = data.circuits.inputs.find(slot => slot.slot === selected.innerwearId)!;
       const board = section(panel, '電路板');
-      const note = document.createElement('p');
-      note.className = 'panel-note circuit-board-limit-note';
-      note.textContent = '可依需求新增或移除項目列；所有列的數值總和上限為 18.0%。';
-      const rowList = document.createElement('div');
-      rowList.className = 'circuit-board-rows';
-      const totalStatus = document.createElement('p');
-      totalStatus.className = 'circuit-board-total';
-      totalStatus.setAttribute('aria-live', 'polite');
-      const actions = document.createElement('div');
-      actions.className = 'circuit-board-actions';
-      const addRowButton = document.createElement('button');
-      addRowButton.type = 'button';
-      addRowButton.className = 'circuit-board-add';
-      addRowButton.textContent = '新增電路板列';
-      actions.append(addRowButton);
-      board.append(note, rowList, totalStatus, actions);
-
       const readRows = () => readCircuitBoardRows(state.values, circuit.attributeField, circuit.valueField);
       const storeRows = (rows: ReturnType<typeof readRows>) => {
         state.values[circuitBoardRowsField(circuit.attributeField)] = serializeCircuitBoardRows(rows);
         state.values[circuit.attributeField] = rows[0].attribute;
         state.values[circuit.valueField] = normalizeCircuitPercentage(rows[0].percentageValue);
       };
-      const refreshTotal = (rows: ReturnType<typeof readRows>) => {
-        const totalPct = canonicalizeNumber(circuitBoardRowsTotal(rows) * 100);
-        if (totalPct > 18 + 1e-9) {
-          totalStatus.textContent = '目前總和 ' + fmt(totalPct) + '%，已超過 18.0% 上限。';
-          totalStatus.classList.add('input-warning');
-        } else {
-          totalStatus.textContent = '目前總和：' + fmt(totalPct) + '% / 18.0%';
-          totalStatus.classList.remove('input-warning');
-        }
-        addRowButton.disabled = rows.length >= circuit.attributeOptions.length;
-        addRowButton.title = addRowButton.disabled ? '已達可選項目數量上限' : '新增電路板列';
-        [...rowList.querySelectorAll<HTMLInputElement>('input[type="number"]')].forEach(input => {
-          input.max = '18';
-        });
-      };
-      const renderCircuitRows = () => {
-        const rows = readRows();
-        disposePickers(rowList);
-        rowList.replaceChildren();
-        rows.forEach((row, index) => {
-          const rowElement = document.createElement('div');
-          rowElement.className = 'circuit-board-row';
-          const picker = createPicker('電路板項目 ' + (index + 1), circuitAttributeOptions(circuit, rows, index), row.attribute, value => {
-            rows[index] = { ...rows[index], attribute: value, percentageValue: value === '無關傷害' ? 0 : rows[index].percentageValue };
-            storeRows(rows);
-            update();
-            renderCircuitRows();
-          });
-          rowElement.append(picker);
-
-          const valueField = document.createElement('label');
-          valueField.className = 'field circuit-board-value';
-          valueField.append(document.createTextNode('電路板數值 ' + (index + 1) + '（%）'));
-          const input = document.createElement('input');
-          input.type = 'number';
-          preventScientificNotation(input);
-          input.min = '0';
-          input.step = 'any';
-          input.placeholder = row.attribute ? '請填寫數值' : '請先選擇屬性';
-          input.value = row.percentageValue === null ? '' : String(canonicalizeNumber(row.percentageValue * 100));
-          input.disabled = !row.attribute || row.attribute === '無關傷害';
-          valueField.append(input);
-          rowElement.append(valueField);
-
-          const removeButton = document.createElement('button');
-          removeButton.type = 'button';
-          removeButton.className = 'circuit-board-remove';
-          removeButton.textContent = '移除';
-          removeButton.setAttribute('aria-label', '移除第 ' + (index + 1) + ' 列電路板');
-          removeButton.disabled = rows.length === 1;
-          removeButton.title = rows.length === 1 ? '至少保留一列' : '移除此列';
-          removeButton.addEventListener('click', () => {
-            rows.splice(index, 1);
-            storeRows(rows);
-            update();
-            renderCircuitRows();
-            addRowButton.focus();
-          });
-          rowElement.append(removeButton);
-          rowList.append(rowElement);
-
-          input.addEventListener('input', () => {
-            if (input.validity.badInput) return;
-            const percentageValue = normalizeCircuitPercentage(Number(input.value) / 100);
-            const candidateRows = rows.map((entry, rowIndex) => rowIndex === index ? { ...entry, percentageValue } : entry);
-            input.setCustomValidity('');
-            rows.splice(0, rows.length, ...normalizeCircuitBoardRows(candidateRows, circuit.attributeOptions, index));
-            [...rowList.querySelectorAll<HTMLInputElement>('input[type="number"]')].forEach((control, rowIndex) => {
-              const displayed = canonicalizeNumber((rows[rowIndex].percentageValue ?? 0) * 100);
-              if (rowIndex !== index || control.value === '' || Number(control.value) !== displayed) control.value = String(displayed);
-            });
-            storeRows(rows);
-            update();
-            refreshTotal(rows);
-          });
-        });
-        refreshTotal(rows);
-      };
-      addRowButton.addEventListener('click', () => {
-        const rows = readRows();
-        if (rows.length >= circuit.attributeOptions.length) return;
-        rows.push({ attribute: '無關傷害', percentageValue: 0 });
-        storeRows(rows);
-        update();
-        renderCircuitRows();
-        rowList.lastElementChild?.querySelector<HTMLInputElement>('input')?.focus();
-      });
-      renderCircuitRows();
+      circuitEditor = mountCircuitBoardEditor(board, circuit.attributeOptions, readRows, rows => { storeRows(rows); update(); },
+        (rows, index) => circuitAttributeOptions(circuit, rows, index));
       const conditionalCircuitConflict = lowerwearConditionalCircuitConflict();
       if (conditionalCircuitConflict && (circuit.slot === "lowerwear" || circuit.slot === "lowerwearAlternative")) {
         const warning = document.createElement("p");
@@ -1770,196 +1302,24 @@ async function start() {
       baselineIsValid = baselineAttributes !== null;
       if (!currentDamage) renderCalculationComparison(undefined, baselineDamage?.result);
       const equipmentDamageSummary = document.querySelector<HTMLElement>('#equipment-damage-summary')!;
-      const baselineFinalDamage = baselineDamage?.result.finalDamage.finalDamage;
-      const currentFinalDamage = currentDamage?.result.finalDamage.finalDamage;
-      const summaryDamageNumber = (value: number) => visibleNumberFormatter.format(value);
-      const summaryPercent = (value: number) => twoDecimalFormatter.format(value);
-      const damageGainRatio = baselineFinalDamage !== undefined && currentFinalDamage !== undefined && baselineFinalDamage !== 0
-        ? currentFinalDamage / baselineFinalDamage - 1
-        : undefined;
-      const damageGain = damageGainRatio === undefined ? '—' : summaryPercent(damageGainRatio * 100) + '%';
-      const damageGainClass = damageGainRatio === undefined || damageGainRatio === 0 ? '' : damageGainRatio > 0 ? 'gain-positive' : 'gain-negative';
-      writeHtml(equipmentDamageSummary, '<div class="equipment-damage-card"><span>基準配置</span><strong>' + (baselineFinalDamage === undefined ? '—' : summaryDamageNumber(baselineFinalDamage)) + '</strong></div><div class="equipment-damage-card"><span>新配置</span><strong>' + (currentFinalDamage === undefined ? '—' : summaryDamageNumber(currentFinalDamage)) + '</strong></div><div class="equipment-damage-card equipment-damage-gain"><span>增幅</span><strong class="' + damageGainClass + '">' + damageGain + '</strong></div>', true);
+      writeHtml(equipmentDamageSummary, renderEquipmentDamageSummary(currentDamage?.result.finalDamage.finalDamage, baselineDamage?.result.finalDamage.finalDamage, visibleNumberFormatter, twoDecimalFormatter), true);
     try {
       if (!currentEvaluation.attributes) throw currentEvaluation.attributeError;
-      const current = currentEvaluation.attributes;
       const before = baselineAttributes;
     document.querySelector('#comparison-label')!.textContent = before ? '' : baseline ? '比較基準已不適用目前資料，請重新設定' : '可儲存目前配置作為比較基準';
 
-      const currentCombatRates = currentEvaluation.combatRates;
-    const currentClass = catalogIndex.classById(state.Job);
-    const baselineClass = baseline ? catalogIndex.classById(baseline.Job) : undefined;
-    const critDamageSupplement = (damage: ReturnType<typeof projectDamage> | null) => damage
-      ? damage.result.classCritDamagePassivePct + damage.result.multiplicativeCritDamage.value * 100
-      : 0;
-    const attackKey = currentClass?.attackType === 'physical' ? 'physicalAttack' : 'magicalAttack';
-    const baselineAttackKey = baselineClass?.attackType === 'physical' ? 'physicalAttack' : 'magicalAttack';
-    const visibleStats = Object.entries(current.stats)
-      .filter(([key]) => !['physicalAttack', 'magicalAttack', 'critRatePct', 'extremizationPct', 'strongerPct', 'heatPct'].includes(key))
-      .map(([key, stat]) => ({ key, stat, previousStat: before?.stats[key] }));
-    const superAdaptabilityIndex = visibleStats.findIndex(entry => entry.key === 'superAdaptabilityPct');
-    if (superAdaptabilityIndex >= 0) {
-      const [superAdaptability] = visibleStats.splice(superAdaptabilityIndex, 1);
-      const adaptabilityIndex = visibleStats.findIndex(entry => entry.key === 'adaptabilityPct');
-      visibleStats.splice(adaptabilityIndex < 0 ? visibleStats.length : adaptabilityIndex + 1, 0, superAdaptability);
-    }
-    const attackStat = current.stats[attackKey];
-    if (attackStat) {
-      visibleStats.unshift({ key: 'attackPower', stat: attackStat, previousStat: before?.stats[baselineAttackKey] });
-    }
-    const percentFormat = (value: number) => visibleNumberFormatter.format(value);
-    const signedDelta = (value: number, format: (value: number) => string, suffix = '') => { const magnitude = format(Math.abs(value)); return magnitude === format(0) ? '' : (value > 0 ? '+' : '−') + magnitude + suffix; };
-    const finalDamageFormat = (value: number) => {
-      const parts = visibleNumberFormatter.formatToParts(value);
-      const integer = parts.filter(part => part.type !== 'decimal' && part.type !== 'fraction').map(part => part.value).join('');
-      const decimal = parts.filter(part => part.type === 'decimal' || part.type === 'fraction').map(part => part.value).join('');
-      return `<span class="damage-integer">${h(integer)}</span>${decimal ? `<span class="damage-decimal">${h(decimal)}</span>` : ''}`;
-    };
-    const probabilityCapWarning = (valueBeforeCap: number) => {
-      const overflow = capOverflowPercentage(valueBeforeCap * 100, 100);
-      return overflow === null ? '' : `<small class="cap-overflow" role="status">超出上限 ${fmt(overflow)}%</small>`;
-    };
-    const combatRateCard = (label: string, attribute: 'critRate' | 'extremization', statKey: 'critRatePct' | 'extremizationPct') => {
-      if (!currentCombatRates) return `<details class="stat" data-disclosure-key="combat:${attribute}"><summary><span>${h(label)}</span><strong>待補輸入</strong></summary><div class="stat-details"><p class="input-hint">${h(calculationIssue(damageCalculationError))}</p></div></details>`;
-      const rate = currentCombatRates[attribute];
-      const stat = current.stats[statKey];
-      const classDiminishing = getClassEffects(applyClassSkillVersions(data.classCombatEffects, state.Job, state.classSkillVersions), currentCombatRates.classId, attribute)
-        .filter(effect => effect.method === 'diminishing');
-      const classRows = classDiminishing.map(effect =>
-        `<p class="stat-source-row"><span>${h(sourceLabel(effect.sourceId))}（${h(effect.id)}）</span><strong>+${fmt(effect.valuePct)}%</strong></p>`,
-      ).join('');
-      const multiplierRows = rate.multipliers.map(effect =>
-        `<p class="stat-source-row"><span>${h(sourceLabel(effect.sourceId))}</span><strong>+${fmt(effect.valuePct)}%（×${fmt(effect.factor)}）</strong></p>`,
-      ).join('');
-      const nonDiminishingRows = rate.nonDiminishingSources.map(effect =>
-        `<p class="stat-source-row"><span>${h(sourceLabel(effect.sourceId))}</span><strong>+${fmt(effect.valuePct)}%</strong></p>`,
-      ).join('');
-      const baseRows = stat ? `${sourceRows(stat.sharedSources, true)}${sourceRows(stat.lowerwearASources, true)}${isLowerwearAveraging()
-        ? `<p class="stat-detail-heading">強/排褲來源</p>${sourceRows(stat.lowerwearBSources, true)}<p class="stat-average">下衣與強/排褲平均 ${fmt(stat.lowerwearAverage)}%</p>` : ''}` : '';
-      const finalAdjustment = rate.finalAdjustmentPct
-        ? `<p class="stat-source-row"><span>${attribute === 'critRate' ? '關卡扣致命' : '最終調整'}</span><strong>${fmt(rate.finalAdjustmentPct)}%</strong></p>` : '';
-      return `<details class="stat" data-disclosure-key="combat:${attribute}"><summary><span>${h(label)}</span><strong>${fmt(rate.finalRate * 100)}%</strong>${probabilityCapWarning(rate.valueBeforeUpperCap)}</summary><div class="stat-details"><p class="stat-detail-heading">角色屬性來源</p>${baseRows || '<p class="stat-source-empty">目前沒有額外屬性來源</p>'}<p class="stat-average">角色屬性合計 ${fmt(rate.baseRawStatPct)}%</p>${classRows ? `<p class="stat-detail-heading">遞減來源</p>${classRows}` : ''}<p class="stat-average">遞減前 ${fmt(rate.rawStatPct)}% → 遞減後 ${fmt(rate.tierRate * 100)}%</p>${multiplierRows ? `<p class="stat-detail-heading">乘算來源</p>${multiplierRows}<p class="stat-average">乘算合計 ×${fmt(rate.multiplierProduct)}</p>` : ''}${nonDiminishingRows ? `<p class="stat-detail-heading">非遞減來源</p>${nonDiminishingRows}` : ''}${finalAdjustment}<p class="stat-average">上限前 ${fmt(rate.valueBeforeUpperCap * 100)}% → 實戰 ${fmt(rate.finalRate * 100)}%</p></div></details>`;
-    };
-    const combatRateCards = `<div class="combat-rate-pair">${combatRateCard('實戰致命一擊機率', 'critRate', 'critRatePct')}${combatRateCard('實戰極大化', 'extremization', 'extremizationPct')}</div>`;
-    const conditionalDamageCard = (label: string, valuePct: number, sources: readonly { sourceId: string; valuePct: number }[], previousValuePct: number | undefined) => {
-      const delta = previousValuePct === undefined ? null : valuePct - previousValuePct;
-      const deltaText = delta === null ? '' : signedDelta(delta, percentFormat, '%');
-      const deltaClass = delta === null || delta === 0 ? '' : delta > 0 ? 'positive' : 'negative';
-      const deltaBadge = deltaText ? '<small class="' + deltaClass + '">' + deltaText + '</small>' : '';
-      return '<details class="stat conditional-stat" data-disclosure-key="conditional:' + h(label) + '"><summary><span>' + h(label) + '</span><strong>' + fmt(valuePct) + '%</strong>' + deltaBadge + '</summary><div class="stat-details"><p class="stat-detail-heading">來源</p>' + (sourceRows(sources, true) || '<p class="stat-source-empty">目前沒有此條件的額外來源</p>') + '<p class="stat-average">來源合計 ' + fmt(valuePct) + '%</p></div></details>';
-    };
-    const baselineConditionalDamage = baselineDamage?.result.attributes.conditionalDamage;
-    const conditionalDamageCards = '<div class="conditional-damage-pair">' + conditionalDamageCard('強者（Boss 體力 > 50%）', current.conditionalDamage.strongerPct, current.conditionalDamage.strongerSources, baselineConditionalDamage?.strongerPct) + conditionalDamageCard('排熱（Boss 體力 ≤ 50%）', current.conditionalDamage.heatPct, current.conditionalDamage.heatSources, baselineConditionalDamage?.heatPct) + '</div>';
-    const multiplicativeDeltaValue = currentDamage && baselineDamage
-      ? currentDamage.result.generalMultiplicativeDamage.value - baselineDamage.result.generalMultiplicativeDamage.value
-      : null;
-    const multiplicativeDeltaText = multiplicativeDeltaValue === null ? '' : signedDelta(multiplicativeDeltaValue, fmt, '×');
-    const multiplicativeDeltaBadge = multiplicativeDeltaText
-      ? '<small class="' + (multiplicativeDeltaValue! > 0 ? 'positive' : 'negative') + '">' + multiplicativeDeltaText + '</small>'
-      : '';
-    const productSourceRows = (kind: 'generalMultiplicativeDamage' | 'multiplicativeCritDamage', excludeBase = false) => {
-      if (!currentDamage) return '';
-      const result = currentDamage.result;
-      const rows = (effects: typeof result.generalMultiplicativeDamage.factors) => effects
-        .filter(effect => !excludeBase || effect.sourceId !== 'character-base:crit-damage-product')
-        .map(effect => `<p class="stat-source-row"><span>${h(sourceLabel(effect.sourceId))}</span><strong>×${fmt(effect.factor)}</strong></p>`).join('');
-      const commonIds = new Set(result[kind].factors.map(effect => effect.sourceId));
-      return rows(result[kind].factors) + (result.lowerwearConfigurations ?? []).map(({ configuration, result: variant }) => {
-        const effects = variant[kind].factors.filter(effect => !commonIds.has(effect.sourceId));
-        return `<p class="stat-detail-heading">${configuration === 'lowerwearA' ? '下衣配置' : '強/排褲配置'}</p>`
-          + (rows(effects) || '<p class="stat-source-empty">勳章在此配置沒有額外加成</p>');
-      }).join('');
-    };
-    const productAverageLabel = currentDamage?.result.lowerwearConfigurations ? '（兩套配置平均）' : '';
-    const multiplicativeEffectCard = currentDamage
-      ? `<details class="stat" data-disclosure-key="multiplicative-effect"><summary><span>乘算效果</span><strong>×${fmt(currentDamage.result.generalMultiplicativeDamage.value)}</strong>${multiplicativeDeltaBadge}</summary><div class="stat-details">${currentDamage.result.generalMultiplicativeDamage.factors.length || currentDamage.result.lowerwearConfigurations
-        ? productSourceRows('generalMultiplicativeDamage')
-        : '<p class="stat-source-empty">目前沒有額外乘算來源</p>'}<p class="stat-average">乘算效果總倍率${productAverageLabel} ×${fmt(currentDamage.result.generalMultiplicativeDamage.value)}</p></div></details>`
-      : `<div class="stat"><p>乘算效果</p><strong>待補輸入</strong><small class="input-hint">${h(calculationIssue(damageCalculationError))}</small></div>`;
-    writeHtml(target, `<div class="stat-list">${visibleStats.map(({ key, stat, previousStat }) => {
-      const meta = data.attributes.attributes.find(entry => entry.key === key);
-      const isPercent = meta?.unit === 'percent';
-      const isCritDamage = key === 'critDamagePct';
-      const currentSupplement = isCritDamage ? critDamageSupplement(currentDamage) : 0;
-      const previousSupplement = isCritDamage ? critDamageSupplement(baselineDamage) : 0;
-      const displayTotal = stat.finalTotal + currentSupplement;
-      const previous = (previousStat?.finalTotal ?? 0) + previousSupplement;
-      const delta = before && (!isCritDamage || (currentDamage && baselineDamage)) ? displayTotal - previous : null;
-      const deltaText = delta === null ? '' : signedDelta(delta, isPercent ? percentFormat : fmt, isPercent ? '%' : '');
-      const relativeDeltaText = delta === null || previous === 0 ? '' : signedDelta(delta / previous * 100, percentFormat, '%');
-      const comparison = delta === null ? '' : !deltaText ? '<p>與基準配置相同。</p>' : '<p>基準 ' + fmt(previous) + (isPercent ? '%' : '') + ' → 目前 ' + fmt(displayTotal) + (isPercent ? '%' : '') + '；差異 ' + deltaText + (relativeDeltaText ? '；相對變化 ' + relativeDeltaText : '') + '</p>';
-      const deltaBadge = deltaText ? '<small class="' + (delta !== null && delta > 0 ? 'positive' : 'negative') + '">' + deltaText + '</small>' : '';
-      const shownName = key === 'attackPower' ? '攻擊力' : meta?.name ?? key;
-      const attributeOverflow = stat.cap === undefined ? null : capOverflowPercentage(stat.totalBeforeCap, stat.cap);
-      const attributeCapWarning = attributeOverflow === null
-        ? ''
-        : `<small class="cap-overflow" role="status">超出上限 ${fmt(attributeOverflow)}%</small>`;
-      const lowerwearAverageLabel = bossHealthCondition().enabled
-        ? bossHealthCondition().lowerwear === 'lowerwearB' ? '強/排褲配置' : '下衣配置'
-        : state.lowerwearAlternativeEnabled ? '下衣+強/排褲平均' : '下衣配置';
-      const lowerwearAverage = stat.lowerwearAverage + currentSupplement;
-      const allCommonSources = [...stat.sharedSources, ...stat.lowerwearASources];
-      const firstInnerwearIndex = allCommonSources.findIndex(source => innerwearOrder.has(source.sourceId));
-      const innerwearSources = allCommonSources
-        .filter(source => innerwearOrder.has(source.sourceId))
-        .sort((left, right) => innerwearOrder.get(left.sourceId)! - innerwearOrder.get(right.sourceId)!);
-      const commonSources = allCommonSources.filter(source => !innerwearOrder.has(source.sourceId));
-      if (firstInnerwearIndex >= 0) commonSources.splice(Math.min(firstInnerwearIndex, commonSources.length), 0, ...innerwearSources);
-      else commonSources.push(...innerwearSources);
-      const passiveSourceRow = isCritDamage && currentDamage && currentDamage.result.classCritDamagePassivePct > 0
-        ? `<p class="stat-source-row"><span>${state.Job === 'CU' ? '精神集中' : h(currentClass?.id ?? state.Job) + '自身技能'}</span><strong>+${fmt(currentDamage.result.classCritDamagePassivePct)}%</strong></p>`
-        : '';
-      const sharedDetails = commonSources.length || passiveSourceRow
-        ? `<p class="stat-detail-heading">共同來源</p>${sourceRows(commonSources, isPercent)}${passiveSourceRow}`
-        : '';
-      const critDamageBaseFactor = currentDamage?.result.multiplicativeCritDamage.factors.find(effect => effect.sourceId === 'character-base:crit-damage-product')?.factor ?? 1.5;
-      const critDamageBaselinePct = currentDamage?.result.multiplicativeCritDamage.baselinePct ?? 150;
-      const critDamageDetails = isCritDamage && currentDamage
-        ? `<p class="stat-detail-heading">乘算來源</p><p class="stat-source-row"><span>乘算暴傷增幅${productAverageLabel}（角色基底 ${fmt(critDamageBaseFactor * 100)}% 扣除 ${fmt(critDamageBaselinePct)}% 基準後）</span><strong>+${fmt(currentDamage.result.multiplicativeCritDamage.value * 100)}%</strong></p>${productSourceRows('multiplicativeCritDamage', true)}`
-        : '';
-      const lowerwearBDetails = isLowerwearAveraging() && stat.lowerwearBSources.length ? `<p class="stat-detail-heading">強/排褲來源</p>${sourceRows(stat.lowerwearBSources, isPercent)}` : '';
-      return `<details class="stat" data-disclosure-key="stat:${h(key)}"><summary><span>${h(shownName)}</span><strong>${fmt(displayTotal)}${isPercent ? '%' : ''}</strong>${attributeCapWarning}${deltaBadge}</summary><div class="stat-details">${sharedDetails}${critDamageDetails}${lowerwearBDetails}<p class="stat-average">${lowerwearAverageLabel} ${fmt(lowerwearAverage)}${isPercent ? '%' : ''}</p>${comparison}</div></details>`;
-    }).join('')}${conditionalDamageCards}${multiplicativeEffectCard}${combatRateCards}</div>`, true);
+    writeHtml(target, renderResultCards(state, baseline, currentEvaluation, baselineEvaluation), true);
+      const finalDamageFormat = (value: number) => renderFinalDamageNumber(value, visibleNumberFormatter);
       const damageTarget = document.querySelector('#damage-result')!;
       try {
         if (!currentDamage) throw damageCalculationError;
         const { result } = currentDamage;
         renderCalculationComparison(result, baselineDamage?.result);
-        let damageRatioHtml = '';
-        if (baseline && before) {
-          const previousFinalDamage = baselineDamage?.result.finalDamage.finalDamage;
-          const damageRatio = previousFinalDamage === undefined || previousFinalDamage === 0
-            ? null
-            : result.finalDamage.finalDamage / previousFinalDamage * 100;
-          const damageDifference = damageRatio === null ? null : damageRatio - 100;
-          const damageDifferenceClass = damageDifference === null || damageDifference === 0 ? '' : damageDifference > 0 ? 'positive' : 'negative';
-          const damageRatioClass = damageDifference === null || damageDifference === 0 ? '' : damageDifference > 0 ? 'damage-ratio-positive' : 'damage-ratio-negative';
-          const damageDifferenceLabel = damageDifference === null ? '—' : (damageDifference > 0 ? '+' : '') + percentFormat(damageDifference) + '%';
-          damageRatioHtml = '<div class="damage-ratio ' + damageRatioClass + '"><div class="damage-ratio-group"><span>新配置是舊配置的</span><strong>' + (damageRatio === null ? '無法計算' : percentFormat(damageRatio) + '%') + '</strong></div><div class="damage-ratio-group"><span>與基準差異</span><strong class="' + damageDifferenceClass + '">' + damageDifferenceLabel + '</strong></div></div>';
-        }
-        const rateSources = (effects: typeof result.combatRates.critRate.multipliers) => effects.map(effect => `${sourceLabel(effect.sourceId)} ×${fmt(effect.factor)}`).join(' · ') || '無';
-        const critDamageText = (value: typeof result, calculation: boolean) => {
-          const product = value.multiplicativeCritDamage;
-          const baseFactor = product.factors.find(effect => effect.sourceId === 'character-base:crit-damage-product')?.factor ?? 1.5;
-          const effects = product.factors.filter(effect => effect.sourceId !== 'character-base:crit-damage-product');
-          return calculation
-            ? `角色基底 ${fmt(baseFactor * 100)}%（×${fmt(baseFactor)}）${effects.map(effect => ` ×${fmt(effect.factor)}`).join('')} − ${fmt(product.baselinePct)}% 基準 = +${fmt(product.value * 100)}%`
-            : effects.map(effect => `×${fmt(effect.factor)}（${sourceLabel(effect.sourceId)}）`).join('、') || '無額外來源';
-        };
-        const configuredCritText = (calculation: boolean) => result.lowerwearConfigurations
-          ? result.lowerwearConfigurations.map(({ configuration, result: variant }) => `${configuration === 'lowerwearA' ? '下衣配置' : '強/排褲配置'}：${critDamageText(variant, calculation)}`).join('；')
-          : critDamageText(result, calculation);
-        const critDamageMultiplier = configuredCritText(false);
-        const critDamageCalculation = configuredCritText(true);
-        const configurationDetails = result.lowerwearConfigurations
-          ? result.lowerwearConfigurations.map(({ configuration, result: variant }) => `<p>${configuration === 'lowerwearA' ? '下衣配置' : '強/排褲配置'}：乘算傷害 ×${fmt(variant.generalMultiplicativeDamage.value)}，最終傷害 ${finalDamageFormat(variant.finalDamage.finalDamage)}</p>`).join('')
-            + '<p>兩套配置分別套用勳章加成後，最終傷害取平均。</p>' : '';
+        const damageRatioHtml = baseline && before ? renderDamageRatio(result.finalDamage.finalDamage, baselineDamage?.result.finalDamage.finalDamage, visibleNumberFormatter) : '';
         writeHtml(damageTarget, `<div class="damage-summary"><div><span>最小攻擊力</span><strong>${fmt(result.attack.lowerDamage)}</strong></div><div><span>最大攻擊力</span><strong>${fmt(result.attack.upperDamage)}</strong></div><div class="final-damage"><span>最終傷害</span><strong>${finalDamageFormat(result.finalDamage.finalDamage)}</strong></div></div>${damageRatioHtml}`, true);
-        const skillWeighting = result.finalDamage.skillDamageWeighting;
-        const skillWeightingText = `超越 ${fmt(skillWeighting.transcendenceSharePct)}% ×${fmt(skillWeighting.transcendenceFactor)} + 強烈 ${fmt(skillWeighting.strongSharePct)}% ×${fmt(skillWeighting.strongFactor)} = ×${fmt(skillWeighting.combinedFactor)}`;
         const calculationDetailsTarget = document.querySelector<HTMLElement>("#calculation-details")!;
         const formulaWasOpen = calculationDetailsTarget.querySelector<HTMLDetailsElement>(".formula-detail")?.open ?? false;
-        writeHtml(calculationDetailsTarget, `<details class="formula-detail" data-disclosure-key="formula-detail"${formulaWasOpen ? ' open' : ''}><summary>展開傷害計算明細</summary><p>強烈／超越技傷加權：${h(skillWeightingText)}</p><p>致命傷害被動：${fmt(result.classCritDamagePassivePct)}%　乘算暴傷增幅${productAverageLabel}：+${fmt(result.multiplicativeCritDamage.value * 100)}%</p><p>乘算暴傷計算：${h(critDamageCalculation)}</p><p>乘算暴傷來源：${h(critDamageMultiplier)}</p><p>爆擊乘算來源：${h(rateSources(result.combatRates.critRate.multipliers))}</p><p>極大乘算來源：${h(rateSources(result.combatRates.extremization.multipliers))}</p><p>乘算傷害${productAverageLabel}：${fmt(result.generalMultiplicativeDamage.value)} 倍　強者／排熱因子：${fmt(result.finalDamage.conditionalFactor)}</p>${configurationDetails}<p>適應力因子：${fmt(result.finalDamage.adaptationFactor)}　防禦因子：${fmt(result.finalDamage.defenseFactor)}</p></details>`, true);
+        writeHtml(calculationDetailsTarget, renderDamageFormula(result, sourceLabel, formulaWasOpen, visibleNumberFormatter), true);
       } catch (error) {
         writeHtml(damageTarget, `<p class="input-warning">尚未計算：${h(calculationIssue(error))}請完成後再試。</p>`, true);
         const details = document.querySelector('#calculation-details')!;

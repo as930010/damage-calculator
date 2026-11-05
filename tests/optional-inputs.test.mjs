@@ -241,3 +241,23 @@ test('legacy circuit budgets normalize deterministically on import, save/reload,
     assert.deepEqual(rows(page).map(row => row.percentageValue), [0.11, 0.07, 0]);
   } finally { page.close(); reload?.close(); }
 });
+
+test('circuit editor remount releases detached row events and commits each active input once', async () => {
+  const page = await uiPage(stateA);
+  try {
+    for (let i = 0; i < 5; i++) {
+      openGloves(page);
+      const old = page.dom.window.document.querySelector('.circuit-board-add');
+      openGloves(page);
+      page.runtime.resetCounts();
+      const before = JSON.stringify(page.readState());
+      old.click();
+      assert.equal(JSON.stringify(page.readState()), before);
+      assert.equal(page.runtime.counts.renderResults ?? 0, 0);
+      const control = controls(page)[0]; control.focus();
+      input(page, control, String(1 + i));
+      assert.equal(page.runtime.counts.renderResults, 1);
+      assert.equal(page.dom.window.document.activeElement, control);
+    }
+  } finally { page.close(); }
+});

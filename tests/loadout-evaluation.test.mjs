@@ -258,3 +258,69 @@ test('comparison empty states retain missing-baseline and invalid-current messag
     finally { page.close(); }
   }
 });
+
+test('damage summary view retains zero/missing baselines, signed changes and precision', async () => {
+  const view = await runtime.load('frontend/damage-summary-view.ts');
+  const number = new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 3 });
+  const percent = new Intl.NumberFormat('zh-TW', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  for (const [current, baseline, text, style] of [[100, 100, '0.00%', ''], [110, 100, '10.00%', 'gain-positive'],
+    [90, 100, '-10.00%', 'gain-negative'], [100, 0, '—', ''], [undefined, 100, '—', ''], [100, undefined, '—', '']]) {
+    const html = view.renderEquipmentDamageSummary(current, baseline, number, percent);
+    assert.ok(html.includes(`<strong class="${style}">${text}</strong>`));
+  }
+  assert.equal(view.renderFinalDamageNumber(1234.123456, number), '<span class="damage-integer">1,234</span><span class="damage-decimal">.123</span>');
+  assert.ok(view.renderDamageRatio(100, 0, number).includes('無法計算'));
+  assert.ok(view.renderDamageRatio(110, 100, number).includes('+10%'));
+  assert.ok(view.renderDamageRatio(90, 100, number).includes('-10%'));
+});
+
+test('source labels use current readonly selections and source rows escape and preserve merged order', async () => {
+  const { sourceLabel, renderSourceRows } = await runtime.load('frontend/source-labels.ts');
+  const state = structuredClone(sample), label = id => sourceLabel(id, gameData, state);
+  assert.equal(label('character-base'), '角色基礎係數');
+  assert.equal(label('class-passive:MN:multiplicative-crit-damage:2'), 'MN 硝基馬達');
+  assert.equal(label('class-passive:CU:multiplicative-crit-damage:1'), '解放意志');
+  assert.equal(label('<未知&來源>'), '來源名稱待確認（<未知&來源>）');
+  state.bossHealthCondition = { enabled: true, lowerwear: 'lowerwearB', comparison: 'above' };
+  assert.equal(label('combat-rate:lowerwear-enhancement'), '強/排褲強化爆擊效果');
+  state.bossHealthCondition.enabled = false;
+  assert.equal(label('combat-rate:lowerwear-enhancement'), '下衣強化爆擊效果');
+  state.values['MasterBeast.Head.CustomAttribute'] = '測試<屬性>';
+  assert.equal(label('master-beast:head-manual'), '聖獸頭飾精靈石：測試<屬性>');
+  const chip = gameData.chipSlots.slots[0];
+  state.values[chip.attributeField] = 'Boss傷害%'; state.values[chip.tuningField] = 'Lv.1';
+  assert.ok(label('chip:' + chip.id).includes('Boss傷害%（調校 Lv.1）'));
+  const circuit = gameData.circuits.inputs[0];
+  state.values[circuit.attributeField] = 'Boss傷害%'; state.values[circuit.valueField] = 0.12;
+  assert.ok(label('circuit-board:' + circuit.slot).includes('電路板'));
+  const { circuitBoardRowsField } = await runtime.load('frontend/circuit-board-rows.ts');
+  state.values[circuitBoardRowsField(circuit.attributeField)] = JSON.stringify([{ attribute: 'Boss傷害%', percentageValue: 0.12 }]);
+  assert.ok(label('circuit-board:' + circuit.slot + ':1').includes('Boss傷害% 12%'));
+  const rows = renderSourceRows([{sourceId:'a',valuePct:1},{sourceId:'b',valuePct:2},{sourceId:'a',valuePct:3}], true, id => id === 'a' ? '<A&>' : 'B');
+  assert.equal(rows, '<p class="stat-source-row"><span>&lt;A&amp;&gt;</span><strong>4%</strong></p><p class="stat-source-row"><span>B</span><strong>2%</strong></p>');
+});
+
+test('skill share input preserves draft, input/blur/Enter submission, rejection and focus contracts', async () => {
+  const page = await createPage(sample, sample);
+  try {
+    const { document, Event, KeyboardEvent } = page.dom.window;
+    const input = document.querySelector('#transcendence-skill-share-number');
+    const stored = () => JSON.parse(page.dom.window.localStorage.getItem('dab-loadout-v1')).transcendenceSkillDamageSharePct;
+    input.focus(); page.runtime.resetCounts();
+    input.value = '72.5'; input.dispatchEvent(new Event('input', { bubbles: true }));
+    assert.equal(stored(), 72.5); assert.equal(document.activeElement, input);
+    assert.equal(page.runtime.counts.renderResults, 1);
+    input.value = ''; page.runtime.resetCounts(); input.dispatchEvent(new Event('input', { bubbles: true }));
+    assert.equal(stored(), 72.5); assert.equal(page.runtime.counts.renderResults ?? 0, 0);
+    input.blur(); assert.equal(input.value, '72.5'); assert.equal(input.getAttribute('aria-invalid'), 'false');
+    input.focus(); input.value = '101'; input.dispatchEvent(new Event('input', { bubbles: true }));
+    assert.equal(input.value, '72.5'); assert.equal(stored(), 72.5);
+    const paste = new Event('paste', { bubbles: true, cancelable: true });
+    Object.defineProperty(paste, 'clipboardData', { value: { getData: () => 'invalid' } });
+    input.dispatchEvent(paste); assert.equal(paste.defaultPrevented, true);
+    input.value = '25'; input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
+    assert.equal(stored(), 25); assert.equal(document.querySelector('.skill-damage-share-complement').textContent, '75');
+    for (const value of ['0', '100', '12.34']) { input.value = value; input.dispatchEvent(new Event('input', { bubbles: true })); assert.equal(stored(), Number(value)); }
+  } finally { page.close(); }
+});

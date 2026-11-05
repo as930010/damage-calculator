@@ -283,3 +283,22 @@ test('actual main import/restore retains baseline and reuses the same index', as
     assert.match(document.querySelector('#equipment-damage-summary').textContent, /0.00%/);
   } finally { page.close(); }
 });
+
+test('picker candidate scope reuses the supplied index and immutable candidate identities', async () => {
+  const { createPickerChoices } = await import('../dist/frontend/picker-choices.js');
+  const { createCatalogIndex } = await import('../dist/frontend/catalog-index.js');
+  const { readFile } = await import('node:fs/promises');
+  const data = JSON.parse(await readFile(new URL('../dist/data/game-data.json', import.meta.url), 'utf8'));
+  const index = createCatalogIndex(data), scope = createPickerChoices(index, data.mapping.magicStoneSelections.catalogFile, () => 'summary');
+  const names = ['A', 'B'];
+  assert.equal(scope.options(names), scope.options(names));
+  assert.deepEqual(scope.options(names).map(x => x.value), names);
+  assert.ok(Object.isFrozen(scope.options(names)));
+  assert.equal(scope.magicStoneChoices('armor'), scope.magicStoneChoices('armor'));
+  const field = data.masterBeast.options.find(x => x.category === 'overall');
+  assert.ok(field);
+  const normal = scope.validationChoices('MasterBeast.OverallPotential');
+  assert.equal(normal, scope.validationChoices('MasterBeast.OverallPotential'));
+  assert.ok(Object.isFrozen(normal));
+  assert.deepEqual(scope.validationChoices('unknown-field'), []);
+});

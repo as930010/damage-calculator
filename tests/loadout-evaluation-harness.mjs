@@ -43,8 +43,15 @@ export async function createRuntime({ dom, sourceReader, transformSource, global
     }
     return resolve(dirname(parent.identifier.split('?')[0]), specifier);
   };
+  const pendingModules = new Map();
   async function getModule(path) {
     if (modules.has(path)) return modules.get(path);
+    if (pendingModules.has(path)) return pendingModules.get(path);
+    const pending = createModule(path);
+    pendingModules.set(path, pending);
+    try { return await pending; } finally { pendingModules.delete(path); }
+  }
+  async function createModule(path) {
     let source = sourceReader ? await sourceReader(relative(root, path).replaceAll('\\', '/')) : await readFile(path.split('?')[0], 'utf8');
     source = stripTypeScriptTypes(source);
     const file = relative(root, path).replaceAll('\\', '/');
