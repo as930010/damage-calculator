@@ -12,7 +12,7 @@ export function sourceLabel(sourceId: string, data: GameData, state: SourceLabel
   if (sourceId === 'character-base') return '角色基礎係數';
   if (sourceId === 'character-base:crit-damage-product') return '角色原始乘算爆傷基準';
   if (sourceId === 'weapon-base-attack') return '武器基礎攻擊力';
-  if (sourceId === 'hunter-instinct') return '獵人的本能';
+  if (sourceId === 'hunter-instinct') return '獵人的本能(公會技能)';
   if (sourceId.startsWith('master-beast-potential:')) return '聖獸潛力';
   const configuredSourceLabels: Readonly<Record<string, string>> = {
     'fixed-effect:master-beast': '大師聖獸固定效果',
@@ -50,7 +50,11 @@ export function sourceLabel(sourceId: string, data: GameData, state: SourceLabel
     const selectedSlots = data.layout.slots.filter(entry => entry.selectionField === fieldId);
     const slot = stoneSlot ?? selectedSlots[0];
     const selected = String(state.values[fieldId] ?? '').trim();
-    if (stoneSlot) return `${stoneSlot.label}魔法石：${selected}`;
+    if (stoneSlot) {
+      if (stoneSlot.group === 'weapon' || stoneSlot.group === 'iceWeapon') return `武器魔法石(含冰武)：${selected}`;
+      const includesIce = ['上衣', '下衣', '手套', '鞋子'].includes(stoneSlot.label);
+      return `${stoneSlot.label}魔法石${includesIce ? '(含冰裝)' : ''}：${selected}`;
+    }
     if (selectedSlots.length > 1) {
       const group = data.layout.groups.find(entry => entry.id === selectedSlots[0].group);
       return `${group?.name ?? selectedSlots[0].group}套裝：${selected}`;

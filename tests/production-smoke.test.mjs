@@ -222,7 +222,7 @@ test('three source and production pages retain unique metadata and current foote
         const canonical = doc.querySelectorAll('head link[rel="canonical"]');
         assert.equal(canonical.length, 1);
         assert.equal(canonical[0].href, 'https://as930010.github.io/damage-calculator/' + path);
-        assert.equal(doc.querySelector('.footer-version bdi').textContent, 'v3.04.19');
+        assert.equal(doc.querySelector('.footer-version bdi').textContent, 'v3.04.23');
       } finally { dom.window.close(); }
     }
     assert.equal(new Set(descriptions).size, 3);
@@ -241,6 +241,7 @@ test('release history preserves published entries and prepends new versions with
       ]);
       const versions = entries.map(entry => entry[0]);
       assert.equal(new Set(versions).size, versions.length, 'versions are unique within release history');
+      assert.deepEqual(entries[0], ['v3.04.23', '2026-11-05', '優化冰裝與內裝魔法石來源顯示方式、獵人的本能新增公會技能標籤']);
       const current = versions.indexOf('v3.04.19'), previous = versions.indexOf('v3.04.18');
       assert.ok(current >= 0 && previous > current);
       assert.deepEqual(entries[previous], ['v3.04.18', '2026-10-30', '新增切換佈景主題功能、按鈕反應與視覺效果優化']);

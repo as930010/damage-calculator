@@ -300,6 +300,32 @@ test('source labels use current readonly selections and source rows escape and p
   assert.equal(rows, '<p class="stat-source-row"><span>&lt;A&amp;&gt;</span><strong>4%</strong></p><p class="stat-source-row"><span>B</span><strong>2%</strong></p>');
 });
 
+test('magic stone source labels identify combined ice equipment and guild skills', async () => {
+  const { sourceLabel, renderSourceRows } = await runtime.load('frontend/source-labels.ts');
+  const state = structuredClone(sample);
+  const label = id => sourceLabel(id, gameData, state);
+  for (const part of ['上衣', '下衣', '手套', '鞋子']) {
+    const slots = gameData.layout.slots.filter(slot => slot.label === part && slot.stoneFields);
+    assert.equal(slots.length, 2);
+    const sources = slots.map(slot => {
+      const field = slot.stoneFields[0]; state.values[field] = '測試<魔法石>';
+      assert.equal(label('simulator:' + field), part + '魔法石(含冰裝)：測試<魔法石>');
+      return { sourceId: 'simulator:' + field, valuePct: 3 };
+    });
+    assert.equal(renderSourceRows(sources, true, label), `<p class="stat-source-row"><span>${part}魔法石(含冰裝)：測試&lt;魔法石&gt;</span><strong>6%</strong></p>`);
+  }
+  const weapons = gameData.layout.slots.filter(slot => ['weapon', 'iceWeapon'].includes(slot.group));
+  assert.equal(weapons.length, 2);
+  const sources = weapons.map(slot => {
+    const field = slot.stoneFields[0]; state.values[field] = '相同魔法石';
+    return { sourceId: 'simulator:' + field, valuePct: 6 };
+  });
+  assert.equal(renderSourceRows(sources, true, label), '<p class="stat-source-row"><span>武器魔法石(含冰武)：相同魔法石</span><strong>12%</strong></p>');
+  state.values[weapons[1].stoneFields[0]] = '另一種魔法石';
+  assert.equal((renderSourceRows(sources, true, label).match(/stat-source-row/g) ?? []).length, 2);
+  assert.equal(label('hunter-instinct'), '獵人的本能(公會技能)');
+});
+
 test('skill share input preserves draft, input/blur/Enter submission, rejection and focus contracts', async () => {
   const page = await createPage(sample, sample);
   try {
