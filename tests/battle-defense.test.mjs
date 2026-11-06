@@ -53,7 +53,9 @@ test('Three active modes are equivalent; inactive drafts never stack', () => {
   value.teamSnapshot={mode:'single',target:'single',rate:.896,sources:['confirmed'],sourceRevision:'test',dataRevision:'test',importedAt:new Date(0).toISOString()};
   for(const mode of['manual','sources','team'])close(externalDefenseRate({...value,mode}),.896);
   assert.throws(()=>externalDefenseRate({...value,mode:'sources',sources:[{id:'x',name:'',percentage:''}]}),/尚未完成/);
-  assert.throws(()=>externalDefenseRate({...value,mode:'team',teamSnapshot:null}),/尚未引用/);
+  assert.equal(externalDefenseRate({...value,mode:'team',teamSnapshot:null}),0);
+  assert.equal(externalDefenseRate({...value,mode:'manual',manualPercentage:''}),0);
+  assert.throws(()=>externalDefenseRate({...value,mode:'manual',manualPercentage:'1e2'}),/十進位/);
 });
 test('Versioned persistence validates snapshots and preserves incomplete source drafts', () => {
   assert.deepEqual(parseBattleDefense(null),defaultBattleDefense());assert.throws(()=>parseBattleDefense('{'));assert.throws(()=>parseBattleDefense('{"schemaVersion":2}'));
@@ -66,7 +68,7 @@ test('Same-page notifications, storage sync and loadout isolation', () => {
   const store=createBattleDefenseStore(host);let notified=0;store.subscribe(()=>notified++);
   store.set({...store.value,manualPercentage:'89.6'});close(store.rate,.896);assert.equal(notified,1);
   host.localStorage.setItem(BATTLE_DEFENSE_KEY,JSON.stringify({...store.value,manualPercentage:'50'}));host.dispatchEvent(new host.StorageEvent('storage',{key:BATTLE_DEFENSE_KEY}));assert.equal(store.rate,.5);assert.equal(notified,2);
-  store.set({...store.value,manualPercentage:''});assert.equal(store.rate,null);assert.match(store.error,/0～100/);assert.equal(host.localStorage.getItem('dab-loadout-v1'),'untouched');store.dispose();dom.window.close();
+  store.set({...store.value,manualPercentage:''});assert.equal(store.rate,0);assert.equal(store.error,'');assert.equal(host.localStorage.getItem('dab-loadout-v1'),'untouched');store.dispose();dom.window.close();
 });
 test('Team single snapshot equals actual simulator engine with default and selected options', () => {
   const raw=JSON.stringify(savedTeam()),saved=parseSavedSimulatorState(raw,catalog);const refs=teamDefenseReferences(raw,catalog,'fixture');

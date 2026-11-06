@@ -101,7 +101,7 @@ export function createBattleDefenseEditor(store: BattleDefenseStore, teamUrl: UR
     for (const input of root.querySelectorAll<HTMLInputElement>('[data-defense-manual], [data-source-percentage]')) input.setAttribute('aria-invalid', String(store.rate === null && !input.closest('[hidden]')));
     const snapshot = value.teamSnapshot;
     root.querySelector<HTMLElement>('.defense-team-info')!.textContent = snapshot
-      ? `${snapshot.mode === 'single' ? '單隊' : '挑戰雙隊'} · ${{ single: '單隊', firstTeam: '第一隊', secondTeam: '第二隊', sharedArena: '雙隊共用場地' }[snapshot.target]} · 外部破防 ${shown(snapshot.rate)} · ${snapshot.sources.join('、') || '無額外破防來源'} · 引用時間 ${snapshot.importedAt}` : '尚未引用隊伍。';
+      ? `${snapshot.mode === 'single' ? '單隊' : '挑戰雙隊'} · ${{ single: '單隊', firstTeam: '第一隊', secondTeam: '第二隊', sharedArena: '雙隊共用場地' }[snapshot.target]} · 外部破防 ${shown(snapshot.rate)} · ${snapshot.sources.join('、') || '無額外破防來源'} · 引用時間 ${snapshot.importedAt}` : '尚未引用隊伍，目前以 0% 計算。';
     try { if (snapshot && teamRevision(localStorage.getItem(TEAM_STATE_KEY)) !== snapshot.sourceRevision) importStatus.textContent = '隊伍配置已有更新，可重新引用破防量。目前仍使用原快照。'; } catch { /* Snapshot remains valid when storage is unavailable. */ }
     importButton.textContent = snapshot ? '重新引用' : '引用隊伍增益破防量';
     renderTotals();

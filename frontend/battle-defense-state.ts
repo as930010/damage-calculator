@@ -33,10 +33,11 @@ export function parseBattleDefense(raw: string | null): BattleDefenseEnvironment
 
 export function externalDefenseRate(value: BattleDefenseEnvironment): number {
   if (value.mode === 'team') {
-    if (!value.teamSnapshot) throw new Error('尚未引用有效的隊伍破防快照。');
+    if (!value.teamSnapshot) return 0;
     return requireDefenseRate(value.teamSnapshot.rate, '隊伍破防快照');
   }
   if (value.mode === 'manual') {
+    if (value.manualPercentage.trim() === '') return 0;
     const rate = parseDefensePercentage(value.manualPercentage);
     if (rate === null) throw new Error('裝備以外來源總破防率請填寫 0～100 的十進位數字，最多八位小數。');
     return rate;
