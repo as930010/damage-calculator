@@ -1,3 +1,7 @@
+import { createBattleDefenseStore } from '../../frontend/battle-defense-state.ts';
+import { createBattleDefenseEditor, equipmentDefenseRates } from '../../frontend/battle-defense-ui.ts';
+import { createDisclosurePreferences } from '../../frontend/disclosure-preferences.ts';
+import { evaluateLoadout } from '../../frontend/projection.ts';
 import { escapeHtml, loadGameData } from '../../frontend/data.ts';
 import type { GameData } from '../../frontend/data.ts';
 import { parseState, stateKey, type LoadoutState } from '../../frontend/state.ts';
@@ -11,6 +15,12 @@ const workspace = byId('score-workspace');
 const editor = byId('transform-lines');
 const output = byId('score-output');
 const reload = byId<HTMLButtonElement>('reload-loadout');
+const battleDefense = createBattleDefenseStore(window);
+const defenseEditor = createBattleDefenseEditor(battleDefense, new URL(document.querySelector<HTMLAnchorElement>('.site-tabs a[href*="buff-simulator"]')!.href));
+status.parentElement!.append(defenseEditor.root);
+const disclosures = createDisclosurePreferences(document);
+defenseEditor.root.open = disclosures.preferredOpen('battle-defense-context', false);
+battleDefense.subscribe(() => { if (data && state) activate(); });
 const formatter = new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 2 });
 const pct = (gain: number | null) => gain === null ? '無法計算' : (gain * 100).toFixed(2) + '%';
 const message = (err: unknown) => err instanceof Error ? err.message : '無法讀取目前配裝。';
@@ -152,7 +162,9 @@ function activate() {
   try {
     if (!data || !state) throw new Error('尚未取得有效配裝。');
     byId('target-status').textContent = '';
-    showLoadout(mode === 'weapon' ? readRatingLoadout(data, state) : readArmorRatingLoadout(data, state, part));
+    const equipment = evaluateLoadout(data, state, false);
+    defenseEditor.setEquipment(equipmentDefenseRates(equipment.damage?.result, equipment.attributes?.stats.defenseIgnorePct?.finalTotal));
+    showLoadout(mode === 'weapon' ? readRatingLoadout(data, state, battleDefense.rate) : readArmorRatingLoadout(data, state, part, battleDefense.rate));
     editor.hidden = false;
     byId('roll-disclosure').hidden = false;
   } catch (error) {

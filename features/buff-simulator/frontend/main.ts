@@ -1,3 +1,4 @@
+import { parseSavedSimulatorState, resolveSavedMembers, TEAM_STATE_KEY, type SavedSimulatorState } from './saved-state.ts';
 import { calculateChallenge, calculateTeam } from "../calculation/engine.ts";
 import { calculateControlTimes } from "../calculation/control-time.ts";
 import type { EffectKey, SelectedMember, SelectedOption, SkillReferenceCatalog, TeamMode } from "../calculation/types.ts";
@@ -38,16 +39,7 @@ app.addEventListener("compositionend", event => {
   syncInputs(event);
 });
 
-interface SavedSimulatorState {
-  version: 1;
-  mode: TeamMode;
-  membersByTeam: Partial<Record<TeamKey, string[]>>;
-  optionsByTeam: Partial<Record<TeamKey, Record<string, boolean | number>>>;
-  bossReductions: Partial<Record<TeamMode, number>>;
-  optionDisclosureOpen: Partial<Record<TeamKey, boolean>>;
-}
-
-const STORAGE_KEY = "buff-team-simulator.state.v1";
+const STORAGE_KEY = TEAM_STATE_KEY;
 const DISCLOSURE_STORAGE_KEY = "buff-team-simulator.disclosures.v1";
 
 function captureDisclosures(): void {
@@ -107,46 +99,15 @@ function applyResultDisclosures(): void {
 
 function restoreSavedState(): void {
   try {
-    const savedText = window.localStorage.getItem(STORAGE_KEY);
-    if (!savedText) return;
-    const saved = JSON.parse(savedText) as Partial<SavedSimulatorState>;
-    if (!saved || saved.version !== 1) return;
-
-    if (saved.mode === "single" || saved.mode === "challenge") mode = saved.mode;
-    for (const team of ["single", "first", "second"] as const) {
-      const isOpen = saved.optionDisclosureOpen?.[team];
-      if (typeof isOpen === "boolean") optionDisclosureOpen[team] = isOpen;
+    const saved = parseSavedSimulatorState(window.localStorage.getItem(STORAGE_KEY), catalog);
+    if (!saved) return;
+    mode = saved.mode;
+    for (const team of ['single', 'first', 'second'] as const) {
+      membersByTeam[team] = saved.membersByTeam[team] ?? [];
+      optionsByTeam[team] = saved.optionsByTeam[team] ?? {};
+      if (typeof saved.optionDisclosureOpen[team] === 'boolean') optionDisclosureOpen[team] = saved.optionDisclosureOpen[team];
     }
-
-    for (const team of ["single", "first", "second"] as const) {
-      const memberCount = team === "single" ? 6 : 4;
-      const savedMembers = saved.membersByTeam?.[team];
-      if (Array.isArray(savedMembers)) {
-        membersByTeam[team] = Array.from({ length: memberCount }, (_, index) =>
-          typeof savedMembers[index] === "string" ? savedMembers[index].slice(0, 120) : membersByTeam[team]?.[index] ?? "");
-      }
-
-      const savedOptions = saved.optionsByTeam?.[team];
-      if (!savedOptions || typeof savedOptions !== "object") continue;
-      for (const option of catalog.loadoutOptions) {
-        const value = savedOptions[option.id];
-        if (option.userInput?.kind === "percentage") {
-          if (typeof value === "number" && Number.isFinite(value) && value >= 0) {
-            const defaultValue = catalog.parameters[option.userInput.parameter] * 100;
-            optionsByTeam[team][option.id] = Math.abs(value - defaultValue) < 1e-7 ? Number(defaultValue.toFixed(6)) : value;
-          }
-        } else if (option.presentation !== "background" && typeof value === "boolean") {
-          optionsByTeam[team][option.id] = value;
-        }
-      }
-    }
-
-    for (const savedMode of ["single", "challenge"] as const) {
-      const value = saved.bossReductions?.[savedMode];
-      if (typeof value === "number" && Number.isFinite(value) && value >= 0 && value < 1) {
-        bossReductions[savedMode] = value;
-      }
-    }
+    bossReductions = saved.bossReductions;
   } catch {
     // Storage may be disabled or contain invalid JSON; keep the default simulator state.
   }
@@ -193,20 +154,7 @@ function optionsFor(team: string): SelectedOption[] {
 }
 
 function membersFor(team: string): SelectedMember[] {
-  return (membersByTeam[team] ?? [])
-    .map((value) => catalog.classes.find((record) => record.enabled &&
-      (record.code.toLocaleLowerCase() === value.trim().toLocaleLowerCase() ||
-       record.name.toLocaleLowerCase() === value.trim().toLocaleLowerCase())))
-    .filter((record) => record !== undefined)
-    .map((record) => {
-      const profile = catalog.classEffects.find((item) => item.classId === record.id && item.mode === mode);
-      return {
-        classId: record.id,
-        classCode: record.code,
-        effects: profile?.effects ?? {},
-        uniquenessGroup: record.uniquenessGroup,
-      };
-    });
+  return resolveSavedMembers(catalog, membersByTeam[team] ?? [], mode);
 }
 
 function invalidMemberEntries(): string[] {

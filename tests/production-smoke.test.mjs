@@ -330,7 +330,7 @@ test('four source and production pages retain unique metadata and current footer
         const canonical = doc.querySelectorAll('head link[rel="canonical"]');
         assert.equal(canonical.length, 1);
         assert.equal(canonical[0].href, 'https://as930010.github.io/damage-calculator/' + path);
-        assert.equal(doc.querySelector('.footer-version bdi').textContent, 'v4.01.03');
+        assert.equal(doc.querySelector('.footer-version bdi').textContent, 'v4.01.07');
       } finally { dom.window.close(); }
     }
     assert.equal(new Set(descriptions).size, 4);
@@ -349,8 +349,9 @@ test('release history preserves published entries and prepends new versions with
       ]);
       const versions = entries.map(entry => entry[0]);
       assert.equal(new Set(versions).size, versions.length, 'versions are unique within release history');
-      assert.deepEqual(entries[0], ['v4.01.03', '2026-11-06', '新增屬性變換試算評分功能']);
-      assert.deepEqual(entries[1], ['v3.04.23', '2026-11-05', '優化冰裝與內裝魔法石來源顯示方式、獵人的本能新增公會技能標籤']);
+      assert.deepEqual(entries[0], ['v4.01.07', '2026-11-06', '新增細算無視防禦以及彈匣選項，用於支援格雷特勳章的效果計算']);
+      assert.deepEqual(entries[1], ['v4.01.03', '2026-11-06', '新增屬性變換試算評分功能']);
+      assert.deepEqual(entries[2], ['v3.04.23', '2026-11-05', '優化冰裝與內裝魔法石來源顯示方式、獵人的本能新增公會技能標籤']);
       const current = versions.indexOf('v3.04.19'), previous = versions.indexOf('v3.04.18');
       assert.ok(current >= 0 && previous > current);
       assert.deepEqual(entries[previous], ['v3.04.18', '2026-10-30', '新增切換佈景主題功能、按鈕反應與視覺效果優化']);

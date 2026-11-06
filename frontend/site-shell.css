@@ -95,7 +95,7 @@ body.site-page {
 .site-button { border: 1px solid #526681; border-radius: 8px; background: var(--site-action-surface); color: var(--site-text); }
 .site-button:hover { background: #315075; }
 .site-button:focus-visible { outline: 2px solid #b6c3ff; outline-offset: 2px; }
-.site-card { border: 1px solid var(--site-border); border-radius: 18px; background: var(--site-surface); }
+.site-card, .battle-defense { border: 1px solid var(--site-border); border-radius: 18px; background: var(--site-surface); }
 
 /* Shared control typography and disclosure geometry; tool styles keep their own sizing. */
 .site-page :is(button, input, select, textarea) { font-family: inherit; }
@@ -215,3 +215,39 @@ body.site-page {
 .mode-switch button { flex: 1; min-width: 0; min-height: 40px; padding: 9px 15px; border: 0; border-radius: 9px; background: transparent; color: var(--site-muted); font: inherit; cursor: pointer; }
 .mode-switch button[aria-selected="true"] { color: var(--site-text); background: var(--site-action-surface); box-shadow: inset 0 0 0 1px var(--site-action-edge); }
 .mode-switch button:focus-visible { outline: 2px solid var(--site-text); outline-offset: 2px; }
+
+/* One compact battle-environment editor shared by the calculator and scoring page. */
+.site-page .battle-defense { padding: 0; margin-block: 0 1rem; min-width: 0; }
+.site-page details.battle-defense.global-source-panel > summary { display: grid; grid-template-columns: auto auto minmax(0, 1fr); align-items: center; gap: .75rem; padding: 1rem 1.25rem; cursor: pointer; list-style: none; }
+.battle-defense > summary::-webkit-details-marker { display: none; }
+.battle-defense .defense-title { font-weight: 700; }
+.battle-defense .defense-summary-values { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem; }
+.battle-defense .defense-summary-values > span { display: flex; flex-wrap: wrap; justify-content: center; gap: .25rem .5rem; min-width: 0; }
+.battle-defense strong, .battle-defense dd { font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.battle-defense .defense-summary-values > span > span, .battle-defense .defense-note { color: var(--text-muted, var(--site-muted)); }
+.battle-defense .defense-body { padding: 0 1.25rem 1.25rem; min-width: 0; }
+.battle-defense .mode-switch { width: 100%; max-width: none; }
+.battle-defense label { display: block; }
+.battle-defense :is(input, select) { box-sizing: border-box; width: 100%; min-width: 0; min-height: 2.75rem; padding: .625rem .75rem; border: 1px solid var(--border-control, var(--site-border)); border-radius: .5rem; background: var(--control, var(--site-surface)); color: var(--text-input, var(--site-text)); font: inherit; }
+.battle-defense :is(input, select, button, summary):focus-visible { outline: 2px solid var(--accent, var(--site-text)); outline-offset: 2px; }
+.battle-defense .defense-source-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(7rem, .2fr) auto; align-items: center; gap: .5rem; margin-block: .5rem; }
+.battle-defense .defense-source-row button { min-width: 2.75rem; min-height: 2.75rem; border: 1px solid var(--border-control, var(--site-border)); border-radius: .5rem; background: var(--control, var(--site-surface)); color: inherit; font: inherit; cursor: pointer; }
+.battle-defense [data-defense-add] { width: fit-content; min-width: calc(100% / 3); max-width: 100%; margin-block: .5rem; }
+.battle-defense .defense-note { font-size: .875rem; line-height: 1.6; }
+.battle-defense .defense-error, .battle-defense .defense-import-status { color: var(--warning, var(--site-text)); overflow-wrap: anywhere; }
+.battle-defense .defense-totals { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; border-top: 1px solid var(--border, var(--site-border)); padding-top: 1rem; margin-block: 1rem 0; }
+.battle-defense .defense-totals dd { margin: .25rem 0 0; font-size: 1.25rem; font-weight: 700; }
+.battle-defense .defense-target { margin-block: .75rem; }
+.battle-defense .defense-team-info { overflow-wrap: anywhere; }
+.battle-defense [hidden] { display: none; }
+@media (max-width: 700px) {
+  .site-page details.battle-defense.global-source-panel > summary { grid-template-columns: auto minmax(0, 1fr); padding: .875rem 1rem; }
+  .battle-defense .defense-summary-values { grid-column: 1 / -1; grid-row: 2; }
+  .battle-defense .defense-summary-values > span { display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .battle-defense .defense-summary-values > span > span { font-size: .75rem; }
+  .battle-defense .defense-source-row { grid-template-columns: minmax(0, 1fr) auto; }
+  .battle-defense [data-source-name] { grid-column: 1 / -1; }
+  .battle-defense .defense-body { padding-inline: 1rem; }
+  .battle-defense .defense-totals { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .battle-defense .defense-totals > div:last-child { grid-column: 1 / -1; }
+}

@@ -225,6 +225,8 @@ export interface FinalDamageInput {
   stageAdaptabilityPenaltyPct: number;
   enemyDefensePct: number;
   defenseIgnorePct: number;
+  /** Independent external battle effects, as a fraction. */
+  externalDefenseBreakRate?: number;
 }
 
 export interface FinalDamageResult {
@@ -241,5 +243,6 @@ export interface FinalDamageResult {
   conditionalFactor: number;
   adaptationFactor: number;
   defenseFactor: number;
+  defenseContext?: { equipmentRate: number; externalRate: number; effectiveRate: number; bossDefenseRate: number };
   finalDamage: number;
 }

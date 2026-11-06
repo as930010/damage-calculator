@@ -19,10 +19,21 @@ test('repeat builds are byte-identical; linked CSS, JS and JSON have content ver
   validateAssets(first.files, first.manifest);
   for (const { path } of first.manifest.css) assert.ok(path.includes(contentHash(first.files.get(path))));
   for (const path of Object.values(first.manifest.data)) if (path.endsWith('.json')) assert.ok(path.includes(contentHash(first.files.get(path))));
-  assert.equal(Object.keys(first.manifest.js).length, 3);
   const initial = first.manifest.js[first.manifest.entry].imports;
-  assert.equal(initial.filter(item => item.kind === 'dynamic-import').length, 1);
-  const transfer = initial.find(item => item.kind === 'dynamic-import').path;
+  const lazy = initial.filter(item => item.kind === 'dynamic-import');
+  assert.equal(lazy.length, 2, 'transfer and team reference are separate on-demand features');
+  const transfer = lazy.find(item => /\/loadout-transfer-/.test(item.path)).path;
+  const teamReference = lazy.find(item => /\/team-defense-reference-/.test(item.path)).path;
+  const eagerlyLoaded = new Set();
+  const visit = path => {
+    if (eagerlyLoaded.has(path)) return;
+    eagerlyLoaded.add(path);
+    for (const dependency of first.manifest.js[path].imports) if (dependency.kind !== 'dynamic-import') visit(dependency.path);
+  };
+  visit(first.manifest.entry);
+  assert.ok(!eagerlyLoaded.has(transfer));
+  assert.ok(!eagerlyLoaded.has(teamReference));
+  assert.ok(first.files.get(teamReference).length > 0);
   assert.equal(first.manifest.transfer, transfer);
   assert.ok(first.files.get('index.html').toString().includes(`name="loadout-transfer-url" content="./${transfer}"`));
   assert.match(transfer, /loadout-transfer-/);
@@ -77,7 +88,7 @@ test('changing a lazy dependency versions the chunk and referencing entry withou
       contents: await readFile(args.path, 'utf8') + '\nconsole.info("new-transfer-version");', loader: 'js',
     }));
   } } });
-  const lazy = value => value.manifest.js[value.manifest.entry].imports.find(item => item.kind === 'dynamic-import').path;
+  const lazy = value => value.manifest.js[value.manifest.entry].imports.find(item => item.kind === 'dynamic-import' && /\/loadout-transfer-/.test(item.path)).path;
   assert.notEqual(lazy(first), lazy(second)); assert.notEqual(first.manifest.entry, second.manifest.entry);
   assert.deepEqual(first.manifest.css, second.manifest.css);
   validateAssets(second.files, second.manifest);

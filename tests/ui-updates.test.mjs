@@ -4,6 +4,73 @@ import { gameData } from './loadout-evaluation-harness.mjs';
 import { uiPage, stateA, stateB, stageFields, enter, assertStageSync, measureDom, workloadActions } from './ui-update-harness.mjs';
 import { createRuntime } from './loadout-evaluation-harness.mjs';
 
+test('Battle defense editor has its own disclosure key and does not change loadout/history', async () => {
+  const page = await uiPage();
+  try {
+    const {document, Event} = page.dom.window;
+    const panel = document.querySelector('#battle-defense-context');
+    assert.equal(panel.previousElementSibling.className,'battle-panel');
+    assert.equal(panel.nextElementSibling.className,'equipment-workspace');
+    assert.equal(panel.open,false);
+    assert.equal(panel.querySelector('.defense-summary-values').children[1].querySelector('span').textContent,'裝備以外的破防來源');
+    assert.equal(panel.querySelector('.defense-totals').children[1].querySelector('dt').textContent,'裝備以外的破防來源');
+    assert.equal(panel.dataset.disclosureKey,'battle-defense-context');
+    assert.equal(document.querySelector('#global-source-settings').dataset.disclosureKey,'global-sources');
+    const before=page.dom.window.localStorage.getItem('dab-loadout-v1');
+    const baseline=page.dom.window.localStorage.getItem('dab-baseline-v1');
+    const undo=document.querySelector('#undo').disabled;
+    panel.open=true;
+    const input=panel.querySelector('[data-defense-manual]');input.focus();input.value='89.6';input.dispatchEvent(new Event('input',{bubbles:true}));
+    assert.equal(document.activeElement,input);assert.equal(panel.querySelector('[data-defense-manual]'),input);
+    assert.match(panel.querySelector('.defense-summary-values').textContent,/90.4008%/);
+    assert.equal(document.querySelector('#undo').disabled,undo);
+    assert.equal(page.dom.window.localStorage.getItem('dab-loadout-v1'),before);
+    assert.equal(page.dom.window.localStorage.getItem('dab-baseline-v1'),baseline);
+    const ratio=document.querySelector('.equipment-damage-gain strong').textContent;assert.match(ratio,/0\.00%/);
+    assert.equal(input.getAttribute('aria-label'),'裝備以外來源總破防率（%）');
+    assert.equal(panel.querySelector('.defense-team-link'),null);
+    assert.match(panel.textContent,/此區塊獨立保存，不包含在匯入匯出設定中且不受復原、重做按鈕影響/);
+    const damage=document.querySelector('#damage-result').textContent;
+    for(const raw of ['1e2','中文','abc','-10','48%','101','4..8']) {
+      input.value=raw;input.dispatchEvent(new Event('input',{bubbles:true}));
+      assert.equal(input.value,'89.6');assert.equal(document.activeElement,input);
+      assert.equal(document.querySelector('#damage-result').textContent,damage);
+      assert.match(panel.querySelector('.defense-error').textContent,/不需輸入 %/);
+    }
+    input.setSelectionRange(0,input.value.length);
+    const invalidKey=new page.dom.window.InputEvent('beforeinput',{inputType:'insertText',data:'負數-1',bubbles:true,cancelable:true});
+    assert.equal(input.dispatchEvent(invalidKey),false);assert.equal(input.value,'89.6');
+    const paste=new Event('paste',{bubbles:true,cancelable:true});Object.defineProperty(paste,'clipboardData',{value:{getData:()=>'-48%'}});
+    assert.equal(input.dispatchEvent(paste),false);assert.equal(input.value,'89.6');
+    input.value='50.5';input.dispatchEvent(new Event('input',{bubbles:true}));assert.equal(input.value,'50.5');assert.equal(panel.querySelector('.defense-error').textContent,'');
+    // Invalid saved/programmatic state is still rejected independently of the input guard.
+    const key='damage-calculator.battle-defense.v1';const saved=JSON.parse(page.dom.window.localStorage.getItem(key));saved.manualPercentage='1e2';
+    page.dom.window.localStorage.setItem(key,JSON.stringify(saved));page.dom.window.dispatchEvent(new page.dom.window.StorageEvent('storage',{key}));
+    assert.match(document.querySelector('#damage-result').textContent,/戰鬥破防/);assert.match(panel.querySelector('.defense-error').textContent,/十進位/);
+  } finally { page.close(); }
+});
+
+test('Independent source rows retain editing nodes, validate drafts and combine remaining defense', async () => {
+  const page=await uiPage();
+  try {
+    const {document,Event}=page.dom.window,panel=document.querySelector('#battle-defense-context');panel.open=true;
+    panel.querySelector('[data-defense-mode="sources"]').click();
+    for(const [i,rate]of [48,50,50,20].entries()){
+      panel.querySelector('[data-defense-add]').click();
+      const row=panel.querySelectorAll('.defense-source-row')[i],name=row.querySelector('[data-source-name]'),number=row.querySelector('[data-source-percentage]');
+      assert.equal(document.activeElement,name);assert.equal(name.value,'');number.value=String(rate);number.dispatchEvent(new Event('input',{bubbles:true}));
+    }
+    assert.match(panel.querySelector('.defense-summary-values').textContent,/89\.6%.*90\.4008%/);
+    const rows=[...panel.querySelectorAll('.defense-source-row')];
+    const percentage=rows[0].querySelector('[data-source-percentage]');percentage.focus();percentage.value='50%';percentage.dispatchEvent(new Event('input',{bubbles:true}));
+    assert.equal(percentage.value,'48');assert.equal(document.activeElement,percentage);assert.match(panel.querySelector('.defense-summary-values').textContent,/89\.6%.*90\.4008%/);
+    rows[1].querySelector('button').click();
+    assert.equal(panel.querySelectorAll('.defense-source-row')[0],rows[0]);assert.equal(panel.querySelectorAll('.defense-source-row')[1],rows[2]);
+    while(panel.querySelector('.defense-source-row'))panel.querySelector('.defense-source-row button').click();
+    assert.match(panel.querySelector('.defense-summary-values').textContent,/裝備以外的破防來源0%/);
+  }finally{page.close();}
+});
+
 function pickerRows(page, label) {
   const { document, Event } = page.dom.window;
   const input = document.querySelector(`input[aria-label="${label}"]`);
@@ -265,6 +332,27 @@ test('support magazines default to locked level one and only affect damage throu
     selectPicker(reloaded, '彈匣等級', 'Lv.4');
     selectPicker(reloaded, '彈匣種類', '支援彈匣I'); assertFixed(reloaded);
   } finally { page.close(); reloaded?.close(); }
+});
+
+test('new super magazines are fixed-level choices with no intrinsic damage and count toward the medal', async () => {
+  const initial = nephronMagazineState([], false); initial.values['Accessory.Earring'] = '';
+  const page = await uiPage(initial);
+  try {
+    const { projectDamage } = await page.runtime.load('frontend/projection.ts');
+    const result = () => projectDamage(gameData, page.readState()).result;
+    const before = result().finalDamage.finalDamage;
+    for (const [slot, name] of [['upper', '超級彈匣I'], ['gloves', '超級彈匣II']]) {
+      openMagazineSlot(page, slot); selectPicker(page, '彈匣種類', name);
+      const level = page.dom.window.document.querySelector('input[aria-label="彈匣等級"]');
+      assert.equal(level.value, 'Lv.1'); assert.equal(level.disabled, true);
+      assert.equal(result().finalDamage.finalDamage, before);
+    }
+    page.dom.window.document.querySelector('button[data-slot-id="Accessory.Earring"]').click();
+    selectPicker(page, '選擇裝備', '格雷特的勳章');
+    assert.equal(result().generalMultiplicativeDamage.factors.find(item => item.sourceId === 'grett-medal:super-magazines')?.factor, 1.01);
+    const exported = await page.exportJson(); await page.importJson(JSON.stringify(exported));
+    assert.equal(result().generalMultiplicativeDamage.factors.find(item => item.sourceId === 'grett-medal:super-magazines')?.factor, 1.01);
+  } finally { page.close(); }
 });
 
 test('Grett medal magazine bonuses enter the existing damage products independently of basic medal and raid effects', async () => {
@@ -564,6 +652,8 @@ test('magazine kinds show their actual effects and chip tuning shows only percen
       '經典彈匣Type - I': '兩極化%',
       '支援彈匣I': '僅供格雷特的勳章效果計數，本身不提供傷害屬性',
       '支援彈匣II': '僅供格雷特的勳章效果計數，本身不提供傷害屬性',
+      '超級彈匣I': '僅供格雷特的勳章效果計數，本身不提供傷害屬性',
+      '超級彈匣II': '僅供格雷特的勳章效果計數，本身不提供傷害屬性',
     };
     assert.deepEqual(rows.map(row => row.querySelector('span').textContent), gameData.nephronArmor.magazines.map(item => item.name));
     for (const row of rows) assert.equal(row.querySelector('small').textContent, expected[row.querySelector('span').textContent]);

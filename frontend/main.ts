@@ -13,7 +13,9 @@ import { loadGameData, readJson, escapeHtml as h, formatNumber as fmt } from './
 import { readState, readBaseline, saveState, normalizePortraitAwakeningValues as normalizePortraitValues, normalizeTranscendenceSkillDamageShare, type LoadoutState } from './state.ts';
 import { createTransferLoader } from './loadout-transfer-loader.ts';
 import { normalizeOptionalEffectValues, isUnrelatedEffectValue, normalizeNephronMagazineSelections, normalizeBossHealthCondition, DEFAULT_BOSS_HEALTH_CONDITION } from './state.ts';
-import { evaluateLoadout, projectDamage } from './projection.ts';
+import { evaluateLoadout as evaluateLoadoutBase, projectDamage as projectDamageBase } from './projection.ts';
+import { createBattleDefenseStore } from './battle-defense-state.ts';
+import { createBattleDefenseEditor, equipmentDefenseRates } from './battle-defense-ui.ts';
 import { createBaselineEvaluationCache } from './baseline-evaluation.ts';
 import { createAttributeEquivalencePanel } from './attribute-equivalence-ui.ts';
 import { createDisclosurePreferences } from './disclosure-preferences.ts';
@@ -50,6 +52,9 @@ const ICE_EQUIPMENT_SHORT_NAMES: Record<string, string> = {
 
 async function start() {
   const data = await loadGameData();
+  const battleDefense = createBattleDefenseStore(window);
+  const evaluateLoadout = (game: typeof data, loadout: LoadoutState, rates = true, input = false) => evaluateLoadoutBase(game, loadout, rates, input, battleDefense.rate);
+  const projectDamage = (game: typeof data, loadout: LoadoutState) => projectDamageBase(game, loadout, battleDefense.rate);
   // This page loads GameData once. Controls/import/history change state, never this data.
   // A future in-session data/parameter refresh must replace this revision token.
   const calculationDataRevision = Symbol('loaded-game-data');
@@ -123,6 +128,7 @@ async function start() {
       if (request.format !== 'ice-optimizer-selection' || request.version !== 1
         || !savedLoadoutAtStartup || request.baseRaw !== savedLoadoutAtStartup
         || !version || request.dataRevision !== version || !validChoices || !validSets
+        || (request.externalDefenseBreakRate ?? 0) !== battleDefense.rate
         || typeof request.expectedDamage !== 'number' || !Number.isFinite(request.expectedDamage)) {
         optimizerApplyMessage = '冰裝搜尋結果已過期或資料不完整；原配裝保持不變，請重新搜尋。';
       } else {
@@ -159,7 +165,7 @@ async function start() {
     { id: 'ring-two', label: '指環 2', icon: 'ring', fixedFields: ['MasterBeast.Ring2.Option1', 'MasterBeast.Ring2.Option2'], stoneFields: ['MasterBeast.Ring2.CustomAttribute', 'MasterBeast.Ring2.CustomValue'], stoneCategory: 'ring', mirrorFields: [['MasterBeast.Ring2.Mirror.1.Attribute', 'MasterBeast.Ring2.Mirror.1.Value'], ['MasterBeast.Ring2.Mirror.2.Attribute', 'MasterBeast.Ring2.Mirror.2.Value'], ['MasterBeast.Ring2.Mirror.3.Attribute', 'MasterBeast.Ring2.Mirror.3.Value']] },
   ];
   const app = document.querySelector<HTMLElement>('#app')!;
-    app.innerHTML = `<section class="workbench"><header class="workspace-heading"><div class="workspace-intro"><span class="eyebrow">EQUIPMENT SIMULATOR</span><h1>裝備傷害比較</h1><p class="workspace-summary">填入當前數值並設為比較基準，再調整配裝查看傷害差異。<br>請注意僅計算理論最高傷害，並不考慮冷卻、動速等問題。</p><ol class="workflow-steps" aria-label="比較流程"><li><span>01</span><span>填入當前數值</span></li><li><span>02</span><span>設為比較基準</span></li><li><span>03</span><span>填入新數值</span></li></ol></div></header><div class="toolbar"><div id="class-picker"></div><label class="toggle"><input id="alternate" type="checkbox">啟用強/排褲切換</label><div class="toolbar-actions"><button id="baseline" type="button">設為比較基準</button><div class="transfer-actions"><button id="import-loadout" type="button">匯入配裝</button><button id="export-loadout" type="button">匯出配裝</button></div></div><input id="loadout-file" type="file" accept="application/json,.json" hidden><span id="transfer-status" role="status" aria-live="polite"></span><span id="save-status" role="status"></span></div><section class="battle-panel"><div class="panel-heading"><h2>關卡設定</h2></div><div id="battle-settings" class="battle-fields"></div></section><div class="equipment-workspace"><section class="equipment-panel"><div class="panel-heading"><h2>裝備配置</h2><span>點選部位以編輯</span></div><div id="equipment-damage-summary" class="equipment-damage-summary" aria-live="polite"></div><div class="canvas-scroll"><div class="equipment-canvas"><span class="group-label costume-label">連身時裝</span><span class="group-label left-label">左冰</span><span class="group-label inner-label">內裝左四</span><span class="group-label weapon-label">冰武 / 武器</span><span class="group-label right-label">右冰</span><span class="group-label accessory-label">飾品</span><span class="group-label beast-label">聖獸飾品</span><div id="title-input" class="canvas-title-input"></div><div id="slots"></div><div id="beast-accessory-fields" class="beast-accessories-grid gear-beast-slots" aria-label="聖獸飾品配置"></div></div></div><p class="panel-note">左冰不支援混搭，但各部位魔法石仍須獨立設定。擁有強/排褲則褲子的傷害增幅會被平均計算。</p><section class="right-ice-set-area"><div class="beast-accessories-heading"><h3>右冰套效</h3><span>最多選擇 ${data.rightIceSets.maxSelectedSets} 套</span></div><p class="panel-note">選擇要啟用的套裝效果。</p><div id="right-ice-set-selectors" class="right-ice-set-selectors"></div></section><div class="beast-accessories-area"><div class="beast-accessories-heading"><h3>聖獸效果設定</h3></div><p class="panel-note">共通顏色與潛力設定</p><div id="master-beast-controls" class="master-beast-controls"></div></div></section><div id="inspector-backdrop" class="inspector-backdrop" aria-hidden="true"></div><aside id="inspector" class="inspector" aria-label="部位設定"></aside></div><details class="global-source-panel weapon-magic-stone-panel"><summary>武器魔力石</summary><div id="weapon-magic-stone-fields"></div></details><details class="global-source-panel"><summary>其他效果來源設定</summary><p class="panel-note">未列在此處的特殊條件或 Buff／Debuff 尚未納入計算。</p><div id="global-source-fields"></div></details><section class="results-panel"><div class="panel-heading"><h2>目前填寫的屬性</h2><span id="comparison-label"></span></div><p class="panel-note">包含裝備、冰裝、飾品、聖獸、關卡、效果設定等所有已填入的屬性加總</p><div id="results" aria-live="polite"></div><section class="damage-panel"><div class="panel-heading"><h2>攻擊與最終傷害</h2></div><div id="damage-result" aria-live="polite"></div><details class="calculation-inspection-panel"><summary>計算結果驗算</summary><div class="calculation-inspection-content"><div id="calculation-comparison" class="calculation-comparison" aria-live="polite"><p>先點選「設為比較基準」保存目前配置，表格就會比較基準與目前配裝。</p></div><div id="calculation-details"></div></div></details></section></section></section>`;
+    app.innerHTML = `<section class="workbench"><header class="workspace-heading"><div class="workspace-intro"><span class="eyebrow">EQUIPMENT SIMULATOR</span><h1>裝備傷害比較</h1><p class="workspace-summary">填入當前數值並設為比較基準，再調整配裝查看傷害差異。<br>請注意僅計算理論最高傷害，並不考慮冷卻、動速等問題。</p><ol class="workflow-steps" aria-label="比較流程"><li><span>01</span><span>填入當前數值</span></li><li><span>02</span><span>設為比較基準</span></li><li><span>03</span><span>填入新數值</span></li></ol></div></header><div class="toolbar"><div id="class-picker"></div><label class="toggle"><input id="alternate" type="checkbox">啟用強/排褲切換</label><div class="toolbar-actions"><button id="baseline" type="button">設為比較基準</button><div class="transfer-actions"><button id="import-loadout" type="button">匯入配裝</button><button id="export-loadout" type="button">匯出配裝</button></div></div><input id="loadout-file" type="file" accept="application/json,.json" hidden><span id="transfer-status" role="status" aria-live="polite"></span><span id="save-status" role="status"></span></div><section class="battle-panel"><div class="panel-heading"><h2>關卡設定</h2></div><div id="battle-settings" class="battle-fields"></div></section><div class="equipment-workspace"><section class="equipment-panel"><div class="panel-heading"><h2>裝備配置</h2><span>點選部位以編輯</span></div><div id="equipment-damage-summary" class="equipment-damage-summary" aria-live="polite"></div><div class="canvas-scroll"><div class="equipment-canvas"><span class="group-label costume-label">連身時裝</span><span class="group-label left-label">左冰</span><span class="group-label inner-label">內裝左四</span><span class="group-label weapon-label">冰武 / 武器</span><span class="group-label right-label">右冰</span><span class="group-label accessory-label">飾品</span><span class="group-label beast-label">聖獸飾品</span><div id="title-input" class="canvas-title-input"></div><div id="slots"></div><div id="beast-accessory-fields" class="beast-accessories-grid gear-beast-slots" aria-label="聖獸飾品配置"></div></div></div><p class="panel-note">左冰不支援混搭，但各部位魔法石仍須獨立設定。擁有強/排褲則褲子的傷害增幅會被平均計算。</p><section class="right-ice-set-area"><div class="beast-accessories-heading"><h3>右冰套效</h3><span>最多選擇 ${data.rightIceSets.maxSelectedSets} 套</span></div><p class="panel-note">選擇要啟用的套裝效果。</p><div id="right-ice-set-selectors" class="right-ice-set-selectors"></div></section><div class="beast-accessories-area"><div class="beast-accessories-heading"><h3>聖獸效果設定</h3></div><p class="panel-note">共通顏色與潛力設定</p><div id="master-beast-controls" class="master-beast-controls"></div></div></section><div id="inspector-backdrop" class="inspector-backdrop" aria-hidden="true"></div><aside id="inspector" class="inspector" aria-label="部位設定"></aside></div><details class="global-source-panel weapon-magic-stone-panel"><summary>武器魔力石</summary><div id="weapon-magic-stone-fields"></div></details><details id="global-source-settings" class="global-source-panel"><summary>其他效果來源設定</summary><p class="panel-note">未列在此處的特殊條件或 Buff／Debuff 尚未納入計算。</p><div id="global-source-fields"></div></details><section class="results-panel"><div class="panel-heading"><h2>目前填寫的屬性</h2><span id="comparison-label"></span></div><p class="panel-note">包含裝備、冰裝、飾品、聖獸、關卡、效果設定等所有已填入的屬性加總</p><div id="results" aria-live="polite"></div><section class="damage-panel"><div class="panel-heading"><h2>攻擊與最終傷害</h2></div><div id="damage-result" aria-live="polite"></div><details class="calculation-inspection-panel"><summary>計算結果驗算</summary><div class="calculation-inspection-content"><div id="calculation-comparison" class="calculation-comparison" aria-live="polite"><p>先點選「設為比較基準」保存目前配置，表格就會比較基準與目前配裝。</p></div><div id="calculation-details"></div></div></details></section></section></section>`;
   const disclosurePreferences = createDisclosurePreferences(document);
   const resultsPanel = app.querySelector<HTMLElement>('.results-panel')!;
   const resultsDisclosure = document.createElement('details');
@@ -176,10 +182,15 @@ async function start() {
   resultsPanel.replaceWith(resultsDisclosure);
   for (const [selector, key] of [
     ['.weapon-magic-stone-panel', 'weapon-magic-stone'],
-    ['.global-source-panel:not(.weapon-magic-stone-panel)', 'global-sources'],
+    ['#global-source-settings', 'global-sources'],
     ['.calculation-inspection-panel', 'calculation-inspection'],
     ['.site-credits-notes', 'site-credits'],
   ] as const) document.querySelector<HTMLDetailsElement>(selector)!.dataset.disclosureKey = key;
+  const defenseEditor = createBattleDefenseEditor(battleDefense, new URL(app.querySelector<HTMLAnchorElement>('a[href*="buff-simulator"]')?.href ?? new URL('./buff-simulator/', location.href).href));
+  defenseEditor.root.id = 'battle-defense-context';
+  app.querySelector('.battle-panel')!.after(defenseEditor.root);
+  defenseEditor.root.open = disclosurePreferences.preferredOpen('battle-defense-context', false);
+  battleDefense.subscribe(() => renderResults());
   const attributeEquivalence = createAttributeEquivalencePanel(data.attributes.attributes, () => {
     const evaluation = evaluateLoadout(data, state, false, true);
     attributeEquivalence.update('comparisonInput' in evaluation ? evaluation.comparisonInput : undefined,
@@ -1323,8 +1334,9 @@ async function start() {
         currentEvaluation.damage?.result,
       );
       const currentDamage = currentEvaluation.damage;
+      defenseEditor.setEquipment(equipmentDefenseRates(currentDamage?.result, currentEvaluation.attributes?.stats.defenseIgnorePct?.finalTotal));
       const damageCalculationError = currentEvaluation.damageError;
-      const baselineEvaluation = baselineEvaluationCache.get(data, baseline, calculationDataRevision);
+      const baselineEvaluation = baselineEvaluationCache.get(data, baseline, calculationDataRevision, battleDefense.rate);
       const baselineDamage = baselineEvaluation?.damage ?? null;
       const baselineAttributes = baselineEvaluation?.attributes ?? null;
       baselineIsValid = baselineAttributes !== null;
@@ -1529,7 +1541,7 @@ async function start() {
   baselineButton.addEventListener('click', () => {
     try {
       const candidate = structuredClone(state);
-      const evaluation = baselineEvaluationCache.get(data, candidate, calculationDataRevision)!;
+      const evaluation = baselineEvaluationCache.get(data, candidate, calculationDataRevision, battleDefense.rate)!;
       if (!evaluation.attributes) throw evaluation.attributeError;
       baseline = candidate;
       baselineIsValid = true;

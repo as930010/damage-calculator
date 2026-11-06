@@ -10,8 +10,8 @@ const [armor, innerwear, attack] = await Promise.all([
 ]);
 const statsFor = sourceList => Object.assign({}, ...sourceList.map(source => source.stats));
 
-test('support magazines force level one without providing intrinsic damage stats', () => {
-  for (const name of ['支援彈匣I', '支援彈匣II']) {
+test('support and super I/II magazines force level one without providing intrinsic damage stats', () => {
+  for (const name of ['支援彈匣I', '支援彈匣II', '超級彈匣I', '超級彈匣II']) {
     const magazine = armor.magazines.find(entry => entry.name === name);
     assert.ok(magazine); assert.equal(magazine.fixedLevel, 1);
     for (const level of [undefined, '', 'Lv.1', 'Lv.6', 3]) {
@@ -22,6 +22,12 @@ test('support magazines force level one without providing intrinsic damage stats
       assert.equal(sources[0].sourceId, `nephron-magazine:upper:${magazine.id}:Lv.1`);
     }
   }
+  for (const name of ['超級彈匣I', '超級彈匣II']) {
+    assert.deepEqual(armor.magazines.find(entry => entry.name === name).otherEffects, armor.magazines.find(entry => entry.name === '支援彈匣I').otherEffects);
+  }
+  assert.deepEqual(resolveGrettMedalMagazineBonuses(['超級彈匣I', '超級彈匣II']), [
+    { sourceId: 'grett-medal:super-magazines', stats: { multiplicativeDamagePct: 1 } },
+  ]);
   assert.deepEqual(resolveGrettMedalMagazineBonuses(['支援彈匣I', '支援彈匣II']), [
     { sourceId: 'grett-medal:support-magazines', stats: { multiplicativeDamagePct: 1.5 } },
   ]);
@@ -169,7 +175,7 @@ test('all Nephron transformations expose ten exact tiers and first three scale b
 
 test('all Nephron magazines retain their specified values and resolve the advertised stat', () => {
   const regular = [0.5,1,1.5,2,2.5,3];
-  assert.equal(armor.magazines.length, 10);
+  assert.equal(armor.magazines.length, 12);
   for (const magazine of armor.magazines) {
     assert.deepEqual(magazine.levelValuesPct, magazine.fixedLevel === 1 ? [0,0,0,0,0,0]
       : magazine.id === 'super-booster' ? [0.5,1,1.5,2,3,4] : regular, magazine.name);

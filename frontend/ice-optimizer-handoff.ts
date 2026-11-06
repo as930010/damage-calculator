@@ -9,6 +9,7 @@ export interface IceOptimizerHandoff {
   choices: Record<string, string>;
   setNames: string[];
   expectedDamage: number;
+  externalDefenseBreakRate?: number;
 }
 
 export function stageIceOptimizerHandoff(selection: IceOptimizerHandoff): void {

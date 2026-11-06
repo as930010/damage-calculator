@@ -1,3 +1,4 @@
+import { combineDefenseRates, requireDefenseRate } from './battle-defense.ts';
 import type { FinalDamageInput, FinalDamageResult } from "./types.ts";
 
 function requireFiniteInputs(input: FinalDamageInput): void {
@@ -67,8 +68,11 @@ export function calculateFinalDamage(input: FinalDamageInput): FinalDamageResult
     1 - ratio(input.stageAdaptabilityPenaltyPct) +
     ratio(input.adaptabilityPct) +
     ratio(input.superAdaptabilityPct);
-  const defenseDenominator =
-    1 - ratio(input.enemyDefensePct) * ratio(input.defenseIgnorePct);
+  const equipmentRate = ratio(input.defenseIgnorePct);
+  const externalRate = input.externalDefenseBreakRate ?? 0;
+  const effectiveRate = combineDefenseRates(equipmentRate, externalRate);
+  const bossDefenseRate = requireDefenseRate(ratio(input.enemyDefensePct), 'Boss 防禦');
+  const defenseDenominator = 1 - bossDefenseRate * effectiveRate;
   if (defenseDenominator === 0) {
     throw new RangeError("Defense factor denominator is zero.");
   }
@@ -106,6 +110,7 @@ export function calculateFinalDamage(input: FinalDamageInput): FinalDamageResult
     conditionalFactor,
     adaptationFactor,
     defenseFactor,
+    ...(externalRate === 0 ? {} : { defenseContext: { equipmentRate, externalRate, effectiveRate, bossDefenseRate } }),
     finalDamage,
   };
 }

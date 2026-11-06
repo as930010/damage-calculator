@@ -1,6 +1,7 @@
+import { createBattleDefenseStore } from '../../../frontend/battle-defense-state.ts';
 import { loadGameData, formatNumber } from '../../../frontend/data.ts';
 import { readState } from '../../../frontend/state.ts';
-import { projectDamage } from '../../../frontend/projection.ts';
+import { projectDamage as projectDamageBase } from '../../../frontend/projection.ts';
 import { stageIceOptimizerHandoff } from '../../../frontend/ice-optimizer-handoff.ts';
 import type { GameData } from '../../../frontend/data.ts';
 import type { LoadoutState } from '../../../frontend/state.ts';
@@ -10,6 +11,9 @@ import type { IceProgress, IceResultAlternative, IceSearchResult } from './searc
 import { iceSeriesOrder, requiredIceSetNames, snapshotIceSearchConstraints } from './search-policy.ts';
 import type { IceSearchConstraints } from './search-policy.ts';
 
+const battleDefense = createBattleDefenseStore(window);
+const projectDamage = (data: GameData, state: LoadoutState) => projectDamageBase(data, state, battleDefense.rate);
+let searchDefenseRate: number | null = 0;
 const savedStateKey = 'dab-loadout-v1';
 const savedSearchKey = 'dab-ice-optimizer-result-v1';
 const conditionsKey = 'dab-ice-optimizer-conditions-v1';
@@ -58,7 +62,7 @@ const dataRevision = () => {
   return path.split('/').pop() ?? '';
 };
 const workerUrl = () => document.querySelector<HTMLMetaElement>('meta[name="optimizer-worker-url"]')?.content ?? '';
-const searchRevision = () => `${dataRevision()}|${workerUrl()}`;
+const searchRevision = () => `${dataRevision()}|${workerUrl()}|defense:${battleDefense.rate}`;
 const setRunning = (running: boolean) => {
   if (running && startButton.dataset.searchState !== 'running') setStartState('running');
   else if (!running && startButton.dataset.searchState === 'running') setStartState('idle');
@@ -362,7 +366,7 @@ function renderResults(data: GameData,
       apply.textContent = text;
       resultControlKeys.set(apply, [outfitUiKey(alternative)]);
       apply.addEventListener('click', () => {
-        if (!resultValid || !searchBaseRaw || readSavedRaw() !== searchBaseRaw) {
+        if (!resultValid || !searchBaseRaw || readSavedRaw() !== searchBaseRaw || battleDefense.rate !== searchDefenseRate) {
           status.textContent = '主頁配裝已變更；請重新搜尋後再套用。';
           return;
         }
@@ -376,7 +380,7 @@ function renderResults(data: GameData,
           stageIceOptimizerHandoff({
             format: 'ice-optimizer-selection', version: 1,
             baseRaw: searchBaseRaw, dataRevision: dataRevision(),
-            choices: alternative.choices, setNames: alternative.setNames, expectedDamage: alternative.damage,
+            choices: alternative.choices, setNames: alternative.setNames, expectedDamage: alternative.damage, externalDefenseBreakRate: searchDefenseRate ?? 0,
           });
           location.assign('../');
         } catch {
@@ -525,6 +529,8 @@ function startSearch() {
     status.textContent = '讀取配裝期間資料已變更，請重新開始搜尋。';
     return;
   }
+  if (battleDefense.rate === null) { status.textContent = '戰鬥破防設定尚未完成，請先完成設定。'; return; }
+  searchDefenseRate = battleDefense.rate;
   searchBaseRaw = raw;
   searchBaseState = state;
   resultValid = true;
@@ -578,7 +584,7 @@ function startSearch() {
       stopWorker();
       status.textContent = '搜尋背景程式無法載入或執行，請重新整理後重試。';
     });
-    current.postMessage({ type: 'start', searchId, data: gameData, state, constraints: searchConditions });
+    current.postMessage({ type: 'start', searchId, data: gameData, state, constraints: searchConditions, externalDefenseBreakRate: searchDefenseRate });
   } catch {
     stopWorker();
     status.textContent = '無法啟動背景搜尋；原配裝未變更。';
@@ -607,13 +613,20 @@ clearButton.addEventListener('click', () => {
   setRunning(false);
 });
 window.addEventListener('storage', event => {
-  if (event.key !== savedStateKey) return;
+  if (event.key !== savedStateKey && event.key !== null) return;
   if (worker) stopWorker();
   resetStartState();
   resultValid = false;
   results.querySelectorAll<HTMLButtonElement>('.optimizer-apply').forEach(button => { button.disabled = true; });
   status.textContent = '偵測到另一個分頁更新配裝。原試算仍可檢視，但需重新搜尋後才能套用。';
   validateConditions();
+});
+
+battleDefense.subscribe(() => {
+  if (worker) stopWorker();
+  resultValid = false;
+  results.querySelectorAll<HTMLButtonElement>('.optimizer-apply').forEach(button => { button.disabled = true; });
+  status.textContent = '戰鬥破防環境已變更；請重新搜尋後再套用。';
 });
 
 loadGameData().then(data => {
@@ -667,6 +680,7 @@ loadGameData().then(data => {
             saved.result!.candidatePolicy, saved.baseState!.values)))) {
       searchBaseRaw = saved.baseRaw;
       searchBaseState = saved.baseState;
+      searchDefenseRate = battleDefense.rate;
       resultValid = raw === saved.baseRaw;
       renderResults(data, saved.result, saved.baseState);
       progress.textContent = `完整傷害計算 ${formatNumber(saved.result.evaluated)} 次；已搜尋次數 ${formatNumber(saved.result.budgetUsed ?? 0)} / ${saved.result.hybrid ? '100,000' : '50,000'}；比較基準傷害 ${formatNumber(saved.result.baselineDamage)}。`;

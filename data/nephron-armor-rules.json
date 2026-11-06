@@ -433,6 +433,24 @@
       "otherEffects": [
         "僅供格雷特的勳章效果計數，本身不提供傷害屬性"
       ]
+    },
+    {
+      "id": "super-type-i",
+      "name": "超級彈匣I",
+      "fixedLevel": 1,
+      "levelValuesPct": [0, 0, 0, 0, 0, 0],
+      "otherEffects": [
+        "僅供格雷特的勳章效果計數，本身不提供傷害屬性"
+      ]
+    },
+    {
+      "id": "super-type-ii",
+      "name": "超級彈匣II",
+      "fixedLevel": 1,
+      "levelValuesPct": [0, 0, 0, 0, 0, 0],
+      "otherEffects": [
+        "僅供格雷特的勳章效果計數，本身不提供傷害屬性"
+      ]
     }
   ],
   "levelLabels": [

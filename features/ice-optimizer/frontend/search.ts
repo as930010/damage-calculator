@@ -142,9 +142,9 @@ function withSelections(base: LoadoutState, choices: Record<string, string>, set
   return { ...base, values };
 }
 
-function damage(data: GameData, state: LoadoutState): number | null {
+function damage(data: GameData, state: LoadoutState, externalDefenseBreakRate = 0): number | null {
   try {
-    const value = projectDamage(data, state).result.finalDamage.finalDamage;
+    const value = projectDamage(data, state, externalDefenseBreakRate).result.finalDamage.finalDamage;
     return Number.isFinite(value) && value > 0 ? value : null;
   } catch { return null; }
 }
@@ -410,7 +410,7 @@ export function generateIceSearchStructures(data: GameData,
 /** Bounded heuristic over complete right ice with exactly three active 3-piece-or-higher bonuses. */
 export async function searchIce(data: GameData, base: LoadoutState,
   onProgress: (progress: IceProgress) => void, constraints: IceSearchConstraints = {},
-  strategy: 'A' | 'C' = 'A'): Promise<IceSearchResult> {
+  strategy: 'A' | 'C' = 'A', externalDefenseBreakRate = 0): Promise<IceSearchResult> {
   constraints = snapshotIceSearchConstraints(constraints);
   for (const field of ['Stage.Adapt', 'Stage.BossDEF', 'Stage.CritRatePenalty']) {
     const input = data.simulatorInputs.inputs.find(entry => entry.fieldIds.includes(field));
@@ -420,7 +420,7 @@ export async function searchIce(data: GameData, base: LoadoutState,
       throw new RangeError(`搜尋設定無效：${field} 必須是傷害計算機可選的關卡數值。`);
     }
   }
-  const baselineDamage = projectDamage(data, base).result.finalDamage.finalDamage;
+  const baselineDamage = projectDamage(data, base, externalDefenseBreakRate).result.finalDamage.finalDamage;
   if (!Number.isFinite(baselineDamage) || baselineDamage <= 0) throw new RangeError('目前配裝無法取得有效的最終傷害。');
   const fields = iceFields(data);
   const rawChoices = Object.fromEntries(iceFields(data).right.map(entry => [entry.selectionField,
@@ -566,7 +566,7 @@ export async function searchIce(data: GameData, base: LoadoutState,
       scored.set(key, null);
       return null;
     }
-    const value = damage(data, withSelections(base, choices, names, fields.setFields));
+    const value = damage(data, withSelections(base, choices, names, fields.setFields), externalDefenseBreakRate);
     evaluated += 1;
     mainEvaluated += 1;
     const candidate = value === null ? null : { choices: { ...choices }, setNames: names, damage: value };
@@ -822,7 +822,7 @@ export async function searchIce(data: GameData, base: LoadoutState,
     if (budgetUsed >= MAX_EVALUATIONS) { budgetExhausted = true; break; }
     budgetUsed += 1;
     const representative = result.alternatives?.[0] ?? result;
-    const verified = damage(data, withSelections(base, representative.choices, representative.setNames, fields.setFields));
+    const verified = damage(data, withSelections(base, representative.choices, representative.setNames, fields.setFields), externalDefenseBreakRate);
     evaluated += 1;
     if (verified === null || Math.abs(verified - result.damage) > damageTolerance(result.damage)) {
       throw new RangeError('冰裝排名與完整傷害引擎的驗算結果不一致。');

@@ -318,15 +318,15 @@ input,select,textarea,.picker-control>input,.mobile-picker-search{
 }
 input::placeholder,.mobile-picker-search::placeholder{color:#9ba3c0}
 input:hover,select:hover,textarea:hover,.picker-control>input:hover{border-color:#8885b9}
-input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible,summary:focus-visible{
-  outline-color:#c4a8e7;box-shadow:0 0 0 4px rgb(155 139 216 / 15%);
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible,summary:focus-visible,.battle-defense .site-button:focus-visible{
+  outline-color:var(--seasonal-action-focus);box-shadow:0 0 0 4px rgb(155 139 216 / 15%);
 }
-button,.pet-skill-toggle,.picker-clear,.circuit-board-add{
+button,.pet-skill-toggle,.picker-clear,.circuit-board-add,.battle-defense .site-button{
   border-color:var(--violet-control-edge);
-  background:linear-gradient(180deg,#282d50,#1b2140);
-  color:#e7e3f2;
+  background:var(--seasonal-action-bg);
+  color:var(--seasonal-action-text);
 }
-button:hover,.pet-skill-toggle:hover{border-color:#a18abb;background:linear-gradient(180deg,#393654,#292d50);color:#f5edfa}
+button:hover,.pet-skill-toggle:hover,.battle-defense .site-button:not(:disabled):hover{border-color:var(--seasonal-action-hover-border);background:var(--seasonal-action-hover-bg);color:var(--seasonal-action-hover-text)}
 button:active,.pet-skill-toggle:active{filter:brightness(1.08)}
 #baseline{border-color:var(--violet-control-edge);background:linear-gradient(180deg,#282d50,#1b2140);color:#d7daf0}
 #baseline:hover{border-color:#737ca6;background:linear-gradient(180deg,#343a60,#242b4a);color:#f0eef8}
@@ -588,8 +588,8 @@ body.site-page-buff {
 .site-page-buff .primary-grid .metric,
 .site-page-buff .support-grid .metric,
 .site-page-buff .control-time-grid div { border-color: rgb(137 139 184 / 32%); background-color: rgb(12 16 26 / 65%); }
-:is(.site-page-buff, .site-page-score) .mode-switch { border-color: rgb(137 139 184 / 32%); background: rgb(10 16 39 / 78%); }
-:is(.site-page-buff, .site-page-score) .mode-switch button[aria-selected="true"] { border-color: var(--warm-wood); background: var(--accent-surface); color: var(--text-heading); }
+.site-page .mode-switch { border-color: rgb(137 139 184 / 32%); background: rgb(10 16 39 / 78%); }
+.site-page .mode-switch button[aria-selected="true"] { border-color: var(--warm-wood); background: var(--accent-surface); color: var(--text-heading); }
 .site-page-buff .total-multiplier strong { color: #f0b66d; }
 
 @media (max-width: 700px) {
