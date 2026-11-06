@@ -25,11 +25,12 @@
           <p class="site-tool-summary">比較武器與防具變換的傷害提升量，可用於試算目前的屬性變換提升量。<br>也可用於評估自己的目標分數想得到多少增幅。</p>
           <ol class="site-tool-steps" aria-label="評分流程"><li><span>01</span><span>讀取目前配裝</span></li><li><span>02</span><span>設定模擬變換</span></li><li><span>03</span><span>檢視評分結果</span></li></ol>
         </div></section>
+        <div class="mode-switch" role="tablist" aria-label="變換模式"><button type="button" role="tab" aria-selected="true" data-mode="weapon" aria-controls="score-workspace">武器屬性變換</button><button type="button" role="tab" aria-selected="false" tabindex="-1" data-mode="armor" aria-controls="score-workspace">防具屬性變換</button></div>
         <section class="site-card" aria-label="配裝來源"><div class="score-head"><h2>目前配裝</h2><button id="reload-loadout" class="site-button" type="button">重新讀取目前配裝</button></div>
           <p id="loadout-status" role="status">正在讀取配裝…</p></section>
         <div id="score-workspace">
           <div class="score-grid"><section class="site-card"><h2>模擬變換</h2>
-            <p class="score-muted">調整只用於本頁試算。重新讀取會還原為首頁已保存的四條變換。 <a href="#configuration-rating" class="score-jump">查看評分</a></p><div id="transform-lines">
+            <label id="armor-part-field" hidden>比較部位<select id="armor-part"><option value="upper">上衣</option><option value="lowerwear">下衣</option><option value="lowerwearAlternative">強/排褲</option><option value="gloves">手套</option><option value="shoes">鞋子</option></select></label><p id="target-status" role="status"></p><p class="score-muted">調整只用於本頁試算。重新讀取會還原為首頁已保存的變換。 <a href="#configuration-rating" class="score-jump">查看評分</a></p><div id="transform-lines">
               <fieldset disabled><legend>第 1 條</legend><div class="score-fields">
                 <label>屬性<select data-choice="0"></select></label>
                 <label>數值<select data-roll="0"></select></label></div><small>目前配裝 · —</small></fieldset>
@@ -51,9 +52,9 @@
           </details>
         </div>
         <details><summary>如何解讀變換評分</summary>
-          <p>先移除目前配裝的四條武器變換，再使用首頁的傷害公式計算。強烈與超越技能依首頁占比加權，無視防禦的效益取決於 Boss 防禦及已有的無視防禦。</p>
-          <p>「× 強化」會乘上武器強化等級。有效傷害詞條各限一條，一般型與強化型可並用。「無關傷害」可以重複選擇，且不增加傷害。</p>
-          <p>底變換從各屬性的最低檔中選出單項收益最低的四種；頂變換從最高檔中選出收益最高的四種，再分別合併試算。這是四種不同屬性的參考組合。PR 表示模擬提升相對於頂變換提升的百分比，可超過 100。</p>
+          <p>武器模式移除四條武器變換；防具模式只移除所選部位的三條變換，再使用首頁的傷害公式計算。強烈與超越技能依首頁占比加權，無視防禦的效益取決於 Boss 防禦及已有的無視防禦。</p>
+          <p>「× 強化」會乘上目標武器或防具自身的強化等級。有效傷害詞條各限一條，一般型與強化型可並用。「無關傷害」可以重複選擇，且不增加傷害。</p>
+          <p>底變換從各屬性的最低檔中選出單項收益最低的四種（防具為三種）；頂變換從最高檔中選出收益最高的四種（防具為三種），再分別合併試算。這是不同有效屬性的參考組合。PR 表示模擬提升相對於頂變換提升的百分比，可超過 100。</p>
         </details>
       </main>
       <footer class="site-footer"><span class="footer-product">裝備傷害計算機</span><span class="footer-version">版本 <bdi>v4.01.03</bdi></span><span class="footer-updated">更新日期：<time datetime="2026-11-06">2026-11-06</time></span></footer>

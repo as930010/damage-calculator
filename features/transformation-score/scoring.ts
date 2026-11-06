@@ -10,7 +10,7 @@ export function ratingRule(rule: WeaponTransformationRule): RatingRule {
   return { ...rule, rolls };
 }
 
-export function compareRolls(before: number, rules: readonly RatingRule[], damageFor: DamageFor) {
+export function compareRolls(before: number, rules: readonly RatingRule[], damageFor: DamageFor, lineCount = 4) {
   const comparisons = rules.map(rule => ({
     rule,
     gains: rule.rolls.map(roll => {
@@ -24,8 +24,8 @@ export function compareRolls(before: number, rules: readonly RatingRule[], damag
       const gain = gains[index];
       return gain === null || !Number.isFinite(gain) || gain < 0 ? [] : [{ choice: rule.choice, roll: rule.rolls[index], gain, order }];
     });
-    const top = candidates.sort((a, b) => (high ? b.gain - a.gain : a.gain - b.gain) || a.order - b.order).slice(0, 4);
-    const damage = top.length === 4 ? damageFor(top) : null;
+    const top = candidates.sort((a, b) => (high ? b.gain - a.gain : a.gain - b.gain) || a.order - b.order).slice(0, lineCount);
+    const damage = top.length === lineCount ? damageFor(top) : null;
     return damage === null ? null : { gain: damage / before - 1, selections: top.map(({ choice, roll }) => ({ choice, roll })) };
   }
   const lowerReference = reference(false);
@@ -34,8 +34,8 @@ export function compareRolls(before: number, rules: readonly RatingRule[], damag
   const gradeCandidates = comparisons.flatMap(({ rule, gains }) => {
     const gain = gains[0];
     return gain === null || !Number.isFinite(gain) || gain < 0 ? [] : [{ choice: rule.choice, roll: rule.rolls[0], gain }];
-  }).sort((a, b) => b.gain - a.gain).slice(0, 4);
-  const gradingDamage = gradeCandidates.length === 4 ? damageFor(gradeCandidates) : null;
+  }).sort((a, b) => b.gain - a.gain).slice(0, lineCount);
+  const gradingDamage = gradeCandidates.length === lineCount ? damageFor(gradeCandidates) : null;
   return {
     comparisons,
     lower: lowerReference?.gain ?? null,
@@ -58,9 +58,9 @@ export function gradeGain(gain: number, lower: number, upper: number) {
 export function scoreConfiguration(context: {
   baselineDamage: number; simulatedDamage: DamageFor; rules: readonly RatingRule[];
   lower: number | null; upper: number | null;
-  gradingLower?: number | null;
+  gradingLower?: number | null; lineCount?: number;
 }, lines: readonly Selection[]) {
-  if (lines.length !== 4) throw new Error('請設定四個變換欄位。');
+  if (lines.length !== (context.lineCount ?? 4)) throw new Error('請設定正確數量的變換欄位。');
   lines = normalizeTransformationSelections(lines);
   for (const line of lines) {
     if (!line.choice || line.choice === UNRELATED_TRANSFORMATION) continue;

@@ -1,7 +1,7 @@
 import { escapeHtml, loadGameData } from '../../frontend/data.ts';
 import type { GameData } from '../../frontend/data.ts';
-import { parseState, stateKey } from '../../frontend/state.ts';
-import { readRatingLoadout } from './loadout.ts';
+import { parseState, stateKey, type LoadoutState } from '../../frontend/state.ts';
+import { readRatingLoadout, readArmorRatingLoadout } from './loadout.ts';
 import { scoreConfiguration, type Selection } from './scoring.ts';
 import { normalizeTransformationSelections, UNRELATED_TRANSFORMATION } from '../../calculation/transformation-selections.ts';
 
@@ -14,7 +14,12 @@ const reload = byId<HTMLButtonElement>('reload-loadout');
 const formatter = new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 2 });
 const pct = (gain: number | null) => gain === null ? '無法計算' : (gain * 100).toFixed(2) + '%';
 const message = (err: unknown) => err instanceof Error ? err.message : '無法讀取目前配裝。';
-type Context = ReturnType<typeof readRatingLoadout>;
+type Context = ReturnType<typeof readRatingLoadout> | ReturnType<typeof readArmorRatingLoadout>;
+let mode: 'weapon' | 'armor' = 'weapon';
+let part = 'upper';
+let state: LoadoutState | undefined;
+const drafts = new Map<string, Selection[]>();
+const draftKey = () => mode === 'weapon' ? mode : 'armor:' + part;
 let data: GameData | undefined;
 let context: Context | undefined;
 let simulation: Selection[] = [];
@@ -40,7 +45,8 @@ function showScore() {
   } catch (error) { output.textContent = message(error); }
 }
 function rollLabel(rule: Context['rules'][number], value: number) {
-  const text = rule.step < 1 ? value.toFixed(1) : String(value);
+  const digits = String(rule.step).split('.')[1]?.length ?? 0;
+  const text = value.toFixed(digits);
   return text + (rule.valueMultiplier === 1 ? '' : '%');
 }
 function valueOptions(line: Selection) {
@@ -73,11 +79,12 @@ function referenceGroup(title: string, lines: readonly Selection[], gain: number
 }
 function showLoadout(next: Context) {
   context = next;
-  simulation = next.actual.map(line => ({ ...line }));
+  simulation = (drafts.get(draftKey()) ?? next.actual).map(line => ({ ...line }));
   const { job, rules } = next;
-  status.textContent = `${job.name} · 武器 +${next.enhancement} · 不含武器變換攻擊力等級 ${formatter.format(next.attackLevel)} · 強烈 ${next.weighting.strongSharePct}%／超越 ${next.weighting.transcendenceSharePct}% · Boss 防禦 ${next.bossDefense}%`;
+  status.textContent = `${job.name} · ${'targetLabel' in next ? next.targetLabel + ' 內布隆' : '武器'} +${next.enhancement} · ${mode === 'weapon' ? '不含武器變換' : '不含目標防具變換'}攻擊力等級 ${formatter.format(next.attackLevel)} · 強烈 ${next.weighting.strongSharePct}%／超越 ${next.weighting.transcendenceSharePct}% · Boss 防禦 ${next.bossDefense}%`;
   if (next.warnings.length) status.textContent += ' ' + next.warnings.join(' ');
   const fields = editor.querySelectorAll('fieldset');
+  fields.forEach((field, i) => { (field as HTMLFieldSetElement).hidden = i >= simulation.length; });
   simulation.forEach((line, index) => {
     const field = fields[index];
     const choice = field.querySelector<HTMLSelectElement>('[data-choice]')!;
@@ -88,12 +95,14 @@ function showLoadout(next: Context) {
     choice.value = line.choice;
     value.innerHTML = valueOptions(line);
     value.disabled = !selected;
-    const original = line.choice ? (selected?.label ?? line.choice) + ' ' + (selected && line.roll !== null ? rollLabel(selected, line.roll) : '未填') : '未設定';
+    const actual = next.actual[index];
+    const actualRule = rules.find(rule => rule.choice === actual.choice);
+    const original = actual.choice ? (actualRule?.label ?? actual.choice) + ' ' + (actualRule && actual.roll !== null ? rollLabel(actualRule, actual.roll) : '未填') : '未設定';
     field.querySelector('small')!.textContent = '目前配裝 · ' + original;
     field.disabled = false;
   });
   syncSimulation();
-  byId('score-bounds').innerHTML = referenceGroup('四有效詞條下最低收益提升參考組合', next.lowerSelection, next.lower) + referenceGroup('最高增幅配置參考組合', next.upperSelection, next.upper);
+  byId('score-bounds').innerHTML = referenceGroup(mode === 'weapon' ? '四有效詞條下最低收益提升參考組合' : '三有效詞條下最低收益提升參考組合', next.lowerSelection, next.lower) + referenceGroup('最高增幅配置參考組合', next.upperSelection, next.upper);
   byId('roll-comparisons').innerHTML = next.comparisons.map(({ rule, gains }) => {
     const rows = rule.rolls.map((roll, i) => `<tr><td>${rollLabel(rule, roll)}</td><td>${pct(gains[i])}</td></tr>`).reverse();
     return `<div class="roll-card"><table><caption>${escapeHtml(rule.label)}</caption><thead><tr><th scope="col">數值</th><th scope="col">提升幅度</th></tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
@@ -117,6 +126,7 @@ editor.addEventListener('change', event => {
     simulation[Number(select.dataset.roll)].roll = select.value === '' ? null : Number(select.value);
   }
   syncSimulation();
+  drafts.set(draftKey(), simulation.map(line => ({ ...line })));
   showScore();
 });
 
@@ -126,9 +136,10 @@ function refresh(force: boolean) {
     const raw = localStorage.getItem(stateKey);
     if (!force && savedRaw === raw) return;
     savedRaw = raw;
-    const state = parseState(raw);
+    state = parseState(raw) ?? undefined;
     if (!state) throw new Error('尚未取得有效的已保存配裝。請先到傷害計算機設定職業、武器與屬性。');
-    showLoadout(readRatingLoadout(data, state));
+    drafts.clear();
+    activate();
   } catch (error) {
     context = undefined;
     simulation = [];
@@ -136,6 +147,43 @@ function refresh(force: boolean) {
     status.textContent = error instanceof SyntaxError ? '已保存的配裝無法解析，請回首頁確認。' : message(error);
   }
 }
+function activate() {
+  byId('armor-part-field').hidden = mode !== 'armor';
+  try {
+    if (!data || !state) throw new Error('尚未取得有效配裝。');
+    byId('target-status').textContent = '';
+    showLoadout(mode === 'weapon' ? readRatingLoadout(data, state) : readArmorRatingLoadout(data, state, part));
+    editor.hidden = false;
+    byId('roll-disclosure').hidden = false;
+  } catch (error) {
+    context = undefined;
+    editor.hidden = true;
+    output.textContent = '';
+    byId('score-bounds').textContent = '';
+    byId('roll-disclosure').hidden = true;
+    byId('target-status').textContent = message(error);
+    status.textContent = state ? `${state.Job} · ${mode === 'armor' ? '防具' : '武器'}屬性變換` : message(error);
+    workspace.hidden = !state;
+  }
+}
+const modes = [...document.querySelectorAll<HTMLButtonElement>('[data-mode]')];
+modes.forEach(button => button.addEventListener('click', () => {
+  mode = button.dataset.mode as typeof mode;
+  modes.forEach(item => { item.setAttribute('aria-selected', String(item === button)); item.tabIndex = item === button ? 0 : -1; });
+  activate();
+}));
+document.querySelector('.mode-switch')!.addEventListener('keydown', event => {
+  const key = (event as KeyboardEvent).key;
+  if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(key)) return;
+  event.preventDefault();
+  const current = modes.findIndex(button => button.getAttribute('aria-selected') === 'true');
+  const next = key === 'Home' ? 0 : key === 'End' ? 1 : 1 - current;
+  modes[next].click(); modes[next].focus();
+});
+byId<HTMLSelectElement>('armor-part').addEventListener('change', event => {
+  part = (event.target as HTMLSelectElement).value;
+  activate();
+});
 async function load() {
   reload.disabled = true;
   try {

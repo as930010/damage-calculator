@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { compareRolls, gradeGain, scoreConfiguration } from '../../dist/features/transformation-score/scoring.js';
-import { readRatingLoadout } from '../../dist/features/transformation-score/loadout.js';
+import { readRatingLoadout, readArmorRatingLoadout } from '../../dist/features/transformation-score/loadout.js';
 import { projectDamage } from '../../dist/frontend/projection.js';
 import { parseState } from '../../dist/frontend/state.js';
 import { validTransformationValue, normalizeTransformationValues, normalizeTransformationSelections } from '../../dist/calculation/transformation-selections.js';
@@ -282,4 +282,84 @@ test('Inclusive rating thresholds and bottom-roll threshold', () => {
     assert.ok(gradeGain(gain,.5,1).startsWith(words[i]));
     if (i < 5) assert.ok(gradeGain(gain-1e-8,.5,1).startsWith(words[i+1]));
   }
+});
+
+function armorState() {
+  const state = structuredClone(saved);
+  for (const slot of data.innerwear.slots) {
+    state.values[slot.typeField] = '內布隆';
+    state.values[slot.enhancementField] = 'Lv.11';
+    state.values[slot.forgingField] = '0';
+    const field = data.nephronArmor.fields.find(item => item.slotId === slot.id);
+    for (const entry of field.transformFields) { delete state.values[entry.attributeField]; delete state.values[entry.valueField]; }
+    delete state.values[field.magazineField]; delete state.values[field.magazineLevelField];
+  }
+  state.lowerwearAlternativeEnabled = true;
+  return state;
+}
+function armorHome(state, slotId, lines) {
+  const copy = structuredClone(state);
+  const fields = data.nephronArmor.fields.find(item => item.slotId === slotId).transformFields;
+  fields.forEach((field, i) => {
+    delete copy.values[field.attributeField]; delete copy.values[field.valueField];
+    if (!lines[i]?.choice) return;
+    copy.values[field.attributeField] = lines[i].choice;
+    if (lines[i].roll !== null) copy.values[field.valueField] = lines[i].roll / 100;
+  });
+  return projectDamage(data, copy).result.finalDamage.finalDamage;
+}
+for (const slot of data.innerwear.slots) test('Armor full-engine equivalence and references: ' + slot.id, () => {
+  const state = armorState();
+  const original = JSON.stringify(state);
+  const context = readArmorRatingLoadout(data, state, slot.id);
+  assert.equal(context.actual.length, 3);
+  assert.equal(context.rules.length, 15);
+  close(context.baselineDamage, armorHome(state, slot.id, []));
+  for (const rule of context.rules) for (const roll of rule.rolls) {
+    close(context.simulatedDamage([line(rule.choice, roll)]), armorHome(state, slot.id, [line(rule.choice, roll)]));
+  }
+  const lines = context.rules.slice(0, 3).map(rule => line(rule.choice, rule.rolls.at(-1)));
+  close(scoreConfiguration(context, lines).after, armorHome(state, slot.id, lines));
+  assert.equal(context.lowerSelection.length, 3); assert.equal(context.upperSelection.length, 3);
+  const sorted = context.comparisons.map(({rule,gains}, order) => ({choice:rule.choice,gain:gains[0],order}))
+    .filter(item => Number.isFinite(item.gain) && item.gain >= 0).sort((a,b)=>a.gain-b.gain || a.order-b.order).slice(0,3);
+  assert.deepEqual(context.lowerSelection.map(item=>item.choice), sorted.map(item=>item.choice));
+  close(context.simulatedDamage(context.lowerSelection), armorHome(state, slot.id, context.lowerSelection));
+  close(context.simulatedDamage(context.upperSelection), armorHome(state, slot.id, context.upperSelection));
+  const zero = scoreConfiguration(context, Array(3).fill(line('無關傷害', null)));
+  assert.equal(zero.gain, 0); assert.equal(zero.pr, 0);
+  assert.equal(JSON.stringify(state), original);
+});
+test('Armor lowerwear respects both condition paths and inactive slots', () => {
+  for (const lowerwear of ['lowerwearA','lowerwearB']) for (const comparison of ['above','below']) {
+    const state = armorState();
+    state.bossHealthCondition = { enabled:true, lowerwear, comparison };
+    const id = lowerwear === 'lowerwearA' ? 'lowerwear' : 'lowerwearAlternative';
+    const context = readArmorRatingLoadout(data,state,id);
+    const lines = context.upperSelection;
+    close(context.simulatedDamage(lines),armorHome(state,id,lines));
+    assert.throws(()=>readArmorRatingLoadout(data,state,id === 'lowerwear' ? 'lowerwearAlternative':'lowerwear'), /未參與/);
+  }
+  const state = armorState(); state.lowerwearAlternativeEnabled = false;
+  assert.throws(()=>readArmorRatingLoadout(data,state,'lowerwearAlternative'), /未參與/);
+});
+test('Armor enhancement, existing transformations, magazines and zero benefits remain independent', () => {
+  const state = armorState();
+  const field = data.nephronArmor.fields[0];
+  state.values[field.magazineField] = data.nephronArmor.magazines[0].name;
+  state.values[field.magazineLevelField] = 'Lv.3';
+  state.values[field.transformFields[0].attributeField] = '所有技能傷害%';
+  state.values[field.transformFields[0].valueField] = .01;
+  for (const level of [10,11,12,13]) {
+    state.values[data.innerwear.slots[0].enhancementField] = 'Lv.' + level;
+    state.transcendenceSkillDamageSharePct = level === 10 ? 0 : level === 11 ? 100 : 50;
+    state.values['Stage.BossDEF'] = level === 10 ? 0 : 83.94;
+    const context = readArmorRatingLoadout(data,state,'upper');
+    assert.equal(context.enhancement,level);
+    for (const selections of [context.actual, context.upperSelection, context.lowerSelection]) {
+      close(context.simulatedDamage(selections),armorHome(state,'upper',selections));
+    }
+  }
+  state.values[data.innerwear.slots[0].typeField] = '百億';
+  assert.throws(()=>readArmorRatingLoadout(data,state,'upper'), /不是內布隆/);
 });
