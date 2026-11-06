@@ -124,7 +124,7 @@ test("the built revision changes with game data so cached bundles cannot go stal
 });
 
 test("stylesheet cache keys cover exactly the CSS linked by the selected theme", async () => {
-  const pages = ["index.html", "buff-simulator/index.html", "ice-optimizer/index.html"];
+  const pages = ["index.html", "buff-simulator/index.html", "ice-optimizer/index.html", "transformation-score/index.html"];
   const linkedCss = [];
   for (const page of pages) {
     const html = await readFile(join(root, "site-dist", page), "utf8");

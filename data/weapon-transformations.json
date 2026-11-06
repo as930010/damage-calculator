@@ -14,7 +14,8 @@
     "超越技傷%",
     "技能傷害%",
     "流血%",
-    "攻擊力等級"
+    "攻擊力等級",
+    "無視防禦%"
   ],
   "slots": [
     {
@@ -36,73 +37,134 @@
   ],
   "rules": [
     {
-      "choice": "雙攻%",
-      "statKey": "doubleAttackPct",
-      "valueMultiplier": 100
-    },
-    {
       "choice": "雙攻% × 強化",
       "statKey": "doubleAttackPct",
       "valueMultiplier": 100,
-      "scaleByEnhancement": true
+      "scaleByEnhancement": true,
+      "label": "攻擊力% × 強化",
+      "minRoll": 0.8,
+      "maxRoll": 1.5,
+      "step": 0.1
     },
     {
       "choice": "攻擊力等級 × 強化",
       "statKey": "attackLevel",
       "valueMultiplier": 1,
-      "scaleByEnhancement": true
+      "scaleByEnhancement": true,
+      "label": "攻擊力等級 × 強化",
+      "minRoll": 0.8,
+      "maxRoll": 1.5,
+      "step": 0.1
     },
     {
       "choice": "技能傷害% × 強化",
       "statKey": "allSkillDamagePct",
       "valueMultiplier": 100,
-      "scaleByEnhancement": true
+      "scaleByEnhancement": true,
+      "label": "所有技能傷害 × 強化",
+      "minRoll": 0.8,
+      "maxRoll": 1.5,
+      "step": 0.1
     },
     {
       "choice": "致命傷害% × 強化",
       "statKey": "critDamagePct",
       "valueMultiplier": 100,
-      "scaleByEnhancement": true
+      "scaleByEnhancement": true,
+      "label": "致命一擊傷害 × 強化",
+      "minRoll": 0.8,
+      "maxRoll": 1.5,
+      "step": 0.1
     },
     {
-      "choice": "致命傷害%",
-      "statKey": "critDamagePct",
-      "valueMultiplier": 100
-    },
-    {
-      "choice": "Boss傷害%",
-      "statKey": "bossDamagePct",
-      "valueMultiplier": 100
-    },
-    {
-      "choice": "兩極化%",
-      "statKey": "polarizationPct",
-      "valueMultiplier": 100
-    },
-    {
-      "choice": "強烈技傷%",
-      "statKey": "strongSkillDamagePct",
-      "valueMultiplier": 100
-    },
-    {
-      "choice": "超越技傷%",
-      "statKey": "transcendenceSkillDamagePct",
-      "valueMultiplier": 100
-    },
-    {
-      "choice": "技能傷害%",
-      "statKey": "allSkillDamagePct",
-      "valueMultiplier": 100
-    },
-    {
-      "choice": "流血%",
-      "statKey": "bleedDamagePct",
-      "valueMultiplier": 100
+      "choice": "雙攻%",
+      "statKey": "doubleAttackPct",
+      "valueMultiplier": 100,
+      "label": "攻擊力%",
+      "minRoll": 6,
+      "maxRoll": 13,
+      "step": 1
     },
     {
       "choice": "攻擊力等級",
       "statKey": "attackLevel",
-      "valueMultiplier": 1
+      "valueMultiplier": 1,
+      "label": "攻擊力等級",
+      "minRoll": 6,
+      "maxRoll": 13,
+      "step": 1
+    },
+    {
+      "choice": "技能傷害%",
+      "statKey": "allSkillDamagePct",
+      "valueMultiplier": 100,
+      "label": "所有技能傷害",
+      "minRoll": 6,
+      "maxRoll": 13,
+      "step": 1
+    },
+    {
+      "choice": "致命傷害%",
+      "statKey": "critDamagePct",
+      "valueMultiplier": 100,
+      "label": "致命一擊傷害",
+      "minRoll": 6,
+      "maxRoll": 13,
+      "step": 1
+    },
+    {
+      "choice": "兩極化%",
+      "statKey": "polarizationPct",
+      "valueMultiplier": 100,
+      "label": "兩極化",
+      "minRoll": 5,
+      "maxRoll": 12,
+      "step": 1
+    },
+    {
+      "choice": "流血%",
+      "statKey": "bleedDamagePct",
+      "valueMultiplier": 100,
+      "label": "流血",
+      "minRoll": 5,
+      "maxRoll": 12,
+      "step": 1
+    },
+    {
+      "choice": "強烈技傷%",
+      "statKey": "strongSkillDamagePct",
+      "valueMultiplier": 100,
+      "label": "強烈技能傷害",
+      "minRoll": 6,
+      "maxRoll": 13,
+      "step": 1
+    },
+    {
+      "choice": "超越技傷%",
+      "statKey": "transcendenceSkillDamagePct",
+      "valueMultiplier": 100,
+      "label": "超越技能傷害",
+      "minRoll": 6,
+      "maxRoll": 13,
+      "step": 1
+    },
+    {
+      "choice": "Boss傷害%",
+      "statKey": "bossDamagePct",
+      "valueMultiplier": 100,
+      "label": "Boss 傷害增加",
+      "minRoll": 8,
+      "maxRoll": 15,
+      "step": 1
+    },
+    {
+      "choice": "無視防禦%",
+      "statKey": "defenseIgnorePct",
+      "valueMultiplier": 100,
+      "label": "無視防禦",
+      "minRoll": 4.5,
+      "maxRoll": 8,
+      "step": 0.5
     }
   ],
   "enhancementField": "Weapon.ENHC"

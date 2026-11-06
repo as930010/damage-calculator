@@ -13,6 +13,29 @@ const stateFor = id => structuredClone(scenarios.find(s => s.id === id).state);
 const aggregations = () => runtime.counts.aggregateCharacterAttributes ?? 0;
 const evaluations = () => runtime.counts.evaluateLoadout ?? 0;
 
+test('Startup and baseline normalize only illegal weapon rolls before creating history snapshots', async () => {
+  const state = structuredClone(sample), baseline = structuredClone(sample);
+  state.values['Weapon.Transform.1.Stat'] = '流血%';
+  state.values['Weapon.Transform.1.Value'] = .055;
+  baseline.values['Weapon.Transform.1.Stat'] = '流血%';
+  baseline.values['Weapon.Transform.1.Value'] = .08;
+  baseline.values['Weapon.Transform.2.Stat'] = '攻擊力等級';
+  baseline.values['Weapon.Transform.2.Value'] = 6.5;
+  const page = await createPage(state, baseline);
+  try {
+    const read = key => JSON.parse(page.dom.window.localStorage.getItem(key));
+    const current = read('dab-loadout-v1'), base = read('dab-baseline-v1');
+    assert.equal(current.values['Weapon.Transform.1.Stat'],'流血%');
+    assert.equal(current.values['Weapon.Transform.1.Value'],undefined);
+    assert.equal(base.values['Weapon.Transform.1.Value'],.08);
+    assert.equal(base.values['Weapon.Transform.2.Stat'],'攻擊力等級');
+    assert.equal(base.values['Weapon.Transform.2.Value'],undefined);
+    assert.equal(current.values['Weapon.Transform.3.Value'],sample.values['Weapon.Transform.3.Value']);
+    assert.match(page.dom.window.document.querySelector('#transfer-status').textContent,/第 1 條.*5.5%.*比較基準.*第 2 條.*6.5 級/);
+    assert.ok(page.dom.window.document.querySelector('#undo').disabled);
+  } finally { page.close(); }
+});
+
 test('public calculation API retains its complete output and original invalid-input errors', async () => {
   const { calculateLoadout } = await runtime.load('calculation/loadout-engine.ts');
   const input = engineInput(gameData, projection.projectAttributes(gameData, stateFor('minimal-complete')).calculationSources);
@@ -56,7 +79,13 @@ for (const [id, current, baseline] of comparisons) {
     const page = await createPage(stateFor(current), stateFor(baseline));
     try {
       assert.equal(digest(resultHtml(page.dom.window.document)), fixture.pages[id]);
-      const expected = expectedWork[current][0] + expectedWork[baseline][0];
+      if (id === 'different') {
+        const stored = JSON.parse(page.dom.window.localStorage.getItem('dab-loadout-v1'));
+        assert.equal(stored.values['Weapon.Transform.4.Stat'], '雙攻% × 強化');
+        assert.equal(stored.values['Weapon.Transform.4.Value'], undefined);
+        assert.match(page.dom.window.document.querySelector('#transfer-status').textContent, /第 4 條.*1.33333333%.*已清空/);
+      }
+      const expected = (id === 'different' ? 0 : expectedWork[current][0]) + expectedWork[baseline][0];
       assert.equal(page.runtime.counts.aggregateCharacterAttributes ?? 0, expected);
       assert.ok(expected < fixture.workload['page:' + id].aggregateCharacterAttributes);
     } finally { page.close(); }
@@ -205,6 +234,7 @@ test('actual import keeps baseline and save/export contracts; cleared storage ha
     const { createCatalogIndex } = await page.runtime.load('frontend/catalog-index.ts');
     const { normalizeOptionalEffectValues } = await page.runtime.load('frontend/state.ts');
     const state = stateFor('special-weapon-average');
+    state.values['Weapon.Transform.4.Value'] = 0.013;
     const json = serializeLoadout(state, gameData).json;
     const imported = parseLoadoutJson(json, state, gameData).state;
     const expectedValues = structuredClone(state.values);

@@ -18,7 +18,7 @@ const attribute = (key: string): ValueReader =>
 const metrics: readonly Metric[] = [
   ["physicalAttack", "物攻", attribute("physicalAttack")],
   ["magicalAttack", "魔攻", attribute("magicalAttack")],
-  ["doubleAttackPct", "雙攻%", attribute("doubleAttackPct")],
+  ["doubleAttackPct", "攻擊力%", attribute("doubleAttackPct")],
   ["critRatePct", "致命一擊%", attribute("critRatePct")],
   ["extremizationPct", "極大化%", attribute("extremizationPct")],
   ["critDamagePct", "致命傷害%", attribute("critDamagePct")],

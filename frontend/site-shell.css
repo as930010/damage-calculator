@@ -19,7 +19,7 @@ body.site-page {
 
 .site-header {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(290px, 420px);
+  grid-template-columns: minmax(0, 1fr) minmax(0, max-content);
   align-items: center;
   gap: 14px;
   min-height: 72px;
@@ -35,7 +35,7 @@ body.site-page {
 .site-nav-wrap { position: relative; justify-self: end; width: 100%; min-width: 0; }
 .site-tabs {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr) minmax(0, 6fr) minmax(0, 6fr);
   gap: 3px;
   width: 100%;
   padding: 3px;
@@ -57,7 +57,8 @@ body.site-page {
   text-align: center;
   text-decoration: none;
   white-space: normal;
-  overflow-wrap: anywhere;
+  word-break: keep-all;
+  overflow-wrap: normal;
   transition: background-color .15s, border-color .15s, color .15s;
 }
 .site-tabs a:hover { border-color: #526681; background: #263449; color: #f2f6fc; }
@@ -176,7 +177,7 @@ body.site-page {
   .site-developer > .developer-mobile { display: flex; flex-direction: column; align-items: flex-start; }
   .site-nav-wrap { grid-column: 1; grid-row: 2; width: 100%; }
   .site-nav-wrap > .live-dot { display: none; }
-  .site-tabs a { font-size: clamp(10px, 2.8vw, 12px); }
+  .site-tabs a { padding-inline: 3px; }
   .site-footer { padding-inline: 12px; }
   .site-footer .footer-updated::before { content: none; }
   .site-page .site-main { padding: 18px 12px 20px; }
@@ -202,4 +203,7 @@ body.site-page {
 }
 @media (max-width: 360px) {
   :is(.workflow-steps, .site-tool-steps) li { font-size: 10px; }
+}
+@media (max-width: 354px) {
+  .site-tabs a { font-size: 11px; }
 }

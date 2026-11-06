@@ -2,6 +2,8 @@ import { mountCircuitBoardEditor } from './circuit-board-editor.ts';
 import { createSkillShareControl } from './skill-share-control.ts';
 import { createPickerChoices } from './picker-choices.ts';
 import * as normalization from './loadout-normalization.ts';
+import { attributeLabel } from './attribute-label.ts';
+import { normalizeTransformationValues, transformationRolls } from '../calculation/transformation-selections.ts';
 import { createResultCardsView, renderDamageFormula } from './result-cards-view.ts';
 import { sourceLabel as resolveSourceLabel } from './source-labels.ts';
 import { renderEquipmentDamageSummary, renderFinalDamageNumber, renderDamageRatio } from './damage-summary-view.ts';
@@ -70,6 +72,8 @@ async function start() {
   const startupInvalidAccessoryAppraisalFields = clearInvalidAccessoryAppraisals(state);
   const clearDuplicateTransformationChoices = (target: LoadoutState) => normalization.clearDuplicateTransformationChoices(data, target);
   const startupDuplicateTransformationFields = clearDuplicateTransformationChoices(state);
+  const startupTransformationValues = normalizeTransformationValues(data.transformations, state.values);
+  if (startupTransformationValues.fields.length && !sampleMode) saveState(state);
   const clearDuplicateNephronTransformationChoices = (target: LoadoutState) => normalization.clearDuplicateNephronTransformationChoices(data, target);
   const startupDuplicateNephronTransformationFields = clearDuplicateNephronTransformationChoices(state);
   const startupDuplicateNephronMagazineFields = normalizeNephronMagazineSelections(state.values, catalogIndex);
@@ -81,6 +85,11 @@ async function start() {
   let baseline = sampleMode ? null : readBaseline();
   let baselineIsValid = false;
   if (baseline) {
+    const baselineTransformValues = normalizeTransformationValues(data.transformations, baseline.values);
+    if (baselineTransformValues.fields.length) {
+      startupTransformationValues.messages.push('比較基準：' + baselineTransformValues.messages.join(' '));
+      saveState(baseline, true);
+    }
     const normalizedBaselinePortraitAwakening = normalizePortraitAwakeningValues(baseline);
     const clearedBaselineMagazines = normalizeNephronMagazineSelections(baseline.values, catalogIndex);
     const clearedBaselineTransformations = clearDuplicateNephronTransformationChoices(baseline);
@@ -287,6 +296,7 @@ async function start() {
     document.querySelector<HTMLElement>('#transfer-status')!.textContent = `已清除不符合目前裝備的鑑定選項（${startupInvalidAccessoryAppraisalFields.length} 個欄位）。`;
   }
   const val = (fieldId: string) => String(state.values[fieldId] ?? '');
+  if (startupTransformationValues.messages.length) document.querySelector<HTMLElement>('#transfer-status')!.textContent = startupTransformationValues.messages.join(' ');
   const summary = (stats: Readonly<Record<string, number>>) => Object.entries(stats).filter(([, value]) => value !== 0).map(([key, value]) => `${data.attributes.attributes.find(a => a.key === key)?.name ?? key} ${fmt(value)}`).join(' · ');
   const pickerChoices = createPickerChoices(catalogIndex, data.mapping.magicStoneSelections.catalogFile, summary);
   const { options, magicStoneChoices, validationChoices } = pickerChoices;
@@ -420,6 +430,11 @@ async function start() {
   const field = (parent: HTMLElement, label: string, fieldId: string, choices: readonly PickerOption[], redraw = false, disabled = false, disabledHint = '請先選擇屬性') => {
     const picker = createPicker(label, choices, val(fieldId), value => {
       state.values[fieldId] = value;
+      const transformSlot = data.transformations.slots.find(slot => slot.choiceField === fieldId);
+      if (transformSlot) {
+        const cleaned = normalizeTransformationValues(data.transformations, state.values);
+        if (cleaned.messages.length) document.querySelector<HTMLElement>('#transfer-status')!.textContent = cleaned.messages.join(' ');
+      }
       for (const armor of data.nephronArmor.fields) {
         const transform = armor.transformFields.find(entry => entry.attributeField === fieldId);
         if (transform) delete state.values[transform.valueField];
@@ -713,7 +728,7 @@ async function start() {
     petSkillCheckbox.checked = state.petSkillAttackEnabled;
     petSkillCheckbox.addEventListener('change', () => { state.petSkillAttackEnabled = petSkillCheckbox.checked; update(); });
     const petSkillLabel = document.createElement('span');
-    petSkillLabel.textContent = '寵物具有 2% 雙攻';
+    petSkillLabel.textContent = '寵物具有 2% 攻擊力';
     petSkillToggle.append(petSkillCheckbox, petSkillLabel);
     general.append(petSkillToggle);
     const nutProtectionToggle = document.createElement('label');
@@ -836,7 +851,7 @@ async function start() {
             const resonance = group('共鳴輸入', '輸入已分配的共鳴點，例如適應力點滿應該填100而非7。');
             const resonanceLimits: Record<string, number> = { 雙攻: 999, 技傷: 100, 適應: 100, 兩極: 50, B傷: 50 };
             for (const effect of data.resonance.effects) {
-              numeric(resonance, effect.name, effect.settingKey, false, { min: 0, max: resonanceLimits[effect.name] ?? 999, step: 1, integer: true });
+              numeric(resonance, attributeLabel(effect.name), effect.settingKey, false, { min: 0, max: resonanceLimits[effect.name] ?? 999, step: 1, integer: true });
             }
     const spirit = group('賦靈錄');
     const spiritClassCodes = catalogIndex.spiritClassCodes;
@@ -1261,10 +1276,23 @@ async function start() {
           .filter(other => other.choiceField !== slot.choiceField)
           .map(other => val(other.choiceField))
           .filter(Boolean));
-        const availableOptions = data.transformations.options.filter(option => !selectedElsewhere.has(option));
-        field(transformationGrid, `變換 ${i + 1}`, slot.choiceField, options(availableOptions), true);
-        const percentage = data.transformations.rules.find(rule => rule.choice === val(slot.choiceField))?.valueMultiplier !== 1;
-        numeric(transformationGrid, `變換 ${i + 1} 數值${percentage ? '（%）' : '（等級）'}`, slot.valueField, percentage);
+        const availableOptions = data.transformations.rules
+          .filter(rule => !selectedElsewhere.has(rule.choice))
+          .map(rule => ({ value: rule.choice, label: rule.label }));
+        field(transformationGrid, `變換 ${i + 1}`, slot.choiceField, availableOptions, true);
+        const rule = data.transformations.rules.find(rule => rule.choice === val(slot.choiceField));
+        const choices = rule ? transformationRolls(rule).map(roll => ({
+          value: String(roll / rule.valueMultiplier), label: String(roll) + (rule.valueMultiplier === 1 ? ' 級' : '%'),
+        })) : [];
+        const raw = state.values[slot.valueField];
+        const chosen = rule && raw !== undefined ? choices.find(option => Math.abs((Number(option.value) - Number(raw)) * rule.valueMultiplier) <= 1e-8) : undefined;
+        const picker = createPicker(`變換 ${i + 1} 數值`, choices, chosen?.value ?? '', value => {
+          if (value === '') delete state.values[slot.valueField];
+          else state.values[slot.valueField] = Number(value);
+          update();
+        });
+        if (!rule) picker.querySelector<HTMLInputElement>('input')!.disabled = true;
+        transformationGrid.append(picker);
       });
     }
   }
@@ -1445,6 +1473,8 @@ async function start() {
   renderBattleSettings();
   toggle.addEventListener('change', () => { state.lowerwearAlternativeEnabled = toggle.checked; update(); renderInspector(); });
   const refreshConfigurationUi = (previousControlSignature: string) => {
+    const cleanedTransforms = normalizeTransformationValues(data.transformations, state.values);
+    if (cleanedTransforms.messages.length) document.querySelector<HTMLElement>('#transfer-status')!.textContent = cleanedTransforms.messages.join(' ');
     normalizeOptionalEffectValues(state.values, catalogIndex);
     // In-place edits can leave render keys pointing at an older snapshot. A bulk
     // restore must also compare against the configuration actually being replaced.
@@ -1586,7 +1616,7 @@ async function start() {
       refreshConfigurationUi(previousControlSignature);
       const clearedFields = [...new Set([...imported.clearedFields, ...duplicateTransformationFields, ...duplicateNephronTransformationFields])];
       const partial = clearedFields.length ? `；${clearedFields.length} 個無法對應或重複的欄位已留空（${clearedFields.slice(0, 5).join('、')}${clearedFields.length > 5 ? '…' : ''}）` : '';
-      document.querySelector<HTMLElement>('#transfer-status')!.textContent = `${sampleMode ? '配裝已匯入；範例模式不會儲存到此裝置' : '配裝已匯入並儲存於此裝置'}${partial}。`;
+      document.querySelector<HTMLElement>('#transfer-status')!.textContent = `${sampleMode ? '配裝已匯入；範例模式不會儲存到此裝置' : '配裝已匯入並儲存於此裝置'}${partial}。` + (imported.transformationWarnings?.join(' ') ?? '');
     } catch (error) {
       if (request !== importRequest) return;
       document.querySelector<HTMLElement>('#transfer-status')!.textContent = `匯入失敗：${error instanceof Error ? error.message : '檔案無法讀取。'}`;

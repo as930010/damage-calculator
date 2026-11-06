@@ -91,6 +91,12 @@ export type WeaponBaseAttackInput = Pick<AttackCalculationInput,
   "attackLevel" | "physicalClassCoefficient" | "magicalClassCoefficient" | "weaponEnhancementFactor"
 >;
 
+/** Weapon attack before enhancement and model-specific rounding. */
+export function unroundedWeaponAttack(classCoefficient: number, attackLevel: number): number {
+  return 0.85 * classCoefficient - 0.7775 * 400 +
+    (0.15 * classCoefficient - 0.0225 * 400) * (99 + attackLevel + 50) + 0.5;
+}
+
 /** Resolve weapon base attacks after all attack-level bonuses are accumulated. */
 export function calculateWeaponBaseAttack(input: WeaponBaseAttackInput): {
   physicalAttack: number;
@@ -100,9 +106,7 @@ export function calculateWeaponBaseAttack(input: WeaponBaseAttackInput): {
     if (!Number.isFinite(value)) throw new TypeError(`Weapon base ${key} must be finite.`);
   }
   const calculate = (classCoefficient: number): number => {
-    const classBase =
-      0.85 * classCoefficient - 0.7775 * 400 +
-      (0.15 * classCoefficient - 0.0225 * 400) * (99 + input.attackLevel + 50) + 0.5;
+    const classBase = unroundedWeaponAttack(classCoefficient, input.attackLevel);
     const value = floorMath(classBase) * input.weaponEnhancementFactor;
     if (!Number.isFinite(value)) throw new RangeError("Weapon base attack must be finite.");
     return value;

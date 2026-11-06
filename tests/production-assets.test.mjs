@@ -165,6 +165,7 @@ async function integratedFixture(seasonal) {
   const cssLinks = main.manifest.css.filter(item => ['site-shell.css', 'seasonal-effects.css'].includes(item.source))
     .map(item => `<link rel="stylesheet" href="../${item.path}" />`).join('');
   const ice = Buffer.from(`<head>${cssLinks}</head><body><header class="site-header"></header></body>`);
+  main.files.set('transformation-score/index.html', ice);
   main.files.set('ice-optimizer/index.html', ice);
   main.manifest.files['ice-optimizer/index.html'] = { bytes: ice.length, hash: contentHash(ice) };
   return main;
@@ -187,7 +188,7 @@ test('integrated themes survive optional seasonal resources and preserve shared 
     }
     assert.equal([...integrated.files.keys()].filter(name => /theme-card-.*\.svg$/.test(name)).length, 5);
     const themeScript = integrated.files.get([...integrated.files.keys()].find(name => /assets\/themes-.*\.js$/.test(name))).toString();
-    for (const page of ['index.html', 'ice-optimizer/index.html', 'buff-simulator/index.html']) {
+    for (const page of ['index.html', 'ice-optimizer/index.html', 'buff-simulator/index.html', 'transformation-score/index.html']) {
       const html = integrated.files.get(page).toString();
       assert.equal((html.match(/data-theme-seasonal/g) ?? []).length, seasonal ? 2 : 1, 'one link when available plus bootstrap lookup');
       assert.equal((html.match(/theme-control:start/g) ?? []).length, 1);

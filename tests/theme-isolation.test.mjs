@@ -220,10 +220,10 @@ test("Buff uses the current shared header and mobile navigation without activity
       const style = selector => dom.window.getComputedStyle(dom.window.document.querySelector(selector));
       assert.equal(style(".site-header").minHeight, "72px");
       assert.equal(style(".site-header").display, "grid");
-      assert.equal(style(".site-header").gridTemplateColumns, width <= 700 ? "minmax(0, 1fr)" : "minmax(0, 1fr) minmax(290px, 420px)");
+      assert.equal(style(".site-header").gridTemplateColumns, width <= 700 ? "minmax(0, 1fr)" : "minmax(0, 1fr) minmax(0, max-content)");
       assert.equal(style(".site-header").gap, width <= 700 ? "8px" : "14px");
-      assert.equal(style(".site-tabs").gridTemplateColumns, "repeat(3, minmax(0, 1fr))");
-      assert.equal(dom.window.document.querySelectorAll(".site-tabs a").length, 3);
+      assert.equal(style(".site-tabs").gridTemplateColumns, "minmax(0, 5fr) minmax(0, 7fr) minmax(0, 6fr) minmax(0, 6fr)");
+      assert.equal(dom.window.document.querySelectorAll(".site-tabs a").length, 4);
       assert.equal(style(".site-tabs a").minHeight, "44px");
       assert.equal(style(".site-developer > .developer-mobile").display, width <= 700 ? "flex" : "none");
     } finally { dom.window.close(); }

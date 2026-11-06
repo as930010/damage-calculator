@@ -32,6 +32,7 @@ export function clearDuplicateTransformationChoices(data: GameData, target: Load
     if (!choice) continue;
     if (seen.has(choice)) {
       delete target.values[slot.choiceField];
+      delete target.values[slot.valueField];
       clearedFields.push(slot.choiceField);
     } else seen.add(choice);
   }

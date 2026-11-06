@@ -1,3 +1,4 @@
+import { attributeLabel } from './attribute-label.ts';
 export interface PickerOption { value: string; label: string; detail?: string }
 let sequence = 0;
 let mobilePickerDialog: HTMLDialogElement | null = null;
@@ -90,6 +91,8 @@ function getMobilePickerDialog() {
 /** Only explicit selections are saved; desktop typing filters the list. */
 export interface PickerDirectEntry { sanitize: (value: string) => string; resolve: (value: string) => string | null; onInvalid: (value: string) => void; onInput?: () => void; allowCharacter?: (character: string) => boolean }
 export function createPicker(label: string, options: readonly PickerOption[], value: string, onChange: (value: string) => void, directEntry?: PickerDirectEntry): HTMLElement {
+  label = attributeLabel(label);
+  options = options.map(option => ({ ...option, label: attributeLabel(option.label) }));
   const clearedValue = options.some(option => option.value === '無關傷害') ? '無關傷害' : '';
   if (clearedValue && !options.some(option => option.value === value)) value = clearedValue;
   const controller = new window.AbortController();

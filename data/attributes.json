@@ -20,7 +20,7 @@
     },
     {
       "key": "doubleAttackPct",
-      "name": "雙攻%",
+      "name": "攻擊力%",
       "unit": "percent",
       "calculationScope": "characterTotal",
       "aggregation": "sum",

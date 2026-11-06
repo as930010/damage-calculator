@@ -175,6 +175,8 @@ export function createCatalogIndex(data: CatalogData, revision: unknown = Symbol
     return catalog ? validationChoices.get(catalog.id)!() : null;
   }
   return Object.freeze({
+    transformationRules: new Map(data.transformations.rules.map(rule => [rule.choice, rule])),
+    transformationDocument: { ...data.transformations, slots: data.transformations.slots.map(slot => ({ ...slot })) },
     data, revision, activeClasses, spiritClassCodes, resolveActiveClassCode, resolveSpiritClassCode,
     classById: (id: string) => classById.get(id), isActiveClass: (id: string) => activeIds.has(id),
     innerwearById: (id: string) => innerwearById.get(id), gloveCircuit, validationCatalog,

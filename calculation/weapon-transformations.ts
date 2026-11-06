@@ -2,6 +2,10 @@ import type { StatContribution } from "./types.ts";
 
 export interface WeaponTransformationRule {
   choice: string;
+  label: string;
+  minRoll: number;
+  maxRoll: number;
+  step: number;
   statKey: string;
   valueMultiplier: number;
   scaleByEnhancement?: boolean;

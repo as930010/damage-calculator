@@ -3182,11 +3182,11 @@
     }
   },
   "pages": {
-    "same": "40e9e98a19c4f4d8a2c6d5136a5757f84efca0f77958fcd95cdb4f56ed645a56",
-    "different": "79f7e27f0705312d440cd5ea007ce7dfc857c1ac6f5a4793f1e9d5d0cf182175",
-    "invalid-baseline": "d7e1f7e0049bd2ef50af0cad5983b0af65880c779f6e874f2fe5cff21f6b1a39",
-    "fallback-baseline": "6bccfdb545e24c7020a2bf11ad546e6a0f4c027da98451c2eaf5d1025c0f9dcd",
-    "fallback-current": "d41de8413f15b47159a89c9d3bc2427281530290a40e386aff32d1d63a11a9b5"
+    "same": "1703741c649c4ad197f6f1f6d3d903c564cca1a52a8934badbba46a636b6b784",
+    "different": "41e554e6c5ad83af047a89ec8fca5564b96da45eb9252bdbadd8dab22f3a668a",
+    "invalid-baseline": "b561e919df1036fc2cfe5d435fbd110d0694236c092e3620bb504af6f64b4b59",
+    "fallback-baseline": "7da52dfc8ac4f122500291ef48938aab15a0615c6f46beff3a2abc7901fde70e",
+    "fallback-current": "3a07b1b3e3531a948e7c53c97e5f4d9a09901278c940b912c047c19bcae338cb"
   },
   "workload": {
     "public-complete": {

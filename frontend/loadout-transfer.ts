@@ -5,6 +5,7 @@ import { isResonanceInputField, parseResonancePoints } from '../calculation/reso
 import { codeForFieldId, fieldIdForCode, isFieldId } from './field-ids.ts';
 import { normalizePortraitAwakeningSplit, normalizeTranscendenceSkillDamageShare, type LoadoutState } from './state.ts';
 import { canonicalizeNumber } from './numeric-input.ts';
+import { normalizeTransformationValues } from '../calculation/transformation-selections.ts';
 import { normalizeOptionalEffectValues, isUnrelatedEffectValue, normalizeNephronMagazineSelections, normalizeBossHealthCondition } from './state.ts';
 import { normalizeClassSkillVersions } from '../calculation/class-skill-versions.ts';
 
@@ -12,6 +13,7 @@ type TransferData = CatalogData;
 type JsonRecord = Record<string, unknown>;
 
 export interface LoadoutImportResult {
+  transformationWarnings?: string[];
   state: LoadoutState;
   clearedFields: string[];
 }
@@ -44,6 +46,8 @@ export function serializeLoadout(state: LoadoutState, data: TransferData, suppli
   const values: Record<string, string | number> = {};
   const omittedFields: string[] = [];
   const fieldValues = { ...state.values };
+  const cleanedTransforms = normalizeTransformationValues(index.transformationDocument, fieldValues, index.transformationRules);
+  omittedFields.push(...cleanedTransforms.fields);
   const portrait = data.otherEffects.portraitAwakening;
   const portraitFields = [portrait.strongSettingKey, portrait.transcendenceSettingKey];
   const hasPortraitValues = portraitFields.some(fieldId => fieldValues[fieldId] !== undefined && fieldValues[fieldId] !== '');
@@ -150,6 +154,12 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
   const mappings = index.equipmentMappings;
   const rawValues = candidate.values;
   if (!isRecord(rawValues)) throw new TypeError('配裝檔的欄位資料格式無效。');
+  const rawTransformValues: Record<string, unknown> = {};
+  for (const [code, value] of Object.entries(rawValues)) {
+    const field = fieldIdForCode(code);
+    if (field) rawTransformValues[field] = value;
+  }
+  const transformationCleanup = normalizeTransformationValues(index.transformationDocument, rawTransformValues, index.transformationRules);
   const optionValuesById: Record<string, string | number> = {};
   for (const [code, value] of Object.entries(rawValues)) {
     const fieldId = fieldIdForCode(code);
@@ -285,7 +295,10 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
   }
 
   const uniqueCleared = [...new Set(clearedFields)];
+  const cleanedTransforms = normalizeTransformationValues(index.transformationDocument, values, index.transformationRules);
+  uniqueCleared.push(...cleanedTransforms.fields.filter(field => !uniqueCleared.includes(field)));
   return {
+    ...(transformationCleanup.messages.length ? { transformationWarnings: transformationCleanup.messages } : {}),
     state: {
       schemaVersion: 3,
       Job: Job ?? current.Job,

@@ -114,9 +114,10 @@ optimized.manifest.files[optimizerCssPath] = { bytes: optimizerCss.length, hash:
 const siteRoot = join(root, 'site-dist');
 const optimizerEntryPath = join(output, 'features', 'ice-optimizer', 'frontend', 'main.js');
 const workerEntryPath = join(output, 'features', 'ice-optimizer', 'frontend', 'worker.js');
+const scoreEntry = join(output, 'features', 'transformation-score', 'main.js');
 const optimizerBundle = await bundle({
   absWorkingDir: root,
-  entryPoints: { 'ice-optimizer': optimizerEntryPath, 'ice-worker': workerEntryPath },
+  entryPoints: { 'ice-optimizer': optimizerEntryPath, 'ice-worker': workerEntryPath, 'transformation-score': scoreEntry },
   outdir: join(siteRoot, 'assets'),
   entryNames: '[name]-[hash]',
   chunkNames: 'chunks/ice-[name]-[hash]',
@@ -125,7 +126,7 @@ const optimizerBundle = await bundle({
   metafile: true, write: false,
 });
 const slash = value => value.replaceAll('\\', '/');
-let optimizerEntryPathHashed, optimizerWorkerPathHashed;
+let optimizerEntryPathHashed, optimizerWorkerPathHashed, scoreScript;
 for (const file of optimizerBundle.outputFiles) {
   const asset = slash(relative(siteRoot, file.path));
   optimized.files.set(asset, file.contents);
@@ -138,6 +139,7 @@ for (const file of optimizerBundle.outputFiles) {
     })),
   };
   const entry = metadata.entryPoint && slash(metadata.entryPoint);
+  if (entry === slash(relative(root, scoreEntry))) scoreScript = asset;
   if (entry === slash(relative(root, optimizerEntryPath))) optimizerEntryPathHashed = asset;
   if (entry === slash(relative(root, workerEntryPath))) optimizerWorkerPathHashed = asset;
 }
@@ -159,6 +161,23 @@ if (optimizerHtml.includes('__OPTIMIZER_') || [shellCssPath, optimizerCssPath, o
 }
 optimized.files.set('ice-optimizer/index.html', optimizerHtml);
 optimized.manifest.files['ice-optimizer/index.html'] = { bytes: optimizerHtml.length, hash: contentHash(optimizerHtml) };
+
+const scoreDirectory = join(root, 'features', 'transformation-score');
+if (!scoreScript) throw new Error('Missing transformation score entry');
+const scoreStyles = Buffer.from(minifyCss(await readFile(join(scoreDirectory, 'styles.css'), 'utf8')));
+const scoreCss = `assets/transformation-score-${contentHash(scoreStyles)}.css`;
+optimized.files.set(scoreCss, scoreStyles);
+optimized.manifest.files[scoreCss] = { bytes: scoreStyles.length, hash: contentHash(scoreStyles) };
+optimized.manifest.css.push({ source: 'transformation-score/styles.css', path: scoreCss });
+const scoreTemplate = await readFile(join(scoreDirectory, 'index.html'), 'utf8');
+const scoreHtml = Buffer.from(scoreTemplate
+  .replace(shellLink, `href="../${shellCssPath}"`)
+  .replace('href="./styles.css"', `href="../${scoreCss}"`)
+  .replace('<link rel="stylesheet" href="__SCORE_SEASONAL__" />', seasonalCssPath
+    ? `<link rel="stylesheet" href="../${seasonalCssPath}" />` : '')
+  .replace('__SCORE_GAME_DATA__', '../' + gameDataPath)
+  .replace('src="./main.js"', `src="../${scoreScript}"`));
+optimized.files.set('transformation-score/index.html', scoreHtml);
 
 shareSimulatorCss(optimized);
 await integrateThemes(root, optimized);

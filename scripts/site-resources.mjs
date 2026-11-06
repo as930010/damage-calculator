@@ -50,7 +50,7 @@ export async function integrateThemes(root, optimized) {
     optimized.manifest.files[path] = { bytes: bytes.length, hash: contentHash(bytes) };
   }
   const themeBootstrap = `<!-- theme-bootstrap:start --><script>try{const s=document.querySelector('link[data-theme-seasonal]'),k='damage-calculator-preview-theme',v=new URL(location.href).searchParams.get('preview-theme')||sessionStorage.getItem(k)||(s?'seasonal':'original');if(['original','harbor','forest','ember'].includes(v)){if(s)s.media='not all';if(v!=='original')document.documentElement.dataset.previewTheme=v}}catch{}</script><!-- theme-bootstrap:end -->`;
-  for (const [page, prefix] of [['index.html', './'], ['ice-optimizer/index.html', '../'], ['buff-simulator/index.html', '../']]) {
+  for (const [page, prefix] of [['index.html', './'], ['ice-optimizer/index.html', '../'], ['buff-simulator/index.html', '../'], ['transformation-score/index.html', '../']]) {
     let html = optimized.files.get(page).toString();
     const seasonalLink = /<link rel="stylesheet" href="([^"]*seasonal-effects-[^"]+\.css)"\s*\/>/g;
     if ([...html.matchAll(seasonalLink)].length !== (seasonalCssPath ? 1 : 0)) throw new Error(`Unexpected seasonal stylesheet count in ${page}`);

@@ -202,9 +202,117 @@ test('Buff production skill failure is retryable and does not disable core calcu
   } finally { page.close(); }
 });
 
-test('three source and production pages retain unique metadata and current footer version', async () => {
+test('production transformation score follows the active loadout and keeps simulations read-only', async () => {
+  const dir = join(root, 'site-dist');
+  const html = await readFile(join(dir, 'transformation-score/index.html'), 'utf8');
+  const base = 'https://production.test/damage-calculator/';
+  const dom = new JSDOM(html, { url: base + 'transformation-score/' });
+  const { document, localStorage, StorageEvent, Event } = dom.window;
+  const workspace = document.querySelector('#score-workspace');
+  const savedKey = 'dab-loadout-v1';
+  const active = JSON.stringify(sample);
+  try {
+    localStorage.setItem('dab-baseline-v1', active);
+    const runtime = await createRuntime({ dom, instrument: false, globals: {
+      Option: dom.window.Option,
+      fetch: async url => {
+        const asset = new URL(url, document.baseURI);
+        assert.ok(asset.href.startsWith(base + 'data/game-data.'));
+        return { ok: true, json: async () => JSON.parse(await readFile(join(dir, asset.href.slice(base.length)), 'utf8')) };
+      },
+    } });
+    const entry = document.querySelector('script[type="module"]').src.slice(base.length);
+    await runtime.load('site-dist/' + entry);
+    await waitFor(() => workspace.hidden, 'a saved comparison baseline alone cannot be scored');
+    localStorage.setItem(savedKey, active);
+    document.querySelector('#reload-loadout').click();
+    await waitFor(() => !workspace.hidden, 'load the saved active equipment');
+    const current = () => document.querySelector('.score-verdict strong').textContent;
+    assert.match(document.querySelector('#score-output').textContent, /變換分數/);
+    assert.ok(document.querySelector('.score-grade').textContent.trim());
+    assert.match(document.querySelector('#score-bounds').textContent, /四有效詞條下最低收益提升參考組合/);
+    assert.match(document.querySelector('#score-bounds').textContent, /最高增幅配置參考組合/);
+    assert.doesNotMatch(document.querySelector('#loadout-status').textContent, /物理職業|魔法職業/);
+    assert.match(document.querySelector('#loadout-status').textContent, /不含武器變換攻擊力等級/);
+    assert.equal(document.querySelector('a[href="../"]:not(.site-tabs a)'), null);
+    const choices = [...document.querySelector('[data-choice]').options].slice(1);
+    const tables = [...document.querySelectorAll('#roll-comparisons table')];
+    assert.equal(tables.length, 14);
+    assert.deepEqual(tables.map(table => table.caption.textContent), gameData.transformations.rules.map(rule => rule.label));
+    for (const table of tables) {
+      assert.equal(table.querySelectorAll('th[scope="col"]').length, 2);
+      assert.equal(table.tBodies[0].rows.length, 8);
+      for (const row of table.tBodies[0].rows) assert.match(row.cells[1].textContent, /^-?\d+\.\d{2}%$/);
+    }
+    assert.equal(tables[5].tBodies[0].rows[0].cells[0].textContent, '13');
+    assert.equal(tables[13].tBodies[0].rows[0].cells[0].textContent, '8.0%');
+    assert.equal(choices.find(option => option.value === '技能傷害%').text, '所有技能傷害');
+    const initial = current();
+    const disclosure = document.querySelector('#roll-disclosure');
+    disclosure.open = false;
+    for (let i = 0; i < 4; i++) {
+      const choice = document.querySelector(`[data-choice="${i}"]`);
+      choice.value = '無關傷害';
+      choice.dispatchEvent(new Event('change', { bubbles: true }));
+      assert.ok(document.querySelector(`[data-roll="${i}"]`).disabled);
+      assert.equal(document.querySelector(`[data-roll="${i}"]`).options.length, 1);
+    }
+    assert.equal(current(), '0.00');
+    assert.match(document.querySelector('#score-output').textContent, /目前提升幅度0.00%/);
+    assert.doesNotMatch(document.querySelector('#configuration-rating').textContent, /無變換基準傷害|模擬後傷害/);
+    const first = document.querySelector('[data-choice="0"]');
+    first.value = '技能傷害%'; first.dispatchEvent(new Event('change', { bubbles: true }));
+    assert.equal(document.querySelector('.score-grade'), null);
+    assert.equal(document.querySelector('[data-roll="0"]').value, '');
+    assert.equal([...document.querySelector('[data-choice="1"]').options].find(option => option.value === '技能傷害%'), undefined);
+    document.querySelector('[data-roll="0"]').value = '13';
+    document.querySelector('[data-roll="0"]').dispatchEvent(new Event('change', { bubbles: true }));
+    const duplicate = document.querySelector('[data-choice="1"]');
+    duplicate.add(new dom.window.Option('所有技能傷害', '技能傷害%')); duplicate.value = '技能傷害%'; duplicate.dispatchEvent(new Event('change', { bubbles: true }));
+    assert.equal(duplicate.value, '');
+    assert.equal(document.querySelector('[data-roll="1"]').value, '');
+    document.querySelector('#reload-loadout').click();
+    assert.equal(disclosure.open, false);
+    assert.equal(current(), initial);
+    assert.equal(localStorage.getItem(savedKey), active);
+    const roll = document.querySelector('[data-roll="0"]');
+    roll.value = '8';
+    roll.dispatchEvent(new Event('change', { bubbles: true }));
+    assert.notEqual(current(), initial);
+    assert.equal(localStorage.getItem(savedKey), active);
+    const changed = { ...sample, Job: 'KE', values: { ...sample.values, 'Weapon.ENHC': 'Lv.13' } };
+    localStorage.setItem(savedKey, JSON.stringify(changed));
+    dom.window.dispatchEvent(new StorageEvent('storage', { key: savedKey }));
+    assert.match(document.querySelector('#loadout-status').textContent, /KE.*\+13.*不含武器變換攻擊力等級/);
+    assert.notEqual(current(), initial);
+    assert.equal(document.querySelector('[data-roll="0"]').value, '13');
+    const highest = index => document.querySelectorAll('#roll-comparisons table')[index].tBodies[0].rows[0].cells[1].textContent;
+    changed.transcendenceSkillDamageSharePct = 0;
+    changed.values['Stage.BossDEF'] = 0;
+    localStorage.setItem(savedKey, JSON.stringify(changed));
+    document.querySelector('#reload-loadout').click();
+    assert.equal(highest(11), '0.00%');
+    assert.equal(highest(13), '0.00%');
+    assert.ok(parseFloat(highest(10)) > 0);
+    changed.transcendenceSkillDamageSharePct = 100;
+    changed.values['Stage.BossDEF'] = 80;
+    localStorage.setItem(savedKey, JSON.stringify(changed));
+    dom.window.dispatchEvent(new StorageEvent('storage', { key: savedKey }));
+    assert.equal(highest(10), '0.00%');
+    assert.ok(parseFloat(highest(11)) > 0);
+    assert.ok(parseFloat(highest(13)) > 0);
+    localStorage.removeItem(savedKey);
+    dom.window.dispatchEvent(new StorageEvent('storage', { key: savedKey }));
+    assert.ok(workspace.hidden);
+    assert.match(document.querySelector('#loadout-status').textContent, /尚未取得/);
+    assert.equal(localStorage.getItem('dab-baseline-v1'), active);
+  } finally { dom.window.close(); }
+});
+
+test('four source and production pages retain unique metadata and current footer version', async () => {
   const pages = [
     ['index.html', 'index.html', '', '配裝模擬器', /艾爾之光.*配裝/],
+    ['features/transformation-score/index.html', 'transformation-score/index.html', 'transformation-score/', '屬性變換評分', /武器變換.*PR/],
     ['features/ice-optimizer/index.html', 'ice-optimizer/index.html', 'ice-optimizer/', '冰裝最佳化試算', /冰裝.*理論傷害/],
     ['features/buff-simulator/index.html', 'buff-simulator/index.html', 'buff-simulator/', '隊伍增益模擬', /Buff／DeBuff/],
   ];
@@ -222,10 +330,10 @@ test('three source and production pages retain unique metadata and current foote
         const canonical = doc.querySelectorAll('head link[rel="canonical"]');
         assert.equal(canonical.length, 1);
         assert.equal(canonical[0].href, 'https://as930010.github.io/damage-calculator/' + path);
-        assert.equal(doc.querySelector('.footer-version bdi').textContent, 'v3.04.23');
+        assert.equal(doc.querySelector('.footer-version bdi').textContent, 'v4.01.03');
       } finally { dom.window.close(); }
     }
-    assert.equal(new Set(descriptions).size, 3);
+    assert.equal(new Set(descriptions).size, 4);
   }
 });
 
@@ -241,7 +349,8 @@ test('release history preserves published entries and prepends new versions with
       ]);
       const versions = entries.map(entry => entry[0]);
       assert.equal(new Set(versions).size, versions.length, 'versions are unique within release history');
-      assert.deepEqual(entries[0], ['v3.04.23', '2026-11-05', '優化冰裝與內裝魔法石來源顯示方式、獵人的本能新增公會技能標籤']);
+      assert.deepEqual(entries[0], ['v4.01.03', '2026-11-06', '新增屬性變換試算評分功能']);
+      assert.deepEqual(entries[1], ['v3.04.23', '2026-11-05', '優化冰裝與內裝魔法石來源顯示方式、獵人的本能新增公會技能標籤']);
       const current = versions.indexOf('v3.04.19'), previous = versions.indexOf('v3.04.18');
       assert.ok(current >= 0 && previous > current);
       assert.deepEqual(entries[previous], ['v3.04.18', '2026-10-30', '新增切換佈景主題功能、按鈕反應與視覺效果優化']);

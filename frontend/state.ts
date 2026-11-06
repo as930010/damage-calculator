@@ -164,7 +164,7 @@ export interface LoadoutState {
   classSkillVersions?: Record<string, boolean>;
   bossHealthCondition?: BossHealthCondition;
 }
-const stateKey = "dab-loadout-v1";
+export const stateKey = "dab-loadout-v1";
 const baselineKey = "dab-baseline-v1";
 
 export function normalizeTranscendenceSkillDamageShare(value: unknown): number {
@@ -189,7 +189,7 @@ export function parseTranscendenceSkillDamageShareInput(raw: string): number | n
   return Number.isFinite(value) && value >= 0 && value <= 100 ? value : null;
 }
 
-function parseState(raw: string | null): LoadoutState | null {
+export function parseState(raw: string | null): LoadoutState | null {
   if (!raw) return null;
   const value: unknown = JSON.parse(raw);
   if (!value || typeof value !== "object") return null;

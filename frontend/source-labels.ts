@@ -1,6 +1,7 @@
 import { escapeHtml as h, formatNumber as fmt, type GameData } from './data.ts';
 import { DEFAULT_BOSS_HEALTH_CONDITION, type BossHealthCondition } from './state.ts';
 import { readCircuitBoardRows } from './circuit-board-rows.ts';
+import { attributeLabel } from './attribute-label.ts';
 
 export interface SourceLabelSelection {
   readonly values: Readonly<Record<string, string | number>>;
@@ -8,6 +9,10 @@ export interface SourceLabelSelection {
 }
 
 export function sourceLabel(sourceId: string, data: GameData, state: SourceLabelSelection): string {
+  return attributeLabel(resolveSourceLabel(sourceId, data, state));
+}
+
+function resolveSourceLabel(sourceId: string, data: GameData, state: SourceLabelSelection): string {
   const bossHealthCondition = () => state.bossHealthCondition ?? DEFAULT_BOSS_HEALTH_CONDITION;
   if (sourceId === 'character-base') return '角色基礎係數';
   if (sourceId === 'character-base:crit-damage-product') return '角色原始乘算爆傷基準';

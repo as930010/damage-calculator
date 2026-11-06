@@ -19,6 +19,12 @@
   --night-indigo: #0E1A46;
   --midnight-violet-edge: #535078;
   --violet-control-edge: #4a5574;
+  --seasonal-action-bg: linear-gradient(180deg,#282d50,#1b2140);
+  --seasonal-action-hover-bg: linear-gradient(180deg,#393654,#292d50);
+  --seasonal-action-text: #e7e3f2;
+  --seasonal-action-hover-text: #f5edfa;
+  --seasonal-action-hover-border: #a18abb;
+  --seasonal-action-focus: #c4a8e7;
   --warm-wood: #9a805e;
   --lantern-gold: #f1ca83;
   --ember-orange: #d98759;
@@ -500,7 +506,8 @@ footer::after{
 
 /* Apply the same seasonal palette and surfaces to the other two tools. */
 body.site-page-buff,
-body.site-page-optimizer {
+body.site-page-optimizer,
+body.site-page-score {
   background: transparent;
   color: var(--text-main);
 }
@@ -521,7 +528,8 @@ body.site-page-buff {
 .site-page-optimizer .app-shell { background: transparent; }
 
 .site-page-buff .site-tool-intro,
-.site-page-optimizer .site-tool-intro {
+.site-page-optimizer .site-tool-intro,
+.site-page-score .site-tool-intro {
   border-color: rgb(139 139 191 / 35%);
   background:
     radial-gradient(ellipse 410px 185px at 87% 100%, rgb(215 136 74 / 14%) 0%, rgb(179 102 67 / 6%) 48%, transparent 100%),
@@ -531,7 +539,8 @@ body.site-page-buff {
 }
 
 .site-page-buff .site-tool-intro::after,
-.site-page-optimizer .site-tool-intro::after {
+.site-page-optimizer .site-tool-intro::after,
+.site-page-score .site-tool-intro::after {
   right: 3%; bottom: -24px; width: 130px; height: 205px;
   border: 0; border-radius: 0; box-shadow: none; opacity: .2; transform: none;
   background: linear-gradient(180deg, rgb(75 77 139 / 82%), rgb(27 31 69 / 84%));
@@ -539,17 +548,23 @@ body.site-page-buff {
 }
 
 .site-page-buff .site-tool-eyebrow,
-.site-page-optimizer .site-tool-eyebrow { color: #bdb9d3; }
+.site-page-optimizer .site-tool-eyebrow,
+.site-page-score .site-tool-eyebrow { color: #bdb9d3; }
 .site-page-buff .site-tool-eyebrow::before,
-.site-page-optimizer .site-tool-eyebrow::before { background: #9a9bc8; }
+.site-page-optimizer .site-tool-eyebrow::before,
+.site-page-score .site-tool-eyebrow::before { background: #9a9bc8; }
 .site-page-buff .site-tool-intro h1,
-.site-page-optimizer .site-tool-intro h1 { color: var(--text-heading); }
+.site-page-optimizer .site-tool-intro h1,
+.site-page-score .site-tool-intro h1 { color: var(--text-heading); }
 .site-page-buff .site-tool-summary,
-.site-page-optimizer .site-tool-summary { color: #c6c4dc; }
+.site-page-optimizer .site-tool-summary,
+.site-page-score .site-tool-summary { color: #c6c4dc; }
 .site-page-buff .site-tool-steps li,
-.site-page-optimizer .site-tool-steps li { border-color: rgb(145 141 187 / 28%); background: rgb(12 20 55 / 65%); color: #e2deef; }
+.site-page-optimizer .site-tool-steps li,
+.site-page-score .site-tool-steps li { border-color: rgb(145 141 187 / 28%); background: rgb(12 20 55 / 65%); color: #e2deef; }
 .site-page-buff .site-tool-steps li span:first-child,
-.site-page-optimizer .site-tool-steps li span:first-child { background: rgb(143 126 192 / 23%); color: #c5b9de; }
+.site-page-optimizer .site-tool-steps li span:first-child,
+.site-page-score .site-tool-steps li span:first-child { background: rgb(143 126 192 / 23%); color: #c5b9de; }
 
 .site-page-buff .team-panel,
 .site-page-buff .result-card,
@@ -579,7 +594,8 @@ body.site-page-buff {
 
 @media (max-width: 700px) {
   .site-page-buff .site-tool-intro::after,
-  .site-page-optimizer .site-tool-intro::after { right: 1%; width: 86px; height: 150px; opacity: .12; }
+  .site-page-optimizer .site-tool-intro::after,
+  .site-page-score .site-tool-intro::after { right: 1%; width: 86px; height: 150px; opacity: .12; }
 }
 
 /* Keep shared navigation, disclosures and tool controls visually consistent. */
@@ -636,20 +652,26 @@ body.site-page-buff {
 .site-page-optimizer .optimizer-result-state small,
 .site-page-optimizer .optimizer-result dt{color:#a9a4b3}
 .site-page-optimizer .optimizer-actions button,
+.site-page-score #reload-loadout,
 .site-page-optimizer .optimizer-result .optimizer-apply{
   border-color:var(--violet-control-edge);
   border-radius:8px;
-  background:linear-gradient(180deg,#282d50,#1b2140);
-  color:#e7e3f2;
+  background:var(--seasonal-action-bg);
+  color:var(--seasonal-action-text);
 }
 .site-page-optimizer .optimizer-actions button:not(:disabled):hover,
+.site-page-score #reload-loadout:not(:disabled):hover,
 .site-page-optimizer .optimizer-result .optimizer-apply:hover{
-  border-color:#a18abb;
-  background:linear-gradient(180deg,#393654,#292d50);
-  color:#f5edfa;
+  border-color:var(--seasonal-action-hover-border);
+  background:var(--seasonal-action-hover-bg);
+  color:var(--seasonal-action-hover-text);
 }
 .site-page-optimizer .optimizer-actions button:focus-visible,
+.site-page-score #reload-loadout:focus-visible,
 .site-page-optimizer .optimizer-result summary:focus-visible{outline-color:#c4a8e7}
+.site-page .theme-trigger[data-theme="seasonal"]{background:var(--panel-alt)}
+.site-page .theme-trigger[data-theme="seasonal"]:hover,
+.site-page .theme-trigger[data-theme="seasonal"][aria-expanded="true"]{background:var(--control-hover);border-color:var(--seasonal-action-hover-border)}
 .site-page-optimizer .optimizer-actions #optimizer-cancel,
 .site-page-optimizer .optimizer-actions #optimizer-clear{
   border-color:var(--violet-control-edge);
@@ -750,10 +772,14 @@ body.site-page-buff {
 .site-page-buff .skill-search-controls input::placeholder{color:#9ba3c0}
 .site-page-buff .option-chip:has(input:checked),
 .site-page-buff .option-editor-chip:has(input:checked){
-  border-color:rgb(184 147 97 / 70%);
-  background:linear-gradient(145deg,rgb(53 44 37 / 82%),rgb(34 31 37 / 82%));
-  color:#f0e2c5;
+  border-color:var(--violet-control-edge);
+  background:var(--seasonal-action-bg);
+  color:var(--seasonal-action-text);
 }
+.site-page-buff .option-chip input:checked { background:var(--text-input); border-color:var(--text-input); }
+.site-page-buff .option-chip:hover,
+.site-page-buff .option-chip:has(input:checked):hover { border-color:var(--seasonal-action-hover-border); background:var(--seasonal-action-hover-bg); }
+.site-page-buff .option-chip input:focus-visible { outline-color:var(--seasonal-action-focus); }
 .site-page-buff .skill-result p{color:#d4ccda}
 .site-page-buff .skill-role-heading span{border-color:rgb(145 143 189 / 35%);color:#b8b5c5}
 
