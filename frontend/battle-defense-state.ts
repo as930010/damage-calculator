@@ -43,7 +43,7 @@ export function externalDefenseRate(value: BattleDefenseEnvironment): number {
     return rate;
   }
   return combineExternalSources(value.sources.map((source, i) => {
-    const rate = parseDefensePercentage(source.percentage);
+    const rate = source.percentage.trim() === '' ? 0 : parseDefensePercentage(source.percentage);
     if (rate === null) throw new Error(`破防來源第 ${i + 1} 條尚未完成；請填寫 0～100 的有效破防率，名稱可留空。`);
     return rate;
   }));

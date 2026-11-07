@@ -58,12 +58,19 @@ test('Independent source rows retain editing nodes, validate drafts and combine 
     for(const [i,rate]of [48,50,50,20].entries()){
       panel.querySelector('[data-defense-add]').click();
       const row=panel.querySelectorAll('.defense-source-row')[i],name=row.querySelector('[data-source-name]'),number=row.querySelector('[data-source-percentage]');
-      assert.equal(document.activeElement,name);assert.equal(name.value,'');number.value=String(rate);number.dispatchEvent(new Event('input',{bubbles:true}));
+      assert.equal(document.activeElement,name);assert.equal(name.value,'');
+      assert.equal(panel.querySelector('.defense-error').textContent,'');
+      assert.doesNotMatch(document.querySelector('#damage-result').textContent,/戰鬥破防設定尚未完成/);
+      number.value=String(rate);number.dispatchEvent(new Event('input',{bubbles:true}));
     }
     assert.match(panel.querySelector('.defense-summary-values').textContent,/89\.6%.*90\.4008%/);
     const rows=[...panel.querySelectorAll('.defense-source-row')];
     const percentage=rows[0].querySelector('[data-source-percentage]');percentage.focus();percentage.value='50%';percentage.dispatchEvent(new Event('input',{bubbles:true}));
     assert.equal(percentage.value,'48');assert.equal(document.activeElement,percentage);assert.match(panel.querySelector('.defense-summary-values').textContent,/89\.6%.*90\.4008%/);
+    percentage.value='';percentage.dispatchEvent(new Event('input',{bubbles:true}));
+    assert.equal(document.activeElement,percentage);assert.match(panel.querySelector('.defense-summary-values').textContent,/80%/);
+    assert.equal(JSON.parse(page.dom.window.localStorage.getItem('damage-calculator.battle-defense.v1')).sources[0].percentage,'');
+    percentage.value='48';percentage.dispatchEvent(new Event('input',{bubbles:true}));
     rows[1].querySelector('button').click();
     assert.equal(panel.querySelectorAll('.defense-source-row')[0],rows[0]);assert.equal(panel.querySelectorAll('.defense-source-row')[1],rows[2]);
     while(panel.querySelector('.defense-source-row'))panel.querySelector('.defense-source-row button').click();
