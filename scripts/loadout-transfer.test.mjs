@@ -11,7 +11,7 @@ import { normalizeOptionalEffectValues } from "../dist/frontend/state.js";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = async (path) => JSON.parse(await readFile(join(root, path), "utf8"));
-const [classes, mapping, simulatorInputs, masterBeast, layout, attack, innerwear, nephronArmor, appraisals, chips, chipSlots, circuits, transformations, growth, weaponAppraisals, weaponGrades, giantStones, colorSetEffects, spiritRecord, otherEffects, pets, rightIceSets] = await Promise.all([
+const [classes, mapping, simulatorInputs, masterBeast, layout, attack, innerwear, nephronArmor, appraisals, chips, chipSlots, circuits, transformations, growth, weaponAppraisals, weaponGrades, giantStones, colorSetEffects, spiritRecord, otherEffects, pets, rightIceSets, accessoryEffects] = await Promise.all([
   read("data/classes.json"), read("data/simulator-equipment-mapping.json"),
   read("data/simulator-input-options.json"), read("data/master-beast-effects.json"),
   read("data/equipment-layout.json"), read("data/attack-parameters.json"), read("data/innerwear-rules.json"), read("data/nephron-armor-rules.json"),
@@ -19,11 +19,11 @@ const [classes, mapping, simulatorInputs, masterBeast, layout, attack, innerwear
   read("data/circuit-board-rules.json"), read("data/weapon-transformations.json"), read("data/weapon-growth.json"),
   read("data/weapon-appraisals.json"), read("data/weapon-grade-options.json"), read("data/giant-magic-stones.json"),
   read("data/color-set-effects.json"), read("data/spirit-record-effects.json"), read("data/other-effect-options.json"),
-  read("data/pet-effects.json"), read("data/equipment/right-ice-set-effects.json"),
+  read("data/pet-effects.json"), read("data/equipment/right-ice-set-effects.json"), read("data/accessory-special-effects.json"),
 ]);
 const catalogFiles = [...new Set([...mapping.selections.map((item) => item.catalogFile), mapping.magicStoneSelections.catalogFile])];
 const catalogs = Object.fromEntries(await Promise.all(catalogFiles.map(async (file) => [file, await read(`data/${file}`)])));
-const data = { classes, mapping, simulatorInputs, masterBeast, catalogs, layout, attack, innerwear, nephronArmor, appraisals, chips, chipSlots, circuits, transformations, growth, weaponAppraisals, weaponGrades, giantStones, colorSetEffects, spiritRecord, otherEffects, pets, rightIceSets };
+const data = { classes, mapping, simulatorInputs, masterBeast, catalogs, layout, attack, innerwear, nephronArmor, appraisals, chips, chipSlots, circuits, transformations, growth, weaponAppraisals, weaponGrades, giantStones, colorSetEffects, spiritRecord, otherEffects, pets, rightIceSets, accessoryEffects };
 const catalogIndex = createCatalogIndex(data);
 const semanticState = (value) => {
   const values = Object.fromEntries(Object.entries(value.values).filter(([fieldId]) => isFieldId(fieldId)));
@@ -315,6 +315,6 @@ test('unrelated effect zero values round-trip without false warnings while inval
   assert.ok(rejected.clearedFields.includes(custom));
   assert.ok(rejected.clearedFields.includes(transform.valueField));
   assert.ok(rejected.clearedFields.includes('classSkillVersions.unknown'));
-  assert.equal(rejected.state.values[custom], 0);
+  assert.equal(rejected.state.values[custom], undefined);
   assert.equal(rejected.state.values[transform.attributeField], validOption.name);
 });

@@ -1,3 +1,5 @@
+import { equipmentProgress, equipmentProgressFields, equipmentProgressChoiceFields } from './equipment-progress.ts';
+import { beastAccessoryStatus } from './beast-accessory-status.ts';
 import { mountCircuitBoardEditor } from './circuit-board-editor.ts';
 import { createSkillShareControl } from './skill-share-control.ts';
 import { createPickerChoices } from './picker-choices.ts';
@@ -394,9 +396,9 @@ async function start() {
   const slotButtons = new Map<string, HTMLButtonElement>();
   const beastButtons = new Map<string, HTMLButtonElement>();
   let slotUiKey = '', beastUiKey = '', masterUiKey = '', rightIceUiKey = '';
+  const progressChoices = equipmentProgressChoiceFields(catalogIndex);
   const slotSignature = () => JSON.stringify([selected.id, state.lowerwearAlternativeEnabled, state.bossHealthCondition,
-    data.layout.slots.map(slot => slot.selectionField ? val(slot.selectionField) : slot.weapon ? val('Weapon.ENHC')
-      : slot.innerwearId ? val(catalogIndex.innerwearById(slot.innerwearId)!.enhancementField) : ''),
+    data.layout.slots.map(slot => equipmentProgressFields(slot, catalogIndex).map(val)),
     data.rightIceSets.selectionFields.map(val)]);
   const beastSignature = () => JSON.stringify([selectedBeastSlotId,
     beastAccessorySlots.map(slot => [...(slot.fixedFields ?? []), ...(slot.stoneFields ?? []), ...slot.mirrorFields.flat()].map(val))]);
@@ -464,7 +466,7 @@ async function start() {
         renderInspector();
         document.querySelectorAll<HTMLDetailsElement>('#inspector details').forEach(node => { node.open = opened.includes(node.querySelector('summary')!.textContent); });
       }
-    });
+    }, undefined, fieldId.startsWith('MasterBeast.') || progressChoices.has(fieldId));
     if (disabled) {
       picker.classList.add('field-disabled');
       picker.setAttribute('aria-disabled', 'true');
@@ -998,13 +1000,13 @@ async function start() {
         });
         beastButtons.set(slot.id, button); root.append(button);
       }
-      const fields = [...(slot.fixedFields ?? []), ...(slot.stoneFields ?? []), ...slot.mirrorFields.flat()];
-      const hasValue = fields.some(fieldId => val(fieldId) !== '');
-      toggleClass(button, 'configured', hasValue);
+      const configuration = beastAccessoryStatus(slot, state.values, catalogIndex);
+      setAttribute(button, 'data-configuration', configuration);
+      toggleClass(button, 'configured', configuration === 'complete');
       toggleClass(button, 'selected', selectedBeastSlotId === slot.id);
-      setAttribute(button, 'aria-label', `${slot.label}${hasValue ? '（已設定）' : ''}`);
+      setAttribute(button, 'aria-label', `${slot.label}（${{ empty: '未設定', partial: '部分設定', complete: '全部完成' }[configuration]}）`);
       setAttribute(button, 'aria-pressed', String(selectedBeastSlotId === slot.id));
-      writeHtml(button, `${icon(slot.icon)}<span>${h(slot.label)}</span>${hasValue ? '<i></i>' : ''}`);
+      writeHtml(button, `${icon(slot.icon)}<span>${h(slot.label)}</span>${configuration === 'complete' ? '<i></i>' : ''}`);
     }
   }
   let circuitEditor: ReturnType<typeof mountCircuitBoardEditor> | undefined;
@@ -1081,14 +1083,17 @@ async function start() {
       const isRightIceSetSlot = (slot.group === 'rightIce' || slot.group === 'iceWeapon') && !!slot.selectionField && !!configured;
       const rightIceEffectIndex = isRightIceSetSlot ? rightIceSetEffectIndexes.get(configured) : undefined;
       const rightIceSetHint = rightIceEffectIndex ? `；屬於套效 ${rightIceEffectIndex}` : '';
-      toggleClass(button, 'configured', !!configured); toggleClass(button, 'selected', selected.id === slot.id);
+      const inactive = !!slot.enabledBy && !alternateLowerwearAvailable();
+      const progress = inactive ? 'empty' : equipmentProgress(slot, state, catalogIndex);
+      setAttribute(button, 'data-configuration', progress);
+      toggleClass(button, 'configured', progress === 'complete'); toggleClass(button, 'selected', selected.id === slot.id);
       toggleClass(button, 'inactive', !!slot.enabledBy && !alternateLowerwearAvailable());
       toggleClass(button, 'right-ice-effect-1', rightIceEffectIndex === 1);
       toggleClass(button, 'right-ice-effect-2', rightIceEffectIndex === 2);
       toggleClass(button, 'right-ice-effect-3', rightIceEffectIndex === 3);
       setAttribute(button, 'aria-label', `${group.name} ${slot.label}：${configured || '未設定'}${rightIceSetHint}`); setAttribute(button, 'aria-pressed', String(selected.id === slot.id));
       setAttribute(button, 'title', `${group.name} ${slot.label}${configured && slot.group !== 'costume' ? '\n' + configured : ''}${rightIceSetHint}`);
-      writeHtml(button, `<span class="gear-slot-label">${h(slot.label)}</span>${selectedItemName ? `<span class="gear-slot-item-name">${h(selectedItemName)}</span>` : ''}${configured ? '<i></i>' : ''}`);
+      writeHtml(button, `<span class="gear-slot-label">${h(slot.label)}</span>${selectedItemName ? `<span class="gear-slot-item-name">${h(selectedItemName)}</span>` : ''}${progress === 'complete' ? '<i></i>' : ''}`);
     }
   }
   function renderInspector() {

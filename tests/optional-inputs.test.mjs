@@ -85,11 +85,13 @@ test('all unrelated-damage fields normalize empty/invalid values while valid sav
   const { normalizeOptionalEffectValues } = await runtime.load('frontend/state.ts');
   const { FIELD_ID_TO_CODE } = await runtime.load('frontend/field-ids.ts');
   const index = createCatalogIndex(gameData);
+  const {equipmentProgressChoiceFields}=await runtime.load('frontend/equipment-progress.ts');
+  const progressChoices=equipmentProgressChoiceFields(index);
   const fields = Object.keys(FIELD_ID_TO_CODE).filter(fieldId => index.resolveFieldChoices(fieldId, {})?.includes('無關傷害'));
   for (const invalid of [undefined, null, '', 'not-a-valid-option']) {
     const values = Object.fromEntries(fields.map(fieldId => [fieldId, invalid]));
     normalizeOptionalEffectValues(values, index);
-    for (const fieldId of fields) assert.equal(values[fieldId], '無關傷害', fieldId);
+    for (const fieldId of fields) assert.equal(values[fieldId], (fieldId.startsWith('MasterBeast.') || progressChoices.has(fieldId)) ? undefined : '無關傷害', fieldId);
     assert.equal(normalizeOptionalEffectValues(values, index), false, 'normalization is stable');
   }
   for (const fieldId of fields) {

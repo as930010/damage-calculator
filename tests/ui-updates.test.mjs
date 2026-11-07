@@ -671,15 +671,15 @@ test('magazine kinds show their actual effects and chip tuning shows only percen
   } finally { page.close(); }
 });
 
-test('unset mirrors default to unrelated damage and disabled zero without overwriting saved fields', async () => {
+test('unset mirrors retain an unselected state without pretending completion', async () => {
   const state = structuredClone(stateA);
   delete state.values[mirrorAttributeField]; delete state.values[mirrorValueField];
   const page = await uiPage(state);
   try {
     openHeadMirrors(page);
-    assert.equal(page.dom.window.document.querySelector('input[aria-label="迷鏡效果屬性"]').value, '無關傷害');
-    assert.equal(mirrorInput(page).value, '0'); assert.equal(mirrorInput(page).disabled, true);
-    assert.equal(page.readState().values[mirrorAttributeField], '無關傷害');
+    assert.equal(page.dom.window.document.querySelector('input[aria-label="迷鏡效果屬性"]').value, '');
+    assert.equal(mirrorInput(page).value, '');
+    assert.equal(page.readState().values[mirrorAttributeField], undefined);
     selectPicker(page, '迷鏡效果屬性', '致命一擊%');
     const input = mirrorInput(page);
     assert.equal(input.disabled, false);
@@ -1189,4 +1189,121 @@ test('missing stage fields retain the existing import policy rather than copying
     // Direct-entry policy remains unchanged: an invalid edit restores the committed value.
     enter(page, 'Boss防禦', 'abc'); await assertStageSync(page, expected);
   } finally { page.close(); }
+});
+
+test('beast three-state progress survives clears, history, JSON and reload for all five slots', async () => {
+  const initial=structuredClone(stateA);
+  for(const key of Object.keys(initial.values)) if(key.startsWith('MasterBeast.') && !key.endsWith('OverallPotential')) delete initial.values[key];
+  const page=await uiPage(initial); let reloaded;
+  try {
+    const {beastAccessoryStatus}=await page.runtime.load('frontend/beast-accessory-status.ts');
+    const {createCatalogIndex}=await page.runtime.load('frontend/catalog-index.ts');const index=createCatalogIndex(gameData);
+    const definitions=[['headwear','Head',true,true],['armor','Armor',false,false],['necklace','Necklace',false,true],['ring-one','Ring1',true,true],['ring-two','Ring2',true,true]];
+    for(const[id,part,fixed,stone]of definitions){
+      const slot={fixedFields:fixed?[`MasterBeast.${part}.Option1`,`MasterBeast.${part}.Option2`]:[],stoneFields:stone?[`MasterBeast.${part}.CustomAttribute`,`MasterBeast.${part}.CustomValue`]:undefined,mirrorFields:[1,2,3].map(i=>[`MasterBeast.${part}.Mirror.${i}.Attribute`,`MasterBeast.${part}.Mirror.${i}.Value`])};
+      const values={};assert.equal(beastAccessoryStatus(slot,values,index),'empty');
+      for(const field of slot.fixedFields)values[field]='無關傷害';
+      if(stone){const field=slot.stoneFields[0];values[field]=index.resolveFieldChoices(field,{})[0];values[slot.stoneFields[1]]=index.resolveFieldChoices(slot.stoneFields[1],values)[0];}
+      const [attr,num]=slot.mirrorFields[0];values[attr]='致命一擊%';assert.equal(beastAccessoryStatus(slot,values,index),'partial');values[num]=0;
+      for(const [attr]of slot.mirrorFields) values[attr]='無關傷害';assert.equal(beastAccessoryStatus(slot,values,index),'complete');
+      values[attr]='致命一擊%';values[num]=0;assert.equal(beastAccessoryStatus(slot,values,index),'complete');
+      delete values[slot.mirrorFields[2][0]];assert.equal(beastAccessoryStatus(slot,values,index),'partial');
+      values[slot.mirrorFields[2][0]]='極大化%';values[slot.mirrorFields[2][1]]=0.00001;assert.equal(beastAccessoryStatus(slot,values,index),'partial');
+    }
+    const card=()=>page.dom.window.document.querySelector('[data-beast-slot-id="armor"]');assert.equal(card().dataset.configuration,'empty');
+    card().click();const selectAt=(i,name)=>{const input=page.dom.window.document.querySelectorAll('input[aria-label="迷鏡效果屬性"]')[i];input.dispatchEvent(new page.dom.window.Event('focus'));const list=page.dom.window.document.getElementById(input.getAttribute('aria-controls'));[...list.querySelectorAll('[role="option"]')].find(el=>el.querySelector('span').textContent===name).click();};
+    selectAt(0,'無關傷害');assert.equal(card().dataset.configuration,'partial');assert.equal(card().querySelector('i'),null);
+    selectAt(1,'無關傷害');selectAt(2,'無關傷害');assert.equal(card().dataset.configuration,'complete');assert.ok(card().querySelector('i'));page.dom.window.document.querySelector('#baseline').click();
+    const input=page.dom.window.document.querySelectorAll('input[aria-label="迷鏡效果屬性"]')[2];input.closest('.picker').querySelector('.picker-clear').click();assert.equal(card().dataset.configuration,'partial');assert.equal(card().querySelector('i'),null);
+    await workloadActions.undo(page);assert.equal(card().dataset.configuration,'complete');await workloadActions.redo(page);assert.equal(card().dataset.configuration,'partial');
+    const exported=await page.exportJson();await page.importJson(JSON.stringify(exported));assert.equal(card().dataset.configuration,'partial');
+    reloaded=await uiPage(page.readState());assert.equal(reloaded.dom.window.document.querySelector('[data-beast-slot-id="armor"]').dataset.configuration,'partial');
+    page.dom.window.document.querySelector('#restore-baseline').click();assert.equal(card().dataset.configuration,'complete');
+  }finally{page.close();reloaded?.close();}
+});
+
+test('every canvas slot derives progress from its applicable required fields', async () => {
+  const runtime=await createRuntime(),{createCatalogIndex}=await runtime.load('frontend/catalog-index.ts');
+  const {equipmentProgress}=await runtime.load('frontend/equipment-progress.ts');const index=createCatalogIndex(gameData);
+  const fresh=()=>({...structuredClone(stateA),values:{}});
+  const {getEquipmentOptionName}=await runtime.load('calculation/equipment-catalog.ts');
+  const pick=(state,field)=>{const mapping=index.equipmentMappings.get(field);const choices=mapping?index.equipmentItems(mapping).map(item=>getEquipmentOptionName(item,mapping.application)):index.resolveFieldChoices(field,state.values);assert.ok(choices?.length,field);state.values[field]=choices[0];};
+  const fill=(slot,nephron=false)=>{
+    const state=fresh();
+    if(slot.selectionField)pick(state,slot.selectionField);
+    const armor=gameData.innerwear.slots.find(s=>s.id===slot.innerwearId);
+    if(armor){state.values[armor.typeField]=nephron?'內布隆':'百億';pick(state,armor.enhancementField);pick(state,armor.forgingField);
+      if(nephron)for(const t of gameData.nephronArmor.fields.find(f=>f.slotId===slot.innerwearId).transformFields)state.values[t.attributeField]='無關傷害';
+      else for(const f of gameData.appraisals.slots.find(f=>f.id===slot.innerwearId).inputFields)pick(state,f);
+    }
+    for(const f of armor&&!nephron?(slot.stoneFields??[]).slice(0,4):slot.stoneFields??[])pick(state,f);
+    if(slot.weapon){pick(state,'Weapon.ENHC');pick(state,gameData.growth.settingKey);for(const g of Object.values(gameData.weaponAppraisals.groups))pick(state,g.settingKey);
+      gameData.transformations.slots.forEach((f,i)=>{const rule=gameData.transformations.rules[i];state.values[f.choiceField]=rule.choice;state.values[f.valueField]=rule.minRoll/rule.valueMultiplier;});}
+    return state;
+  };
+  for(const slot of gameData.layout.slots){assert.equal(equipmentProgress(slot,fresh(),index),'empty',slot.id);
+    if(slot.group==='accessories')continue;
+    for(const nephron of slot.innerwearId?[false,true]:[false]){
+      const state=fill(slot,nephron);assert.equal(equipmentProgress(slot,state,index),'complete',slot.id+':'+nephron);
+      if(slot.stoneFields?.length){delete state.values[slot.stoneFields[0]];assert.equal(equipmentProgress(slot,state,index),'partial');state.values[slot.stoneFields[0]]='not-an-option';assert.equal(equipmentProgress(slot,state,index),'partial');}
+    }
+  }
+  for(const slot of gameData.layout.slots.filter(s=>s.innerwearId)){
+    const state=fill(slot,true),chip=gameData.chipSlots.slots.find(s=>s.id===slot.innerwearId),armor=gameData.nephronArmor.fields.find(s=>s.slotId===slot.innerwearId);
+    pick(state,chip.attributeField);assert.equal(equipmentProgress(slot,state,index),'partial','selected chip needs tuning');
+    pick(state,chip.tuningField);assert.equal(equipmentProgress(slot,state,index),'complete');
+    state.values[chip.tuningField]='invalid';assert.equal(equipmentProgress(slot,state,index),'partial');
+    delete state.values[chip.attributeField];delete state.values[chip.tuningField];
+    const magazine=gameData.nephronArmor.magazines.find(m=>m.fixedLevel===undefined);state.values[armor.magazineField]=magazine.name;
+    assert.equal(equipmentProgress(slot,state,index),'partial','selected magazine needs level');pick(state,armor.magazineLevelField);assert.equal(equipmentProgress(slot,state,index),'complete');
+    delete state.values[armor.magazineField];delete state.values[armor.magazineLevelField];
+    const circuit=gameData.circuits.inputs.find(s=>s.slot===slot.innerwearId),rows=circuit.attributeField.replace(/Attribute$/,'Rows');
+    state.values[rows]=JSON.stringify([{attribute:'invalid',percentageValue:0}]);assert.equal(equipmentProgress(slot,state,index),'partial');
+    for(const percentageValue of [-0.01,0.19,'invalid']){state.values[rows]=JSON.stringify([{attribute:circuit.attributeOptions.find(a=>a!=='無關傷害'),percentageValue}]);assert.equal(equipmentProgress(slot,state,index),'partial');}
+    state.values[rows]=JSON.stringify([{attribute:'無關傷害',percentageValue:0}]);assert.equal(equipmentProgress(slot,state,index),'complete');
+    const transform=armor.transformFields[0];state.values[transform.attributeField]=gameData.nephronArmor.transformations.find(t=>t.name!=='無關傷害').name;
+    assert.equal(equipmentProgress(slot,state,index),'partial','effective transformation needs a legal tier');pick(state,transform.valueField);assert.equal(equipmentProgress(slot,state,index),'complete');
+    state.values[transform.valueField]=Infinity;assert.equal(equipmentProgress(slot,state,index),'partial');
+  }
+  const pants=gameData.layout.slots.find(s=>s.innerwearId==='lowerwear'),pantsState=fill(pants,true);
+  pantsState.lowerwearAlternativeEnabled=true;
+  const chips=gameData.chipSlots.slots.filter(s=>['lowerwear','lowerwearAlternative'].includes(s.id));
+  for(const chip of chips){pantsState.values[chip.attributeField]='強者%';pick(pantsState,chip.tuningField);}
+  assert.equal(equipmentProgress(pants,pantsState,index),'partial');pantsState.lowerwearAlternativeEnabled=false;assert.equal(equipmentProgress(pants,pantsState,index),'complete');
+  const weapon=gameData.layout.slots.find(s=>s.weapon),weaponState=fill(weapon);
+  for(const field of ['Weapon.ENHC',gameData.growth.settingKey,...Object.values(gameData.weaponAppraisals.groups).map(g=>g.settingKey),...gameData.transformations.slots.flatMap(s=>[s.choiceField,s.valueField])]){
+    const saved=weaponState.values[field];delete weaponState.values[field];assert.equal(equipmentProgress(weapon,weaponState,index),'partial',field);weaponState.values[field]=saved;
+  }
+  const left=gameData.layout.slots.filter(s=>s.group==='leftIce'),leftState=fill(left[0]);
+  assert.equal(equipmentProgress(left[0],leftState,index),'complete');for(const other of left.slice(1))assert.equal(equipmentProgress(other,leftState,index),'partial');
+  for(const slot of gameData.layout.slots.filter(s=>s.group==='accessories')){
+    const mapping=index.equipmentMappings.get(slot.selectionField);
+    for(const item of index.equipmentItems(mapping)){
+      const state=fresh();state.values[slot.selectionField]=item.name;
+      const group=gameData.accessoryEffects.groups.find(g=>g.selectionField===slot.selectionField),meta=item.appraisal;
+      if(meta?.canAppraise===false){assert.equal(equipmentProgress(slot,state,index),'complete');continue;}
+      assert.equal(equipmentProgress(slot,state,index),'partial');
+      if(meta?.canAppraise===true&&meta.effectCount>0&&group&&meta.effectCount<=group.inputFields.length){
+        const options=group.optionsByEquipmentName?.[item.name]??group.options;
+        for(const field of group.inputFields.slice(0,meta.effectCount))state.values[field]=options[0].name;
+        assert.equal(equipmentProgress(slot,state,index),'complete');delete state.values[group.inputFields[0]];assert.equal(equipmentProgress(slot,state,index),'partial');
+      }
+    }
+  }
+});
+
+test('canvas completion refreshes stone dependencies while retaining buttons, Inspector, focus and history',async()=>{
+  const initial=structuredClone(stateA),slot=gameData.layout.slots.find(s=>s.group==='leftIce'),stone=slot.stoneFields[0];delete initial.values[stone];
+  const page=await uiPage(initial);let reload;
+  try{const {document,Event}=page.dom.window;const card=document.querySelector(`[data-slot-id="${slot.id}"]`);assert.equal(card.dataset.configuration,'partial');card.click();
+    const field=document.querySelector('input[aria-label="魔法石 1"]');selectPicker(page,'魔法石 1',gameData.catalogs['equipment/magic-stones.json'].items.find(i=>i.active&&i.targetApplications?.armor).targetApplications.armor.sourceName);
+    assert.equal(card.dataset.configuration,'complete');assert.ok(card.querySelector('i'));assert.equal(document.querySelector('input[aria-label="魔法石 1"]'),field);
+    document.querySelector('#baseline').click();field.closest('.picker').querySelector('.picker-clear').click();assert.equal(card.dataset.configuration,'partial');assert.equal(card.querySelector('i'),null);
+    await workloadActions.undo(page);assert.equal(card.dataset.configuration,'complete');await workloadActions.redo(page);assert.equal(card.dataset.configuration,'partial');
+    document.querySelector('#restore-baseline').click();assert.equal(card.dataset.configuration,'complete');
+    const json=await page.exportJson();await page.importJson(JSON.stringify(json));assert.equal(document.querySelector(`[data-slot-id="${slot.id}"]`).dataset.configuration,'complete');
+    reload=await uiPage(page.readState());assert.equal(reload.dom.window.document.querySelector(`[data-slot-id="${slot.id}"]`).dataset.configuration,'complete');
+    const alt=document.querySelector('[data-slot-id="inner-lowerwearAlternative"]');document.querySelector('#alternate').checked=false;document.querySelector('#alternate').dispatchEvent(new Event('change'));assert.equal(alt.classList.contains('inactive'),true);assert.equal(alt.dataset.configuration,'empty');assert.equal(alt.querySelector('i'),null);
+    const savedAlt=Object.fromEntries(Object.entries(page.readState().values).filter(([f])=>f.includes('SwitchBottom')));document.querySelector('#alternate').checked=true;document.querySelector('#alternate').dispatchEvent(new Event('change'));assert.equal(alt.classList.contains('inactive'),false);assert.deepEqual(Object.fromEntries(Object.entries(page.readState().values).filter(([f])=>f.includes('SwitchBottom'))),savedAlt);
+  }finally{page.close();reload?.close();}
 });

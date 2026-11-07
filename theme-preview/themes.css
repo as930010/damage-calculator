@@ -147,7 +147,8 @@ html[data-preview-theme] body.site-page .stat[open]{background:var(--p-raised);b
 html[data-preview-theme] body.site-page .equipment-damage-card{background:linear-gradient(145deg,var(--p-input),var(--p-surface));border-color:var(--p-line)}
 html[data-preview-theme] body.site-page .equipment-damage-card span{color:var(--p-muted)}
 html[data-preview-theme] body.site-page .equipment-damage-card strong{color:var(--p-ink)}
-html[data-preview-theme] body.site-page .gear-slot{background:var(--p-raised)}
+html[data-preview-theme] body.site-page .gear-slot{--slot-normal-a:var(--p-raised);--slot-normal-b:var(--p-raised);--slot-hover-a:color-mix(in srgb,var(--group-color) 14%,var(--p-raised));--slot-hover-b:var(--slot-hover-a);--slot-edge:var(--p-line);--slot-hover-edge:var(--group-color)}
 html[data-preview-theme] body.site-page .gear-slot:is(:hover,.selected){background:color-mix(in srgb,var(--group-color) 14%,var(--p-raised))}
-html[data-preview-theme] body.site-page .beast-accessory-slot{background:var(--p-raised)}
+html[data-preview-theme] body.site-page .beast-accessory-slot{--slot-normal-a:var(--p-raised);--slot-normal-b:var(--p-raised);--slot-edge:var(--p-line);--slot-hover-edge:var(--p-edge);--slot-hover-a:color-mix(in srgb,var(--p-accent) 14%,var(--p-raised));--slot-hover-b:var(--slot-hover-a)}
+html[data-preview-theme] body.site-page .beast-accessory-slot:is(:hover,.selected){background:var(--slot-hover-a);border-color:var(--slot-hover-edge)}
 html[data-preview-theme] body.site-page .sample-banner{border-color:var(--p-edge);color:var(--p-ink)}

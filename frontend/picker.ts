@@ -90,10 +90,10 @@ function getMobilePickerDialog() {
 
 /** Only explicit selections are saved; desktop typing filters the list. */
 export interface PickerDirectEntry { sanitize: (value: string) => string; resolve: (value: string) => string | null; onInvalid: (value: string) => void; onInput?: () => void; allowCharacter?: (character: string) => boolean }
-export function createPicker(label: string, options: readonly PickerOption[], value: string, onChange: (value: string) => void, directEntry?: PickerDirectEntry): HTMLElement {
+export function createPicker(label: string, options: readonly PickerOption[], value: string, onChange: (value: string) => void, directEntry?: PickerDirectEntry, preserveEmpty = false): HTMLElement {
   label = attributeLabel(label);
   options = options.map(option => ({ ...option, label: attributeLabel(option.label) }));
-  const clearedValue = options.some(option => option.value === '無關傷害') ? '無關傷害' : '';
+  const clearedValue = !preserveEmpty && options.some(option => option.value === '無關傷害') ? '無關傷害' : '';
   if (clearedValue && !options.some(option => option.value === value)) value = clearedValue;
   const controller = new window.AbortController();
   let disposed = false;

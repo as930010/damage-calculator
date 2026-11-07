@@ -1,3 +1,4 @@
+import { equipmentProgressChoiceFields } from './equipment-progress.ts';
 import { isFieldId, FIELD_ID_TO_CODE } from "./field-ids.ts";
 import type { CatalogIndex } from './catalog-index.ts';
 import { normalizeClassSkillVersions } from '../calculation/class-skill-versions.ts';
@@ -37,7 +38,7 @@ export function normalizeNephronMagazineSelections(values: Record<string, string
 }
 
 const optionalEffectsByCatalog = new WeakMap<CatalogIndex, {
-  fields: string[]; choices: Map<string, readonly unknown[]>; circuitChoices: Map<string, readonly unknown[]>;
+  fields: string[]; progressChoices: ReadonlySet<string>; choices: Map<string, readonly unknown[]>; circuitChoices: Map<string, readonly unknown[]>;
   valueFields: Map<string, string>;
 }>();
 function optionalEffectFields(index: CatalogIndex) {
@@ -61,7 +62,7 @@ function optionalEffectFields(index: CatalogIndex) {
     optionalFields.push(fieldId);
     choices.set(fieldId, fieldChoices);
   }
-  fields = { fields: optionalFields, choices, circuitChoices, valueFields };
+  fields = { fields: optionalFields, progressChoices: equipmentProgressChoiceFields(index), choices, circuitChoices, valueFields };
   optionalEffectsByCatalog.set(index, fields);
   return fields;
 }
@@ -75,7 +76,14 @@ export function normalizeOptionalEffectValues(values: Record<string, string | nu
   const fields = optionalEffectFields(index);
   for (const fieldId of fields.fields) {
     const choices = fields.circuitChoices.get(fieldId) ?? fields.choices.get(fieldId);
-    if (!choices?.some(choice => String(choice) === String(values[fieldId] ?? ''))) set(fieldId, '無關傷害');
+    if (!choices?.some(choice => String(choice) === String(values[fieldId] ?? ''))) {
+      if (fieldId.startsWith('MasterBeast.') || fields.progressChoices.has(fieldId)) {
+        // Unselected equipment fields remain distinguishable from an explicit unrelated selection.
+        for (const key of [fieldId, fields.valueFields.get(fieldId)]) if (key && Object.hasOwn(values, key)) { delete values[key]; changed = true; }
+        continue;
+      }
+      set(fieldId, '無關傷害');
+    }
     const valueField = fields.valueFields.get(fieldId);
     if (valueField && values[fieldId] === '無關傷害') set(valueField, 0);
   }

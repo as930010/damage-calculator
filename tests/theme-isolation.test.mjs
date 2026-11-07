@@ -128,6 +128,9 @@ test("activity CSS changes only visual properties on non-decorative selectors", 
           violations.push(selector + " hides its focus indicator");
         }
         if (property.startsWith("--") && selector === ":root") continue;
+        // Equipment progress endpoints are colors only; progress percentages and layout stay in core CSS.
+        if ([".beast-accessory-slot", ":is(.gear-slot,.beast-accessory-slot)"].includes(selector) && /^--slot-(?:normal-[ab]|hover-[ab]|edge)$/.test(property)
+          && /^(?:#[\da-f]{3,8}|rgb\([^;]+\)|color-mix\([^;]+\))$/i.test(value)) continue;
         // These component-scoped tokens only supply the existing clear-button text colors.
         if (selector === ".picker-control" && /^--picker-clear(?:-hover)?-color$/.test(property)
           && /^#[\da-f]{3,8}$/i.test(value)) continue;

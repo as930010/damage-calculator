@@ -798,3 +798,5 @@ body.site-page-buff p.roster-note{
 }
 
 .site-page-buff .skill-reference > summary::before{border-color:#e0bd79}
+
+:is(.gear-slot,.beast-accessory-slot) { --slot-normal-a: rgb(19 26 48 / 80%); --slot-normal-b: rgb(13 18 38 / 80%); --slot-hover-a: #303251; --slot-hover-b: #252a45; --slot-edge: color-mix(in srgb,var(--group-color, #c7a6f3),#7776ad 85%); }

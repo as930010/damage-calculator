@@ -7,7 +7,7 @@ export type CatalogData = Pick<GameData,
   | 'classes' | 'mapping' | 'catalogs' | 'simulatorInputs' | 'masterBeast'
   | 'layout' | 'attack' | 'innerwear' | 'appraisals' | 'chips' | 'chipSlots' | 'circuits'
   | 'transformations' | 'growth' | 'weaponAppraisals' | 'weaponGrades' | 'giantStones' | 'nephronArmor'
-  | 'colorSetEffects' | 'spiritRecord' | 'otherEffects' | 'pets' | 'rightIceSets'>;
+  | 'accessoryEffects' | 'colorSetEffects' | 'spiritRecord' | 'otherEffects' | 'pets' | 'rightIceSets'>;
 type Choices = readonly (string | number)[];
 type Values = Readonly<Record<string, unknown>>;
 const emptyChoices: Choices = Object.freeze([]);
