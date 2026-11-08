@@ -1,3 +1,4 @@
+import { normalizeSupportMagazineLevel, supportMagazineLevelKey } from '../calculation/support-magazines.ts';
 import type { CoreCatalog } from './data-loader.ts';
 import type { SelectedMember, SelectedOption, TeamMode } from '../calculation/types.ts';
 import { resolveLoadoutOption } from '../calculation/options.ts';
@@ -25,7 +26,13 @@ export function parseSavedSimulatorState(raw: string | null, catalog: CoreCatalo
     const options: Record<string, boolean | number> = {};
     for (const option of catalog.loadoutOptions) {
       const value = saved.optionsByTeam?.[team]?.[option.id];
-      if (option.userInput?.kind === 'percentage') {
+      if (option.userInput?.kind === 'support-magazine') {
+        const levelKey = supportMagazineLevelKey(option.id), previous = saved.optionsByTeam?.[team];
+        if (previous && (Object.hasOwn(previous, option.id) || Object.hasOwn(previous, levelKey))) {
+          options[option.id] = typeof value === 'boolean' ? value : false;
+          options[levelKey] = normalizeSupportMagazineLevel(previous[levelKey]);
+        }
+      } else if (option.userInput?.kind === 'percentage') {
         const defaultValue = catalog.parameters[option.userInput.parameter] * 100;
         options[option.id] = typeof value === 'number' && Number.isFinite(value) && value >= 0
           ? Math.abs(value - defaultValue) < 1e-7 ? Number(defaultValue.toFixed(6)) : value : defaultValue;
@@ -52,6 +59,7 @@ export function resolveSavedMembers(catalog: CoreCatalog, names: readonly string
 
 export function resolveSavedOptions(catalog: CoreCatalog, values: Record<string, boolean | number>): SelectedOption[] {
   return catalog.loadoutOptions.map(option => {
+    if (option.userInput?.kind === 'support-magazine') return resolveLoadoutOption(option, catalog.parameters, values[option.id] === true, values[supportMagazineLevelKey(option.id)]);
     if (option.userInput?.kind === 'percentage') {
       const parameter = option.userInput.parameter;
       return resolveLoadoutOption(option, { ...catalog.parameters, [parameter]: Number(values[option.id] ?? catalog.parameters[parameter] * 100) / 100 }, true);

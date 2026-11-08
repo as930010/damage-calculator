@@ -164,7 +164,7 @@ function activate() {
     byId('target-status').textContent = '';
     const equipment = evaluateLoadout(data, state, false);
     defenseEditor.setEquipment(equipmentDefenseRates(equipment.damage?.result, equipment.attributes?.stats.defenseIgnorePct?.finalTotal));
-    showLoadout(mode === 'weapon' ? readRatingLoadout(data, state, battleDefense.rate) : readArmorRatingLoadout(data, state, part, battleDefense.rate));
+    showLoadout(mode === 'weapon' ? readRatingLoadout(data, state, battleDefense.rate, battleDefense.defenseIgnoreAdditive) : readArmorRatingLoadout(data, state, part, battleDefense.rate, battleDefense.defenseIgnoreAdditive));
     editor.hidden = false;
     byId('roll-disclosure').hidden = false;
   } catch (error) {

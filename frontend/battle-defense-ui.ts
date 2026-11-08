@@ -1,7 +1,10 @@
 import { combineDefenseRates, isDefensePercentageDraft } from '../calculation/battle-defense.ts';
 import type { LoadoutCalculationResult } from '../calculation/loadout-engine.ts';
-import { teamRevision, type BattleDefenseStore } from './battle-defense-state.ts';
+import { teamRevision, teamSnapshotUpdateReason, type BattleDefenseStore } from './battle-defense-state.ts';
 import { TEAM_STATE_KEY } from '../features/buff-simulator/frontend/saved-state.ts';
+
+// One lazy module boundary serves both freshness checks and explicit imports.
+const loadTeamReferenceModule = () => import('./team-defense-reference.ts');
 
 const shown = (value: number | null) => value === null ? '—' : (value * 100).toFixed(4).replace(/0+$/, '').replace(/\.$/, '') + '%';
 export function equipmentDefenseRates(result: LoadoutCalculationResult | undefined, fallback?: number): number[] {
@@ -23,15 +26,44 @@ export function createBattleDefenseEditor(store: BattleDefenseStore, teamUrl: UR
       </div>
       <div data-defense-panel="manual" role="tabpanel"><label>裝備以外來源總破防率（%）<input type="text" inputmode="decimal" data-defense-manual aria-label="裝備以外來源總破防率（%）" autocomplete="off" spellcheck="false"></label><p class="defense-note">不包含裝備提供的無視防禦。</p></div>
       <div data-defense-panel="sources" role="tabpanel" hidden><div class="defense-sources"></div><button type="button" class="site-button" data-defense-add>＋ 新增破防來源</button><p class="defense-note">請只填入可以同時生效的獨立破防來源；相同來源或互相覆蓋的技能請勿重複計入。</p><p class="defense-note">技能特性若只適用特定技能，計算結果僅適用相同條件，不代表所有技能均享有該破防。</p></div>
-      <div data-defense-panel="team" role="tabpanel" hidden><p>從已保存的隊伍配置引用破防率快照；隊伍變更不會自動覆寫目前快照。</p><label class="defense-target" hidden>引用目標<select aria-label="引用隊伍目標"></select></label><button type="button" class="site-button" data-defense-import>引用隊伍增益破防量</button><p class="defense-team-info"></p><p class="defense-import-status" role="status"></p></div>
-      <p class="defense-error" role="status"></p><dl class="defense-totals"></dl><p class="defense-note">此區塊獨立保存，不包含在匯入匯出設定中且不受復原、重做按鈕影響</p>
+      <div data-defense-panel="team" role="tabpanel" hidden><p>從已保存的隊伍配置引用破防率快照；隊伍變更不會自動覆寫目前快照。</p><div class="mode-switch" role="tablist" aria-label="準備引用的隊伍模式"><button type="button" role="tab" data-reference-mode="single" id="battle-defense-reference-single" aria-controls="battle-defense-reference-options">單隊配置</button><button type="button" role="tab" data-reference-mode="challenge" id="battle-defense-reference-challenge" aria-controls="battle-defense-reference-options">挑戰雙隊配置</button></div><div id="battle-defense-reference-options" role="tabpanel"><p class="defense-reference-status" role="status"></p><label class="defense-target" hidden>引用目標<select aria-label="引用隊伍目標"><option value="">請選擇引用目標</option><option value="firstTeam">第一隊</option><option value="secondTeam">第二隊</option><option value="sharedArena">雙隊共用場地</option></select></label><button type="button" class="site-button" data-defense-import>引用隊伍增益破防量</button></div><p class="defense-team-info"></p><p class="defense-import-status defense-snapshot-status" role="status"></p><p class="defense-import-status" role="status"></p></div>
+      <p class="defense-error" role="status"></p><dl class="defense-totals"></dl><p class="defense-note defense-additive-info"></p><p class="defense-note">此區塊獨立保存，不包含在匯入匯出設定中且不受復原、重做按鈕影響</p>
     </div>`;
   const manual = root.querySelector<HTMLInputElement>('[data-defense-manual]')!;
   const sourceArea = root.querySelector<HTMLElement>('.defense-sources')!;
   const error = root.querySelector<HTMLElement>('.defense-error')!;
-  const importStatus = root.querySelector<HTMLElement>('.defense-import-status')!;
+  const importStatus = root.querySelector<HTMLElement>('.defense-import-status:not(.defense-snapshot-status)')!;
   const target = root.querySelector<HTMLSelectElement>('.defense-target select')!;
   const importButton = root.querySelector<HTMLButtonElement>('[data-defense-import]')!;
+  type ReferenceMode = 'single' | 'challenge';
+  const referenceTabs = [...root.querySelectorAll<HTMLButtonElement>('[data-reference-mode]')];
+  const referenceStatus = root.querySelector<HTMLElement>('.defense-reference-status')!;
+  // Only a preselection hint; actual imports use the simulator's validated parser.
+  const savedReference = () => {
+    try { return JSON.parse(localStorage.getItem(TEAM_STATE_KEY) ?? 'null') as { version?: number; mode?: string; membersByTeam?: Record<string, unknown> } | null; }
+    catch { return null; }
+  };
+  let referenceMode: ReferenceMode = store.value.teamSnapshot?.mode ?? (savedReference()?.mode === 'challenge' ? 'challenge' : 'single');
+  const referenceTargets: Record<ReferenceMode, string> = { single: 'single', challenge: store.value.teamSnapshot?.mode === 'challenge' ? store.value.teamSnapshot.target : '' };
+  let selectionSnapshot = JSON.stringify(store.value.teamSnapshot), importRequest = 0;
+  const targetLabels: Record<string, string> = { single: '單隊', firstTeam: '第一隊', secondTeam: '第二隊', sharedArena: '雙隊共用場地' };
+  const renderReferenceSelection = () => {
+    referenceTabs.forEach(button => {
+      const selected = button.dataset.referenceMode === referenceMode;
+      button.setAttribute('aria-selected', String(selected)); button.tabIndex = selected ? 0 : -1;
+    });
+    root.querySelector('#battle-defense-reference-options')!.setAttribute('aria-labelledby', 'battle-defense-reference-' + referenceMode);
+    target.parentElement!.hidden = referenceMode === 'single';
+    target.value = referenceMode === 'challenge' ? referenceTargets.challenge : '';
+    const label = referenceMode === 'single' ? '單隊配置' : '挑戰雙隊配置';
+    const saved = savedReference();
+    const keys = referenceMode === 'single' ? ['single'] : ['first', 'second'];
+    const hasMembers = keys.some(key => Array.isArray(saved?.membersByTeam?.[key]) && (saved!.membersByTeam![key] as unknown[]).some(name => typeof name === 'string' && name.trim()));
+    referenceStatus.textContent = !saved || saved.version !== 1
+      ? '目前沒有可引用的有效隊伍配置。請先至隊伍增益模擬完成設定。'
+      : !hasMembers ? `目前尚無已保存的${label}。`
+      : `準備引用：${label}${referenceMode === 'challenge' ? ' · ' + (targetLabels[referenceTargets.challenge] ?? '請選擇引用目標') : ''}。按下引用後才生效。`;
+  };
   let equipment: number[] = [];
   const rows = new Map<string, HTMLElement>();
   const percentages = new WeakMap<HTMLInputElement, { value: string; start: number | null; end: number | null }>();
@@ -63,12 +95,44 @@ export function createBattleDefenseEditor(store: BattleDefenseStore, teamUrl: UR
     const group = document.createElement('div'), dt = document.createElement('dt'), dd = document.createElement('dd'); dt.textContent = title; group.append(dt, dd); totals.append(group);
   }
   const renderTotals = () => {
-    const rate = store.rate;
+    const rate = store.rate, additive = store.defenseIgnoreAdditive;
     const displayRates = (values: number[]) => !values.length ? '—' : values.every(v => v === values[0]) ? shown(values[0]) : values.map((v, i) => `${i === 0 ? '下衣' : '強/排褲'} ${shown(v)}`).join('／');
     let effective = '—';
-    try { if (rate !== null) effective = displayRates(equipment.map(value => combineDefenseRates(value, rate))); } catch { effective = '無法計算'; }
+    try { if (rate !== null && additive !== null) effective = displayRates(equipment.map(value => combineDefenseRates(value, rate, additive))); } catch { effective = '無法計算'; }
+    root.querySelector<HTMLElement>('.defense-additive-info')!.textContent = additive && equipment.length
+      ? `原始裝備 ${displayRates(equipment)} + 隊伍無視防禦加算 ${shown(additive)} = 加算後 ${displayRates(equipment.map(value => value + additive))}` : '';
     const values = [displayRates(equipment), shown(rate), effective];
     values.forEach((value, i) => { summary.children[i].querySelector('strong')!.textContent = value; totals.children[i].querySelector('dd')!.textContent = value; });
+  };
+
+  const snapshotStatus = root.querySelector<HTMLElement>('.defense-snapshot-status')!;
+  let currentDataRevision: string | undefined, checkedSnapshotRevision: string | undefined;
+  let versionRequest: Promise<void> | undefined, disposed = false, versionCheckFailed = false;
+  const updateSnapshotNotice = () => {
+    const snapshot = store.value.teamSnapshot;
+    if (!snapshot) { snapshotStatus.textContent = ''; return; }
+    let sourceRevision = snapshot.sourceRevision;
+    try { sourceRevision = teamRevision(localStorage.getItem(TEAM_STATE_KEY)); } catch { /* Keep the snapshot when storage is unavailable. */ }
+    const reason = teamSnapshotUpdateReason(snapshot, sourceRevision, currentDataRevision);
+    snapshotStatus.textContent = reason === 'data' ? '隊伍效果資料已有更新，請重新引用破防量。目前仍使用原快照。'
+      : reason === 'team' ? '隊伍配置已有更新，可重新引用破防量。目前仍使用原快照。'
+      : versionCheckFailed ? '目前無法確認隊伍效果資料版本，仍使用原快照；可稍後重新引用。' : '';
+  };
+  const checkSnapshotVersion = (force = false) => {
+    const snapshot = store.value.teamSnapshot;
+    if (!snapshot || disposed || versionRequest || (!force && checkedSnapshotRevision === snapshot.dataRevision)) return;
+    checkedSnapshotRevision = snapshot.dataRevision;
+    versionRequest = (async () => {
+      try {
+        const { loadTeamDefenseDataRevision } = await loadTeamReferenceModule();
+        const revision = await loadTeamDefenseDataRevision(teamUrl);
+        if (!disposed) { currentDataRevision = revision; versionCheckFailed = false; updateSnapshotNotice(); }
+      } catch {
+        if (!disposed) {
+          versionCheckFailed = true; updateSnapshotNotice();
+        }
+      } finally { versionRequest = undefined; }
+    })();
   };
 
   const render = () => {
@@ -100,9 +164,14 @@ export function createBattleDefenseEditor(store: BattleDefenseStore, teamUrl: UR
     error.textContent = store.error;
     for (const input of root.querySelectorAll<HTMLInputElement>('[data-defense-manual], [data-source-percentage]')) input.setAttribute('aria-invalid', String(store.rate === null && !input.closest('[hidden]')));
     const snapshot = value.teamSnapshot;
+    if (selectionSnapshot !== JSON.stringify(snapshot)) {
+      selectionSnapshot = JSON.stringify(snapshot);
+      if (snapshot) { referenceMode = snapshot.mode; referenceTargets[snapshot.mode] = snapshot.target; }
+    }
+    renderReferenceSelection();
     root.querySelector<HTMLElement>('.defense-team-info')!.textContent = snapshot
-      ? `${snapshot.mode === 'single' ? '單隊' : '挑戰雙隊'} · ${{ single: '單隊', firstTeam: '第一隊', secondTeam: '第二隊', sharedArena: '雙隊共用場地' }[snapshot.target]} · 外部破防 ${shown(snapshot.rate)} · ${snapshot.sources.join('、') || '無額外破防來源'} · 引用時間 ${snapshot.importedAt}` : '尚未引用隊伍，目前以 0% 計算。';
-    try { if (snapshot && teamRevision(localStorage.getItem(TEAM_STATE_KEY)) !== snapshot.sourceRevision) importStatus.textContent = '隊伍配置已有更新，可重新引用破防量。目前仍使用原快照。'; } catch { /* Snapshot remains valid when storage is unavailable. */ }
+      ? `已引用：${snapshot.mode === 'single' ? '單隊配置' : '挑戰雙隊配置'} · ${{ single: '單隊', firstTeam: '第一隊', secondTeam: '第二隊', sharedArena: '雙隊共用場地' }[snapshot.target]} · 外部破防 ${shown(snapshot.rate)} · ${snapshot.sources.join('、') || '無額外破防來源'} · 引用時間 ${snapshot.importedAt}` : '尚未引用隊伍，目前以 0% 計算。';
+    updateSnapshotNotice(); checkSnapshotVersion();
     importButton.textContent = snapshot ? '重新引用' : '引用隊伍增益破防量';
     renderTotals();
 
@@ -126,6 +195,11 @@ export function createBattleDefenseEditor(store: BattleDefenseStore, teamUrl: UR
   root.addEventListener('click', event => {
     const button = (event.target as Element).closest<HTMLButtonElement>('button');
     if (!button) return;
+    if (button.dataset.referenceMode) {
+      importRequest++; importButton.disabled = false; importStatus.textContent = '';
+      referenceMode = button.dataset.referenceMode as ReferenceMode;
+      renderReferenceSelection();
+    }
     if (button.dataset.defenseMode) set({ mode: button.dataset.defenseMode as typeof store.value.mode });
     if (button.hasAttribute('data-defense-add')) {
       const id = window.crypto.randomUUID(); set({ sources: [...store.value.sources, { id, name: '', percentage: '' }] }); rows.get(id)?.querySelector('input')?.focus();
@@ -142,42 +216,47 @@ export function createBattleDefenseEditor(store: BattleDefenseStore, teamUrl: UR
     const mode = button.dataset.defenseMode!; button.id = 'battle-defense-tab-' + mode; button.setAttribute('aria-controls', 'battle-defense-panel-' + mode);
     const panel = root.querySelector<HTMLElement>(`[data-defense-panel="${mode}"]`)!; panel.id = 'battle-defense-panel-' + mode; panel.setAttribute('aria-labelledby', button.id);
   });
-  root.querySelector('.mode-switch')!.addEventListener('keydown', event => {
+  for (const buttons of [tabs, referenceTabs]) buttons[0].parentElement!.addEventListener('keydown', event => {
     const key = (event as KeyboardEvent).key;
     if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(key)) return;
-    event.preventDefault(); const current = tabs.findIndex(t => t.getAttribute('aria-selected') === 'true');
-    const index = key === 'Home' ? 0 : key === 'End' ? 2 : (current + (key === 'ArrowLeft' ? 2 : 1)) % 3;
-    tabs[index].click(); tabs[index].focus();
+    event.preventDefault(); const current = buttons.findIndex(t => t.getAttribute('aria-selected') === 'true');
+    const index = key === 'Home' ? 0 : key === 'End' ? buttons.length - 1 : (current + (key === 'ArrowLeft' ? buttons.length - 1 : 1)) % buttons.length;
+    buttons[index].click(); buttons[index].focus();
   });
-  let importRequest = 0;
+  target.addEventListener('change', () => {
+    importRequest++; importButton.disabled = false; importStatus.textContent = '';
+    referenceTargets.challenge = target.value; renderReferenceSelection();
+  });
   importButton.addEventListener('click', async () => {
+    const mode = referenceMode, selectedTarget = referenceTargets[mode];
+    if (mode === 'challenge' && !selectedTarget) { importStatus.textContent = '請明確選擇第一隊、第二隊或雙隊共用場地，再按引用。'; target.focus(); return; }
     const request = ++importRequest; importButton.disabled = true; importStatus.textContent = '正在讀取隊伍…';
     try {
-      const { loadTeamDefenseReferences } = await import('./team-defense-reference.ts');
-      const refs = await loadTeamDefenseReferences(localStorage.getItem(TEAM_STATE_KEY), teamUrl);
-      if (request !== importRequest) return;
-      const previous = target.value || store.value.teamSnapshot?.target || '';
-      target.replaceChildren(new Option('請選擇引用目標', ''), ...refs.refs.map(ref => new Option(ref.label, ref.target)));
-      target.value = refs.mode === 'single' ? 'single' : refs.refs.some(ref => ref.target === previous) ? previous : '';
-      target.parentElement!.hidden = refs.mode === 'single';
-      const ref = refs.refs.find(ref => ref.target === target.value);
-      if (!ref) { importStatus.textContent = '請明確選擇第一隊、第二隊或雙隊共用場地，再按引用。'; target.focus(); return; }
+      const { loadTeamDefenseReferences } = await loadTeamReferenceModule();
+      const refs = await loadTeamDefenseReferences(localStorage.getItem(TEAM_STATE_KEY), teamUrl, mode);
+      if (request !== importRequest || disposed) return;
+      const ref = refs.refs.find(ref => ref.target === selectedTarget);
+      if (!ref) { importStatus.textContent = `目前尚無已保存的${targetLabels[selectedTarget] ?? '隊伍'}配置。`; target.focus(); return; }
+      versionCheckFailed = false; currentDataRevision = checkedSnapshotRevision = refs.dataRevision;
       set({ teamSnapshot: { mode: refs.mode, target: ref.target, rate: ref.rate, sources: ref.sources, sourceIds: ref.sourceIds,
-        sourceRevision: refs.sourceRevision, dataRevision: refs.dataRevision, importedAt: new Date().toISOString() } });
+        sourceRevision: refs.sourceRevision, dataRevision: refs.dataRevision, defenseIgnoreAdditive: ref.defenseIgnoreAdditive ?? 0, defenseIgnoreSources: ref.defenseIgnoreSources ?? [], importedAt: new Date().toISOString() } });
       importStatus.textContent = '已引用破防率快照。隊伍變更後可按「重新引用」。';
-    } catch { importStatus.textContent = '目前沒有可引用的有效隊伍配置。請先至隊伍增益模擬完成設定。'; }
-    finally { importButton.disabled = false; }
+    } catch (error) {
+      if (request !== importRequest || disposed) return;
+      importStatus.textContent = error instanceof Error && error.message.startsWith('目前') ? error.message : '目前沒有可引用的有效隊伍配置。請先至隊伍增益模擬完成設定。';
+    } finally { if (request === importRequest && !disposed) importButton.disabled = false; }
   });
   const stale = (event: StorageEvent) => {
     if (event.key !== TEAM_STATE_KEY && event.key !== null) return;
-    const snapshot = store.value.teamSnapshot;
-    if (!snapshot) return;
-    try {
-      if (teamRevision(localStorage.getItem(TEAM_STATE_KEY)) !== snapshot.sourceRevision) importStatus.textContent = '隊伍配置已有更新，可重新引用破防量。目前仍使用原快照。';
-    } catch { /* Snapshot remains valid when storage is unavailable. */ }
+    updateSnapshotNotice(); checkSnapshotVersion(true); renderReferenceSelection();
   };
+  const refreshSnapshotVersion = () => { updateSnapshotNotice(); checkSnapshotVersion(true); renderReferenceSelection(); };
+  const onToggle = () => { if (root.open) refreshSnapshotVersion(); };
   window.addEventListener('storage', stale);
+  window.addEventListener('pageshow', refreshSnapshotVersion);
+  window.addEventListener('focus', refreshSnapshotVersion);
+  root.addEventListener('toggle', onToggle);
   const unsubscribe = store.subscribe(render); render();
   return { root, setEquipment(values: number[]) { equipment = values; renderTotals(); },
-    dispose() { unsubscribe(); window.removeEventListener('storage', stale); } };
+    dispose() { disposed = true; importRequest++; unsubscribe(); window.removeEventListener('storage', stale); window.removeEventListener('pageshow', refreshSnapshotVersion); window.removeEventListener('focus', refreshSnapshotVersion); root.removeEventListener('toggle', onToggle); } };
 }

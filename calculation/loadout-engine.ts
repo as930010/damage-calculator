@@ -49,6 +49,7 @@ export interface LoadoutCalculationInput {
   stageAdaptabilityPenaltyPct: number;
   enemyDefensePct: number;
   externalDefenseBreakRate?: number;
+  defenseIgnoreAdditive?: number;
   /** Percent of skill damage assigned to transcendence; the strong share is its complement. */
   transcendenceSkillDamageSharePct?: number;
   critDamageProductBasePct: number;
@@ -112,6 +113,7 @@ export function finalDamageInputs(
     enemyDefensePct: input.enemyDefensePct,
     defenseIgnorePct: statTotal(attributes, 'defenseIgnorePct'),
     externalDefenseBreakRate: input.externalDefenseBreakRate ?? 0,
+    defenseIgnoreAdditive: input.defenseIgnoreAdditive ?? 0,
   };
 }
 

@@ -59,3 +59,13 @@ HTML 與 Manifest 包含匯入／匯出 Chunk 相同版本 URL。首次載入失
 執行 pnpm run test:build，驗證可重現性、版本更新、CSS 獨立失效、清單及引用完整性；執行 pnpm run test:production，以既有 DOM Harness 驗證首頁與 Buff 產物、延後載入、狀態保護及四頁 Metadata／版本歷史。冰裝 Worker UI 與排名由 pnpm run test:ice 涵蓋。變換評分的公式、取整與配裝整合由 `pnpm run test:score` 驗證。主題隔離使用 pnpm run test:theme-isolation。
 
 正式發布還需依變更範圍完成四頁瀏覽器 Smoke Test，確認 CSS／JS／SVG／JSON 載入與 Pages 子路徑；不能只因 build 或 push 成功就宣稱部署完成。
+
+### 隊伍增益職業資料維護
+
+`features/buff-simulator/data/class-effects.json` 使用 Schema 2：每職業一份共用 `effects`；僅有模式差異時提供完整替換的 `challengeEffects`。職業增幅由計算核心即時計算，不保存衍生分數。技能參照僅供說明，不參與效果矩陣計算；實際技能仍可能受被動或條件影響。挑戰雙隊沿用既有共享場地來源去重與計算流程。
+
+VI 已依 2026-09-09 平衡移除「猛虎4式：怒濤」的破甲參照，保留技能本身的遊戲存在性；破防由 15% 與 5% 乘算合併為 19.25%。戰鬥破防採快照，職業資料更新時應提醒重新引用，不自動覆寫舊快照。
+
+LA 的「無視防禦加算」與外部破防分開傳遞，先加至受益角色裝備無視防禦組，再套用原防禦倍率；Buff 基礎輸出不包含此額外效益，另以首頁保存配裝（沒有面板時採 0%）顯示。整站建置提供唯讀配裝適配入口，僅有此效果時延後讀取；Buff 獨立輸出沒有首頁時採 0%。目前 60 職業兩模式皆共用效果，未使用 challengeEffects。LA Buff 保留原來源的 5% 攻擊與 8.25/235 致命傷害換算；移除固定 1.0382，獨立 Debuff 為 5%。
+
+隊伍破防快照保留 dataRevision 與 sourceRevision；新增可選 defenseIgnoreAdditive、defenseIgnoreSources，舊快照缺值視為 0。資料過期只提醒重新引用，不自動改寫。切回手動／逐項模式不套用快照加算。

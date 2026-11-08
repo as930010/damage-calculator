@@ -16,14 +16,14 @@ const weapon = right.find(entry => entry.selectionField === 'Ice.Weapon.Set');
 const leftIce = data.mapping.selections.find(entry => entry.catalogFile === 'equipment/left-ice.json');
 
 test('共享外部破防環境同時作用於冰裝基準與每個推薦候選', async () => {
-  const state=iceScenario(data,base,6),rate=.896;
-  const search=await searchIce(data,state,()=>{},{},'A',rate);
-  assert.equal(search.baselineDamage,projectDamage(data,state,rate).result.finalDamage.finalDamage);
+  const state=iceScenario(data,base,6),rate=.896,additive=.05;
+  const search=await searchIce(data,state,()=>{},{},'A',rate,additive);
+  assert.equal(search.baselineDamage,projectDamage(data,state,rate,additive).result.finalDamage.finalDamage);
   assert.notEqual(search.baselineDamage,projectDamage(data,state,0).result.finalDamage.finalDamage);
   assert.ok(search.results.length>0);
   for(const result of search.results)for(const candidate of result.alternatives??[result]){
     const values={...state.values,...candidate.choices};data.rightIceSets.selectionFields.forEach((f,i)=>values[f]=candidate.setNames[i]??'');
-    assert.ok(sameDamage(candidate.damage,projectDamage(data,{...state,values},rate).result.finalDamage.finalDamage));
+    assert.ok(sameDamage(candidate.damage,projectDamage(data,{...state,values},rate,additive).result.finalDamage.finalDamage));
   }
 });
 

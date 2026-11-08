@@ -1,9 +1,11 @@
+import { GREEN_CONTROL_BUFF_COMPONENTS } from '../calculation/support-magazines.ts';
 import type {
   CalculationParameters,
   ControlTimeCategory,
   ClassModeProfile,
   ClassRecord,
   EffectKey,
+  EffectValues,
   EffectTypeDefinition,
   LoadoutOptionDefinition,
   ControlTimeParameters,
@@ -66,33 +68,64 @@ function assertUnique(values: string[], label: string): void {
 
 export function parseCoreCatalog(payloads: CoreCatalogPayloads): CoreCatalog {
   const classes = requireArray<ClassRecord>(payloads.classes, "classes");
-  const classEffects = requireArray<ClassModeProfile>(payloads.classEffects, "classEffects");
+  if (!isRecord(payloads.classEffects) || payloads.classEffects.schemaVersion !== 2) {
+    throw new TypeError("classEffects requires schemaVersion 2");
+  }
+  const entries = requireArray<unknown>(payloads.classEffects.classes, "classEffects.classes");
   const effectTypes = requireArray<EffectTypeDefinition>(payloads.effectTypes, "effectTypes");
   const loadoutOptions = requireArray<LoadoutOptionDefinition>(payloads.loadoutOptions, "loadoutOptions");
   if (!isRecord(payloads.calculationParameters)) throw new TypeError("calculationParameters must be an object");
   const raw = payloads.calculationParameters as unknown as RawCalculationParameters;
 
+  for (const item of classes) {
+    if (!isRecord(item) || typeof item.id !== "string" || !item.id.trim()
+      || typeof item.code !== "string" || !item.code.trim()) throw new TypeError("Invalid class identity");
+  }
   assertUnique(classes.map((item) => item.id), "classes");
+  assertUnique(classes.map((item) => item.code), "class codes");
   assertUnique(effectTypes.map((item) => item.key), "effectTypes");
   assertUnique(loadoutOptions.map((item) => item.id), "loadoutOptions");
 
-  const classIds = new Set(classes.map((item) => item.id));
+  const classById = new Map(classes.map((item) => [item.id, item]));
   const effectKeys = new Set(effectTypes.map((item) => item.key));
-  const seenProfiles = new Set<string>();
-  for (const profile of classEffects) {
-    if (!classIds.has(profile.classId)) throw new TypeError(`Unknown class ${profile.classId}`);
-    if (profile.mode !== "single" && profile.mode !== "challenge") {
-      throw new TypeError(`Invalid mode for ${profile.classId}`);
-    }
-    const profileKey = `${profile.classId}:${profile.mode}`;
-    if (seenProfiles.has(profileKey)) throw new TypeError(`Duplicate profile ${profileKey}`);
-    seenProfiles.add(profileKey);
-    for (const [key, value] of Object.entries(profile.effects)) {
+  const parseEffects = (value: unknown, label: string): EffectValues => {
+    if (!isRecord(value)) throw new TypeError(`${label} must be an effects object`);
+    const effects: EffectValues = {};
+    for (const [key, rawValue] of Object.entries(value)) {
       if (!effectKeys.has(key as EffectKey)) throw new TypeError(`Unknown effect key ${key}`);
-      requireFinite(value, `${profileKey}.${key}`);
+      const number = requireFinite(rawValue, `${label}.${key}`);
+      if ((key === "defenseBreak" || key === "shield" || key === "defenseIgnoreAdditive") && (number < 0 || number > 1)) {
+        throw new TypeError(`${label}.${key} must be a ratio between 0 and 1`);
+      }
+      if (effectTypes.find(effect => effect.key === key)?.unit === "count" && (!Number.isInteger(number) || number < 0)) {
+        throw new TypeError(`${label}.${key} must be a nonnegative count`);
+      }
+      effects[key as EffectKey] = number;
     }
-    requireFinite(profile.estimatedDamageScore, `${profileKey}.estimatedDamageScore`);
+    return effects;
+  };
+  const profiles = new Map<string, { code: string; effects: EffectValues; challengeEffects?: EffectValues }>();
+  for (const entry of entries) {
+    if (!isRecord(entry) || typeof entry.classId !== "string" || !classById.has(entry.classId)) {
+      throw new TypeError("Unknown class in classEffects");
+    }
+    if (entry.code !== classById.get(entry.classId)!.code) throw new TypeError(`Invalid code for ${entry.classId}`);
+    if (profiles.has(entry.classId)) throw new TypeError(`Duplicate class ${entry.classId}`);
+    if (Object.keys(entry).some(key => !["classId", "code", "effects", "challengeEffects"].includes(key))) {
+      throw new TypeError(`Unknown class-effects field for ${entry.classId}`);
+    }
+    profiles.set(entry.classId, {
+      code: entry.code as string,
+      effects: parseEffects(entry.effects, entry.classId),
+      ...(Object.hasOwn(entry, "challengeEffects") ? { challengeEffects: parseEffects(entry.challengeEffects, `${entry.classId}.challenge`) } : {}),
+    });
   }
+  if (profiles.size !== classes.length) throw new TypeError("classEffects must include every class");
+  // A challenge override replaces the entire effect object; it never adds to the common base.
+  const classEffects: ClassModeProfile[] = (["single", "challenge"] as const).flatMap(mode =>
+    [...profiles].map(([classId, profile]) => ({ classId, code: profile.code, mode,
+      effects: { ...(mode === "challenge" ? profile.challengeEffects ?? profile.effects : profile.effects) } })),
+  );
 
   for (const option of loadoutOptions) {
     if (option.presentation !== undefined && option.presentation !== "background") {
@@ -101,12 +134,13 @@ export function parseCoreCatalog(payloads: CoreCatalogPayloads): CoreCatalog {
     if (option.scope !== "per-team" || typeof option.defaultSelected !== "boolean") {
       throw new TypeError(`Invalid selection metadata for ${option.id}`);
     }
-    if (option.userInput && (
-      option.userInput.kind !== "percentage" ||
-      !["movementSpeedShoePercent", "skillDamageGlovePercent"].includes(option.userInput.parameter) ||
-      typeof option.userInput.helpText !== "string"
-    )) {
-      throw new TypeError(`Invalid user input metadata for ${option.id}`);
+    if (option.userInput) {
+      const input = option.userInput;
+      if (input.kind === 'support-magazine') {
+        if (!Object.hasOwn(GREEN_CONTROL_BUFF_COMPONENTS, input.target) || Object.keys(option.effects).length) throw new TypeError(`Invalid support magazine metadata for ${option.id}`);
+      } else if (input.kind !== 'percentage' || !["movementSpeedShoePercent", "skillDamageGlovePercent"].includes(input.parameter) || typeof input.helpText !== 'string') {
+        throw new TypeError(`Invalid user input metadata for ${option.id}`);
+      }
     }
     for (const spec of Object.values(option.effects)) {
       if (spec?.kind === "fixed") requireFinite(spec.value, `${option.id}.value`);
@@ -115,6 +149,8 @@ export function parseCoreCatalog(payloads: CoreCatalogPayloads): CoreCatalog {
       else throw new TypeError(`Invalid option effect for ${option.id}`);
     }
   }
+
+  assertUnique(loadoutOptions.flatMap(option => option.userInput?.kind === 'support-magazine' ? [option.userInput.target] : []), 'support magazine targets');
 
   const parameters: CoreCatalog["parameters"] = {
     criticalDamagePercent: requireFinite(raw.criticalDamage.defaultPercent, "criticalDamage.defaultPercent") / 100,

@@ -75,5 +75,8 @@
     "defaultSelected": true,
     "presentation": "background",
     "effects": { "resistanceReduction": { "kind": "fixed", "value": 150 } }
-  }
+  },
+  {"id": "support-magazine-i", "label": "支援彈匣I", "scope": "per-team", "defaultSelected": false, "userInput": {"kind": "support-magazine", "target": "attackBuff"}, "effects": {}},
+  {"id": "support-magazine-ii", "label": "支援彈匣II", "scope": "per-team", "defaultSelected": false, "userInput": {"kind": "support-magazine", "target": "allSkillDamageBuff"}, "effects": {}},
+  {"id": "support-magazine-iii", "label": "支援彈匣III", "scope": "per-team", "defaultSelected": false, "userInput": {"kind": "support-magazine", "target": "allSpeedBuff"}, "effects": {}}
 ]

@@ -936,3 +936,12 @@ body.site-page-buff {
 .site-page-buff .support-grid .metric,
 .site-page-buff .control-time-grid div { border-color: #344153; background: #17202c; }
 .site-page-buff .total-multiplier strong { color: #f0b66d; }
+
+
+/* Support magazines reuse option-chip state colours and the existing responsive editor grid. */
+.support-magazine { display: grid; grid-template-columns: minmax(0, 1fr) auto; min-width: 0; cursor: default; }
+.support-magazines { grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); }
+.support-magazine label { display: grid; cursor: pointer; }
+.support-magazine-title { display: flex; align-items: center; gap: var(--space-2); }
+.support-magazine select { min-width: 0; padding: .4em; border: 1px solid var(--border-control, var(--line)); border-radius: .4em; background: var(--control, var(--panel)); color: var(--text-input, var(--text)); font: inherit; }
+.support-magazine select:disabled { opacity: .55; }

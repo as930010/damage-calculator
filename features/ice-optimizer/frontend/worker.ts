@@ -5,7 +5,7 @@ import type { LoadoutState } from '../../../frontend/state.ts';
 import type { IceSearchConstraints } from './search-policy.ts';
 
 self.addEventListener('message', async (event: MessageEvent<{
-  type: 'start'; searchId: string; data: GameData; state: LoadoutState; constraints?: IceSearchConstraints; externalDefenseBreakRate?: number;
+  type: 'start'; searchId: string; data: GameData; state: LoadoutState; constraints?: IceSearchConstraints; externalDefenseBreakRate?: number; defenseIgnoreAdditive?: number;
 }>) => {
   if (event.data?.type !== 'start') return;
   const searchId = event.data.searchId;
@@ -30,7 +30,7 @@ self.addEventListener('message', async (event: MessageEvent<{
         self.postMessage({ type: 'progress', searchId, progress: { ...progress, results, strategy,
           bestDamage: Math.max(progress.bestDamage, merged[0]?.damage ?? progress.baselineDamage),
           completedBudget: a?.budgetUsed ?? 0, completedEvaluated: a?.evaluated ?? 0 } });
-      }, event.data.constraints, strategy, event.data.externalDefenseBreakRate ?? 0);
+      }, event.data.constraints, strategy, event.data.externalDefenseBreakRate ?? 0, event.data.defenseIgnoreAdditive ?? 0);
       merge(result.results, result.baselineDamage);
       const metrics: IceStrategyMetrics = { elapsedMs: performance.now() - before,
         budgetUsed: result.budgetUsed, evaluated: result.evaluated,

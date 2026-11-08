@@ -5,6 +5,7 @@ export type EffectKey =
   | "buff"
   | "debuff"
   | "defenseBreak"
+  | "defenseIgnoreAdditive"
   | "shield"
   | "attackReduction"
   | "cooldownAcceleration"
@@ -34,7 +35,6 @@ export interface ClassModeProfile {
   code: string;
   mode: TeamMode;
   effects: EffectValues;
-  estimatedDamageScore: number;
 }
 
 export interface EffectTypeDefinition {
@@ -46,10 +46,15 @@ export interface EffectTypeDefinition {
   sortOrder: number;
 }
 
+export type SupportMagazineTarget = 'attackBuff' | 'allSkillDamageBuff' | 'allSpeedBuff';
+export interface SupportMagazineSelection { id: string; target: SupportMagazineTarget; level: number; enabled: boolean }
+export interface SupportMagazineDetail { optionId: string; target: SupportMagazineTarget; level: number; classCode: string; baseValue: number; effectiveValue: number }
 export interface SelectedMember {
   classId: string;
   classCode: string;
   effects: EffectValues;
+  /** Ephemeral owning-team settings, bound before shared-arena uniqueness. */
+  supportMagazines?: readonly SupportMagazineSelection[];
   /** Values in one exclusivity group overwrite each other on the same map. */
   uniquenessGroup?: string;
 }
@@ -58,6 +63,7 @@ export interface SelectedOption {
   /** Stable option source ID; same ID across teams is effective once in a shared arena. */
   id: string;
   effects: EffectValues;
+  supportMagazine?: SupportMagazineSelection;
 }
 
 export type OptionValueSpec =
@@ -79,7 +85,7 @@ export interface LoadoutOptionDefinition {
     kind: "percentage";
     parameter: "movementSpeedShoePercent" | "skillDamageGlovePercent";
     helpText: string;
-  };
+  } | { kind: "support-magazine"; target: SupportMagazineTarget };
   effects: Partial<Record<EffectKey, OptionValueSpec>>;
 }
 
@@ -163,6 +169,8 @@ export interface TeamCalculationResult {
   /** Multiplier minus one; challenge results display this increment. */
   debuffIncrease: number;
   defenseBreak: number;
+  /** Additive beneficiary ignore; displayed separately from totalDamageMultiplier. */
+  defenseIgnoreAdditive?: number;
   defenseBreakDamageIncrease: number;
   defenseDamageMultiplier: number;
   totalDamageMultiplier: number;
@@ -179,6 +187,7 @@ export interface TeamCalculationResult {
   superArmor: SupportRank;
   breakdown: EffectBreakdown[];
   ignoredClassIds: string[];
+  supportMagazineDetails?: SupportMagazineDetail[];
 }
 
 export interface ChallengeCalculationInput {

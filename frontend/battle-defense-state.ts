@@ -4,7 +4,7 @@ export const BATTLE_DEFENSE_KEY = 'damage-calculator.battle-defense.v1';
 export interface DefenseSource { id: string; name: string; percentage: string }
 export interface TeamDefenseSnapshot {
   mode: 'single' | 'challenge'; target: 'single' | 'firstTeam' | 'secondTeam' | 'sharedArena';
-  rate: number; sources: string[]; sourceIds?: string[]; sourceRevision: string; dataRevision: string; importedAt: string;
+  rate: number; sources: string[]; defenseIgnoreAdditive?: number; defenseIgnoreSources?: string[]; sourceIds?: string[]; sourceRevision: string; dataRevision: string; importedAt: string;
 }
 export interface BattleDefenseEnvironment {
   schemaVersion: 1; mode: 'manual' | 'sources' | 'team'; manualPercentage: string;
@@ -26,7 +26,11 @@ export function parseBattleDefense(raw: string | null): BattleDefenseEnvironment
     || !Array.isArray(snapshot.sources) || snapshot.sources.some(s => typeof s !== 'string')
     || (snapshot.sourceIds !== undefined && (!Array.isArray(snapshot.sourceIds) || snapshot.sourceIds.some(s => typeof s !== 'string')))
     || typeof snapshot.sourceRevision !== 'string' || typeof snapshot.dataRevision !== 'string' || typeof snapshot.importedAt !== 'string')) throw new Error('隊伍破防快照格式無效，請重新引用。');
-  if (snapshot) requireDefenseRate(snapshot.rate, '隊伍破防快照');
+  if (snapshot) {
+    requireDefenseRate(snapshot.rate, '隊伍破防快照');
+    requireDefenseRate(snapshot.defenseIgnoreAdditive ?? 0, '隊伍無視防禦加算');
+    if (snapshot.defenseIgnoreSources !== undefined && (!Array.isArray(snapshot.defenseIgnoreSources) || snapshot.defenseIgnoreSources.some(s => typeof s !== 'string'))) throw new Error('隊伍無視防禦來源無效。');
+  }
   return { schemaVersion: 1, mode: value.mode, manualPercentage: value.manualPercentage,
     sources: value.sources.map(s => ({ id: s.id, name: s.name, percentage: s.percentage })), teamSnapshot: snapshot };
 }
@@ -49,6 +53,10 @@ export function externalDefenseRate(value: BattleDefenseEnvironment): number {
   }));
 }
 
+export function teamDefenseIgnoreAdditive(value: BattleDefenseEnvironment): number {
+  return value.mode === 'team' ? requireDefenseRate(value.teamSnapshot?.defenseIgnoreAdditive ?? 0, '隊伍無視防禦加算') : 0;
+}
+
 /** One page store, with explicit same-document notifications and cross-document storage sync. */
 export function createBattleDefenseStore(host: Window) {
   let lastRaw: string | null | undefined;
@@ -68,6 +76,7 @@ export function createBattleDefenseStore(host: Window) {
     get value() { return value; },
     get error() { try { if (readError) return readError; externalDefenseRate(value); return storageError; } catch (error) { return (error as Error).message; } },
     get rate(): number | null { try { return readError ? null : externalDefenseRate(value); } catch { return null; } },
+    get defenseIgnoreAdditive(): number | null { try { return readError ? null : teamDefenseIgnoreAdditive(value); } catch { return null; } },
     set(next: BattleDefenseEnvironment) {
       value = parseBattleDefense(JSON.stringify(next)); readError = ''; storageError = '';
       try { lastRaw = JSON.stringify(value); host.localStorage.setItem(BATTLE_DEFENSE_KEY, lastRaw); }
@@ -85,4 +94,10 @@ export function teamRevision(raw: string | null): string {
   let hash = 2166136261;
   for (const char of raw ?? '') hash = Math.imul(hash ^ char.charCodeAt(0), 16777619);
   return (hash >>> 0).toString(16);
+}
+
+/** Freshness is advisory: the saved rate remains active until an explicit re-import. */
+export function teamSnapshotUpdateReason(snapshot: TeamDefenseSnapshot, sourceRevision: string, dataRevision?: string): 'data' | 'team' | null {
+  if (dataRevision !== undefined && snapshot.dataRevision !== dataRevision) return 'data';
+  return snapshot.sourceRevision !== sourceRevision ? 'team' : null;
 }

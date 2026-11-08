@@ -12,5 +12,6 @@
   { "key": "actionSpeedDiminishing", "label": "遞減動速", "unit": "ratio", "group": "utility", "aggregation": "multiply", "sortOrder": 10 },
   { "key": "roarBlock", "label": "扛吼／擋傷", "unit": "count", "group": "utility", "aggregation": "rank", "sortOrder": 11 },
   { "key": "debuffCleanse", "label": "消火／解Debuff", "unit": "count", "group": "utility", "aggregation": "rank", "sortOrder": 12 },
-  { "key": "superArmor", "label": "霸體", "unit": "count", "group": "utility", "aggregation": "rank", "sortOrder": 13 }
+  { "key": "superArmor", "label": "霸體", "unit": "count", "group": "utility", "aggregation": "rank", "sortOrder": 13 },
+  {"key": "defenseIgnoreAdditive", "label": "無視防禦加算", "unit": "ratio", "group": "damage", "aggregation": "sum", "sortOrder": 14}
 ]

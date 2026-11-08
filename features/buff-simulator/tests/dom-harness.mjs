@@ -16,7 +16,7 @@ function countFunction(source, name) {
   return source.replace(pattern, `$1 globalThis.__calls.${name}++;`);
 }
 
-export async function boot({ saved = null, savedDisclosures = null, storageThrows = false, compiled = false, production = false, fetchSkill } = {}) {
+export async function boot({ saved = null, savedDisclosures = null, storageThrows = false, compiled = false, production = false, fetchSkill, fetchCore } = {}) {
   // Run the real source without rebuilding during incremental work; compiled verifies release output.
   const root = production ? new URL('../site-dist/', import.meta.url) : compiled ? buildRoot : sourceRoot;
   const failures = [];
@@ -62,13 +62,13 @@ export async function boot({ saved = null, savedDisclosures = null, storageThrow
     };
   }
   const context = createContext({ window, document: window.document, URL,
-    HTMLInputElement: window.HTMLInputElement, console: { error: (...args) => failures.push(args) },
+    HTMLInputElement: window.HTMLInputElement, HTMLSelectElement: window.HTMLSelectElement, console: { error: (...args) => failures.push(args) },
     __calls: calls, __teamResults: teamResults,
     fetch: async url => {
       const path = new URL(String(url)).pathname.split('/data/')[1];
       requests.push(path);
       const response = { ok: true, json: async () => JSON.parse(await readFile(new URL(`data/${path}`, root), 'utf8')) };
-      return /^skill-reference[.-]/.test(path) && fetchSkill ? fetchSkill(response) : response;
+      return /^skill-reference[.-]/.test(path) ? (fetchSkill ? fetchSkill(response) : response) : (fetchCore ? fetchCore(path, response) : response);
     },
   });
   const modules = new Map();

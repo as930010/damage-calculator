@@ -1,3 +1,5 @@
+import { GREEN_CONTROL_BUFF_COMPONENTS, SUPPORT_MAGAZINE_LEVELS, normalizeSupportMagazineLevel, supportMagazineBonus, supportMagazineLevelKey } from '../calculation/support-magazines.ts';
+import { calculateBeneficiaryDefenseGain } from '../calculation/defense.ts';
 import { parseSavedSimulatorState, resolveSavedMembers, TEAM_STATE_KEY, type SavedSimulatorState } from './saved-state.ts';
 import { calculateChallenge, calculateTeam } from "../calculation/engine.ts";
 import { calculateControlTimes } from "../calculation/control-time.ts";
@@ -27,7 +29,7 @@ let skillReferenceOpen = false;
 let firstShell = true;
 let resultDisclosureOpen: Record<string, boolean> = {};
 let lastPersistedState: string | null = null;
-let inputValues = new WeakMap<HTMLInputElement, string>();
+let inputValues = new WeakMap<HTMLInputElement | HTMLSelectElement, string>();
 const composingInputs = new WeakSet<HTMLInputElement>();
 
 // The app root survives shell rebuilds; install composition listeners only once.
@@ -137,6 +139,11 @@ const asPercent = (value: number): string => `${(value * 100).toFixed(2)}%`;
 const asMultiplier = (value: number): string => `${value.toFixed(4)}×`;
 function optionsFor(team: string): SelectedOption[] {
   return catalog.loadoutOptions.map((definition) => {
+    if (definition.userInput?.kind === 'support-magazine') {
+      const selected = app.querySelector<HTMLInputElement>(`[data-option="${definition.id}"][data-team="${team}"]`)?.checked ?? optionsByTeam[team]?.[definition.id] === true;
+      const level = app.querySelector<HTMLSelectElement>(`[data-magazine-level="${definition.id}"][data-team="${team}"]`)?.value;
+      return resolveLoadoutOption(definition, catalog.parameters, selected, level === undefined ? optionsByTeam[team]?.[supportMagazineLevelKey(definition.id)] : Number(level));
+    }
     const parameterName = definition.userInput?.kind === "percentage" ? definition.userInput.parameter : undefined;
     if (parameterName) {
       const input = document.querySelector<HTMLInputElement>(`[data-option-value="${definition.id}"][data-team="${team}"]`);
@@ -193,18 +200,39 @@ function optionPanel(team: string): string {
   const toggleOptions = catalog.loadoutOptions.filter((option) => !option.userInput && option.presentation !== "background");
   const backgroundOptions = catalog.loadoutOptions.filter((option) => option.presentation === "background");
   const valueEditors = valueOptions.map((option) => {
-    const parameterName = option.userInput!.parameter;
+    if (option.userInput?.kind !== 'percentage') return '';
+    const parameterName = option.userInput.parameter;
     const value = optionsByTeam[team]?.[option.id] ?? Number((catalog.parameters[parameterName] * 100).toFixed(6));
-    return `<label class="option-editor"><span class="option-editor-heading"><strong>${escapeHtml(option.label)}</strong><small>${escapeHtml(option.userInput!.helpText)}</small></span><span class="option-editor-input"><input type="number" min="0" step="0.1" inputmode="decimal" data-option-value="${escapeHtml(option.id)}" data-team="${team}" value="${Number(value)}" aria-label="${escapeHtml(option.label)}百分比"><span>%</span></span></label>`;
+    return `<label class="option-editor"><span class="option-editor-heading"><strong>${escapeHtml(option.label)}</strong><small>${escapeHtml(option.userInput.helpText)}</small></span><span class="option-editor-input"><input type="number" min="0" step="0.1" inputmode="decimal" data-option-value="${escapeHtml(option.id)}" data-team="${team}" value="${Number(value)}" aria-label="${escapeHtml(option.label)}百分比"><span>%</span></span></label>`;
   }).join("");
   const toggles = toggleOptions.map((option) => {
     const checked = optionsByTeam[team]?.[option.id] ?? option.defaultSelected;
     return `<label class="option-chip"><input type="checkbox" data-option="${escapeHtml(option.id)}" data-team="${team}" ${checked ? "checked" : ""}><span>${escapeHtml(option.label)}</span></label>`;
   }).join("");
+  const magazines = catalog.loadoutOptions.filter(option => option.userInput?.kind === 'support-magazine').map(option => {
+    const level = normalizeSupportMagazineLevel(optionsByTeam[team]?.[supportMagazineLevelKey(option.id)]);
+    const checked = optionsByTeam[team]?.[option.id] === true;
+    return `<div class="option-chip support-magazine" data-support-magazine="${escapeHtml(option.id)}" data-team="${team}"><label class="option-editor-heading"><span class="support-magazine-title"><input type="checkbox" data-option="${escapeHtml(option.id)}" data-team="${team}" ${checked ? 'checked' : ''}><strong>${escapeHtml(option.label)}</strong></span><small data-magazine-info></small></label><select data-magazine-level="${escapeHtml(option.id)}" data-team="${team}" aria-label="${escapeHtml(option.label)}等級" ${checked ? '' : 'disabled'}>${SUPPORT_MAGAZINE_LEVELS.map(value => `<option value="${value}"${value === level ? ' selected' : ''}>Lv.${value}</option>`).join('')}</select></div>`;
+  }).join('');
   const backgroundNote = backgroundOptions.length
     ? `<p class="background-option-note"><strong>已預設納入：</strong>${backgroundOptions.map((option) => escapeHtml(option.label)).join("、")}。這些常見來源會直接計入隊伍結果，不需另外勾選。</p>`
     : "";
-  return `<div class="loadout-controls">${valueEditors ? `<div class="option-editors">${valueEditors}</div>` : ""}${backgroundNote}${toggles ? `<div class="option-list">${toggles}</div>` : ""}</div>`;
+  return `<div class="loadout-controls">${valueEditors ? `<div class="option-editors">${valueEditors}</div>` : ""}${backgroundNote}${toggles ? `<div class="option-list">${toggles}</div>` : ""}${magazines ? `<div class="option-editors support-magazines">${magazines}</div>` : ''}</div>`;
+}
+
+function syncSupportMagazineControls(): void {
+  const teams = mode === 'single' ? ['single'] : ['first', 'second'];
+  for (const team of teams) {
+    const hasGreenControl = membersFor(team).some(member => member.uniquenessGroup === 'green-control');
+    for (const row of app.querySelectorAll<HTMLElement>(`[data-support-magazine][data-team="${team}"]`)) {
+      const definition = catalog.loadoutOptions.find(option => option.id === row.dataset.supportMagazine)!;
+      if (definition.userInput?.kind !== 'support-magazine') continue;
+      const checked = row.querySelector<HTMLInputElement>('input')!.checked, select = row.querySelector<HTMLSelectElement>('select')!;
+      select.disabled = !checked;
+      const component = GREEN_CONTROL_BUFF_COMPONENTS[definition.userInput.target];
+      row.querySelector('[data-magazine-info]')!.textContent = `${component.label} +${(supportMagazineBonus(Number(select.value)) * 100).toFixed(1)}%${!checked ? '（未啟用）' : hasGreenControl ? '' : '（目前無可強化的綠控來源）'}`;
+    }
+  }
 }
 
 function skillReferencePanel(): string {
@@ -287,19 +315,20 @@ function teamPanel(team: TeamKey, title: string, memberCount: number): string {
   </section>`;
 }
 
-function inputValue(input: HTMLInputElement): string {
-  if (input.type === "checkbox") return String(input.checked);
-  if (input.type === "number") return `${Number(input.value)}:${input.validity.badInput}`;
+function inputValue(input: HTMLInputElement | HTMLSelectElement): string {
+  if (input instanceof HTMLInputElement && input.type === "checkbox") return String(input.checked);
+  if (input instanceof HTMLInputElement && input.type === "number") return `${Number(input.value)}:${input.validity.badInput}`;
   if (input.hasAttribute("data-skill-query")) return input.value.trim().toLocaleLowerCase();
   return input.value;
 }
 
 function syncInputs(event: Event): void {
   const input = event.target;
-  if (!(input instanceof HTMLInputElement) || composingInputs.has(input) || (event as InputEvent).isComposing) return;
+  if (!(input instanceof HTMLInputElement || input instanceof HTMLSelectElement) || (input instanceof HTMLInputElement && composingInputs.has(input)) || (event as InputEvent).isComposing) return;
+  if (input instanceof HTMLSelectElement && input.hasAttribute('data-magazine-level')) input.value = String(normalizeSupportMagazineLevel(Number(input.value)));
   const isSearch = input.hasAttribute("data-skill-query");
   const isMember = input.hasAttribute("data-member");
-  if (!isSearch && !isMember && !input.hasAttribute("data-option") && !input.hasAttribute("data-option-value") && input.id !== "boss-reduction") return;
+  if (!isSearch && !isMember && !input.hasAttribute("data-option") && !input.hasAttribute("data-option-value") && !input.hasAttribute("data-magazine-level") && input.id !== "boss-reduction") return;
   const value = inputValue(input);
   if (inputValues.get(input) === value) return;
   inputValues.set(input, value);
@@ -309,6 +338,7 @@ function syncInputs(event: Event): void {
   }
   saveCurrentInputs();
   persistSavedState();
+  syncSupportMagazineControls();
   updateResults();
   if (isMember) updateSkillReference();
 }
@@ -366,8 +396,9 @@ function shell(): void {
     shell();
     if (hadFocus) app.querySelector<HTMLButtonElement>(`[data-mode="${nextMode}"]`)?.focus();
   }));
+  syncSupportMagazineControls();
   inputValues = new WeakMap();
-  app.querySelectorAll<HTMLInputElement>("input").forEach(input => inputValues.set(input, inputValue(input)));
+  app.querySelectorAll<HTMLInputElement | HTMLSelectElement>("input, select").forEach(input => inputValues.set(input, inputValue(input)));
   app.oninput = syncInputs;
   app.onchange = syncInputs;
   updateResults();
@@ -380,10 +411,17 @@ function saveCurrentInputs(): void {
   const teams = mode === "single" ? ["single"] : ["first", "second"];
   for (const team of teams) {
     membersByTeam[team] = [...app.querySelectorAll<HTMLInputElement>(`[data-member][data-team="${team}"]`)].map((input) => input.value);
+    const previous = optionsByTeam[team];
     optionsByTeam[team] = {
       ...Object.fromEntries([...app.querySelectorAll<HTMLInputElement>(`[data-option][data-team="${team}"]`)].map((input) => [input.dataset.option ?? "", input.checked])),
       ...Object.fromEntries([...app.querySelectorAll<HTMLInputElement>(`[data-option-value][data-team="${team}"]`)].map((input) => [input.dataset.optionValue ?? "", Number(input.value)])),
     };
+    for (const definition of catalog.loadoutOptions.filter(option => option.userInput?.kind === 'support-magazine')) {
+      const levelKey = supportMagazineLevelKey(definition.id);
+      const level = normalizeSupportMagazineLevel(Number(app.querySelector<HTMLSelectElement>(`[data-magazine-level="${definition.id}"][data-team="${team}"]`)?.value));
+      if (optionsByTeam[team][definition.id] === true || level !== 1 || Object.hasOwn(previous, definition.id) || Object.hasOwn(previous, levelKey)) optionsByTeam[team][levelKey] = level;
+      else delete optionsByTeam[team][definition.id];
+    }
   }
   const bossInput = app.querySelector<HTMLInputElement>("#boss-reduction");
   const value = Number(bossInput?.value) / 100;
@@ -410,6 +448,11 @@ function formatResultValue(key: EffectKey, value: number | string, definitions: 
 }
 
 function detailList(result: ReturnType<typeof calculateTeam>): string {
+  const magazineRows = (result.supportMagazineDetails ?? []).map(detail => {
+    const label = catalog.loadoutOptions.find(option => option.id === detail.optionId)?.label ?? detail.optionId;
+    const component = GREEN_CONTROL_BUFF_COMPONENTS[detail.target].label;
+    return `<div class="detail-row"><span>${escapeHtml(label)} Lv.${detail.level} · ${escapeHtml(detail.classCode)}</span><code>${escapeHtml(component)} ${asPercent(detail.baseValue)} → ${asPercent(detail.effectiveValue)}</code><b>+${((detail.effectiveValue - detail.baseValue) * 100).toFixed(1)}%</b></div>`;
+  }).join('');
   const definitions = new Map(catalog.effectTypes.map((definition) => [definition.key, definition]));
   return `<details class="calculation-details"><summary>展開計算明細</summary><div class="detail-grid">${result.breakdown.map((entry) => {
     const inputs = entry.values.filter((value) => value !== 0);
@@ -427,8 +470,45 @@ function detailList(result: ReturnType<typeof calculateTeam>): string {
         : factors;
     }
     return `<div class="detail-row"><span>${escapeHtml(definitions.get(entry.key)?.label ?? entry.key)}</span><code>${escapeHtml(expression)}</code><b>${escapeHtml(formatResultValue(entry.key, entry.result, definitions))}</b></div>`;
-  }).join("")}</div></details>`;
+  }).join("")}${magazineRows}</div></details>`;
 }
+
+type BeneficiaryDefense = { rates: number[]; source: 'loadout' | 'empty' };
+let beneficiary: BeneficiaryDefense | null = null, beneficiaryRaw: string | null | undefined;
+let beneficiaryPending = false, beneficiaryError = '';
+function ensureBeneficiaryDefense(): void {
+  let raw: string | null = null;
+  try { raw = window.localStorage.getItem('dab-loadout-v1'); } catch { /* Missing homepage data means zero equipment ignore. */ }
+  if (beneficiaryPending || raw === beneficiaryRaw) return;
+  beneficiaryRaw = raw; beneficiaryError = '';
+  const moduleUrl = document.querySelector<HTMLMetaElement>('meta[name="beneficiary-defense-url"]')?.content;
+  const dataUrl = document.querySelector<HTMLMetaElement>('meta[name="beneficiary-data-url"]')?.content;
+  if (!raw || !moduleUrl || !dataUrl) { beneficiary = { rates: [0], source: 'empty' }; return; }
+  beneficiary = null; beneficiaryPending = true;
+  const expected = raw;
+  void (async () => {
+    try {
+      const module = await import(new URL(moduleUrl, document.baseURI).href) as { readBeneficiaryDefense(url: string, raw: string): Promise<BeneficiaryDefense> };
+      beneficiary = await module.readBeneficiaryDefense(new URL(dataUrl, document.baseURI).href, expected);
+    } catch { beneficiaryError = '無法取得首頁面板，本項效益目前無法評估。'; }
+    finally { beneficiaryPending = false; updateResults(); }
+  })();
+}
+function beneficiaryDefenseNote(result: ReturnType<typeof calculateTeam>): string {
+  if (!result.defenseIgnoreAdditive) return '';
+  ensureBeneficiaryDefense();
+  const boss = Number(app.querySelector<HTMLInputElement>('#boss-reduction')?.value ?? 0) / 100;
+  let detail = beneficiaryError || '正在讀取首頁面板…';
+  if (beneficiary) {
+    try {
+      const gains = beneficiary.rates.map(rate => calculateBeneficiaryDefenseGain(rate, result.defenseIgnoreAdditive!, result.defenseBreak, boss));
+      detail = `${beneficiary.source === 'empty' ? '無首頁面板，以裝備無視防禦 0% 試算' : '引用傷害計算機配裝的裝備無視防禦 ' + beneficiary.rates.map(asPercent).join('／')}；本項相對提升 ${gains.map(asPercent).join('／')}。`;
+    } catch (error) { detail = error instanceof Error ? error.message : '本項效益無法評估'; }
+  }
+  return `<p class="roster-note">裝備無視防禦加算 +${asPercent(result.defenseIgnoreAdditive)}。${escapeHtml(detail)}此項獨立表示，上方增益未包含此條。</p>`;
+}
+window.addEventListener('storage', event => { if (event.key === 'dab-loadout-v1' || event.key === null) { beneficiaryRaw = undefined; updateResults(); } });
+window.addEventListener('pageshow', () => { if (catalog && beneficiaryRaw !== undefined) updateResults(); });
 
 function damagePanel(title: string, team: string, result: ReturnType<typeof calculateTeam>): string {
   const controlTimes = calculateControlTimes(result.resistanceReduction, catalog.parameters.controlTime);
@@ -453,7 +533,7 @@ function damagePanel(title: string, team: string, result: ReturnType<typeof calc
       ${metric("扛吼／擋傷", supportRankLabel(result.roarBlock))}
       ${metric("消火／解Debuff", supportRankLabel(result.debuffCleanse))}
       ${metric("霸體", supportRankLabel(result.superArmor, "superArmor", catalog.parameters.superArmorRankLabels))}
-    </div></section><details class="control-times"><summary><span>控場時間預估</span><small>查看各類控場秒數</small></summary>
+    </div></section>${beneficiaryDefenseNote(result)}<details class="control-times"><summary><span>控場時間預估</span><small>查看各類控場秒數</small></summary>
       <div class="control-time-grid">${controlTimes.map((entry) => `<div><span>${escapeHtml(entry.label)}</span><strong>${entry.seconds.toFixed(2)} 秒</strong></div>`).join("")}</div>
       <p>各類控場時間 = MIN(${catalog.parameters.controlTime.capSeconds} 秒, ${result.resistanceReduction.toFixed(2)} 點 × ${catalog.parameters.controlTime.secondsPerResistancePoint} × 類別係數)。</p>
     </details>${detailList(result)}
@@ -503,7 +583,7 @@ function updateResults(): void {
 async function start(): Promise<void> {
   catalog = await loadCoreCatalog(new URL("data/", document.baseURI));
   for (const team of ["single", "first", "second"]) {
-    optionsByTeam[team] = Object.fromEntries(catalog.loadoutOptions.map((option) => {
+    optionsByTeam[team] = Object.fromEntries(catalog.loadoutOptions.filter(option => option.userInput?.kind !== 'support-magazine').map((option) => {
       if (option.userInput?.kind === "percentage") {
         return [option.id, Number((catalog.parameters[option.userInput.parameter] * 100).toFixed(6))];
       }

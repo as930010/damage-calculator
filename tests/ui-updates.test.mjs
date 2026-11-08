@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { gameData } from './loadout-evaluation-harness.mjs';
@@ -1306,4 +1307,119 @@ test('canvas completion refreshes stone dependencies while retaining buttons, In
     const alt=document.querySelector('[data-slot-id="inner-lowerwearAlternative"]');document.querySelector('#alternate').checked=false;document.querySelector('#alternate').dispatchEvent(new Event('change'));assert.equal(alt.classList.contains('inactive'),true);assert.equal(alt.dataset.configuration,'empty');assert.equal(alt.querySelector('i'),null);
     const savedAlt=Object.fromEntries(Object.entries(page.readState().values).filter(([f])=>f.includes('SwitchBottom')));document.querySelector('#alternate').checked=true;document.querySelector('#alternate').dispatchEvent(new Event('change'));assert.equal(alt.classList.contains('inactive'),false);assert.deepEqual(Object.fromEntries(Object.entries(page.readState().values).filter(([f])=>f.includes('SwitchBottom'))),savedAlt);
   }finally{page.close();reload?.close();}
+});
+
+test('old team-data snapshots warn without changing loadout/history; only explicit re-import updates damage',async()=>{
+  const buffRoot=new URL('../features/buff-simulator/data/',import.meta.url),payloads={};
+  const names={classes:'classes',classEffects:'class-effects',effectTypes:'effect-types',loadoutOptions:'loadout-options',calculationParameters:'calculation-parameters'};
+  for(const[key,name]of Object.entries(names))payloads[key]=JSON.parse(await readFile(new URL(name+'.json',buffRoot),'utf8'));
+  const raw=JSON.stringify({version:1,mode:'single',membersByTeam:{single:['VI']},optionsByTeam:{single:{}},bossReductions:{single:.7192}});
+  const sourceRuntime=await createRuntime(),{teamRevision}=await sourceRuntime.load('frontend/battle-defense-state.ts');
+  const snapshot={mode:'single',target:'single',rate:.354,sources:['職業：VI'],sourceRevision:teamRevision(raw),dataRevision:'old-data',importedAt:'2026-11-07'};
+  const environment={schemaVersion:1,mode:'team',manualPercentage:'0',sources:[],teamSnapshot:snapshot};
+  let failed=false;const requests=[];const page=await uiPage(stateA,stateA,{storage:{'damage-calculator.battle-defense.v1':JSON.stringify(environment),'buff-team-simulator.state.v1':raw},globals:{fetch:async url=>{
+    const path=new URL(String(url),'https://loadout.test/').pathname;requests.push(path);
+    if(path.includes('/data/game-data'))return{ok:true,json:async()=>gameData};
+    if(failed)throw new Error('offline');
+    if(path.endsWith('asset-manifest.json'))return{ok:true,json:async()=>({data:Object.fromEntries(Object.values(names).map(name=>['data/'+name+'.json','data/'+name+'.current.json']))})};
+    const name=Object.values(names).find(name=>path.endsWith(name+'.current.json'));if(!name)throw new Error('Unexpected '+path);
+    return{ok:true,json:async()=>payloads[Object.keys(names).find(key=>names[key]===name)]};
+  }}});
+  const wait=async check=>{for(let i=0;i<200;i++){if(check())return;await new Promise(r=>setTimeout(r,5));}assert.fail('snapshot notice/import did not settle');};
+  try{const {document,localStorage}=page.dom.window,panel=document.querySelector('#battle-defense-context'),notice=panel.querySelector('.defense-snapshot-status');await wait(()=>notice.textContent.includes('效果資料已有更新'));
+    const stored=localStorage.getItem('damage-calculator.battle-defense.v1'),loadout=localStorage.getItem('dab-loadout-v1'),baseline=localStorage.getItem('dab-baseline-v1'),undo=document.querySelector('#undo').disabled,damage=document.querySelector('#damage-result').textContent;
+    assert.equal(JSON.parse(stored).teamSnapshot.rate,.354);assert.ok(requests.filter(p=>p.includes('buff-simulator')).every(p=>p.endsWith('asset-manifest.json')),'freshness check reads no effect payload');
+    panel.open=true;panel.querySelector('[data-defense-import]').click();await wait(()=>panel.querySelector('.defense-import-status:not(.defense-snapshot-status)').textContent.includes('已引用'));
+    const updated=JSON.parse(localStorage.getItem('damage-calculator.battle-defense.v1'));assert.notEqual(updated.teamSnapshot.rate,.354);assert.match(updated.teamSnapshot.dataRevision,/class-effects.current.json/);assert.equal(notice.textContent,'');assert.notEqual(document.querySelector('#damage-result').textContent,damage);
+    assert.equal(localStorage.getItem('dab-loadout-v1'),loadout);assert.equal(localStorage.getItem('dab-baseline-v1'),baseline);assert.equal(document.querySelector('#undo').disabled,undo);
+    failed=true;page.dom.window.dispatchEvent(new page.dom.window.Event('focus'));await wait(()=>notice.textContent.includes('無法確認'));assert.equal(localStorage.getItem('damage-calculator.battle-defense.v1'),JSON.stringify(updated));
+    failed=false;page.dom.window.dispatchEvent(new page.dom.window.Event('focus'));await wait(()=>notice.textContent==='');
+  }finally{page.close();}
+});
+
+test('LA snapshot summary and damage update together; switching away removes additive without editing gear/history',async()=>{
+  const env={schemaVersion:1,mode:'team',manualPercentage:'91.5',sources:[{id:'one',name:'',percentage:'91.5'}],
+    teamSnapshot:{mode:'single',target:'single',rate:.915,sources:['break'],sourceRevision:'x',dataRevision:'x',importedAt:'2026-11-08',defenseIgnoreAdditive:.05,defenseIgnoreSources:['職業：LA']}};
+  const page=await uiPage(stateA,stateA,{storage:{'damage-calculator.battle-defense.v1':JSON.stringify(env)}});
+  try{const{document,localStorage}=page.dom.window,panel=document.querySelector('#battle-defense-context'),before=document.querySelector('#damage-result').textContent;
+    assert.match(panel.querySelector('.defense-additive-info').textContent,/隊伍無視防禦加算 5%/);assert.doesNotMatch(panel.querySelector('.defense-additive-info').textContent,/職業：LA|[（）]/);
+    const gear=localStorage.getItem('dab-loadout-v1'),baseline=localStorage.getItem('dab-baseline-v1'),undo=document.querySelector('#undo').disabled;
+    panel.querySelector('[data-defense-mode="manual"]').click();const manual=document.querySelector('#damage-result').textContent;assert.notEqual(manual,before);assert.equal(panel.querySelector('.defense-additive-info').textContent,'');
+    panel.querySelector('[data-defense-mode="sources"]').click();assert.equal(document.querySelector('#damage-result').textContent,manual);
+    panel.querySelector('[data-defense-mode="team"]').click();assert.equal(document.querySelector('#damage-result').textContent,before);
+    assert.equal(localStorage.getItem('dab-loadout-v1'),gear);assert.equal(localStorage.getItem('dab-baseline-v1'),baseline);assert.equal(document.querySelector('#undo').disabled,undo);
+  }finally{page.close();}
+});
+
+async function referenceTestPage({savedMode='single',single=['LA'],first=['LA'],second=['IM'],snapshot=null,fetchGate}={}) {
+  const names={classes:'classes',classEffects:'class-effects',effectTypes:'effect-types',loadoutOptions:'loadout-options',calculationParameters:'calculation-parameters'};
+  const payloads=Object.fromEntries(await Promise.all(Object.values(names).map(async name=>[name,JSON.parse(await readFile(new URL('../features/buff-simulator/data/'+name+'.json',import.meta.url),'utf8'))])));
+  const options=Object.fromEntries(payloads['loadout-options'].filter(o=>o.userInput?.kind!=='percentage').map(o=>[o.id,false]));
+  const saved={version:1,mode:savedMode,membersByTeam:{single,first,second},optionsByTeam:{single:options,first:options,second:options},bossReductions:{single:.7192,challenge:.9601}};
+  const env={schemaVersion:1,mode:'team',manualPercentage:'0',sources:[],teamSnapshot:snapshot};
+  const page=await uiPage(stateA,stateA,{storage:{'damage-calculator.battle-defense.v1':JSON.stringify(env),'buff-team-simulator.state.v1':JSON.stringify(saved)},globals:{fetch:async url=>{
+    const path=new URL(String(url),'https://loadout.test/').pathname;
+    if(path.includes('/data/game-data'))return{ok:true,json:async()=>gameData};
+    if(path.endsWith('asset-manifest.json'))return{ok:true,json:async()=>({data:Object.fromEntries(Object.values(names).map(name=>['data/'+name+'.json','data/'+name+'.current.json']))})};
+    const name=Object.values(names).find(n=>path.endsWith(n+'.current.json'));if(!name)throw new Error('Unexpected '+path);
+    if(fetchGate)await fetchGate(name);
+    return{ok:true,json:async()=>payloads[name]};
+  }}});
+  page.referenceSaved=saved;return page;
+}
+const waitForReference=async (check,detail=()=> '')=>{for(let i=0;i<200;i++){if(check())return;await new Promise(r=>setTimeout(r,5));}assert.fail('reference request did not settle: '+detail());};
+
+test('Reference mode is independent of last Buff mode; only explicit import changes snapshots and LA',async()=>{
+  const page=await referenceTestPage();try{
+    const {document,localStorage,Event,KeyboardEvent}=page.dom.window,panel=document.querySelector('#battle-defense-context');panel.open=true;
+    const snapshot=()=>JSON.parse(localStorage.getItem('damage-calculator.battle-defense.v1')).teamSnapshot;
+    const status=panel.querySelector('.defense-import-status:not(.defense-snapshot-status)'),importButton=panel.querySelector('[data-defense-import]'),target=panel.querySelector('.defense-target select'),manual=panel.querySelector('[data-defense-manual]');
+    const importNow=async()=>{importButton.click();await waitForReference(()=>!importButton.disabled&&status.textContent.includes('已引用'));};
+    assert.equal(panel.querySelector('[data-reference-mode="single"]').getAttribute('aria-selected'),'true');
+    const gear=localStorage.getItem('dab-loadout-v1'),baseline=localStorage.getItem('dab-baseline-v1'),saved=localStorage.getItem('buff-team-simulator.state.v1'),undo=document.querySelector('#undo').disabled;
+    await importNow();assert.equal(snapshot().mode,'single');assert.equal(snapshot().defenseIgnoreAdditive,.05);assert.deepEqual(snapshot().defenseIgnoreSources,['職業：LA']);assert.ok(snapshot().sourceIds.length);
+    assert.doesNotMatch(panel.querySelector('.defense-additive-info').textContent,/[（）]|職業/);
+    const before=JSON.stringify(snapshot()),damage=document.querySelector('#damage-result').textContent;
+    panel.querySelector('[data-reference-mode="single"]').dispatchEvent(new KeyboardEvent('keydown',{key:'End',bubbles:true,cancelable:true}));
+    assert.equal(document.activeElement,panel.querySelector('[data-reference-mode="challenge"]'));assert.equal(target.parentElement.hidden,false);
+    target.value='secondTeam';target.dispatchEvent(new Event('change',{bubbles:true}));
+    assert.match(panel.querySelector('.defense-reference-status').textContent,/準備引用：挑戰雙隊配置 · 第二隊/);assert.match(panel.querySelector('.defense-team-info').textContent,/已引用：單隊配置/);
+    assert.equal(JSON.stringify(snapshot()),before);assert.equal(document.querySelector('#damage-result').textContent,damage);
+    await importNow();assert.equal(snapshot().mode,'challenge');assert.equal(snapshot().target,'secondTeam');assert.ok(Math.abs(snapshot().rate-.15)<1e-12,'the existing background defense source remains active');assert.equal(snapshot().defenseIgnoreAdditive,0);assert.deepEqual(snapshot().defenseIgnoreSources,[]);
+    for(const value of['firstTeam','sharedArena']){target.value=value;target.dispatchEvent(new Event('change',{bubbles:true}));await importNow();assert.equal(snapshot().target,value);assert.equal(snapshot().defenseIgnoreAdditive,.05);}
+    // The simulator last mode can now be challenge; the independent single control still works.
+    const changed={...page.referenceSaved,mode:'challenge'};localStorage.setItem('buff-team-simulator.state.v1',JSON.stringify(changed));page.dom.window.dispatchEvent(new page.dom.window.StorageEvent('storage',{key:'buff-team-simulator.state.v1'}));
+    const active=JSON.stringify(snapshot());panel.querySelector('[data-reference-mode="single"]').click();assert.equal(JSON.stringify(snapshot()),active);await importNow();assert.equal(snapshot().mode,'single');
+    assert.equal(localStorage.getItem('buff-team-simulator.state.v1'),JSON.stringify(changed));assert.equal(JSON.parse(saved).mode,'single');
+    assert.equal(localStorage.getItem('dab-loadout-v1'),gear);assert.equal(localStorage.getItem('dab-baseline-v1'),baseline);assert.equal(document.querySelector('#undo').disabled,undo);assert.equal(panel.querySelector('[data-defense-manual]'),manual);
+  }finally{page.close();}
+});
+test('Snapshot selection restores before last mode; missing sources preserve snapshot until explicit valid import',async()=>{
+  const old={mode:'challenge',target:'secondTeam',rate:.2,sources:['retained'],sourceIds:['retained-id'],sourceRevision:'old',dataRevision:'old',importedAt:'2026-11-08',defenseIgnoreAdditive:.05,defenseIgnoreSources:['職業：LA']};
+  const page=await referenceTestPage({snapshot:old,single:[],second:[]});try{
+    const{document,localStorage,Event}=page.dom.window,panel=document.querySelector('#battle-defense-context');panel.open=true;
+    const target=panel.querySelector('.defense-target select'),status=panel.querySelector('.defense-import-status:not(.defense-snapshot-status)'),button=panel.querySelector('[data-defense-import]'),stored=localStorage.getItem('damage-calculator.battle-defense.v1');
+    assert.equal(panel.querySelector('[data-reference-mode="challenge"]').getAttribute('aria-selected'),'true');assert.equal(target.value,'secondTeam');
+    await waitForReference(()=>panel.querySelector('.defense-snapshot-status').textContent.includes('效果資料已有更新'));
+    button.click();await waitForReference(()=>!button.disabled&&status.textContent.includes('第二隊配置'),()=>status.textContent);assert.equal(localStorage.getItem('damage-calculator.battle-defense.v1'),stored);
+    panel.querySelector('[data-reference-mode="single"]').click();assert.match(panel.querySelector('.defense-reference-status').textContent,/目前尚無已保存的單隊配置/);
+    button.click();await waitForReference(()=>!button.disabled&&status.textContent.includes('單隊配置'));assert.equal(localStorage.getItem('damage-calculator.battle-defense.v1'),stored);
+    const updated={...page.referenceSaved,membersByTeam:{single:['IM'],first:[],second:[]}};localStorage.setItem('buff-team-simulator.state.v1',JSON.stringify(updated));page.dom.window.dispatchEvent(new page.dom.window.StorageEvent('storage',{key:'buff-team-simulator.state.v1'}));
+    assert.match(panel.querySelector('.defense-snapshot-status').textContent,/已有更新/);assert.equal(localStorage.getItem('damage-calculator.battle-defense.v1'),stored);
+    button.click();await waitForReference(()=>!button.disabled&&status.textContent.includes('已引用'));const snapshot=JSON.parse(localStorage.getItem('damage-calculator.battle-defense.v1')).teamSnapshot;
+    assert.equal(snapshot.mode,'single');assert.ok(Math.abs(snapshot.rate-.15)<1e-12,'preserve the fixed background break source');assert.equal(snapshot.defenseIgnoreAdditive,0);assert.deepEqual(snapshot.defenseIgnoreSources,[]);
+    panel.querySelector('[data-reference-mode="challenge"]').click();assert.match(panel.querySelector('.defense-reference-status').textContent,/目前尚無已保存的挑戰雙隊配置/);
+    target.value='sharedArena';target.dispatchEvent(new Event('change',{bubbles:true}));const valid=localStorage.getItem('damage-calculator.battle-defense.v1');button.click();await waitForReference(()=>!button.disabled&&status.textContent.includes('挑戰雙隊配置'));assert.equal(localStorage.getItem('damage-calculator.battle-defense.v1'),valid);
+  }finally{page.close();}
+});
+test('Switching reference mode cancels an in-flight import without touching the active environment',async()=>{
+  let release,requested=false;const gate=new Promise(resolve=>release=resolve);
+  const page=await referenceTestPage({fetchGate:async name=>{if(name==='class-effects'){requested=true;await gate;}}});
+  try{const{document,localStorage,Event}=page.dom.window,panel=document.querySelector('#battle-defense-context'),button=panel.querySelector('[data-defense-import]');
+    const before=localStorage.getItem('damage-calculator.battle-defense.v1');button.click();await waitForReference(()=>requested);
+    panel.querySelector('[data-reference-mode="challenge"]').click();const target=panel.querySelector('.defense-target select');target.value='secondTeam';target.dispatchEvent(new Event('change',{bubbles:true}));release();
+    await new Promise(r=>setTimeout(r,30));assert.equal(localStorage.getItem('damage-calculator.battle-defense.v1'),before);assert.equal(button.disabled,false);
+    button.click();await waitForReference(()=>!button.disabled&&panel.querySelector('.defense-import-status:not(.defense-snapshot-status)').textContent.includes('已引用'));
+    assert.equal(JSON.parse(localStorage.getItem('damage-calculator.battle-defense.v1')).teamSnapshot.target,'secondTeam');
+  }finally{release();page.close();}
 });

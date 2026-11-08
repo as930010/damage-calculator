@@ -12,8 +12,9 @@ import { iceSeriesOrder, requiredIceSetNames, snapshotIceSearchConstraints } fro
 import type { IceSearchConstraints } from './search-policy.ts';
 
 const battleDefense = createBattleDefenseStore(window);
-const projectDamage = (data: GameData, state: LoadoutState) => projectDamageBase(data, state, battleDefense.rate);
+const projectDamage = (data: GameData, state: LoadoutState) => projectDamageBase(data, state, battleDefense.rate, battleDefense.defenseIgnoreAdditive);
 let searchDefenseRate: number | null = 0;
+let searchDefenseAdditive: number | null = 0;
 const savedStateKey = 'dab-loadout-v1';
 const savedSearchKey = 'dab-ice-optimizer-result-v1';
 const conditionsKey = 'dab-ice-optimizer-conditions-v1';
@@ -62,7 +63,7 @@ const dataRevision = () => {
   return path.split('/').pop() ?? '';
 };
 const workerUrl = () => document.querySelector<HTMLMetaElement>('meta[name="optimizer-worker-url"]')?.content ?? '';
-const searchRevision = () => `${dataRevision()}|${workerUrl()}|defense:${battleDefense.rate}`;
+const searchRevision = () => `${dataRevision()}|${workerUrl()}|defense:${battleDefense.rate}${battleDefense.defenseIgnoreAdditive ? "|ignore:" + battleDefense.defenseIgnoreAdditive : ""}`;
 const setRunning = (running: boolean) => {
   if (running && startButton.dataset.searchState !== 'running') setStartState('running');
   else if (!running && startButton.dataset.searchState === 'running') setStartState('idle');
@@ -366,7 +367,7 @@ function renderResults(data: GameData,
       apply.textContent = text;
       resultControlKeys.set(apply, [outfitUiKey(alternative)]);
       apply.addEventListener('click', () => {
-        if (!resultValid || !searchBaseRaw || readSavedRaw() !== searchBaseRaw || battleDefense.rate !== searchDefenseRate) {
+        if (!resultValid || !searchBaseRaw || readSavedRaw() !== searchBaseRaw || battleDefense.rate !== searchDefenseRate || battleDefense.defenseIgnoreAdditive !== searchDefenseAdditive) {
           status.textContent = '主頁配裝已變更；請重新搜尋後再套用。';
           return;
         }
@@ -380,7 +381,7 @@ function renderResults(data: GameData,
           stageIceOptimizerHandoff({
             format: 'ice-optimizer-selection', version: 1,
             baseRaw: searchBaseRaw, dataRevision: dataRevision(),
-            choices: alternative.choices, setNames: alternative.setNames, expectedDamage: alternative.damage, externalDefenseBreakRate: searchDefenseRate ?? 0,
+            choices: alternative.choices, setNames: alternative.setNames, expectedDamage: alternative.damage, externalDefenseBreakRate: searchDefenseRate ?? 0, defenseIgnoreAdditive: searchDefenseAdditive ?? 0,
           });
           location.assign('../');
         } catch {
@@ -530,7 +531,7 @@ function startSearch() {
     return;
   }
   if (battleDefense.rate === null) { status.textContent = '戰鬥破防設定尚未完成，請先完成設定。'; return; }
-  searchDefenseRate = battleDefense.rate;
+  searchDefenseRate = battleDefense.rate; searchDefenseAdditive = battleDefense.defenseIgnoreAdditive;
   searchBaseRaw = raw;
   searchBaseState = state;
   resultValid = true;
@@ -584,7 +585,7 @@ function startSearch() {
       stopWorker();
       status.textContent = '搜尋背景程式無法載入或執行，請重新整理後重試。';
     });
-    current.postMessage({ type: 'start', searchId, data: gameData, state, constraints: searchConditions, externalDefenseBreakRate: searchDefenseRate });
+    current.postMessage({ type: 'start', searchId, data: gameData, state, constraints: searchConditions, externalDefenseBreakRate: searchDefenseRate, defenseIgnoreAdditive: searchDefenseAdditive });
   } catch {
     stopWorker();
     status.textContent = '無法啟動背景搜尋；原配裝未變更。';
@@ -680,7 +681,7 @@ loadGameData().then(data => {
             saved.result!.candidatePolicy, saved.baseState!.values)))) {
       searchBaseRaw = saved.baseRaw;
       searchBaseState = saved.baseState;
-      searchDefenseRate = battleDefense.rate;
+      searchDefenseRate = battleDefense.rate; searchDefenseAdditive = battleDefense.defenseIgnoreAdditive;
       resultValid = raw === saved.baseRaw;
       renderResults(data, saved.result, saved.baseState);
       progress.textContent = `完整傷害計算 ${formatNumber(saved.result.evaluated)} 次；已搜尋次數 ${formatNumber(saved.result.budgetUsed ?? 0)} / ${saved.result.hybrid ? '100,000' : '50,000'}；比較基準傷害 ${formatNumber(saved.result.baselineDamage)}。`;

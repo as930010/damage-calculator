@@ -386,7 +386,7 @@ function damageInputs(data: GameData, state: LoadoutState, attributes: Character
 }
 
 /** One source preparation and one ordered attribute evaluation for all result views. */
-export function evaluateLoadout(data: GameData, state: LoadoutState, includeFallbackRates = true, includeComparisonInput = false, externalDefenseBreakRate: number | null = 0) {
+export function evaluateLoadout(data: GameData, state: LoadoutState, includeFallbackRates = true, includeComparisonInput = false, externalDefenseBreakRate: number | null = 0, defenseIgnoreAdditive: number | null = 0) {
   let sources: ReturnType<typeof resolveLoadoutSources>;
   let preparation: ReturnType<typeof prepareLoadoutAttributes>;
   try {
@@ -398,8 +398,8 @@ export function evaluateLoadout(data: GameData, state: LoadoutState, includeFall
   let damageError: unknown;
   let combatRates: ReturnType<typeof calculateLoadoutCombatRates> | null = null;
   try {
-    if (externalDefenseBreakRate === null) throw new Error('戰鬥破防設定尚未完成或包含非法數值。');
-    const input = { ...damageInputs(data, state, preparation.attributes, sources), externalDefenseBreakRate };
+    if (externalDefenseBreakRate === null || defenseIgnoreAdditive === null) throw new Error('戰鬥破防設定尚未完成或包含非法數值。');
+    const input = { ...damageInputs(data, state, preparation.attributes, sources), externalDefenseBreakRate, defenseIgnoreAdditive };
     const evaluation = evaluatePreparedLoadout(input, preparation);
     if (evaluation.result) {
       const result = evaluation.result;
@@ -419,8 +419,8 @@ export function evaluateLoadout(data: GameData, state: LoadoutState, includeFall
 }
 
 /** Full formula path; keep the existing throwing API for external callers. */
-export function projectDamage(data: GameData, state: LoadoutState, externalDefenseBreakRate: number | null = 0) {
-  const evaluation = evaluateLoadout(data, state, false, false, externalDefenseBreakRate);
+export function projectDamage(data: GameData, state: LoadoutState, externalDefenseBreakRate: number | null = 0, defenseIgnoreAdditive: number | null = 0) {
+  const evaluation = evaluateLoadout(data, state, false, false, externalDefenseBreakRate, defenseIgnoreAdditive);
   if (!evaluation.damage) throw evaluation.damageError;
   return evaluation.damage;
 }

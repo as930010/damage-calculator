@@ -70,7 +70,8 @@ export function calculateFinalDamage(input: FinalDamageInput): FinalDamageResult
     ratio(input.superAdaptabilityPct);
   const equipmentRate = ratio(input.defenseIgnorePct);
   const externalRate = input.externalDefenseBreakRate ?? 0;
-  const effectiveRate = combineDefenseRates(equipmentRate, externalRate);
+  const defenseIgnoreAdditive = input.defenseIgnoreAdditive ?? 0;
+  const effectiveRate = combineDefenseRates(equipmentRate, externalRate, defenseIgnoreAdditive);
   const bossDefenseRate = requireDefenseRate(ratio(input.enemyDefensePct), 'Boss 防禦');
   const defenseDenominator = 1 - bossDefenseRate * effectiveRate;
   if (defenseDenominator === 0) {
@@ -110,7 +111,8 @@ export function calculateFinalDamage(input: FinalDamageInput): FinalDamageResult
     conditionalFactor,
     adaptationFactor,
     defenseFactor,
-    ...(externalRate === 0 ? {} : { defenseContext: { equipmentRate, externalRate, effectiveRate, bossDefenseRate } }),
+    ...(externalRate === 0 && defenseIgnoreAdditive === 0 ? {} : { defenseContext: { equipmentRate, externalRate, effectiveRate, bossDefenseRate,
+      ...(defenseIgnoreAdditive === 0 ? {} : { defenseIgnoreAdditive, adjustedEquipmentRate: equipmentRate + defenseIgnoreAdditive }) } }),
     finalDamage,
   };
 }

@@ -768,12 +768,6 @@
           "icon": "skill-icons/VI-03.png"
         },
         {
-          "name": "猛虎4式:怒濤",
-          "category": "DeBuff",
-          "description": "每打擊33%機率使敵方5秒間防禦 -33%",
-          "icon": "skill-icons/VI-04.png"
-        },
-        {
           "name": "槍術的極致(被動)",
           "category": "DeBuff",
           "description": "指令/主動技能/特殊主動技能打擊時\n敵方5秒間防禦 -5%\n所受傷害 +12%",
@@ -1067,13 +1061,13 @@
         {
           "name": "原野力量",
           "category": "Buff",
-          "description": "我方\n物理攻擊 +11.5%\n所受傷害 -13.8%",
+          "description": "我方\n攻擊力 +11.5%\n所受傷害 -13.8%",
           "icon": "skill-icons/DN-03.png"
         },
         {
           "name": "原野力量(轉換)",
           "category": "Buff",
-          "description": "我方\n物理攻擊、致命傷害 +9.2%\n覺醒回復速度 +34.5%",
+          "description": "我方\n攻擊力、致命傷害 +9.2%\n覺醒回復速度 +34.5%",
           "icon": "skill-icons/DN-04.png"
         }
       ]

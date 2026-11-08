@@ -28,11 +28,11 @@ export function createBaselineEvaluationCache() {
     evaluation: ReturnType<typeof evaluateLoadout> } | undefined;
   return {
     clear() { last = undefined; },
-    get(data: GameData, baseline: LoadoutState | null, revision: unknown, externalDefenseBreakRate: number | null = 0) {
+    get(data: GameData, baseline: LoadoutState | null, revision: unknown, externalDefenseBreakRate: number | null = 0, defenseIgnoreAdditive: number | null = 0) {
       if (!baseline) { last = undefined; return null; }
-      const key = inputKey([baseline, externalDefenseBreakRate]);
+      const key = inputKey([baseline, externalDefenseBreakRate, defenseIgnoreAdditive]);
       if (!last || last.data !== data || last.revision !== revision || last.key !== key) {
-        const evaluation = freezeSnapshot(structuredClone(evaluateLoadout(data, baseline, false, false, externalDefenseBreakRate)));
+        const evaluation = freezeSnapshot(structuredClone(evaluateLoadout(data, baseline, false, false, externalDefenseBreakRate, defenseIgnoreAdditive)));
         last = { data, revision, key, evaluation };
       }
       return last.evaluation;

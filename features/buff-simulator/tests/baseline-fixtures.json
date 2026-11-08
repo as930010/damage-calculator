@@ -266,7 +266,7 @@
       }
     ],
     "resultHtmlHash": "03ace45205675450a6208ee68c836a5a7ae44b924ba1348b7924ce11b4c1ae62",
-    "skillHtmlHash": "cdefb959a074877b20de7141dc3062b262951eb764bab20e532d964b9b379d99",
+    "skillHtmlHash": "45116734789553de16a5b9d6be04ffbf38e781ce4b99b67c6bb0192caeaeb64f",
     "saved": null
   },
   "configuredSingle": {
@@ -286,7 +286,7 @@
         "cooldownAcceleration": 0.19999999999999996,
         "cooldownReductionSeconds": 0,
         "resistanceReduction": 550,
-        "mpRecoveryPerSecond": 1.0986250000000002,
+        "mpRecoveryPerSecond": 0.22249999999999992,
         "actionSpeedMultiplicative": 0.4,
         "actionSpeedDiminishing": 0,
         "roarBlock": "none",
@@ -449,7 +449,7 @@
             "key": "mpRecoveryPerSecond",
             "values": [
               0.01875,
-              1.06,
+              0.2,
               0,
               0,
               0,
@@ -462,7 +462,7 @@
               0
             ],
             "aggregation": "multiply",
-            "result": 1.0986250000000002
+            "result": 0.22249999999999992
           },
           {
             "key": "actionSpeedMultiplicative",
@@ -563,7 +563,7 @@
         "ignoredClassIds": []
       }
     ],
-    "resultHtmlHash": "dea9be9bbe95b5d77784e9b480babb182654e2fad6244230f7fc1a79c47eeb40",
+    "resultHtmlHash": "4b64d3a70e210b7752f66d101d8a58d9666f43720b2301008a52c5a77e48e822",
     "skillHtmlHash": "bebc80cc76fbe671cff04048b1b4a0369caa6aef0edee70fa9422558cb388848",
     "saved": {
       "version": 1,
@@ -648,7 +648,7 @@
         "cooldownAcceleration": 0.19999999999999996,
         "cooldownReductionSeconds": 0,
         "resistanceReduction": 550,
-        "mpRecoveryPerSecond": 0.19999999999999996,
+        "mpRecoveryPerSecond": 0.22249999999999992,
         "actionSpeedMultiplicative": 0.2584000000000002,
         "actionSpeedDiminishing": 0,
         "roarBlock": "none",
@@ -810,7 +810,7 @@
           {
             "key": "mpRecoveryPerSecond",
             "values": [
-              0,
+              0.01875,
               0.2,
               0,
               0,
@@ -824,7 +824,7 @@
               0
             ],
             "aggregation": "multiply",
-            "result": 0.19999999999999996
+            "result": 0.22249999999999992
           },
           {
             "key": "actionSpeedMultiplicative",
@@ -1218,7 +1218,7 @@
         "cooldownAcceleration": 0.19999999999999996,
         "cooldownReductionSeconds": 0,
         "resistanceReduction": 550,
-        "mpRecoveryPerSecond": 0.19999999999999996,
+        "mpRecoveryPerSecond": 0.22249999999999992,
         "actionSpeedMultiplicative": 0.2584000000000002,
         "actionSpeedDiminishing": 0,
         "roarBlock": "none",
@@ -1380,7 +1380,7 @@
           {
             "key": "mpRecoveryPerSecond",
             "values": [
-              0,
+              0.01875,
               0.2,
               0,
               0,
@@ -1394,7 +1394,7 @@
               0
             ],
             "aggregation": "multiply",
-            "result": 0.19999999999999996
+            "result": 0.22249999999999992
           },
           {
             "key": "actionSpeedMultiplicative",
@@ -1498,7 +1498,7 @@
         ]
       }
     ],
-    "resultHtmlHash": "d655b2aee4699886b092381862935a7014e4fda42e278f2bb582c51b81da1208",
+    "resultHtmlHash": "9f864e4c6d2ec76faf18e3d9c3313abdc76b874f316ad2a8ecf4fd6d04091fc5",
     "skillHtmlHash": "4244d347670560bfe3731b4ce74ac66de50aab98622f5ac236e1ff0aecd5487f",
     "saved": {
       "version": 1,
@@ -1564,7 +1564,7 @@
   "invalidInputs": {
     "results": [],
     "resultHtmlHash": "1b123be7e6bdddadc6859c51663bdb40ca296fae66b3a3880fa389daab53477f",
-    "skillHtmlHash": "cdefb959a074877b20de7141dc3062b262951eb764bab20e532d964b9b379d99",
+    "skillHtmlHash": "45116734789553de16a5b9d6be04ffbf38e781ce4b99b67c6bb0192caeaeb64f",
     "saved": {
       "version": 1,
       "mode": "single",

@@ -257,3 +257,19 @@ test('即時排名、取消、過期訊息及套用要求均使用同一份搜�
     assert.equal(document.querySelector('#optimizer-results').childElementCount, 0);
   } finally { dom.window.close(); }
 });
+
+test('LA additive ignore is captured by Worker and invalidates running search when only additive changes',async()=>{
+  const html=(await readFile(new URL('../index.html',import.meta.url),'utf8')).replace('__OPTIMIZER_GAME_DATA_URL__','../data/game-data.test.json').replace('__OPTIMIZER_WORKER_URL__','../assets/worker.test.js');
+  const dom=new JSDOM(html,{url:'https://optimizer.test/damage-calculator/ice-optimizer/'});
+  dom.window.localStorage.setItem('dab-loadout-v1',JSON.stringify(iceScenario(gameData,sample,17)));
+  const key='damage-calculator.battle-defense.v1',snapshot={mode:'single',target:'single',rate:.915,sources:[],sourceRevision:'x',dataRevision:'x',importedAt:'2026-11-08',defenseIgnoreAdditive:.05,defenseIgnoreSources:['職業：LA']};
+  const env={schemaVersion:1,mode:'team',manualPercentage:'0',sources:[],teamSnapshot:snapshot};
+  dom.window.localStorage.setItem(key,JSON.stringify(env));
+  const workers=[];class Worker{constructor(){workers.push(this);}addEventListener(){}postMessage(request){this.request=request;}terminate(){this.terminated=true;}}
+  const runtime=await createRuntime({dom,instrument:false,globals:{Worker,sessionStorage:dom.window.sessionStorage,location:{href:dom.window.location.href,assign(){}},fetch:async()=>({ok:true,json:async()=>structuredClone(gameData)})}});
+  try{await runtime.load('features/ice-optimizer/frontend/main.ts');await new Promise(r=>setTimeout(r,0));
+    dom.window.document.querySelector('#optimizer-start').click();assert.equal(workers.at(-1).request.defenseIgnoreAdditive,.05);assert.equal(workers.at(-1).request.externalDefenseBreakRate,.915);
+    const running=workers.at(-1);env.teamSnapshot.defenseIgnoreAdditive=0;dom.window.localStorage.setItem(key,JSON.stringify(env));dom.window.dispatchEvent(new dom.window.StorageEvent('storage',{key}));
+    assert.equal(running.terminated,true);dom.window.document.querySelector('#optimizer-start').click();assert.equal(workers.at(-1).request.defenseIgnoreAdditive,0);
+  }finally{dom.window.close();}
+});

@@ -227,6 +227,8 @@ export interface FinalDamageInput {
   defenseIgnorePct: number;
   /** Independent external battle effects, as a fraction. */
   externalDefenseBreakRate?: number;
+  /** Team additive ignore, a fraction added to the equipment group. */
+  defenseIgnoreAdditive?: number;
 }
 
 export interface FinalDamageResult {
@@ -243,6 +245,6 @@ export interface FinalDamageResult {
   conditionalFactor: number;
   adaptationFactor: number;
   defenseFactor: number;
-  defenseContext?: { equipmentRate: number; externalRate: number; effectiveRate: number; bossDefenseRate: number };
+  defenseContext?: { equipmentRate: number; defenseIgnoreAdditive?: number; adjustedEquipmentRate?: number; externalRate: number; effectiveRate: number; bossDefenseRate: number };
   finalDamage: number;
 }

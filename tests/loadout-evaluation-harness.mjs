@@ -19,7 +19,7 @@ export async function createRuntime({ dom, sourceReader, transformSource, global
     __count: (name, amount = 1) => { counts[name] = (counts[name] ?? 0) + amount; }, ...extraGlobals };
   if (dom) {
     for (const name of ['window', 'document', 'location', 'localStorage', 'navigator', 'HTMLElement',
-      'HTMLInputElement', 'HTMLSelectElement', 'HTMLTextAreaElement', 'HTMLDetailsElement', 'Element',
+      'HTMLInputElement', 'Option', 'HTMLSelectElement', 'HTMLTextAreaElement', 'HTMLDetailsElement', 'Element',
       'Node', 'Event', 'KeyboardEvent', 'MouseEvent', 'File', 'Blob']) globals[name] = dom.window[name];
     globals.requestAnimationFrame = callback => setTimeout(callback, 0);
     globals.cancelAnimationFrame = clearTimeout;

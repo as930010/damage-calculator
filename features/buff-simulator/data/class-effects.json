@@ -1,1481 +1,627 @@
-[
-  {
-    "classId": "ke",
-    "code": "KE",
-    "mode": "single",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.2,
-      "shield": 0.2,
-      "attackReduction": -0.12,
-      "superArmor": 1
-    },
-    "estimatedDamageScore": 0.38472042146034036
-  },
-  {
-    "classId": "rm",
-    "code": "RM",
-    "mode": "single",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.2,
-      "resistanceReduction": 220
-    },
-    "estimatedDamageScore": 0.38472042146034036
-  },
-  {
-    "classId": "im",
-    "code": "IM",
-    "mode": "single",
-    "effects": {
-      "debuff": 0.2
-    },
-    "estimatedDamageScore": 0.19999999999999996
-  },
-  {
-    "classId": "ge",
-    "code": "GE",
-    "mode": "single",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.2,
-      "shield": 0.08,
-      "resistanceReduction": 130
-    },
-    "estimatedDamageScore": 0.38472042146034036
-  },
-  {
-    "classId": "as",
-    "code": "AS",
-    "mode": "single",
-    "effects": {
-      "buff": 0.2
-    },
-    "estimatedDamageScore": 0.19999999999999996
-  },
-  {
-    "classId": "oz",
-    "code": "OZ",
-    "mode": "single",
-    "effects": {
-      "buff": 0.12,
-      "defenseBreak": 0.2,
-      "attackReduction": 0.2,
-      "resistanceReduction": 195,
-      "mpRecoveryPerSecond": 0.08571428571428572,
-      "actionSpeedMultiplicative": 0.1
-    },
-    "estimatedDamageScore": 0.38472042146034036
-  },
-  {
-    "classId": "mm",
-    "code": "MM",
-    "mode": "single",
-    "effects": {
-      "buff": 0.12,
-      "defenseBreak": 0.20999999999999996
-    },
-    "estimatedDamageScore": 0.40128058155559
-  },
-  {
-    "classId": "la",
-    "code": "LA",
-    "mode": "single",
-    "effects": {
-      "buff": 0.12837981914893626,
-      "debuff": 0.05,
-      "defenseBreak": 0.1,
-      "shield": 0.31999999999999995,
-      "mpRecoveryPerSecond": 0.02222222222,
-      "actionSpeedMultiplicative": 0.05,
-      "superArmor": 1
-    },
-    "estimatedDamageScore": 0.3100185502697217
-  },
-  {
-    "classId": "an",
-    "code": "AN",
-    "mode": "single",
-    "effects": {
-      "buff": 0.12,
-      "defenseBreak": 0.195,
-      "mpRecoveryPerSecond": 0.06875,
-      "actionSpeedMultiplicative": 0.15
-    },
-    "estimatedDamageScore": 0.37658625863528594
-  },
-  {
-    "classId": "dab",
-    "code": "DaB",
-    "mode": "single",
-    "effects": {
-      "debuff": 0.2100000000000002,
-      "mpRecoveryPerSecond": 0.01875
-    },
-    "estimatedDamageScore": 0.2100000000000002
-  },
-  {
-    "classId": "tw",
-    "code": "TW",
-    "mode": "single",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.2,
-      "shield": 0.2,
-      "mpRecoveryPerSecond": 0.01875,
-      "roarBlock": 1
-    },
-    "estimatedDamageScore": 0.38472042146034036
-  },
-  {
-    "classId": "pr",
-    "code": "PR",
-    "mode": "single",
-    "effects": {
-      "buff": 0.2225722727,
-      "defenseBreak": 0.1,
-      "shield": 0.15039999999999998,
-      "mpRecoveryPerSecond": 0.041477272727272724,
-      "actionSpeedDiminishing": 0.1,
-      "debuffCleanse": 1,
-      "superArmor": 1
-    },
-    "estimatedDamageScore": 0.3517842377
-  },
-  {
-    "classId": "fb",
-    "code": "FB",
-    "mode": "single",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.195
-    },
-    "estimatedDamageScore": 0.37658625863528594
-  },
-  {
-    "classId": "rh",
-    "code": "RH",
-    "mode": "single",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.2,
-      "attackReduction": 0.225,
-      "resistanceReduction": 150
-    },
-    "estimatedDamageScore": 0.38472042146034036
-  },
-  {
-    "classId": "ni",
-    "code": "NI",
-    "mode": "single",
-    "effects": {
-      "buff": 0.1,
-      "debuff": 0.12,
-      "shield": 0.04500000000000004,
-      "resistanceReduction": 150,
-      "mpRecoveryPerSecond": 0.03636363636363636
-    },
-    "estimatedDamageScore": 0.2320000000000002
-  },
-  {
-    "classId": "re",
-    "code": "RE",
-    "mode": "single",
-    "effects": {
-      "buff": 0.15,
-      "debuff": 0.1928816,
-      "defenseBreak": 0.1,
-      "resistanceReduction": 150,
-      "actionSpeedMultiplicative": 0.1
-    },
-    "estimatedDamageScore": 0.5167989388471601
-  },
-  {
-    "classId": "cu",
-    "code": "CU",
-    "mode": "single",
-    "effects": {
-      "debuff": 0.12000000000000001,
-      "defenseBreak": 0.2,
-      "shield": 0.3
-    },
-    "estimatedDamageScore": 0.38472042146034036
-  },
-  {
-    "classId": "ce",
-    "code": "CE",
-    "mode": "single",
-    "effects": {
-      "buff": 0.12,
-      "debuff": 0.12,
-      "shield": 0.2,
-      "resistanceReduction": 150,
-      "debuffCleanse": 1,
-      "superArmor": 2
-    },
-    "estimatedDamageScore": 0.2544000000000002
-  },
-  {
-    "classId": "cs",
-    "code": "CS",
-    "mode": "single",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.2
-    },
-    "estimatedDamageScore": 0.38472042146034036
-  },
-  {
-    "classId": "ca",
-    "code": "CA",
-    "mode": "single",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.2,
-      "roarBlock": 1,
-      "debuffCleanse": 1
-    },
-    "estimatedDamageScore": 0.38472042146034036
-  },
-  {
-    "classId": "cc",
-    "code": "CC",
-    "mode": "single",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.19999999999999996,
-      "shield": 0.5,
-      "attackReduction": 0.2,
-      "actionSpeedMultiplicative": 0.08,
-      "roarBlock": 1,
-      "debuffCleanse": 1
-    },
-    "estimatedDamageScore": 0.38472042146034036
-  },
-  {
-    "classId": "fp",
-    "code": "FP",
-    "mode": "single",
-    "effects": {
-      "buff": 0.2,
-      "actionSpeedMultiplicative": 0.18
-    },
-    "estimatedDamageScore": 0.19999999999999996
-  },
-  {
-    "classId": "cet",
-    "code": "CeT",
-    "mode": "single",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.2,
-      "shield": 0.2,
-      "mpRecoveryPerSecond": 0.0109,
-      "superArmor": 3
-    },
-    "estimatedDamageScore": 0.38472042146034036
-  },
-  {
-    "classId": "dia",
-    "code": "DiA",
-    "mode": "single",
-    "effects": {
-      "buff": 0.2544000000000002,
-      "defenseBreak": 0.15,
-      "shield": 0.19999999999999996,
-      "cooldownAcceleration": 0.2,
-      "resistanceReduction": 150,
-      "mpRecoveryPerSecond": 0.2121212121,
-      "actionSpeedMultiplicative": 0.1,
-      "debuffCleanse": 3,
-      "superArmor": 3
-    },
-    "estimatedDamageScore": 0.4643588177068909
-  },
-  {
-    "classId": "vi",
-    "code": "VI",
-    "mode": "single",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.354,
-      "resistanceReduction": 150,
-      "actionSpeedMultiplicative": 0.1
-    },
-    "estimatedDamageScore": 0.6928025035991348
-  },
-  {
-    "classId": "br",
-    "code": "BR",
-    "mode": "single",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.1925
-    },
-    "estimatedDamageScore": 0.3725549087177107
-  },
-  {
-    "classId": "sh",
-    "code": "SH",
-    "mode": "single",
-    "effects": {
-      "buff": 0.06,
-      "debuff": 0.07,
-      "defenseBreak": 0.1925
-    },
-    "estimatedDamageScore": 0.3899569441675246
-  },
-  {
-    "classId": "su",
-    "code": "SU",
-    "mode": "single",
-    "effects": {
-      "buff": 0.2544000000000002,
-      "defenseBreak": 0.15,
-      "shield": 0.2799999999999999,
-      "cooldownAcceleration": 0.2,
-      "resistanceReduction": 150,
-      "mpRecoveryPerSecond": 0.21939393939393925,
-      "actionSpeedMultiplicative": 0.1,
-      "debuffCleanse": 3,
-      "superArmor": 3
-    },
-    "estimatedDamageScore": 0.4643588177068909
-  },
-  {
-    "classId": "es",
-    "code": "ES",
-    "mode": "single",
-    "effects": {
-      "buff": 0.1,
-      "debuff": 0.08,
-      "defenseBreak": 0.2,
-      "shield": 0.15,
-      "attackReduction": -0.1,
-      "resistanceReduction": 100,
-      "actionSpeedDiminishing": 0.03,
-      "debuffCleanse": 3
-    },
-    "estimatedDamageScore": 0.4687927327632897
-  },
-  {
-    "classId": "fl",
-    "code": "FL",
-    "mode": "single",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.2
-    },
-    "estimatedDamageScore": 0.38472042146034036
-  },
-  {
-    "classId": "bq",
-    "code": "BQ",
-    "mode": "single",
-    "effects": {
-      "debuff": 0.2,
-      "attackReduction": 0.4,
-      "resistanceReduction": 500
-    },
-    "estimatedDamageScore": 0.19999999999999996
-  },
-  {
-    "classId": "ad",
-    "code": "AD",
-    "mode": "single",
-    "effects": {
-      "buff": 0.101,
-      "debuff": 0.07,
-      "defenseBreak": 0.2,
-      "shield": 0.2,
-      "actionSpeedMultiplicative": 0.1,
-      "debuffCleanse": 1
-    },
-    "estimatedDamageScore": 0.45651570259802043
-  },
-  {
-    "classId": "db",
-    "code": "DB",
-    "mode": "single",
-    "effects": {
-      "debuff": 0.2,
-      "actionSpeedDiminishing": 0.2
-    },
-    "estimatedDamageScore": 0.19999999999999996
-  },
-  {
-    "classId": "dn",
-    "code": "DN",
-    "mode": "single",
-    "effects": {
-      "buff": 0.15345404255319162,
-      "debuff": 0.0507,
-      "defenseBreak": 0.1
-    },
-    "estimatedDamageScore": 0.34002180036961716
-  },
-  {
-    "classId": "mp",
-    "code": "MP",
-    "mode": "single",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.196
-    },
-    "estimatedDamageScore": 0.37820543710019594
-  },
-  {
-    "classId": "om",
-    "code": "OM",
-    "mode": "single",
-    "effects": {
-      "buff": 0.2544000000000002,
-      "defenseBreak": 0.15,
-      "shield": 0.24,
-      "attackReduction": 0.2,
-      "cooldownAcceleration": 0.2,
-      "resistanceReduction": 150,
-      "mpRecoveryPerSecond": 0.2,
-      "actionSpeedMultiplicative": 0.1,
-      "debuffCleanse": 3,
-      "superArmor": 3.0
-    },
-    "estimatedDamageScore": 0.4643588177068909
-  },
-  {
-    "classId": "ct",
-    "code": "CT",
-    "mode": "single",
-    "effects": {
-      "debuff": 0.20960000000000023,
-      "attackReduction": 0.1,
-      "cooldownAcceleration": 0.3
-    },
-    "estimatedDamageScore": 0.20960000000000023
-  },
-  {
-    "classId": "in",
-    "code": "IN",
-    "mode": "single",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.2
-    },
-    "estimatedDamageScore": 0.38472042146034036
-  },
-  {
-    "classId": "da",
-    "code": "DA",
-    "mode": "single",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.19999999999999996
-    },
-    "estimatedDamageScore": 0.38472042146034036
-  },
-  {
-    "classId": "de",
-    "code": "DE",
-    "mode": "single",
-    "effects": {
-      "buff": 0.2544000000000002,
-      "defenseBreak": 0.15,
-      "shield": 0.2,
-      "cooldownAcceleration": 0.2,
-      "resistanceReduction": 150,
-      "mpRecoveryPerSecond": 0.2,
-      "actionSpeedMultiplicative": 0.1,
-      "roarBlock": 2,
-      "debuffCleanse": 3,
-      "superArmor": 3.0
-    },
-    "estimatedDamageScore": 0.4643588177068909
-  },
-  {
-    "classId": "tb",
-    "code": "TB",
-    "mode": "single",
-    "effects": {
-      "buff": 0.1,
-      "debuff": 0.08,
-      "defenseBreak": 0.1,
-      "resistanceReduction": 100
-    },
-    "estimatedDamageScore": 0.3135580694756852
-  },
-  {
-    "classId": "bma",
-    "code": "BMa",
-    "mode": "single",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.19999999999999996
-    },
-    "estimatedDamageScore": 0.38472042146034036
-  },
-  {
-    "classId": "mn",
-    "code": "MN",
-    "mode": "single",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.2,
-      "resistanceReduction": 120
-    },
-    "estimatedDamageScore": 0.38472042146034036
-  },
-  {
-    "classId": "po",
-    "code": "PO",
-    "mode": "single",
-    "effects": {
-      "buff": 0.08,
-      "debuff": 0.08,
-      "defenseBreak": 0.2,
-      "shield": 0.03,
-      "superArmor": 1
-    },
-    "estimatedDamageScore": 0.4420874103494117
-  },
-  {
-    "classId": "ri",
-    "code": "RI",
-    "mode": "single",
-    "effects": {
-      "buff": 0.2,
-      "mpRecoveryPerSecond": 0.0263
-    },
-    "estimatedDamageScore": 0.19999999999999996
-  },
-  {
-    "classId": "bl",
-    "code": "BL",
-    "mode": "single",
-    "effects": {
-      "buff": 0.2544000000000002,
-      "defenseBreak": 0.15,
-      "shield": 0.2799999999999999,
-      "cooldownAcceleration": 0.2,
-      "resistanceReduction": 150,
-      "mpRecoveryPerSecond": 0.203030303,
-      "actionSpeedMultiplicative": 0.1,
-      "debuffCleanse": 3,
-      "superArmor": 3.0
-    },
-    "estimatedDamageScore": 0.4643588177068909
-  },
-  {
-    "classId": "he",
-    "code": "HE",
-    "mode": "single",
-    "effects": {
-      "buff": 0.1123404255319147,
-      "defenseBreak": 0.2,
-      "resistanceReduction": 100
-    },
-    "estimatedDamageScore": 0.3752504489731492
-  },
-  {
-    "classId": "bi",
-    "code": "BI",
-    "mode": "single",
-    "effects": {
-      "buff": 0.13190000000000013,
-      "defenseBreak": 0.2,
-      "attackReduction": 0.13,
-      "mpRecoveryPerSecond": 0.1
-    },
-    "estimatedDamageScore": 0.39943307593835664
-  },
-  {
-    "classId": "ew",
-    "code": "EW",
-    "mode": "single",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.2,
-      "resistanceReduction": 100,
-      "mpRecoveryPerSecond": 0.0062499999999999995,
-      "debuffCleanse": 1
-    },
-    "estimatedDamageScore": 0.38472042146034036
-  },
-  {
-    "classId": "rs",
-    "code": "RS",
-    "mode": "single",
-    "effects": {
-      "buff": 0.2544000000000002,
-      "defenseBreak": 0.15,
-      "shield": 0.2,
-      "attackReduction": 0.15,
-      "cooldownAcceleration": 0.2,
-      "cooldownReductionSeconds": 1,
-      "resistanceReduction": 150,
-      "mpRecoveryPerSecond": 0.2,
-      "actionSpeedMultiplicative": 0.1,
-      "debuffCleanse": 3,
-      "superArmor": 3.0
-    },
-    "estimatedDamageScore": 0.4643588177068909
-  },
-  {
-    "classId": "nl",
-    "code": "NL",
-    "mode": "single",
-    "effects": {
-      "buff": 0.2,
-      "defenseBreak": 0.1
-    },
-    "estimatedDamageScore": 0.3268263328037222
-  },
-  {
-    "classId": "tp",
-    "code": "TP",
-    "mode": "single",
-    "effects": {
-      "debuff": 0.2
-    },
-    "estimatedDamageScore": 0.19999999999999996
-  },
-  {
-    "classId": "li",
-    "code": "LI",
-    "mode": "single",
-    "effects": {
-      "buff": 0.029090909090909056,
-      "debuff": 0.18,
-      "defenseBreak": 0.07
-    },
-    "estimatedDamageScore": 0.3014047374928257
-  },
-  {
-    "classId": "cel",
-    "code": "CeL",
-    "mode": "single",
-    "effects": {
-      "buff": 0.1806666667,
-      "debuff": 0.04,
-      "defenseBreak": 0.15,
-      "shield": 0.25,
-      "mpRecoveryPerSecond": 0.07,
-      "roarBlock": 2,
-      "debuffCleanse": 3
-    },
-    "estimatedDamageScore": 0.4334155213
-  },
-  {
-    "classId": "np",
-    "code": "NP",
-    "mode": "single",
-    "effects": {
-      "buff": 0.2544000000000002,
-      "defenseBreak": 0.15,
-      "shield": 0.19999999999999996,
-      "cooldownAcceleration": 0.2,
-      "resistanceReduction": 150,
-      "mpRecoveryPerSecond": 1.06,
-      "actionSpeedMultiplicative": 0.1,
-      "debuffCleanse": 3,
-      "superArmor": 3.0
-    },
-    "estimatedDamageScore": 0.4643588177068909
-  },
-  {
-    "classId": "mo",
-    "code": "MO",
-    "mode": "single",
-    "effects": {
-      "buff": 0.2,
-      "resistanceReduction": 100
-    },
-    "estimatedDamageScore": 0.19999999999999996
-  },
-  {
-    "classId": "gb",
-    "code": "GB",
-    "mode": "single",
-    "effects": {
-      "buff": 0.2,
-      "resistanceReduction": 100
-    },
-    "estimatedDamageScore": 0.19999999999999996
-  },
-  {
-    "classId": "av",
-    "code": "AV",
-    "mode": "single",
-    "effects": {
-      "buff": 0.2544000000000002,
-      "defenseBreak": 0.15,
-      "shield": 0.2619999999999999,
-      "cooldownAcceleration": 0.2,
-      "resistanceReduction": 150,
-      "mpRecoveryPerSecond": 0.2,
-      "actionSpeedMultiplicative": 0.1,
-      "debuffCleanse": 3,
-      "superArmor": 3.0
-    },
-    "estimatedDamageScore": 0.4643588177068909
-  },
-  {
-    "classId": "ac",
-    "code": "AC",
-    "mode": "single",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.2,
-      "debuffCleanse": 3
-    },
-    "estimatedDamageScore": 0.38472042146034036
-  },
-  {
-    "classId": "mi",
-    "code": "MI",
-    "mode": "single",
-    "effects": {
-      "debuff": 0.125,
-      "defenseBreak": 0.2,
-      "resistanceReduction": 125
-    },
-    "estimatedDamageScore": 0.39090220905614537
-  },
-  {
-    "classId": "ke",
-    "code": "KE",
-    "mode": "challenge",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.2,
-      "shield": 0.2,
-      "attackReduction": -0.12,
-      "superArmor": 1
-    },
-    "estimatedDamageScore": 0.34671008722908114
-  },
-  {
-    "classId": "rm",
-    "code": "RM",
-    "mode": "challenge",
-    "effects": {
-      "buff": 0.1200000000000001,
-      "defenseBreak": 0.2,
-      "resistanceReduction": 220
-    },
-    "estimatedDamageScore": 0.34671008722908114
-  },
-  {
-    "classId": "im",
-    "code": "IM",
-    "mode": "challenge",
-    "effects": {
-      "debuff": 0.2
-    },
-    "estimatedDamageScore": 0.19999999999999996
-  },
-  {
-    "classId": "ge",
-    "code": "GE",
-    "mode": "challenge",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.2,
-      "shield": 0.08,
-      "resistanceReduction": 130
-    },
-    "estimatedDamageScore": 0.34671008722908114
-  },
-  {
-    "classId": "as",
-    "code": "AS",
-    "mode": "challenge",
-    "effects": {
-      "buff": 0.2
-    },
-    "estimatedDamageScore": 0.19999999999999996
-  },
-  {
-    "classId": "oz",
-    "code": "OZ",
-    "mode": "challenge",
-    "effects": {
-      "buff": 0.12,
-      "defenseBreak": 0.2,
-      "attackReduction": 0.2,
-      "resistanceReduction": 195,
-      "mpRecoveryPerSecond": 0.08571428571428572,
-      "actionSpeedMultiplicative": 0.1
-    },
-    "estimatedDamageScore": 0.34671008722908114
-  },
-  {
-    "classId": "mm",
-    "code": "MM",
-    "mode": "challenge",
-    "effects": {
-      "buff": 0.12,
-      "defenseBreak": 0.20999999999999996
-    },
-    "estimatedDamageScore": 0.36047948106053673
-  },
-  {
-    "classId": "la",
-    "code": "LA",
-    "mode": "challenge",
-    "effects": {
-      "buff": 0.1847988101063831,
-      "defenseBreak": 0.1,
-      "shield": 0.31999999999999995,
-      "mpRecoveryPerSecond": 0.02222222222,
-      "actionSpeedMultiplicative": 0.05,
-      "superArmor": 1
-    },
-    "estimatedDamageScore": 0.2936911533853055
-  },
-  {
-    "classId": "an",
-    "code": "AN",
-    "mode": "challenge",
-    "effects": {
-      "buff": 0.12,
-      "defenseBreak": 0.195,
-      "mpRecoveryPerSecond": 0.06875,
-      "actionSpeedMultiplicative": 0.15
-    },
-    "estimatedDamageScore": 0.3399293839363797
-  },
-  {
-    "classId": "dab",
-    "code": "DaB",
-    "mode": "challenge",
-    "effects": {
-      "debuff": 0.2100000000000002
-    },
-    "estimatedDamageScore": 0.2100000000000002
-  },
-  {
-    "classId": "tw",
-    "code": "TW",
-    "mode": "challenge",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.2,
-      "shield": 0.2,
-      "mpRecoveryPerSecond": 0.01875,
-      "roarBlock": 1
-    },
-    "estimatedDamageScore": 0.34671008722908114
-  },
-  {
-    "classId": "pr",
-    "code": "PR",
-    "mode": "challenge",
-    "effects": {
-      "buff": 0.2225722727,
-      "defenseBreak": 0.1,
-      "shield": 0.15039999999999998,
-      "mpRecoveryPerSecond": 0.041477272727272724,
-      "actionSpeedDiminishing": 0.1,
-      "debuffCleanse": 2,
-      "superArmor": 1
-    },
-    "estimatedDamageScore": 0.3349362948
-  },
-  {
-    "classId": "fb",
-    "code": "FB",
-    "mode": "challenge",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.195
-    },
-    "estimatedDamageScore": 0.3399293839363797
-  },
-  {
-    "classId": "rh",
-    "code": "RH",
-    "mode": "challenge",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.2,
-      "attackReduction": 0.225,
-      "resistanceReduction": 150
-    },
-    "estimatedDamageScore": 0.34671008722908114
-  },
-  {
-    "classId": "ni",
-    "code": "NI",
-    "mode": "challenge",
-    "effects": {
-      "buff": 0.1,
-      "debuff": 0.12,
-      "shield": 0.04500000000000004,
-      "resistanceReduction": 150,
-      "mpRecoveryPerSecond": 0.03636363636363636
-    },
-    "estimatedDamageScore": 0.2320000000000002
-  },
-  {
-    "classId": "re",
-    "code": "RE",
-    "mode": "challenge",
-    "effects": {
-      "buff": 0.15,
-      "debuff": 0.1928816,
-      "defenseBreak": 0.1,
-      "resistanceReduction": 150,
-      "actionSpeedMultiplicative": 0.1
-    },
-    "estimatedDamageScore": 0.4978943376387879
-  },
-  {
-    "classId": "cu",
-    "code": "CU",
-    "mode": "challenge",
-    "effects": {
-      "debuff": 0.12000000000000001,
-      "defenseBreak": 0.2,
-      "shield": 0.3
-    },
-    "estimatedDamageScore": 0.34671008722908114
-  },
-  {
-    "classId": "ce",
-    "code": "CE",
-    "mode": "challenge",
-    "effects": {
-      "buff": 0.12,
-      "debuff": 0.12,
-      "shield": 0.2,
-      "resistanceReduction": 150,
-      "debuffCleanse": 1,
-      "superArmor": 2
-    },
-    "estimatedDamageScore": 0.2544000000000002
-  },
-  {
-    "classId": "cs",
-    "code": "CS",
-    "mode": "challenge",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.2
-    },
-    "estimatedDamageScore": 0.34671008722908114
-  },
-  {
-    "classId": "ca",
-    "code": "CA",
-    "mode": "challenge",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.2,
-      "roarBlock": 1,
-      "debuffCleanse": 1
-    },
-    "estimatedDamageScore": 0.34671008722908114
-  },
-  {
-    "classId": "cc",
-    "code": "CC",
-    "mode": "challenge",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.19999999999999996,
-      "shield": 0.5,
-      "attackReduction": 0.2,
-      "actionSpeedMultiplicative": 0.08,
-      "roarBlock": 1,
-      "debuffCleanse": 1
-    },
-    "estimatedDamageScore": 0.34671008722908114
-  },
-  {
-    "classId": "fp",
-    "code": "FP",
-    "mode": "challenge",
-    "effects": {
-      "buff": 0.2,
-      "actionSpeedMultiplicative": 0.18
-    },
-    "estimatedDamageScore": 0.19999999999999996
-  },
-  {
-    "classId": "cet",
-    "code": "CeT",
-    "mode": "challenge",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.2,
-      "shield": 0.2,
-      "mpRecoveryPerSecond": 0.0109,
-      "superArmor": 3
-    },
-    "estimatedDamageScore": 0.34671008722908114
-  },
-  {
-    "classId": "dia",
-    "code": "DiA",
-    "mode": "challenge",
-    "effects": {
-      "buff": 0.2544000000000002,
-      "defenseBreak": 0.15,
-      "shield": 0.19999999999999996,
-      "cooldownAcceleration": 0.2,
-      "resistanceReduction": 150,
-      "mpRecoveryPerSecond": 0.2121212121,
-      "actionSpeedMultiplicative": 0.1,
-      "debuffCleanse": 3,
-      "superArmor": 3
-    },
-    "estimatedDamageScore": 0.4356636394528275
-  },
-  {
-    "classId": "vi",
-    "code": "VI",
-    "mode": "challenge",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.354,
-      "resistanceReduction": 150,
-      "actionSpeedMultiplicative": 0.1
-    },
-    "estimatedDamageScore": 0.5953694510779148
-  },
-  {
-    "classId": "br",
-    "code": "BR",
-    "mode": "challenge",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.1925
-    },
-    "estimatedDamageScore": 0.33656457368818327
-  },
-  {
-    "classId": "sh",
-    "code": "SH",
-    "mode": "challenge",
-    "effects": {
-      "buff": 0.06,
-      "debuff": 0.07,
-      "defenseBreak": 0.1925
-    },
-    "estimatedDamageScore": 0.353510303104587
-  },
-  {
-    "classId": "su",
-    "code": "SU",
-    "mode": "challenge",
-    "effects": {
-      "buff": 0.2544000000000002,
-      "defenseBreak": 0.15,
-      "shield": 0.2799999999999999,
-      "cooldownAcceleration": 0.2,
-      "resistanceReduction": 150,
-      "mpRecoveryPerSecond": 0.21939393939393925,
-      "actionSpeedMultiplicative": 0.1,
-      "debuffCleanse": 3,
-      "superArmor": 3
-    },
-    "estimatedDamageScore": 0.4356636394528275
-  },
-  {
-    "classId": "es",
-    "code": "ES",
-    "mode": "challenge",
-    "effects": {
-      "buff": 0.1,
-      "debuff": 0.08,
-      "defenseBreak": 0.2,
-      "shield": 0.15,
-      "attackReduction": -0.1,
-      "resistanceReduction": 100,
-      "actionSpeedDiminishing": 0.03,
-      "debuffCleanse": 3
-    },
-    "estimatedDamageScore": 0.4284746282394183
-  },
-  {
-    "classId": "fl",
-    "code": "FL",
-    "mode": "challenge",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.2
-    },
-    "estimatedDamageScore": 0.34671008722908114
-  },
-  {
-    "classId": "bq",
-    "code": "BQ",
-    "mode": "challenge",
-    "effects": {
-      "debuff": 0.2,
-      "attackReduction": 0.4,
-      "resistanceReduction": 500
-    },
-    "estimatedDamageScore": 0.19999999999999996
-  },
-  {
-    "classId": "ad",
-    "code": "AD",
-    "mode": "challenge",
-    "effects": {
-      "buff": 0.101,
-      "debuff": 0.07,
-      "defenseBreak": 0.2,
-      "shield": 0.2,
-      "actionSpeedMultiplicative": 0.1,
-      "debuffCleanse": 1
-    },
-    "estimatedDamageScore": 0.41653460041246726
-  },
-  {
-    "classId": "db",
-    "code": "DB",
-    "mode": "challenge",
-    "effects": {
-      "debuff": 0.2,
-      "actionSpeedDiminishing": 0.2
-    },
-    "estimatedDamageScore": 0.19999999999999996
-  },
-  {
-    "classId": "dn",
-    "code": "DN",
-    "mode": "challenge",
-    "effects": {
-      "buff": 0.15345404255319162,
-      "debuff": 0.0507,
-      "defenseBreak": 0.1
-    },
-    "estimatedDamageScore": 0.3233204584199936
-  },
-  {
-    "classId": "mp",
-    "code": "MP",
-    "mode": "challenge",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.196
-    },
-    "estimatedDamageScore": 0.34128005653949733
-  },
-  {
-    "classId": "om",
-    "code": "OM",
-    "mode": "challenge",
-    "effects": {
-      "buff": 0.2544000000000002,
-      "defenseBreak": 0.15,
-      "shield": 0.24,
-      "attackReduction": 0.2,
-      "cooldownAcceleration": 0.2,
-      "resistanceReduction": 150,
-      "mpRecoveryPerSecond": 0.2,
-      "actionSpeedMultiplicative": 0.1,
-      "debuffCleanse": 3,
-      "superArmor": 3.0
-    },
-    "estimatedDamageScore": 0.4356636394528275
-  },
-  {
-    "classId": "ct",
-    "code": "CT",
-    "mode": "challenge",
-    "effects": {
-      "debuff": 0.20960000000000023,
-      "attackReduction": 0.1,
-      "cooldownAcceleration": 0.3
-    },
-    "estimatedDamageScore": 0.20960000000000023
-  },
-  {
-    "classId": "in",
-    "code": "IN",
-    "mode": "challenge",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.2
-    },
-    "estimatedDamageScore": 0.34671008722908114
-  },
-  {
-    "classId": "da",
-    "code": "DA",
-    "mode": "challenge",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.19999999999999996
-    },
-    "estimatedDamageScore": 0.34671008722908114
-  },
-  {
-    "classId": "de",
-    "code": "DE",
-    "mode": "challenge",
-    "effects": {
-      "buff": 0.2544000000000002,
-      "defenseBreak": 0.15,
-      "shield": 0.2,
-      "cooldownAcceleration": 0.2,
-      "resistanceReduction": 150,
-      "mpRecoveryPerSecond": 0.2,
-      "actionSpeedMultiplicative": 0.1,
-      "roarBlock": 2,
-      "debuffCleanse": 3,
-      "superArmor": 3.0
-    },
-    "estimatedDamageScore": 0.4356636394528275
-  },
-  {
-    "classId": "tb",
-    "code": "TB",
-    "mode": "challenge",
-    "effects": {
-      "buff": 0.1,
-      "debuff": 0.08,
-      "defenseBreak": 0.1,
-      "resistanceReduction": 100
-    },
-    "estimatedDamageScore": 0.2971865578458375
-  },
-  {
-    "classId": "bma",
-    "code": "BMa",
-    "mode": "challenge",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.19999999999999996
-    },
-    "estimatedDamageScore": 0.34671008722908114
-  },
-  {
-    "classId": "mn",
-    "code": "MN",
-    "mode": "challenge",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.2,
-      "resistanceReduction": 120
-    },
-    "estimatedDamageScore": 0.34671008722908114
-  },
-  {
-    "classId": "po",
-    "code": "PO",
-    "mode": "challenge",
-    "effects": {
-      "buff": 0.08,
-      "debuff": 0.08,
-      "defenseBreak": 0.2,
-      "shield": 0.03,
-      "superArmor": 1
-    },
-    "estimatedDamageScore": 0.40250236227142877
-  },
-  {
-    "classId": "ri",
-    "code": "RI",
-    "mode": "challenge",
-    "effects": {
-      "buff": 0.2,
-      "mpRecoveryPerSecond": 0.0263
-    },
-    "estimatedDamageScore": 0.19999999999999996
-  },
-  {
-    "classId": "bl",
-    "code": "BL",
-    "mode": "challenge",
-    "effects": {
-      "buff": 0.2544000000000002,
-      "defenseBreak": 0.15,
-      "shield": 0.2799999999999999,
-      "cooldownAcceleration": 0.2,
-      "resistanceReduction": 150,
-      "mpRecoveryPerSecond": 0.203030303,
-      "debuffCleanse": 3,
-      "superArmor": 3.0
-    },
-    "estimatedDamageScore": 0.4356636394528275
-  },
-  {
-    "classId": "he",
-    "code": "HE",
-    "mode": "challenge",
-    "effects": {
-      "buff": 0.1123404255319147,
-      "defenseBreak": 0.2,
-      "resistanceReduction": 100
-    },
-    "estimatedDamageScore": 0.3375000638361767
-  },
-  {
-    "classId": "bi",
-    "code": "BI",
-    "mode": "challenge",
-    "effects": {
-      "buff": 0.13190000000000013,
-      "defenseBreak": 0.2,
-      "attackReduction": 0.13,
-      "mpRecoveryPerSecond": 0.1
-    },
-    "estimatedDamageScore": 0.36101888190589015
-  },
-  {
-    "classId": "ew",
-    "code": "EW",
-    "mode": "challenge",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.2,
-      "resistanceReduction": 100,
-      "mpRecoveryPerSecond": 0.0062499999999999995,
-      "debuffCleanse": 1
-    },
-    "estimatedDamageScore": 0.34671008722908114
-  },
-  {
-    "classId": "rs",
-    "code": "RS",
-    "mode": "challenge",
-    "effects": {
-      "buff": 0.2544000000000002,
-      "defenseBreak": 0.15,
-      "shield": 0.2,
-      "attackReduction": 0.15,
-      "cooldownAcceleration": 0.2,
-      "cooldownReductionSeconds": 1,
-      "resistanceReduction": 150,
-      "mpRecoveryPerSecond": 0.2,
-      "actionSpeedMultiplicative": 0.1,
-      "debuffCleanse": 3,
-      "superArmor": 3.0
-    },
-    "estimatedDamageScore": 0.4356636394528275
-  },
-  {
-    "classId": "nl",
-    "code": "NL",
-    "mode": "challenge",
-    "effects": {
-      "buff": 0.2,
-      "defenseBreak": 0.1
-    },
-    "estimatedDamageScore": 0.31028945236953254
-  },
-  {
-    "classId": "tp",
-    "code": "TP",
-    "mode": "challenge",
-    "effects": {
-      "debuff": 0.2
-    },
-    "estimatedDamageScore": 0.19999999999999996
-  },
-  {
-    "classId": "li",
-    "code": "LI",
-    "mode": "challenge",
-    "effects": {
-      "buff": 0.029090909090909056,
-      "debuff": 0.18,
-      "defenseBreak": 0.07
-    },
-    "estimatedDamageScore": 0.2903553676022699
-  },
-  {
-    "classId": "cel",
-    "code": "CeL",
-    "mode": "challenge",
-    "effects": {
-      "buff": 0.1806666667,
-      "debuff": 0.04,
-      "defenseBreak": 0.15,
-      "shield": 0.25,
-      "mpRecoveryPerSecond": 0.07,
-      "roarBlock": 2,
-      "debuffCleanse": 3
-    },
-    "estimatedDamageScore": 0.4053266995
-  },
-  {
-    "classId": "np",
-    "code": "NP",
-    "mode": "challenge",
-    "effects": {
-      "buff": 0.2544000000000002,
-      "defenseBreak": 0.15,
-      "shield": 0.19999999999999996,
-      "cooldownAcceleration": 0.2,
-      "resistanceReduction": 150,
-      "mpRecoveryPerSecond": 0.2,
-      "actionSpeedMultiplicative": 0.1,
-      "debuffCleanse": 3,
-      "superArmor": 3.0
-    },
-    "estimatedDamageScore": 0.4356636394528275
-  },
-  {
-    "classId": "mo",
-    "code": "MO",
-    "mode": "challenge",
-    "effects": {
-      "buff": 0.2,
-      "resistanceReduction": 100
-    },
-    "estimatedDamageScore": 0.19999999999999996
-  },
-  {
-    "classId": "gb",
-    "code": "GB",
-    "mode": "challenge",
-    "effects": {
-      "buff": 0.2,
-      "resistanceReduction": 100
-    },
-    "estimatedDamageScore": 0.19999999999999996
-  },
-  {
-    "classId": "av",
-    "code": "AV",
-    "mode": "challenge",
-    "effects": {
-      "buff": 0.2544000000000002,
-      "defenseBreak": 0.15,
-      "shield": 0.2619999999999999,
-      "cooldownAcceleration": 0.2,
-      "resistanceReduction": 150,
-      "mpRecoveryPerSecond": 0.2,
-      "actionSpeedMultiplicative": 0.1,
-      "debuffCleanse": 3,
-      "superArmor": 3.0
-    },
-    "estimatedDamageScore": 0.4356636394528275
-  },
-  {
-    "classId": "ac",
-    "code": "AC",
-    "mode": "challenge",
-    "effects": {
-      "debuff": 0.12,
-      "defenseBreak": 0.2,
-      "debuffCleanse": 3
-    },
-    "estimatedDamageScore": 0.34671008722908114
-  },
-  {
-    "classId": "mi",
-    "code": "MI",
-    "mode": "challenge",
-    "effects": {
-      "debuff": 0.125,
-      "defenseBreak": 0.2,
-      "resistanceReduction": 125
-    },
-    "estimatedDamageScore": 0.35272218583278225
-  }
-]
+{
+  "schemaVersion": 2,
+  "classes": [
+    {
+      "classId": "ke",
+      "code": "KE",
+      "effects": {
+        "debuff": 0.12,
+        "defenseBreak": 0.2,
+        "shield": 0.2,
+        "attackReduction": -0.12,
+        "superArmor": 1
+      }
+    },
+    {
+      "classId": "rm",
+      "code": "RM",
+      "effects": {
+        "debuff": 0.12,
+        "defenseBreak": 0.2,
+        "resistanceReduction": 220
+      }
+    },
+    {
+      "classId": "im",
+      "code": "IM",
+      "effects": {
+        "debuff": 0.2
+      }
+    },
+    {
+      "classId": "ge",
+      "code": "GE",
+      "effects": {
+        "debuff": 0.12,
+        "defenseBreak": 0.2,
+        "shield": 0.08,
+        "resistanceReduction": 130
+      }
+    },
+    {
+      "classId": "as",
+      "code": "AS",
+      "effects": {
+        "buff": 0.2
+      }
+    },
+    {
+      "classId": "oz",
+      "code": "OZ",
+      "effects": {
+        "buff": 0.12,
+        "defenseBreak": 0.2,
+        "attackReduction": 0.2,
+        "resistanceReduction": 195,
+        "mpRecoveryPerSecond": 0.08571428571428572,
+        "actionSpeedMultiplicative": 0.1
+      }
+    },
+    {
+      "classId": "mm",
+      "code": "MM",
+      "effects": {
+        "buff": 0.12,
+        "defenseBreak": 0.20999999999999996
+      }
+    },
+    {
+      "classId": "la",
+      "code": "LA",
+      "effects": {
+        "buff": 0.08686170212765965,
+        "debuff": 0.05,
+        "defenseBreak": 0.1,
+        "shield": 0.31999999999999995,
+        "mpRecoveryPerSecond": 0.02222222222,
+        "actionSpeedMultiplicative": 0.05,
+        "superArmor": 1,
+        "defenseIgnoreAdditive": 0.05
+      }
+    },
+    {
+      "classId": "an",
+      "code": "AN",
+      "effects": {
+        "buff": 0.12,
+        "defenseBreak": 0.195,
+        "mpRecoveryPerSecond": 0.06875,
+        "actionSpeedMultiplicative": 0.15
+      }
+    },
+    {
+      "classId": "dab",
+      "code": "DaB",
+      "effects": {
+        "debuff": 0.2100000000000002,
+        "mpRecoveryPerSecond": 0.01875
+      }
+    },
+    {
+      "classId": "tw",
+      "code": "TW",
+      "effects": {
+        "debuff": 0.12,
+        "defenseBreak": 0.2,
+        "shield": 0.2,
+        "mpRecoveryPerSecond": 0.01875,
+        "roarBlock": 1
+      }
+    },
+    {
+      "classId": "pr",
+      "code": "PR",
+      "effects": {
+        "buff": 0.2225722727,
+        "defenseBreak": 0.1,
+        "shield": 0.15039999999999998,
+        "mpRecoveryPerSecond": 0.041477272727272724,
+        "actionSpeedDiminishing": 0.1,
+        "debuffCleanse": 2,
+        "superArmor": 1
+      }
+    },
+    {
+      "classId": "fb",
+      "code": "FB",
+      "effects": {
+        "debuff": 0.12,
+        "defenseBreak": 0.195
+      }
+    },
+    {
+      "classId": "rh",
+      "code": "RH",
+      "effects": {
+        "debuff": 0.12,
+        "defenseBreak": 0.2,
+        "attackReduction": 0.225,
+        "resistanceReduction": 150
+      }
+    },
+    {
+      "classId": "ni",
+      "code": "NI",
+      "effects": {
+        "buff": 0.1,
+        "debuff": 0.12,
+        "shield": 0.04500000000000004,
+        "resistanceReduction": 150,
+        "mpRecoveryPerSecond": 0.03636363636363636
+      }
+    },
+    {
+      "classId": "re",
+      "code": "RE",
+      "effects": {
+        "buff": 0.15,
+        "debuff": 0.1928816,
+        "defenseBreak": 0.1,
+        "resistanceReduction": 150,
+        "actionSpeedMultiplicative": 0.1
+      }
+    },
+    {
+      "classId": "cu",
+      "code": "CU",
+      "effects": {
+        "debuff": 0.12000000000000001,
+        "defenseBreak": 0.2,
+        "shield": 0.3
+      }
+    },
+    {
+      "classId": "ce",
+      "code": "CE",
+      "effects": {
+        "buff": 0.12,
+        "debuff": 0.12,
+        "shield": 0.2,
+        "resistanceReduction": 150,
+        "debuffCleanse": 1,
+        "superArmor": 2
+      }
+    },
+    {
+      "classId": "cs",
+      "code": "CS",
+      "effects": {
+        "debuff": 0.12,
+        "defenseBreak": 0.2
+      }
+    },
+    {
+      "classId": "ca",
+      "code": "CA",
+      "effects": {
+        "debuff": 0.12,
+        "defenseBreak": 0.2,
+        "roarBlock": 1,
+        "debuffCleanse": 1
+      }
+    },
+    {
+      "classId": "cc",
+      "code": "CC",
+      "effects": {
+        "debuff": 0.12,
+        "defenseBreak": 0.19999999999999996,
+        "shield": 0.5,
+        "attackReduction": 0.2,
+        "actionSpeedMultiplicative": 0.08,
+        "roarBlock": 1,
+        "debuffCleanse": 1
+      }
+    },
+    {
+      "classId": "fp",
+      "code": "FP",
+      "effects": {
+        "buff": 0.2,
+        "actionSpeedMultiplicative": 0.18
+      }
+    },
+    {
+      "classId": "cet",
+      "code": "CeT",
+      "effects": {
+        "debuff": 0.12,
+        "defenseBreak": 0.2,
+        "shield": 0.2,
+        "mpRecoveryPerSecond": 0.0109,
+        "superArmor": 3
+      }
+    },
+    {
+      "classId": "dia",
+      "code": "DiA",
+      "effects": {
+        "buff": 0.2544000000000002,
+        "defenseBreak": 0.15,
+        "shield": 0.19999999999999996,
+        "cooldownAcceleration": 0.2,
+        "resistanceReduction": 150,
+        "mpRecoveryPerSecond": 0.2121212121,
+        "actionSpeedMultiplicative": 0.1,
+        "debuffCleanse": 3,
+        "superArmor": 3
+      }
+    },
+    {
+      "classId": "vi",
+      "code": "VI",
+      "effects": {
+        "debuff": 0.12,
+        "defenseBreak": 0.1925,
+        "resistanceReduction": 150,
+        "actionSpeedMultiplicative": 0.1
+      }
+    },
+    {
+      "classId": "br",
+      "code": "BR",
+      "effects": {
+        "debuff": 0.12,
+        "defenseBreak": 0.1925
+      }
+    },
+    {
+      "classId": "sh",
+      "code": "SH",
+      "effects": {
+        "buff": 0.06,
+        "debuff": 0.07,
+        "defenseBreak": 0.1925
+      }
+    },
+    {
+      "classId": "su",
+      "code": "SU",
+      "effects": {
+        "buff": 0.2544000000000002,
+        "defenseBreak": 0.15,
+        "shield": 0.2799999999999999,
+        "cooldownAcceleration": 0.2,
+        "resistanceReduction": 150,
+        "mpRecoveryPerSecond": 0.21939393939393925,
+        "actionSpeedMultiplicative": 0.1,
+        "debuffCleanse": 3,
+        "superArmor": 3
+      }
+    },
+    {
+      "classId": "es",
+      "code": "ES",
+      "effects": {
+        "buff": 0.1,
+        "debuff": 0.08,
+        "defenseBreak": 0.2,
+        "shield": 0.15,
+        "attackReduction": -0.1,
+        "resistanceReduction": 100,
+        "actionSpeedDiminishing": 0.03,
+        "debuffCleanse": 3
+      }
+    },
+    {
+      "classId": "fl",
+      "code": "FL",
+      "effects": {
+        "debuff": 0.12,
+        "defenseBreak": 0.2
+      }
+    },
+    {
+      "classId": "bq",
+      "code": "BQ",
+      "effects": {
+        "debuff": 0.2,
+        "attackReduction": 0.4,
+        "resistanceReduction": 500
+      }
+    },
+    {
+      "classId": "ad",
+      "code": "AD",
+      "effects": {
+        "buff": 0.101,
+        "debuff": 0.07,
+        "defenseBreak": 0.2,
+        "shield": 0.2,
+        "actionSpeedMultiplicative": 0.1,
+        "debuffCleanse": 1
+      }
+    },
+    {
+      "classId": "db",
+      "code": "DB",
+      "effects": {
+        "debuff": 0.2,
+        "actionSpeedDiminishing": 0.2
+      }
+    },
+    {
+      "classId": "dn",
+      "code": "DN",
+      "effects": {
+        "buff": 0.15345404255319162,
+        "debuff": 0.0507,
+        "defenseBreak": 0.1
+      }
+    },
+    {
+      "classId": "mp",
+      "code": "MP",
+      "effects": {
+        "debuff": 0.12,
+        "defenseBreak": 0.196
+      }
+    },
+    {
+      "classId": "om",
+      "code": "OM",
+      "effects": {
+        "buff": 0.2544000000000002,
+        "defenseBreak": 0.15,
+        "shield": 0.24,
+        "attackReduction": 0.2,
+        "cooldownAcceleration": 0.2,
+        "resistanceReduction": 150,
+        "mpRecoveryPerSecond": 0.2,
+        "actionSpeedMultiplicative": 0.1,
+        "debuffCleanse": 3,
+        "superArmor": 3.0
+      }
+    },
+    {
+      "classId": "ct",
+      "code": "CT",
+      "effects": {
+        "debuff": 0.20960000000000023,
+        "attackReduction": 0.1,
+        "cooldownAcceleration": 0.3
+      }
+    },
+    {
+      "classId": "in",
+      "code": "IN",
+      "effects": {
+        "debuff": 0.12,
+        "defenseBreak": 0.2
+      }
+    },
+    {
+      "classId": "da",
+      "code": "DA",
+      "effects": {
+        "debuff": 0.12,
+        "defenseBreak": 0.19999999999999996
+      }
+    },
+    {
+      "classId": "de",
+      "code": "DE",
+      "effects": {
+        "buff": 0.2544000000000002,
+        "defenseBreak": 0.15,
+        "shield": 0.2,
+        "cooldownAcceleration": 0.2,
+        "resistanceReduction": 150,
+        "mpRecoveryPerSecond": 0.2,
+        "actionSpeedMultiplicative": 0.1,
+        "roarBlock": 2,
+        "debuffCleanse": 3,
+        "superArmor": 3.0
+      }
+    },
+    {
+      "classId": "tb",
+      "code": "TB",
+      "effects": {
+        "buff": 0.1,
+        "debuff": 0.08,
+        "defenseBreak": 0.1,
+        "resistanceReduction": 100
+      }
+    },
+    {
+      "classId": "bma",
+      "code": "BMa",
+      "effects": {
+        "debuff": 0.12,
+        "defenseBreak": 0.19999999999999996
+      }
+    },
+    {
+      "classId": "mn",
+      "code": "MN",
+      "effects": {
+        "debuff": 0.12,
+        "defenseBreak": 0.2,
+        "resistanceReduction": 120
+      }
+    },
+    {
+      "classId": "po",
+      "code": "PO",
+      "effects": {
+        "buff": 0.08,
+        "debuff": 0.08,
+        "defenseBreak": 0.2,
+        "shield": 0.03,
+        "superArmor": 1
+      }
+    },
+    {
+      "classId": "ri",
+      "code": "RI",
+      "effects": {
+        "buff": 0.2,
+        "mpRecoveryPerSecond": 0.0263
+      }
+    },
+    {
+      "classId": "bl",
+      "code": "BL",
+      "effects": {
+        "buff": 0.2544000000000002,
+        "defenseBreak": 0.15,
+        "shield": 0.2799999999999999,
+        "cooldownAcceleration": 0.2,
+        "resistanceReduction": 150,
+        "mpRecoveryPerSecond": 0.203030303,
+        "actionSpeedMultiplicative": 0.1,
+        "debuffCleanse": 3,
+        "superArmor": 3.0
+      }
+    },
+    {
+      "classId": "he",
+      "code": "HE",
+      "effects": {
+        "buff": 0.1123404255319147,
+        "defenseBreak": 0.2,
+        "resistanceReduction": 100
+      }
+    },
+    {
+      "classId": "bi",
+      "code": "BI",
+      "effects": {
+        "buff": 0.13190000000000013,
+        "defenseBreak": 0.2,
+        "attackReduction": 0.13,
+        "mpRecoveryPerSecond": 0.1
+      }
+    },
+    {
+      "classId": "ew",
+      "code": "EW",
+      "effects": {
+        "debuff": 0.12,
+        "defenseBreak": 0.2,
+        "resistanceReduction": 100,
+        "mpRecoveryPerSecond": 0.0062499999999999995,
+        "debuffCleanse": 1
+      }
+    },
+    {
+      "classId": "rs",
+      "code": "RS",
+      "effects": {
+        "buff": 0.2544000000000002,
+        "defenseBreak": 0.15,
+        "shield": 0.2,
+        "attackReduction": 0.15,
+        "cooldownAcceleration": 0.2,
+        "cooldownReductionSeconds": 1,
+        "resistanceReduction": 150,
+        "mpRecoveryPerSecond": 0.2,
+        "actionSpeedMultiplicative": 0.1,
+        "debuffCleanse": 3,
+        "superArmor": 3.0
+      }
+    },
+    {
+      "classId": "nl",
+      "code": "NL",
+      "effects": {
+        "buff": 0.2,
+        "defenseBreak": 0.1
+      }
+    },
+    {
+      "classId": "tp",
+      "code": "TP",
+      "effects": {
+        "debuff": 0.2
+      }
+    },
+    {
+      "classId": "li",
+      "code": "LI",
+      "effects": {
+        "buff": 0.029090909090909056,
+        "debuff": 0.18,
+        "defenseBreak": 0.07
+      }
+    },
+    {
+      "classId": "cel",
+      "code": "CeL",
+      "effects": {
+        "buff": 0.1806666667,
+        "debuff": 0.04,
+        "defenseBreak": 0.15,
+        "shield": 0.25,
+        "mpRecoveryPerSecond": 0.07,
+        "roarBlock": 2,
+        "debuffCleanse": 3
+      }
+    },
+    {
+      "classId": "np",
+      "code": "NP",
+      "effects": {
+        "buff": 0.2544000000000002,
+        "defenseBreak": 0.15,
+        "shield": 0.19999999999999996,
+        "cooldownAcceleration": 0.2,
+        "resistanceReduction": 150,
+        "mpRecoveryPerSecond": 0.2,
+        "actionSpeedMultiplicative": 0.1,
+        "debuffCleanse": 3,
+        "superArmor": 3.0
+      }
+    },
+    {
+      "classId": "mo",
+      "code": "MO",
+      "effects": {
+        "buff": 0.2,
+        "resistanceReduction": 100
+      }
+    },
+    {
+      "classId": "gb",
+      "code": "GB",
+      "effects": {
+        "buff": 0.2,
+        "resistanceReduction": 100
+      }
+    },
+    {
+      "classId": "av",
+      "code": "AV",
+      "effects": {
+        "buff": 0.2544000000000002,
+        "defenseBreak": 0.15,
+        "shield": 0.2619999999999999,
+        "cooldownAcceleration": 0.2,
+        "resistanceReduction": 150,
+        "mpRecoveryPerSecond": 0.2,
+        "actionSpeedMultiplicative": 0.1,
+        "debuffCleanse": 3,
+        "superArmor": 3.0
+      }
+    },
+    {
+      "classId": "ac",
+      "code": "AC",
+      "effects": {
+        "debuff": 0.12,
+        "defenseBreak": 0.2,
+        "debuffCleanse": 3
+      }
+    },
+    {
+      "classId": "mi",
+      "code": "MI",
+      "effects": {
+        "debuff": 0.125,
+        "defenseBreak": 0.2,
+        "resistanceReduction": 125
+      }
+    }
+  ]
+}

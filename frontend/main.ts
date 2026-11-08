@@ -55,8 +55,8 @@ const ICE_EQUIPMENT_SHORT_NAMES: Record<string, string> = {
 async function start() {
   const data = await loadGameData();
   const battleDefense = createBattleDefenseStore(window);
-  const evaluateLoadout = (game: typeof data, loadout: LoadoutState, rates = true, input = false) => evaluateLoadoutBase(game, loadout, rates, input, battleDefense.rate);
-  const projectDamage = (game: typeof data, loadout: LoadoutState) => projectDamageBase(game, loadout, battleDefense.rate);
+  const evaluateLoadout = (game: typeof data, loadout: LoadoutState, rates = true, input = false) => evaluateLoadoutBase(game, loadout, rates, input, battleDefense.rate, battleDefense.defenseIgnoreAdditive);
+  const projectDamage = (game: typeof data, loadout: LoadoutState) => projectDamageBase(game, loadout, battleDefense.rate, battleDefense.defenseIgnoreAdditive);
   // This page loads GameData once. Controls/import/history change state, never this data.
   // A future in-session data/parameter refresh must replace this revision token.
   const calculationDataRevision = Symbol('loaded-game-data');
@@ -131,6 +131,7 @@ async function start() {
         || !savedLoadoutAtStartup || request.baseRaw !== savedLoadoutAtStartup
         || !version || request.dataRevision !== version || !validChoices || !validSets
         || (request.externalDefenseBreakRate ?? 0) !== battleDefense.rate
+        || (request.defenseIgnoreAdditive ?? 0) !== battleDefense.defenseIgnoreAdditive
         || typeof request.expectedDamage !== 'number' || !Number.isFinite(request.expectedDamage)) {
         optimizerApplyMessage = '冰裝搜尋結果已過期或資料不完整；原配裝保持不變，請重新搜尋。';
       } else {
@@ -1341,7 +1342,7 @@ async function start() {
       const currentDamage = currentEvaluation.damage;
       defenseEditor.setEquipment(equipmentDefenseRates(currentDamage?.result, currentEvaluation.attributes?.stats.defenseIgnorePct?.finalTotal));
       const damageCalculationError = currentEvaluation.damageError;
-      const baselineEvaluation = baselineEvaluationCache.get(data, baseline, calculationDataRevision, battleDefense.rate);
+      const baselineEvaluation = baselineEvaluationCache.get(data, baseline, calculationDataRevision, battleDefense.rate, battleDefense.defenseIgnoreAdditive);
       const baselineDamage = baselineEvaluation?.damage ?? null;
       const baselineAttributes = baselineEvaluation?.attributes ?? null;
       baselineIsValid = baselineAttributes !== null;
@@ -1546,7 +1547,7 @@ async function start() {
   baselineButton.addEventListener('click', () => {
     try {
       const candidate = structuredClone(state);
-      const evaluation = baselineEvaluationCache.get(data, candidate, calculationDataRevision, battleDefense.rate)!;
+      const evaluation = baselineEvaluationCache.get(data, candidate, calculationDataRevision, battleDefense.rate, battleDefense.defenseIgnoreAdditive)!;
       if (!evaluation.attributes) throw evaluation.attributeError;
       baseline = candidate;
       baselineIsValid = true;

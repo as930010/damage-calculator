@@ -1,3 +1,4 @@
+import { normalizeSupportMagazineLevel } from './support-magazines.ts';
 import type {
   CalculationParameters,
   LoadoutOptionDefinition,
@@ -8,7 +9,11 @@ export function resolveLoadoutOption(
   definition: LoadoutOptionDefinition,
   parameters: CalculationParameters,
   selected = definition.defaultSelected,
+  level: unknown = 1,
 ): SelectedOption {
+  if (definition.userInput?.kind === 'support-magazine') {
+    return { id: definition.id, effects: {}, supportMagazine: { id: definition.id, target: definition.userInput.target, level: normalizeSupportMagazineLevel(level), enabled: selected } };
+  }
   const effects: SelectedOption["effects"] = {};
 
   for (const [key, spec] of Object.entries(definition.effects)) {

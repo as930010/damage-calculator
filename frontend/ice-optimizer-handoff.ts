@@ -10,6 +10,7 @@ export interface IceOptimizerHandoff {
   setNames: string[];
   expectedDamage: number;
   externalDefenseBreakRate?: number;
+  defenseIgnoreAdditive?: number;
 }
 
 export function stageIceOptimizerHandoff(selection: IceOptimizerHandoff): void {

@@ -5,8 +5,8 @@ import { JSDOM } from 'jsdom';
 import { combineDefenseRates, combineExternalSources, parseDefensePercentage, isDefensePercentageDraft } from '../dist/calculation/battle-defense.js';
 import { calculateFinalDamage } from '../dist/calculation/final-damage.js';
 import { finalDamageInputs } from '../dist/calculation/loadout-engine.js';
-import { defaultBattleDefense, parseBattleDefense, externalDefenseRate, createBattleDefenseStore, BATTLE_DEFENSE_KEY, teamRevision } from '../dist/frontend/battle-defense-state.js';
-import { teamDefenseReferences } from '../dist/frontend/team-defense-reference.js';
+import { defaultBattleDefense, parseBattleDefense, externalDefenseRate, createBattleDefenseStore, BATTLE_DEFENSE_KEY, teamRevision, teamSnapshotUpdateReason, teamDefenseIgnoreAdditive } from '../dist/frontend/battle-defense-state.js';
+import { teamDefenseReferences, loadTeamDefenseDataRevision, loadTeamDefenseReferences } from '../dist/frontend/team-defense-reference.js';
 import { parseCoreCatalog } from '../dist/features/buff-simulator/frontend/data-loader.js';
 import { parseSavedSimulatorState, resolveSavedMembers, resolveSavedOptions } from '../dist/features/buff-simulator/frontend/saved-state.js';
 import { calculateChallenge, calculateTeam } from '../dist/features/buff-simulator/calculation/engine.js';
@@ -134,4 +134,124 @@ test('Armor with A/B pants preserves the same external environment and other equ
     const lines=context.upperSelection;for(const[f,i]of fields.map((f,i)=>[f,i])){copy.values[f.attributeField]=lines[i].choice;copy.values[f.valueField]=lines[i].roll/100;}
     close(context.simulatedDamage(lines),projectDamage(data,copy,.896).result.finalDamage.finalDamage);
   }
+});
+
+test('VI snapshot data freshness is independent of source revision and never overwrites the stored rate', async () => {
+  const saved={...savedTeam(),membersByTeam:{single:['VI']}};const raw=JSON.stringify(saved),refs=teamDefenseReferences(raw,catalog,'current-data');
+  const old={mode:'single',target:'single',rate:.354,sources:['職業：VI'],sourceRevision:teamRevision(raw),dataRevision:'old-data',importedAt:'2026-11-07'};
+  const environment={...defaultBattleDefense(),mode:'team',teamSnapshot:old};
+  assert.equal(teamSnapshotUpdateReason(old,teamRevision(raw),'current-data'),'data');assert.equal(teamSnapshotUpdateReason(old,'changed-source','current-data'),'data');assert.equal(teamSnapshotUpdateReason(old,'changed-source','old-data'),'team');assert.equal(teamSnapshotUpdateReason(old,teamRevision(raw),'old-data'),null);
+  close(externalDefenseRate(parseBattleDefense(JSON.stringify(environment))),.354);assert.equal(environment.teamSnapshot.dataRevision,'old-data');
+  const D=.7192,options=resolveSavedOptions(catalog,parseSavedSimulatorState(raw,catalog).optionsByTeam.single);
+  const expected=1-(1-.1925)*options.reduce((remaining,o)=>remaining*(1-(o.effects.defenseBreak??0)),1);close(refs.refs[0].rate,expected);
+  const manifest=json('../site-dist/buff-simulator/asset-manifest.json');const names=['classes','class-effects','effect-types','loadout-options','calculation-parameters'];const paths=names.map(n=>manifest.data['data/'+n+'.json']);
+  const fetchBefore=globalThis.fetch,requests=[];globalThis.fetch=async url=>{const path=new URL(url).pathname.split('/buff-simulator/')[1];requests.push(path);return{ok:true,json:async()=>path==='asset-manifest.json'?manifest:json('../site-dist/buff-simulator/'+path)};};
+  try {const revision=await loadTeamDefenseDataRevision(new URL('https://test.local/buff-simulator/'));assert.equal(revision,paths.join('|'));assert.deepEqual(requests,['asset-manifest.json']);
+    const imported=await loadTeamDefenseReferences(raw,new URL('https://test.local/buff-simulator/'));assert.equal(imported.dataRevision,revision);close(imported.refs[0].rate,expected);assert.equal(requests.length,7);
+    globalThis.fetch=async()=>({ok:true,json:async()=>({data:{}})});await assert.rejects(loadTeamDefenseDataRevision(new URL('https://test.local/buff-simulator/')),/有效隊伍/);
+  }finally{globalThis.fetch=fetchBefore;}
+  const before=projectDamage(data,state,.354),after=projectDamage(data,state,expected);assert.notEqual(before.result.finalDamage.finalDamage,after.result.finalDamage.finalDamage);
+  close(scoreConfiguration(readRatingLoadout(data,state,expected),readRatingLoadout(data,state,expected).actual).after,after.result.finalDamage.finalDamage);
+  assert.equal(old.rate,.354);assert.ok(D>0);
+});
+
+test('LA exact additive group uses E+L before external break; core precision and boundaries', () => {
+  const evaluated=evaluateLoadout(data,state,false,true),input=finalDamageInputs(evaluated.comparisonInput,evaluated.damage.result);
+  const base={...input,defenseIgnorePct:8.7,externalDefenseBreakRate:.915,enemyDefensePct:96.01};
+  const before=calculateFinalDamage(base),after=calculateFinalDamage({...base,defenseIgnoreAdditive:.05});
+  close(before.defenseContext.effectiveRate,.922395);close(after.defenseContext.effectiveRate,.926645);
+  close(before.defenseFactor,8.740604685783106);close(after.defenseFactor,9.063871110193827);
+  close(after.finalDamage/before.finalDamage-1,.03698444627481265);
+  assert.equal(after.defenseContext.equipmentRate,.087);close(after.defenseContext.adjustedEquipmentRate,.137);
+  assert.equal(calculateFinalDamage({...base,enemyDefensePct:0,defenseIgnoreAdditive:.05}).defenseFactor,1);
+  close(combineDefenseRates(0,0,.05),.05);close(combineDefenseRates(.95,0,.05),1);
+  for(const v of[-.1,NaN,Infinity,1.1])assert.throws(()=>combineDefenseRates(.087,.915,v));
+  assert.throws(()=>calculateFinalDamage({...base,defenseIgnorePct:96,defenseIgnoreAdditive:.05}),/加算/);
+  close(calculateFinalDamage({...base,externalDefenseBreakRate:1,defenseIgnoreAdditive:.05}).defenseFactor,calculateFinalDamage({...base,externalDefenseBreakRate:1}).defenseFactor);
+});
+test('LA snapshots preserve independent additive data, mode isolation and old snapshot defaults', () => {
+  const value={...defaultBattleDefense(),mode:'team',manualPercentage:'10',sources:[{id:'one',name:'',percentage:'20'}],
+    teamSnapshot:{mode:'single',target:'single',rate:.3,sources:['break'],sourceRevision:'old',dataRevision:'old',importedAt:'2026-11-08'}};
+  assert.equal(teamDefenseIgnoreAdditive(parseBattleDefense(JSON.stringify(value))),0);
+  value.teamSnapshot.defenseIgnoreAdditive=.05;value.teamSnapshot.defenseIgnoreSources=['職業：LA'];
+  const restored=parseBattleDefense(JSON.stringify(value));assert.deepEqual(restored,value);close(teamDefenseIgnoreAdditive(restored),.05);
+  for(const [mode,rate]of[['manual',.1],['sources',.2]]){const off={...restored,mode};close(externalDefenseRate(off),rate);assert.equal(teamDefenseIgnoreAdditive(off),0);assert.deepEqual(off.teamSnapshot,value.teamSnapshot);}
+  assert.equal(teamSnapshotUpdateReason(restored.teamSnapshot,'old','new'),'data');close(restored.teamSnapshot.defenseIgnoreAdditive,.05);
+  const dom=new JSDOM('',{url:'https://test.local'}),store=createBattleDefenseStore(dom.window);store.set(restored);close(store.defenseIgnoreAdditive,.05);
+  const next={...restored,mode:'manual'};dom.window.localStorage.setItem(BATTLE_DEFENSE_KEY,JSON.stringify(next));dom.window.dispatchEvent(new dom.window.StorageEvent('storage',{key:BATTLE_DEFENSE_KEY}));assert.equal(store.defenseIgnoreAdditive,0);store.dispose();dom.window.close();
+});
+test('LA references obey single, challenge route and shared-arena source uniqueness', () => {
+  for(const mode of['single','challenge']){
+    const saved=savedTeam(mode);saved.membersByTeam={single:['LA','LA'],first:['LA','LA'],second:['NP']};
+    const refs=teamDefenseReferences(JSON.stringify(saved),catalog,'current');
+    for(const ref of refs.refs){const expected=ref.target==='secondTeam'?0:.05;close(ref.defenseIgnoreAdditive??0,expected);if(expected)assert.deepEqual(ref.defenseIgnoreSources,['職業：LA']);}
+    if(mode==='challenge'){saved.membersByTeam.second=['LA'];const both=teamDefenseReferences(JSON.stringify(saved),catalog,'current');for(const ref of both.refs)close(ref.defenseIgnoreAdditive,.05);}
+  }
+});
+test('LA same context reaches Baseline, weapon candidates and every armor A/B target without mutation', () => {
+  const original=JSON.stringify(state),B=.915,L=.05,cache=createBaselineEvaluationCache(),revision={};
+  const plain=cache.get(data,state,revision,B,0),la=cache.get(data,state,revision,B,L);
+  assert.notEqual(la.damage.result.finalDamage.finalDamage,plain.damage.result.finalDamage.finalDamage);
+  close(la.damage.result.finalDamage.finalDamage,projectDamage(data,state,B,L).result.finalDamage.finalDamage);
+  const context=readRatingLoadout(data,state,B,L);close(scoreConfiguration(context,context.actual).after,la.damage.result.finalDamage.finalDamage);
+  const lines=[{choice:'無視防禦%',roll:8},{choice:'技能傷害%',roll:10},{choice:'雙攻%',roll:8},{choice:'無關傷害',roll:null}],copy=structuredClone(state);
+  data.transformations.slots.forEach((f,i)=>{delete copy.values[f.choiceField];delete copy.values[f.valueField];if(lines[i].roll===null)return;copy.values[f.choiceField]=lines[i].choice;copy.values[f.valueField]=lines[i].roll/100;});
+  close(scoreConfiguration(context,lines).after,projectDamage(data,copy,B,L).result.finalDamage.finalDamage);
+  for(const target of data.innerwear.slots){const armor=structuredClone(state);armor.lowerwearAlternativeEnabled=true;
+    for(const slot of data.innerwear.slots){armor.values[slot.typeField]='內布隆';armor.values[slot.enhancementField]=slot.id===target.id?'Lv.11':'Lv.12';armor.values[slot.forgingField]=0;}
+    const rating=readArmorRatingLoadout(data,armor,target.id,B,L),fields=data.nephronArmor.fields.find(f=>f.slotId===target.id).transformFields;
+    for(const[f,i]of fields.map((f,i)=>[f,i])){armor.values[f.attributeField]=rating.upperSelection[i].choice;armor.values[f.valueField]=rating.upperSelection[i].roll/100;}
+    close(rating.simulatedDamage(rating.upperSelection),projectDamage(data,armor,B,L).result.finalDamage.finalDamage);
+  }
+  assert.equal(JSON.stringify(state),original);
+});
+test('Readonly Buff beneficiary adapter reads saved equipment and defaults missing loadout to zero',async()=>{
+  const {readBeneficiaryDefense}=await import('../dist/frontend/beneficiary-defense.js');
+  assert.deepEqual(await readBeneficiaryDefense('test:data',null),{rates:[0],source:'empty'});
+  const fetchBefore=globalThis.fetch;let calls=0;globalThis.fetch=async()=>{calls++;return{ok:true,json:async()=>data};};
+  try{const raw=JSON.stringify(state),result=await readBeneficiaryDefense('test:data',raw),expected=projectDamage(data,state).result;
+    const rates=expected.lowerwearConfigurations?.map(c=>c.result.attributes.stats.defenseIgnorePct.finalTotal/100)??[expected.attributes.stats.defenseIgnorePct.finalTotal/100];
+    assert.deepEqual(result,{rates,source:'loadout'});assert.equal(JSON.stringify(state),raw);
+    await readBeneficiaryDefense('test:data',raw);assert.equal(calls,1);
+    await assert.rejects(readBeneficiaryDefense('test:data','{'));
+  }finally{globalThis.fetch=fetchBefore;}
+});
+
+test('Explicit reference modes resolve both saved rosters independently of last mode and preserve scope',()=>{
+  const scoped=structuredClone(catalog);for(const p of scoped.classEffects)if(p.code==='LA')p.effects.defenseBreak=p.mode==='single'?.1:.4;
+  for(const lastMode of['single','challenge']){
+    const saved=savedTeam(lastMode);saved.membersByTeam={single:['LA','LA'],first:['LA','LA'],second:['IM']};
+    const disabled=Object.fromEntries(scoped.loadoutOptions.filter(o=>o.userInput?.kind!=='percentage').map(o=>[o.id,false]));saved.optionsByTeam={single:disabled,first:disabled,second:disabled};
+    const raw=JSON.stringify(saved),parsed=parseSavedSimulatorState(raw,scoped);
+    for(const requested of['single','challenge']){
+      const refs=teamDefenseReferences(raw,scoped,'data',requested);assert.equal(refs.mode,requested);assert.equal(refs.sourceRevision,teamRevision(raw));
+      const resolve=key=>({members:resolveSavedMembers(scoped,parsed.membersByTeam[key],requested),options:resolveSavedOptions(scoped,parsed.optionsByTeam[key])});
+      if(requested==='single'){const expected=calculateTeam({mode:requested,...resolve('single'),defense:{bossDamageReduction:.7192}});close(refs.refs[0].rate,expected.defenseBreak);close(refs.refs[0].rate,1-(1-.1)*(1-.15));close(refs.refs[0].defenseIgnoreAdditive,.05);}
+      else {const expected=calculateChallenge({firstTeam:resolve('first'),secondTeam:resolve('second'),defense:{challengeBreakCoefficient:.9601}});assert.deepEqual(refs.refs.map(r=>r.target),['firstTeam','secondTeam','sharedArena']);
+        for(const ref of refs.refs){close(ref.rate,expected[ref.target].defenseBreak);close(ref.defenseIgnoreAdditive??0,expected[ref.target].defenseIgnoreAdditive??0);}
+        close(refs.refs[0].rate,1-(1-.4)*(1-.15));close(refs.refs[1].rate,.15);close(refs.refs[2].rate,1-(1-.4)*(1-.15));close(refs.refs[2].defenseIgnoreAdditive,.05);
+      }
+    }
+    assert.equal(JSON.stringify(saved),raw);assert.equal(parsed.mode,lastMode);
+  }
+});
+test('Missing requested mode never falls back; a valid member with zero break remains importable',()=>{
+  const saved=savedTeam('single');saved.membersByTeam={single:['LA'],first:[],second:[]};assert.throws(()=>teamDefenseReferences(JSON.stringify(saved),catalog,'v','challenge'),/目前尚無已保存的挑戰雙隊配置/);
+  saved.mode='challenge';saved.membersByTeam={single:[],first:['LA'],second:[]};assert.throws(()=>teamDefenseReferences(JSON.stringify(saved),catalog,'v','single'),/目前尚無已保存的單隊配置/);
+  const disabled=Object.fromEntries(catalog.loadoutOptions.filter(o=>o.userInput?.kind!=='percentage').map(o=>[o.id,false]));saved.membersByTeam.single=['IM'];saved.optionsByTeam.single=disabled;
+  // No loadout effects in this fixture: a member with no break must still be a valid zero result.
+  const zero=teamDefenseReferences(JSON.stringify(saved),{...catalog,loadoutOptions:[]},'v','single');assert.equal(zero.refs[0].rate,0);assert.equal(zero.refs[0].defenseIgnoreAdditive??0,0);
+  saved.membersByTeam.first=['UNKNOWN'];assert.doesNotThrow(()=>teamDefenseReferences(JSON.stringify(saved),catalog,'v','single'));assert.throws(()=>teamDefenseReferences(JSON.stringify(saved),catalog,'v','challenge'),/有效隊伍/);
+  assert.throws(()=>teamDefenseReferences('{',catalog,'v','single'),/有效隊伍/);
+});
+
+test('Support magazine levels survive cross-mode parsing without altering defense references or LA snapshots',()=>{
+  const saved=savedTeam('single');saved.membersByTeam={single:['NP','LA'],first:['BL','LA'],second:['NP']};
+  const rawBefore=JSON.stringify(saved),singleBefore=teamDefenseReferences(rawBefore,catalog,'data','single'),challengeBefore=teamDefenseReferences(rawBefore,catalog,'data','challenge');
+  saved.optionsByTeam.single={'support-magazine-i':true,'support-magazine-i-level':5,'support-magazine-iii':true,'support-magazine-iii-level':2};
+  saved.optionsByTeam.first={'support-magazine-ii':true,'support-magazine-ii-level':6};saved.optionsByTeam.second={'support-magazine-iii':false,'support-magazine-iii-level':6};
+  const raw=JSON.stringify(saved),restored=parseSavedSimulatorState(raw,catalog);
+  assert.equal(restored.optionsByTeam.single['support-magazine-i-level'],5);assert.equal(restored.optionsByTeam.second['support-magazine-iii-level'],6);
+  for(const[mode,previous]of[['single',singleBefore],['challenge',challengeBefore]]){const now=teamDefenseReferences(raw,catalog,'data',mode);assert.deepEqual(now.refs,previous.refs);assert.notEqual(now.sourceRevision,previous.sourceRevision);}
+  assert.equal(saved.mode,'single');assert.equal(JSON.stringify(saved),raw);
 });

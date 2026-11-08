@@ -115,9 +115,10 @@ const siteRoot = join(root, 'site-dist');
 const optimizerEntryPath = join(output, 'features', 'ice-optimizer', 'frontend', 'main.js');
 const workerEntryPath = join(output, 'features', 'ice-optimizer', 'frontend', 'worker.js');
 const scoreEntry = join(output, 'features', 'transformation-score', 'main.js');
+const beneficiaryEntry = join(output, 'frontend', 'beneficiary-defense.js');
 const optimizerBundle = await bundle({
   absWorkingDir: root,
-  entryPoints: { 'ice-optimizer': optimizerEntryPath, 'ice-worker': workerEntryPath, 'transformation-score': scoreEntry },
+  entryPoints: { 'ice-optimizer': optimizerEntryPath, 'ice-worker': workerEntryPath, 'transformation-score': scoreEntry, 'beneficiary-defense': beneficiaryEntry },
   outdir: join(siteRoot, 'assets'),
   entryNames: '[name]-[hash]',
   chunkNames: 'chunks/ice-[name]-[hash]',
@@ -126,7 +127,7 @@ const optimizerBundle = await bundle({
   metafile: true, write: false,
 });
 const slash = value => value.replaceAll('\\', '/');
-let optimizerEntryPathHashed, optimizerWorkerPathHashed, scoreScript;
+let optimizerEntryPathHashed, optimizerWorkerPathHashed, scoreScript, beneficiaryScript;
 for (const file of optimizerBundle.outputFiles) {
   const asset = slash(relative(siteRoot, file.path));
   optimized.files.set(asset, file.contents);
@@ -139,6 +140,7 @@ for (const file of optimizerBundle.outputFiles) {
     })),
   };
   const entry = metadata.entryPoint && slash(metadata.entryPoint);
+  if (entry === slash(relative(root, beneficiaryEntry))) beneficiaryScript = asset;
   if (entry === slash(relative(root, scoreEntry))) scoreScript = asset;
   if (entry === slash(relative(root, optimizerEntryPath))) optimizerEntryPathHashed = asset;
   if (entry === slash(relative(root, workerEntryPath))) optimizerWorkerPathHashed = asset;
@@ -178,6 +180,11 @@ const scoreHtml = Buffer.from(scoreTemplate
   .replace('__SCORE_GAME_DATA__', '../' + gameDataPath)
   .replace('src="./main.js"', `src="../${scoreScript}"`));
 optimized.files.set('transformation-score/index.html', scoreHtml);
+
+if (!beneficiaryScript) throw new Error('Missing readonly beneficiary bridge');
+const buffPage = 'buff-simulator/index.html';
+optimized.files.set(buffPage, Buffer.from(optimized.files.get(buffPage).toString().replace('</head>',
+  `<meta name="beneficiary-defense-url" content="../${beneficiaryScript}"><meta name="beneficiary-data-url" content="../${gameDataPath}"></head>`)));
 
 shareSimulatorCss(optimized);
 await integrateThemes(root, optimized);

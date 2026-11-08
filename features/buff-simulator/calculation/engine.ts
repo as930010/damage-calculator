@@ -1,3 +1,4 @@
+import { applySupportMagazines, bindSupportMagazineSources } from './support-magazines.ts';
 import {
   cappedMultiplicativeBonus,
   collectValues,
@@ -20,7 +21,7 @@ import type {
 } from "./types.ts";
 
 const optionEffects = (input: TeamCalculationInput): EffectValues[] =>
-  (input.options ?? []).map((option) => option.effects);
+  (input.options ?? []).filter(option => !option.supportMagazine).map((option) => option.effects);
 
 /** Keep one arena-wide copy of each option ID and retain its strongest configured value. */
 function mergeArenaOptionsBySource(options: SelectedOption[]): SelectedOption[] {
@@ -60,6 +61,8 @@ function makeBreakdown(
     ["superArmor", "rank", result.superArmor],
   ];
 
+  if (result.defenseIgnoreAdditive) entries.push(["defenseIgnoreAdditive", "sum", result.defenseIgnoreAdditive]);
+
   return entries.map(([key, aggregation, value]) => ({
     key: key as EffectBreakdown["key"],
     values: collectValues(members, options, key),
@@ -70,7 +73,9 @@ function makeBreakdown(
 
 export function calculateTeam(input: TeamCalculationInput): TeamCalculationResult {
   const uniqueness = applyUniquenessScope(input.members, input.uniqueClassCodes);
-  const members = uniqueness.activeMembers.map((member) => member.effects);
+  const augmented = uniqueness.activeMembers.map(member => applySupportMagazines(member, input.options ?? [], input.uniqueClassCodes ?? []));
+  const members = augmented.map(member => member.effects);
+  const magazineDetails = augmented.flatMap(member => member.details);
   const options = optionEffects(input);
   const values = (key: keyof EffectValues) => collectValues(members, options, key);
 
@@ -99,6 +104,7 @@ export function calculateTeam(input: TeamCalculationInput): TeamCalculationResul
     defenseBreakDamageIncrease,
     defenseDamageMultiplier,
     totalDamageMultiplier: buffMultiplier * debuffMultiplier * defenseDamageMultiplier,
+    ...(sumEffects(values("defenseIgnoreAdditive")) === 0 ? {} : { defenseIgnoreAdditive: sumEffects(values("defenseIgnoreAdditive")) }),
     shield: combineShield(values("shield")),
     attackReduction: multiplyBonuses(values("attackReduction")) - 1,
     cooldownAcceleration: multiplyBonuses(values("cooldownAcceleration")) - 1,
@@ -112,6 +118,7 @@ export function calculateTeam(input: TeamCalculationInput): TeamCalculationResul
     superArmor: rankSupport(values("superArmor")),
     breakdown: [],
     ignoredClassIds: uniqueness.ignoredClassIds,
+    ...(magazineDetails.length ? { supportMagazineDetails: magazineDetails } : {}),
   };
   result.breakdown = makeBreakdown(members, options, result);
   return result;
@@ -138,12 +145,15 @@ export function calculateChallenge(
   };
   const sharedArena: TeamCalculationInput = {
     mode: "challenge",
-    members: [...input.firstTeam.members, ...input.secondTeam.members],
+    members: [
+      ...bindSupportMagazineSources(input.firstTeam.members, input.firstTeam.options ?? [], input.uniqueClassCodes ?? []),
+      ...bindSupportMagazineSources(input.secondTeam.members, input.secondTeam.options ?? [], input.uniqueClassCodes ?? []),
+    ],
     options: mergeArenaOptionsBySource([
       ...(input.firstTeam.options ?? []),
       ...(input.secondTeam.options ?? []),
       ...sharedOptions,
-    ]),
+    ].filter(option => !option.supportMagazine)),
     defense: input.defense,
     uniqueClassCodes: input.uniqueClassCodes,
     actionSpeedCap: input.actionSpeedCap,

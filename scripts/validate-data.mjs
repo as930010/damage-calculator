@@ -1,3 +1,4 @@
+import { parseCoreCatalog, parseSkillReferenceCatalog } from '../features/buff-simulator/frontend/data-loader.ts';
 import { readdir, readFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { dirname, join, relative, resolve } from "node:path";
@@ -250,6 +251,19 @@ if (weaponGrades) {
     }
   }
 }
+
+// Use the same parser as the Buff runtime; maintenance manifests are not inputs.
+try {
+  const buffRoot = join(root, 'features', 'buff-simulator', 'data');
+  const payloads = Object.fromEntries(await Promise.all(Object.entries({classes:'classes',classEffects:'class-effects',effectTypes:'effect-types',loadoutOptions:'loadout-options',calculationParameters:'calculation-parameters'})
+    .map(async ([key,name]) => [key, JSON.parse(await readFile(join(buffRoot, name+'.json'), 'utf8'))])));
+  const catalog = parseCoreCatalog(payloads);
+  const skills = parseSkillReferenceCatalog(JSON.parse(await readFile(join(buffRoot, 'skill-reference.json'), 'utf8')), catalog.classes);
+  for (const role of skills.roles) for (const skill of role.skills) if (skill.icon) {
+    if (!/^skill-icons\/[\w-]+\.png$/.test(skill.icon)) throw new Error('Invalid skill icon path');
+    await readFile(join(buffRoot, skill.icon));
+  }
+} catch (error) { errors.push(`Buff 資料檢查失敗：${error.message}`); }
 
 const typescriptPackagePath = require.resolve("typescript/package.json");
 const typescriptPackage = JSON.parse(await readFile(typescriptPackagePath, "utf8"));

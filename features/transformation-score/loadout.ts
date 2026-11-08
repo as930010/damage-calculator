@@ -9,7 +9,7 @@ import type { LoadoutState } from '../../frontend/state.ts';
 import { compareRolls, ratingRule, type Selection } from './scoring.ts';
 import { normalizeTransformationSelections, normalizeTransformationValues, UNRELATED_TRANSFORMATION } from '../../calculation/transformation-selections.ts';
 
-export function readRatingLoadout(data: GameData, state: LoadoutState, externalDefenseBreakRate: number | null = 0) {
+export function readRatingLoadout(data: GameData, state: LoadoutState, externalDefenseBreakRate: number | null = 0, defenseIgnoreAdditive: number | null = 0) {
   const job = data.classes.classes.find(entry => entry.id === state.Job);
   if (!job) throw new Error('目前配裝的職業無法辨識。');
   const transforms = data.transformations;
@@ -31,7 +31,7 @@ export function readRatingLoadout(data: GameData, state: LoadoutState, externalD
   });
   const actual = normalizeTransformationSelections(rawActual);
   if (actual.some((line, i) => line.choice !== rawActual[i].choice)) warnings.push('重複的有效傷害詞條已在本頁模擬中清空，保留第一條。');
-  const evaluation = evaluateLoadout(data, { ...state, values }, false, true, externalDefenseBreakRate);
+  const evaluation = evaluateLoadout(data, { ...state, values }, false, true, externalDefenseBreakRate, defenseIgnoreAdditive);
   const input = 'comparisonInput' in evaluation ? evaluation.comparisonInput : undefined;
   const result = evaluation.damage?.result;
   if (!input || !result) throw evaluation.damageError ?? new Error('目前配裝無法計算。');
@@ -63,7 +63,7 @@ export function readRatingLoadout(data: GameData, state: LoadoutState, externalD
 }
 
 /** Armor field identifiers and tier units are supplied by the same rules as the homepage. */
-export function readArmorRatingLoadout(data: GameData, state: LoadoutState, slotId: string, externalDefenseBreakRate: number | null = 0) {
+export function readArmorRatingLoadout(data: GameData, state: LoadoutState, slotId: string, externalDefenseBreakRate: number | null = 0, defenseIgnoreAdditive: number | null = 0) {
   const slot = data.innerwear.slots.find(item => item.id === slotId);
   const field = data.nephronArmor.fields.find(item => item.slotId === slotId);
   if (!slot || !field) throw new Error('無法辨識防具部位。');
@@ -94,7 +94,7 @@ export function readArmorRatingLoadout(data: GameData, state: LoadoutState, slot
     delete values[attributeField]; delete values[valueField];
     return { choice: rule || choice === UNRELATED_TRANSFORMATION ? choice : '', roll };
   }));
-  const baseline = evaluateLoadout(data, { ...state, values }, false, true, externalDefenseBreakRate);
+  const baseline = evaluateLoadout(data, { ...state, values }, false, true, externalDefenseBreakRate, defenseIgnoreAdditive);
   const input = 'comparisonInput' in baseline ? baseline.comparisonInput : undefined;
   const result = baseline.damage?.result;
   if (!input || !result) throw baseline.damageError ?? new Error('目前配裝無法計算。');
