@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { projectAttributes, projectDamage } from '../dist/frontend/projection.js';
 import { normalizePortraitAwakeningSplit } from '../dist/frontend/state.js';
 import { resolveInnerwearSources } from '../dist/calculation/innerwear.js';
-import { resolveMasterBeastEffects, resolveRightIceSetEffects } from '../dist/calculation/equipment-effects.js';
+import { resolveMasterBeastEffects, resolveRightIceSetEffects, resolveSpiritRecordEffects, resolveSpiritRecordSelections } from '../dist/calculation/equipment-effects.js';
 
 const readJson = async path => JSON.parse(await readFile(new URL(`../data/${path}`, import.meta.url), 'utf8'));
 
@@ -869,4 +869,51 @@ test('強/排褲不可將相同條件電路板效果重複計入，強者與排�
 
   const invalidChipValues = { ...chipValues, [chipSlots.lowerwearAlternative.attributeField]: '強者%' };
   assert.throws(() => projectAttributes(data, { ...validState, values: invalidChipValues }), /下衣與強\/排褲不可同時使用.*芯片/);
+});
+
+test('TB、DN、TW 與全部 60 職業的賦靈錄支線加成完整且門檻正確',async()=>{
+  const data=await loadData(),doc=data.spiritRecord,rows=doc.classSelectors.classes;
+  assert.equal(rows.length,60);assert.equal(new Set(rows.map(r=>r.classCode)).size,60);
+  assert.deepEqual([...new Set(rows.map(r=>r.classCode))].sort(),data.classes.classes.map(c=>c.id).sort());
+  const groups=['1支線','2支線','3支線','4支線'];
+  for(const group of groups){const expected=rows.filter(r=>r.branch===group).map(r=>r.classCode).sort(),bonus=doc.branchBonuses.find(b=>b.name===group);assert.equal(expected.length,15);assert.deepEqual([...bonus.eligibleClasses].sort(),expected);}
+  for(const job of data.classes.classes){
+    const row=rows.find(r=>r.classCode===job.id);
+    const same=rows.filter(r=>r.branch===row.branch).slice(0,6).map(r=>r.classCode);
+    for(let n=0;n<=6;n++){
+      const selections=resolveSpiritRecordSelections(doc,same.slice(0,n)),effects=resolveSpiritRecordEffects(doc,job.id,job.attackType,selections);
+      const branch=effects.filter(e=>e.sourceId.startsWith('spirit-record:branch:'));
+      assert.equal(branch.length,n?1:0,job.id+':'+n);
+      if(n){assert.equal(branch[0].sourceId,'spirit-record:branch:'+row.branch);assert.deepEqual(branch[0].stats,{allSkillDamagePct:[0,1,2,3,3,3,5][n]});}
+      assert.deepEqual(effects[0].stats,doc.defaultMaxedStats);
+    }
+    const other=rows.find(r=>r.branch!==row.branch);
+    assert.equal(resolveSpiritRecordEffects(doc,job.id,job.attackType,resolveSpiritRecordSelections(doc,[other.classCode])).some(e=>e.sourceId.startsWith('spirit-record:branch:')),false);
+    assert.deepEqual(resolveSpiritRecordSelections(doc,[job.id.toLowerCase()]),[row.branch,...row.traits]);
+  }
+});
+test('TB + GB/CU/EW/DB/CA/MO 的完整屬性投影包含 1 支線所有技能傷害 3%',async()=>{
+  const data=await loadData(),codes=['GB','CU','EW','DB','CA','MO'],values=Object.fromEntries(data.spiritRecord.classSelectors.settingKeys.map((key,i)=>[key,codes[i]])),state={schemaVersion:3,Job:'TB',values,lowerwearAlternativeEnabled:false};
+  const attributes=projectAttributes(data,state),source=attributes.stats.allSkillDamagePct.sharedSources.find(e=>e.sourceId==='spirit-record:branch:1支線');
+  assert.equal(source.valuePct,3);
+  const before=projectAttributes(data,{...state,values:{}});
+  assert.equal(attributes.stats.allSkillDamagePct.finalTotal-before.stats.allSkillDamagePct.finalTotal,3);
+  const selected=resolveSpiritRecordSelections(data.spiritRecord,codes);assert.equal(selected.filter(x=>x==='1支線').length,4);assert.equal(selected.filter(x=>x==='4支線').length,2);
+  const fx=resolveSpiritRecordEffects(data.spiritRecord,'TB','physical',selected);
+  for(const[name,key,value]of[['敏銳','polarizationPct',3],['巨人審判者','strongerPct',2],['動武','heatPct',2],['扭曲的視線','bleedDamagePct',2]])assert.equal(fx.find(e=>e.sourceId==='spirit-record:trait:'+name).stats[key],value);
+});
+test('賦靈錄全部八種傷害特性在 0–6 個門檻與物魔限制正確，選項不重複計數',async()=>{
+  const {spiritRecord:doc}=await loadData();
+  const oracle={
+    '敏銳':['polarizationPct',[0,0,0,3,3,3,5]],'巨人審判者':['strongerPct',[0,0,2,2,3,5,3]],'動武':['heatPct',[0,0,2,2,3,5,3]],
+    '扭曲的視線':['bleedDamagePct',[0,0,2,2,2,2,2]],'物理特化':['doubleAttackPct',[0,0,1,1,3,3,3]],'魔法特化':['doubleAttackPct',[0,0,1,1,3,3,3]],'時空':['defenseIgnorePct',[0,0,2,2,2,2,2]],'魔族':['adaptabilityPct',[0,0,2,2,2,2,2]]
+  };
+  assert.deepEqual(doc.traits.map(t=>t.name).sort(),Object.keys(oracle).sort());
+  for(const[name,[key,values]]of Object.entries(oracle))for(const type of['physical','magical'])for(let n=0;n<=6;n++){
+    const source=resolveSpiritRecordEffects(doc,'TB',type,Array(n).fill(name)).find(s=>s.sourceId==='spirit-record:trait:'+name);
+    const blocked=name==='物理特化'&&type==='magical'||name==='魔法特化'&&type==='physical';
+    assert.equal(source?.stats[key]??0,blocked?0:values[n],name+':'+type+':'+n);
+  }
+  assert.throws(()=>resolveSpiritRecordSelections(doc,['TB','tb']),/重複/);assert.throws(()=>resolveSpiritRecordSelections(doc,['UNKNOWN']),/找不到/);
+  assert.throws(()=>resolveSpiritRecordSelections(doc,Array(7).fill('TB')),/最多/);
 });

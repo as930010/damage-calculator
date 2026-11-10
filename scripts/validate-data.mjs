@@ -158,6 +158,21 @@ for (const classId of classIds) {
   }
 }
 
+// Class selection and branch eligibility must describe the same complete roster.
+const spirit = documents.get('data/spirit-record-effects.json');
+const spiritClasses = spirit?.classSelectors?.classes;
+if (Array.isArray(spiritClasses) && Array.isArray(spirit?.branchBonuses)) {
+  const codes = spiritClasses.map(entry => entry.classCode);
+  if (new Set(codes).size !== codes.length || codes.length !== classIds.size || codes.some(code => !classIds.has(code))) errors.push('賦靈錄職業選項必須完整且不重複地涵蓋所有職業。');
+  const branches = spirit.branchBonuses.map(bonus => bonus.name);
+  if (new Set(branches).size !== branches.length || spiritClasses.some(entry => !branches.includes(entry.branch))) errors.push('賦靈錄支線名稱重複或職業支線未定義。');
+  for (const bonus of spirit.branchBonuses) {
+    const expected = spiritClasses.filter(entry => entry.branch === bonus.name).map(entry => entry.classCode);
+    const actual = bonus.eligibleClasses;
+    if (!Array.isArray(actual) || new Set(actual).size !== actual.length || actual.length !== expected.length || expected.some(code => !actual.includes(code))) errors.push('賦靈錄加成 ' + bonus.name + ' 的適用職業與職業選項支線不一致。');
+  }
+}
+
 const classDamagePassives = documents.get("data/class-damage-passives.json");
 if (classDamagePassives) {
   for (const field of ["critDamagePctByClass", "bossDamagePctByClass"]) {

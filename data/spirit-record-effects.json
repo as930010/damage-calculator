@@ -30,6 +30,7 @@
         "ES",
         "DB",
         "CT",
+        "TB",
         "RI",
         "EW",
         "LI",
@@ -59,6 +60,7 @@
         "FP",
         "BR",
         "FL",
+        "DN",
         "IN",
         "BMa",
         "BL",
@@ -84,6 +86,7 @@
       "eligibleClasses": [
         "IM",
         "MM",
+        "TW",
         "NI",
         "CS",
         "CeT",
