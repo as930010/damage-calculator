@@ -549,3 +549,37 @@ test('DN field power descriptions remove only the physical restriction and retai
     {name:'原野力量(轉換)',description:'我方\n攻擊力、致命傷害 +9.2%\n覺醒回復速度 +34.5%',icon:'skill-icons/DN-04.png'}]);
   const h=await open(t);edit(h,'[data-member]','DN');await h.openSkills();h.reset();edit(h,'[data-skill-query]','原野力量');assert.equal(h.app.querySelectorAll('.skill-entry').length,2);assert.doesNotMatch(h.query('[data-skill-results]').textContent,/物理攻擊/);assert.match(h.query('[data-skill-results]').innerHTML,/我方<br>攻擊力/);work(h,{calculateTeam:0,updateResults:0,storage:0});
 });
+
+test('Support accessory and both resistance sources default on and preserve independent saved opt-outs', async t => {
+  const accessory = 'incense-defense-break', badge = 'dark-ghost-badge-resistance', crystal = 'ice-crystal-resistance';
+  const ids = [accessory, badge, crystal];
+  const legacy = { version:1, mode:'single', membersByTeam:{single:['IM']}, optionsByTeam:{single:{}} };
+  const h = await open(t,{saved:legacy});
+  const field = (id,team='single') => '[data-option="'+id+'"][data-team="'+team+'"]';
+  for (const id of ids) assert.equal(h.query(field(id)).checked,true);
+  assert.equal(h.query(field(accessory)).parentElement.textContent,'支援飾品（香爐、預言書）');
+  const result = () => capture(h).results.at(-1);
+  const initial = result();
+  edit(h,field(accessory),false);
+  closeNumber(result().defenseBreak,1-(1-initial.defenseBreak)/.85);
+  edit(h,field(badge),false);assert.equal(result().resistanceReduction,initial.resistanceReduction-100);
+  edit(h,field(crystal),false);assert.equal(result().resistanceReduction,initial.resistanceReduction-250);
+  const saved = h.saved();for (const id of ids) assert.equal(saved.optionsByTeam.single[id],false);
+  const restored = await open(t,{saved});
+  for (const id of ids) assert.equal(restored.query(field(id)).checked,false);
+  for (const id of ids) edit(h,field(id),true);
+  assert.deepEqual(result(),initial);
+  h.clickMode('challenge');
+  const both = () => capture(h).results.slice(-3);
+  const [beforeFirst,beforeSecond,beforeArena] = both();
+  edit(h,field(accessory,'first'),false);edit(h,field(badge,'first'),false);edit(h,field(crystal,'second'),false);
+  const [first,second,arena] = both();
+  closeNumber(first.defenseBreak,1-(1-beforeFirst.defenseBreak)/.85);
+  assert.equal(first.resistanceReduction,beforeFirst.resistanceReduction-100);
+  assert.equal(second.resistanceReduction,beforeSecond.resistanceReduction-150);
+  assert.equal(arena.defenseBreak,beforeArena.defenseBreak);assert.equal(arena.resistanceReduction,beforeArena.resistanceReduction);
+  const separate = await open(t,{saved:h.saved()});
+  for (const [team,option,checked] of [['first',accessory,false],['second',accessory,true],['first',badge,false],['second',badge,true],['first',crystal,true],['second',crystal,false]]) {
+    assert.equal(separate.query(field(option,team)).checked,checked);
+  }
+});

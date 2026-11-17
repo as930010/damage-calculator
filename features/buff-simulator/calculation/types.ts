@@ -148,6 +148,7 @@ export interface TeamCalculationInput {
   /** Shared arena support options are applied once when their IDs match. */
   uniqueClassCodes?: string[];
   actionSpeedCap?: number;
+  includeDefenseContributions?: boolean;
 }
 
 export type SupportRank = "none" | "has" | "good" | "strong";
@@ -160,7 +161,16 @@ export interface EffectBreakdown {
   result: number | SupportRank;
 }
 
+export interface DefenseContribution {
+  id: string;
+  category: "class" | "loadout" | "defense-ignore";
+  label: string;
+  /** Fraction supplied by this source after applying eligibility and uniqueness rules. */
+  rate: number;
+}
+
 export interface TeamCalculationResult {
+  defenseContributions?: DefenseContribution[];
   mode: TeamMode;
   buffMultiplier: number;
   debuffMultiplier: number;
@@ -191,13 +201,14 @@ export interface TeamCalculationResult {
 }
 
 export interface ChallengeCalculationInput {
-  firstTeam: Omit<TeamCalculationInput, "mode" | "defense" | "uniqueClassCodes" | "actionSpeedCap">;
-  secondTeam: Omit<TeamCalculationInput, "mode" | "defense" | "uniqueClassCodes" | "actionSpeedCap">;
+  firstTeam: Omit<TeamCalculationInput, "mode" | "defense" | "uniqueClassCodes" | "actionSpeedCap" | "includeDefenseContributions">;
+  secondTeam: Omit<TeamCalculationInput, "mode" | "defense" | "uniqueClassCodes" | "actionSpeedCap" | "includeDefenseContributions">;
   /** Options applied only to the combined eight-person calculation. */
   sharedOptions?: SelectedOption[];
   defense: DefenseModel;
   uniqueClassCodes?: string[];
   actionSpeedCap?: number;
+  includeDefenseContributions?: boolean;
 }
 
 export interface ChallengeCalculationResult {

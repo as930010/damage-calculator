@@ -623,7 +623,7 @@ window.addEventListener('storage', event => {
   validateConditions();
 });
 
-battleDefense.subscribe(() => {
+battleDefense.subscribeCalculation(() => {
   if (worker) stopWorker();
   resultValid = false;
   results.querySelectorAll<HTMLButtonElement>('.optimizer-apply').forEach(button => { button.disabled = true; });

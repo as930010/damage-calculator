@@ -61,7 +61,7 @@ const server = createServer(async (request, response) => {
     if (withoutSeasonal && extname(file) === '.html' && (!themes || !integratedThemes)) {
       body = Buffer.from(body.toString('utf8').replace(
         /<link rel="stylesheet" href="(\.\.?\/assets\/seasonal-effects-[^"/]+\.css)"(?: data-theme-seasonal)?\s*\/>/gm,
-        themes ? `<link rel="stylesheet" href="$1" media="all" data-theme-seasonal />\n<script>try{const k='damage-calculator-preview-theme',v=new URL(location.href).searchParams.get('preview-theme')||sessionStorage.getItem(k)||'seasonal';if(v!=='seasonal'){document.querySelector('link[data-theme-seasonal]').media='not all';if(['harbor','forest','ember'].includes(v))document.documentElement.dataset.previewTheme=v}}catch{}</script>\n` : '',
+        themes ? `<link rel="stylesheet" href="$1" media="all" data-theme-seasonal />\n<script>try{const k='damage-calculator-preview-theme',v=new URL(location.href).searchParams.get('preview-theme')||sessionStorage.getItem(k)||'original';if(v!=='seasonal'){document.querySelector('link[data-theme-seasonal]').media='not all';if(['harbor','forest','ember'].includes(v))document.documentElement.dataset.previewTheme=v}}catch{}</script>\n` : '',
       ).replace(/<!-- theme-bootstrap:start -->[\s\S]*?<!-- theme-bootstrap:end -->/g, '')
         .replace(/<!-- theme-control:start -->[\s\S]*?<!-- theme-control:end -->/g, ''));
     }

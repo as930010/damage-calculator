@@ -20,7 +20,7 @@ const defenseEditor = createBattleDefenseEditor(battleDefense, new URL(document.
 status.parentElement!.append(defenseEditor.root);
 const disclosures = createDisclosurePreferences(document);
 defenseEditor.root.open = disclosures.preferredOpen('battle-defense-context', false);
-battleDefense.subscribe(() => { if (data && state) activate(); });
+battleDefense.subscribeCalculation(() => { if (data && state) activate(); });
 const formatter = new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 2 });
 const pct = (gain: number | null) => gain === null ? '無法計算' : (gain * 100).toFixed(2) + '%';
 const message = (err: unknown) => err instanceof Error ? err.message : '無法讀取目前配裝。';

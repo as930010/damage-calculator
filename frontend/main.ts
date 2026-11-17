@@ -193,7 +193,7 @@ async function start() {
   defenseEditor.root.id = 'battle-defense-context';
   app.querySelector('.battle-panel')!.after(defenseEditor.root);
   defenseEditor.root.open = disclosurePreferences.preferredOpen('battle-defense-context', false);
-  battleDefense.subscribe(() => renderResults());
+  battleDefense.subscribeCalculation(() => renderResults());
   const attributeEquivalence = createAttributeEquivalencePanel(data.attributes.attributes, () => {
     const evaluation = evaluateLoadout(data, state, false, true);
     attributeEquivalence.update('comparisonInput' in evaluation ? evaluation.comparisonInput : undefined,

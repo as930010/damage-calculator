@@ -13,6 +13,7 @@ import { applyUniquenessScope } from "./team-uniqueness.ts";
 import type {
   ChallengeCalculationInput,
   ChallengeCalculationResult,
+  DefenseContribution,
   EffectBreakdown,
   EffectValues,
   SelectedOption,
@@ -20,8 +21,13 @@ import type {
   TeamCalculationResult,
 } from "./types.ts";
 
-const optionEffects = (input: TeamCalculationInput): EffectValues[] =>
-  (input.options ?? []).filter(option => !option.supportMagazine).map((option) => option.effects);
+function defenseContributions(id: string, label: string, category: "class" | "loadout", effects: EffectValues): DefenseContribution[] {
+  const contributions: DefenseContribution[] = [];
+  const { defenseBreak = 0, defenseIgnoreAdditive = 0 } = effects;
+  if (defenseBreak > 0) contributions.push({ id, label, category, rate: defenseBreak });
+  if (defenseIgnoreAdditive > 0) contributions.push({ id, label, category: "defense-ignore", rate: defenseIgnoreAdditive });
+  return contributions;
+}
 
 /** Keep one arena-wide copy of each option ID and retain its strongest configured value. */
 function mergeArenaOptionsBySource(options: SelectedOption[]): SelectedOption[] {
@@ -76,7 +82,8 @@ export function calculateTeam(input: TeamCalculationInput): TeamCalculationResul
   const augmented = uniqueness.activeMembers.map(member => applySupportMagazines(member, input.options ?? [], input.uniqueClassCodes ?? []));
   const members = augmented.map(member => member.effects);
   const magazineDetails = augmented.flatMap(member => member.details);
-  const options = optionEffects(input);
+  const activeOptions = (input.options ?? []).filter(option => !option.supportMagazine);
+  const options = activeOptions.map(option => option.effects);
   const values = (key: keyof EffectValues) => collectValues(members, options, key);
 
   const buffMultiplier = multiplyBonuses(values("buff"));
@@ -96,6 +103,10 @@ export function calculateTeam(input: TeamCalculationInput): TeamCalculationResul
 
   const result: TeamCalculationResult = {
     mode: input.mode,
+    ...(input.includeDefenseContributions ? { defenseContributions: [
+      ...uniqueness.activeMembers.flatMap((member, index) => defenseContributions("class:" + member.classId, member.classCode, "class", members[index])),
+      ...activeOptions.flatMap(option => defenseContributions("loadout:" + option.id, option.id, "loadout", option.effects)),
+    ] } : {}),
     buffMultiplier,
     debuffMultiplier,
     buffIncrease: buffMultiplier - 1,
@@ -129,19 +140,17 @@ export function calculateChallenge(
   input: ChallengeCalculationInput,
 ): ChallengeCalculationResult {
   const sharedOptions = input.sharedOptions ?? [];
+  const sharedSettings = { defense: input.defense, uniqueClassCodes: input.uniqueClassCodes,
+    actionSpeedCap: input.actionSpeedCap, includeDefenseContributions: input.includeDefenseContributions };
   const team1: TeamCalculationInput = {
     ...input.firstTeam,
     mode: "challenge",
-    defense: input.defense,
-    uniqueClassCodes: input.uniqueClassCodes,
-    actionSpeedCap: input.actionSpeedCap,
+    ...sharedSettings,
   };
   const team2: TeamCalculationInput = {
     ...input.secondTeam,
     mode: "challenge",
-    defense: input.defense,
-    uniqueClassCodes: input.uniqueClassCodes,
-    actionSpeedCap: input.actionSpeedCap,
+    ...sharedSettings,
   };
   const sharedArena: TeamCalculationInput = {
     mode: "challenge",
@@ -154,9 +163,7 @@ export function calculateChallenge(
       ...(input.secondTeam.options ?? []),
       ...sharedOptions,
     ].filter(option => !option.supportMagazine)),
-    defense: input.defense,
-    uniqueClassCodes: input.uniqueClassCodes,
-    actionSpeedCap: input.actionSpeedCap,
+    ...sharedSettings,
   };
 
   return {

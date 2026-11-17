@@ -598,7 +598,10 @@
           "steel-wall-defense-break": true,
           "wind-ball-defense-break": true,
           "movement-speed-shoes": 30,
-          "skill-damage-gloves": 25
+          "skill-damage-gloves": 25,
+          "incense-defense-break": true,
+          "dark-ghost-badge-resistance": true,
+          "ice-crystal-resistance": true
         },
         "first": {
           "movement-speed-shoes": 14.4,
@@ -1533,7 +1536,10 @@
           "steel-wall-defense-break": true,
           "wind-ball-defense-break": true,
           "movement-speed-shoes": 14.4,
-          "skill-damage-gloves": 18
+          "skill-damage-gloves": 18,
+          "incense-defense-break": true,
+          "dark-ghost-badge-resistance": true,
+          "ice-crystal-resistance": true
         },
         "first": {
           "green-beast": true,
@@ -1542,7 +1548,10 @@
           "steel-wall-defense-break": true,
           "wind-ball-defense-break": false,
           "movement-speed-shoes": 14.4,
-          "skill-damage-gloves": 18
+          "skill-damage-gloves": 18,
+          "incense-defense-break": true,
+          "dark-ghost-badge-resistance": true,
+          "ice-crystal-resistance": true
         },
         "second": {
           "green-beast": true,
@@ -1551,7 +1560,10 @@
           "steel-wall-defense-break": true,
           "wind-ball-defense-break": true,
           "movement-speed-shoes": 14.4,
-          "skill-damage-gloves": 30
+          "skill-damage-gloves": 30,
+          "incense-defense-break": true,
+          "dark-ghost-badge-resistance": true,
+          "ice-crystal-resistance": true
         }
       },
       "bossReductions": {
@@ -1598,7 +1610,10 @@
           "steel-wall-defense-break": true,
           "wind-ball-defense-break": true,
           "movement-speed-shoes": 14.4,
-          "skill-damage-gloves": 18
+          "skill-damage-gloves": 18,
+          "incense-defense-break": true,
+          "dark-ghost-badge-resistance": true,
+          "ice-crystal-resistance": true
         },
         "first": {
           "movement-speed-shoes": 14.4,

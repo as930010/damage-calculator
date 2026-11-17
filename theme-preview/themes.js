@@ -1,7 +1,7 @@
 (() => {
   const key = 'damage-calculator-preview-theme';
   const seasonal = document.querySelector('link[data-theme-seasonal]');
-  const fallback = seasonal ? 'seasonal' : 'original';
+  const fallback = 'original';
   const themes = [
     { id: 'original', name: '預設', group: 'basic' },
     { id: 'seasonal', name: '共存節', group: 'basic' },

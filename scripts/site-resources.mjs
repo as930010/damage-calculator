@@ -49,7 +49,7 @@ export async function integrateThemes(root, optimized) {
     optimized.files.set(path, bytes);
     optimized.manifest.files[path] = { bytes: bytes.length, hash: contentHash(bytes) };
   }
-  const themeBootstrap = `<!-- theme-bootstrap:start --><script>try{const s=document.querySelector('link[data-theme-seasonal]'),k='damage-calculator-preview-theme',v=new URL(location.href).searchParams.get('preview-theme')||sessionStorage.getItem(k)||(s?'seasonal':'original');if(['original','harbor','forest','ember'].includes(v)){if(s)s.media='not all';if(v!=='original')document.documentElement.dataset.previewTheme=v}}catch{}</script><!-- theme-bootstrap:end -->`;
+  const themeBootstrap = `<!-- theme-bootstrap:start --><script>try{const s=document.querySelector('link[data-theme-seasonal]'),k='damage-calculator-preview-theme',requested=new URL(location.href).searchParams.get('preview-theme'),palettes=['harbor','forest','ember'],valid=v=>v==='original'||(v==='seasonal'&&s)||palettes.includes(v);let stored;try{stored=sessionStorage.getItem(k)}catch{}const v=valid(requested)?requested:valid(stored)?stored:'original';if(s)s.media=v==='seasonal'?'all':'not all';if(palettes.includes(v))document.documentElement.dataset.previewTheme=v}catch{}</script><!-- theme-bootstrap:end -->`;
   for (const [page, prefix] of [['index.html', './'], ['ice-optimizer/index.html', '../'], ['buff-simulator/index.html', '../'], ['transformation-score/index.html', '../']]) {
     let html = optimized.files.get(page).toString();
     const seasonalLink = /<link rel="stylesheet" href="([^"]*seasonal-effects-[^"]+\.css)"\s*\/>/g;

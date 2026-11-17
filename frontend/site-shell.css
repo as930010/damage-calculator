@@ -238,7 +238,12 @@ body.site-page {
 .battle-defense .defense-totals { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; border-top: 1px solid var(--border, var(--site-border)); padding-top: 1rem; margin-block: 1rem 0; }
 .battle-defense .defense-totals dd { margin: .25rem 0 0; font-size: 1.25rem; font-weight: 700; }
 .battle-defense .defense-target { margin-block: .75rem; }
-.battle-defense .defense-team-info { overflow-wrap: anywhere; }
+.battle-defense .defense-reference { margin-block: .75rem; }
+.battle-defense .defense-reference > summary { cursor: pointer; font-weight: 700; }
+.battle-defense .defense-reference > p { margin-block: .5rem; }
+.battle-defense .defense-team-info { grid-column: 1 / -1; overflow-wrap: anywhere; }
+.battle-defense .defense-team-info p { margin-block: .25rem; }
+.battle-defense .defense-team-info p:empty { margin: 0; }
 .battle-defense [hidden] { display: none; }
 @media (max-width: 700px) {
   .site-page details.battle-defense.global-source-panel > summary { grid-template-columns: auto minmax(0, 1fr); padding: .875rem 1rem; }

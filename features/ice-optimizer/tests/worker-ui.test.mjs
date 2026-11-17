@@ -263,13 +263,13 @@ test('LA additive ignore is captured by Worker and invalidates running search wh
   const dom=new JSDOM(html,{url:'https://optimizer.test/damage-calculator/ice-optimizer/'});
   dom.window.localStorage.setItem('dab-loadout-v1',JSON.stringify(iceScenario(gameData,sample,17)));
   const key='damage-calculator.battle-defense.v1',snapshot={mode:'single',target:'single',rate:.915,sources:[],sourceRevision:'x',dataRevision:'x',importedAt:'2026-11-08',defenseIgnoreAdditive:.05,defenseIgnoreSources:['職業：LA']};
-  const env={schemaVersion:1,mode:'team',manualPercentage:'0',sources:[],teamSnapshot:snapshot};
+  const env={schemaVersion:2,mode:'sources',manualPercentage:'0',sources:[{kind:'team',id:'team',snapshot}]};
   dom.window.localStorage.setItem(key,JSON.stringify(env));
   const workers=[];class Worker{constructor(){workers.push(this);}addEventListener(){}postMessage(request){this.request=request;}terminate(){this.terminated=true;}}
   const runtime=await createRuntime({dom,instrument:false,globals:{Worker,sessionStorage:dom.window.sessionStorage,location:{href:dom.window.location.href,assign(){}},fetch:async()=>({ok:true,json:async()=>structuredClone(gameData)})}});
   try{await runtime.load('features/ice-optimizer/frontend/main.ts');await new Promise(r=>setTimeout(r,0));
     dom.window.document.querySelector('#optimizer-start').click();assert.equal(workers.at(-1).request.defenseIgnoreAdditive,.05);assert.equal(workers.at(-1).request.externalDefenseBreakRate,.915);
-    const running=workers.at(-1);env.teamSnapshot.defenseIgnoreAdditive=0;dom.window.localStorage.setItem(key,JSON.stringify(env));dom.window.dispatchEvent(new dom.window.StorageEvent('storage',{key}));
+    const running=workers.at(-1);snapshot.defenseIgnoreAdditive=0;dom.window.localStorage.setItem(key,JSON.stringify(env));dom.window.dispatchEvent(new dom.window.StorageEvent('storage',{key}));
     assert.equal(running.terminated,true);dom.window.document.querySelector('#optimizer-start').click();assert.equal(workers.at(-1).request.defenseIgnoreAdditive,0);
   }finally{dom.window.close();}
 });

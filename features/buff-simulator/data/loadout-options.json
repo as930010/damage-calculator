@@ -53,10 +53,9 @@
   },
   {
     "id": "incense-defense-break",
-    "label": "香爐（破防）",
+    "label": "支援飾品（香爐、預言書）",
     "scope": "per-team",
     "defaultSelected": true,
-    "presentation": "background",
     "effects": { "defenseBreak": { "kind": "fixed", "value": 0.15 } }
   },
   {
@@ -64,7 +63,6 @@
     "label": "暗鬼徽章",
     "scope": "per-team",
     "defaultSelected": true,
-    "presentation": "background",
     "effects": { "resistanceReduction": { "kind": "fixed", "value": 100 } },
     "note": "暗鬼徽章提供 100 點降抗；冰晶露另提供 150 點，兩者皆預設納入。"
   },
@@ -73,7 +71,6 @@
     "label": "冰晶露（降抗）",
     "scope": "per-team",
     "defaultSelected": true,
-    "presentation": "background",
     "effects": { "resistanceReduction": { "kind": "fixed", "value": 150 } }
   },
   {"id": "support-magazine-i", "label": "支援彈匣I", "scope": "per-team", "defaultSelected": false, "userInput": {"kind": "support-magazine", "target": "attackBuff"}, "effects": {}},
