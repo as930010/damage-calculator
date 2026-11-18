@@ -40,6 +40,20 @@ function expectedTransfer(snapshot) {
   return expected;
 }
 
+// Pin the historical order and independently verify the entire current option list.
+// New catalog entries then need no second hand-maintained list in this test.
+function liveEquipmentChoices(field, values) {
+  const stone = index.equipmentMappings.get(field);
+  if (stone?.application && index.validationCatalog(field)) return gameData.catalogs[stone.catalogFile].items
+    .filter(item => item.active && item.slotId === stone.slotId).map(item => item.targetApplications?.[stone.application]?.sourceName ?? item.name);
+  const accessory = gameData.accessoryEffects.groups.find(group => group.inputFields.includes(field));
+  if (accessory) return (accessory.optionsByEquipmentName?.[values[accessory.selectionField]] ?? accessory.options).map(option => option.name);
+  if (gameData.appraisals.slots.some(slot => slot.inputFields.includes(field))) return gameData.appraisals.options.map(option => option.name);
+  const group = [...Object.values(gameData.weaponAppraisals.groups), gameData.weaponGrades,
+    ...gameData.weaponGrades.colorGroups, gameData.giantStones].find(g => g.settingKey === field || g.settingKeys?.includes(field));
+  return group?.options.map(option => option.name);
+}
+
 for (const context of choiceContexts()) {
   test(`ordered field choices: ${context.id}`, () => {
     for (const field of Object.keys(fixture.choices[context.id])) {
@@ -52,7 +66,14 @@ for (const context of choiceContexts()) {
           : { '亞特瑪5%超越': ['亞特瑪5%強烈', '亞特瑪5%超越', '亞特瑪4%強烈/超越'] }
         : {};
       const currentExpected = Array.isArray(expected) ? expected.flatMap(choice => stoneAdditions[choice] ?? [choice]) : expected;
-      assert.deepEqual(normalize(index.resolveFieldChoices(field, context.values)), additions.length ? [...currentExpected, ...additions] : currentExpected, field);
+      const actual = normalize(index.resolveFieldChoices(field, context.values));
+      const live = liveEquipmentChoices(field, context.values);
+      if (live && Array.isArray(currentExpected)) {
+        assert.deepEqual(actual, live, field + ': current catalog');
+        assert.deepEqual(actual.filter(choice => currentExpected.includes(choice)), currentExpected, field + ': historical choices');
+      } else {
+        assert.deepEqual(actual, additions.length ? [...currentExpected, ...additions] : currentExpected, field);
+      }
     }
   });
 }
@@ -267,6 +288,7 @@ test('actual main import/restore retains baseline and reuses the same index', as
     Object.defineProperty(file, 'files', { value: [{ text: async () => fixture.transfers.export.json }] });
     page.runtime.resetCounts(); file.dispatchEvent(new Event('change'));
     for (let i = 0; i < 200 && document.querySelector('#transfer-status').textContent.includes('正在載入'); i++) {
+      [...document.querySelectorAll('dialog button')].find(b => b.textContent === '套用至畫布')?.click();
       await new Promise(resolve => setTimeout(resolve, 5));
     }
     assert.match(document.querySelector('#transfer-status').textContent, /已匯入/);

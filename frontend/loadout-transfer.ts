@@ -4,12 +4,24 @@ export { equipmentTransferCode } from './catalog-index.ts';
 import { isResonanceInputField, parseResonancePoints } from '../calculation/resonance-input.ts';
 import { codeForFieldId, fieldIdForCode, isFieldId } from './field-ids.ts';
 import { normalizePortraitAwakeningSplit, normalizeTranscendenceSkillDamageShare, type LoadoutState } from './state.ts';
+import { resolveUnsignedInteger } from './direct-input.ts';
 import { canonicalizeNumber } from './numeric-input.ts';
 import { normalizeTransformationValues } from '../calculation/transformation-selections.ts';
 import { normalizeOptionalEffectValues, isUnrelatedEffectValue, normalizeNephronMagazineSelections, normalizeBossHealthCondition } from './state.ts';
 import { normalizeClassSkillVersions } from '../calculation/class-skill-versions.ts';
 
+import { decodeSingle, encodeSingle, parseArchiveJson } from './loadout-archive.ts';
+import { readProfileArchive, snapshot } from './loadout-profiles.ts';
+
 type TransferData = CatalogData;
+export function exportWorkingLoadout(state: LoadoutState): string {
+  return encodeSingle(snapshot(state));
+}
+export interface ImportedLoadout extends LoadoutImportResult {
+  name?: string;
+  baseline?: LoadoutState | null;
+  exact?: boolean;
+}
 type JsonRecord = Record<string, unknown>;
 
 export interface LoadoutImportResult {
@@ -40,7 +52,16 @@ function isMasterBeastMirrorValue(fieldId: string): boolean {
   return /^MasterBeast\..+\.Mirror\.\d+\.Value$/.test(fieldId);
 }
 
-export function serializeLoadout(state: LoadoutState, data: TransferData, suppliedIndex?: CatalogIndex): { json: string; omittedFields: string[] } {
+const stageFields = ['Stage.Adapt', 'Stage.CritRatePenalty', 'Stage.BossDEF'] as const;
+
+function matchesFieldChoice(field: string, value: string | number, choices: readonly (string | number)[], index: CatalogIndex): boolean {
+  const circuit = index.circuitAttributes.get(field);
+  if (circuit) return circuit.has(String(value));
+  return choices.some(option => String(option) === String(value))
+    || (stageFields.some(id => id === field) && Number.isFinite(Number(value)) && resolveUnsignedInteger(String(value)) !== null);
+}
+
+function legacyPayload(state: LoadoutState, data: TransferData, suppliedIndex?: CatalogIndex) {
   const index = indexFor(data, suppliedIndex);
   const mappings = index.equipmentMappings;
   const values: Record<string, string | number> = {};
@@ -102,7 +123,7 @@ export function serializeLoadout(state: LoadoutState, data: TransferData, suppli
     const choices = index.resolveFieldChoices(fieldId, fieldValues);
     if (choices) {
       if (transferValue === 0 && isUnrelatedEffectValue(fieldId, fieldValues, index)) { values[String(fieldCode)] = 0; continue; }
-      if (!choices.some(option => String(option) === String(transferValue))) { omittedFields.push(fieldId); continue; }
+      if (!matchesFieldChoice(fieldId, transferValue, choices, index)) { omittedFields.push(fieldId); continue; }
       values[String(fieldCode)] = transferValue;
       continue;
     }
@@ -130,7 +151,18 @@ export function serializeLoadout(state: LoadoutState, data: TransferData, suppli
     ...(classSkillVersions ? { classSkillVersions } : {}),
     ...(bossHealthCondition ? { bossHealthCondition } : {}),
   };
-  return { json: `${JSON.stringify(payload)}\n`, omittedFields };
+  return {payload, omittedFields};
+}
+
+export function serializeLoadout(state: LoadoutState, data: TransferData, index?: CatalogIndex) {
+  const {payload, omittedFields} = legacyPayload(state, data, index);
+  return { json: JSON.stringify(payload) + '\n', omittedFields };
+}
+
+export function invalidLoadoutFields(state: LoadoutState, data: TransferData, index: CatalogIndex): string[] {
+  const {payload, omittedFields} = legacyPayload(state, data, index);
+  const checked = deserializeLoadout(payload, state, data, index);
+  return [...new Set([...omittedFields.filter(key => state.values[key] !== '' && state.values[key] !== undefined), ...checked.clearedFields])];
 }
 
 export function deserializeLoadout(raw: unknown, current: LoadoutState, data: TransferData, suppliedIndex?: CatalogIndex): LoadoutImportResult {
@@ -174,7 +206,18 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
       } else optionValuesById[fieldId] = candidateValue[fieldId];
     }
   }
-  const optionValues = optionValuesById;
+  // A v3 selection is an item code. Dependent appraisal choices need its equipment name.
+  const equipmentValues: Record<string, string> = {};
+  const invalidEquipment: string[] = [];
+  for (const [fieldId, mapping] of mappings) {
+    const selection = rawValues[String(codeForFieldId(fieldId)!)];
+    if (selection === undefined || selection === null || selection === '') continue;
+    const item = index.resolveEquipmentCode(mapping, selection);
+    const name = item && getOptionName(item, mapping);
+    if (name && index.matchEquipment(mapping, name).length === 1) equipmentValues[fieldId] = name;
+    else invalidEquipment.push(fieldId);
+  }
+  const optionValues = { ...optionValuesById, ...equipmentValues };
   if (isRecord(rawValues)) {
     for (const [code, value] of Object.entries(rawValues)) {
       const fieldId = fieldIdForCode(code);
@@ -198,7 +241,7 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
       const choices = index.resolveFieldChoices(fieldId, optionValues);
       if (choices) {
         if (normalizedValue === 0 && isUnrelatedEffectValue(fieldId, optionValues, index)
-          || choices.some(option => String(option) === String(normalizedValue))) values[fieldId] = normalizedValue;
+          || matchesFieldChoice(fieldId, normalizedValue, choices, index)) values[fieldId] = normalizedValue;
         else clearedFields.push(fieldId);
       } else values[fieldId] = normalizedValue;
     }
@@ -206,12 +249,12 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
 
   // Older compact exports use numeric codes 1, 2, and 3. Accept the explicit semantic
   // fields as a fallback so readable exports still round-trip if those codes are absent.
-  for (const fieldId of ['Stage.Adapt', 'Stage.CritRatePenalty', 'Stage.BossDEF'] as const) {
+  for (const fieldId of stageFields) {
     if (values[fieldId] !== undefined) continue;
     const explicitValue = candidate[fieldId];
     if (!isValidPrimitive(explicitValue) || typeof explicitValue === 'string' && explicitValue.trim() === '') continue;
     const choices = index.resolveFieldChoices(fieldId, optionValues);
-    if (choices && !choices.some(option => String(option) === String(explicitValue))) {
+    if (choices && !matchesFieldChoice(fieldId, explicitValue, choices, index)) {
       clearedFields.push(fieldId);
       continue;
     }
@@ -250,14 +293,8 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
   }
 
 
-  for (const [fieldId, mapping] of mappings) {
-    const fieldCode = codeForFieldId(fieldId)!;
-    const selection = rawValues[String(fieldCode)];
-    if (selection === undefined || selection === null || selection === '') continue;
-    const item = index.resolveEquipmentCode(mapping, selection);
-    if (item) values[fieldId] = getOptionName(item, mapping) ?? '';
-    else clearedFields.push(fieldId);
-  }
+  Object.assign(values, equipmentValues);
+  clearedFields.push(...invalidEquipment);
 
   const fallbackColor = data.masterBeast.spiritStoneColorSelector.defaultColor;
   const color = candidate.masterBeastSpiritStoneColor;
@@ -316,9 +353,13 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
   };
 }
 
-export function parseLoadoutJson(json: string, current: LoadoutState, data: TransferData, suppliedIndex?: CatalogIndex): LoadoutImportResult {
-  let raw: unknown;
-  try { raw = JSON.parse(json) as unknown; }
-  catch { throw new TypeError('檔案不是有效的 JSON。'); }
+export function parseLoadoutJson(json: string, current: LoadoutState, data: TransferData, suppliedIndex?: CatalogIndex): ImportedLoadout {
+  const raw = parseArchiveJson(json);
+  if (raw.format === 'damage-calculator-profile') {
+    const [profile] = readProfileArchive(raw).profiles;
+    return { state: profile.loadout, name: profile.name, ...(Object.hasOwn(profile,'baseline') ? {baseline: profile.baseline} : {}), clearedFields: [], exact: true };
+  }
+  if (raw.format === 'damage-calculator-loadout' && raw.formatVersion === 4)
+    return { state: snapshot(decodeSingle(raw)), clearedFields: [], exact: true };
   return deserializeLoadout(raw, current, data, suppliedIndex);
 }

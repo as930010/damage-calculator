@@ -111,6 +111,32 @@ test("activity theme is optional and its complete removal leaves a buildable cor
   assert.match(buildScript, /seasonalCssPath\s*\?/);
 });
 
+test("source HTML defaults to original when scripts never execute", async () => {
+  for (const file of ['index.html', 'features/buff-simulator/index.html',
+    'features/ice-optimizer/index.html', 'features/transformation-score/index.html']) {
+    const dom = new JSDOM(await readFile(resolve(root, file), "utf8"));
+    try {
+      const { document } = dom.window;
+      const links = [...document.querySelectorAll('link[rel="stylesheet"]')];
+      const seasonal = links.filter(link => /seasonal-effects|__OPTIMIZER_SEASONAL_CSS_URL__|__SCORE_SEASONAL__/.test(link.getAttribute("href")));
+      assert.equal(seasonal.length, seasonalCss === null ? 0 : 1, file);
+      if (seasonal.length) {
+        assert.equal(seasonal[0].media, "not all", file + " must not apply activity tokens without JavaScript");
+        assert.ok(seasonal[0].hasAttribute("data-theme-seasonal"), file);
+      }
+      assert.ok(links.some(link => /(?:^|\/)styles\.css(?:\?|$)/.test(link.getAttribute("href"))), file + " retains core CSS");
+      assert.equal(document.documentElement.dataset.previewTheme, undefined, file);
+      assert.equal(document.querySelector(".theme-trigger"), null, file);
+    } finally { dom.window.close(); }
+  }
+});
+
+const sharedThemeColors = ["--site-border", "--site-surface", "--site-text", "--site-muted",
+  "--site-action-surface", "--site-action-edge", "--site-control-surface", "--site-field-surface",
+  "--site-control-hover", "--site-control-edge", "--site-control-hover-edge",
+  "--site-control-disabled", "--site-control-disabled-text", "--site-focus-ring",
+  "--site-danger", "--site-warning", "--site-success"];
+
 test("activity CSS changes only visual properties on non-decorative selectors", () => {
   if (seasonalCss === null) return;
   const violations = [];
@@ -128,6 +154,8 @@ test("activity CSS changes only visual properties on non-decorative selectors", 
           violations.push(selector + " hides its focus indicator");
         }
         if (property.startsWith("--") && selector === ":root") continue;
+        if (selector === "body.site-page" && sharedThemeColors.includes(property)
+          && /^(?:var\(--[\w-]+\)|color-mix\(in srgb, var\(--[\w-]+\), var\(--[\w-]+\) \d+%\))$/.test(value)) continue;
         // Equipment progress endpoints are colors only; progress percentages and layout stay in core CSS.
         if ([".beast-accessory-slot", ":is(.gear-slot,.beast-accessory-slot)"].includes(selector) && /^--slot-(?:normal-[ab]|hover-[ab]|edge)$/.test(property)
           && /^(?:#[\da-f]{3,8}|rgb\([^;]+\)|color-mix\([^;]+\))$/i.test(value)) continue;
@@ -231,4 +259,72 @@ test("Buff uses the current shared header and mobile navigation without activity
       assert.equal(style(".site-developer > .developer-mobile").display, width <= 700 ? "flex" : "none");
     } finally { dom.window.close(); }
   }
+});
+
+test("shared control geometry and state rules apply in every theme while the original palette stays isolated", async () => {
+  const shell = await readFile(resolve(root, "frontend/site-shell.css"), "utf8");
+  const dom = new JSDOM('<!doctype html><link rel="stylesheet" data-theme-seasonal media="not all"><body class="site-page"></body>');
+  try {
+    const {document} = dom.window;
+    const style = document.createElement("style");
+    style.textContent = shell;
+    document.head.append(style);
+    const token = name => dom.window.getComputedStyle(document.body).getPropertyValue(name).trim();
+    const rules = [...style.sheet.cssRules];
+    const shared = rules.find(rule => rule.style?.getPropertyValue("--site-control-height"));
+    assert.ok(shared, "shared controls must be in a CSS rule that the browser can parse");
+    assert.ok(token("--site-control-height"));
+    assert.ok(token("--site-control-compact"));
+    assert.ok(token("--site-focus-ring"));
+    assert.notEqual(token("--site-control-disabled"), token("--site-field-surface"));
+
+    const shape = ["--site-control-height", "--site-control-compact", "--site-control-radius",
+      "--site-control-label", "--site-control-gap"];
+    const geometry = shape.map(token);
+    const controlRules = [...shared.cssRules];
+    const disabled = controlRules.find(rule => rule.selectorText?.includes(":is(button, input, select, textarea):disabled"));
+    assert.equal(disabled.style.getPropertyValue("background"), "var(--site-control-disabled)");
+    assert.equal(disabled.style.getPropertyValue("opacity"), "1");
+    const focus = controlRules.find(rule => rule.style?.getPropertyValue("outline").includes("var(--site-focus-ring)"));
+    assert.match(focus.selectorText, /:focus-visible/);
+    assert.match(focus.selectorText, /:has\(> input:focus-visible\)/);
+    assert.equal(focus.style.getPropertyValue("box-shadow"), "none");
+    const selected = controlRules.find(rule => rule.selectorText?.includes('[aria-selected="true"]') && rule.style.getPropertyValue("background"));
+    assert.equal(selected.style.getPropertyValue("background"), "var(--site-action-surface)");
+
+    for (const palette of ["harbor", "forest", "ember"]) {
+      document.documentElement.dataset.previewTheme = palette;
+      assert.deepEqual(shape.map(token), geometry, palette);
+      assert.equal(token("--site-focus-ring"), "", "original focus must not leak into " + palette);
+    }
+    delete document.documentElement.dataset.previewTheme;
+    document.querySelector("link[data-theme-seasonal]").media = "all";
+    assert.deepEqual(shape.map(token), geometry, "seasonal");
+    assert.equal(token("--site-focus-ring"), "", "original focus must not leak into seasonal");
+    document.querySelector("link[data-theme-seasonal]").media = "not all";
+    assert.ok(token("--site-focus-ring"));
+  } finally { dom.window.close(); }
+});
+
+test("the palette and seasonal sheets supply the same control color roles", async () => {
+  const palette = await readFile(resolve(root, "theme-preview/themes.css"), "utf8");
+  const shell = await readFile(resolve(root, "frontend/site-shell.css"), "utf8");
+  assert.ok(seasonalCss?.length || !indexHtml.includes("data-theme-seasonal"), "enabled seasonal sheet must be readable");
+  for (const source of [palette, seasonalCss].filter(Boolean)) {
+    const dom = new JSDOM("<!doctype html>");
+    try {
+      const style = dom.window.document.createElement("style");
+      style.textContent = source;
+      dom.window.document.head.append(style);
+      const mapping = [...style.sheet.cssRules].find(rule => rule.style?.getPropertyValue("--site-focus-ring"));
+      assert.ok(mapping, "theme needs a color mapping for shared controls");
+      for (const role of sharedThemeColors) assert.match(mapping.style.getPropertyValue(role), /var\(--/, role);
+      assert.equal(mapping.style.getPropertyValue("--site-control-height"), "", "geometry belongs in Site Shell");
+    } finally { dom.window.close(); }
+  }
+  const primary = shell.match(/& :where\(#optimizer-start, \.optimizer-apply\) \{[\s\S]*?\}/)?.[0];
+  assert.match(primary, /var\(--site-action-surface\)/);
+  assert.doesNotMatch(shell, /:where\([^\n]*(?:#profile-save|#baseline)/,
+    "home save and baseline must use ordinary action rules");
+  if (seasonalCss) assert.doesNotMatch(seasonalCss, /^#baseline\b/m, "seasonal baseline must not have a separate highlight");
 });

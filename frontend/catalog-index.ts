@@ -95,6 +95,13 @@ export function createCatalogIndex(data: CatalogData, revision: unknown = Symbol
   register([data.growth.settingKey], names(data.growth.levels));
   const appraisals = names(data.appraisals.options);
   for (const slot of data.appraisals.slots) register(slot.inputFields, appraisals);
+  const contextualAppraisals = new Set<string>();
+  for (const group of data.accessoryEffects.groups) {
+    const shared = names(group.options);
+    const overrides = new Map(Object.entries(group.optionsByEquipmentName ?? {}).map(([name, options]) => [name, names(options)]));
+    if (overrides.size) for (const field of group.inputFields) contextualAppraisals.add(field);
+    register(group.inputFields, values => (overrides.get(String(values[group.selectionField] ?? '')) ?? shared)());
+  }
   const circuits = memoizeChoices(() => [...Object.keys(data.circuits.statKeyByAttributeName), '無關傷害']);
   for (const input of data.circuits.inputs) register([input.attributeField], circuits);
   const chipNames = names(data.chips.chips);
@@ -120,6 +127,14 @@ export function createCatalogIndex(data: CatalogData, revision: unknown = Symbol
   }
 
   const catalogItems = new Map<string, readonly EquipmentCatalogItem[]>();
+  for (const application of ['armor', 'weapon'] as const) {
+    const stones = data.mapping.magicStoneSelections;
+    // Fields without a legacy validation list use the equipment mapping directly.
+    const fields = stones.inputGroups.filter(group => group.application === application && validationCatalog(group.selectionField));
+    register(fields.map(group => group.selectionField), memoizeChoices(() =>
+      activeCatalogItems(stones.catalogFile).filter(item => item.slotId === stones.slotId)
+        .map(item => getEquipmentOptionName(item, application))));
+  }
   function activeCatalogItems(file: string) {
     if (!Object.hasOwn(data.catalogs, file)) return emptyItems;
     let items = catalogItems.get(file);
@@ -175,6 +190,8 @@ export function createCatalogIndex(data: CatalogData, revision: unknown = Symbol
     return catalog ? validationChoices.get(catalog.id)!() : null;
   }
   return Object.freeze({
+    circuitAttributes: new Map(data.circuits.inputs.map(input => [input.attributeField, new Set(input.attributeOptions)])),
+    contextualAppraisals: contextualAppraisals as ReadonlySet<string>,
     transformationRules: new Map(data.transformations.rules.map(rule => [rule.choice, rule])),
     transformationDocument: { ...data.transformations, slots: data.transformations.slots.map(slot => ({ ...slot })) },
     data, revision, activeClasses, spiritClassCodes, resolveActiveClassCode, resolveSpiritClassCode,

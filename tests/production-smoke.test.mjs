@@ -57,7 +57,10 @@ async function productionPage({ reader, search = '' } = {}) {
     const input = dom.window.document.querySelector('#loadout-file');
     Object.defineProperty(input, 'files', { configurable: true, value: [{ text: async () => json }] });
     input.dispatchEvent(new dom.window.Event('change'));
-    await waitFor(() => /已匯入/.test(dom.window.document.querySelector('#transfer-status').textContent), 'import completes');
+    await waitFor(() => {
+      [...dom.window.document.querySelectorAll('dialog button')].find(button => button.textContent === '套用至畫布')?.click();
+      return /已匯入/.test(dom.window.document.querySelector('#transfer-status').textContent);
+    }, 'import completes');
   };
   return page;
 }
@@ -89,7 +92,7 @@ test('production main matches source results and preserves lazy transfer, stage,
     page.dom.window.document.querySelector('#restore-baseline').click();
     assert.equal(page.dom.window.document.querySelector('input[aria-label="Boss防禦"]').value, String(sample.values['Stage.BossDEF']));
     const exported = await page.exportJson();
-    assert.equal(exported['Stage.BossDEF'], page.readState().values['Stage.BossDEF']);
+    assert.equal(exported.values['3'], page.readState().values['Stage.BossDEF']);
   } finally { source.close(); page.close(); }
 });
 
@@ -153,7 +156,7 @@ test('delayed transfer preserves export intent and newer imports win while core 
     await waitFor(() => requested, 'optional chunk requested');
     enter(page, 'Boss防禦', '50');
     release();
-    assert.equal((await exported)['Stage.BossDEF'], sample.values['Stage.BossDEF']);
+    assert.equal((await exported).values['3'], sample.values['Stage.BossDEF']);
     assert.equal(page.readState().values['Stage.BossDEF'], '50');
     const transfer = await page.runtime.load('dist/frontend/loadout-transfer.js');
     const input = page.dom.window.document.querySelector('#loadout-file');
@@ -330,7 +333,7 @@ test('four source and production pages retain unique metadata and current footer
         const canonical = doc.querySelectorAll('head link[rel="canonical"]');
         assert.equal(canonical.length, 1);
         assert.equal(canonical[0].href, 'https://as930010.github.io/damage-calculator/' + path);
-        assert.equal(doc.querySelector('.footer-version bdi').textContent, 'v4.05.03');
+        assert.equal(doc.querySelector('.footer-version bdi').textContent, 'v4.06.06');
       } finally { dom.window.close(); }
     }
     assert.equal(new Set(descriptions).size, 4);
@@ -349,13 +352,14 @@ test('release history preserves published entries and prepends new versions with
       ]);
       const versions = entries.map(entry => entry[0]);
       assert.equal(new Set(versions).size, versions.length, 'versions are unique within release history');
-      assert.deepEqual(entries[0], ['v4.05.03', '2026-11-17', '優化引用破防區塊操作、隊伍增益模擬自由度']);
-      assert.deepEqual(entries[1], ['v4.03.03', '2026-11-10', '修正TB、DN、TW未被賦靈錄加成正確識別到分支的問題']);
-      assert.deepEqual(entries[2], ['v4.03.02', '2026-11-09', '大規模優化隊伍Buff模擬內容，增加支援彈匣']);
-      assert.deepEqual(entries[3], ['v4.02.02', '2026-11-07', '優化裝備配置部分設定與完成設定的提醒方式']);
-      assert.deepEqual(entries[4], ['v4.01.07', '2026-11-06', '新增細算無視防禦以及彈匣選項，用於支援格雷特勳章的效果計算']);
-      assert.deepEqual(entries[5], ['v4.01.03', '2026-11-06', '新增屬性變換試算評分功能']);
-      assert.deepEqual(entries[6], ['v3.04.23', '2026-11-05', '優化冰裝與內裝魔法石來源顯示方式、獵人的本能新增公會技能標籤']);
+      assert.deepEqual(entries[0], ['v4.06.06', '2026-11-19', '新增儲存角色與配置快捷切換功能，優化UI與主題配色']);
+      assert.deepEqual(entries[1], ['v4.05.03', '2026-11-17', '優化引用破防區塊操作、隊伍增益模擬自由度']);
+      assert.deepEqual(entries[2], ['v4.03.03', '2026-11-10', '修正TB、DN、TW未被賦靈錄加成正確識別到分支的問題']);
+      assert.deepEqual(entries[3], ['v4.03.02', '2026-11-09', '大規模優化隊伍Buff模擬內容，增加支援彈匣']);
+      assert.deepEqual(entries[4], ['v4.02.02', '2026-11-07', '優化裝備配置部分設定與完成設定的提醒方式']);
+      assert.deepEqual(entries[5], ['v4.01.07', '2026-11-06', '新增細算無視防禦以及彈匣選項，用於支援格雷特勳章的效果計算']);
+      assert.deepEqual(entries[6], ['v4.01.03', '2026-11-06', '新增屬性變換試算評分功能']);
+      assert.deepEqual(entries[7], ['v3.04.23', '2026-11-05', '優化冰裝與內裝魔法石來源顯示方式、獵人的本能新增公會技能標籤']);
       const current = versions.indexOf('v3.04.19'), previous = versions.indexOf('v3.04.18');
       assert.ok(current >= 0 && previous > current);
       assert.deepEqual(entries[previous], ['v3.04.18', '2026-10-30', '新增切換佈景主題功能、按鈕反應與視覺效果優化']);

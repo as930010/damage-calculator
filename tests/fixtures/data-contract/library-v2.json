@@ -1,0 +1,74 @@
+{
+  "format": "damage-calculator-profiles",
+  "version": 2,
+  "schemaVersion": 1,
+  "fieldMapVersion": 1,
+  "valueCodecVersion": 1,
+  "strings": [
+    "無關傷害"
+  ],
+  "snapshots": [
+    {
+      "schemaVersion": 3,
+      "Job": "KE",
+      "lowerwearAlternativeEnabled": true,
+      "masterBeastSpiritStoneColor": "綠",
+      "petSkillAttackEnabled": true,
+      "nutProtectionPotionEnabled": false,
+      "nephronRaidEnabled": false,
+      "transcendenceSkillDamageSharePct": 60,
+      "bossHealthCondition": {
+        "enabled": true,
+        "comparison": "below",
+        "lowerwear": "lowerwearB"
+      },
+      "values": {
+        "1": "0",
+        "3": 0,
+        "192": [
+          0
+        ],
+        "193": [
+          0
+        ],
+        "194": [
+          0
+        ],
+        "201": [
+          0
+        ],
+        "202": [
+          0
+        ]
+      }
+    },
+    {
+      "base": 0,
+      "set": {
+        "2": "5"
+      },
+      "remove": [
+        "202"
+      ]
+    }
+  ],
+  "profiles": [
+    {
+      "id": "contract-a",
+      "name": "配置 A",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-02T00:00:00.000Z",
+      "loadout": 0,
+      "baseline": 1
+    },
+    {
+      "id": "contract-b",
+      "name": "配置 B",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-02T00:00:00.000Z",
+      "loadout": 0,
+      "baseline": 0
+    }
+  ],
+  "activeProfileId": "contract-a"
+}

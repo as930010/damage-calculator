@@ -2,7 +2,7 @@
 
 ## 現行架構
 
-main 是唯一長期維護基準。整站建置的四頁均提供五個互斥選項：預設、共存節、薄霧、森林、夕陽；沒有工作階段偏好時預設共存節。
+main 是唯一長期維護基準。整站建置的四頁均提供五個互斥選項：預設、共存節、薄霧、森林、夕陽；沒有有效 URL 指定或工作階段偏好時預設「預設」主題（original）。
 
 共用選擇器位於 theme-preview/themes.js，卡片及常規配色位於 theme-preview/themes.css，縮圖位於 theme-preview/cards/。名稱雖保留 preview，scripts/build.mjs 已將這些資源正式輸出至 site-dist/assets/，四頁共用同一組資源。
 
@@ -12,9 +12,9 @@ main 是唯一長期維護基準。整站建置的四頁均提供五個互斥選
 
 首頁先載入 styles.css、polish.css、site-shell.css，再載入 seasonal-effects.css；冰裝與變換評分各自使用 site-shell.css 與自身 styles.css，Buff 使用自身 styles.css 與共用 site-shell.css，活動表在各頁基礎樣式之後。整站建置最後加入 themes.css 與 defer 的 themes.js。
 
-建置會標記唯一活動連結為 data-theme-seasonal，並插入首次繪製前的主題 bootstrap。選擇共存節時活動表 media 為 all，其他選項為 not all；薄霧、森林、夕陽使用根元素 data-preview-theme，預設與共存節清除此屬性。常規配色不能與活動樣式疊加。最終規則仍依 CSS Cascade、選擇器權重、來源順序及作用域決定，不代表最後一份檔案的所有規則一律勝出。
+四頁來源 HTML 的唯一活動連結均帶有 media="not all" 與 data-theme-seasonal，沒有 JavaScript 時也呈現 original。建置保留這個初始狀態，並插入首次繪製前的主題 bootstrap，僅在恢復有效主題偏好時啟用額外視覺層。選擇共存節時活動表 media 為 all，其他選項為 not all；薄霧、森林、夕陽使用根元素 data-preview-theme，預設與共存節清除此屬性。恢復共存節偏好時由 bootstrap 加上原生 blocking="render"，讓該樣式參與首次繪製；原始預設不等待活動樣式，也不隱藏頁面。常規配色不能與活動樣式疊加。最終規則仍依 CSS Cascade、選擇器權重、來源順序及作用域決定，不代表最後一份檔案的所有規則一律勝出。
 
-偏好沿用 sessionStorage 的 damage-calculator-preview-theme；preview-theme URL 參數優先於工作階段偏好。不得把視覺停用變成清除配裝或回滾功能提交。
+偏好使用 localStorage 的 damage-calculator-preview-theme。有效 URL 優先，其次為有效 localStorage、舊 sessionStorage，最後 original。沒有有效持久化偏好時才遷移舊值；儲存失敗降級至工作階段或頁面狀態。同源分頁同步有效偏好，URL 明確指定的頁面維持其選擇。不得把視覺停用變成清除配裝或回滾功能提交。
 
 ## 現在可用的停用程序
 
@@ -26,7 +26,7 @@ main 是唯一長期維護基準。整站建置的四頁均提供五個互斥選
 
 在首頁與 Buff 來源 HTML 同時移除 seasonal-effects.css 的 link，再執行整站建置；冰裝與變換評分的活動連結由根建置器依首頁是否提供活動資源決定。先移除所有來源引用，才可移除活動 CSS 檔案。不可只刪除仍被 HTML 引用的來源檔。
 
-scripts/site-resources.mjs 無條件整合共用選擇器及常規配色，活動 link 存在時才標記及啟停活動表。活動缺席時不顯示共存節卡片，初始主題及舊 seasonal 工作階段偏好回退至「預設」；其餘四款及工作階段保存繼續正常運作。正常版本仍預設共存節。本機 preview 的 --without-seasonal 是舊診斷模式，不代表這個正式建置流程。
+scripts/site-resources.mjs 無條件整合共用選擇器及常規配色，活動 link 存在時才標記及啟停活動表。活動缺席時不顯示共存節卡片，初始主題及舊 seasonal 工作階段偏好回退至「預設」；其餘四款及工作階段保存繼續正常運作。正常版本與原始首頁 HTML 均原生預設 original。本機 preview 的 --without-seasonal 是舊診斷模式，不代表這個正式建置流程。
 
 整站整合只在共用 CSS 內容完全相同時，把 Buff 的 Site Shell／活動資源引用改為根目錄雜湊 URL；Buff 獨立建置仍輸出自己的完整資源。兩頁活動引用不一致時建置會拒絕整合，避免發布殘缺主題。
 

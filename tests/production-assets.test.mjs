@@ -1,3 +1,4 @@
+import { seasonalStylesheetLink } from '../scripts/theme-resources.mjs';
 import { JSDOM } from 'jsdom';
 import { shareSimulatorCss, integrateThemes } from '../scripts/site-resources.mjs';
 import test from 'node:test';
@@ -174,7 +175,9 @@ async function integratedFixture(seasonal) {
     html: seasonal ? buffHtml : omitSeasonal(buffHtml), cssOverrides });
   for (const [name, bytes] of buff.files) main.files.set('buff-simulator/' + name, bytes);
   const cssLinks = main.manifest.css.filter(item => ['site-shell.css', 'seasonal-effects.css'].includes(item.source))
-    .map(item => `<link rel="stylesheet" href="../${item.path}" />`).join('');
+    .map(item => item.source === 'seasonal-effects.css'
+      ? seasonalStylesheetLink('../' + item.path).replace('<link rel="stylesheet"', '<link data-build-test="preserved" rel="stylesheet"')
+      : `<link rel="stylesheet" href="../${item.path}" />`).join('');
   const ice = Buffer.from(`<head>${cssLinks}</head><body><header class="site-header"></header></body>`);
   main.files.set('transformation-score/index.html', ice);
   main.files.set('ice-optimizer/index.html', ice);
@@ -215,7 +218,7 @@ test('integrated themes survive optional seasonal resources and preserve shared 
         assert.equal(document.querySelector('.theme-trigger').dataset.theme, seasonal ? 'seasonal' : 'original');
         for (const id of ['harbor', 'forest', 'ember', 'original', ...(seasonal ? ['seasonal'] : [])]) {
           document.querySelector(`.theme-card[data-theme="${id}"]`).click();
-          assert.equal(dom.window.sessionStorage.getItem('damage-calculator-preview-theme'), id);
+          assert.equal(dom.window.localStorage.getItem('damage-calculator-preview-theme'), id);
           assert.equal(document.documentElement.dataset.previewTheme, ['original', 'seasonal'].includes(id) ? undefined : id);
           if (seasonal) assert.equal(document.querySelector('link[data-theme-seasonal]').media, id === 'seasonal' ? 'all' : 'not all');
         }
@@ -225,10 +228,170 @@ test('integrated themes survive optional seasonal resources and preserve shared 
   });
 });
 
+test('production pages retain original with no scripts, controller failure, and unavailable session storage', async () => {
+  for (const page of ['index.html', 'ice-optimizer/index.html', 'transformation-score/index.html', 'buff-simulator/index.html']) {
+    const html = await readFile(join(root, 'site-dist', page), 'utf8');
+    const dom = new JSDOM(html, { url: 'https://example.test/damage-calculator/' + page, runScripts: 'outside-only' });
+    try {
+      const { document } = dom.window;
+      const seasonal = document.querySelectorAll('link[data-theme-seasonal]');
+      assert.equal(seasonal.length, 1, page);
+      assert.equal(seasonal[0].media, 'not all', page + ' uses the base CSS without running any script');
+      assert.equal(document.documentElement.dataset.previewTheme, undefined);
+      assert.equal(document.querySelector('.theme-trigger'), null);
+      Object.defineProperty(dom.window, 'sessionStorage', { get() { throw new Error('Storage unavailable'); } });
+      dom.window.eval(html.match(/<!-- theme-bootstrap:start --><script>([\s\S]*?)<\/script>/)[1]);
+      assert.equal(seasonal[0].media, 'not all', 'controller absent and storage unavailable keep the native default');
+      assert.equal(document.documentElement.dataset.previewTheme, undefined);
+    } finally { dom.window.close(); }
+  }
+});
+
+test('all pages resolve URL, session preference and native default consistently before and after the controller', async () => {
+  const integrated = await integratedFixture(true);
+  shareSimulatorCss(integrated);
+  await integrateThemes(root, integrated);
+  const themeScript = integrated.files.get([...integrated.files.keys()].find(name => /assets\/themes-.*\.js$/.test(name))).toString();
+  const cases = [
+    [null, null, 'original'], ['invalid', null, 'original'],
+    ...['original', 'seasonal', 'harbor', 'forest', 'ember'].map(value => [value, null, value]),
+    ...['original', 'seasonal', 'harbor', 'forest', 'ember'].map(value => ['forest', value, value]),
+    ['harbor', 'invalid', 'harbor'], [null, 'invalid', 'original'], ['invalid', 'invalid', 'original'],
+  ];
+  for (const page of ['index.html', 'ice-optimizer/index.html', 'buff-simulator/index.html', 'transformation-score/index.html']) {
+    const html = integrated.files.get(page).toString();
+    const bootstrap = html.match(/<!-- theme-bootstrap:start --><script>([\s\S]*?)<\/script>/)[1];
+    for (const [stored, requested, expected] of cases) {
+      const url = new URL('https://example.test/damage-calculator/' + page);
+      if (requested !== null) url.searchParams.set('preview-theme', requested);
+      const dom = new JSDOM(html, { url: url.href, runScripts: 'outside-only' });
+      const label = page + ' stored=' + stored + ' requested=' + requested;
+      try {
+        const { document } = dom.window;
+        if (stored !== null) dom.window.sessionStorage.setItem('damage-calculator-preview-theme', stored);
+        const verify = () => {
+          assert.equal(document.querySelector('link[data-theme-seasonal]').media, expected === 'seasonal' ? 'all' : 'not all', label);
+          assert.equal(document.documentElement.dataset.previewTheme, ['original', 'seasonal'].includes(expected) ? undefined : expected, label);
+          assert.equal(document.querySelectorAll('link[data-theme-seasonal]').length, 1, label);
+        };
+        dom.window.eval(bootstrap);
+        verify();
+        assert.equal(document.querySelector('link[data-theme-seasonal]').getAttribute('blocking'), expected === 'seasonal' ? 'render' : null, label + ' render blocking only for restored seasonal preference');
+        assert.equal(dom.window.sessionStorage.getItem('damage-calculator-preview-theme'), stored, 'migration preserves legacy drafts');
+        assert.equal(dom.window.localStorage.getItem('damage-calculator-preview-theme'), expected);
+        dom.window.eval(themeScript);
+        verify();
+        assert.equal(document.querySelector('.theme-trigger').dataset.theme, expected, label);
+        assert.equal(dom.window.localStorage.getItem('damage-calculator-preview-theme'), expected, label);
+      } finally { dom.window.close(); }
+    }
+  }
+});
+
+test('theme integration recognizes reordered attributes and rejects active seasonal defaults', async () => {
+  const integrated = await integratedFixture(true);
+  shareSimulatorCss(integrated);
+  const page = 'ice-optimizer/index.html';
+  const original = integrated.files.get(page).toString();
+  const reordered = original.replace(/<link data-build-test="preserved" rel="stylesheet" href="([^"]*seasonal-effects-[^"]+\.css)" media="not all" data-theme-seasonal \/>/,
+    '<link data-theme-seasonal media="not all" data-build-test="preserved" href="$1" rel="stylesheet" />');
+  assert.notEqual(reordered, original);
+  integrated.files.set(page, Buffer.from(reordered));
+  await integrateThemes(root, integrated);
+  assert.match(integrated.files.get(page).toString(), /data-build-test="preserved"/);
+  const active = await integratedFixture(true);
+  shareSimulatorCss(active);
+  active.files.set(page, Buffer.from(active.files.get(page).toString().replace('media="not all"', 'media="all"')));
+  await assert.rejects(integrateThemes(root, active), /must be inactive and marked/);
+});
+
 test('shared CSS integration rejects differing content rather than silently changing visuals', async () => {
   const integrated = await integratedFixture(true);
   const manifest = JSON.parse(integrated.files.get('buff-simulator/asset-manifest.json'));
   const path = manifest.css.find(item => item.source === 'site-shell.css').path;
   integrated.files.set('buff-simulator/' + path, Buffer.from('different CSS'));
   assert.throws(() => shareSimulatorCss(integrated), /content differs/);
+});
+
+
+test('persistent theme precedence and legacy migration agree in bootstrap and controller on all four pages', async () => {
+  const integrated = await integratedFixture(true);
+  shareSimulatorCss(integrated);
+  await integrateThemes(root, integrated);
+  const controller = integrated.files.get([...integrated.files.keys()].find(name => /assets\/themes-.*\.js$/.test(name))).toString();
+  const key = 'damage-calculator-preview-theme';
+  const cases = [
+    [null, null, null, 'original'],
+    ...['original','seasonal','harbor','forest','ember'].map(value => [value, 'ember', null, value]),
+    [null,'forest',null,'forest'], ['forest','ember',null,'forest'],
+    ['invalid','harbor',null,'harbor'], ['invalid','invalid',null,'original'],
+    ['ember','forest','harbor','harbor'], ['forest','ember','invalid','forest'],
+  ];
+  for (const page of ['index.html','ice-optimizer/index.html','transformation-score/index.html','buff-simulator/index.html']) {
+    const html = integrated.files.get(page).toString();
+    const bootstrap = html.match(/<!-- theme-bootstrap:start --><script>([\s\S]*?)<\/script>/)[1];
+    for (const [local, session, requested, expected] of cases) {
+      const dom = new JSDOM(html, {url:'https://example.test/damage-calculator/' + page + (requested ? '?preview-theme=' + requested : ''), runScripts:'outside-only'});
+      try {
+        const {window} = dom;
+        window.localStorage.setItem('unrelated-loadout', 'preserve');
+        if (local !== null) window.localStorage.setItem(key,local);
+        if (session !== null) window.sessionStorage.setItem(key,session);
+        window.eval(bootstrap);
+        assert.equal(window.localStorage.getItem(key),expected);
+        assert.equal(window.document.querySelector('link[data-theme-seasonal]').media,expected === 'seasonal' ? 'all' : 'not all');
+        assert.equal(window.document.documentElement.dataset.previewTheme,['original','seasonal'].includes(expected) ? undefined : expected);
+        window.eval(controller);
+        assert.equal(window.document.querySelector('.theme-trigger').dataset.theme,expected);
+        assert.equal(window.localStorage.getItem(key),expected);
+        assert.equal(window.localStorage.getItem('unrelated-loadout'),'preserve');
+        assert.equal(window.sessionStorage.getItem(key),session);
+      } finally { dom.window.close(); }
+    }
+  }
+});
+
+test('theme storage failures degrade safely and cross-tab updates preserve focus without write loops', async () => {
+  const integrated = await integratedFixture(true);
+  shareSimulatorCss(integrated);
+  await integrateThemes(root,integrated);
+  const html = integrated.files.get('index.html').toString();
+  const bootstrap = html.match(/<!-- theme-bootstrap:start --><script>([\s\S]*?)<\/script>/)[1];
+  const controller = integrated.files.get([...integrated.files.keys()].find(name => /assets\/themes-.*\.js$/.test(name))).toString();
+  const key = 'damage-calculator-preview-theme';
+  for (const failure of ['local','both','write']) {
+    const dom = new JSDOM(html,{url:'https://example.test/damage-calculator/',runScripts:'outside-only'});
+    try {
+      const {window} = dom;
+      if (failure === 'write') Object.defineProperty(window,'localStorage',{value:{getItem(){return null;},setItem(){throw Error('Read only');}}});
+      else Object.defineProperty(window,'localStorage',{get(){throw Error('Blocked');}});
+      if (failure === 'both') Object.defineProperty(window,'sessionStorage',{get(){throw Error('Blocked');}});
+      else window.sessionStorage.setItem(key,'forest');
+      assert.doesNotThrow(() => {window.eval(bootstrap);window.eval(controller);});
+      window.document.querySelector('.theme-card[data-theme="harbor"]').click();
+      const trigger = window.document.querySelector('.theme-trigger');
+      assert.equal(trigger.dataset.theme,'harbor');
+      assert.equal(trigger.dataset.preferenceStorage,failure === 'both' ? 'page' : 'session');
+      if (failure !== 'both') assert.equal(window.sessionStorage.getItem(key),'harbor');
+    } finally {dom.window.close();}
+  }
+  for (const requested of ['', '?preview-theme=forest']) {
+    const dom = new JSDOM(html,{url:'https://example.test/damage-calculator/' + requested,runScripts:'outside-only'});
+    try {
+      const {window} = dom;
+      window.eval(bootstrap);window.eval(controller);
+      const trigger = window.document.querySelector('.theme-trigger');
+      const main = window.document.querySelector('main');
+      trigger.focus();
+      let writes = 0;
+      window.Storage.prototype.setItem = () => { writes++; };
+      window.dispatchEvent(new window.StorageEvent('storage',{key,newValue:'ember',storageArea:window.localStorage}));
+      assert.equal(trigger.dataset.theme,requested ? 'forest' : 'ember');
+      assert.equal(window.document.activeElement,trigger);
+      assert.equal(window.document.querySelector('main'),main);
+      assert.equal(writes,0);
+      window.dispatchEvent(new window.StorageEvent('storage',{key,newValue:'invalid',storageArea:window.localStorage}));
+      assert.equal(trigger.dataset.theme,requested ? 'forest' : 'ember');
+    } finally {dom.window.close();}
+  }
 });

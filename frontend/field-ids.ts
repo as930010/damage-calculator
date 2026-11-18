@@ -11,9 +11,9 @@ export function isFieldId(value: string): boolean {
 }
 
 export function codeForFieldId(fieldId: string): number | undefined {
-  return FIELD_ID_TO_CODE[fieldId];
+  return isFieldId(fieldId) ? FIELD_ID_TO_CODE[fieldId] : undefined;
 }
 
 export function fieldIdForCode(code: string): string | undefined {
-  return CODE_TO_FIELD_ID[code];
+  return Object.hasOwn(CODE_TO_FIELD_ID, code) ? CODE_TO_FIELD_ID[code] : undefined;
 }

@@ -1,0 +1,265 @@
+{
+  "armor": {
+    "armor-appraisal-crit-1": "致命一擊+1%",
+    "armor-appraisal-crit-1-5": "致命一擊+1.5%",
+    "armor-appraisal-crit-2": "致命一擊+2%",
+    "armor-appraisal-extremization-1": "極大化+1%",
+    "armor-appraisal-extremization-1-5": "極大化+1.5%",
+    "armor-appraisal-extremization-2": "極大化+2%",
+    "armor-appraisal-all-skill-0-5": "所有技能傷害+0.5%",
+    "armor-appraisal-no-effect": "無關傷害"
+  },
+  "weapon": {
+    "Weapon.Appraisal.Primary": {
+      "weapon-appraisal-a-2": "攻擊力等級+4",
+      "weapon-appraisal-a-3": "攻擊力等級+3.5",
+      "weapon-appraisal-a-4": "攻擊力等級+3",
+      "weapon-appraisal-a-5": "致命一擊+8%",
+      "weapon-appraisal-a-6": "致命一擊+7%",
+      "weapon-appraisal-a-7": "致命一擊+6%",
+      "weapon-appraisal-a-8": "極大化+8%",
+      "weapon-appraisal-a-9": "極大化+7%",
+      "weapon-appraisal-a-10": "極大化+6%",
+      "weapon-appraisal-a-11": "無關傷害"
+    },
+    "Weapon.Appraisal.Additional1": {
+      "weapon-appraisal-b-2": "攻擊力等級+3.25",
+      "weapon-appraisal-b-3": "攻擊力等級+2.75",
+      "weapon-appraisal-b-4": "攻擊力等級+2.25",
+      "weapon-appraisal-b-5": "致命一擊+6.5%",
+      "weapon-appraisal-b-6": "致命一擊+5.5%",
+      "weapon-appraisal-b-7": "致命一擊+4.5%",
+      "weapon-appraisal-b-8": "極大化+6.5%",
+      "weapon-appraisal-b-9": "極大化+5.5%",
+      "weapon-appraisal-b-10": "極大化+4.5%",
+      "weapon-appraisal-b-11": "無關傷害"
+    },
+    "Weapon.Appraisal.Additional2": {
+      "weapon-appraisal-b-2": "攻擊力等級+3.25",
+      "weapon-appraisal-b-3": "攻擊力等級+2.75",
+      "weapon-appraisal-b-4": "攻擊力等級+2.25",
+      "weapon-appraisal-b-5": "致命一擊+6.5%",
+      "weapon-appraisal-b-6": "致命一擊+5.5%",
+      "weapon-appraisal-b-7": "致命一擊+4.5%",
+      "weapon-appraisal-b-8": "極大化+6.5%",
+      "weapon-appraisal-b-9": "極大化+5.5%",
+      "weapon-appraisal-b-10": "極大化+4.5%",
+      "weapon-appraisal-b-11": "無關傷害"
+    }
+  },
+  "giant": {
+    "giant-stone-6": "攻擊力+5%",
+    "giant-stone-7": "攻擊力等級+6",
+    "giant-stone-2": "攻擊力+5.5%",
+    "giant-stone-3": "攻擊力+6%",
+    "giant-stone-4": "攻擊力等級+7",
+    "giant-stone-5": "攻擊力等級+8"
+  },
+  "grades": {
+    "weapon-grade-brilliant": "燦爛",
+    "weapon-grade-abyss": "深淵"
+  },
+  "colors": {
+    "red": {
+      "red-attack-level-1-5": "攻擊力等級+1.5",
+      "red-attack-level-1-75": "攻擊力等級+1.75",
+      "red-attack-level-2": "攻擊力等級+2"
+    },
+    "blue": {
+      "blue-double-attack-1-5": "攻擊力+1.5%",
+      "blue-double-attack-1-75": "攻擊力+1.75%",
+      "blue-double-attack-2": "攻擊力+2%"
+    },
+    "yellow": {
+      "yellow-attack-level-1": "攻擊力等級+1",
+      "yellow-double-attack-1": "攻擊力+1%",
+      "yellow-crit-damage-1-5": "致命一擊傷害+1.5%",
+      "yellow-attack-level-1-25": "攻擊力等級+1.25",
+      "yellow-double-attack-1-25": "攻擊力+1.25%",
+      "yellow-attack-level-1-5": "攻擊力等級+1.5",
+      "yellow-double-attack-1-5": "攻擊力+1.5%",
+      "yellow-crit-damage-1-6": "致命一擊傷害+1.6%",
+      "yellow-crit-damage-1-7": "致命一擊傷害+1.7%"
+    }
+  },
+  "accessories": {
+    "Accessory.Top": {
+      "fields": [
+        "Accessory.Top.Appraisal.1",
+        "Accessory.Top.Appraisal.2",
+        "Accessory.Top.Appraisal.3"
+      ],
+      "options": [
+        "攻擊力+1%",
+        "所有技能傷害+1%",
+        "致命一擊+3%",
+        "極大化+3%",
+        "無關傷害"
+      ],
+      "items": {
+        "accessories-95e201845618": {
+          "count": 3
+        },
+        "accessories-16419061ad91": {
+          "count": 3
+        },
+        "accessories-6df481e697c8": {
+          "count": 3
+        },
+        "accessories-dfe5aa6a6da8": {
+          "count": 3
+        },
+        "accessories-cd17fc7008c5": {
+          "count": 3
+        }
+      }
+    },
+    "Accessory.FaceMiddle": {
+      "fields": [
+        "Accessory.FaceMiddle.Appraisal.1",
+        "Accessory.FaceMiddle.Appraisal.2",
+        "Accessory.FaceMiddle.Appraisal.3"
+      ],
+      "options": [
+        "無視防禦%",
+        "所有技能傷害%",
+        "Boss傷害%",
+        "致命傷害%",
+        "雙攻%",
+        "兩極化%",
+        "適應力%",
+        "100%血殺%",
+        "流血%",
+        "致命一擊%",
+        "極大化%",
+        "無關傷害"
+      ],
+      "items": {
+        "accessories-78963f024026": {
+          "count": 3
+        }
+      }
+    },
+    "Accessory.FaceBottom": {
+      "fields": [
+        "Accessory.FaceBottom.Appraisal.1",
+        "Accessory.FaceBottom.Appraisal.2",
+        "Accessory.FaceBottom.Appraisal.3"
+      ],
+      "options": [
+        "無視防禦%",
+        "所有技能傷害%",
+        "Boss傷害%",
+        "致命傷害%",
+        "雙攻%",
+        "兩極化%",
+        "適應力%",
+        "100%血殺%",
+        "流血%",
+        "致命一擊%",
+        "極大化%",
+        "無關傷害"
+      ],
+      "items": {
+        "accessories-a6048e80cfef": {
+          "count": 3
+        }
+      }
+    },
+    "Accessory.Arm": {
+      "fields": [
+        "Accessory.Arm.Appraisal.1",
+        "Accessory.Arm.Appraisal.2",
+        "Accessory.Arm.Appraisal.3"
+      ],
+      "options": [
+        "無視防禦%",
+        "所有技能傷害%",
+        "Boss傷害%",
+        "致命傷害%",
+        "雙攻%",
+        "兩極化%",
+        "適應力%",
+        "100%血殺%",
+        "流血%",
+        "致命一擊%",
+        "極大化%",
+        "無關傷害"
+      ],
+      "items": {
+        "accessories-b1c45bb85f99": {
+          "count": 3
+        }
+      }
+    },
+    "Accessory.Necklace": {
+      "fields": [
+        "Accessory.Necklace.Appraisal.1",
+        "Accessory.Necklace.Appraisal.2",
+        "Accessory.Necklace.Appraisal.3"
+      ],
+      "options": [
+        "無視防禦%",
+        "所有技能傷害%",
+        "Boss傷害%",
+        "致命傷害%",
+        "雙攻%",
+        "兩極化%",
+        "適應力%",
+        "100%血殺%",
+        "流血%",
+        "致命一擊%",
+        "極大化%",
+        "無關傷害"
+      ],
+      "items": {
+        "accessories-53df98059aae": {
+          "count": 3
+        },
+        "accessories-c7472449e875": {
+          "count": 2,
+          "options": [
+            "致命一擊+2%",
+            "極大化+2%",
+            "無關傷害"
+          ]
+        }
+      }
+    },
+    "Accessory.Ring1": {
+      "fields": [
+        "Accessory.Ring1.Appraisal.1",
+        "Accessory.Ring1.Appraisal.2"
+      ],
+      "options": [
+        "致命一擊+2%",
+        "極大化+2%",
+        "無關傷害"
+      ],
+      "items": {
+        "accessories-88ae18e2898b": {
+          "count": 2
+        }
+      }
+    },
+    "Accessory.Ring2": {
+      "fields": [
+        "Accessory.Ring2.Appraisal.1",
+        "Accessory.Ring2.Appraisal.2"
+      ],
+      "options": [
+        "致命一擊+2%",
+        "極大化+2%",
+        "無關傷害"
+      ],
+      "items": {
+        "accessories-strong-warrior-technical-ring": {
+          "count": 2
+        },
+        "accessories-ddbdfcbdbd3e": {
+          "count": 2
+        }
+      }
+    }
+  }
+}

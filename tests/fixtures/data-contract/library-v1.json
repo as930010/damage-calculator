@@ -1,0 +1,118 @@
+{
+  "format": "damage-calculator-profiles",
+  "version": 1,
+  "library": {
+    "schemaVersion": 1,
+    "activeProfileId": "contract-a",
+    "profiles": [
+      {
+        "id": "contract-a",
+        "name": "配置 A",
+        "createdAt": "2026-01-01T00:00:00.000Z",
+        "updatedAt": "2026-01-02T00:00:00.000Z",
+        "loadout": {
+          "schemaVersion": 3,
+          "Job": "KE",
+          "lowerwearAlternativeEnabled": true,
+          "masterBeastSpiritStoneColor": "綠",
+          "petSkillAttackEnabled": true,
+          "nutProtectionPotionEnabled": false,
+          "nephronRaidEnabled": false,
+          "transcendenceSkillDamageSharePct": 60,
+          "bossHealthCondition": {
+            "enabled": true,
+            "comparison": "below",
+            "lowerwear": "lowerwearB"
+          },
+          "values": {
+            "Stage.Adapt": "0",
+            "Stage.BossDEF": 0,
+            "Accessory.FaceBottom.Appraisal.1": "無關傷害",
+            "Accessory.FaceBottom.Appraisal.2": "無關傷害",
+            "Accessory.FaceBottom.Appraisal.3": "無關傷害",
+            "Accessory.Ring1.Appraisal.1": "無關傷害",
+            "Accessory.Ring1.Appraisal.2": "無關傷害"
+          }
+        },
+        "baseline": {
+          "schemaVersion": 3,
+          "Job": "KE",
+          "lowerwearAlternativeEnabled": true,
+          "masterBeastSpiritStoneColor": "綠",
+          "petSkillAttackEnabled": true,
+          "nutProtectionPotionEnabled": false,
+          "nephronRaidEnabled": false,
+          "transcendenceSkillDamageSharePct": 60,
+          "bossHealthCondition": {
+            "enabled": true,
+            "comparison": "below",
+            "lowerwear": "lowerwearB"
+          },
+          "values": {
+            "Stage.Adapt": "0",
+            "Stage.BossDEF": 0,
+            "Accessory.FaceBottom.Appraisal.1": "無關傷害",
+            "Accessory.FaceBottom.Appraisal.2": "無關傷害",
+            "Accessory.FaceBottom.Appraisal.3": "無關傷害",
+            "Accessory.Ring1.Appraisal.1": "無關傷害",
+            "Stage.CritRatePenalty": "5"
+          }
+        }
+      },
+      {
+        "id": "contract-b",
+        "name": "配置 B",
+        "createdAt": "2026-01-01T00:00:00.000Z",
+        "updatedAt": "2026-01-02T00:00:00.000Z",
+        "loadout": {
+          "schemaVersion": 3,
+          "Job": "KE",
+          "lowerwearAlternativeEnabled": true,
+          "masterBeastSpiritStoneColor": "綠",
+          "petSkillAttackEnabled": true,
+          "nutProtectionPotionEnabled": false,
+          "nephronRaidEnabled": false,
+          "transcendenceSkillDamageSharePct": 60,
+          "bossHealthCondition": {
+            "enabled": true,
+            "comparison": "below",
+            "lowerwear": "lowerwearB"
+          },
+          "values": {
+            "Stage.Adapt": "0",
+            "Stage.BossDEF": 0,
+            "Accessory.FaceBottom.Appraisal.1": "無關傷害",
+            "Accessory.FaceBottom.Appraisal.2": "無關傷害",
+            "Accessory.FaceBottom.Appraisal.3": "無關傷害",
+            "Accessory.Ring1.Appraisal.1": "無關傷害",
+            "Accessory.Ring1.Appraisal.2": "無關傷害"
+          }
+        },
+        "baseline": {
+          "schemaVersion": 3,
+          "Job": "KE",
+          "lowerwearAlternativeEnabled": true,
+          "masterBeastSpiritStoneColor": "綠",
+          "petSkillAttackEnabled": true,
+          "nutProtectionPotionEnabled": false,
+          "nephronRaidEnabled": false,
+          "transcendenceSkillDamageSharePct": 60,
+          "bossHealthCondition": {
+            "enabled": true,
+            "comparison": "below",
+            "lowerwear": "lowerwearB"
+          },
+          "values": {
+            "Stage.Adapt": "0",
+            "Stage.BossDEF": 0,
+            "Accessory.FaceBottom.Appraisal.1": "無關傷害",
+            "Accessory.FaceBottom.Appraisal.2": "無關傷害",
+            "Accessory.FaceBottom.Appraisal.3": "無關傷害",
+            "Accessory.Ring1.Appraisal.1": "無關傷害",
+            "Accessory.Ring1.Appraisal.2": "無關傷害"
+          }
+        }
+      }
+    ]
+  }
+}

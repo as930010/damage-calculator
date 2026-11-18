@@ -50,6 +50,8 @@ export async function uiPage(state = stateA, baseline = stateA, options = {}) {
       Object.defineProperty(input, 'files', { configurable: true, value: [{ text: async () => json }] });
       input.dispatchEvent(new page.dom.window.Event('change'));
       for (let i = 0; i < 200 && document.querySelector('#transfer-status').textContent.includes('正在載入'); i++) {
+        const apply = [...document.querySelectorAll('dialog button')].find(button => button.textContent === '套用至畫布');
+        if (apply) apply.click();
         await new Promise(resolve => setTimeout(resolve, 5));
       }
       assert.match(document.querySelector('#transfer-status').textContent, /已匯入/);

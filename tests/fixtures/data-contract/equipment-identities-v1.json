@@ -1,0 +1,386 @@
+{
+  "equipment/one-piece-costumes.json|one-piece-costumes|": {
+    "fields": [
+      "Costume.OnePiece"
+    ],
+    "items": {
+      "one-piece-costumes-c0ad27783ebb": "東方美食",
+      "one-piece-costumes-cc80e4b42591": "天下一味",
+      "one-piece-costumes-growth-transparent": "成長強化透明時裝",
+      "one-piece-costumes-80f4924cb34b": "貝斯馬共存節",
+      "one-piece-costumes-1ea57b09512d": "艾利亞諾德共存節",
+      "one-piece-costumes-8ea6657956e0": "運動女僕",
+      "one-piece-costumes-5f39f7831987": "共存節禮服",
+      "one-piece-costumes-d5243fda69e6": "高貴格鬥士"
+    }
+  },
+  "equipment/left-ice.json|left-ice|": {
+    "fields": [
+      "Left.Ice.Set"
+    ],
+    "items": {
+      "left-ice-734c964b39a6": "幻影面紗",
+      "left-ice-70e8bd7bfbb8": "真理假面",
+      "left-ice-470c33d294a5": "紫霄花郎",
+      "left-ice-428091305670": "星辰牧者",
+      "left-ice-30f5e8befebf": "日冕．灼耀花仙",
+      "left-ice-ccf7fa891692": "幽潮吞源",
+      "left-ice-20c88b3b11d9": "猛虎奇談",
+      "left-ice-c67eb4b17855": "厄瑞玻斯的哀歌",
+      "left-ice-a66b917b6af3": "薇塔芳塔娜"
+    }
+  },
+  "equipment/right-ice.json|weapon|": {
+    "fields": [
+      "Ice.Weapon.Set"
+    ],
+    "items": {
+      "right-ice-31f837c78c3e": "騎士團",
+      "right-ice-8b30ee371504": "幻影面紗",
+      "right-ice-212411181d4b": "真理假面",
+      "right-ice-6e9290e986d6": "紫霄花郎",
+      "right-ice-2429b45ddf91": "星辰牧者",
+      "right-ice-e55ee3207cea": "日冕．灼耀花仙",
+      "right-ice-02a81e40927d": "幽潮吞源",
+      "right-ice-41a6da7a5f9d": "猛虎奇談",
+      "right-ice-f5d8da0ce0c6": "厄瑞玻斯的哀歌",
+      "right-ice-a288692bfe4a": "薇塔芳塔娜",
+      "right-ice-a2a986093d78": "深淵的存在",
+      "right-ice-72700e9dcdab": "飛龍乘雲"
+    }
+  },
+  "equipment/right-ice.json|weaponAccessory|": {
+    "fields": [
+      "Right.Ice.WeaponAccessory"
+    ],
+    "items": {
+      "right-ice-eaebc73db589": "騎士團",
+      "right-ice-494667811336": "神埃",
+      "right-ice-c6066883e5fc": "真理假面",
+      "right-ice-354dfaba9259": "日冕．灼耀花仙"
+    }
+  },
+  "equipment/right-ice.json|faceTop|": {
+    "fields": [
+      "Right.Ice.FaceTop"
+    ],
+    "items": {
+      "right-ice-b94c65720795": "騎士團",
+      "right-ice-4906468faf57": "神埃",
+      "right-ice-2aadb08e4674": "幻影面紗",
+      "right-ice-322d214d7234": "星辰牧者",
+      "right-ice-af450dd14aaf": "厄瑞玻斯的哀歌",
+      "right-ice-55a84ad16ec8": "深淵的存在",
+      "right-ice-7df7ca526399": "飛龍乘雲"
+    }
+  },
+  "equipment/right-ice.json|faceMiddle|": {
+    "fields": [
+      "Right.Ice.FaceMiddle"
+    ],
+    "items": {
+      "right-ice-43a1d059a6ab": "騎士團",
+      "right-ice-77560b5664c3": "紫霄花郎",
+      "right-ice-efd2d668c486": "幽潮吞源",
+      "right-ice-c207f596d1d9": "猛虎奇談",
+      "right-ice-ad4be631a942": "薇塔芳塔娜",
+      "right-ice-603e3eb5dfe9": "飛龍乘雲"
+    }
+  },
+  "equipment/right-ice.json|faceBottom|": {
+    "fields": [
+      "Right.Ice.FaceBottom"
+    ],
+    "items": {
+      "right-ice-30a72cbfed8c": "騎士團",
+      "right-ice-a42a0cffd6f4": "神埃",
+      "right-ice-a148d4beb802": "真理假面",
+      "right-ice-59ed1b451860": "日冕．灼耀花仙",
+      "right-ice-800aa3066323": "厄瑞玻斯的哀歌"
+    }
+  },
+  "equipment/right-ice.json|earring|": {
+    "fields": [
+      "Right.Ice.Earring"
+    ],
+    "items": {
+      "right-ice-634d66c34ae3": "騎士團",
+      "right-ice-356ccef5a543": "神埃",
+      "right-ice-25c4646b686c": "真理假面",
+      "right-ice-e56069acc642": "星辰牧者",
+      "right-ice-c5cdd5fcee3d": "猛虎奇談",
+      "right-ice-8710328740f4": "深淵的存在"
+    }
+  },
+  "equipment/right-ice.json|support|": {
+    "fields": [
+      "Right.Ice.Support"
+    ],
+    "items": {
+      "right-ice-3d1a517ff1aa": "騎士團",
+      "right-ice-72a31f36ed70": "幻影面紗",
+      "right-ice-88d6408d870b": "日冕．灼耀花仙",
+      "right-ice-084193316ee7": "厄瑞玻斯的哀歌"
+    }
+  },
+  "equipment/right-ice.json|top|": {
+    "fields": [
+      "Right.Ice.Top"
+    ],
+    "items": {
+      "right-ice-63ba64ad3119": "騎士團",
+      "right-ice-6fcf6ba3ea3e": "神埃",
+      "right-ice-ce41f415cc50": "幻影面紗",
+      "right-ice-cd749d053a5c": "紫霄花郎",
+      "right-ice-9b8b6c29f507": "日冕．灼耀花仙",
+      "right-ice-9d68dcb2a666": "猛虎奇談",
+      "right-ice-0d73beb8d41d": "薇塔芳塔娜",
+      "right-ice-1cf1cb2ff544": "飛龍乘雲"
+    }
+  },
+  "equipment/right-ice.json|bottom|": {
+    "fields": [
+      "Right.Ice.Bottom"
+    ],
+    "items": {
+      "right-ice-179b3506d0a2": "騎士團",
+      "right-ice-82ef8b84cbc3": "神埃",
+      "right-ice-4a7308dc37dd": "真理假面",
+      "right-ice-607805724c45": "星辰牧者",
+      "right-ice-eef8eee48601": "幽潮吞源",
+      "right-ice-e54091011ff5": "厄瑞玻斯的哀歌",
+      "right-ice-0bc1d5ef2971": "薇塔芳塔娜"
+    }
+  },
+  "equipment/right-ice.json|arm|": {
+    "fields": [
+      "Right.Ice.Arm"
+    ],
+    "items": {
+      "right-ice-e460d7818ae1": "騎士團",
+      "right-ice-b9729ef76858": "神埃",
+      "right-ice-67c0ec54a812": "紫霄花郎",
+      "right-ice-3438aa894001": "幽潮吞源",
+      "right-ice-b851f39f6995": "深淵的存在"
+    }
+  },
+  "equipment/right-ice.json|necklace|": {
+    "fields": [
+      "Right.Ice.Necklace"
+    ],
+    "items": {
+      "right-ice-5cc25a99ed68": "騎士團",
+      "right-ice-d9fa6ed29818": "紫霄花郎",
+      "right-ice-c3dc537fe977": "幽潮吞源",
+      "right-ice-33320153a23a": "薇塔芳塔娜"
+    }
+  },
+  "equipment/right-ice.json|ring|": {
+    "fields": [
+      "Right.Ice.Ring"
+    ],
+    "items": {
+      "right-ice-8bfd0b19b4ad": "騎士團",
+      "right-ice-0d08974ee88c": "幻影面紗",
+      "right-ice-42770cc1e51e": "星辰牧者",
+      "right-ice-ba962007ec06": "猛虎奇談",
+      "right-ice-8df834a3c6f3": "深淵的存在"
+    }
+  },
+  "equipment/accessories.json|weaponAccessory|": {
+    "fields": [
+      "Accessory.WeaponAccessory"
+    ],
+    "items": {
+      "accessories-55f06471666f": "Type-Q女王的勳章",
+      "accessories-c26cb94abffc": "暗鬼的徽章",
+      "accessories-6903afb73192": "火魔的印記"
+    }
+  },
+  "equipment/accessories.json|faceTop|": {
+    "fields": [
+      "Accessory.FaceTop"
+    ],
+    "items": {
+      "accessories-52b0a3f7e43a": "MAESTRO光環",
+      "accessories-3c8801d7376b": "魂靈皇冠",
+      "accessories-e3208062ddd2": "麻木皇冠",
+      "accessories-corrupted-thorn-horn": "被侵蝕的荊棘角"
+    }
+  },
+  "equipment/accessories.json|faceMiddle|": {
+    "fields": [
+      "Accessory.FaceMiddle"
+    ],
+    "items": {
+      "accessories-78963f024026": "亞特瑪臉中"
+    }
+  },
+  "equipment/accessories.json|faceBottom|": {
+    "fields": [
+      "Accessory.FaceBottom"
+    ],
+    "items": {
+      "accessories-a6048e80cfef": "亞特瑪臉下",
+      "accessories-aceceeff098c": "精銳格雷特的面甲",
+      "accessories-ed320a117d68": "巴力溫毛飾",
+      "accessories-935dedaba0b2": "瑪瑙碎片"
+    }
+  },
+  "equipment/accessories.json|earring|": {
+    "fields": [
+      "Accessory.Earring"
+    ],
+    "items": {
+      "accessories-00b2b054cdd1": "天線耳環",
+      "accessories-2bb5f7c00dfb": "軍團幹部裝飾",
+      "accessories-grett-medal": "格雷特的勳章"
+    }
+  },
+  "equipment/accessories.json|ringA|": {
+    "fields": [
+      "Accessory.Ring1"
+    ],
+    "items": {
+      "accessories-7e998f1b36ba": "憤怒戒指",
+      "accessories-88ae18e2898b": "鬥士憤怒戒指",
+      "accessories-0530073b32cc": "完整的能量變換裝置",
+      "accessories-e9c1d70ee92e": "鏡之世界的碎片"
+    }
+  },
+  "equipment/accessories.json|support|": {
+    "fields": [
+      "Accessory.Support"
+    ],
+    "items": {
+      "accessories-7c03d2195006": "命運的預言書",
+      "accessories-8ba1f88318c3": "機器人偶頭",
+      "accessories-4d58c9af9855": "夢緣香爐",
+      "accessories-f3023522a762": "普萊卡斯的形象",
+      "accessories-94c39a781ccf": "攜帶式能量環",
+      "accessories-5267ea0433a4": "魔族之眼",
+      "accessories-524951c1617b": "粉絲手燈"
+    }
+  },
+  "equipment/accessories.json|top|": {
+    "fields": [
+      "Accessory.Top"
+    ],
+    "items": {
+      "accessories-95e201845618": "亞特瑪上衣 - 橘",
+      "accessories-16419061ad91": "亞特瑪上衣 - 米",
+      "accessories-6df481e697c8": "亞特瑪上衣 - 紫",
+      "accessories-dfe5aa6a6da8": "亞特瑪上衣 - 綠",
+      "accessories-cd17fc7008c5": "亞特瑪上衣 - 藍"
+    }
+  },
+  "equipment/accessories.json|bottom|": {
+    "fields": [
+      "Accessory.Bottom"
+    ],
+    "items": {
+      "accessories-9fda9b758b7f": "靈魂的枷鎖",
+      "accessories-e625c38fc206": "發光之花"
+    }
+  },
+  "equipment/accessories.json|arm|": {
+    "fields": [
+      "Accessory.Arm"
+    ],
+    "items": {
+      "accessories-b1c45bb85f99": "亞特瑪手臂",
+      "accessories-82cab3c7f6d7": "新皇后的手臂裝飾"
+    }
+  },
+  "equipment/accessories.json|necklace|": {
+    "fields": [
+      "Accessory.Necklace"
+    ],
+    "items": {
+      "accessories-53df98059aae": "亞特瑪項鍊",
+      "accessories-58a63def64ee": "班德王國項鍊",
+      "accessories-c7472449e875": "堅毅的鬥士項鍊"
+    }
+  },
+  "equipment/accessories.json|ringB|": {
+    "fields": [
+      "Accessory.Ring2"
+    ],
+    "items": {
+      "accessories-strong-technical-ring": "強烈的技術戒指",
+      "accessories-decc7e3a2bd6": "超越的技術戒指",
+      "accessories-strong-warrior-technical-ring": "強烈鬥士的技術戒指",
+      "accessories-ddbdfcbdbd3e": "超越鬥士的技術戒指",
+      "accessories-63bcda2a2d49": "技術的戒指"
+    }
+  },
+  "equipment/magic-stones.json|magicStone|armor": {
+    "fields": [
+      "Costume.MagicStone",
+      "Left.Ice.Hair.MagicStone",
+      "Left.Ice.Upper.MagicStone",
+      "Left.Ice.Bottom.MagicStone",
+      "Left.Ice.Gloves.MagicStone",
+      "Left.Ice.Shoes.MagicStone",
+      "Left.Armor.Upper.MagicStone.1",
+      "Left.Armor.Upper.MagicStone.2",
+      "Left.Armor.Upper.MagicStone.3",
+      "Left.Armor.Upper.MagicStone.4",
+      "Left.Armor.Bottom.MagicStone.1",
+      "Left.Armor.Bottom.MagicStone.2",
+      "Left.Armor.Bottom.MagicStone.3",
+      "Left.Armor.Bottom.MagicStone.4",
+      "Left.Armor.SwitchBottom.MagicStone.1",
+      "Left.Armor.SwitchBottom.MagicStone.2",
+      "Left.Armor.SwitchBottom.MagicStone.3",
+      "Left.Armor.SwitchBottom.MagicStone.4",
+      "Left.Armor.Gloves.MagicStone.1",
+      "Left.Armor.Gloves.MagicStone.2",
+      "Left.Armor.Gloves.MagicStone.3",
+      "Left.Armor.Gloves.MagicStone.4",
+      "Left.Armor.Shoes.MagicStone.1",
+      "Left.Armor.Shoes.MagicStone.2",
+      "Left.Armor.Shoes.MagicStone.3",
+      "Left.Armor.Shoes.MagicStone.4",
+      "Left.Armor.Upper.MagicStone.5",
+      "Left.Armor.Bottom.MagicStone.5",
+      "Left.Armor.SwitchBottom.MagicStone.5",
+      "Left.Armor.Gloves.MagicStone.5",
+      "Left.Armor.Shoes.MagicStone.5"
+    ],
+    "items": {
+      "magic-stone-hunting-boss-damage": "狩獵2.5%B傷",
+      "magic-stone-sage-crit-rate": "賢者6%致命",
+      "magic-stone-sage-extremization": "賢者6%極大",
+      "magic-stone-atma-boss-damage": "亞特瑪3%B傷",
+      "magic-stone-atma-all-skill-damage": "亞特瑪2%技傷",
+      "magic-stone-atma-strong-skill-damage-25-5": "亞特瑪2.5%強烈",
+      "magic-stone-atma-transcendence-skill-damage": "亞特瑪2.5%超越",
+      "magic-stone-atma-strong-transcendence-skill-damage-2-4": "亞特瑪2%強烈/超越",
+      "magic-stone-no-damage": "無關傷害"
+    }
+  },
+  "equipment/magic-stones.json|magicStone|weapon": {
+    "fields": [
+      "Weapon.MagicStone.1",
+      "Weapon.MagicStone.2",
+      "Weapon.MagicStone.3",
+      "Weapon.MagicStone.4",
+      "Weapon.MagicStone.5",
+      "Weapon.MagicStone.6",
+      "Ice.Weapon.MagicStone.1",
+      "Ice.Weapon.MagicStone.2"
+    ],
+    "items": {
+      "magic-stone-hunting-boss-damage": "狩獵5%B傷",
+      "magic-stone-sage-crit-rate": "賢者12%致命",
+      "magic-stone-sage-extremization": "賢者12%極大",
+      "magic-stone-atma-boss-damage": "亞特瑪6%B傷",
+      "magic-stone-atma-all-skill-damage": "亞特瑪4%技傷",
+      "magic-stone-atma-strong-skill-damage-25-5": "亞特瑪5%強烈",
+      "magic-stone-atma-transcendence-skill-damage": "亞特瑪5%超越",
+      "magic-stone-atma-strong-transcendence-skill-damage-2-4": "亞特瑪4%強烈/超越",
+      "magic-stone-no-damage": "無關傷害"
+    }
+  }
+}

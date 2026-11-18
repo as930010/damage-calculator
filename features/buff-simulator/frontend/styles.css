@@ -891,7 +891,6 @@ details:not(.skill-reference)[open] > summary::before { transform: rotate(45deg)
   color: #cbd5e5;
 }
 .background-option-note strong { color: #c3d0ff; font-weight: 700; }
-.option-editor-chip:has(input:checked),
 .option-chip:has(input:checked) { border-color: #596b9c; background: #252c3a; }
 
 /* Neutralize the former cooldown highlight and standardize selected-chip text. */

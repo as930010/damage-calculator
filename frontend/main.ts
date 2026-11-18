@@ -1,3 +1,5 @@
+import { ProfileDraft } from './profile-draft.ts';
+import { mountProfileManager } from './loadout-profiles-ui.ts';
 import { equipmentProgress, equipmentProgressFields, equipmentProgressChoiceFields } from './equipment-progress.ts';
 import { beastAccessoryStatus } from './beast-accessory-status.ts';
 import { mountCircuitBoardEditor } from './circuit-board-editor.ts';
@@ -12,7 +14,7 @@ import { renderEquipmentDamageSummary, renderFinalDamageNumber, renderDamageRati
 import { getClassSkillVersionOptions, isClassSkillVersionEnabled } from '../calculation/class-skill-versions.ts';
 import { type AccessoryEffectOption } from '../calculation/equipment-effects.ts';
 import { loadGameData, readJson, escapeHtml as h, formatNumber as fmt } from './data.ts';
-import { readState, readBaseline, saveState, normalizePortraitAwakeningValues as normalizePortraitValues, normalizeTranscendenceSkillDamageShare, type LoadoutState } from './state.ts';
+import { parseState, readState, readBaseline, normalizePortraitAwakeningValues as normalizePortraitValues, normalizeTranscendenceSkillDamageShare, type LoadoutState } from './state.ts';
 import { createTransferLoader } from './loadout-transfer-loader.ts';
 import { normalizeOptionalEffectValues, isUnrelatedEffectValue, normalizeNephronMagazineSelections, normalizeBossHealthCondition, DEFAULT_BOSS_HEALTH_CONDITION } from './state.ts';
 import { evaluateLoadout as evaluateLoadoutBase, projectDamage as projectDamageBase } from './projection.ts';
@@ -66,12 +68,18 @@ async function start() {
   const sampleId = new URLSearchParams(location.search).get('sample');
   if (sampleId !== null && !/^[a-z0-9-]+$/.test(sampleId)) throw new RangeError('驗算範例名稱無效。');
   const sampleMode = sampleId !== null;
+  const profileDraft = new ProfileDraft(undefined, sampleMode);
+  let refreshProfiles = () => {};
   const savedLoadoutAtStartup = sampleMode ? null : (() => {
     try { return localStorage.getItem('dab-loadout-v1'); } catch { return null; }
   })();
-  const state: LoadoutState = sampleMode
-    ? await readJson<LoadoutState>(`examples/${sampleId}.json`)
+  const initialState = sampleMode
+    ? parseState(JSON.stringify(await readJson<LoadoutState>(`examples/${sampleId}.json`)))
     : readState(catalogIndex.activeClasses[0]?.id ?? 'DaB');
+  if (!initialState) throw Error('範例配裝格式無效。');
+  const state = initialState;
+  let baseline = sampleMode ? null : readBaseline();
+  const saveState = (value: LoadoutState, isBaseline = false) => profileDraft.write(isBaseline ? state : value, isBaseline ? value : baseline);
   state.transcendenceSkillDamageSharePct = normalizeTranscendenceSkillDamageShare(state.transcendenceSkillDamageSharePct);
   const normalizePortraitAwakeningValues = (target: LoadoutState) => normalizePortraitValues(target.values, data.otherEffects.portraitAwakening);
   const startupPortraitAwakeningNormalized = normalizePortraitAwakeningValues(state);
@@ -89,7 +97,6 @@ async function start() {
   const applyWeaponMagicStonePreset = (grade: string, overwrite = false) => normalization.applyWeaponMagicStonePreset(data, state, grade, overwrite);
   applyWeaponMagicStonePreset(String(state.values[data.weaponGrades.settingKey] ?? ''));
   if (startupOptionalEffectsNormalized && !sampleMode) saveState(state);
-  let baseline = sampleMode ? null : readBaseline();
   let baselineIsValid = false;
   if (baseline) {
     const baselineTransformValues = normalizeTransformationValues(data.transformations, baseline.values);
@@ -319,6 +326,7 @@ async function start() {
   const equipmentPickerChoices = new Map<string, readonly PickerOption[]>();
   const orderedEquipmentItems = new Map<string, ReturnType<typeof catalogIndex.equipmentItems>>();
   const refreshHistoryControls = () => {
+    refreshProfiles();
     undoButton.disabled = !history.canUndo;
     redoButton.disabled = !history.canRedo;
     const canRestore = Boolean(baseline && baselineIsValid && !history.matches(baseline));
@@ -417,15 +425,17 @@ async function start() {
     values: Object.fromEntries(Object.keys(state.values).filter(fieldId => !fieldId.startsWith('Stage.')).sort().map(fieldId => [fieldId, state.values[fieldId]])) });
   const configurationControlKeys = new Map<string, string>();
   const refreshRightIceSelectors = () => { if (rightIceUiKey !== rightIceSignature()) renderRightIceSetSelectors(); };
-  const update = (force = false) => {
-    normalizeNephronMagazineSelections(state.values, catalogIndex);
-    normalizeOptionalEffectValues(state.values, catalogIndex);
+  const update = (force = false, persistedImport = false) => {
+    if (!persistedImport) {
+      normalizeNephronMagazineSelections(state.values, catalogIndex);
+      normalizeOptionalEffectValues(state.values, catalogIndex);
+    }
     const changed = history.record(state);
     if (!changed && !force) {
       refreshHistoryControls();
       return;
     }
-    document.querySelector('#save-status')!.textContent = sampleMode ? '驗算範例模式：本頁調整不儲存' : saveState(state) ? '已儲存於此裝置' : '此瀏覽器無法儲存設定';
+    document.querySelector('#save-status')!.textContent = sampleMode ? '驗算範例模式：本頁調整不儲存' : persistedImport || saveState(state) ? '已儲存於此裝置' : '此瀏覽器無法儲存設定';
     refreshEquipmentUi(); renderResults();
     refreshHistoryControls();
   };
@@ -468,6 +478,7 @@ async function start() {
         document.querySelectorAll<HTMLDetailsElement>('#inspector details').forEach(node => { node.open = opened.includes(node.querySelector('summary')!.textContent); });
       }
     }, undefined, fieldId.startsWith('MasterBeast.') || progressChoices.has(fieldId));
+    picker.dataset.fieldId = fieldId;
     if (disabled) {
       picker.classList.add('field-disabled');
       picker.setAttribute('aria-disabled', 'true');
@@ -1490,10 +1501,12 @@ async function start() {
   };
   renderBattleSettings();
   toggle.addEventListener('change', () => { state.lowerwearAlternativeEnabled = toggle.checked; update(); renderInspector(); });
-  const refreshConfigurationUi = (previousControlSignature: string) => {
-    const cleanedTransforms = normalizeTransformationValues(data.transformations, state.values);
-    if (cleanedTransforms.messages.length) document.querySelector<HTMLElement>('#transfer-status')!.textContent = cleanedTransforms.messages.join(' ');
-    normalizeOptionalEffectValues(state.values, catalogIndex);
+  const refreshConfigurationUi = (previousControlSignature: string, persistedImport = false) => {
+    if (!persistedImport) {
+      const cleanedTransforms = normalizeTransformationValues(data.transformations, state.values);
+      if (cleanedTransforms.messages.length) document.querySelector<HTMLElement>('#transfer-status')!.textContent = cleanedTransforms.messages.join(' ');
+      normalizeOptionalEffectValues(state.values, catalogIndex);
+    }
     // In-place edits can leave render keys pointing at an older snapshot. A bulk
     // restore must also compare against the configuration actually being replaced.
     if (previousControlSignature !== configurationControlSignature()) configurationControlKeys.clear();
@@ -1503,7 +1516,7 @@ async function start() {
     syncBossHealthControls();
     renderBattleSettings();
     renderSkillDamageShare();
-    update(true);
+    update(true, persistedImport);
     if (configurationControlKeys.get('inspector') !== JSON.stringify([selected.id, selectedBeastSlotId, configurationControlSignature()])) renderInspector();
     renderTitleInput();
     if (configurationControlKeys.get('global') !== configurationControlSignature()) renderGlobalInputs();
@@ -1520,6 +1533,38 @@ async function start() {
     }
     refreshConfigurationUi(previousControlSignature);
   };
+  const validateProfile = async (profile: {loadout: LoadoutState; baseline?: LoadoutState | null}) => {
+      const {invalidLoadoutFields} = await loadTransfer();
+      for (const [label, candidate] of [['配置',profile.loadout],['比較基準',profile.baseline]] as const) {
+        if (!candidate) continue;
+        if (!catalogIndex.activeClasses.some(entry => entry.id === candidate.Job)) throw Error(label + '的職業已無效，原存檔與草稿均保留。');
+        const invalidFields = invalidLoadoutFields(candidate, data, catalogIndex);
+        const checked = structuredClone(candidate);
+        const invalid = [
+          ...invalidFields,
+          ...clearInvalidAccessoryAppraisals(checked),
+          ...clearDuplicateTransformationChoices(checked),
+          ...normalizeTransformationValues(data.transformations, checked.values).fields,
+          ...clearDuplicateNephronTransformationChoices(checked),
+          ...normalizeNephronMagazineSelections(checked.values,catalogIndex).clearedFields,
+        ];
+        if (invalid.length) throw Error(label + '含無效欄位（' + invalid.join('、') + '）。');
+        if (label === '比較基準') {
+          const evaluated = evaluateLoadout(data, candidate);
+          if (!evaluated.attributes) throw Error('此配置的比較基準無法套用目前資料；請先備份，原草稿未變更。');
+        }
+      }
+    };
+  const profilesUi = mountProfileManager({root: toolbar, draft: profileDraft, readOnly: sampleMode,
+    working: () => ({loadout: state, baseline}), validate: validateProfile,
+    apply: profile => {
+      baseline = structuredClone(profile.baseline ?? null);
+      baselineEvaluationCache.clear();
+      history.reset(profile.loadout);
+      applyHistorySnapshot(structuredClone(profile.loadout));
+    },
+  });
+  refreshProfiles = profilesUi.refresh;
   const undo = () => {
     const previous = history.undo();
     if (previous) applyHistorySnapshot(previous);
@@ -1568,7 +1613,7 @@ async function start() {
     return false;
   };
   document.addEventListener('keydown', event => {
-    if (event.defaultPrevented) return;
+    if (event.defaultPrevented || document.querySelector('.profile-dialog[open]')) return;
     const action = historyShortcutAction(event, isEditableHistoryTarget(event.target));
     if (action === 'undo' && history.canUndo) { event.preventDefault(); undo(); }
     else if (action === 'redo' && history.canRedo) { event.preventDefault(); redo(); }
@@ -1594,16 +1639,15 @@ async function start() {
     document.querySelector<HTMLElement>('#transfer-status')!.textContent = '正在載入配裝匯出功能…';
     try {
       const exportState = structuredClone(state);
-      const { serializeLoadout } = await loadTransfer();
-      const exported = serializeLoadout(exportState, data, catalogIndex);
-      const blobUrl = URL.createObjectURL(new Blob([exported.json], { type: 'application/json' }));
+      const { exportWorkingLoadout } = await loadTransfer();
+      const json = exportWorkingLoadout(exportState);
+      const blobUrl = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
       const link = document.createElement('a');
       link.href = blobUrl;
       link.download = `damage-calculator-loadout-${new Date().toISOString().slice(0, 10)}.json`;
       link.click();
       URL.revokeObjectURL(blobUrl);
-      const details = exported.omittedFields.length ? `；${exported.omittedFields.length} 個無法識別欄位已留空` : '';
-      document.querySelector<HTMLElement>('#transfer-status')!.textContent = `配裝 JSON 已匯出${details}。`;
+      document.querySelector<HTMLElement>('#transfer-status')!.textContent = '配裝 JSON 已匯出。';
       setExportState('success');
       exportResetTimer = setTimeout(() => setExportState('idle'), 1000);
     } catch (error) {
@@ -1620,26 +1664,46 @@ async function start() {
     const request = ++importRequest;
     try {
       document.querySelector<HTMLElement>('#transfer-status')!.textContent = '正在載入配裝匯入功能…';
+      if (file.size > 5 * 1024 * 1024) throw Error('檔案上限為 5 MB。');
       const [json, { parseLoadoutJson }] = await Promise.all([file.text(), loadTransfer()]);
       if (request !== importRequest) return;
       const imported = parseLoadoutJson(json, state, data, catalogIndex);
+      const candidate = imported.state;
+      if (imported.exact) await validateProfile({loadout: candidate, baseline: imported.baseline});
+      else {
+        normalizePortraitAwakeningValues(candidate);
+        imported.clearedFields.push(...clearDuplicateTransformationChoices(candidate), ...clearDuplicateNephronTransformationChoices(candidate), ...clearInvalidAccessoryAppraisals(candidate));
+        normalization.applyWeaponMagicStonePreset(data, candidate, String(candidate.values[data.weaponGrades.settingKey] ?? ''));
+        normalizeOptionalEffectValues(candidate.values, catalogIndex);
+      }
+      const clearedFields = [...new Set(imported.clearedFields)];
+      if (request !== importRequest) return;
+      const choice = await profilesUi.importDestination(candidate, imported.baseline, imported.name,
+        clearedFields.length ? ' 舊格式無效欄位將略過：' + clearedFields.slice(0,5).join('、') : '', () => request === importRequest);
+      if (request !== importRequest) return;
+      if (choice !== '套用至畫布') {
+        document.querySelector<HTMLElement>('#transfer-status')!.textContent = choice ? '已匯入為新配置。' : '已取消匯入。';
+        return;
+      }
+      const nextBaseline = Object.hasOwn(imported,'baseline') ? imported.baseline ?? null : baseline;
+      if (!sampleMode && !profileDraft.write(candidate, nextBaseline)) throw Error(profileDraft.error);
       const previousControlSignature = configurationControlSignature();
-      Object.assign(state, imported.state);
-      if (!Object.hasOwn(imported.state, 'classSkillVersions')) delete state.classSkillVersions;
-      if (!Object.hasOwn(imported.state, 'bossHealthCondition')) delete state.bossHealthCondition;
-      normalizePortraitAwakeningValues(state);
-      const duplicateTransformationFields = clearDuplicateTransformationChoices(state);
-      const duplicateNephronTransformationFields = clearDuplicateNephronTransformationChoices(state);
-      applyWeaponMagicStonePreset(String(state.values[data.weaponGrades.settingKey] ?? ''));
-      refreshConfigurationUi(previousControlSignature);
-      const clearedFields = [...new Set([...imported.clearedFields, ...duplicateTransformationFields, ...duplicateNephronTransformationFields])];
+      if (baseline !== nextBaseline) baselineEvaluationCache.clear();
+      baseline = nextBaseline;
+      Object.assign(state, candidate);
+      if (!Object.hasOwn(candidate,'classSkillVersions')) delete state.classSkillVersions;
+      if (!Object.hasOwn(candidate,'bossHealthCondition')) delete state.bossHealthCondition;
+      refreshConfigurationUi(previousControlSignature, true);
       const partial = clearedFields.length ? `；${clearedFields.length} 個無法對應或重複的欄位已留空（${clearedFields.slice(0, 5).join('、')}${clearedFields.length > 5 ? '…' : ''}）` : '';
       document.querySelector<HTMLElement>('#transfer-status')!.textContent = `${sampleMode ? '配裝已匯入；範例模式不會儲存到此裝置' : '配裝已匯入並儲存於此裝置'}${partial}。` + (imported.transformationWarnings?.join(' ') ?? '');
     } catch (error) {
       if (request !== importRequest) return;
       document.querySelector<HTMLElement>('#transfer-status')!.textContent = `匯入失敗：${error instanceof Error ? error.message : '檔案無法讀取。'}`;
     } finally {
-      if (request === importRequest) fileInput.value = '';
+      if (request === importRequest) {
+        fileInput.value = '';
+        document.querySelector<HTMLElement>('#import-loadout')?.focus({preventScroll:true});
+      }
     }
   });
   renderSlots(); renderInspector(); renderTitleInput(); renderBeastAccessories(); renderMasterBeastColorSelector(); renderGlobalInputs(); renderWeaponMagicStones(); renderRightIceSetSelectors(); renderResults(); refreshHistoryControls();

@@ -1,0 +1,28 @@
+{
+  "format": "damage-calculator-loadout",
+  "formatVersion": 3,
+  "Job": "KE",
+  "Stage.Adapt": "0",
+  "Stage.CritRatePenalty": null,
+  "Stage.BossDEF": 0,
+  "values": {
+    "1": "0",
+    "3": 0,
+    "192": "無關傷害",
+    "193": "無關傷害",
+    "194": "無關傷害",
+    "201": "無關傷害",
+    "202": "無關傷害"
+  },
+  "lowerwearAlternativeEnabled": true,
+  "masterBeastSpiritStoneColor": "綠",
+  "petSkillAttackEnabled": true,
+  "nutProtectionPotionEnabled": false,
+  "nephronRaidEnabled": false,
+  "transcendenceSkillDamageSharePct": 60,
+  "bossHealthCondition": {
+    "enabled": true,
+    "comparison": "below",
+    "lowerwear": "lowerwearB"
+  }
+}

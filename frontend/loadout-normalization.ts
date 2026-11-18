@@ -16,7 +16,7 @@ export function clearInvalidAccessoryAppraisals(data: GameData, target: LoadoutS
       : 0;
     for (const [index, fieldId] of group.inputFields.entries()) {
       const value = String(target.values[fieldId] ?? '');
-      if (!value || (index < effectCount && options.some(option => option.name === value))) continue;
+      if (!value || value === '無關傷害' || (index < effectCount && options.some(option => option.name === value))) continue;
       delete target.values[fieldId];
       clearedFields.push(fieldId);
     }
@@ -29,7 +29,7 @@ export function clearDuplicateTransformationChoices(data: GameData, target: Load
   const clearedFields: string[] = [];
   for (const slot of data.transformations.slots) {
     const choice = String(target.values[slot.choiceField] ?? '');
-    if (!choice) continue;
+    if (!choice || choice === '無關傷害') continue;
     if (seen.has(choice)) {
       delete target.values[slot.choiceField];
       delete target.values[slot.valueField];

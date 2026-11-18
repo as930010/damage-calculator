@@ -75,7 +75,8 @@ export function normalizeOptionalEffectValues(values: Record<string, string | nu
   };
   const fields = optionalEffectFields(index);
   for (const fieldId of fields.fields) {
-    const choices = fields.circuitChoices.get(fieldId) ?? fields.choices.get(fieldId);
+    const choices = index.contextualAppraisals.has(fieldId) ? index.resolveFieldChoices(fieldId, values)
+      : fields.circuitChoices.get(fieldId) ?? fields.choices.get(fieldId);
     if (!choices?.some(choice => String(choice) === String(values[fieldId] ?? ''))) {
       if (fieldId.startsWith('MasterBeast.') || fields.progressChoices.has(fieldId)) {
         // Unselected equipment fields remain distinguishable from an explicit unrelated selection.

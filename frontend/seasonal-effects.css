@@ -202,6 +202,26 @@ body::before {
 
 /* Coexistence night theme: midnight blue and violet with restrained campfire warmth. */
 :root{color-scheme:dark}
+body.site-page {
+  --site-border: var(--border);
+  --site-surface: var(--surface);
+  --site-text: var(--text-main);
+  --site-muted: var(--text-muted);
+  --site-action-surface: var(--accent-surface);
+  --site-action-edge: color-mix(in srgb, var(--warm-wood), var(--lantern-gold) 35%);
+  --site-control-surface: var(--control);
+  --site-field-surface: var(--field);
+  --site-control-hover: var(--control-hover);
+  --site-control-edge: color-mix(in srgb, var(--border-control), var(--moon-lavender) 36%);
+  --site-control-hover-edge: var(--seasonal-action-hover-border);
+  --site-control-disabled: color-mix(in srgb, var(--field), var(--control) 55%);
+  --site-control-disabled-text: var(--text-soft);
+  --site-focus-ring: var(--seasonal-action-focus);
+  --site-danger: var(--negative);
+  --site-warning: var(--warning);
+  --site-success: var(--positive);
+}
+
 body.site-page-main{color:var(--text-main);background:transparent}
 .site-header{
   border-color:rgb(116 126 171 / 27%);
@@ -318,9 +338,6 @@ input,select,textarea,.picker-control>input,.mobile-picker-search{
 }
 input::placeholder,.mobile-picker-search::placeholder{color:#9ba3c0}
 input:hover,select:hover,textarea:hover,.picker-control>input:hover{border-color:#8885b9}
-input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible,summary:focus-visible,.battle-defense .site-button:focus-visible{
-  outline-color:var(--seasonal-action-focus);box-shadow:0 0 0 4px rgb(155 139 216 / 15%);
-}
 button,.pet-skill-toggle,.picker-clear,.circuit-board-add,.battle-defense .site-button{
   border-color:var(--violet-control-edge);
   background:var(--seasonal-action-bg);
@@ -328,8 +345,6 @@ button,.pet-skill-toggle,.picker-clear,.circuit-board-add,.battle-defense .site-
 }
 button:hover,.pet-skill-toggle:hover,.battle-defense .site-button:not(:disabled):hover{border-color:var(--seasonal-action-hover-border);background:var(--seasonal-action-hover-bg);color:var(--seasonal-action-hover-text)}
 button:active,.pet-skill-toggle:active{filter:brightness(1.08)}
-#baseline{border-color:var(--violet-control-edge);background:linear-gradient(180deg,#282d50,#1b2140);color:#d7daf0}
-#baseline:hover{border-color:#737ca6;background:linear-gradient(180deg,#343a60,#242b4a);color:#f0eef8}
 .toggle{color:#d0d0e3}.toggle input{accent-color:#c5a6e6}
 .picker-list{
   border-color:#71698d;background:#13172e;color:var(--text-main);
@@ -651,40 +666,9 @@ body.site-page-buff {
 .site-page-optimizer .optimizer-result-header span{color:#d3c39e}
 .site-page-optimizer .optimizer-result-state small,
 .site-page-optimizer .optimizer-result dt{color:#a9a4b3}
-.site-page-optimizer .optimizer-actions button,
-.site-page-score #reload-loadout,
-.site-page-optimizer .optimizer-result .optimizer-apply{
-  border-color:var(--violet-control-edge);
-  border-radius:8px;
-  background:var(--seasonal-action-bg);
-  color:var(--seasonal-action-text);
-}
-.site-page-optimizer .optimizer-actions button:not(:disabled):hover,
-.site-page-score #reload-loadout:not(:disabled):hover,
-.site-page-optimizer .optimizer-result .optimizer-apply:hover{
-  border-color:var(--seasonal-action-hover-border);
-  background:var(--seasonal-action-hover-bg);
-  color:var(--seasonal-action-hover-text);
-}
-.site-page-optimizer .optimizer-actions button:focus-visible,
-.site-page-score #reload-loadout:focus-visible,
-.site-page-optimizer .optimizer-result summary:focus-visible{outline-color:#c4a8e7}
 .site-page .theme-trigger[data-theme="seasonal"]{background:var(--panel-alt)}
 .site-page .theme-trigger[data-theme="seasonal"]:hover,
 .site-page .theme-trigger[data-theme="seasonal"][aria-expanded="true"]{background:var(--control-hover);border-color:var(--seasonal-action-hover-border)}
-.site-page-optimizer .optimizer-actions #optimizer-cancel,
-.site-page-optimizer .optimizer-actions #optimizer-clear{
-  border-color:var(--violet-control-edge);
-  border-radius:8px;
-  background:linear-gradient(180deg,#282d50,#1b2140);
-  color:#e7e3f2;
-}
-.site-page-optimizer .optimizer-actions #optimizer-cancel:not(:disabled):hover,
-.site-page-optimizer .optimizer-actions #optimizer-clear:not(:disabled):hover{
-  border-color:#a18abb;
-  background:linear-gradient(180deg,#393654,#292d50);
-  color:#f5edfa;
-}
 
 /* Match calculation inspection surfaces and disclosure arrows to the seasonal UI. */
 .site-page-main .calculation-inspection-panel{
@@ -770,8 +754,7 @@ body.site-page-buff {
 .site-page-buff .member-slot input{background:transparent;border-color:transparent}
 .site-page-buff .member-slot input::placeholder,
 .site-page-buff .skill-search-controls input::placeholder{color:#9ba3c0}
-.site-page-buff .option-chip:has(input:checked),
-.site-page-buff .option-editor-chip:has(input:checked){
+.site-page-buff .option-chip:has(input:checked){
   border-color:var(--violet-control-edge);
   background:var(--seasonal-action-bg);
   color:var(--seasonal-action-text);

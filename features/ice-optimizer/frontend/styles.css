@@ -29,8 +29,6 @@
 .optimizer-spinner { width: 10px; height: 10px; box-sizing: border-box; border: 1.5px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: optimizer-spin .8s linear infinite; }
 @keyframes optimizer-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .optimizer-spinner { animation: none; } }
-.optimizer-actions #optimizer-cancel, .optimizer-actions #optimizer-clear { border: 1px solid var(--site-border); border-radius: 8px; background: #242a34; color: var(--site-text); }
-.optimizer-actions #optimizer-cancel:not(:disabled):hover, .optimizer-actions #optimizer-clear:not(:disabled):hover { background: #303b4b; }
 #optimizer-status, #optimizer-progress { margin: 14px 0 0; color: var(--site-muted); line-height: 1.6; }
 #optimizer-progress:empty { display: none; }
 .optimizer-results { display: grid; gap: 12px; margin-top: 22px; }

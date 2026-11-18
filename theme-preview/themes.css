@@ -57,6 +57,17 @@ html[data-preview-theme="forest"]{--p-ground:#1b201a;--p-surface:#272f25;--p-rai
 html[data-preview-theme="ember"]{--p-ground:#211c1b;--p-surface:#302825;--p-raised:#413630;--p-input:#291f1e;--p-edge:#79675f;--p-ink:#eee9e3;--p-muted:#d0c0b6;--p-accent:#dfb998;--p-active:#40322e;--p-focus:#b8d3c7;--p-line:#574841;--p-positive:#b8d3bf;--p-negative:#e5b1a9;--p-warning:#e0c19b}
 html[data-preview-theme] body.site-page{
   --site-border:var(--p-edge);--site-text:var(--p-ink);--site-muted:var(--p-muted);--site-surface:var(--p-surface);
+  --site-action-surface:var(--p-active);
+  --site-action-edge:color-mix(in srgb,var(--p-edge),var(--p-accent) 48%);
+  --site-control-surface:var(--p-raised);
+  --site-field-surface:var(--p-input);
+  --site-control-hover:color-mix(in srgb,var(--p-raised),var(--p-accent) 12%);
+  --site-control-edge:color-mix(in srgb,var(--p-edge),var(--p-muted) 30%);
+  --site-control-hover-edge:color-mix(in srgb,var(--p-edge),var(--p-focus) 55%);
+  --site-control-disabled:color-mix(in srgb,var(--p-input),var(--p-surface) 55%);
+  --site-control-disabled-text:color-mix(in srgb,var(--p-muted),var(--p-input) 18%);
+  --site-focus-ring:var(--p-focus);
+  --site-danger:var(--p-negative);--site-warning:var(--p-warning);--site-success:var(--p-positive);
   --page-bg:var(--p-ground);--bg:var(--p-ground);--panel:var(--p-surface);--panel-alt:var(--p-input);--panel-strong:var(--p-raised);--surface:var(--p-input);--surface-raised:var(--p-raised);--control:var(--p-raised);--control-hover:var(--p-active);--field:var(--p-input);
   --border:var(--p-edge);--border-strong:var(--p-edge);--border-mid:var(--p-edge);--border-row:var(--p-edge);--border-dim:var(--p-edge);--border-control:var(--p-edge);--line:var(--p-edge);
   --text:var(--p-ink);--text-main:var(--p-ink);--text-input:var(--p-ink);--text-heading:var(--p-ink);--text-strong:var(--p-ink);--text-status:var(--p-muted);--text-label:var(--p-muted);--text-muted:var(--p-muted);--text-source:var(--p-muted);--text-soft:var(--p-muted);--muted:var(--p-muted);
@@ -74,22 +85,18 @@ html[data-preview-theme] body.site-page .primary-grid .metric{background:color-m
 html[data-preview-theme] body.site-page :is(.mode-switch,.optimizer-constraints,.calculation-inspection-panel){background:var(--p-input);border-color:var(--p-line)}
 html[data-preview-theme] body.site-page :is(.panel-heading,.configuration-heading){background:transparent;color:var(--p-ink)}
 html[data-preview-theme] body.site-page :is(.result-heading,.result-stack .result-heading){background:linear-gradient(105deg,var(--p-raised),var(--p-surface));border-color:var(--p-line)}
-html[data-preview-theme] body.site-page :is(input:not([type=checkbox]):not([type=radio]),select,textarea,.picker-list,.skill-damage-share-number-wrap,.percent-input){background:var(--field);border-color:var(--border-control);color:var(--text-input)}
+html[data-preview-theme] body.site-page :is(input[type=range],.picker-list){background:var(--field);border-color:var(--border-control);color:var(--text-input)}
 html[data-preview-theme] body.site-page input::placeholder{color:var(--p-muted);opacity:1}
-html[data-preview-theme] body.site-page :is(.site-tabs a,.mode-switch button){background:transparent;border-color:transparent;color:var(--p-muted)}
-html[data-preview-theme] body.site-page :is(.site-tabs a:hover,.mode-switch button:hover){background:var(--p-raised);color:var(--p-ink)}
-html[data-preview-theme] body.site-page :is(.site-tabs a[aria-current=page],.mode-switch button[aria-selected=true],.optimizer-series-options label:has(input:checked),.option-chip:has(input:checked),button[aria-pressed=true]){background:var(--p-active);border-color:var(--p-edge);color:var(--p-ink)}
-html[data-preview-theme] body.site-page :is(.site-button,.optimizer-actions button,.optimizer-constraint-body button,.optimizer-apply){background:var(--p-raised);border-color:var(--p-edge);color:var(--p-ink)}
+html[data-preview-theme] body.site-page .site-tabs a{background:transparent;border-color:transparent;color:var(--p-muted)}
+html[data-preview-theme] body.site-page .site-tabs a:hover{background:var(--p-raised);color:var(--p-ink)}
+html[data-preview-theme] body.site-page :is(.site-tabs a[aria-current=page],button[aria-pressed=true]){background:var(--p-active);border-color:var(--p-edge);color:var(--p-ink)}
 html[data-preview-theme] body.site-page :is(.site-developer,.site-footer,.site-tool-summary,.workspace-summary,.optimizer-caveat,#optimizer-status,#optimizer-progress,.panel-note,.field,.metric span,.optimizer-result dt,.optimizer-result-state small,.roster-note){color:var(--p-muted)}
 html[data-preview-theme] body.site-page :is(h1,h2,h3,.optimizer-result summary){color:var(--p-ink)}
 html[data-preview-theme] body.site-page :is(.eyebrow,.site-tool-eyebrow,.total-multiplier strong,.optimizer-result-header span){color:var(--p-accent)}
 html[data-preview-theme] body.site-page :is(.eyebrow,.panel-heading h2)::before{background:var(--p-accent)}
-html[data-preview-theme] body.site-page :is(button,input,select,summary,a):focus-visible{outline-color:var(--p-focus)}
 /* Keep nested surfaces visually continuous inside their existing controls. */
 html[data-preview-theme] body.site-page .member-slot input{background:transparent;border-color:transparent}
 html[data-preview-theme] body.site-page .canvas-title-input{background:var(--p-surface);border-color:var(--p-edge)}
-html[data-preview-theme] body.site-page .optimizer-actions :is(#optimizer-cancel,#optimizer-clear){background:var(--p-raised);border-color:var(--p-edge);color:var(--p-ink)}
-html[data-preview-theme] body.site-page .optimizer-actions :is(#optimizer-cancel,#optimizer-clear):not(:disabled):hover{background:var(--p-active)}
 /* The picker is one control: input and clear share a surface; only the floating list is raised. */
 html[data-preview-theme] body.site-page .picker-control>input{caret-color:var(--p-accent)}
 html[data-preview-theme] body.site-page .picker-control{--picker-clear-color:var(--p-muted);--picker-clear-hover-color:var(--p-ink)}
@@ -135,13 +142,11 @@ html[data-preview-theme] body.site-page :is(.calculation-comparison thead th,.at
 html[data-preview-theme] body.site-page :is(.attribute-equivalence-active,.calculation-comparison-positive){background:var(--p-active)}
 html[data-preview-theme] body.site-page .calculation-comparison-negative{background:color-mix(in srgb,var(--p-negative) 12%,var(--p-surface))}
 html[data-preview-theme] body.site-page input[type=checkbox]{background:var(--p-raised);border-color:var(--p-edge)}
-html[data-preview-theme] body.site-page input[type=checkbox]:checked{background:var(--p-accent);border-color:var(--p-accent)}
 html[data-preview-theme] body.site-page input[type=checkbox]:checked::after{border-color:var(--p-ground)}
 html[data-preview-theme] body.site-page .picker-control>.picker-clear:hover::before{background:var(--p-line)}
 /* Polish-layer colors that were still bypassing the palette on the calculator. */
 html[data-preview-theme] body.site-page .skill-damage-share-control{background:linear-gradient(145deg,var(--p-input),var(--p-surface));border-color:var(--p-line);color:var(--p-muted)}
 html[data-preview-theme] body.site-page .skill-damage-share-control output{color:var(--p-ink)}
-html[data-preview-theme] body.site-page .toolbar-actions button:disabled{background:var(--p-input);border-color:var(--p-edge);color:var(--p-muted)}
 html[data-preview-theme] body.site-page .stat{background:linear-gradient(145deg,var(--p-input),var(--p-surface));border-color:var(--p-line)}
 html[data-preview-theme] body.site-page .stat[open]{background:var(--p-raised);border-color:var(--p-edge)}
 html[data-preview-theme] body.site-page .equipment-damage-card{background:linear-gradient(145deg,var(--p-input),var(--p-surface));border-color:var(--p-line)}

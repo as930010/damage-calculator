@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 3,
+  "Job": "KE",
+  "values": {
+    "Stage.Adapt": "0",
+    "Stage.BossDEF": 0,
+    "Accessory.FaceBottom.Appraisal.1": "無關傷害",
+    "Accessory.FaceBottom.Appraisal.2": "無關傷害",
+    "Accessory.FaceBottom.Appraisal.3": "無關傷害",
+    "Accessory.Ring1.Appraisal.1": "無關傷害",
+    "Accessory.Ring1.Appraisal.2": "無關傷害",
+    "Left.Armor.Upper.Circuit.Attribute": "無關傷害",
+    "Left.Armor.Upper.Circuit.Value": 0,
+    "Left.Armor.Bottom.Circuit.Attribute": "無關傷害",
+    "Left.Armor.Bottom.Circuit.Value": 0,
+    "Left.Armor.SwitchBottom.Circuit.Attribute": "無關傷害",
+    "Left.Armor.SwitchBottom.Circuit.Value": 0,
+    "Left.Armor.Gloves.Circuit.Attribute": "無關傷害",
+    "Left.Armor.Gloves.Circuit.Value": 0,
+    "Left.Armor.Shoes.Circuit.Attribute": "無關傷害",
+    "Left.Armor.Shoes.Circuit.Value": 0,
+    "GuildFountain.Stage2": "無關傷害",
+    "GuildFountain.Stage3": "無關傷害",
+    "GuildFountain.Stage4": "無關傷害",
+    "Pet.Passive": "無關傷害",
+    "Left.Armor.Upper.Circuit.Rows": "[{\"attribute\":\"無關傷害\",\"percentageValue\":0}]",
+    "Left.Armor.Bottom.Circuit.Rows": "[{\"attribute\":\"無關傷害\",\"percentageValue\":0}]",
+    "Left.Armor.SwitchBottom.Circuit.Rows": "[{\"attribute\":\"無關傷害\",\"percentageValue\":0}]",
+    "Left.Armor.Gloves.Circuit.Rows": "[{\"attribute\":\"無關傷害\",\"percentageValue\":0}]",
+    "Left.Armor.Shoes.Circuit.Rows": "[{\"attribute\":\"無關傷害\",\"percentageValue\":0}]"
+  },
+  "lowerwearAlternativeEnabled": true,
+  "masterBeastSpiritStoneColor": "綠",
+  "petSkillAttackEnabled": true,
+  "nutProtectionPotionEnabled": false,
+  "nephronRaidEnabled": false,
+  "transcendenceSkillDamageSharePct": 60,
+  "bossHealthCondition": {
+    "enabled": true,
+    "comparison": "below",
+    "lowerwear": "lowerwearB"
+  }
+}

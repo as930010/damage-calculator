@@ -1,7 +1,7 @@
 (() => {
   const key = 'damage-calculator-preview-theme';
   const seasonal = document.querySelector('link[data-theme-seasonal]');
-  const fallback = 'original';
+  const preferences = __THEME_PREFERENCES__(Boolean(seasonal));
   const themes = [
     { id: 'original', name: '預設', group: 'basic' },
     { id: 'seasonal', name: '共存節', group: 'basic' },
@@ -9,12 +9,8 @@
     { id: 'forest', name: '森林', group: 'palette' },
     { id: 'ember', name: '夕陽', group: 'palette' },
   ].filter(theme => seasonal || theme.id !== 'seasonal');
-  const valid = value => themes.some(theme => theme.id === value);
-  let applied = fallback;
-  try { applied = sessionStorage.getItem(key) || applied; } catch {}
-  const requested = new URL(location.href).searchParams.get('preview-theme');
-  if (valid(requested)) applied = requested;
-  if (!valid(applied)) applied = fallback;
+  let applied = preferences.resolve();
+  let persistence = 'page';
   const header = document.querySelector('.site-header');
   if (!header) return;
 
@@ -60,17 +56,26 @@
     }
     popover.querySelector('.theme-applied-label').textContent = `目前使用：${themes.find(theme => theme.id === applied).name}`;
   };
-  const applyTheme = value => {
-    if (seasonal) seasonal.media = value === 'seasonal' ? 'all' : 'not all';
+  const applyTheme = (value, persist = true) => {
+    const seasonalMedia = value === 'seasonal' ? 'all' : 'not all';
+    if (seasonal && seasonal.media !== seasonalMedia) seasonal.media = seasonalMedia;
     if (value === 'original' || value === 'seasonal') delete document.documentElement.dataset.previewTheme;
     else document.documentElement.dataset.previewTheme = value;
     applied = value;
     trigger.dataset.theme = value;
     trigger.setAttribute('aria-label', `主題：${themes.find(theme => theme.id === value).name}，開啟主題選擇`);
-    try { sessionStorage.setItem(key, value); } catch {}
+    if (persist) persistence = preferences.save(value);
+    trigger.dataset.preferenceStorage = persistence;
+    trigger.title = persistence === 'local' ? '' : persistence === 'session' ? '主題僅於此工作階段保存' : '主題僅於此頁面使用';
     updateSelection();
   };
   applyTheme(applied);
+  addEventListener('storage', event => {
+    if (preferences.valid(preferences.requested) || event.key !== preferences.key || !preferences.valid(event.newValue)) return;
+    try { if (event.storageArea !== window.localStorage) return; } catch { return; }
+    persistence = 'local';
+    applyTheme(event.newValue, false);
+  });
 
   const position = () => {
     if (!popover.matches(':popover-open')) return;

@@ -256,3 +256,214 @@ body.site-page {
   .battle-defense .defense-totals { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .battle-defense .defense-totals > div:last-child { grid-column: 1 / -1; }
 }
+
+/* Original palette values. The other palettes supply the same properties from
+   their existing theme stylesheets. */
+html:not([data-preview-theme]):not(:has(link[data-theme-seasonal][media="all"])) body.site-page {
+  --site-control-surface: #1a222d;
+  --site-field-surface: #141b24;
+  --site-control-hover: #29374a;
+  --site-control-edge: #6b7a90;
+  --site-control-hover-edge: #8a9db9;
+  --site-control-disabled: #1a2029;
+  --site-control-disabled-text: #8999ad;
+  --site-focus-ring: #a3c2eb;
+  --site-danger: #f4a7a1;
+  --site-warning: #f0b66d;
+  --site-success: #a9d8bc;
+}
+
+/* Match the three theme branches used by the bootstrap. Keep the original
+   branch's specificity so legacy page sheets cannot change the control frame. */
+html:is(
+  :not([data-preview-theme]):not(:has(link[data-theme-seasonal][media="all"])),
+  [data-preview-theme],
+  :has(link[data-theme-seasonal][media="all"])
+) body.site-page {
+  --site-control-height: 44px;
+  --site-control-compact: 36px;
+  --site-control-radius: 10px;
+  --site-control-padding: 14px;
+  --site-control-label: 13px;
+  --site-field-text: 14px;
+  --site-helper-text: 13px;
+  --site-section-title: 17px;
+  --site-control-gap: 8px;
+
+  /* Ordinary actions share a frame. Compact row tools, disclosures and chips
+     keep their own dimensions. */
+  & :where(.site-button, .profile-actions button, .profile-management-actions button,
+      .profile-dialog button, .toolbar-actions button, .optimizer-actions button,
+      .optimizer-constraint-body button, .optimizer-apply, [data-skill-retry]) {
+    min-height: var(--site-control-height);
+    padding: 8px var(--site-control-padding);
+    border: 1px solid var(--site-control-edge);
+    border-radius: var(--site-control-radius);
+    background: var(--site-control-surface);
+    color: var(--site-text);
+    font-size: var(--site-control-label);
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  & :where(#optimizer-start, .optimizer-apply) {
+    border-color: var(--site-action-edge);
+    background: var(--site-action-surface);
+  }
+  & :where(#profile-delete) { color: var(--site-danger); }
+  & :where(.optimizer-constraint-list button, #range-clear) {
+    min-height: var(--site-control-compact);
+    padding-inline: 10px;
+  }
+  & :where(.site-button, .profile-actions button, .profile-management-actions button,
+      .profile-dialog button, .toolbar-actions button, .optimizer-actions button,
+      .optimizer-constraint-body button, .optimizer-apply, [data-skill-retry]):not(:disabled):hover {
+    border-color: var(--site-control-hover-edge);
+    background: var(--site-control-hover);
+  }
+  & :where(#optimizer-start, .optimizer-apply):not(:disabled):hover {
+    background: color-mix(in srgb, var(--site-action-surface), var(--site-focus-ring) 12%);
+  }
+  & button:not(:disabled):active { filter: none; }
+  & :where(.site-button, .profile-actions button, .profile-management-actions button,
+      .profile-dialog button, .toolbar-actions button, .optimizer-actions button,
+      .optimizer-constraint-body button, .optimizer-apply):not(:disabled):active {
+    background: color-mix(in srgb, var(--site-control-hover), var(--site-field-surface) 36%);
+  }
+
+  /* The outer frame owns the background and ring for compound fields. */
+  & :where(input:not([type="checkbox"], [type="radio"], [type="range"],
+      [type="file"], [type="hidden"], [data-member], #boss-reduction,
+      #transcendence-skill-share-number), select, textarea, .member-slot,
+      .boss-control .percent-input, .skill-damage-share-number-wrap) {
+    min-height: var(--site-control-height);
+    border: 1px solid var(--site-control-edge);
+    border-radius: var(--site-control-radius);
+    background: var(--site-field-surface);
+    color: var(--site-text);
+    font-size: var(--site-field-text);
+    line-height: 1.5;
+  }
+  & :where(select) { color-scheme: dark; padding-inline-start: var(--space-3, 12px); }
+  & :where(.boss-health-controls select, .circuit-board-row input, .support-magazine select,
+      .option-editor-input input, .boss-control .percent-input, .skill-damage-share-number-wrap) {
+    min-height: var(--site-control-compact);
+    font-size: var(--site-control-label);
+  }
+  & :where([data-member], #boss-reduction) {
+    background: transparent;
+    color: var(--site-text);
+    font-size: var(--site-field-text);
+  }
+  & input::placeholder { color: var(--site-muted); }
+  & :where(input[readonly], textarea[readonly]) {
+    background: var(--site-surface);
+    border-style: dashed;
+    cursor: text;
+  }
+  & :where(input[aria-invalid="true"], textarea[aria-invalid="true"], select[aria-invalid="true"],
+      .skill-damage-share-number-wrap.is-invalid) {
+    border-color: var(--site-danger);
+  }
+  & :where(input:not([type="range"], [type="checkbox"], [type="radio"], [type="file"],
+      [data-member], #boss-reduction, #transcendence-skill-share-number), select, textarea):not(:disabled, [readonly], [aria-invalid="true"]):hover {
+    border-color: var(--site-control-hover-edge);
+  }
+
+  & :where(.field-disabled, .beast-unavailable-field) { opacity: 1; color: var(--site-muted); }
+  & :is(button, input, select, textarea):disabled,
+  & #profile-manager :where(.profile-chip, .profile-manage-toggle):disabled {
+    opacity: 1;
+    filter: none;
+    box-shadow: none;
+    cursor: not-allowed;
+    border-color: var(--site-border);
+    background: var(--site-control-disabled);
+    color: var(--site-control-disabled-text);
+  }
+  & input:is([type="checkbox"], [type="radio"]):checked:disabled {
+    background: var(--site-control-disabled-text);
+  }
+  & #optimizer-start[data-search-state="running"] {
+    background: var(--site-action-surface);
+    border-color: var(--site-action-edge);
+    color: var(--site-text);
+    cursor: progress;
+  }
+
+  /* Keep the keyboard signal on one surface of each compound control. */
+  & :where(button, summary, a, select, textarea,
+      input:not([data-member], #boss-reduction, #transcendence-skill-share-number)):focus-visible,
+  & :where(.member-slot, .percent-input, .skill-damage-share-number-wrap):has(> input:focus-visible) {
+    outline: 2px solid var(--site-focus-ring);
+    outline-offset: 2px;
+    box-shadow: none;
+  }
+  & :where([data-member], #boss-reduction):focus-visible {
+    /* The labelled wrapper draws the ring. */
+    outline-color: transparent;
+    box-shadow: none;
+  }
+  & :where(.team-panel, .member-slot, .percent-input):focus-within {
+    box-shadow: none;
+  }
+  & :where(.team-panel):focus-within { border-color: var(--site-border); }
+  & :where(.optimizer-series-options label):has(input:focus-visible) { outline-color: transparent; }
+
+  & :where(.mode-switch button) {
+    border: 1px solid transparent;
+    border-radius: var(--site-control-radius);
+    font-size: var(--site-control-label);
+    font-weight: 600;
+  }
+  & :where(.mode-switch button)[aria-selected="false"]:not(:disabled):hover {
+    background: var(--site-control-hover);
+    color: var(--site-text);
+  }
+  & :where(.mode-switch button)[aria-selected="true"],
+  & :where(.option-chip, .optimizer-series-options label):has(input:checked) {
+    border-color: var(--site-action-edge);
+    background: var(--site-action-surface);
+    color: var(--site-text);
+    box-shadow: none;
+  }
+  & :where(.mode-switch button)[aria-selected="true"] { font-weight: 700; }
+  & :where(input[type="checkbox"], input[type="radio"]):checked:not(:disabled) {
+    border-color: var(--site-focus-ring);
+    background: var(--site-focus-ring);
+  }
+
+  & :where(.panel-heading h2, .profile-heading h2, .score-head h2,
+      .score-grid h2, .section-label strong, .results-heading h2) {
+    font-size: var(--site-section-title);
+    font-weight: 650;
+    line-height: 1.4;
+    letter-spacing: normal;
+  }
+  & :where(.battle-fields label, .battle-defense label, .score-fields label,
+      .optimizer-constraint-controls label, .boss-control) {
+    font-size: var(--site-control-label);
+  }
+  & :where(.panel-note, .score-muted, .defense-note, .optimizer-caveat,
+      .profile-message, .background-option-note, .skill-empty) {
+    color: var(--site-muted);
+    font-size: var(--site-helper-text);
+    line-height: 1.55;
+  }
+  & :where(#save-status, #transfer-status, #constraint-status, #optimizer-status,
+      #optimizer-progress, .defense-error, .defense-import-status,
+      .attribute-equivalence-status, .portrait-awakening-error) {
+    font-size: var(--site-helper-text);
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+  }
+  & :where(.defense-error, .portrait-awakening-error, #constraint-status[data-invalid="true"],
+      .skill-empty[role="alert"]) {
+    color: var(--site-danger);
+  }
+  & :where(.input-warning, .warning-card) { color: var(--site-warning); }
+  & :where(.profile-current[data-status="saved"], .optimizer-result-header span) { color: var(--site-success); }
+  & :where(.profile-actions, .profile-management-actions, .optimizer-actions,
+      .optimizer-constraint-controls) {
+    gap: var(--site-control-gap);
+  }
+}

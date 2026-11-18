@@ -35,6 +35,8 @@ jobs:
       - run: pnpm run test:build
       - run: pnpm run test:production
       - run: pnpm run test:transfer
+      - run: pnpm run test:profiles
+      - run: pnpm run test:data-contract
       - run: pnpm run test:field-ids
       - run: pnpm run test:data-loading
       - run: pnpm run test:data-schema

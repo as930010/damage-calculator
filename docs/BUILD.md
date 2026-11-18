@@ -69,3 +69,50 @@ VI 已依 2026-09-09 平衡移除「猛虎4式：怒濤」的破甲參照，保�
 LA 的「無視防禦加算」與外部破防分開傳遞，先加至受益角色裝備無視防禦組，再套用原防禦倍率；Buff 基礎輸出不包含此額外效益，另以首頁保存配裝（沒有面板時採 0%）顯示。整站建置提供唯讀配裝適配入口，僅有此效果時延後讀取；Buff 獨立輸出沒有首頁時採 0%。目前 60 職業兩模式皆共用效果，未使用 challengeEffects。LA Buff 保留原來源的 5% 攻擊與 8.25/235 致命傷害換算；移除固定 1.0382，獨立 Debuff 為 5%。
 
 隊伍破防快照保留 dataRevision 與 sourceRevision；新增可選 defenseIgnoreAdditive、defenseIgnoreSources，舊快照缺值視為 0。資料過期只提醒重新引用，不自動改寫。切回手動／逐項模式不套用快照加算。
+
+## 配裝資料與備份相容性
+
+遊戲資料由 `scripts/build.mjs` 彙整成 `dist/data/game-data.json`。`frontend/catalog-index.ts` 供首頁 Picker 與匯入驗證查詢選項，編輯中的值保存在 Schema 3 的 `LoadoutState`。`frontend/loadout-archive.ts` 將欄位 ID、字串字典、快照及 Baseline 差異寫入檔案。`frontend/loadout-transfer.ts` 與 `frontend/loadout-profiles.ts` 分別處理畫布及正式配置，首頁在套用或還原前驗證目前的遊戲資料。
+
+| 變更 | 維護位置與步驟 |
+| --- | --- |
+| 新增裝備或時裝 | 在 `data/equipment/` 對應目錄新增唯一且永久的 item ID、部位與選項名稱。同一欄位使用的保存名稱也必須唯一。已有部位會自動遍歷新項目。新部位另檢查 `data/simulator-equipment-mapping.json` 與 `data/equipment-layout.json` 的綁定。 |
+| 新增魔法石或魔力石 | 一般魔法石在 `data/equipment/magic-stones.json` 定義武器、防具各自的名稱與效果。武器彩色魔力石讀取 `data/weapon-grade-options.json`，巨型魔力石讀取 `data/giant-magic-stones.json`。既有欄位可直接承載新選項。 |
+| 新增鑑定 | 武器、防具分別使用 `data/weapon-appraisals.json`、`data/armor-appraisals.json`。飾品在 `data/accessory-special-effects.json` 設定部位或單件專屬選項，並在裝備目錄確認可鑑定條數。選項測試會依條數及目前裝備建立有效配裝。 |
+| 新增配裝欄位 | 在 `frontend/field-transfer-codes.ts` 配發高於歷史最大值的新整數，更新相關 UI、Schema 驗證或資料綁定。在 `tests/fixtures/data-contract/` 新增 `field-map-v1-additions-YYYYMMDD.json`，只列該批語意欄位及 ID。原始 v1 表與已發布補充檔保留供審查。 |
+| 移除、改名或改變語義 | 保留舊 ID。單一配裝 v3 的裝備依 item ID 雜湊讀取，v4 及配置庫 v2 的裝備值則保存選項字串。只改 UI 顯示字詞可沿用 `frontend/attribute-label.ts`。更改保存字串、沿用舊名稱給新物件、停用舊物件時，要針對舊備份制定明確轉換或拒絕政策。新增一個 JSON 的 `aliases` 欄位本身不會啟動遷移。 |
+| 調整 Schema 或 Codec | 改工作狀態的型別、必要欄位、預設值或資料語義時，檢查 `parseState`、`snapshot` 與舊資料遷移。改欄位映射解讀、字典標記、快照或差異格式時，新增對應版本與解碼路徑，保留舊解碼器及範本。Schema 3 的 `values` 支援字串與數字，布林設定使用具名欄位。 |
+
+### 本機驗證
+
+使用 Node.js 24 與專案指定的 pnpm，在專案根目錄執行下列命令。更新 TS 或來源 JSON 後需重新建置，測試才會讀到新的資料與編譯模組。
+
+```sh
+pnpm run typecheck
+pnpm run validate:data
+pnpm run build
+pnpm run test:data-contract
+pnpm run test:profiles
+```
+
+`test:data-contract` 使用固定 Seed、正式匯入入口及隔離的首頁 DOM／Storage。遇到 Seed 失敗，可在建置後執行 `node --experimental-vm-modules --test --test-name-pattern="seed 1597" tests/archive-contract.test.mjs`，把數字換成失敗報告的 Seed。斷言會列出案例與深度差異。遇到欄位或目錄識別失敗，先依欄位名、item ID、適用部位核對歷史快照。遇到畫布失敗，依序核對 Picker 顯示值、保存值與再次匯出的型別。
+
+固定歷史樣本涵蓋單一配裝 v3／v4、正式配置 v2、配置庫 v1／v2，以及五個曾遺失的鑑定欄位。舊檔的可讀性與新資料的遍歷分開驗證。發布新增選項後，可追加該版本的匿名舊檔與有意義的還原斷言，以保護新發布的保存值。固定樣本沒有自動更新指令。改變效果數值時，另跑對應的傷害或技能測試。
+
+現有 Pages 工作流程在上傳建置產物前執行 `test:data-contract`、`test:profiles`、正式資源與 Smoke 等測試，任一步失敗會停止發布。
+
+## 共用主題介面規範
+
+四個工具共用 `frontend/site-shell.css` 的元件尺寸、字級、間距及狀態。預設色值留在 Site Shell。薄霧、森林、夕陽透過 `theme-preview/themes.css` 的 `data-preview-theme` 配色映射，共存節只在活動 stylesheet 的 `media` 為 `all` 時提供 Token。新增控制元件時先接到共用語義規則，主題樣式表只提供配色或裝飾例外。
+
+| 語義 | 共用規則 |
+| --- | --- |
+| 表面 | 頁面底色由既有 Site Shell 提供，面板用 `--site-surface`，次要操作用 `--site-control-surface`，輸入用 `--site-field-surface`，選取與主要操作用 `--site-action-surface`。 |
+| 邊框與文字 | 使用 1px 邊框。互動邊框依 `--site-control-edge` 和 `--site-control-hover-edge`，選取邊框用 `--site-action-edge`。一般文字用 `--site-text`，說明用 `--site-muted`，錯誤、警告、成功用 `--site-danger`、`--site-warning`、`--site-success`。 |
+| 普通動作 | 共用 44px 最小高度、10px 圓角、14px 水平內距、13px／600／1.4。首頁的儲存與設為比較基準沿用普通動作外觀。開始搜尋與套用搜尋結果採主要外觀。刪除仍有確認流程，入口用危險色標示。 |
+| 欄位 | 繼承 Site Shell 字體堆疊（Inter、Segoe UI、微軟正黑體及 sans-serif），普通欄位採 14px、1.5 行高與 44px 最小高度。高度不足以容納內容時允許自然增加。Boss 條件、電路板與支援彈匣等緊湊欄位採 36px 最小高度、13px。搜尋選單保留清除按鈕預留空間。 |
+| 互動 | Hover 只提高表面和邊框的可辨識度，Active 壓低填色。選取和焦點分開使用邊框及外框。鍵盤外框用 `--site-focus-ring`，2px 寬、偏移 2px。複合欄位只在外框顯示焦點，停用疊加陰影。 |
+| Disabled／Readonly／Invalid／Loading | 原生禁用狀態使用一致背景、文字、邊框與游標。唯讀欄位可選取文字，保留可讀對比並使用虛線。已有 `aria-invalid` 的欄位使用錯誤邊框。冰裝搜尋中的按鈕繼續顯示進度與主要操作底色。 |
+| 排版與間距 | 面板標題 17px／650／1.4，欄位標籤與說明 13px，說明行高 1.55。沿用 4／8／12／16／24px 既有間距單位。主要按鈕群的間距用 8px Token。 |
+
+配置標籤、頂部導覽、收合標題、圖示按鈕、複選框及計算結果維持各自用途的尺寸。裝備槽色彩、品質提示、增減幅及密集結果表格也各有用途。新增元件時先比對相同功能的既有規則，並以預設及四款其他主題實測 `disabled`、鍵盤焦點及窄版換行。

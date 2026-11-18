@@ -750,7 +750,8 @@ test('import synchronizes all stage controls with actual calculation State and e
     await page.importState(stateB);
     await assertStageSync(page, stateB);
     const json = await page.exportJson();
-    for (const [field] of stageFields) assert.equal(json[field], stateB.values[field]);
+    const { decodeSingle } = await page.runtime.load('frontend/loadout-archive.ts');
+    for (const [field] of stageFields) assert.equal(decodeSingle(json).values[field], stateB.values[field]);
   } finally { page.close(); }
 });
 

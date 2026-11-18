@@ -217,8 +217,8 @@ test('all circuit boards support bounded rows and retain them across compact exp
       const rowField = board.attribute.replace(/\.Attribute$/, '.Rows');
       const savedRows = page.readState().values[rowField];
       const exported = await page.exportJson();
-      const { FIELD_ID_TO_CODE } = await page.runtime.load('frontend/field-ids.ts');
-      assert.equal(exported.values[String(FIELD_ID_TO_CODE[rowField])], savedRows, `${board.slot} rows exported`);
+      const { decodeSingle } = await page.runtime.load('frontend/loadout-archive.ts');
+      assert.equal(decodeSingle(exported).values[rowField], savedRows, `${board.slot} rows exported`);
       await page.importJson(JSON.stringify(exported));
       assert.equal(page.readState().values[rowField], savedRows, `${board.slot} rows imported`);
     }
@@ -267,7 +267,8 @@ test('lowerwear can combine stronger and heat rows while alternate toggle keeps 
 test('legacy circuit budgets normalize deterministically on import, save/reload, and baseline restore', async () => {
   const page = await uiPage(); let reload;
   try {
-    const exported = await page.exportJson();
+    const { serializeLoadout } = await page.runtime.load('frontend/loadout-transfer.ts');
+    const exported = JSON.parse(serializeLoadout(page.readState(), gameData).json);
     const { FIELD_ID_TO_CODE } = await page.runtime.load('frontend/field-ids.ts');
     exported.values[FIELD_ID_TO_CODE[rowsField]] = JSON.stringify([
       { attribute: 'Boss傷害%', percentageValue: 0.11 },

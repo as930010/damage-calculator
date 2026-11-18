@@ -1,3 +1,4 @@
+import { seasonalStylesheetPattern, themeBootstrap, themeController } from './theme-resources.mjs';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { contentHash, minifyCss } from './production-assets.mjs';
@@ -43,19 +44,21 @@ export async function integrateThemes(root, optimized) {
   }
   const themeCssBytes = Buffer.from(minifyCss(themeCss));
   const themeCssPath = `assets/themes-${contentHash(themeCssBytes)}.css`;
-  const themeJsBytes = await readFile(join(root, 'theme-preview', 'themes.js'));
+  const themeJsBytes = Buffer.from(themeController(await readFile(join(root, 'theme-preview', 'themes.js'), 'utf8')));
   const themeJsPath = `assets/themes-${contentHash(themeJsBytes)}.js`;
   for (const [path, bytes] of [[themeCssPath, themeCssBytes], [themeJsPath, themeJsBytes]]) {
     optimized.files.set(path, bytes);
     optimized.manifest.files[path] = { bytes: bytes.length, hash: contentHash(bytes) };
   }
-  const themeBootstrap = `<!-- theme-bootstrap:start --><script>try{const s=document.querySelector('link[data-theme-seasonal]'),k='damage-calculator-preview-theme',requested=new URL(location.href).searchParams.get('preview-theme'),palettes=['harbor','forest','ember'],valid=v=>v==='original'||(v==='seasonal'&&s)||palettes.includes(v);let stored;try{stored=sessionStorage.getItem(k)}catch{}const v=valid(requested)?requested:valid(stored)?stored:'original';if(s)s.media=v==='seasonal'?'all':'not all';if(palettes.includes(v))document.documentElement.dataset.previewTheme=v}catch{}</script><!-- theme-bootstrap:end -->`;
   for (const [page, prefix] of [['index.html', './'], ['ice-optimizer/index.html', '../'], ['buff-simulator/index.html', '../'], ['transformation-score/index.html', '../']]) {
     let html = optimized.files.get(page).toString();
-    const seasonalLink = /<link rel="stylesheet" href="([^"]*seasonal-effects-[^"]+\.css)"\s*\/>/g;
-    if ([...html.matchAll(seasonalLink)].length !== (seasonalCssPath ? 1 : 0)) throw new Error(`Unexpected seasonal stylesheet count in ${page}`);
+    const seasonalLinks = [...html.matchAll(seasonalStylesheetPattern)];
+    if (seasonalLinks.length !== (seasonalCssPath ? 1 : 0)) throw new Error(`Unexpected seasonal stylesheet count in ${page}`);
+    if (seasonalLinks.some(([link]) => !/\smedia=["']not all["']/.test(link) || !/\sdata-theme-seasonal(?:\s|\/?>)/.test(link))) {
+      throw new Error(`Seasonal stylesheet must be inactive and marked in ${page}`);
+    }
     html = seasonalCssPath
-      ? html.replace(seasonalLink, '<link rel="stylesheet" href="$1" data-theme-seasonal />' + themeBootstrap)
+      ? html.replace(seasonalStylesheetPattern, link => link + themeBootstrap)
       : html.replace('</head>', themeBootstrap + '\n</head>');
     html = html.replace('</head>', `<!-- theme-control:start --><link rel="stylesheet" href="${prefix}${themeCssPath}"><script defer src="${prefix}${themeJsPath}"></script><!-- theme-control:end -->\n</head>`);
     const bytes = Buffer.from(html);

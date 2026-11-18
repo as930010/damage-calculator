@@ -1,3 +1,4 @@
+import { seasonalStylesheetLink } from './theme-resources.mjs';
 import { shareSimulatorCss, integrateThemes } from './site-resources.mjs';
 import { isPublishableDataFile, publicGameData } from './public-game-data.mjs';
 import { cleanOutput, contentHash, minifyCss, productionAssets, writeProduction } from './production-assets.mjs';
@@ -101,7 +102,7 @@ if (!shellCssPath || !optimized.files.has(shellCssPath)) throw new Error('Missin
 const optimizerTemplate = await readFile(join(root, 'features', 'ice-optimizer', 'index.html'), 'utf8');
 const shellLink = 'href="./frontend/site-shell.css"';
 const optimizerStyleLink = 'href="./frontend/styles.css"';
-const optimizerSeasonalLink = '<link rel="stylesheet" href="__OPTIMIZER_SEASONAL_CSS_URL__" />';
+const optimizerSeasonalLink = seasonalStylesheetLink('__OPTIMIZER_SEASONAL_CSS_URL__');
 if (optimizerTemplate.split(shellLink).length !== 2 || optimizerTemplate.split(optimizerStyleLink).length !== 2
   || optimizerTemplate.split(optimizerSeasonalLink).length !== 2) {
   throw new Error('Invalid optimizer CSS references');
@@ -153,7 +154,7 @@ const optimizerHtml = Buffer.from(optimizerTemplate
   .replace(shellLink, `href="../${shellCssPath}"`)
   .replace(optimizerStyleLink, `href="../${optimizerCssPath}"`)
   .replace(optimizerSeasonalLink, seasonalCssPath
-    ? `<link rel="stylesheet" href="../${seasonalCssPath}" />` : '')
+    ? seasonalStylesheetLink('../' + seasonalCssPath) : '')
   .replace('content="__OPTIMIZER_GAME_DATA_URL__"', `content="../${gameDataPath}"`)
   .replace('content="__OPTIMIZER_WORKER_URL__"', `content="../${optimizerWorkerPathHashed}"`)
   .replace('src="./frontend/main.js"', `src="../${optimizerEntryPathHashed}"`));
@@ -175,8 +176,8 @@ const scoreTemplate = await readFile(join(scoreDirectory, 'index.html'), 'utf8')
 const scoreHtml = Buffer.from(scoreTemplate
   .replace(shellLink, `href="../${shellCssPath}"`)
   .replace('href="./styles.css"', `href="../${scoreCss}"`)
-  .replace('<link rel="stylesheet" href="__SCORE_SEASONAL__" />', seasonalCssPath
-    ? `<link rel="stylesheet" href="../${seasonalCssPath}" />` : '')
+  .replace(seasonalStylesheetLink('__SCORE_SEASONAL__'), seasonalCssPath
+    ? seasonalStylesheetLink('../' + seasonalCssPath) : '')
   .replace('__SCORE_GAME_DATA__', '../' + gameDataPath)
   .replace('src="./main.js"', `src="../${scoreScript}"`));
 optimized.files.set('transformation-score/index.html', scoreHtml);

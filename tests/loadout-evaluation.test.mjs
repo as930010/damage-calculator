@@ -249,6 +249,8 @@ test('actual import keeps baseline and save/export contracts; cleared storage ha
     Object.defineProperty(input, 'files', { configurable: true, value: [{ text: async () => json }] });
     page.runtime.resetCounts(); input.dispatchEvent(new page.dom.window.Event('change'));
     await new Promise(resolve => setTimeout(resolve, 0));
+    [...page.dom.window.document.querySelectorAll('dialog button')].find(b => b.textContent === '套用至畫布').click();
+    await new Promise(resolve => setTimeout(resolve, 0));
     assert.match(page.dom.window.document.querySelector('#transfer-status').textContent, /已匯入/);
     assert.equal(page.runtime.counts.evaluateLoadout, 1);
     assert.equal(page.runtime.counts.aggregateCharacterAttributes, 1);

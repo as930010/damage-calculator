@@ -1,3 +1,4 @@
+import { seasonalStylesheetLink, seasonalStylesheetPattern, themeBootstrap, themeController } from './theme-resources.mjs';
 import { createServer } from "node:http";
 import { readFile, stat } from "node:fs/promises";
 import { dirname, extname, join, resolve, sep } from "node:path";
@@ -42,7 +43,8 @@ const server = createServer(async (request, response) => {
     if (!pathname.startsWith(base)) { response.writeHead(404); response.end('Not found'); return; }
     if (themes && (pathname === `${base}__theme-preview.css` || pathname === `${base}__theme-preview.js` || /^__theme-card-(original|seasonal|harbor|forest|ember)\.svg$/.test(pathname.slice(base.length)))) {
       const file = pathname.endsWith('.css') ? 'themes.css' : pathname.endsWith('.js') ? 'themes.js' : `cards/${pathname.slice(base.length)}`;
-      const body = await readFile(join(root, '..', 'theme-preview', file));
+      const raw = await readFile(join(root, '..', 'theme-preview', file));
+      const body = file === 'themes.js' ? Buffer.from(themeController(raw.toString('utf8'))) : raw;
       response.writeHead(200, { 'Content-Type': contentTypes[extname(file)], 'Cache-Control': 'no-store', 'Content-Length': body.length });
       response.end(request.method === 'HEAD' ? undefined : body);
       return;
@@ -59,11 +61,12 @@ const server = createServer(async (request, response) => {
     // Keep the seasonal sheet in its production position for the local theme
     // switcher, but leave it inactive until the seasonal option is selected.
     if (withoutSeasonal && extname(file) === '.html' && (!themes || !integratedThemes)) {
-      body = Buffer.from(body.toString('utf8').replace(
-        /<link rel="stylesheet" href="(\.\.?\/assets\/seasonal-effects-[^"/]+\.css)"(?: data-theme-seasonal)?\s*\/>/gm,
-        themes ? `<link rel="stylesheet" href="$1" media="all" data-theme-seasonal />\n<script>try{const k='damage-calculator-preview-theme',v=new URL(location.href).searchParams.get('preview-theme')||sessionStorage.getItem(k)||'original';if(v!=='seasonal'){document.querySelector('link[data-theme-seasonal]').media='not all';if(['harbor','forest','ember'].includes(v))document.documentElement.dataset.previewTheme=v}}catch{}</script>\n` : '',
-      ).replace(/<!-- theme-bootstrap:start -->[\s\S]*?<!-- theme-bootstrap:end -->/g, '')
-        .replace(/<!-- theme-control:start -->[\s\S]*?<!-- theme-control:end -->/g, ''));
+      let html = body.toString('utf8')
+        .replace(/<!-- theme-bootstrap:start -->[\s\S]*?<!-- theme-bootstrap:end -->/g, '')
+        .replace(/<!-- theme-control:start -->[\s\S]*?<!-- theme-control:end -->/g, '');
+      html = html.replace(seasonalStylesheetPattern, (_link, href) => themes ? seasonalStylesheetLink(href) : '');
+      if (themes) html = html.replace('</head>', themeBootstrap + '\n</head>');
+      body = Buffer.from(html);
     }
     if (themes && extname(file) === '.html' && !integratedThemes) {
       body = Buffer.from(body.toString('utf8').replace('</head>', `<link rel="stylesheet" href="${base}__theme-preview.css"><script defer src="${base}__theme-preview.js"></script></head>`));

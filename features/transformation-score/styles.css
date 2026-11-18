@@ -41,9 +41,5 @@
 .site-page-score #roll-disclosure > summary::marker { color: var(--accent, var(--site-text)); }
 .site-page-score #roll-disclosure[open] > summary { margin-bottom: 12px; }
 .site-page-score #roll-disclosure > p { margin-top: 0; }
-.site-page-score:has(.theme-trigger[data-theme="seasonal"]) #reload-loadout:disabled {
-  opacity: .48;
-}
-.site-page-score:has(.theme-trigger[data-theme="seasonal"]) #reload-loadout:focus-visible { outline-offset: 3px; }
 @media (max-width: 900px) { .site-page-score #roll-comparisons { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 520px) { .site-page-score #roll-comparisons { grid-template-columns: 1fr; } }

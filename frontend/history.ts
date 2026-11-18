@@ -45,6 +45,12 @@ export class LoadoutHistory {
     this.snapshots = [serializeConfigurationSnapshot(initialState)];
   }
 
+  /** A profile switch starts a new editing session; it is not an undoable edit. */
+  reset(initialState: LoadoutState): void {
+    this.snapshots = [serializeConfigurationSnapshot(initialState)];
+    this.cursor = 0;
+  }
+
   get canUndo(): boolean { return this.cursor > 0; }
   get canRedo(): boolean { return this.cursor < this.snapshots.length - 1; }
   get undoSteps(): number { return this.cursor; }
