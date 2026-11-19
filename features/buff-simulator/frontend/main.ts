@@ -346,19 +346,27 @@ function shell(): void {
   app.innerHTML = `<section class="site-tool-intro" aria-labelledby="buff-intro-title">
     <div class="site-tool-intro-body">
       <h1 id="buff-intro-title">隊伍增益模擬</h1>
-      <p class="site-tool-summary">填入職業代碼與配置效果，查看分路或同場增益。已保存的隊伍可供傷害計算機引用破防。</p>
+      <p class="site-tool-summary">填入職業代碼與配置效果，查看分路或同場增益<br>已保存的隊伍可供傷害計算機引用破防</p>
     </div>
     <div class="team-mode-control">
       <div class="mode-switch" role="tablist" aria-label="隊伍模式">
-        <button data-mode="single" role="tab" aria-selected="${mode === "single"}">單隊 <small>6 人</small></button>
-        <button data-mode="challenge" role="tab" aria-selected="${mode === "challenge"}">挑戰雙隊 <small>4 + 4</small></button>
+        <button type="button" id="buff-mode-single" data-mode="single" role="tab" aria-controls="buff-mode-panel" aria-selected="${mode === "single"}" tabindex="${mode === "single" ? 0 : -1}">單隊 <small>6 人</small></button>
+        <button type="button" id="buff-mode-challenge" data-mode="challenge" role="tab" aria-controls="buff-mode-panel" aria-selected="${mode === "challenge"}" tabindex="${mode === "challenge" ? 0 : -1}">挑戰雙隊 <small>4 + 4</small></button>
       </div>
     </div>
   </section>
-  <div class="section-label configuration-heading"><strong>隊伍配置</strong>${mode === "challenge" ? bossControl() : ""}</div>
+  <div id="buff-mode-panel" role="tabpanel" aria-labelledby="buff-mode-${mode}">
+  <div id="buff-configuration" class="section-label configuration-heading site-inpage-target" tabindex="-1" role="region" aria-label="隊伍配置">
+    <div class="buff-configuration-nav"><strong>隊伍配置</strong><a class="site-inpage-link" href="#buff-results" data-buff-jump>查看增益結果</a></div>
+    ${mode === "challenge" ? bossControl() : ""}
+  </div>
   ${mode === "single" ? `<div class="workspace single-workspace">${teamPanel("single", "單隊配置", 6)}</div>` : `<div class="workspace challenge-workspace">${teamPanel("first", "第一隊", 4)}${teamPanel("second", "第二隊", 4)}</div>`}
   <datalist id="class-list">${catalog.classes.filter((record) => record.enabled).map((record) => `<option value="${escapeHtml(record.code)}">${escapeHtml(record.name)}</option>`).join("")}</datalist>
-  <section id="results" aria-live="polite"></section>
+  <section id="buff-results" class="site-inpage-target" tabindex="-1" aria-label="隊伍增益結果">
+    <a class="site-inpage-link" href="#buff-configuration">返回隊伍配置</a>
+    <div id="results" aria-live="polite"></div>
+  </section>
+  </div>
   ${skillReferencePanel()}`;
   const skillPanel = app.querySelector<HTMLDetailsElement>(".skill-reference")!;
   let skillPanelOpen = skillPanel.open;
@@ -380,7 +388,8 @@ function shell(): void {
       persistSavedState();
     }
   }));
-  app.querySelectorAll<HTMLButtonElement>("[data-mode]").forEach((button) => button.addEventListener("click", () => {
+  const modeTabs = [...app.querySelectorAll<HTMLButtonElement>("[data-mode]")];
+  modeTabs.forEach((button) => button.addEventListener("click", () => {
     const nextMode = button.dataset.mode as TeamMode;
     if (nextMode === mode) return;
     const hadFocus = document.activeElement === button;
@@ -391,6 +400,17 @@ function shell(): void {
     shell();
     if (hadFocus) app.querySelector<HTMLButtonElement>(`[data-mode="${nextMode}"]`)?.focus();
   }));
+  modeTabs[0].parentElement!.addEventListener("keydown", (event) => {
+    if (event.altKey || event.ctrlKey || event.metaKey || !["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+    const current = modeTabs.findIndex(tab => tab === event.target);
+    if (current < 0) return;
+    event.preventDefault();
+    const offset = event.key === "ArrowLeft" ? -1 : 1;
+    const next = event.key === "Home" ? 0 : event.key === "End" ? modeTabs.length - 1
+      : (current + offset + modeTabs.length) % modeTabs.length;
+    modeTabs[next].focus();
+    modeTabs[next].click();
+  });
   syncSupportMagazineControls();
   inputValues = new WeakMap();
   app.querySelectorAll<HTMLInputElement | HTMLSelectElement>("input, select").forEach(input => inputValues.set(input, inputValue(input)));

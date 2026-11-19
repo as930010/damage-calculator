@@ -125,7 +125,6 @@ html[data-preview-theme] body.site-page :is(.section-label,.roster-note){border-
 html[data-preview-theme] body.site-page :is(.results-heading,.metric-section,.support-grid,.primary-grid){border-color:var(--p-line)}
 html[data-preview-theme] body.site-page :is(.boss-control .percent-input span,.option-editor-input span){color:var(--p-accent)}
 html[data-preview-theme] body.site-page .background-option-note{background:var(--p-active);border-color:var(--p-edge);color:var(--p-ink)}
-html[data-preview-theme] body.site-page :is(.primary-grid .metric,.support-grid .metric):hover{border-color:var(--p-edge)}
 html[data-preview-theme] body.site-page :is(.skill-role-heading strong,.background-option-note strong,.support-grid .metric:nth-child(5) strong){color:var(--p-accent)}
 html[data-preview-theme] body.site-page .skill-reference>summary::before{background:var(--p-active);color:var(--p-accent)}
 html[data-preview-theme] body.site-page :is(.team-panel,.result-card):hover{border-color:var(--p-edge)}

@@ -76,7 +76,7 @@ input::placeholder { color: #9cabb8; font-weight: 400; }
 .option-chip:has(input:checked) { color: #c4f1e7; border-color: #397f78; background: #122b2c; }
 .option-chip input { accent-color: var(--accent); margin: 0; }
 
-#results { margin-top: 32px; }
+#buff-results { margin-top: 32px; }
 .results-heading { margin-bottom: 13px; }
 .results-heading h2 { font-size: 19px; }
 .result-context { color: var(--muted); font-size: 12px; }
@@ -337,7 +337,7 @@ input::placeholder { color: #7d928e; }
 .percent-input span { padding-right: 12px; color: var(--accent); font-size: 13px; font-weight: 750; }
 .percent-input:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(131, 231, 207, .1); }
 
-#results { margin-top: 34px; scroll-margin-top: 20px; }
+#buff-results { margin-top: 34px; scroll-margin-top: 20px; }
 .results-heading { align-items: center; margin-bottom: 16px; }
 .results-heading h2 { font-size: clamp(20px, 2.2vw, 25px); letter-spacing: -.03em; }
 .result-context { padding: 7px 10px; border: 1px solid #33464a; border-radius: 99px; color: #b5c6c2; background: rgba(18, 31, 35, .65); font-size: 11px; }
@@ -477,7 +477,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
   .option-editor-input { justify-content: flex-start; }
   .option-editor-input input { width: 7em; text-align: left; }
   .option-chip { min-height: 44px; padding-inline: 10px; }
-  #results { margin-top: 27px; }
+  #buff-results { margin-top: 27px; }
   .result-stack { gap: 12px; }
   .result-heading, .result-stack .result-heading { min-height: 112px; padding: 18px; }
   .total-multiplier { min-width: 0; }
@@ -559,7 +559,7 @@ input::placeholder { color: #858e9f; }
 .option-editor-input input, .skill-search-controls input { border-color: #3c414c; background: #171b21; }
 .option-chip:has(input:checked) { border-color: #596b9c; background: #252c3a; }
 .background-option-note { border-left-color: #c3d0ff; background: #252c3a; }
-#results { margin-top: 24px; }
+#buff-results { margin-top: 24px; }
 .result-heading::after { display: none; }
 .result-card { background: #1e2229; box-shadow: 0 12px 30px #0003; }
 .total-multiplier { text-align: right; }
@@ -610,7 +610,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
   padding-bottom: 10px;
   border-bottom: 1px solid #303640;
 }
-#results { margin-top: 28px; }
+#buff-results { margin-top: 28px; }
 .result-heading, .result-stack .result-heading {
   min-height: 100px;
   padding: 17px 22px;
@@ -622,8 +622,6 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .metric-section { padding: 16px 20px 18px; }
 .metric-section-heading { margin-bottom: 10px; }
 .metric-section-heading small, .result-title > small, .control-times summary small { color: #929baa; }
-.primary-grid .metric, .support-grid .metric { transition: border-color .16s ease, background-color .16s ease; }
-.primary-grid .metric:hover, .support-grid .metric:hover { border-color: #48505e; background-color: #20242c; }
 .team-panel:hover { border-color: #424956; }
 .result-card:hover { border-color: #424956; }
 .option-chip:hover { border-color: #596b9c; background: #252c3a; }
@@ -652,7 +650,6 @@ body::before {
   .total-multiplier small { max-width: 160px; font-size: 10px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .primary-grid .metric, .support-grid .metric { transition: none; }
 }
 
 /* Design pass 4: stable mode selector and inset brand alignment */
@@ -746,7 +743,8 @@ details:not(.skill-reference)[open] > summary::before { transform: rotate(45deg)
   .option-editor-input input { width: 8.4em; min-width: 8.4em; text-align: left; }
 }
 
-.configuration-heading { justify-content: space-between; gap: 16px; }
+.configuration-heading { justify-content: space-between; flex-wrap: wrap; gap: 4px 16px; }
+.buff-configuration-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 0 14px; }
 .configuration-heading .boss-control { flex: 0 1 260px; }
 @media (max-width: 700px) {
   .configuration-heading .boss-control { flex: none; flex-direction: row; align-items: center; gap: 8px; font-size: 11px; }
@@ -801,8 +799,6 @@ details:not(.skill-reference)[open] > summary::before { transform: rotate(45deg)
 .support-grid .metric:nth-child(9),
 .support-grid .metric:nth-child(10),
 .support-grid .metric:nth-child(11) { background: linear-gradient(145deg, #22262d, #1b1f25 82%); }
-.primary-grid .metric:hover,
-.support-grid .metric:hover { border-color: #596b9c; background-color: #20242c; }
 .background-option-note {
   border-color: #303640;
   border-left: 2px solid #8c9ed4;

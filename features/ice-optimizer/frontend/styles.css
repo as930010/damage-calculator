@@ -3,6 +3,8 @@
 .optimizer-workspace { margin-top: 22px; padding: clamp(18px, 3vw, 30px); }
 .optimizer-constraints { margin-top: 16px; border: 1px solid var(--site-border); border-radius: 8px; }
 .optimizer-constraints summary { padding: 12px 14px; cursor: pointer; }
+.optimizer-condition-summary { display: block; color: var(--site-muted); }
+#condition-summary-status { color: var(--site-warning); }
 .optimizer-constraint-body { display: grid; gap: 16px; padding: 0 14px 14px; }
 .optimizer-constraint-body h2 { font-size: 14px; margin: 0 0 8px; }
 .optimizer-constraint-controls { display: flex; flex-wrap: wrap; align-items: end; gap: 8px; }
@@ -32,7 +34,35 @@
 #optimizer-status, #optimizer-progress { margin: 14px 0 0; color: var(--site-muted); line-height: 1.6; }
 #optimizer-progress { padding-inline-start: 10px; border-inline-start: 2px solid var(--site-action-edge); font-variant-numeric: tabular-nums; }
 #optimizer-progress:empty { display: none; }
-.optimizer-results { display: grid; gap: 12px; margin-top: 22px; }
+.optimizer-setup, .optimizer-result-region { min-inline-size: 0; }
+.optimizer-result-region { margin-block-start: 22px; }
+.optimizer-result-region > h2 {
+  margin: 0 0 12px;
+  padding-block-end: 8px;
+  border-block-end: 1px solid var(--site-border);
+  color: var(--site-text);
+  font-size: var(--site-section-title, 17px);
+}
+.optimizer-result-empty { margin: 0; color: var(--site-muted); }
+.optimizer-result-region:has(.optimizer-results:not(:empty)) .optimizer-result-empty { display: none; }
+.optimizer-setup .optimizer-result-jump { display: none; }
+.optimizer-results { display: grid; gap: 12px; }
+@media (min-width: 1120px) {
+  .optimizer-workspace {
+    display: grid;
+    grid-template-columns: minmax(315px, 1fr) minmax(0, 1.65fr);
+    align-items: start;
+    gap: clamp(20px, 2vw, 32px);
+  }
+  .optimizer-result-region { margin-block-start: 0; }
+  .optimizer-setup .optimizer-series-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 1119px) {
+  .optimizer-workspace:has(.optimizer-results:not(:empty)) .optimizer-result-jump {
+    display: inline-flex;
+    margin-block-start: 8px;
+  }
+}
 .optimizer-results:empty { display: none; }
 .optimizer-result { padding: 18px; }
 .optimizer-result-header { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 5px 14px; }

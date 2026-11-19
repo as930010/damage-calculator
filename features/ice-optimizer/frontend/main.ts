@@ -32,6 +32,8 @@ const setAdd = document.querySelector<HTMLButtonElement>('#set-add')!;
 const fixedList = document.querySelector<HTMLElement>('#fixed-list')!;
 const setList = document.querySelector<HTMLElement>('#set-list')!;
 const conditionStatus = document.querySelector<HTMLElement>('#constraint-status')!;
+const conditionSummary = document.querySelector<HTMLElement>('#condition-summary')!;
+const conditionSummaryStatus = document.querySelector<HTMLElement>('#condition-summary-status')!;
 const conditionClear = document.querySelector<HTMLButtonElement>('#constraint-clear')!;
 const seriesOptions = document.querySelector<HTMLElement>('#series-options')!;
 const rangeClear = document.querySelector<HTMLButtonElement>('#range-clear')!;
@@ -132,6 +134,7 @@ function refreshConditionOptions() {
     row.append(label, remove); fixedList.append(row);
   }
   const selected = conditions.requiredSetEffectIds ?? [];
+  conditionSummary.textContent = `已選套裝 ${available.filter(name => checked.includes(name)).length}／${available.length} 組 · 固定 ${Object.keys(fixed).length} · 必選套效 ${selected.length}`;
   const autoSets = selected.map(id => data.rightIceSets.effects.find(effect => effect.active && effect.id === id)?.setName).filter((name): name is string => Boolean(name) && !checked.includes(name!));
   const notice = document.querySelector<HTMLElement>('#required-series-notice')!;
   notice.textContent = autoSets.length ? `必選套效納入：${autoSets.join('、')}` : '';
@@ -186,6 +189,7 @@ function validateConditions() {
     conditionStatus.textContent = error instanceof Error ? error.message : '搜尋條件無法成立。';
   }
   conditionStatus.dataset.invalid = String(!conditionsValid);
+  conditionSummaryStatus.textContent = conditionsValid ? '' : ' · 條件無法成立';
   setRunning(Boolean(worker));
 }
 
@@ -196,7 +200,9 @@ function conditionsChanged() {
   results.querySelectorAll<HTMLButtonElement>('.optimizer-apply').forEach(button => { button.disabled = true; });
   try { sessionStorage.setItem(conditionsKey, JSON.stringify(conditions)); sessionStorage.removeItem(savedSearchKey); } catch { /* Storage is optional. */ }
   refreshConditionOptions(); validateConditions();
-  status.textContent = '搜尋條件已變更；原結果僅供檢視，請重新搜尋後再套用。';
+  status.textContent = results.childElementCount
+    ? '搜尋條件已變更；原結果僅供檢視，請重新搜尋後再套用。'
+    : '搜尋條件已更新。';
 }
 fixedSlot.addEventListener('change', refreshFixedItems);
 rangeClear.addEventListener('click', () => {

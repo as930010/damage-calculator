@@ -25,15 +25,19 @@
         <section class="optimizer-intro site-tool-intro">
           <div class="site-tool-intro-body">
             <h1>冰裝最佳化試算</h1>
-            <p class="site-tool-summary">沿用傷害計算機的配裝與關卡設定，在指定條件下搜尋右冰組合。結果依理論傷害排序，不計冷卻與 MP 消耗。</p>
+            <p class="site-tool-summary">沿用傷害計算機的配裝與關卡設定，在指定條件下搜尋右冰組合。<br>結果依理論傷害排序，不計冷卻與 MP 消耗</p>
           </div>
         </section>
         <section class="optimizer-workspace site-card" aria-label="冰裝搜尋">
-          <div class="optimizer-actions"><button id="optimizer-start" class="site-button" type="button" disabled>開始搜尋</button><button id="optimizer-cancel" type="button" disabled>取消搜尋</button><button id="optimizer-clear" type="button" disabled>清空試算</button></div>
+          <div class="optimizer-setup">
+            <div class="optimizer-actions"><button id="optimizer-start" class="site-button" type="button" disabled>開始搜尋</button><button id="optimizer-cancel" type="button" disabled>取消搜尋</button><button id="optimizer-clear" type="button" disabled>清空試算</button></div>
           <p id="optimizer-status" role="status" aria-live="polite">正在讀取遊戲資料…</p>
           <p id="optimizer-progress" aria-live="polite"></p>
+          <a class="optimizer-result-jump site-inpage-link" href="#optimizer-result-region">查看搜尋結果</a>
           <details class="optimizer-constraints">
-            <summary>自訂搜尋條件</summary>
+            <summary><span>自訂搜尋條件
+              <small class="optimizer-condition-summary"><span id="condition-summary"></span><span id="condition-summary-status"></span></small>
+            </span></summary>
             <div class="optimizer-constraint-body">
               <div><h2 class="optimizer-series-heading"><button id="range-clear" type="button">全選</button><span>參與試算的冰裝套裝 <span id="range-count"></span></span></h2>
                 <div id="series-options" class="optimizer-series-options"></div>
@@ -50,7 +54,12 @@
               <button id="constraint-clear" type="button">清除全部條件</button>
             </div>
           </details>
-          <div id="optimizer-results" class="optimizer-results" aria-live="polite"></div>
+          </div>
+          <section class="optimizer-result-region site-inpage-target" id="optimizer-result-region" aria-labelledby="optimizer-result-title" tabindex="-1">
+            <h2 id="optimizer-result-title">搜尋結果</h2>
+            <p class="optimizer-result-empty">尚無搜尋結果</p>
+            <div id="optimizer-results" class="optimizer-results" aria-live="polite"></div>
+          </section>
         </section>
       </main>
       <footer class="site-footer"><span class="footer-product">裝備傷害計算機</span><span class="footer-version">版本 <bdi>v4.07.03</bdi></span><span class="footer-updated">更新日期：<time datetime="2026-11-19">2026-11-19</time></span></footer>

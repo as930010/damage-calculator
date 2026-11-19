@@ -176,7 +176,7 @@ async function start() {
     { id: 'ring-two', label: '指環 2', icon: 'ring', fixedFields: ['MasterBeast.Ring2.Option1', 'MasterBeast.Ring2.Option2'], stoneFields: ['MasterBeast.Ring2.CustomAttribute', 'MasterBeast.Ring2.CustomValue'], stoneCategory: 'ring', mirrorFields: [['MasterBeast.Ring2.Mirror.1.Attribute', 'MasterBeast.Ring2.Mirror.1.Value'], ['MasterBeast.Ring2.Mirror.2.Attribute', 'MasterBeast.Ring2.Mirror.2.Value'], ['MasterBeast.Ring2.Mirror.3.Attribute', 'MasterBeast.Ring2.Mirror.3.Value']] },
   ];
   const app = document.querySelector<HTMLElement>('#app')!;
-    app.innerHTML = `<section class="workbench"><header class="workspace-heading"><div class="workspace-intro"><h1>裝備傷害比較</h1><p class="workspace-summary">比較同一角色的配裝。結果為理論最高傷害，不計冷卻與動作速度。</p><ol class="workflow-steps" aria-label="比較流程"><li><span>01</span><span>選職業與配裝</span></li><li><span>02</span><span>設為比較基準</span></li><li><span>03</span><span>換裝後查看差異</span></li></ol></div></header><div class="toolbar"><div id="class-picker"></div><label class="toggle"><input id="alternate" type="checkbox">啟用強/排褲切換</label><div class="toolbar-actions"><button id="baseline" type="button">設為比較基準</button><div class="transfer-actions"><button id="import-loadout" type="button">匯入配裝</button><button id="export-loadout" type="button">匯出配裝</button></div></div><input id="loadout-file" type="file" accept="application/json,.json" hidden><span id="transfer-status" role="status" aria-live="polite"></span><span id="save-status" role="status"></span></div><section class="battle-panel"><div class="panel-heading"><h2>關卡設定</h2></div><div id="battle-settings" class="battle-fields"></div></section><div class="equipment-workspace"><section class="equipment-panel"><div class="panel-heading"><h2>裝備配置</h2><span>點選部位以編輯</span></div><div id="equipment-damage-summary" class="equipment-damage-summary" aria-live="polite"></div><div class="canvas-scroll"><div class="equipment-canvas"><span class="group-label costume-label">連身時裝</span><span class="group-label left-label">左冰</span><span class="group-label inner-label">內裝左四</span><span class="group-label weapon-label">冰武 / 武器</span><span class="group-label right-label">右冰</span><span class="group-label accessory-label">飾品</span><span class="group-label beast-label">聖獸飾品</span><div id="title-input" class="canvas-title-input"></div><div id="slots"></div><div id="beast-accessory-fields" class="beast-accessories-grid gear-beast-slots" aria-label="聖獸飾品配置"></div></div></div><p class="panel-note">左冰不支援混搭，但各部位魔法石仍須獨立設定。擁有強/排褲則褲子的傷害增幅會被平均計算。</p><section class="right-ice-set-area"><div class="beast-accessories-heading"><h3>右冰套效</h3><span>最多選擇 ${data.rightIceSets.maxSelectedSets} 套</span></div><p class="panel-note">選擇要啟用的套裝效果。</p><div id="right-ice-set-selectors" class="right-ice-set-selectors"></div></section><div class="beast-accessories-area"><div class="beast-accessories-heading"><h3>聖獸效果設定</h3></div><p class="panel-note">共通顏色與潛力設定</p><div id="master-beast-controls" class="master-beast-controls"></div></div></section><div id="inspector-backdrop" class="inspector-backdrop" aria-hidden="true"></div><aside id="inspector" class="inspector" aria-label="部位設定"></aside></div><details class="global-source-panel weapon-magic-stone-panel"><summary>武器魔力石</summary><div id="weapon-magic-stone-fields"></div></details><details id="global-source-settings" class="global-source-panel"><summary>其他效果來源設定</summary><p class="panel-note">未列在此處的特殊條件或 Buff／Debuff 尚未納入計算。</p><div id="global-source-fields"></div></details><section class="results-panel"><div class="panel-heading"><h2>目前填寫的屬性</h2><span id="comparison-label"></span></div><p class="panel-note">包含裝備、冰裝、飾品、聖獸、關卡、效果設定等所有已填入的屬性加總</p><div id="results" aria-live="polite"></div><section class="damage-panel"><div class="panel-heading"><h2>攻擊與最終傷害</h2></div><div id="damage-result" aria-live="polite"></div><details class="calculation-inspection-panel"><summary>計算結果驗算</summary><div class="calculation-inspection-content"><div id="calculation-comparison" class="calculation-comparison" aria-live="polite"><p>先點選「設為比較基準」保存目前配置，表格就會比較基準與目前配裝。</p></div><div id="calculation-details"></div></div></details></section></section></section>`;
+    app.innerHTML = `<section class="workbench"><header class="workspace-heading"><div class="workspace-intro"><h1>裝備傷害比較</h1><p class="workspace-summary">比較同一角色的配裝。結果為理論最高傷害，不計冷卻與動作速度</p></div></header><div class="toolbar"><div id="class-picker"></div><label class="toggle"><input id="alternate" type="checkbox">啟用強/排褲切換</label><div class="toolbar-actions"><button id="baseline" type="button">設為比較基準</button><div class="transfer-actions"><button id="import-loadout" type="button">匯入配裝</button><button id="export-loadout" type="button">匯出配裝</button></div></div><input id="loadout-file" type="file" accept="application/json,.json" hidden><span id="transfer-status" role="status" aria-live="polite"></span><span id="save-status" role="status"></span></div><section class="battle-panel"><div class="panel-heading"><h2>關卡設定</h2></div><div id="battle-settings" class="battle-fields"></div></section><div class="equipment-workspace"><section class="equipment-panel"><div class="panel-heading"><h2 id="equipment-config-heading" class="site-inpage-target" tabindex="-1">裝備配置</h2><a class="site-inpage-link" href="#damage-detail-heading">查看傷害明細</a></div><div id="equipment-damage-summary" class="equipment-damage-summary" aria-live="polite"></div><div class="canvas-scroll"><div class="equipment-canvas"><span class="group-label costume-label">連身時裝</span><span class="group-label left-label">左冰</span><span class="group-label inner-label">內裝左四</span><span class="group-label weapon-label">冰武 / 武器</span><span class="group-label right-label">右冰</span><span class="group-label accessory-label">飾品</span><span class="group-label beast-label">聖獸飾品</span><div id="title-input" class="canvas-title-input"></div><div id="slots"></div><div id="beast-accessory-fields" class="beast-accessories-grid gear-beast-slots" aria-label="聖獸飾品配置"></div></div></div><p class="panel-note">左冰不支援混搭，但各部位魔法石仍須獨立設定。擁有強/排褲則褲子的傷害增幅會被平均計算。</p><section class="right-ice-set-area"><div class="beast-accessories-heading"><h3>右冰套效</h3><span>最多選擇 ${data.rightIceSets.maxSelectedSets} 套</span></div><p class="panel-note">選擇要啟用的套裝效果。</p><div id="right-ice-set-selectors" class="right-ice-set-selectors"></div></section><div class="beast-accessories-area"><div class="beast-accessories-heading"><h3>聖獸效果設定</h3></div><p class="panel-note">共通顏色與潛力設定</p><div id="master-beast-controls" class="master-beast-controls"></div></div></section><div id="inspector-backdrop" class="inspector-backdrop" aria-hidden="true"></div><aside id="inspector" class="inspector" aria-label="部位設定"></aside></div><details class="global-source-panel weapon-magic-stone-panel"><summary>武器魔力石</summary><div id="weapon-magic-stone-fields"></div></details><details id="global-source-settings" class="global-source-panel"><summary>其他效果來源設定</summary><p class="panel-note">未列在此處的特殊條件或 Buff／Debuff 尚未納入計算。</p><div id="global-source-fields"></div></details><section class="results-panel"><div class="panel-heading"><h2>目前填寫的屬性</h2><span id="comparison-label"></span></div><p class="panel-note">包含裝備、冰裝、飾品、聖獸、關卡、效果設定等所有已填入的屬性加總</p><div id="results" aria-live="polite"></div><section class="damage-panel"><div class="panel-heading"><h2 id="damage-detail-heading" class="site-inpage-target" tabindex="-1">攻擊與最終傷害</h2><a class="site-inpage-link" href="#equipment-config-heading">返回裝備配置</a></div><div id="damage-result" aria-live="polite"></div><details class="calculation-inspection-panel"><summary>計算結果驗算</summary><div class="calculation-inspection-content"><div id="calculation-comparison" class="calculation-comparison" aria-live="polite"><p>先點選「設為比較基準」保存目前配置，表格就會比較基準與目前配裝。</p></div><div id="calculation-details"></div></div></details></section></section></section>`;
   const disclosurePreferences = createDisclosurePreferences(document);
   const resultsPanel = app.querySelector<HTMLElement>('.results-panel')!;
   const resultsDisclosure = document.createElement('details');
@@ -227,10 +227,31 @@ async function start() {
   const renderSkillDamageShare = skillShareControl.render;
   const inspectorPanel = document.querySelector<HTMLElement>('#inspector')!;
   const inspectorBackdrop = document.querySelector<HTMLElement>('#inspector-backdrop')!;
+  const toolbarActions = app.querySelector<HTMLElement>('.toolbar-actions')!;
   const mobileInspectorQuery = window.matchMedia('(max-width: 700px)');
+  const suspendedEditorBackground = new Set<HTMLElement>();
+  const suspendMobileEditorBackground = () => {
+    const activeBranches = new Set<HTMLElement>();
+    for (const active of [inspectorPanel, toolbarActions, inspectorBackdrop]) {
+      for (let node: HTMLElement | null = active; node && node !== document.body; node = node.parentElement) {
+        activeBranches.add(node);
+      }
+    }
+    const parents = new Set([...activeBranches].map(branch => branch.parentElement!));
+    for (const parent of parents) {
+      for (const sibling of parent.children) {
+        if (!(sibling instanceof HTMLElement) || activeBranches.has(sibling) || sibling.inert ||
+          sibling.matches('dialog')) continue;
+        // Page-level dialogs manage their own focus when opened by the toolbar or Picker.
+        sibling.inert = true;
+        suspendedEditorBackground.add(sibling);
+      }
+    }
+  };
   const closeMobileInspector = () => {
     document.body.classList.remove('mobile-inspector-open');
-    inspectorPanel.removeAttribute('aria-modal');
+    for (const area of suspendedEditorBackground) area.inert = false;
+    suspendedEditorBackground.clear();
     inspectorPanel.removeAttribute('role');
     inspectorBackdrop.hidden = true;
     const trigger = selectedBeastSlotId
@@ -242,8 +263,8 @@ async function start() {
     if (!mobileInspectorQuery.matches) return;
     document.body.classList.add('mobile-inspector-open');
     inspectorPanel.setAttribute('role', 'dialog');
-    inspectorPanel.setAttribute('aria-modal', 'true');
     inspectorBackdrop.hidden = false;
+    suspendMobileEditorBackground();
     inspectorPanel.querySelector<HTMLButtonElement>('.inspector-close')?.focus();
   };
   inspectorBackdrop.addEventListener('click', closeMobileInspector);
@@ -251,10 +272,10 @@ async function start() {
     if (event.target instanceof Element && event.target.closest('.inspector-close')) closeMobileInspector();
   });
   document.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && document.body.classList.contains('mobile-inspector-open')) closeMobileInspector();
+    if (event.key === 'Escape' && document.body.classList.contains('mobile-inspector-open') &&
+      !document.querySelector('dialog.mobile-picker-dialog[open]')) closeMobileInspector();
   });
   mobileInspectorQuery.addEventListener('change', event => { if (!event.matches && document.body.classList.contains('mobile-inspector-open')) closeMobileInspector(); });
-  const toolbarActions = app.querySelector<HTMLElement>('.toolbar-actions')!;
   const baselineButton = toolbarActions.querySelector<HTMLButtonElement>('#baseline')!;
   const transferButtons = toolbarActions.querySelector<HTMLElement>('.transfer-actions')!;
   const transferStatus = toolbar.querySelector<HTMLElement>('#transfer-status')!;

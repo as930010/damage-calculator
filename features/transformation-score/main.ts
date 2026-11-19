@@ -14,6 +14,9 @@ const status = byId('loadout-status');
 const workspace = byId('score-workspace');
 const editor = byId('transform-lines');
 const output = byId('score-output');
+const comparisons = byId('roll-comparisons');
+const rollFilter = byId('roll-filter');
+const filterStatus = byId('roll-filter-status');
 const reload = byId<HTMLButtonElement>('reload-loadout');
 const battleDefense = createBattleDefenseStore(window);
 const defenseEditor = createBattleDefenseEditor(battleDefense, new URL(document.querySelector<HTMLAnchorElement>('.site-tabs a[href*="buff-simulator"]')!.href));
@@ -49,9 +52,11 @@ function showScore() {
   }
   try {
     const score = evaluate(simulation);
-    output.innerHTML = `<div class="score-verdict"><span>變換分數</span><strong>${score.pr.toFixed(2)}</strong></div>
-      <dl class="score-metrics"><dt>目前提升幅度</dt><dd>${pct(score.gain)}</dd></dl>
-      <p class="score-grade">${escapeHtml(score.grade)}</p>`;
+    output.innerHTML = `<div class="score-verdict">
+      <div><span>變換分數</span><small>相對頂變換的提升比例</small></div>
+      <strong>${score.pr.toFixed(2)}</strong>
+      <p class="score-grade">${escapeHtml(score.grade)}</p>
+    </div><dl class="score-metrics"><dt>目前提升幅度</dt><dd>${pct(score.gain)}</dd></dl>`;
   } catch (error) { output.textContent = message(error); }
 }
 function rollLabel(rule: Context['rules'][number], value: number) {
@@ -87,6 +92,16 @@ function referenceGroup(title: string, lines: readonly Selection[], gain: number
   }).join('');
   return `<section><h3>${title}</h3><dl>${rows}</dl><p>參考提升幅度：${pct(gain)}</p></section>`;
 }
+function filterRollComparisons() {
+  const selected = new Set([...rollFilter.querySelectorAll<HTMLInputElement>('input:checked')].map(input => input.value));
+  const cards = comparisons.querySelectorAll<HTMLElement>('.roll-card');
+  for (const card of cards) card.hidden = !selected.has(card.dataset.rollChoice ?? '');
+  comparisons.toggleAttribute('data-filtered', selected.size === 1);
+  filterStatus.textContent = `已選擇 ${selected.size}／${cards.length} 種屬性`;
+}
+
+rollFilter.addEventListener('change', filterRollComparisons);
+
 function showLoadout(next: Context) {
   context = next;
   simulation = (drafts.get(draftKey()) ?? next.actual).map(line => ({ ...line }));
@@ -112,11 +127,22 @@ function showLoadout(next: Context) {
     field.disabled = false;
   });
   syncSimulation();
-  byId('score-bounds').innerHTML = referenceGroup(mode === 'weapon' ? '四有效詞條下最低收益提升參考組合' : '三有效詞條下最低收益提升參考組合', next.lowerSelection, next.lower) + referenceGroup('最高增幅配置參考組合', next.upperSelection, next.upper);
-  byId('roll-comparisons').innerHTML = next.comparisons.map(({ rule, gains }) => {
+  byId('score-bounds').innerHTML = referenceGroup(mode === 'weapon' ? '最低收益參考（四條）' : '最低收益參考（三條）', next.lowerSelection, next.lower) + referenceGroup('頂變換參考', next.upperSelection, next.upper);
+  const previous = new Map([...rollFilter.querySelectorAll<HTMLInputElement>('input')].map(input => [input.value, input.checked]));
+  rollFilter.replaceChildren(...next.comparisons.map(({ rule }) => {
+    const label = document.createElement('label');
+    const input = document.createElement('input');
+    input.type = 'checkbox';
+    input.value = rule.choice;
+    input.checked = previous.get(rule.choice) ?? true;
+    label.append(input, document.createTextNode(rule.label));
+    return label;
+  }));
+  comparisons.innerHTML = next.comparisons.map(({ rule, gains }) => {
     const rows = rule.rolls.map((roll, i) => `<tr><td>${rollLabel(rule, roll)}</td><td>${pct(gains[i])}</td></tr>`).reverse();
-    return `<div class="roll-card"><table><caption>${escapeHtml(rule.label)}</caption><thead><tr><th scope="col">數值</th><th scope="col">提升幅度</th></tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
+    return `<div class="roll-card" data-roll-choice="${escapeHtml(rule.choice)}"><table><caption>${escapeHtml(rule.label)}</caption><thead><tr><th scope="col">數值</th><th scope="col">提升幅度</th></tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
   }).join('');
+  filterRollComparisons();
   workspace.hidden = false;
   showScore();
 }

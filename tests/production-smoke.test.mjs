@@ -82,6 +82,35 @@ async function productionPage({ reader, search = '' } = {}) {
   return page;
 }
 
+test('production result shortcuts address unique focusable destinations', async () => {
+  const page = await productionPage();
+  const cases = [
+    [page.dom.window, '#damage-detail-heading', '查看傷害明細'],
+    [page.dom.window, '#equipment-config-heading', '返回裝備配置'],
+  ];
+  const staticWindows = [];
+  try {
+    for (const [route, target, label] of [
+      ['ice-optimizer', '#optimizer-result-region', '查看搜尋結果'],
+      ['transformation-score', '#configuration-rating', '查看評分'],
+    ]) {
+      const html = await readFile(join(root, 'site-dist', route, 'index.html'), 'utf8');
+      const { window } = new JSDOM(html);
+      staticWindows.push(window);
+      cases.push([window, target, label]);
+    }
+    for (const [{ document }, target, label] of cases) {
+      const link = document.querySelector(`a.site-inpage-link[href="${target}"]`);
+      assert.equal(link?.textContent.trim(), label);
+      assert.equal(document.querySelectorAll(target).length, 1, target);
+      assert.equal(document.querySelector(target).getAttribute('tabindex'), '-1', target);
+    }
+  } finally {
+    for (const window of staticWindows) window.close();
+    page.close();
+  }
+});
+
 test('production main matches source results and preserves lazy transfer, stage, history, baseline and picker controls', async () => {
   const source = await uiPage(sample, sample), page = await productionPage();
   const sourceTransfer = await source.runtime.load('frontend/loadout-transfer.ts');
@@ -250,8 +279,8 @@ test('production transformation score follows the active loadout and keeps simul
     const current = () => document.querySelector('.score-verdict strong').textContent;
     assert.match(document.querySelector('#score-output').textContent, /變換分數/);
     assert.ok(document.querySelector('.score-grade').textContent.trim());
-    assert.match(document.querySelector('#score-bounds').textContent, /四有效詞條下最低收益提升參考組合/);
-    assert.match(document.querySelector('#score-bounds').textContent, /最高增幅配置參考組合/);
+    assert.match(document.querySelector('#score-bounds').textContent, /最低收益參考（四條）/);
+    assert.match(document.querySelector('#score-bounds').textContent, /頂變換參考/);
     assert.doesNotMatch(document.querySelector('#loadout-status').textContent, /物理職業|魔法職業/);
     assert.match(document.querySelector('#loadout-status').textContent, /不含武器變換攻擊力等級/);
     assert.equal(document.querySelector('a[href="../"]:not(.site-tabs a)'), null);
@@ -268,6 +297,19 @@ test('production transformation score follows the active loadout and keeps simul
     assert.equal(tables[13].tBodies[0].rows[0].cells[0].textContent, '8.0%');
     assert.equal(choices.find(option => option.value === '技能傷害%').text, '所有技能傷害');
     const initial = current();
+    const filter = document.querySelector('#roll-filter');
+    const boxes = [...filter.querySelectorAll('input')];
+    assert.equal(boxes.length, 14);
+    assert.ok(boxes.every(box => box.checked));
+    boxes.slice(0, -1).forEach(box => { box.checked = false; });
+    boxes[0].dispatchEvent(new Event('change', { bubbles: true }));
+    assert.match(document.querySelector('#roll-filter-status').textContent, /1／14/);
+    assert.deepEqual([...document.querySelectorAll('#roll-comparisons .roll-card:not([hidden]) table')], [tables.at(-1)]);
+    assert.equal(current(), initial);
+    assert.equal(localStorage.getItem(savedKey), active);
+    boxes.forEach(box => { box.checked = true; });
+    boxes[0].dispatchEvent(new Event('change', { bubbles: true }));
+    assert.equal(document.querySelectorAll('#roll-comparisons .roll-card:not([hidden])').length, 14);
     const disclosure = document.querySelector('#roll-disclosure');
     disclosure.open = false;
     for (let i = 0; i < 4; i++) {

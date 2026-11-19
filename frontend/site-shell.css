@@ -35,6 +35,22 @@ body.site-page {
 }
 .site-page .skip-to-workspace:not(:focus) { clip-path: inset(50%); }
 
+.site-inpage-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--site-control-height, 44px);
+  color: var(--site-text);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: .2em;
+}
+.site-inpage-target { scroll-margin-block-start: 12px; }
+:is(.site-inpage-link, .site-inpage-target):focus-visible {
+  outline: 2px solid var(--site-focus-ring, var(--accent, var(--site-text)));
+  outline-offset: 3px;
+}
+
 .site-header {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, max-content);

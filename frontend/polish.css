@@ -52,7 +52,7 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
 .equipment-damage-card span{color:var(--text-muted);font-size:12px}
 .equipment-damage-card strong{overflow-wrap:anywhere;color:var(--text-main);font-size:18px;font-variant-numeric:tabular-nums}
 .equipment-damage-card:first-child strong{font-weight:600}
-.equipment-damage-card:nth-child(2) strong{font-weight:750}
+.equipment-damage-card:nth-child(2) strong{font-size:clamp(17px, 1.6vw, 22px);font-weight:750}
 .equipment-damage-gain strong{color:#9fc8ff}
 @media(max-width:700px){
   .workbench{padding-top:12px}

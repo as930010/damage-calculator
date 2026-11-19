@@ -34,6 +34,23 @@ for (const [name, setup] of Object.entries(scenarios)) {
   });
 }
 
+
+test('Buff mode tabs keep one sequential stop and move focus with the selected panel', async t => {
+  const h = await open(t);
+  const key = name => h.window.document.activeElement.dispatchEvent(
+    new h.window.KeyboardEvent('keydown', { key: name, bubbles: true, cancelable: true }));
+  h.query('[data-mode="single"]').focus();
+  key('ArrowRight');
+  assert.equal(h.window.document.activeElement, h.query('#buff-mode-challenge'));
+  assert.equal(h.query('#buff-mode-single').tabIndex, -1);
+  assert.equal(h.query('#buff-mode-challenge').tabIndex, 0);
+  assert.equal(h.query('#buff-mode-panel').getAttribute('aria-labelledby'), 'buff-mode-challenge');
+  assert.equal(h.app.querySelectorAll('[data-member]').length, 8);
+  key('Home');
+  assert.equal(h.window.document.activeElement, h.query('#buff-mode-single'));
+  assert.equal(h.app.querySelectorAll('[data-member]').length, 6);
+});
+
 test('single/challenge round-trip restores separate rosters, percentages, toggles and Boss values', async t => {
   const h = await open(t); scenarios.configuredSingle(h);
   const single = capture(h);
