@@ -104,13 +104,42 @@ for (const scenario of importCases(fixture.transfers.export.json)) {
   });
 }
 
+async function captureLegacyChoices(state) {
+  const choices = [];
+  const page = await createPage(state, complete, {
+    globals: { __captureChoices: (label, options) => choices.push(normalize({ label, options })) },
+    transformSource(file, source) {
+      // The historical digest includes presentation text. Replay that formatter to keep
+      // the fixture intact, then compare live option identities independently.
+      if (file === 'frontend/equipment-stat-summary.ts') return `
+        import { formatNumber } from './data.ts';
+        export function createEquipmentStatSummary(attributes) {
+          return stats => Object.entries(stats).filter(([, value]) => value !== 0)
+            .map(([key, value]) => (attributes.find(entry => entry.key === key)?.name ?? key) + ' ' + formatNumber(value))
+            .join(' · ');
+        }`;
+      return candidateTransform(file, source);
+    },
+  });
+  try { return choices; } finally { page.close(); }
+}
+
+function choiceIdentities(choices) {
+  return choices.map(({ label, options }) => ({
+    label,
+    options: options.map(({ detail, ...identity }) => identity),
+  }));
+}
+
 for (const [id, state] of [['complete', complete], ['legacy-startup', legacyStartup], ['incomplete', incomplete]]) {
   test(`actual main candidates, results and saved states: ${id}`, async () => {
     const choices = [], before = digest(gameData);
     const page = await createPage(state, complete, { transformSource: candidateTransform,
       globals: { __captureChoices: (label, options) => choices.push(normalize({ label, options })) } });
     try {
-      assert.equal(digest(choices), fixture.pages[id].choicesHash);
+      const historicalChoices = await captureLegacyChoices(state);
+      assert.equal(digest(historicalChoices), fixture.pages[id].choicesHash);
+      assert.deepEqual(choiceIdentities(choices), choiceIdentities(historicalChoices));
       assert.equal(choices.length, fixture.pages[id].pickerCount);
       if (id === 'complete') {
         assert.equal(digest(resultHtml(page.dom.window.document)), fixture.pages[id].resultHash);

@@ -207,7 +207,8 @@
       "active": true,
       "stats": {
         "critDamagePct": 3,
-        "adaptabilityPct": 2
+        "adaptabilityPct": 2,
+        "multiplicativeDamagePct": 4
       },
       "effects": [],
       "appraisal": {

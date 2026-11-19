@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "dataUpdatedAt": "2026-09-25",
+  "dataUpdatedAt": "2026-11-19",
   "options": [
     {
       "name": "紅",
@@ -11,7 +11,7 @@
     {
       "name": "藍",
       "stats": {
-        "multiplicativeDamagePct": 8
+        "multiplicativeDamagePct": 12
       }
     },
     {

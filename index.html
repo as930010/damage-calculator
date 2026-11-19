@@ -16,11 +16,12 @@
   </head>
   <body class="site-page site-page-main">
     <div class="app-shell">
+      <a class="skip-to-workspace" href="#app">跳到主要內容</a>
       <header class="site-header">
         <div class="site-developer" aria-label="開發者資訊"><span class="developer-desktop">開發者：八雲雲OuO</span><span class="developer-desktop">Discord：yakumo_1231</span><span class="developer-desktop">E-Mail：as930010@gmail.com</span><span class="developer-support">有任何問題回報或建議歡迎透過Discord訊息，也歡迎各類贊助支持</span><span class="developer-mobile"><span>開發者：八雲雲OuO</span><span>Discord：yakumo_1231</span></span></div>
         <div class="site-nav-wrap"><nav class="site-tabs" aria-label="功能頁面"><a href="./" aria-current="page">傷害計算機</a><a href="./ice-optimizer/"><span class="nav-label">冰裝最佳化<wbr>試算</span></a><a href="./transformation-score/"><span class="nav-label">屬性變換<wbr>評分</span></a><a href="./buff-simulator/"><span class="nav-label">隊伍增益<wbr>模擬</span></a></nav><span class="live-dot" aria-label="計算工具已就緒"></span></div>
       </header>
-      <main id="app" class="layout site-main">
+      <main id="app" tabindex="-1" class="layout site-main">
         <section class="loading-card"><div class="spinner"></div><h1>正在載入遊戲資料</h1><p>讀取裝備目錄與計算參數…</p></section>
       </main>
       <details class="site-credits-notes">
@@ -57,6 +58,10 @@
           <section class="site-credits-block" aria-labelledby="site-updates-heading">
             <h2 id="site-updates-heading">更新紀錄</h2>
             <ol class="site-release-list" tabindex="0" aria-label="更新紀錄，捲動可查看更多">
+              <li>
+                <time datetime="2026-11-19">2026-11-19</time>
+                <div><strong>v4.07.03</strong><p>優化UI、優化詞條顯示邏輯、更新天線耳機與百億藍套裝效果</p></div>
+              </li>
               <li>
                 <time datetime="2026-11-19">2026-11-19</time>
                 <div><strong>v4.06.06</strong><p>新增儲存角色與配置快捷切換功能，優化UI與主題配色</p></div>
@@ -253,7 +258,7 @@
           </section>
         </div>
       </details>
-      <footer class="site-footer"><span class="footer-product">裝備傷害計算機</span><span class="footer-version">版本 <bdi>v4.06.06</bdi></span><span class="footer-updated">更新日期：<time datetime="2026-11-19">2026-11-19</time></span></footer>
+      <footer class="site-footer"><span class="footer-product">裝備傷害計算機</span><span class="footer-version">版本 <bdi>v4.07.03</bdi></span><span class="footer-updated">更新日期：<time datetime="2026-11-19">2026-11-19</time></span></footer>
     </div>
     <script type="module" src="./frontend/main.js?v=__BUILD_REVISION__"></script>
   </body>

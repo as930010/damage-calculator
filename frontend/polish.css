@@ -4,9 +4,8 @@
 :root{--page-bg:#10141b; --panel:#191f29; --panel-alt:#171d26; --surface:#141a23; --surface-raised:#202938; --control:#1a222d; --control-hover:#253243; --field:#121922; --border:#2a3544; --border-strong:#344153; --border-mid:#303c4b; --border-row:#293442; --border-control:#3a4859; --accent:#c7dcff; --accent-surface:#202e42; --accent-border:#6c91c5; --text-main:#e8edf5; --text-heading:#f2f5fb; --text-label:#b9c7d9; --text-muted:#aab8cb; --text-soft:#91a1b6; --positive:#7fe0b6; --negative:#ff9eaa; font-family:Inter,"Segoe UI","Microsoft JhengHei",sans-serif; font-variant-numeric:tabular-nums; background:radial-gradient(ellipse at 82% -18%,rgb(70 101 150 / 18%),transparent 38rem),var(--page-bg)}
 body{min-width:320px; background:transparent; letter-spacing:.012em} .app-shell{min-height:100vh}       .developer-mobile{display:none}
  .live-dot{box-shadow:0 0 12px rgb(127 224 182 / 55%)} .workbench{width:min(100%,1580px); padding:clamp(20px,3.3vw,46px) clamp(16px,3.4vw,48px) 52px}
-.workspace-heading{position:relative; isolation:isolate; min-height:0; margin:0 0 20px; padding:clamp(20px,3vw,34px) clamp(20px,3vw,36px); overflow:hidden; border:1px solid rgb(119 151 194 / 26%); border-radius:18px; background:linear-gradient(112deg,rgb(35 49 68 / 94%),rgb(25 32 43 / 94%) 56%,rgb(27 34 46 / 82%)),var(--panel); box-shadow:0 18px 48px rgb(0 0 0 / 16%)}
-.workspace-heading::after{position:absolute; z-index:-1; right:-64px; bottom:-138px; width:360px; height:250px; border:1px solid rgb(156 190 238 / 14%); border-radius:50%; box-shadow:0 0 0 24px rgb(156 190 238 / 3%),0 0 0 50px rgb(156 190 238 / 3%); content:""; transform:rotate(-18deg); pointer-events:none}
-.eyebrow{display:inline-flex; align-items:center; gap:9px; color:#a9c8f4; font-size:10px; font-weight:700; letter-spacing:.22em} .eyebrow::before{width:19px; height:1px; background:#8bb4ec; content:""} .workspace-heading h1{max-width:760px; margin:13px 0 0; color:#f3f6fc; font-size:clamp(18px,2vw,25px); font-weight:650; letter-spacing:.02em; line-height:1.62}
+
+.eyebrow{display:inline-flex; align-items:center; gap:9px; color:#a9c8f4; font-size:10px; font-weight:700; letter-spacing:.22em} .eyebrow::before{width:19px; height:1px; background:#8bb4ec; content:""}
 /* Pass 2 — Normalize spacing and section rhythm throughout the workbench. */
 .toolbar{border:1px solid rgb(117 139 171 / 18%); border-radius:14px; background:rgb(23 29 38 / 82%)}
 .battle-panel,.equipment-panel,.inspector,.weapon-magic-stone-panel,.global-source-panel,.results-panel,.attribute-equivalence-panel{border-color:rgb(119 139 165 / 24%); border-radius:16px; background:linear-gradient(145deg,rgb(28 35 46 / 98%),rgb(23 29 38 / 98%)); box-shadow:0 12px 34px rgb(0 0 0 / 11%)} .battle-panel{margin-bottom:20px} .panel-heading{min-height:56px; padding:16px 22px}
@@ -17,8 +16,8 @@ button,input,.pet-skill-toggle{border-radius:10px; transition:background-color 1
 button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid #9ec3f5; outline-offset:3px; box-shadow:0 0 0 5px rgb(103 153 218 / 16%)} .field{gap:7px; color:#bdc9d9; font-weight:550} .field input{min-width:0; border-color:#394657; background:#141b24} .picker-list{border-color:#53647b; border-radius:12px} .picker-list button{min-height:42px; border-radius:8px} .inspector{padding:22px}
 .inspector-title{padding-bottom:18px} .editor-section{border-color:rgb(123 145 174 / 23%)} .mobile-picker-dialog{border-radius:20px}
 /* Pass 4 — Improve scanability and make the final result the visual anchor. */
-.results-panel,.attribute-equivalence-panel{overflow:clip} .results-panel>.panel-heading,.attribute-equivalence-panel>.panel-heading,.damage-panel>.panel-heading{background:rgb(18 24 33 / 36%)} .stat-list{gap:12px; padding:4px 22px 24px} .stat{min-width:0; border-color:#334051; border-radius:11px; background:linear-gradient(145deg,#19212b,#151c25); transition:background-color 150ms ease,box-shadow 150ms ease}
-.stat:hover{border-color:#50647f; box-shadow:0 7px 20px rgb(0 0 0 / 12%)} .stat summary{min-height:24px; gap:8px} .stat summary span{line-height:1.5} .stat strong{font-size:16px; letter-spacing:.015em} .stat[open]{border-color:#607b9f; background:#1b2634} .stat-details{border-top-color:rgb(122 146 176 / 22%)} .stat-source-row{min-height:35px}
+.results-panel,.attribute-equivalence-panel{overflow:clip} .results-panel>.panel-heading,.attribute-equivalence-panel>.panel-heading,.damage-panel>.panel-heading{background:rgb(18 24 33 / 36%)} .stat-list{gap:12px; padding:4px 22px 24px} .stat{min-width:0; border-color:var(--site-border); border-radius:11px; transition:background-color 150ms ease,border-color 150ms ease}
+.stat:hover{border-color:var(--site-control-hover-edge)} .stat summary{min-height:24px; gap:8px} .stat summary span{line-height:1.5} .stat strong{font-size:16px; letter-spacing:.015em} .stat[open]{border-color:#607b9f; background:#1b2634} .stat-details{border-top-color:rgb(122 146 176 / 22%)} .stat-source-row{min-height:35px}
 .damage-summary .final-damage{background:linear-gradient(130deg,#25354b,#202a3a)} .damage-summary .final-damage strong{letter-spacing:-.025em} .calculation-comparison{margin-inline:22px}
 .formula-detail{border-color:rgb(122 146 176 / 22%)}
 /* Pass 5 — Keep narrow screens readable and honor reduced-motion preferences. */
@@ -26,7 +25,7 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
   .workbench{padding-inline:clamp(16px,3vw,28px)} .inspector{box-shadow:none}
 }
 @media(max-width:700px) {
-       .workbench{width:100%; padding:18px 12px 20px} .workspace-heading{margin-bottom:14px; padding:20px 18px; border-radius:15px} .workspace-heading h1{margin-top:10px; font-size:17px; line-height:1.55}
+       .workbench{width:100%; padding:18px 12px 20px}
 .battle-panel{margin-bottom:14px} .battle-fields{grid-template-columns:minmax(0,1fr); gap:10px; padding:14px 16px 2px} .battle-fields>*,.battle-fields .field,.battle-fields .picker{width:100%; min-width:0} .panel-heading{min-height:50px; padding:14px 16px}
   .panel-note{padding-inline:16px} .equipment-workspace{gap:14px} .equipment-panel,.results-panel,.weapon-magic-stone-panel,.global-source-panel{border-radius:14px} .equipment-canvas{min-width:660px} .stat-list{grid-template-columns:minmax(0,1fr); gap:8px; padding:2px 12px 16px} .combat-rate-pair{grid-column:1/-1; grid-template-columns:1fr} .stat{padding:0 10px} .stat summary{min-height:44px; padding-block:10px; flex-wrap:wrap; gap:5px} .stat strong{font-size:14px}
   footer{padding-inline:12px;column-gap:4px;row-gap:4px} footer .footer-updated::before{content:none}
@@ -44,33 +43,22 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
 }
 /* Continued refinement — add a restrained navigation cue and improve slot label clarity. */
 .panel-heading h2{display:inline-flex; align-items:center; gap:10px} .panel-heading h2::before{width:3px; height:16px; flex:none; border-radius:3px; background:linear-gradient(180deg,#9fc8ff,#6e94c6); content:""} .gear-slot span,.beast-accessory-slot span{font-size:11px; letter-spacing:.015em} button,input,.pet-skill-toggle{transition:background-color 140ms ease,border-color 140ms ease,box-shadow 140ms ease}
-/* A clear, compact workflow replaces the oversized instruction stack. */
-.workspace-intro{width:min(100%,1040px)} .workspace-heading h1{max-width:none; margin:12px 0 6px; font-size:clamp(25px,3vw,36px); line-height:1.2} .workspace-heading .workspace-summary{max-width:680px; color:#b1c0d4; font-size:14px; line-height:1.6} .workflow-steps{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; max-width:860px; margin:19px 0 0; padding:0; list-style:none}
-.workflow-steps li{display:flex; align-items:center; gap:10px; min-height:48px; padding:10px 13px; border:1px solid rgb(145 170 206 / 21%); border-radius:11px; background:rgb(13 19 28 / 24%); color:#d7e2f2; font-size:13px; font-weight:600}
-.workflow-steps li span:first-child{display:grid; place-items:center; flex:0 0 25px; height:25px; border-radius:50%; background:rgb(137 173 221 / 15%); color:#b8d1f4; font-size:10px; font-weight:700}
-@media(max-width:700px) {
-  .workspace-heading{padding:18px 16px} .workspace-heading h1{margin:10px 0 5px; font-size:clamp(23px,6vw,29px); line-height:1.2} .workspace-heading .workspace-summary{font-size:12px} .workflow-steps{gap:6px; margin-top:14px} .workflow-steps li{min-width:0; min-height:60px; flex-direction:column; justify-content:center; gap:5px; padding:7px 3px; text-align:center; font-size:11px; line-height:1.35}
-  .workflow-steps li span:first-child{flex-basis:22px; height:22px}
-}
-@media(max-width:360px) {
-  .workflow-steps li{font-size:10px}
-}
-
-/* Compact the opening and surface the damage comparison beside the equipment build. */
+/* Surface the damage comparison beside the equipment build. */
 .workbench{padding-top:clamp(12px,2.5vw,34px)}
-.workspace-heading{padding-block:clamp(16px,2.6vw,30px)}
-.workflow-steps{margin-top:15px}
-.equipment-damage-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:12px 20px 0}
-.equipment-damage-card{display:flex;min-width:0;min-height:68px;flex-direction:column;justify-content:center;gap:7px;padding:11px 14px;border:1px solid #344153;border-radius:11px;background:linear-gradient(145deg,#19212b,#151c25)}
-.equipment-damage-card span{color:#aab8cb;font-size:11px}
-.equipment-damage-card strong{overflow-wrap:anywhere;color:#f2f5fb;font-size:18px;font-variant-numeric:tabular-nums}
+
+.equipment-damage-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:12px 20px 0;border:1px solid var(--site-border);border-radius:10px;background:var(--surface)}
+.equipment-damage-card{display:flex;min-width:0;min-height:62px;flex-direction:column;justify-content:center;gap:3px;padding:9px 14px}
+.equipment-damage-card + .equipment-damage-card{border-inline-start:1px solid var(--site-border)}
+.equipment-damage-card span{color:var(--text-muted);font-size:12px}
+.equipment-damage-card strong{overflow-wrap:anywhere;color:var(--text-main);font-size:18px;font-variant-numeric:tabular-nums}
+.equipment-damage-card:first-child strong{font-weight:600}
+.equipment-damage-card:nth-child(2) strong{font-weight:750}
 .equipment-damage-gain strong{color:#9fc8ff}
 @media(max-width:700px){
   .workbench{padding-top:12px}
-  .workspace-heading{padding:16px}
-  .workflow-steps{margin-top:12px}
-  .workflow-steps li{min-height:56px}
-  .equipment-damage-summary{grid-template-columns:minmax(0,1fr);gap:7px;padding:10px 14px 0}
+
+  .equipment-damage-summary{grid-template-columns:minmax(0,1fr);margin:10px 14px 0}
+  .equipment-damage-card + .equipment-damage-card{border-inline-start:0;border-block-start:1px solid var(--site-border)}
   .equipment-damage-card{min-height:48px;flex-direction:row;align-items:center;justify-content:space-between;gap:12px;padding:9px 12px}
   .equipment-damage-card strong{font-size:16px;text-align:right}
 }
@@ -164,7 +152,7 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
 .site-release-list time{color:#8191a8;font-size:10px;white-space:nowrap;text-align:center}
 .site-release-list strong{color:#c6d4e8;font-size:11px;font-weight:650;white-space:nowrap}
 .site-release-list p{min-width:0;margin:0;color:#93a1b4;font-size:11px;text-align:left}
-@media(max-width:700px){.site-credits-notes{width:calc(100% - 24px);border-radius:11px}.site-credits-notes>summary{min-height:40px;padding:9px 12px}.site-credits-notes{max-width:none}.site-credits-content{grid-template-columns:1fr;gap:0;padding:13px 13px 15px}.site-credits-block:first-child{display:block;padding:0 0 14px}.site-credits-block .site-thanks-note{margin-bottom:0}.site-credits-block+.site-credits-block{padding:14px 0 0;border-left:0;border-top:1px solid rgb(119 139 165 / 22%)}.site-release-list li{grid-template-columns:1fr;gap:3px}}
+@media(max-width:700px){.site-credits-notes{width:calc(100% - 24px);border-radius:11px}.site-credits-notes>summary{min-height:44px;padding:9px 12px}.site-credits-notes{max-width:none}.site-credits-content{grid-template-columns:1fr;gap:0;padding:13px 13px 15px}.site-credits-block:first-child{display:block;padding:0 0 14px}.site-credits-block .site-thanks-note{margin-bottom:0}.site-credits-block+.site-credits-block{padding:14px 0 0;border-left:0;border-top:1px solid rgb(119 139 165 / 22%)}.site-release-list li{grid-template-columns:1fr;gap:3px}}
 
 .calculation-inspection-panel{margin:0 22px 18px;border:1px solid rgb(122 146 176 / 22%);border-radius:10px;background:rgb(20 27 36 / 42%)}
 .calculation-inspection-panel>summary{padding:13px 15px;color:#b9c4d6;font-size:12px;cursor:pointer;list-style:none}

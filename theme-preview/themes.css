@@ -78,13 +78,12 @@ html[data-preview-theme] body.site-page{
 html[data-preview-theme] body.site-page :is(.site-header,.site-footer){background:var(--p-input);border-color:var(--p-line)}
 html[data-preview-theme] body.site-page .site-tabs{background:var(--p-ground);border-color:var(--p-edge)}
 html[data-preview-theme] body.site-page :is(.toolbar,.battle-panel,.damage-panel,.equipment-panel,.inspector,.weapon-magic-stone-panel,.global-source-panel,.results-panel,.attribute-equivalence-panel,.team-panel,.result-card,.skill-reference,.optimizer-workspace,.optimizer-result,.site-credits-notes,.mobile-picker-dialog){background:var(--p-surface);border-color:var(--p-line);color:var(--p-ink)}
-html[data-preview-theme] body.site-page :is(.workspace-heading,.site-tool-intro){background:linear-gradient(105deg,var(--p-raised),var(--p-surface));border-color:var(--p-edge)}
 html[data-preview-theme] body.site-page :is(.battle-panel,.damage-panel){background:var(--p-input)}
 html[data-preview-theme] body.site-page :is(.stat,.member-slot,.option-editor,.option-chip,.skill-result,.primary-grid .metric,.support-grid .metric,.control-time-grid div){background:var(--p-input);border-color:var(--p-line);color:var(--p-ink)}
 html[data-preview-theme] body.site-page .primary-grid .metric{background:color-mix(in srgb,var(--p-input) 58%,var(--p-surface))}
 html[data-preview-theme] body.site-page :is(.mode-switch,.optimizer-constraints,.calculation-inspection-panel){background:var(--p-input);border-color:var(--p-line)}
 html[data-preview-theme] body.site-page :is(.panel-heading,.configuration-heading){background:transparent;color:var(--p-ink)}
-html[data-preview-theme] body.site-page :is(.result-heading,.result-stack .result-heading){background:linear-gradient(105deg,var(--p-raised),var(--p-surface));border-color:var(--p-line)}
+html[data-preview-theme] body.site-page :is(.result-heading,.result-stack .result-heading){background:var(--p-surface);border-color:var(--p-line)}
 html[data-preview-theme] body.site-page :is(input[type=range],.picker-list){background:var(--field);border-color:var(--border-control);color:var(--text-input)}
 html[data-preview-theme] body.site-page input::placeholder{color:var(--p-muted);opacity:1}
 html[data-preview-theme] body.site-page .site-tabs a{background:transparent;border-color:transparent;color:var(--p-muted)}
@@ -92,7 +91,7 @@ html[data-preview-theme] body.site-page .site-tabs a:hover{background:var(--p-ra
 html[data-preview-theme] body.site-page :is(.site-tabs a[aria-current=page],button[aria-pressed=true]){background:var(--p-active);border-color:var(--p-edge);color:var(--p-ink)}
 html[data-preview-theme] body.site-page :is(.site-developer,.site-footer,.site-tool-summary,.workspace-summary,.optimizer-caveat,#optimizer-status,#optimizer-progress,.panel-note,.field,.metric span,.optimizer-result dt,.optimizer-result-state small,.roster-note){color:var(--p-muted)}
 html[data-preview-theme] body.site-page :is(h1,h2,h3,.optimizer-result summary){color:var(--p-ink)}
-html[data-preview-theme] body.site-page :is(.eyebrow,.site-tool-eyebrow,.total-multiplier strong,.optimizer-result-header span){color:var(--p-accent)}
+html[data-preview-theme] body.site-page :is(.eyebrow,.total-multiplier strong,.optimizer-result-header span){color:var(--p-accent)}
 html[data-preview-theme] body.site-page :is(.eyebrow,.panel-heading h2)::before{background:var(--p-accent)}
 /* Keep nested surfaces visually continuous inside their existing controls. */
 html[data-preview-theme] body.site-page .member-slot input{background:transparent;border-color:transparent}
@@ -122,8 +121,6 @@ html[data-preview-theme] body.site-page :is(.formula-detail,.optimizer-result de
 html[data-preview-theme] body.site-page :is(.damage-summary .final-damage strong,.control-time-grid strong,.total-multiplier strong){color:var(--p-accent)}
 html[data-preview-theme] body.site-page .damage-summary .final-damage{background:var(--p-active);border-color:var(--p-edge)}
 /* Shared wayfinding and Buff's formerly blue badges use the current material. */
-html[data-preview-theme] body.site-page :is(.workflow-steps,.site-tool-steps) li{background:var(--p-input);border-color:var(--p-line);color:var(--p-ink)}
-html[data-preview-theme] body.site-page :is(.workflow-steps,.site-tool-steps) li span:first-child{background:var(--p-active);color:var(--p-accent)}
 html[data-preview-theme] body.site-page :is(.section-label,.roster-note){border-left-color:var(--p-accent)}
 html[data-preview-theme] body.site-page :is(.results-heading,.metric-section,.support-grid,.primary-grid){border-color:var(--p-line)}
 html[data-preview-theme] body.site-page :is(.boss-control .percent-input span,.option-editor-input span){color:var(--p-accent)}
@@ -147,11 +144,8 @@ html[data-preview-theme] body.site-page .picker-control>.picker-clear:hover::bef
 /* Polish-layer colors that were still bypassing the palette on the calculator. */
 html[data-preview-theme] body.site-page .skill-damage-share-control{background:linear-gradient(145deg,var(--p-input),var(--p-surface));border-color:var(--p-line);color:var(--p-muted)}
 html[data-preview-theme] body.site-page .skill-damage-share-control output{color:var(--p-ink)}
-html[data-preview-theme] body.site-page .stat{background:linear-gradient(145deg,var(--p-input),var(--p-surface));border-color:var(--p-line)}
+html[data-preview-theme] body.site-page .stat{background:var(--p-input);border-color:var(--p-line)}
 html[data-preview-theme] body.site-page .stat[open]{background:var(--p-raised);border-color:var(--p-edge)}
-html[data-preview-theme] body.site-page .equipment-damage-card{background:linear-gradient(145deg,var(--p-input),var(--p-surface));border-color:var(--p-line)}
-html[data-preview-theme] body.site-page .equipment-damage-card span{color:var(--p-muted)}
-html[data-preview-theme] body.site-page .equipment-damage-card strong{color:var(--p-ink)}
 html[data-preview-theme] body.site-page .gear-slot{--slot-normal-a:var(--p-raised);--slot-normal-b:var(--p-raised);--slot-hover-a:color-mix(in srgb,var(--group-color) 14%,var(--p-raised));--slot-hover-b:var(--slot-hover-a);--slot-edge:var(--p-line);--slot-hover-edge:var(--group-color)}
 html[data-preview-theme] body.site-page .gear-slot:is(:hover,.selected){background:color-mix(in srgb,var(--group-color) 14%,var(--p-raised))}
 html[data-preview-theme] body.site-page .beast-accessory-slot{--slot-normal-a:var(--p-raised);--slot-normal-b:var(--p-raised);--slot-edge:var(--p-line);--slot-hover-edge:var(--p-edge);--slot-hover-a:color-mix(in srgb,var(--p-accent) 14%,var(--p-raised));--slot-hover-b:var(--slot-hover-a)}

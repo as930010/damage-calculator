@@ -14,16 +14,15 @@
   </head>
   <body class="site-page site-page-score">
     <div class="app-shell">
+      <a class="skip-to-workspace" href="#score-main">跳到主要內容</a>
       <header class="site-header">
         <div class="site-developer" aria-label="開發者資訊"><span class="developer-desktop">開發者：八雲雲OuO</span><span class="developer-desktop">Discord：yakumo_1231</span><span class="developer-desktop">E-Mail：as930010@gmail.com</span><span class="developer-support">有任何問題回報或建議歡迎透過Discord訊息，也歡迎各類贊助支持</span><span class="developer-mobile"><span>開發者：八雲雲OuO</span><span>Discord：yakumo_1231</span></span></div>
         <div class="site-nav-wrap"><nav class="site-tabs" aria-label="功能頁面"><a href="../">傷害計算機</a><a href="../ice-optimizer/"><span class="nav-label">冰裝最佳化<wbr>試算</span></a><a href="./" aria-current="page"><span class="nav-label">屬性變換<wbr>評分</span></a><a href="../buff-simulator/"><span class="nav-label">隊伍增益<wbr>模擬</span></a></nav></div>
       </header>
-      <main class="site-main">
+      <main id="score-main" class="site-main" tabindex="-1">
         <section class="site-tool-intro"><div class="site-tool-intro-body">
-          <span class="site-tool-eyebrow">ATTRIBUTE TRANSFORMATION SCORE</span>
           <h1>屬性變換評分</h1>
-          <p class="site-tool-summary">比較武器與防具變換的傷害提升量，可用於試算目前的屬性變換提升量。<br>也可用於評估自己的目標分數想得到多少增幅。</p>
-          <ol class="site-tool-steps" aria-label="評分流程"><li><span>01</span><span>讀取目前配裝</span></li><li><span>02</span><span>設定模擬變換</span></li><li><span>03</span><span>檢視評分結果</span></li></ol>
+          <p class="site-tool-summary">將武器或防具的模擬詞條與目前配裝比較，查看傷害提升幅度與同部位的參考組合。</p>
         </div></section>
         <div class="mode-switch" role="tablist" aria-label="變換模式"><button type="button" role="tab" aria-selected="true" data-mode="weapon" aria-controls="score-workspace">武器屬性變換</button><button type="button" role="tab" aria-selected="false" tabindex="-1" data-mode="armor" aria-controls="score-workspace">防具屬性變換</button></div>
         <section class="site-card" aria-label="配裝來源"><div class="score-head"><h2>目前配裝</h2><button id="reload-loadout" class="site-button" type="button">重新讀取目前配裝</button></div>
@@ -57,7 +56,7 @@
           <p>底變換從各屬性的最低檔中選出單項收益最低的四種（防具為三種）；頂變換從最高檔中選出收益最高的四種（防具為三種），再分別合併試算。這是不同有效屬性的參考組合。PR 表示模擬提升相對於頂變換提升的百分比，可超過 100。</p>
         </details>
       </main>
-      <footer class="site-footer"><span class="footer-product">裝備傷害計算機</span><span class="footer-version">版本 <bdi>v4.06.06</bdi></span><span class="footer-updated">更新日期：<time datetime="2026-11-19">2026-11-19</time></span></footer>
+      <footer class="site-footer"><span class="footer-product">裝備傷害計算機</span><span class="footer-version">版本 <bdi>v4.07.03</bdi></span><span class="footer-updated">更新日期：<time datetime="2026-11-19">2026-11-19</time></span></footer>
     </div>
     <script type="module" src="./main.js"></script>
   </body>

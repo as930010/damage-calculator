@@ -1,7 +1,7 @@
 /* Ice optimizer content only; the website shell is shared with the other tools. */
 .optimizer-workspace .optimizer-caveat { margin: 12px 0 0; color: var(--site-muted); font-size: 12px; line-height: 1.6; }
 .optimizer-workspace { margin-top: 22px; padding: clamp(18px, 3vw, 30px); }
-.optimizer-constraints { margin-bottom: 18px; border: 1px solid var(--site-border); border-radius: 8px; }
+.optimizer-constraints { margin-top: 16px; border: 1px solid var(--site-border); border-radius: 8px; }
 .optimizer-constraints summary { padding: 12px 14px; cursor: pointer; }
 .optimizer-constraint-body { display: grid; gap: 16px; padding: 0 14px 14px; }
 .optimizer-constraint-body h2 { font-size: 14px; margin: 0 0 8px; }
@@ -30,6 +30,7 @@
 @keyframes optimizer-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .optimizer-spinner { animation: none; } }
 #optimizer-status, #optimizer-progress { margin: 14px 0 0; color: var(--site-muted); line-height: 1.6; }
+#optimizer-progress { padding-inline-start: 10px; border-inline-start: 2px solid var(--site-action-edge); font-variant-numeric: tabular-nums; }
 #optimizer-progress:empty { display: none; }
 .optimizer-results { display: grid; gap: 12px; margin-top: 22px; }
 .optimizer-results:empty { display: none; }
@@ -64,9 +65,10 @@
 }
 .optimizer-series-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0}
 .optimizer-series-options label{display:flex;align-items:center;gap:8px;min-width:0;padding:8px;border:1px solid var(--site-border);border-radius:8px;cursor:pointer;overflow-wrap:anywhere}
-.optimizer-series-options label:has(input:checked){border-color:#8da6c8;background-color:rgb(141 166 200 / 12%)}
 .optimizer-series-options label:has(input:focus-visible){outline:2px solid #b6c3ff;outline-offset:2px}
 
 @media(max-width:700px){.optimizer-series-options{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
-#range-clear{min-width:6em;margin-inline-end:.6em}
+.optimizer-series-heading{display:flex;align-items:center;gap:8px}
+#range-clear{flex:none;min-width:6em}
+#range-count{display:inline-block;white-space:nowrap;color:var(--site-muted);font-weight:400}

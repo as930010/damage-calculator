@@ -15,6 +15,7 @@ import { capture, edit, scenarios } from './scenarios.mjs';
 // Full numeric outputs and v1 payloads are checked alongside complete result/skill HTML hashes.
 // VI/DN reference edits change only full-roster skill digests. NP single and DaB corrections change only
 // MP metrics/breakdowns; old-data replay and independent field/DOM checks verified both fixtures.
+// The UI audit removed redundant result eyebrows; only the corresponding result digests changed.
 const fixtures = JSON.parse(await readFile(fixturesUrl, 'utf8'));
 async function open(t, options) { const h = await boot(options); t.after(h.close); return h; }
 function work(h, expected) {

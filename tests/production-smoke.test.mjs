@@ -8,6 +8,23 @@ import { uiPage, stageFields, stateB, enter, workloadActions } from './ui-update
 import { boot as buffPage } from '../features/buff-simulator/tests/dom-harness.mjs';
 import { scenarios, capture } from '../features/buff-simulator/tests/scenarios.mjs';
 
+test('source and production expose a keyboard shortcut to the main workspace on all four pages', async () => {
+  for (const route of ['', 'ice-optimizer/', 'transformation-score/', 'buff-simulator/']) {
+    for (const pagePath of [route ? 'features/' + route : '', 'site-dist/' + route]) {
+      const html = await readFile(join(root, pagePath, 'index.html'), 'utf8');
+      const { window } = new JSDOM(html);
+      try {
+        const link = window.document.querySelector('a[href], button, input, select, [tabindex="0"]');
+        assert.equal(link?.className, 'skip-to-workspace', pagePath);
+        assert.match(link.textContent, /跳到主要內容/);
+        const target = window.document.querySelector(link.getAttribute('href'));
+        assert.equal(target?.localName, 'main', pagePath);
+        assert.equal(target.tabIndex, -1, pagePath);
+      } finally { window.close(); }
+    }
+  }
+});
+
 const waitFor = async (check, message) => {
   for (let i = 0; i < 400; i++) { if (check()) return; await new Promise(resolve => setTimeout(resolve, 5)); }
   assert.fail(message);
@@ -333,7 +350,7 @@ test('four source and production pages retain unique metadata and current footer
         const canonical = doc.querySelectorAll('head link[rel="canonical"]');
         assert.equal(canonical.length, 1);
         assert.equal(canonical[0].href, 'https://as930010.github.io/damage-calculator/' + path);
-        assert.equal(doc.querySelector('.footer-version bdi').textContent, 'v4.06.06');
+        assert.equal(doc.querySelector('.footer-version bdi').textContent, 'v4.07.03');
       } finally { dom.window.close(); }
     }
     assert.equal(new Set(descriptions).size, 4);
@@ -352,14 +369,15 @@ test('release history preserves published entries and prepends new versions with
       ]);
       const versions = entries.map(entry => entry[0]);
       assert.equal(new Set(versions).size, versions.length, 'versions are unique within release history');
-      assert.deepEqual(entries[0], ['v4.06.06', '2026-11-19', '新增儲存角色與配置快捷切換功能，優化UI與主題配色']);
-      assert.deepEqual(entries[1], ['v4.05.03', '2026-11-17', '優化引用破防區塊操作、隊伍增益模擬自由度']);
-      assert.deepEqual(entries[2], ['v4.03.03', '2026-11-10', '修正TB、DN、TW未被賦靈錄加成正確識別到分支的問題']);
-      assert.deepEqual(entries[3], ['v4.03.02', '2026-11-09', '大規模優化隊伍Buff模擬內容，增加支援彈匣']);
-      assert.deepEqual(entries[4], ['v4.02.02', '2026-11-07', '優化裝備配置部分設定與完成設定的提醒方式']);
-      assert.deepEqual(entries[5], ['v4.01.07', '2026-11-06', '新增細算無視防禦以及彈匣選項，用於支援格雷特勳章的效果計算']);
-      assert.deepEqual(entries[6], ['v4.01.03', '2026-11-06', '新增屬性變換試算評分功能']);
-      assert.deepEqual(entries[7], ['v3.04.23', '2026-11-05', '優化冰裝與內裝魔法石來源顯示方式、獵人的本能新增公會技能標籤']);
+      assert.deepEqual(entries[0], ["v4.07.03","2026-11-19","優化UI、優化詞條顯示邏輯、更新天線耳機與百億藍套裝效果"]);
+      assert.deepEqual(entries[1], ['v4.06.06', '2026-11-19', '新增儲存角色與配置快捷切換功能，優化UI與主題配色']);
+      assert.deepEqual(entries[2], ['v4.05.03', '2026-11-17', '優化引用破防區塊操作、隊伍增益模擬自由度']);
+      assert.deepEqual(entries[3], ['v4.03.03', '2026-11-10', '修正TB、DN、TW未被賦靈錄加成正確識別到分支的問題']);
+      assert.deepEqual(entries[4], ['v4.03.02', '2026-11-09', '大規模優化隊伍Buff模擬內容，增加支援彈匣']);
+      assert.deepEqual(entries[5], ['v4.02.02', '2026-11-07', '優化裝備配置部分設定與完成設定的提醒方式']);
+      assert.deepEqual(entries[6], ['v4.01.07', '2026-11-06', '新增細算無視防禦以及彈匣選項，用於支援格雷特勳章的效果計算']);
+      assert.deepEqual(entries[7], ['v4.01.03', '2026-11-06', '新增屬性變換試算評分功能']);
+      assert.deepEqual(entries[8], ['v3.04.23', '2026-11-05', '優化冰裝與內裝魔法石來源顯示方式、獵人的本能新增公會技能標籤']);
       const current = versions.indexOf('v3.04.19'), previous = versions.indexOf('v3.04.18');
       assert.ok(current >= 0 && previous > current);
       assert.deepEqual(entries[previous], ['v3.04.18', '2026-10-30', '新增切換佈景主題功能、按鈕反應與視覺效果優化']);

@@ -1519,3 +1519,24 @@ test('Switching reference mode cancels an in-flight import without touching the 
     assert.equal(JSON.parse(localStorage.getItem('damage-calculator.battle-defense.v1')).sources.find(source=>source.kind==='team').snapshot.target,'secondTeam');
   }finally{release();page.close();}
 });
+
+test('equipment and growth pickers show stat details without changing option names or selection', async () => {
+  const page = await uiPage();
+  try {
+    const { document, KeyboardEvent } = page.dom.window;
+    const choices = label => {
+      const input = document.querySelector(`#inspector input[aria-label="${label}"]`);
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      return [...document.getElementById(input.getAttribute('aria-controls')).querySelectorAll('[role=option]')];
+    };
+    document.querySelector('button[data-slot-id="Accessory.Earring"]').click();
+    const earring = choices('選擇裝備').find(option => option.querySelector('span')?.textContent === '天線耳環');
+    assert.equal(earring.querySelector('small').textContent, '適應力 2% · 致命傷害 3% · 乘算效果 4%');
+    earring.click();
+    assert.equal(page.readState().values['Accessory.Earring'], '天線耳環');
+    document.querySelector('button[data-slot-id="weapon"]').click();
+    const growth = choices('武器成長').filter(option => option.querySelector('small'));
+    assert.ok(growth.length > 0);
+    assert.ok(growth.some(option => /\d%/.test(option.querySelector('small').textContent)));
+  } finally { page.close(); }
+});

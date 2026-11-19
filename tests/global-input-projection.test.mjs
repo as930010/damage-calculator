@@ -483,19 +483,36 @@ test('未確認鑑定資料的飾品不會套用其鑑定輸入', async () => {
   assert.equal(result.attributes.stats.doubleAttackPct.finalTotal, baseline.attributes.stats.doubleAttackPct.finalTotal);
 });
 
-test('百億套效紅藍固定值與綠色依內裝手套單技傷電路計算', async () => {
+test('百億紅藍套效與天線耳環獨立乘算，綠色依內裝手套單技傷電路計算', async () => {
   const data = await loadData();
   const baseValues = { "Weapon.ENHC": 'Lv.8', "Left.Armor.Upper.ENHC": 'Lv.8', "Left.Armor.Bottom.ENHC": 'Lv.8', "Left.Armor.Gloves.ENHC": 'Lv.8', "Left.Armor.Shoes.ENHC": 'Lv.8', "Left.Armor.Upper.FORGE": 0, "Left.Armor.Bottom.FORGE": 0, "Left.Armor.Gloves.FORGE": 0, "Left.Armor.Shoes.FORGE": 0 };
   const baseState = { schemaVersion: 2, Job: 'KE', lowerwearAlternativeEnabled: false };
   const baseResult = projectDamage(data, { ...baseState, values: baseValues }).result;
   const base = baseResult.generalMultiplicativeDamage.value;
   const red = projectDamage(data, { ...baseState, values: { ...baseValues, "Left.Armor.SetColor": '紅' } }).result.generalMultiplicativeDamage.value;
-  const blue = projectDamage(data, { ...baseState, values: { ...baseValues, "Left.Armor.SetColor": '藍' } }).result.generalMultiplicativeDamage.value;
   const greenWithoutCircuit = projectDamage(data, { ...baseState, values: { ...baseValues, "Left.Armor.SetColor": '綠' } }).result.generalMultiplicativeDamage.value;
   const greenWithCircuitResult = projectDamage(data, { ...baseState, values: { ...baseValues, "Left.Armor.SetColor": '綠', "Left.Armor.Gloves.Circuit.Attribute": '單技傷%', "Left.Armor.Gloves.Circuit.Value": 0.05 } }).result;
 
   assert.equal(red / base, 1.2);
-  assert.equal(blue / base, 1.08);
+  const blueSource = 'color-set:藍';
+  const earringSource = 'simulator:Accessory.Earring';
+  for (const [set, earring, expected] of [
+    ['', '', 1],
+    ['藍', '', 1.12],
+    ['', '天線耳環', 1.04],
+    ['藍', '天線耳環', 1.1648],
+  ]) {
+    const result = projectDamage(data, { ...baseState, values: {
+      ...baseValues, 'Left.Armor.SetColor': set, 'Accessory.Earring': earring,
+    } }).result.generalMultiplicativeDamage;
+    const relevant = result.factors.filter(({ sourceId }) => sourceId === blueSource || sourceId === earringSource);
+    assert.deepEqual(Object.fromEntries(relevant.map(({ sourceId, factor }) => [sourceId, factor])), {
+      ...(set ? { [blueSource]: 1.12 } : {}),
+      ...(earring ? { [earringSource]: 1.04 } : {}),
+    });
+    assert.equal(relevant.length, Number(Boolean(set)) + Number(Boolean(earring)));
+    assert.ok(Math.abs(result.value / base - expected) < 1e-12, `${set || '無套效'}／${earring || '無耳環'}`);
+  }
   assert.equal(greenWithoutCircuit / base, 1.1);
   assert.ok(Math.abs(greenWithCircuitResult.generalMultiplicativeDamage.value / base - 1.144) < 1e-12);
   assert.equal(greenWithCircuitResult.attributes.stats.strongSkillDamagePct.finalTotal - baseResult.attributes.stats.strongSkillDamagePct.finalTotal, 5);
@@ -685,7 +702,7 @@ test('mixed Nephron and Billion keep shared innerwear bonuses, set effects, circ
   assert.equal(damage.attributes.stats.allSkillDamagePct.sharedSources.find(entry => entry.sourceId === 'innerwear:gloves').valuePct, 55);
   assert.equal(damage.combatRates.extremization.multipliers.find(entry => entry.sourceId === 'shoes-extremization-enhancement').valuePct, 13);
 
-  for (const [color, expected] of [['紅', 20], ['藍', 8]]) {
+  for (const [color, expected] of [['紅', 20], ['藍', 12]]) {
     const colored = projectAttributes(data, { ...state, values: { ...values, 'Left.Armor.SetColor': color } });
     assert.equal(colored.calculationSources.shared.find(entry => entry.sourceId === 'color-set:' + color).stats.multiplicativeDamagePct, expected);
   }

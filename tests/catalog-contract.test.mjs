@@ -3,6 +3,8 @@ import test from 'node:test';
 import { readFile } from 'node:fs/promises';
 import { createCatalogIndex, equipmentTransferCode } from '../dist/frontend/catalog-index.js';
 import { getEquipmentOptionName } from '../dist/calculation/equipment-catalog.js';
+import { createEquipmentStatSummary, equipmentStatOrder } from '../dist/frontend/equipment-stat-summary.js';
+import { createPickerChoices } from '../dist/frontend/picker-choices.js';
 import { attributeLabel } from '../dist/frontend/attribute-label.js';
 import { decodeSingle } from '../dist/frontend/loadout-archive.js';
 import { exportWorkingLoadout, invalidLoadoutFields, serializeLoadout, parseLoadoutJson } from '../dist/frontend/loadout-transfer.js';
@@ -307,4 +309,56 @@ test('removed v4 selection reports the field at import and leaves saved workspac
     assert.deepEqual(keys.map(k=>storage.getItem(k)),before);
     assert.equal(doc.querySelector('.profile-dialog'),null);
   } finally {page.close();}
+});
+
+test('equipment display order covers every attribute exactly once', () => {
+  const keys = gameData.attributes.attributes.map(({ key }) => key);
+  assert.deepEqual([...equipmentStatOrder].sort(), [...keys].sort(), 'register new attributes in equipmentStatOrder');
+  const stats = Object.fromEntries([...keys].reverse().map(key => [key, 1]));
+  const summary = createEquipmentStatSummary(gameData.attributes.attributes);
+  const byKey = Object.fromEntries(keys.map(key => [key, summary({ [key]: 1 })]));
+  assert.equal(summary(stats), equipmentStatOrder.map(key => byKey[key]).join(' · '));
+});
+
+test('equipment summaries use metadata units, preserve digits and leave source data intact', () => {
+  const metadata = Object.freeze([...gameData.attributes.attributes.map(entry => Object.freeze({ ...entry })),
+    Object.freeze({ key: 'futureRate', unit: 'percent', name: '新詞條％' }),
+    Object.freeze({ key: 'flatPct', unit: 'flat', name: '目標100%' }),
+  ]);
+  const summary = createEquipmentStatSummary(metadata);
+  const first = Object.freeze({ critDamagePct: 3, adaptabilityPct: 2, multiplicativeDamagePct: 6 });
+  const second = Object.freeze({ multiplicativeDamagePct: 6, critDamagePct: 3, adaptabilityPct: 2 });
+  for (const stats of [first, second]) {
+    assert.equal(summary(stats), '適應力 2% · 致命傷害 3% · 乘算效果 6%');
+  }
+  assert.equal(summary({ doubleAttackPct: 4, physicalAttack: 300, magicalAttack: 250, attackLevel: 2 }),
+    '物攻 300 · 魔攻 250 · 攻擊力等級 2 · 攻擊力 4%');
+  assert.equal(summary({ fullHealthKillDamagePct: 5, adaptabilityPct: 2.5, physicalAttack: -12345.678912, actionSpeedPct: -0.125 }),
+    '物攻 -12,345.67891 · 適應力 2.5% · 動作速度 -0.125% · 100%血殺 5%');
+  assert.equal(summary({ critRatePct: 0, attackLevel: -0 }), '');
+  assert.equal(summary({}), '');
+  assert.equal(summary({ critDamagePct: 3 }), '致命傷害 3%');
+  const unknown = { zPct: 1, futureRate: 2, flatPct: 3, ABC: 4, critDamagePct: 3 };
+  const fallback = '致命傷害 3% · ABC 4 · 目標100% 3 · 新詞條 2% · zPct 1';
+  assert.equal(summary(unknown), fallback);
+  assert.equal(summary(Object.fromEntries(Object.entries(unknown).reverse())), fallback);
+});
+
+test('weapon and armor stone summaries are cached with the original equipment choice identities', () => {
+  const summary = createEquipmentStatSummary(gameData.attributes.attributes);
+  const index = createCatalogIndex(gameData);
+  const catalog = gameData.mapping.magicStoneSelections.catalogFile;
+  let formats = 0;
+  const choices = createPickerChoices(index, catalog, stats => { formats++; return summary(stats); });
+  for (const application of ['armor', 'weapon']) {
+    const list = choices.magicStoneChoices(application);
+    const items = index.activeCatalogItems(catalog);
+    assert.ok(list.length > 1);
+    assert.deepEqual(list.map(choice => choice.value), items.map(item => getEquipmentOptionName(item, application)));
+    assert.equal(list[0].detail, summary(items[0].targetApplications?.[application]?.stats ?? items[0].stats ?? {}));
+    assert.ok(list.some(choice => /\d%/.test(choice.detail)));
+    const count = formats;
+    assert.equal(choices.magicStoneChoices(application), list);
+    assert.equal(formats, count);
+  }
 });

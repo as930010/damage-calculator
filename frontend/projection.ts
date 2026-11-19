@@ -166,7 +166,7 @@ export function resolveLoadoutSources(data: GameData, state: LoadoutState) {
   const requiredCircuitValue = (circuitRowsBySlot.get("gloves") ?? [])
     .filter(row => row.attribute === requiredCircuitAttribute)
     .reduce((total, row) => total + (row.percentageValue ?? 0), 0);
-  const colorSet = resolveColorSetEffect(data.colorSetEffects, text(data.colorSetEffects.settingKey), requiredCircuitAttribute, requiredCircuitValue, text("Accessory.Earring"));
+  const colorSet = resolveColorSetEffect(data.colorSetEffects, text(data.colorSetEffects.settingKey), requiredCircuitAttribute, requiredCircuitValue);
   if (colorSet) groups.shared.push(colorSet);
   groups.shared.push(...resolveWeaponTransformationsFromFields(data.transformations, values));
   const growth = resolveWeaponGrowth(data.growth, text(data.growth.settingKey));

@@ -228,20 +228,6 @@ body.site-page-main{color:var(--text-main);background:transparent}
   background:linear-gradient(90deg,rgb(7 12 32 / 65%),rgb(10 16 43 / 65%) 58%,rgb(17 14 34 / 65%));
   box-shadow:none;
 }
-.workspace-heading{
-  border-color:rgb(139 139 191 / 35%);
-  background:
-    radial-gradient(ellipse 410px 185px at 87% 100%,rgb(215 136 74 / 14%) 0%,rgb(179 102 67 / 6%) 48%,transparent 100%),
-    linear-gradient(112deg,rgb(10 16 39 / 65%),rgb(8 13 31 / 65%) 55%,rgb(22 17 39 / 65%));
-  background-clip:padding-box;
-  box-shadow:none;
-}
-
-.workspace-heading::after{
-  right:3%;bottom:-24px;width:130px;height:205px;border:0;border-radius:0;box-shadow:none;opacity:.2;transform:none;
-  background:linear-gradient(180deg,rgb(75 77 139 / 82%),rgb(27 31 69 / 84%));
-  clip-path:polygon(50% 0,63% 25%,56% 25%,75% 48%,65% 48%,91% 77%,62% 77%,62% 100%,38% 100%,38% 77%,9% 77%,35% 48%,25% 48%,44% 25%,37% 25%);
-}
 .eyebrow{color:#bdb9d3}
 .eyebrow::before{background:#9a9bc8}
 .workspace-heading h1{color:var(--text-heading)}
@@ -252,13 +238,11 @@ body.site-page-main{color:var(--text-main);background:transparent}
   box-shadow:none;
 }
 .canvas-title-input .field{color:#d1cee6}
-.workflow-steps li{border-color:rgb(145 141 187 / 28%);background:rgb(12 20 55 / 65%);color:#e2deef}
-.workflow-steps li span:first-child{background:rgb(143 126 192 / 23%);color:#c5b9de}
 .toolbar{
   border-color:rgb(126 133 183 / 30%);
   background:linear-gradient(100deg,rgb(10 16 39 / 65%),rgb(8 13 31 / 65%));
 }
-.toolbar,.workflow-steps li,.panel-heading,.editor-section,.right-ice-set-area{border-color:rgb(137 139 184 / 32%)}
+.toolbar,.panel-heading,.editor-section,.right-ice-set-area{border-color:rgb(137 139 184 / 32%)}
 .battle-panel,.damage-panel,.equipment-panel,.inspector,.weapon-magic-stone-panel,.global-source-panel,.results-panel,.attribute-equivalence-panel{
   border-color:rgb(125 134 183 / 34%);
   background-color:transparent;
@@ -291,7 +275,7 @@ body.site-page-main{color:var(--text-main);background:transparent}
 .battle-panel .panel-heading,.results-panel .panel-heading,.attribute-equivalence-panel .panel-heading{
   background:linear-gradient(90deg,rgb(15 18 29 / 65%),rgb(11 13 22 / 45%));
 }
-.results-panel .stat,.results-panel .equipment-damage-card,.results-panel .damage-summary>div{
+.results-panel .stat,.results-panel .damage-summary>div{
   background:linear-gradient(145deg,rgb(12 14 24 / 65%),rgb(8 10 18 / 65%));
 }
 .equipment-canvas{background-color:transparent;background-image:none}
@@ -310,7 +294,7 @@ body.site-page-main{color:var(--text-main);background:transparent}
 .gear-slot .gear-slot-item-name{color:#f3e8d4}
 .gear-slot:hover,.beast-accessory-slot:hover{background:linear-gradient(155deg,#303251,#252a45)}
 .gear-slot.selected,.beast-accessory-slot.selected{box-shadow:none}
-.stat,.equipment-damage-card,.damage-summary>div{
+.stat,.damage-summary>div{
   border-color:#414967;
   background:linear-gradient(145deg,rgb(11 17 42 / 65%),rgb(7 11 27 / 65%));
   box-shadow:none;
@@ -398,7 +382,6 @@ body::before{
 @media (max-width:700px){
   :root{--campfire-glow-bottom-offset:calc(189px + env(safe-area-inset-bottom, 0px));}
 
-  .workspace-heading::after{right:1%;width:86px;height:150px;opacity:.12}
 
   .mobile-inspector-open #inspector{border-color:#9c8150}
 }
@@ -455,9 +438,8 @@ footer::after{
     linear-gradient(16deg,transparent 36%,#60412e 39% 53%,transparent 56%),
     linear-gradient(-16deg,transparent 36%,#805538 39% 53%,transparent 56%);
 }
-@media (max-width:380px){.workspace-heading::after{display:none}}
 /* Panel and card hierarchy now comes from surface color and border definition. */
-.workspace-heading,.toolbar,.battle-panel,.equipment-panel,.inspector,.weapon-magic-stone-panel,.global-source-panel,.results-panel,.attribute-equivalence-panel,.site-credits-notes{
+.toolbar,.battle-panel,.equipment-panel,.inspector,.weapon-magic-stone-panel,.global-source-panel,.results-panel,.attribute-equivalence-panel,.site-credits-notes{
   box-shadow:none;
 }
 .mobile-inspector-open #inspector{
@@ -465,7 +447,7 @@ footer::after{
 }
 
 /* Keep fills and warm light inside the rounded panel edges. */
-.workspace-heading,.toolbar,.battle-panel,.damage-panel,.equipment-panel,.inspector,.weapon-magic-stone-panel,.global-source-panel,.results-panel,.attribute-equivalence-panel,.site-credits-notes,.stat,.equipment-damage-card,.damage-summary>div,.gear-slot,.beast-accessory-slot{
+.toolbar,.battle-panel,.damage-panel,.equipment-panel,.inspector,.weapon-magic-stone-panel,.global-source-panel,.results-panel,.attribute-equivalence-panel,.site-credits-notes,.stat,.damage-summary>div,.gear-slot,.beast-accessory-slot{
   background-clip:padding-box;
 }
 .battle-panel>.panel-heading:first-child,.damage-panel>.panel-heading:first-child,.equipment-panel>.panel-heading:first-child,.results-panel>.panel-heading:first-child,.attribute-equivalence-panel>.panel-heading:first-child{
@@ -479,7 +461,6 @@ footer::after{
   [class*="panel"],
   [class*="card"],
   .workbench,
-  .workspace-heading,
   .toolbar,
   .inspector,
   .site-credits-notes,
@@ -487,7 +468,6 @@ footer::after{
   .canvas-title-input,
   .toolbar-actions,
   .stat,
-  .equipment-damage-card,
   .damage-summary > div,
   .gear-slot,
   .beast-accessory-slot,
@@ -513,8 +493,8 @@ footer::after{
   box-shadow: none !important;
 }
 
-.app-shell :is([class*="panel"], [class*="card"], .workspace-heading, .stat, .gear-slot, .beast-accessory-slot)::before,
-.app-shell :is([class*="panel"], [class*="card"], .workspace-heading, .stat, .gear-slot, .beast-accessory-slot)::after {
+.app-shell :is([class*="panel"], [class*="card"], .stat, .gear-slot, .beast-accessory-slot)::before,
+.app-shell :is([class*="panel"], [class*="card"], .stat, .gear-slot, .beast-accessory-slot)::after {
   box-shadow: none !important;
   filter: none !important;
 }
@@ -542,45 +522,12 @@ body.site-page-buff {
 .site-page-buff .app-shell,
 .site-page-optimizer .app-shell { background: transparent; }
 
-.site-page-buff .site-tool-intro,
-.site-page-optimizer .site-tool-intro,
-.site-page-score .site-tool-intro {
-  border-color: rgb(139 139 191 / 35%);
-  background:
-    radial-gradient(ellipse 410px 185px at 87% 100%, rgb(215 136 74 / 14%) 0%, rgb(179 102 67 / 6%) 48%, transparent 100%),
-    linear-gradient(112deg, rgb(10 16 39 / 65%), rgb(8 13 31 / 65%) 55%, rgb(22 17 39 / 65%));
-  background-clip: padding-box;
-  box-shadow: none;
-}
-
-.site-page-buff .site-tool-intro::after,
-.site-page-optimizer .site-tool-intro::after,
-.site-page-score .site-tool-intro::after {
-  right: 3%; bottom: -24px; width: 130px; height: 205px;
-  border: 0; border-radius: 0; box-shadow: none; opacity: .2; transform: none;
-  background: linear-gradient(180deg, rgb(75 77 139 / 82%), rgb(27 31 69 / 84%));
-  clip-path: polygon(50% 0,63% 25%,56% 25%,75% 48%,65% 48%,91% 77%,62% 77%,62% 100%,38% 100%,38% 77%,9% 77%,35% 48%,25% 48%,44% 25%,37% 25%);
-}
-
-.site-page-buff .site-tool-eyebrow,
-.site-page-optimizer .site-tool-eyebrow,
-.site-page-score .site-tool-eyebrow { color: #bdb9d3; }
-.site-page-buff .site-tool-eyebrow::before,
-.site-page-optimizer .site-tool-eyebrow::before,
-.site-page-score .site-tool-eyebrow::before { background: #9a9bc8; }
 .site-page-buff .site-tool-intro h1,
 .site-page-optimizer .site-tool-intro h1,
 .site-page-score .site-tool-intro h1 { color: var(--text-heading); }
 .site-page-buff .site-tool-summary,
 .site-page-optimizer .site-tool-summary,
 .site-page-score .site-tool-summary { color: #c6c4dc; }
-.site-page-buff .site-tool-steps li,
-.site-page-optimizer .site-tool-steps li,
-.site-page-score .site-tool-steps li { border-color: rgb(145 141 187 / 28%); background: rgb(12 20 55 / 65%); color: #e2deef; }
-.site-page-buff .site-tool-steps li span:first-child,
-.site-page-optimizer .site-tool-steps li span:first-child,
-.site-page-score .site-tool-steps li span:first-child { background: rgb(143 126 192 / 23%); color: #c5b9de; }
-
 .site-page-buff .team-panel,
 .site-page-buff .result-card,
 .site-page-buff .skill-reference,
@@ -608,9 +555,6 @@ body.site-page-buff {
 .site-page-buff .total-multiplier strong { color: #f0b66d; }
 
 @media (max-width: 700px) {
-  .site-page-buff .site-tool-intro::after,
-  .site-page-optimizer .site-tool-intro::after,
-  .site-page-score .site-tool-intro::after { right: 1%; width: 86px; height: 150px; opacity: .12; }
 }
 
 /* Keep shared navigation, disclosures and tool controls visually consistent. */

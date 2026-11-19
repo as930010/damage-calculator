@@ -16,24 +16,26 @@
   </head>
   <body class="site-page site-page-optimizer">
     <div class="app-shell">
+      <a class="skip-to-workspace" href="#app">跳到主要內容</a>
       <header class="site-header">
         <div class="site-developer" aria-label="開發者資訊"><span class="developer-desktop">開發者：八雲雲OuO</span><span class="developer-desktop">Discord：yakumo_1231</span><span class="developer-desktop">E-Mail：as930010@gmail.com</span><span class="developer-support">有任何問題回報或建議歡迎透過Discord訊息，也歡迎各類贊助支持</span><span class="developer-mobile"><span>開發者：八雲雲OuO</span><span>Discord：yakumo_1231</span></span></div>
         <div class="site-nav-wrap"><nav class="site-tabs" aria-label="功能頁面"><a href="../">傷害計算機</a><a href="./" aria-current="page"><span class="nav-label">冰裝最佳化<wbr>試算</span></a><a href="../transformation-score/"><span class="nav-label">屬性變換<wbr>評分</span></a><a href="../buff-simulator/"><span class="nav-label">隊伍增益<wbr>模擬</span></a></nav></div>
       </header>
-      <main id="app" class="site-main">
+      <main id="app" tabindex="-1" class="site-main">
         <section class="optimizer-intro site-tool-intro">
           <div class="site-tool-intro-body">
-            <span class="site-tool-eyebrow">ICE EQUIPMENT OPTIMIZER</span>
             <h1>冰裝最佳化試算</h1>
-            <p class="site-tool-summary">根據目前在「傷害計算機」使用的現在配裝與關卡設定計算右冰傷害最高的組合。<br>請注意僅計算理論最高傷害，並不考慮冷卻、MP消耗等問題。</p>
-            <ol class="site-tool-steps" aria-label="最佳化流程"><li><span>01</span><span>設定搜尋條件</span></li><li><span>02</span><span>開始搜尋冰裝</span></li><li><span>03</span><span>檢視並套用穿搭</span></li></ol>
+            <p class="site-tool-summary">沿用傷害計算機的配裝與關卡設定，在指定條件下搜尋右冰組合。結果依理論傷害排序，不計冷卻與 MP 消耗。</p>
           </div>
         </section>
         <section class="optimizer-workspace site-card" aria-label="冰裝搜尋">
+          <div class="optimizer-actions"><button id="optimizer-start" class="site-button" type="button" disabled>開始搜尋</button><button id="optimizer-cancel" type="button" disabled>取消搜尋</button><button id="optimizer-clear" type="button" disabled>清空試算</button></div>
+          <p id="optimizer-status" role="status" aria-live="polite">正在讀取遊戲資料…</p>
+          <p id="optimizer-progress" aria-live="polite"></p>
           <details class="optimizer-constraints">
             <summary>自訂搜尋條件</summary>
             <div class="optimizer-constraint-body">
-              <div><h2><button id="range-clear" type="button">全選</button> 參與試算的冰裝套裝 <span id="range-count"></span></h2>
+              <div><h2 class="optimizer-series-heading"><button id="range-clear" type="button">全選</button><span>參與試算的冰裝套裝 <span id="range-count"></span></span></h2>
                 <div id="series-options" class="optimizer-series-options"></div>
               </div>
               <div><h2>固定裝備 <span id="fixed-count">0／11</span></h2>
@@ -48,13 +50,10 @@
               <button id="constraint-clear" type="button">清除全部條件</button>
             </div>
           </details>
-          <div class="optimizer-actions"><button id="optimizer-start" class="site-button" type="button" disabled>開始搜尋</button><button id="optimizer-cancel" type="button" disabled>取消搜尋</button><button id="optimizer-clear" type="button" disabled>清空試算</button></div>
-          <p id="optimizer-status" role="status" aria-live="polite">正在讀取遊戲資料…</p>
-          <p id="optimizer-progress" aria-live="polite"></p>
           <div id="optimizer-results" class="optimizer-results" aria-live="polite"></div>
         </section>
       </main>
-      <footer class="site-footer"><span class="footer-product">裝備傷害計算機</span><span class="footer-version">版本 <bdi>v4.06.06</bdi></span><span class="footer-updated">更新日期：<time datetime="2026-11-19">2026-11-19</time></span></footer>
+      <footer class="site-footer"><span class="footer-product">裝備傷害計算機</span><span class="footer-version">版本 <bdi>v4.07.03</bdi></span><span class="footer-updated">更新日期：<time datetime="2026-11-19">2026-11-19</time></span></footer>
     </div>
     <script type="module" src="./frontend/main.js"></script>
   </body>

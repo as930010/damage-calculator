@@ -306,10 +306,9 @@ function ensureSkillReference(): void {
 }
 
 function teamPanel(team: TeamKey, title: string, memberCount: number): string {
-  const routeLabel = team === "single" ? "" : `<span class="eyebrow">ROUTE ${team === "first" ? "01" : "02"}</span>`;
   const bossControlMarkup = team === "single" ? bossControl() : "";
   return `<section class="panel team-panel">
-    <div class="panel-heading"><div>${routeLabel}<h2>${title}</h2></div>${bossControlMarkup}</div>
+    <div class="panel-heading"><div><h2>${title}</h2></div>${bossControlMarkup}</div>
     <div class="member-grid">${Array.from({ length: memberCount }, (_, index) => `<label class="member-slot"><span class="slot-index">${String(index + 1).padStart(2, "0")}</span><input data-member data-team="${team}" list="class-list" autocomplete="off" value="${escapeHtml(membersByTeam[team]?.[index] ?? "")}" placeholder="輸入代碼" aria-label="${title}隊員 ${index + 1}"></label>`).join("")}</div>
     <details class="option-disclosure" data-team="${team}" ${optionDisclosureOpen[team] ? "open" : ""}><summary>配置效果</summary>${optionPanel(team)}</details>
   </section>`;
@@ -346,14 +345,10 @@ function syncInputs(event: Event): void {
 function shell(): void {
   app.innerHTML = `<section class="site-tool-intro" aria-labelledby="buff-intro-title">
     <div class="site-tool-intro-body">
-      <span class="site-tool-eyebrow">TEAM BUFF SIMULATOR</span>
       <h1 id="buff-intro-title">隊伍增益模擬</h1>
-      <p class="site-tool-summary">進行單隊伍或攻擊隊成員設置以及各項輔助裝備效益<br>試算並查看 Buff、Debuff 帶來的隊伍增益。</p>
-      <ol class="site-tool-steps" aria-label="模擬流程"><li><span>01</span><span>選擇隊伍模式</span></li><li><span>02</span><span>填入職業與效果</span></li><li><span>03</span><span>查看隊伍收益</span></li></ol>
+      <p class="site-tool-summary">填入職業代碼與配置效果，查看分路或同場增益。已保存的隊伍可供傷害計算機引用破防。</p>
     </div>
-  </section>
-  <section class="hero">
-    <div class="hero-console">
+    <div class="team-mode-control">
       <div class="mode-switch" role="tablist" aria-label="隊伍模式">
         <button data-mode="single" role="tab" aria-selected="${mode === "single"}">單隊 <small>6 人</small></button>
         <button data-mode="challenge" role="tab" aria-selected="${mode === "challenge"}">挑戰雙隊 <small>4 + 4</small></button>
@@ -510,11 +505,11 @@ function beneficiaryDefenseNote(result: ReturnType<typeof calculateTeam>): strin
 window.addEventListener('storage', event => { if (event.key === 'dab-loadout-v1' || event.key === null) { beneficiaryRaw = undefined; updateResults(); } });
 window.addEventListener('pageshow', () => { if (catalog && beneficiaryRaw !== undefined) updateResults(); });
 
-function damagePanel(title: string, team: string, result: ReturnType<typeof calculateTeam>): string {
+function damagePanel(title: string, result: ReturnType<typeof calculateTeam>): string {
   const controlTimes = calculateControlTimes(result.resistanceReduction, catalog.parameters.controlTime);
   const netIncrease = result.totalDamageMultiplier - 1;
   return `<article class="result-card">
-    <div class="result-heading"><div class="result-title"><span class="eyebrow">${team}</span><h3>${title}</h3></div><div class="total-multiplier"><span>基礎輸出</span><strong>${asPercent(result.totalDamageMultiplier)}</strong><small>傷害是原本的 ${result.totalDamageMultiplier.toFixed(2)} 倍</small></div></div>
+    <div class="result-heading"><div class="result-title"><h3>${title}</h3></div><div class="total-multiplier"><span>基礎輸出</span><strong>${asPercent(result.totalDamageMultiplier)}</strong><small>傷害是原本的 ${result.totalDamageMultiplier.toFixed(2)} 倍</small></div></div>
     <section class="metric-section damage-section"><div class="metric-section-heading"><span>01</span><div><strong>傷害增幅</strong></div></div><div class="metric-grid primary-grid">
       ${metric("Buff 增幅", asPercent(result.buffIncrease))}
       ${metric("Debuff 增幅", asPercent(result.debuffIncrease))}
@@ -558,7 +553,7 @@ function updateResults(): void {
       uniqueClassCodes: uniqueSupportCodes(),
       actionSpeedCap: catalog.parameters.actionSpeedCap,
     });
-    results.innerHTML = `${invalidMemberNote()}${emptyRosterNote()}<div class="results-heading"><div class="section-label"><strong>隊伍效益</strong></div></div>${damagePanel("單隊結果", "單隊", result)}`;
+    results.innerHTML = `${invalidMemberNote()}${emptyRosterNote()}<div class="results-heading"><div class="section-label"><strong>隊伍效益</strong></div></div>${damagePanel("單隊結果", result)}`;
     applyResultDisclosures();
     return;
   }
@@ -576,7 +571,7 @@ function updateResults(): void {
     uniqueClassCodes: uniqueSupportCodes(),
     actionSpeedCap: catalog.parameters.actionSpeedCap,
   });
-  results.innerHTML = `${invalidMemberNote()}${emptyRosterNote()}<div class="results-heading"><div class="section-label"><strong>分路與八人同場</strong></div><span class="result-context">同場重複效果只計一次</span></div><div class="result-stack">${damagePanel("第一隊・分路", "ROUTE 01", challenge.firstTeam)}${damagePanel("第二隊・分路", "ROUTE 02", challenge.secondTeam)}${damagePanel("八人同場", "SHARED ARENA", challenge.sharedArena)}</div>`;
+  results.innerHTML = `${invalidMemberNote()}${emptyRosterNote()}<div class="results-heading"><div class="section-label"><strong>分路與八人同場</strong></div><span class="result-context">同場重複效果只計一次</span></div><div class="result-stack">${damagePanel("第一隊・分路", challenge.firstTeam)}${damagePanel("第二隊・分路", challenge.secondTeam)}${damagePanel("八人同場", challenge.sharedArena)}</div>`;
   applyResultDisclosures();
 }
 

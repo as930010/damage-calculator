@@ -4,7 +4,7 @@ import { normalizeTranscendenceSkillDamageShare, parseTranscendenceSkillDamageSh
 export function createSkillShareControl(getValue: () => number | undefined, setValue: (value: number) => void, onChange: () => void) {
   const skillShareControl = document.createElement('div');
   skillShareControl.className = 'skill-damage-share-control';
-  const skillShareLabel = document.createElement('span');
+  const skillShareLabel = document.createElement('label');
   skillShareLabel.className = 'skill-damage-share-label';
   skillShareLabel.textContent = '超越占比';
   const skillShareOutput = document.createElement('output');
@@ -21,13 +21,14 @@ export function createSkillShareControl(getValue: () => number | undefined, setV
   skillShareNumberWrap.className = 'skill-damage-share-number-wrap';
   const skillShareNumberInput = document.createElement('input');
   skillShareNumberInput.id = 'transcendence-skill-share-number';
+  skillShareLabel.htmlFor = skillShareNumberInput.id;
   skillShareNumberInput.type = 'text';
   skillShareNumberInput.inputMode = 'decimal';
   skillShareNumberInput.autocomplete = 'off';
   skillShareNumberInput.spellcheck = false;
   skillShareNumberInput.maxLength = 6;
   skillShareNumberInput.pattern = '(?:0|[1-9]\\d{0,2})(?:\\.\\d{0,2})?';
-  skillShareNumberInput.setAttribute('aria-label', '超越技傷占比百分比');
+  skillShareNumberInput.setAttribute('aria-label', '超越占比（%）');
   skillShareNumberInput.setAttribute('aria-describedby', 'skill-damage-share-output');
   skillShareNumberInput.title = '只接受 0–100 的數字，最多兩位小數。';
   const skillSharePercent = document.createElement('span');
