@@ -313,8 +313,11 @@ test('first expansion loads once, keeps original ordered HTML/icons, and reuses 
   const h = await open(t); h.reset(); await h.openSkills();
   assert.equal(skillRequests(h), 1);
   assert.equal(capture(h).skillHtmlHash, fixtures.defaultSingle.skillHtmlHash);
-  assert.equal(h.app.querySelectorAll('.skill-entry').length, 253);
-  assert.equal(h.query('[data-skill-results]').querySelectorAll('*').length, 2528);
+  assert.equal(h.app.querySelectorAll('.skill-entry').length, 251);
+  const skillList = h.query('[data-skill-results]');
+  assert.equal(skillList.querySelectorAll('*').length, 2512);
+  assert.doesNotMatch(skillList.textContent, /亂殺快感|解放意志:織語者/);
+  assert.match(skillList.textContent, /使用特殊主動技能時恢復5%最大MP/);
   for (const image of h.app.querySelectorAll('.skill-entry img')) {
     assert.equal(image.getAttribute('loading'), 'lazy');
     assert.ok(image.src.startsWith('https://test.example/buff-simulator/data/'));
@@ -324,7 +327,7 @@ test('first expansion loads once, keeps original ordered HTML/icons, and reuses 
   assert.equal(h.query('[data-skill-results]').childElementCount, 0);
   await h.openSkills(); h.event(h.query('.skill-reference'), 'toggle');
   assert.equal(skillRequests(h), 1);
-  assert.equal(h.app.querySelectorAll('.skill-entry').length, 253);
+  assert.equal(h.app.querySelectorAll('.skill-entry').length, 251);
   h.clickMode('challenge'); await h.openSkills();
   assert.equal(skillRequests(h), 1);
 });
@@ -366,7 +369,7 @@ test('completion while collapsed caches data without creating hidden items', asy
   assert.equal(h.query('[data-skill-results]').childElementCount, 0);
   await h.openSkills();
   assert.equal(skillRequests(h), 1);
-  assert.equal(h.app.querySelectorAll('.skill-entry').length, 253);
+  assert.equal(h.app.querySelectorAll('.skill-entry').length, 251);
 });
 
 test('shell replacement during loading never fills an obsolete or collapsed panel', async t => {
@@ -437,7 +440,7 @@ for (const [name, corrupt] of Object.entries({
     assert.ok(h.app.querySelector('[data-skill-retry]'));
     assert.equal(capture(h).resultHtmlHash, fixtures.defaultSingle.resultHtmlHash);
     h.query('[data-skill-retry]').click(); await h.settleSkills();
-    assert.equal(h.app.querySelectorAll('.skill-entry').length, 253);
+    assert.equal(h.app.querySelectorAll('.skill-entry').length, 251);
     assert.equal(skillRequests(h), 2);
   });
 }
@@ -451,11 +454,11 @@ test('all 60 classes share effects and preserve every field outside the seven au
   assert.equal(corePayloads.classEffects.classes.length,60);assert.equal(catalog.classEffects.length,120);
   for(const role of catalog.classes){const profiles=catalog.classEffects.filter(p=>p.classId===role.id);assert.equal(profiles.length,2);assert.deepEqual(profiles[0].effects,profiles[1].effects);assert.notEqual(profiles[0].effects,profiles[1].effects);assert.equal('estimatedDamageScore' in profiles[0],false);}
   assert.equal(corePayloads.classEffects.classes.filter(p=>p.challengeEffects).length,0);
-  const changed={RM:['buff','debuff'],DaB:['mpRecoveryPerSecond'],PR:['debuffCleanse'],BL:['actionSpeedMultiplicative'],NP:['mpRecoveryPerSecond'],LA:['buff','debuff','defenseIgnoreAdditive'],VI:['defenseBreak']};
+  const changed={RM:['buff','debuff'],DaB:['mpRecoveryPerSecond'],PR:['buff','mpRecoveryPerSecond','debuffCleanse'],BL:['actionSpeedMultiplicative'],NP:['mpRecoveryPerSecond'],LA:['buff','debuff','defenseIgnoreAdditive'],VI:['defenseBreak']};
   const projection=catalog.classEffects.map(p=>({code:p.code,mode:p.mode,effects:Object.fromEntries(Object.entries(p.effects).filter(([key])=>!changed[p.code]?.includes(key)).sort(([a],[b])=>a.localeCompare(b)))})).sort((a,b)=>(a.code+':'+a.mode).localeCompare(b.code+':'+b.mode));
-  assert.equal(createHash('sha256').update(JSON.stringify(projection)).digest('hex'),'60301ed93cd9f44e1ebabd88c21190e6d2d54aa9dfcfcea2dcba80629097ebcf');
+  assert.equal(createHash('sha256').update(JSON.stringify(projection)).digest('hex'),'a27e1e0d6389818801fd46500ea17c0885bfcaac7f1aa0fb92a2fe110dd96e65');
   for(const mode of ['single','challenge']){const fx=code=>catalog.classEffects.find(p=>p.code===code&&p.mode===mode).effects;
-    closeNumber(fx('RM').debuff,.12);assert.equal('buff' in fx('RM'),false);closeNumber(fx('DaB').mpRecoveryPerSecond,.01875);assert.equal(fx('PR').debuffCleanse,2);closeNumber(fx('BL').actionSpeedMultiplicative,.1);closeNumber(fx('NP').mpRecoveryPerSecond,.2);
+    closeNumber(fx('RM').debuff,.12);assert.equal('buff' in fx('RM'),false);assert.equal('mpRecoveryPerSecond' in fx('DaB'),false);closeNumber(fx('PR').mpRecoveryPerSecond,.05);closeNumber((1+fx('PR').buff)*1.1,1.2225722727);assert.equal(fx('PR').debuffCleanse,2);closeNumber(fx('BL').actionSpeedMultiplicative,.1);closeNumber(fx('NP').mpRecoveryPerSecond,.2);
     closeNumber(fx('LA').buff,1.05*(2.35+.0825)/2.35-1);closeNumber((1+fx('LA').buff)*1.0382-1,.12837981914893626);closeNumber((1+fx('LA').buff)*1.0382*1.05-1,.1847988101063831);closeNumber(fx('LA').debuff,.05);closeNumber(fx('LA').defenseIgnoreAdditive,.05);closeNumber(fx('LA').defenseBreak,.1);closeNumber(fx('VI').defenseBreak,.1925);
   }
 });

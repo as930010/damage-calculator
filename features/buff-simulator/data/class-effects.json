@@ -93,8 +93,7 @@
       "classId": "dab",
       "code": "DaB",
       "effects": {
-        "debuff": 0.2100000000000002,
-        "mpRecoveryPerSecond": 0.01875
+        "debuff": 0.2100000000000002
       }
     },
     {
@@ -112,10 +111,10 @@
       "classId": "pr",
       "code": "PR",
       "effects": {
-        "buff": 0.2225722727,
+        "buff": 0.11142933881818173,
         "defenseBreak": 0.1,
         "shield": 0.15039999999999998,
-        "mpRecoveryPerSecond": 0.041477272727272724,
+        "mpRecoveryPerSecond": 0.05,
         "actionSpeedDiminishing": 0.1,
         "debuffCleanse": 2,
         "superArmor": 1

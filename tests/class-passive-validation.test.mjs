@@ -93,7 +93,7 @@ test('職業致命傷害被動依使用者指定加算值與覆寫值保存', as
 test('Boss 傷害被動只保留明確提供的增幅', async () => {
   const document = await readJson('class-damage-passives.json');
   const classesDocument = await readJson('classes.json');
-  const expected = { IM: 20, TW: 10, PR: 10, RE: 20, CU: 15, CS: 20, CA: 12, CC: 20, CeT: 10, VI: 15, AD: 3, BMa: 15, PO: 10, RI: 10, RS: 10, LI: 8, CEL: 20, MO: 15, AV: 15, MI: 12.5 };
+  const expected = { IM: 20, TW: 10, PR: 24, RE: 20, CU: 15, CS: 20, CA: 12, CC: 20, CeT: 10, VI: 15, AD: 3, BMa: 15, PO: 10, RI: 10, RS: 10, LI: 8, CEL: 20, MO: 15, AV: 15, MI: 12.5 };
   for (const [classId, valuePct] of Object.entries(document.bossDamagePctByClass)) assert.equal(valuePct, expected[classId] ?? 0, classId);
   assert.deepEqual(Object.keys(document.bossDamagePctByClass).sort(), classesDocument.classes.map(entry => entry.id).sort());
   assert.equal(document.bossDamagePctByClass.FB, 0);

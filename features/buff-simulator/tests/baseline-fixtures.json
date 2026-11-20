@@ -266,7 +266,7 @@
       }
     ],
     "resultHtmlHash": "e670ff20aec396c42a21b3d84459d68a241b3e9f92b329cde1e3815d6a949769",
-    "skillHtmlHash": "45116734789553de16a5b9d6be04ffbf38e781ce4b99b67c6bb0192caeaeb64f",
+    "skillHtmlHash": "f57919c1fdfc3e5b3ea1bff99a146e4f15fb2bfde54cea49d0870294b8ab3fa2",
     "saved": null
   },
   "configuredSingle": {
@@ -286,7 +286,7 @@
         "cooldownAcceleration": 0.19999999999999996,
         "cooldownReductionSeconds": 0,
         "resistanceReduction": 550,
-        "mpRecoveryPerSecond": 0.22249999999999992,
+        "mpRecoveryPerSecond": 0.19999999999999996,
         "actionSpeedMultiplicative": 0.4,
         "actionSpeedDiminishing": 0,
         "roarBlock": "none",
@@ -448,7 +448,7 @@
           {
             "key": "mpRecoveryPerSecond",
             "values": [
-              0.01875,
+              0,
               0.2,
               0,
               0,
@@ -462,7 +462,7 @@
               0
             ],
             "aggregation": "multiply",
-            "result": 0.22249999999999992
+            "result": 0.19999999999999996
           },
           {
             "key": "actionSpeedMultiplicative",
@@ -563,8 +563,8 @@
         "ignoredClassIds": []
       }
     ],
-    "resultHtmlHash": "7b5680722390a91ad05786a6f9d4688978095fa0cd42e2a6c3f86febfb03bcb5",
-    "skillHtmlHash": "bebc80cc76fbe671cff04048b1b4a0369caa6aef0edee70fa9422558cb388848",
+    "resultHtmlHash": "b555d35cee909e426d4338ba12bb81cd2f439725f5f8f19f4b94a3da0b3da76b",
+    "skillHtmlHash": "ea5591580bfe5c6ccbf09fd4526e66e4c41ca9e67a02752510bc268cd0d9fa46",
     "saved": {
       "version": 1,
       "mode": "single",
@@ -597,11 +597,11 @@
           "hundred-billion-red-top-critical-damage": true,
           "steel-wall-defense-break": true,
           "wind-ball-defense-break": true,
-          "movement-speed-shoes": 30,
-          "skill-damage-gloves": 25,
           "incense-defense-break": true,
           "dark-ghost-badge-resistance": true,
-          "ice-crystal-resistance": true
+          "ice-crystal-resistance": true,
+          "movement-speed-shoes": 30,
+          "skill-damage-gloves": 25
         },
         "first": {
           "movement-speed-shoes": 14.4,
@@ -651,7 +651,7 @@
         "cooldownAcceleration": 0.19999999999999996,
         "cooldownReductionSeconds": 0,
         "resistanceReduction": 550,
-        "mpRecoveryPerSecond": 0.22249999999999992,
+        "mpRecoveryPerSecond": 0.19999999999999996,
         "actionSpeedMultiplicative": 0.2584000000000002,
         "actionSpeedDiminishing": 0,
         "roarBlock": "none",
@@ -813,7 +813,7 @@
           {
             "key": "mpRecoveryPerSecond",
             "values": [
-              0.01875,
+              0,
               0.2,
               0,
               0,
@@ -827,7 +827,7 @@
               0
             ],
             "aggregation": "multiply",
-            "result": 0.22249999999999992
+            "result": 0.19999999999999996
           },
           {
             "key": "actionSpeedMultiplicative",
@@ -1221,7 +1221,7 @@
         "cooldownAcceleration": 0.19999999999999996,
         "cooldownReductionSeconds": 0,
         "resistanceReduction": 550,
-        "mpRecoveryPerSecond": 0.22249999999999992,
+        "mpRecoveryPerSecond": 0.19999999999999996,
         "actionSpeedMultiplicative": 0.2584000000000002,
         "actionSpeedDiminishing": 0,
         "roarBlock": "none",
@@ -1383,7 +1383,7 @@
           {
             "key": "mpRecoveryPerSecond",
             "values": [
-              0.01875,
+              0,
               0.2,
               0,
               0,
@@ -1397,7 +1397,7 @@
               0
             ],
             "aggregation": "multiply",
-            "result": 0.22249999999999992
+            "result": 0.19999999999999996
           },
           {
             "key": "actionSpeedMultiplicative",
@@ -1501,8 +1501,8 @@
         ]
       }
     ],
-    "resultHtmlHash": "c1c715bf65d9969f99de8051b51a039f2c9a26fa02dc9f09ef35770233258ce0",
-    "skillHtmlHash": "4244d347670560bfe3731b4ce74ac66de50aab98622f5ac236e1ff0aecd5487f",
+    "resultHtmlHash": "38183e6902d3c388445a72b4aba99a7863bbe2cf44a622530e5ff73c19c03e1f",
+    "skillHtmlHash": "125a0460facdd2f264ad6cda464c0d1bdaee0a835959182ddcfcb482b6efd8f0",
     "saved": {
       "version": 1,
       "mode": "challenge",
@@ -1535,11 +1535,11 @@
           "hundred-billion-red-top-critical-damage": true,
           "steel-wall-defense-break": true,
           "wind-ball-defense-break": true,
-          "movement-speed-shoes": 14.4,
-          "skill-damage-gloves": 18,
           "incense-defense-break": true,
           "dark-ghost-badge-resistance": true,
-          "ice-crystal-resistance": true
+          "ice-crystal-resistance": true,
+          "movement-speed-shoes": 14.4,
+          "skill-damage-gloves": 18
         },
         "first": {
           "green-beast": true,
@@ -1547,11 +1547,11 @@
           "hundred-billion-red-top-critical-damage": true,
           "steel-wall-defense-break": true,
           "wind-ball-defense-break": false,
-          "movement-speed-shoes": 14.4,
-          "skill-damage-gloves": 18,
           "incense-defense-break": true,
           "dark-ghost-badge-resistance": true,
-          "ice-crystal-resistance": true
+          "ice-crystal-resistance": true,
+          "movement-speed-shoes": 14.4,
+          "skill-damage-gloves": 18
         },
         "second": {
           "green-beast": true,
@@ -1559,11 +1559,11 @@
           "hundred-billion-red-top-critical-damage": true,
           "steel-wall-defense-break": true,
           "wind-ball-defense-break": true,
-          "movement-speed-shoes": 14.4,
-          "skill-damage-gloves": 30,
           "incense-defense-break": true,
           "dark-ghost-badge-resistance": true,
-          "ice-crystal-resistance": true
+          "ice-crystal-resistance": true,
+          "movement-speed-shoes": 14.4,
+          "skill-damage-gloves": 30
         }
       },
       "bossReductions": {
@@ -1576,7 +1576,7 @@
   "invalidInputs": {
     "results": [],
     "resultHtmlHash": "1b123be7e6bdddadc6859c51663bdb40ca296fae66b3a3880fa389daab53477f",
-    "skillHtmlHash": "45116734789553de16a5b9d6be04ffbf38e781ce4b99b67c6bb0192caeaeb64f",
+    "skillHtmlHash": "f57919c1fdfc3e5b3ea1bff99a146e4f15fb2bfde54cea49d0870294b8ab3fa2",
     "saved": {
       "version": 1,
       "mode": "single",
@@ -1609,11 +1609,11 @@
           "hundred-billion-red-top-critical-damage": true,
           "steel-wall-defense-break": true,
           "wind-ball-defense-break": true,
-          "movement-speed-shoes": 14.4,
-          "skill-damage-gloves": 18,
           "incense-defense-break": true,
           "dark-ghost-badge-resistance": true,
-          "ice-crystal-resistance": true
+          "ice-crystal-resistance": true,
+          "movement-speed-shoes": 14.4,
+          "skill-damage-gloves": 18
         },
         "first": {
           "movement-speed-shoes": 14.4,

@@ -283,12 +283,6 @@
           "category": "DeBuff",
           "description": "施展三次箭矢技能後\n敵方10秒間(冷卻3秒)\n所受傷害 +10%\n所受致命傷害 +10%\n※無法與烙印射擊共存，必定覆蓋烙印射擊。",
           "icon": "skill-icons/DaB-03.png"
-        },
-        {
-          "name": "亂殺快感(被動)",
-          "category": "Buff",
-          "description": "箭雨MP回收率 +100%",
-          "icon": "skill-icons/DaB-04.png"
         }
       ]
     },
@@ -351,14 +345,8 @@
         {
           "name": "反覆無常的祝福",
           "category": "Buff",
-          "description": "隨機發動下述其中1個效果\n我方使用特殊主動技能時攻擊力 +1% (最大5重疊)\n使用特殊主動技能時恢復10%最大MP\n覺醒狀態時最大MP +40",
+          "description": "隨機發動下述其中1個效果\n我方使用特殊主動技能時攻擊力 +1% (最大5重疊)\n使用特殊主動技能時恢復5%最大MP\n覺醒狀態時最大MP +40",
           "icon": "skill-icons/PR-06.png"
-        },
-        {
-          "name": "解放意志:織語者",
-          "category": "Buff",
-          "description": "觸發識讀效果時，\n對所有敵方傷害 +2%\n(最大5重疊)",
-          "icon": "skill-icons/PR-07.png"
         },
         {
           "name": "強音",
