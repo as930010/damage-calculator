@@ -7,6 +7,7 @@ import type {
   SimulatorEquipmentMappingDocument,
 } from "./equipment-catalog.ts";
 import {
+  circuitBoardStatKeys,
   resolveArmorAppraisals,
   resolveAtmaSetEffects,
   resolveCircuitBoardEffects,
@@ -199,7 +200,8 @@ export function resolveSupplementalSimulatorSources(
   for (const entry of circuitBoard) {
     if (!entry.contribution) {
       const attribute = selections.circuitBoardValues?.[entry.slot]?.attribute;
-      if (attribute?.trim() && !documents.circuitBoard.statKeyByAttributeName[attribute]) {
+      const rule = documents.circuitBoard.inputs.find(candidate => candidate.slot === entry.slot);
+      if (attribute?.trim() && rule && !circuitBoardStatKeys(documents.circuitBoard, rule, attribute)) {
         unmappedCircuitBoardSlots.push(entry.slot);
       }
       continue;

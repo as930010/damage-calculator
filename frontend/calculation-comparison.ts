@@ -32,6 +32,7 @@ const metrics: readonly Metric[] = [
   ["fullHealthKillDamagePct", "100%血殺%", attribute("fullHealthKillDamagePct")],
   ["adaptabilityPct", "適應力%", attribute("adaptabilityPct")],
   ["defenseIgnorePct", "無視防禦%", attribute("defenseIgnorePct")],
+  ["cooldownResetPct", "重置冷卻%", attribute("cooldownResetPct")],
   ["multiplicativeEffect", "乘算效果", (result) => result.generalMultiplicativeDamage.value],
   ["multiplicativeCritDamage", "乘算暴傷", (result) => result.multiplicativeCritDamage.value],
   ["attackLevel", "攻擊力等級", attribute("attackLevel")],
@@ -60,7 +61,9 @@ export function compareLoadoutResults(
 ): CalculationComparisonRow[] {
   const current = readCalculationComparisonValues(currentResult);
   const baseline = readCalculationComparisonValues(baselineResult);
-  return metrics.map(([key, label]) => {
+  const visibleMetrics = metrics.filter(([key]) => key !== "cooldownResetPct"
+    || currentResult.attributes.stats[key] !== undefined || baselineResult.attributes.stats[key] !== undefined);
+  return visibleMetrics.map(([key, label]) => {
     const expected = baseline[key];
     const actual = current[key];
     if (!Number.isFinite(expected)) throw new RangeError(`基準配置的${label}缺少有效數值。`);

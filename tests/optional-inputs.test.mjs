@@ -30,28 +30,56 @@ function select(page, label, value) {
   assert.ok(option, value); option.click();
 }
 
-test('upper circuit reset chance preserves reference percentages without contributing damage', async () => {
+test('cooldown reset adds upper circuit rows and the blue set without contributing damage', async () => {
   const runtime = await createRuntime();
   const { projectAttributes, evaluateLoadout } = await runtime.load('frontend/projection.ts');
+  const { finalDamageInputs } = await runtime.load('calculation/loadout-engine.ts');
+  const dataWithoutBlueReset = structuredClone(gameData);
+  delete dataWithoutBlueReset.colorSetEffects.options.find(option => option.name === '藍').stats.cooldownResetPct;
+  const withoutResetStatistic = result => {
+    const damage = structuredClone(result);
+    delete damage.attributes.stats.cooldownResetPct;
+    for (const { result: variant } of damage.lowerwearConfigurations ?? []) delete variant.attributes.stats.cooldownResetPct;
+    return damage;
+  };
   const rowField = upperAttribute.replace(/\.Attribute$/, '.Rows');
-  for (const multiple of [false, true]) {
+  const scenarios = [
+    { color: '', expectedSet: 0, rows: [0.12] },
+    { color: '紅', expectedSet: 0, rows: [0.12] },
+    { color: '綠', expectedSet: 0, rows: [] },
+    { color: '藍', expectedSet: 8, rows: [] },
+    { color: '藍', expectedSet: 8, rows: [0.05, 0.07] },
+  ];
+  for (const { color, expectedSet, rows: resetRows } of scenarios) {
     const state = structuredClone(stateA);
     delete state.values[rowField];
-    state.values[upperAttribute] = '重置機率%'; state.values[upperValue] = 0.12;
-    if (multiple) state.values[rowField] = JSON.stringify([
-      { attribute: '重置機率%', percentageValue: 0.12 },
-      { attribute: 'Boss傷害%', percentageValue: 0.06 },
-    ]);
+    state.values['Left.Armor.SetColor'] = color;
+    state.values[upperAttribute] = resetRows.length ? '重置機率%' : '無關傷害';
+    state.values[upperValue] = resetRows[0] ?? 0;
     const reference = structuredClone(state);
-    reference.values[upperAttribute] = '無關傷害'; reference.values[upperValue] = 0;
-    if (multiple) reference.values[rowField] = JSON.stringify([
-      { attribute: '無關傷害', percentageValue: 0 },
-      { attribute: 'Boss傷害%', percentageValue: 0.06 },
+    reference.values[upperAttribute] = '無關傷害';
+    reference.values[upperValue] = 0;
+    if (resetRows.length > 1) {
+      const board = resetRows.map(percentageValue => ({ attribute: '重置機率%', percentageValue }));
+      const unrelated = { attribute: '無關傷害', percentageValue: 0 };
+      const boss = { attribute: 'Boss傷害%', percentageValue: 0.06 };
+      state.values[rowField] = JSON.stringify([...board, boss]);
+      reference.values[rowField] = JSON.stringify([...board.map(() => unrelated), boss]);
+    }
+    const result = projectAttributes(gameData, state).stats.cooldownResetPct;
+    assert.equal(result.finalTotal, (resetRows.length ? 12 : 0) + expectedSet);
+    assert.deepEqual(Array.from(result.sharedSources, ({ sourceId }) => sourceId), [
+      ...resetRows.map((_, i) => resetRows.length > 1 ? 'circuit-board:upper:' + (i + 1) : 'circuit-board:upper'),
+      ...(expectedSet ? ['color-set:藍'] : []),
     ]);
-    assert.deepEqual(projectAttributes(gameData, state), projectAttributes(gameData, reference));
-    assert.deepEqual(evaluateLoadout(gameData, state), evaluateLoadout(gameData, reference));
-    assert.equal(state.values[upperAttribute], '重置機率%');
-    assert.equal(state.values[upperValue], 0.12);
+    // Keep the blue set's damage multiplier in both evaluations and remove only its reset chance.
+    const current = evaluateLoadout(gameData, state, true, true);
+    const withoutReset = evaluateLoadout(dataWithoutBlueReset, reference, true, true);
+    assert.ok(current.damage && withoutReset.damage, 'test loadouts have valid damage results');
+    assert.equal(withoutReset.damage.result.attributes.stats.cooldownResetPct.finalTotal, 0);
+    assert.deepEqual(finalDamageInputs(current.comparisonInput, current.damage.result),
+      finalDamageInputs(withoutReset.comparisonInput, withoutReset.damage.result));
+    assert.deepEqual(withoutResetStatistic(current.damage.result), withoutResetStatistic(withoutReset.damage.result));
   }
 });
 
@@ -66,7 +94,21 @@ test('upper circuit reset chance can be edited and survives export, import and r
     assert.equal(controls(page)[0].disabled, false);
     input(page, controls(page)[0], '12');
     assert.equal(controls(page)[0].value, '12');
+    const resetTotal = () => document.querySelector('#results [data-disclosure-key="stat:cooldownResetPct"]');
+    assert.equal(resetTotal().nextElementSibling.dataset.disclosureKey, 'multiplicative-effect');
+    assert.equal(resetTotal().querySelector('summary span').textContent, '重置冷卻%');
+    assert.equal(resetTotal().querySelector('summary strong').textContent, '12%');
     assert.equal(document.querySelector('#damage-result').innerHTML, result);
+    const allRows = () => [...document.querySelectorAll('#calculation-comparison [data-disclosure-key="comparison-all-values"] tbody tr')];
+    const comparisonRow = () => allRows().find(row => row.querySelector('th').textContent === '重置冷卻%');
+    assert.ok(comparisonRow());
+    assert.equal(comparisonRow().nextElementSibling.querySelector('th').textContent, '乘算效果');
+    assert.deepEqual([...comparisonRow().querySelectorAll('td')].map(cell => cell.textContent), ['0', '12', '+12']);
+    document.querySelector('#global-source-settings').open = true;
+    select(page, '百億/內布隆套效', '藍');
+    assert.equal(resetTotal().querySelector('summary strong').textContent, '20%');
+    assert.deepEqual([...comparisonRow().querySelectorAll('td')].map(cell => cell.textContent), ['0', '20', '+20']);
+    assert.deepEqual([...resetTotal().querySelectorAll('.stat-source-row strong')].map(value => value.textContent), ['12%', '8%']);
     assert.doesNotMatch(document.body.textContent, /尚未有屬性對應/);
     const exported = await page.exportJson();
     await page.importJson(JSON.stringify(exported));
@@ -75,6 +117,7 @@ test('upper circuit reset chance can be edited and survives export, import and r
     assert.equal(reload.dom.window.document.querySelector('input[aria-label="電路板項目 1"]').value, '重置機率%');
     assert.equal(controls(reload)[0].value, '12');
     assert.equal(controls(reload)[0].disabled, false);
+    assert.equal(reload.dom.window.document.querySelector('#results [data-disclosure-key="stat:cooldownResetPct"] summary strong').textContent, '20%');
     assert.doesNotMatch(reload.dom.window.document.body.textContent, /尚未有屬性對應/);
   } finally { page.close(); reload?.close(); }
 });

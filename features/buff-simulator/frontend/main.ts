@@ -223,14 +223,13 @@ function optionPanel(team: string): string {
 function syncSupportMagazineControls(): void {
   const teams = mode === 'single' ? ['single'] : ['first', 'second'];
   for (const team of teams) {
-    const hasGreenControl = membersFor(team).some(member => member.uniquenessGroup === 'green-control');
     for (const row of app.querySelectorAll<HTMLElement>(`[data-support-magazine][data-team="${team}"]`)) {
       const definition = catalog.loadoutOptions.find(option => option.id === row.dataset.supportMagazine)!;
       if (definition.userInput?.kind !== 'support-magazine') continue;
       const checked = row.querySelector<HTMLInputElement>('input')!.checked, select = row.querySelector<HTMLSelectElement>('select')!;
       select.disabled = !checked;
       const component = GREEN_CONTROL_BUFF_COMPONENTS[definition.userInput.target];
-      row.querySelector('[data-magazine-info]')!.textContent = `${component.label} +${(supportMagazineBonus(Number(select.value)) * 100).toFixed(1)}%${!checked ? '（未啟用）' : hasGreenControl ? '' : '（目前無可強化的綠控來源）'}`;
+      row.querySelector('[data-magazine-info]')!.textContent = `${component.label} +${(supportMagazineBonus(Number(select.value)) * 100).toFixed(1)}%`;
     }
   }
 }

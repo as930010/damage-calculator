@@ -6,7 +6,7 @@ export const equipmentStatOrder = [
   // Adaptability and general encounter modifiers.
   'adaptabilityPct', 'superAdaptabilityPct', 'polarizationPct', 'defenseIgnorePct',
   // Critical hits and combat rates.
-  'critRatePct', 'extremizationPct', 'critDamagePct', 'actionSpeedPct',
+  'critRatePct', 'extremizationPct', 'critDamagePct', 'actionSpeedPct', 'cooldownResetPct',
   // Boss and skill damage.
   'bossDamagePct', 'skillTypeAttackPct', 'allSkillDamagePct', 'strongSkillDamagePct', 'transcendenceSkillDamagePct',
   // Conditional and product effects.

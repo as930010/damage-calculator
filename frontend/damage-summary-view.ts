@@ -1,7 +1,7 @@
 import { escapeHtml as h } from './data.ts';
 
 export function renderEquipmentDamageSummary(currentFinalDamage: number | undefined, baselineFinalDamage: number | undefined, numberFormatter: Intl.NumberFormat, percentFormatter: Intl.NumberFormat): string {
-  const summaryDamageNumber = (value: number) => numberFormatter.format(value);
+  const summaryDamageNumber = (value: number) => renderFinalDamageNumber(value, numberFormatter);
   const summaryPercent = (value: number) => percentFormatter.format(value);
   const damageGainRatio = baselineFinalDamage !== undefined && currentFinalDamage !== undefined && baselineFinalDamage !== 0
     ? currentFinalDamage / baselineFinalDamage - 1

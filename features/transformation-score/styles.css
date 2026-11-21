@@ -52,14 +52,19 @@
 .site-page-score #roll-comparisons { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; align-items: start; }
 .site-page-score .roll-filter { margin-block-end: 12px; }
 .site-page-score .roll-filter summary { cursor: pointer; }
-.site-page-score .roll-filter-options { display: flex; flex-wrap: wrap; gap: 8px; margin-block: 10px; }
-.site-page-score .roll-filter-options label { display: flex; flex: 1 1 max-content; align-items: center; gap: 8px; min-width: min(100%, 100px); max-width: 100%; min-height: 44px; padding: 8px 6px; border: 1px solid var(--site-border); border-radius: 8px; cursor: pointer; overflow-wrap: anywhere; }
+.site-page-score .roll-filter-options { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 165px), 1fr)); gap: 8px; margin-block: 10px; }
+.site-page-score .roll-filter-options label { display: flex; align-items: center; gap: 8px; min-width: 0; min-height: 44px; padding: 8px 6px; border: 1px solid var(--site-border); border-radius: 8px; cursor: pointer; overflow-wrap: anywhere; }
+.site-page-score .roll-filter-options input { flex: none; }
+@media (max-width: 700px) {
+  .site-page-score .roll-filter-options { grid-template-columns: repeat(auto-fill, minmax(min(100%, 162px), 1fr)); }
+  .site-page-score .roll-filter-options label { gap: 6px; font-size: var(--site-control-label, 13px); }
+}
 .site-page-score .roll-filter-options label:has(input:focus-visible) { outline: 2px solid var(--site-focus-ring); outline-offset: 2px; }
 .site-page-score #roll-comparisons[data-filtered] { grid-template-columns: minmax(0, 390px); }
 .site-page-score .roll-card { min-width: 0; padding: .5rem; border: 1px solid var(--border, var(--site-border)); border-radius: .625rem; background: var(--panel-alt, var(--site-surface)); }
 .site-page-score table { width: 100%; border-collapse: collapse; table-layout: fixed; font-variant-numeric: tabular-nums; }
 .site-page-score caption { text-align: start; font-weight: 650; padding: 8px; overflow-wrap: anywhere; }
-.site-page-score :is(th, td) { text-align: end; padding: 5px 8px; }
+.site-page-score .roll-card :is(th, td) { text-align: center; padding: 5px 8px; }
 .site-page-score thead { border-block-end: 1px solid var(--site-border); }
 .site-page-score th { color: var(--site-muted); font-size: 12px; font-weight: 600; }
 .site-page-score tbody tr + tr { border-block-start: 1px solid var(--border, var(--site-border)); }

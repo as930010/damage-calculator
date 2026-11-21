@@ -91,7 +91,7 @@ html[data-preview-theme] body.site-page .site-tabs a:hover{background:var(--p-ra
 html[data-preview-theme] body.site-page :is(.site-tabs a[aria-current=page],button[aria-pressed=true]){background:var(--p-active);border-color:var(--p-edge);color:var(--p-ink)}
 html[data-preview-theme] body.site-page :is(.site-developer,.site-footer,.site-tool-summary,.workspace-summary,.optimizer-caveat,#optimizer-status,#optimizer-progress,.panel-note,.field,.metric span,.optimizer-result dt,.optimizer-result-state small,.roster-note){color:var(--p-muted)}
 html[data-preview-theme] body.site-page :is(h1,h2,h3,.optimizer-result summary){color:var(--p-ink)}
-html[data-preview-theme] body.site-page :is(.eyebrow,.total-multiplier strong,.optimizer-result-header span){color:var(--p-accent)}
+html[data-preview-theme] body.site-page :is(.eyebrow,.total-multiplier strong,:is(.optimizer-result-header, .optimizer-result-state) > span){color:var(--p-accent)}
 html[data-preview-theme] body.site-page :is(.eyebrow,.panel-heading h2)::before{background:var(--p-accent)}
 /* Keep nested surfaces visually continuous inside their existing controls. */
 html[data-preview-theme] body.site-page .member-slot input{background:transparent;border-color:transparent}

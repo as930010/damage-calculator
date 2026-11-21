@@ -153,8 +153,10 @@ test('即時排名、取消、過期訊息及套用要求均使用同一份搜�
     const first = workers.at(-1);
     assert.equal(start.dataset.searchState, 'running');
     first.send('progress', { progress: progress([baseline]) });
-    assert.match(document.querySelector('#optimizer-results').textContent, /當前配裝為目前已知最佳解/);
+    assert.match(document.querySelector('.optimizer-result-progress').textContent, /當前配裝為目前已知最佳解/);
+    assert.equal(document.querySelector('.optimizer-result-state'), null);
     first.send('progress', { progress: progress([winner]) });
+    assert.equal(document.querySelector('.optimizer-result-progress'), null);
     assert.ok(document.querySelector('.optimizer-apply'));
     cancel.click();
     assert.equal(start.dataset.searchState, 'idle');

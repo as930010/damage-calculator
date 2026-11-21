@@ -504,14 +504,15 @@ test('百億紅藍套效與天線耳環獨立乘算，綠色依內裝手套單�
   ]) {
     const result = projectDamage(data, { ...baseState, values: {
       ...baseValues, 'Left.Armor.SetColor': set, 'Accessory.Earring': earring,
-    } }).result.generalMultiplicativeDamage;
-    const relevant = result.factors.filter(({ sourceId }) => sourceId === blueSource || sourceId === earringSource);
+    } }).result;
+    assert.equal(result.attributes.stats.cooldownResetPct.finalTotal, set ? 8 : 0);
+    const relevant = result.generalMultiplicativeDamage.factors.filter(({ sourceId }) => sourceId === blueSource || sourceId === earringSource);
     assert.deepEqual(Object.fromEntries(relevant.map(({ sourceId, factor }) => [sourceId, factor])), {
       ...(set ? { [blueSource]: 1.12 } : {}),
       ...(earring ? { [earringSource]: 1.04 } : {}),
     });
     assert.equal(relevant.length, Number(Boolean(set)) + Number(Boolean(earring)));
-    assert.ok(Math.abs(result.value / base - expected) < 1e-12, `${set || '無套效'}／${earring || '無耳環'}`);
+    assert.ok(Math.abs(result.generalMultiplicativeDamage.value / base - expected) < 1e-12, `${set || '無套效'}／${earring || '無耳環'}`);
   }
   assert.equal(greenWithoutCircuit / base, 1.1);
   assert.ok(Math.abs(greenWithCircuitResult.generalMultiplicativeDamage.value / base - 1.144) < 1e-12);

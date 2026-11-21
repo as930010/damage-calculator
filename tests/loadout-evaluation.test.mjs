@@ -2,10 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { createRuntime, createPage, gameData, sample, legacyEvaluation, normalize,
-  evaluationSnapshot, digest, resultHtml } from './loadout-evaluation-harness.mjs';
+  evaluationSnapshot, digest, resultHtml, historicalEvaluationData } from './loadout-evaluation-harness.mjs';
 import { scenarios, comparisons, engineInput } from './loadout-evaluation-scenarios.mjs';
 
 const fixture = JSON.parse(await readFile(new URL('./fixtures/loadout-evaluation.json', import.meta.url), 'utf8'));
+const historicalData = historicalEvaluationData();
 const runtime = await createRuntime();
 const projection = await runtime.load('frontend/projection.ts');
 const { createBaselineEvaluationCache } = await runtime.load('frontend/baseline-evaluation.ts');
@@ -38,7 +39,7 @@ test('Startup and baseline normalize only illegal weapon rolls before creating h
 
 test('public calculation API retains its complete output and original invalid-input errors', async () => {
   const { calculateLoadout } = await runtime.load('calculation/loadout-engine.ts');
-  const input = engineInput(gameData, projection.projectAttributes(gameData, stateFor('minimal-complete')).calculationSources);
+  const input = engineInput(historicalData, projection.projectAttributes(historicalData, stateFor('minimal-complete')).calculationSources);
   for (const [id, changes] of [['valid', {}], ['undefined-weapon', { weaponEnhancementLevel: undefined }],
     ['nan-weapon', { weaponEnhancementLevel: NaN }], ['negative-weapon', { weaponEnhancementLevel: -1 }],
     ['late-failure', { transcendenceSkillDamageSharePct: 101 }]]) {
@@ -59,7 +60,7 @@ const expectedWork = {
 for (const { id, state } of scenarios) {
   test(`evaluation: ${id} keeps exact pre-refactor values, ordered sources and errors`, () => {
     runtime.resetCounts();
-    const value = projection.evaluateLoadout(gameData, state);
+    const value = projection.evaluateLoadout(historicalData, state);
     const { attributeProjectionHash, combatProjectionHash, ...expected } = fixture.evaluations[id];
     assert.deepEqual(evaluationSnapshot(value), expected);
     assert.equal(runtime.counts.resolveLoadoutSources, 1);
@@ -67,8 +68,8 @@ for (const { id, state } of scenarios) {
     assert.ok(aggregations() <= (fixture.workload[id].aggregateCharacterAttributes ?? 0));
     assert.ok(runtime.counts.resolveLoadoutSources <= fixture.workload[id].projectAttributes);
     // Public throwing/attribute/rate APIs remain equivalent too.
-    assert.deepEqual(evaluationSnapshot(legacyEvaluation(projection, gameData, state)), expected);
-    const capture = fn => { try { return { value: fn(gameData, state) }; } catch (error) { return { error }; } };
+    assert.deepEqual(evaluationSnapshot(legacyEvaluation(projection, historicalData, state)), expected);
+    const capture = fn => { try { return { value: fn(historicalData, state) }; } catch (error) { return { error }; } };
     assert.equal(digest(normalize(capture(projection.projectAttributes))), attributeProjectionHash);
     assert.equal(digest(normalize(capture(projection.projectCombatRates))), combatProjectionHash);
   });
@@ -76,7 +77,7 @@ for (const { id, state } of scenarios) {
 
 for (const [id, current, baseline] of comparisons) {
   test(`actual main UI: ${id} keeps all result HTML and comparison formatting`, async () => {
-    const page = await createPage(stateFor(current), stateFor(baseline));
+    const page = await createPage(stateFor(current), stateFor(baseline), { data: historicalData });
     try {
       assert.equal(digest(resultHtml(page.dom.window.document)), fixture.pages[id]);
       if (id === 'different') {

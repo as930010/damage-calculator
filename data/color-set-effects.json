@@ -11,7 +11,8 @@
     {
       "name": "藍",
       "stats": {
-        "multiplicativeDamagePct": 12
+        "multiplicativeDamagePct": 12,
+        "cooldownResetPct": 8
       }
     },
     {

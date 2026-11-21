@@ -12,7 +12,10 @@
         "Boss傷害%",
         "重置機率%",
         "無關傷害"
-      ]
+      ],
+      "statKeyByAttributeName": {
+        "重置機率%": "cooldownResetPct"
+      }
     },
     {
       "slot": "lowerwear",

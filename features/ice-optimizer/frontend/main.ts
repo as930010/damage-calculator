@@ -1,5 +1,6 @@
 import { createBattleDefenseStore } from '../../../frontend/battle-defense-state.ts';
 import { loadGameData, formatNumber } from '../../../frontend/data.ts';
+import { renderFinalDamageNumber } from '../../../frontend/damage-summary-view.ts';
 import { readState } from '../../../frontend/state.ts';
 import { projectDamage as projectDamageBase } from '../../../frontend/projection.ts';
 import { stageIceOptimizerHandoff } from '../../../frontend/ice-optimizer-handoff.ts';
@@ -21,6 +22,7 @@ const conditionsKey = 'dab-ice-optimizer-conditions-v1';
 const status = document.querySelector<HTMLElement>('#optimizer-status')!;
 const progress = document.querySelector<HTMLElement>('#optimizer-progress')!;
 const results = document.querySelector<HTMLElement>('#optimizer-results')!;
+const titleNumberFormatter = new Intl.NumberFormat('zh-TW', { maximumFractionDigits: 5 });
 const startButton = document.querySelector<HTMLButtonElement>('#optimizer-start')!;
 const cancelButton = document.querySelector<HTMLButtonElement>('#optimizer-cancel')!;
 const clearButton = document.querySelector<HTMLButtonElement>('#optimizer-clear')!;
@@ -332,7 +334,8 @@ function renderResults(data: GameData,
     const header = document.createElement('div');
     header.className = 'optimizer-result-header';
     const title = document.createElement('h2');
-    title.textContent = `第 ${index + 1} 名${alternatives.length > 1 ? `（並列 ${alternatives.length} 組）` : ''} · ${formatNumber(item.damage)}`;
+    const damage = renderFinalDamageNumber(item.damage, titleNumberFormatter);
+    title.innerHTML = `第 ${index + 1} 名${alternatives.length > 1 ? `（並列 ${alternatives.length} 組）` : ''} · ${damage}`;
     const baselineBest = index === 0 && search.baselineInScope
       && alternatives.some(alternative => alternative.isBaseline)
       && !search.results.some(candidate => candidate.damage > search.baselineDamage
@@ -340,7 +343,7 @@ function renderResults(data: GameData,
     const gain = document.createElement('span');
     if (baselineBest) {
       const state = document.createElement('div');
-      state.className = 'optimizer-result-state';
+      state.className = running ? 'optimizer-result-progress' : 'optimizer-result-state';
       gain.textContent = running
         ? '當前配裝為目前已知最佳解，搜尋仍在進行中…'
         : '當前配裝是目前已知最佳解';

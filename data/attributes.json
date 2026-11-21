@@ -147,6 +147,14 @@
       "active": true
     },
     {
+      "key": "cooldownResetPct",
+      "name": "重置冷卻%",
+      "unit": "percent",
+      "calculationScope": "characterTotal",
+      "aggregation": "sum",
+      "active": true
+    },
+    {
       "key": "defenseIgnorePct",
       "name": "無視防禦%",
       "unit": "percent",

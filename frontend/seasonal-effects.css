@@ -307,7 +307,7 @@ body.site-page-main{color:var(--text-main);background:transparent}
 .stat-source-row{border-bottom-color:rgb(145 151 192 / 21%)}
 .stat-source-row strong{color:#eee5f5}
 .stat-detail-heading,.stat-average,.stat-source-empty{color:#c0bed9}
-.equipment-damage-card span,.damage-summary span{color:#c1c2dc}
+.equipment-damage-card > span,.damage-summary span{color:#c1c2dc}
 .equipment-damage-card strong{color:#f6edf0}
 .equipment-damage-gain strong,.damage-ratio-positive strong,.positive{color:#b4d3ed}
 .equipment-damage-gain strong.gain-positive,.damage-ratio-positive>strong.gain-positive,.damage-ratio .positive,.damage-ratio-group>strong.positive{color:#b4d3ed}
@@ -607,7 +607,7 @@ body.site-page-buff {
 .site-page-optimizer .optimizer-result h2,
 .site-page-optimizer .optimizer-result h3,
 .site-page-optimizer .optimizer-result summary{color:#d4ccda}
-.site-page-optimizer .optimizer-result-header span{color:#d3c39e}
+.site-page-optimizer :is(.optimizer-result-header, .optimizer-result-state) > span{color:#d3c39e}
 .site-page-optimizer .optimizer-result-state small,
 .site-page-optimizer .optimizer-result dt{color:#a9a4b3}
 .site-page .theme-trigger[data-theme="seasonal"]{background:var(--panel-alt)}

@@ -765,10 +765,12 @@ async function start() {
     const pick = (container: HTMLElement, label: string, fieldId: string, entries: readonly { name: string }[]) =>
       field(container, label, fieldId, options([...new Set(entries.map(entry => entry.name))]));
     const general = group('增益與環境');
+    general.classList.add('global-environment-grid');
     pick(general, '消耗品', 'Effect.Consumable', data.otherEffects.consumables);
     pick(general, '場地', 'Effect.Environment', data.otherEffects.environments);
     pick(general, '巔峰選項', 'Peak.Option', data.otherEffects.peakOptions);
     pick(general, '寵物', 'Pet.Passive', data.pets.options);
+    for (const effect of data.otherEffects.binaryEffects) pick(general, effect.name, effect.settingKey, effect.options);
     const petSkillToggle = document.createElement('label');
     petSkillToggle.className = 'pet-skill-toggle';
     const petSkillCheckbox = document.createElement('input');
@@ -789,7 +791,6 @@ async function start() {
     nutProtectionLabel.textContent = '特殊靈藥：努特的庇護';
     nutProtectionToggle.append(nutProtectionCheckbox, nutProtectionLabel);
     general.append(nutProtectionToggle);
-    for (const effect of data.otherEffects.binaryEffects) pick(general, effect.name, effect.settingKey, effect.options);
     const portrait = data.otherEffects.portraitAwakening;
     const portraitSection = document.createElement('section');
     portraitSection.className = 'portrait-awakening-fields';
@@ -1078,7 +1079,7 @@ async function start() {
       const valueRule = data.masterBeast.mirrorValueRules.byAttribute[attribute] ?? data.masterBeast.mirrorValueRules.default;
       const input = numeric(
         mirrorGrid,
-        '迷鏡效果數值（%）',
+        '數值(%)',
         valueField,
         true,
         { min: 0, max: valueRule.maxPct, step: valueRule.stepPct },

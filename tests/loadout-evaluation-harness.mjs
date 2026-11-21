@@ -10,8 +10,17 @@ export const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const gameData = JSON.parse(await readFile(resolve(root, 'dist/data/game-data.json'), 'utf8'));
 export const sample = JSON.parse(await readFile(resolve(root, 'data/examples/public-example-2026-09-28.json'), 'utf8'));
 
+/** The historical hashes predate the cooldown reset attribute and its two sources. */
+export function historicalEvaluationData() {
+  const data = structuredClone(gameData);
+  data.attributes.attributes = data.attributes.attributes.filter(({ key }) => key !== 'cooldownResetPct');
+  delete data.circuits.inputs.find(({ slot }) => slot === 'upper').statKeyByAttributeName['重置機率%'];
+  delete data.colorSetEffects.options.find(({ name }) => name === '藍').stats.cooldownResetPct;
+  return data;
+}
+
 /** Real source modules, with counters inserted only in the test's VM copies. */
-export async function createRuntime({ dom, sourceReader, transformSource, globals: extraGlobals, instrument = true } = {}) {
+export async function createRuntime({ dom, data = gameData, sourceReader, transformSource, globals: extraGlobals, instrument = true } = {}) {
   const counts = {};
   const globals = { console, structuredClone, URL, URLSearchParams, Intl, Error, RangeError, TypeError,
     TextEncoder, TextDecoder, btoa, atob,
@@ -27,7 +36,7 @@ export async function createRuntime({ dom, sourceReader, transformSource, global
       if (String(url).includes('/data/examples/public-example-2026-09-28.json'))
         return { ok: true, json: async () => structuredClone(sample) };
       if (!String(url).includes('/data/game-data.json')) throw new Error(`Unexpected request: ${url}`);
-      return { ok: true, json: async () => structuredClone(gameData) };
+      return { ok: true, json: async () => structuredClone(data) };
     };
     dom.window.matchMedia = () => ({ matches: false, addEventListener() {}, removeEventListener() {} });
   }
@@ -125,8 +134,14 @@ export function normalize(value) {
 export function resultHtml(document) {
   // Disclosure storage keys do not change the rendered result or comparison content.
   return Object.fromEntries(['results', 'damage-result', 'calculation-details', 'calculation-comparison',
-    'equipment-damage-summary', 'comparison-label'].map(id => [id,
-    document.getElementById(id)?.innerHTML.replace(/ data-disclosure-key="[^"]*"/g, '') ?? null]));
+    'equipment-damage-summary', 'comparison-label'].map(id => {
+    const html = document.getElementById(id)?.innerHTML.replace(/ data-disclosure-key="[^"]*"/g, '') ?? null;
+    // The display test checks the spans while this digest retains the exact historical number text.
+    const comparableHtml = id === 'equipment-damage-summary' && html !== null
+      ? html.replace(/<span class="damage-(?:integer|decimal)">([^<]*)<\/span>/g, '$1')
+      : html;
+    return [id, comparableHtml];
+  }));
 }
 
 export function digest(value) {

@@ -386,6 +386,7 @@ input::placeholder { color: #7d928e; }
 .metric-section + .metric-section { border-top: 1px solid rgba(143, 177, 170, .14); }
 .metric-section-heading { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
 .metric-section-heading > span { width: 25px; height: 25px; border-radius: 8px; font-size: 9px; }
+#results .result-stack .metric-section-heading > span { display: none; }
 .metric-section-heading > div { display: grid; gap: 2px; }
 .metric-section-heading strong { font-size: 13px; }
 .metric-section-heading small { color: #8fa4a0; font-size: 10px; }
@@ -871,3 +872,49 @@ body.site-page-buff {
 .team-mode-control .mode-switch { margin: 0; width: 100%; }
 .total-multiplier strong, .metric strong { font-variant-numeric: tabular-nums; }
 @media (max-width: 700px) { .team-mode-control { flex-basis: 100%; } }
+
+/* Desktop challenge comparison — Iteration 4A */
+@media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+  .site-page-buff .challenge-workspace,
+  .site-page-buff .challenge-workspace .member-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .site-page-buff .challenge-workspace {
+    align-items: start;
+  }
+
+  #results .result-stack:has(> .result-card:nth-child(3)) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+
+    > .result-card {
+      container: buff-challenge-card / inline-size;
+    }
+
+    @media (width < 1280px) {
+      > .result-card:nth-child(3) {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (min-width: 1280px) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @container buff-challenge-card (width < 560px) {
+    .primary-grid,
+    .control-time-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .support-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .detail-row {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) max-content;
+    }
+  }
+}

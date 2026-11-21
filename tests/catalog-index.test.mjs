@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { createRuntime, createPage, gameData, normalize, digest, resultHtml } from './loadout-evaluation-harness.mjs';
+import { createRuntime, createPage, gameData, normalize, digest, resultHtml, historicalEvaluationData } from './loadout-evaluation-harness.mjs';
 import { complete, incomplete, legacyStartup, choiceContexts, importCases, candidateTransform, captureCall, monitorCatalogData } from './catalog-index-scenarios.mjs';
 
 const fixture = JSON.parse(await readFile(new URL('./fixtures/catalog-index.json', import.meta.url), 'utf8'));
@@ -107,6 +107,7 @@ for (const scenario of importCases(fixture.transfers.export.json)) {
 async function captureLegacyChoices(state) {
   const choices = [];
   const page = await createPage(state, complete, {
+    data: historicalEvaluationData(),
     globals: { __captureChoices: (label, options) => choices.push(normalize({ label, options })) },
     transformSource(file, source) {
       // The historical digest includes presentation text. Replay that formatter to keep
@@ -121,7 +122,9 @@ async function captureLegacyChoices(state) {
       return candidateTransform(file, source);
     },
   });
-  try { return choices; } finally { page.close(); }
+  try {
+    return { choices, resultHash: digest(resultHtml(page.dom.window.document)) };
+  } finally { page.close(); }
 }
 
 function choiceIdentities(choices) {
@@ -137,12 +140,14 @@ for (const [id, state] of [['complete', complete], ['legacy-startup', legacyStar
     const page = await createPage(state, complete, { transformSource: candidateTransform,
       globals: { __captureChoices: (label, options) => choices.push(normalize({ label, options })) } });
     try {
-      const historicalChoices = await captureLegacyChoices(state);
+      const { choices: historicalChoices, resultHash } = await captureLegacyChoices(state);
       assert.equal(digest(historicalChoices), fixture.pages[id].choicesHash);
       assert.deepEqual(choiceIdentities(choices), choiceIdentities(historicalChoices));
       assert.equal(choices.length, fixture.pages[id].pickerCount);
       if (id === 'complete') {
-        assert.equal(digest(resultHtml(page.dom.window.document)), fixture.pages[id].resultHash);
+        assert.equal(resultHash, fixture.pages[id].resultHash);
+        assert.ok(page.dom.window.document.querySelector('#results [data-disclosure-key="stat:cooldownResetPct"]'));
+        assert.doesNotMatch(page.dom.window.document.querySelector('#damage-result').textContent, /尚未計算/);
         assertStoredStateMatches(page.dom.window.localStorage.getItem('dab-loadout-v1'), fixture.pages[id].savedState);
       } else {
         const doc = page.dom.window.document;

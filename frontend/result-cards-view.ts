@@ -108,7 +108,7 @@ export function createResultCardsView(data: GameData, visibleNumberFormatter: In
         ? productSourceRows('generalMultiplicativeDamage')
         : '<p class="stat-source-empty">目前沒有額外乘算來源</p>'}<p class="stat-average">乘算效果總倍率${productAverageLabel} ×${fmt(currentDamage.result.generalMultiplicativeDamage.value)}</p></div></details>`
       : `<div class="stat"><p>乘算效果</p><strong>待補輸入</strong><small class="input-hint">${h(calculationIssue(damageCalculationError))}</small></div>`;
-    return `<div class="stat-list">${visibleStats.map(({ key, stat, previousStat }) => {
+    const renderStatCard = ({ key, stat, previousStat }: (typeof visibleStats)[number]) => {
       const meta = data.attributes.attributes.find(entry => entry.key === key);
       const isPercent = meta?.unit === 'percent';
       const isCritDamage = key === 'critDamagePct';
@@ -150,8 +150,19 @@ export function createResultCardsView(data: GameData, visibleNumberFormatter: In
         ? `<p class="stat-detail-heading">乘算來源</p><p class="stat-source-row"><span>乘算暴傷增幅${productAverageLabel}（角色基底 ${fmt(critDamageBaseFactor * 100)}% 扣除 ${fmt(critDamageBaselinePct)}% 基準後）</span><strong>+${fmt(currentDamage.result.multiplicativeCritDamage.value * 100)}%</strong></p>${productSourceRows('multiplicativeCritDamage', true)}`
         : '';
       const lowerwearBDetails = isLowerwearAveraging() && stat.lowerwearBSources.length ? `<p class="stat-detail-heading">強/排褲來源</p>${sourceRows(stat.lowerwearBSources, isPercent)}` : '';
-      return `<details class="stat" data-disclosure-key="stat:${h(key)}"><summary><span>${h(shownName)}</span><strong>${fmt(displayTotal)}${isPercent ? '%' : ''}</strong>${attributeCapWarning}${deltaBadge}</summary><div class="stat-details">${sharedDetails}${critDamageDetails}${lowerwearBDetails}<p class="stat-average">${lowerwearAverageLabel} ${fmt(lowerwearAverage)}${isPercent ? '%' : ''}</p>${comparison}</div></details>`;
-    }).join('')}${conditionalDamageCards}${multiplicativeEffectCard}${combatRateCards}</div>`;
+      const lowerwearSubtotal = key === 'cooldownResetPct'
+        ? (commonSources.length ? '' : '<p class="stat-source-empty">目前沒有額外屬性來源</p>')
+        : `<p class="stat-average">${lowerwearAverageLabel} ${fmt(lowerwearAverage)}${isPercent ? '%' : ''}</p>`;
+      return `<details class="stat" data-disclosure-key="stat:${h(key)}"><summary><span>${h(shownName)}</span><strong>${fmt(displayTotal)}${isPercent ? '%' : ''}</strong>${attributeCapWarning}${deltaBadge}</summary><div class="stat-details">${sharedDetails}${critDamageDetails}${lowerwearBDetails}${lowerwearSubtotal}${comparison}</div></details>`;
+    };
+    const ordinaryStatCards = [];
+    let cooldownResetCard = '';
+    for (const entry of visibleStats) {
+      const card = renderStatCard(entry);
+      if (entry.key === 'cooldownResetPct') cooldownResetCard = card;
+      else ordinaryStatCards.push(card);
+    }
+    return `<div class="stat-list">${ordinaryStatCards.join('')}${conditionalDamageCards}${cooldownResetCard}${multiplicativeEffectCard}${combatRateCards}</div>`;
   };
 }
 

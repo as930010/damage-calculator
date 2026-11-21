@@ -203,6 +203,7 @@ export interface CircuitBoardRule {
   valueField: string;
   wearSet: "shared" | "lowerwearA" | "lowerwearB";
   attributeOptions: readonly string[];
+  statKeyByAttributeName?: Readonly<Record<string, string | readonly string[]>>;
 }
 
 export interface CircuitBoardRulesDocument {
@@ -579,6 +580,10 @@ export function resolveSpiritRecordEffects(
   return contributions;
 }
 
+export function circuitBoardStatKeys(document: CircuitBoardRulesDocument, rule: CircuitBoardRule, attribute: string) {
+  return rule.statKeyByAttributeName?.[attribute] ?? document.statKeyByAttributeName[attribute];
+}
+
 /** Map free-text circuit-board attributes and decimal percentages to Calc row 43:47. */
 export function resolveCircuitBoardEffects(
   document: CircuitBoardRulesDocument,
@@ -596,7 +601,7 @@ export function resolveCircuitBoardEffects(
       if (!Number.isFinite(selection.percentageValue)) {
         throw new TypeError(rule.slot + " circuit-board percentage must be finite.");
       }
-      const mappedStatKeys = document.statKeyByAttributeName[selection.attribute];
+      const mappedStatKeys = circuitBoardStatKeys(document, rule, selection.attribute);
       if (!mappedStatKeys) return { slot: rule.slot, wearSet: rule.wearSet, contribution: null };
       const statKeys = Array.isArray(mappedStatKeys) ? mappedStatKeys : [mappedStatKeys];
       return {

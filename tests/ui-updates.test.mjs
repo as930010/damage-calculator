@@ -681,6 +681,7 @@ test('unset mirrors retain an unselected state without pretending completion', a
     openHeadMirrors(page);
     assert.equal(page.dom.window.document.querySelector('input[aria-label="迷鏡效果屬性"]').value, '');
     assert.equal(mirrorInput(page).value, '');
+    assert.equal(mirrorInput(page).labels[0].textContent, '數值(%)');
     assert.equal(page.readState().values[mirrorAttributeField], undefined);
     selectPicker(page, '迷鏡效果屬性', '致命一擊%');
     const input = mirrorInput(page);

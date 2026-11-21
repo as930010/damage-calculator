@@ -546,14 +546,16 @@ test('Support magazine saves normalize invalid levels to Lv.1 and keep untouched
 });
 test('Magazine Checkbox and Select update once, preserve focus and disabled drafts, and restore after reload',async t=>{
   const h=await open(t);edit(h,'[data-member]','NP');const id='support-magazine-i',box=h.query('[data-option="'+id+'"]'),level=h.query('[data-magazine-level="'+id+'"]');
+  const info=h.query('[data-support-magazine="'+id+'"] [data-magazine-info]');
   assert.equal(box.checked,false);assert.equal(level.disabled,true);assert.equal(level.value,'1');
+  assert.equal(info.textContent,'攻擊力 Buff +0.5%');
   h.reset();edit(h,'[data-option="'+id+'"]',true);h.event(box,'change');work(h,{calculateTeam:1,updateResults:1,storage:1,shell:0});assert.equal(level.disabled,false);
   level.focus();h.reset();edit(h,'[data-magazine-level="'+id+'"]',5);h.event(level,'change');work(h,{calculateTeam:1,updateResults:1,storage:1,shell:0});assert.equal(h.window.document.activeElement,level);assert.equal(h.query('[data-magazine-level="'+id+'"]'),level);
   closeNumber(capture(h).results.at(-1).breakdown.find(e=>e.key==='buff').values[0],.2824);assert.match(h.query('.calculation-details').textContent,/支援彈匣I Lv.5 · NP/);assert.match(h.query('.calculation-details').textContent,/攻擊力 Buff 12.00% → 14.50%/);
   edit(h,'[data-option="'+id+'"]',false);assert.equal(level.disabled,true);assert.equal(level.value,'5');assert.equal(h.saved().optionsByTeam.single[id+'-level'],5);closeNumber(capture(h).results.at(-1).breakdown.find(e=>e.key==='buff').values[0],.2544);
   edit(h,'[data-option="'+id+'"]',true);closeNumber(capture(h).results.at(-1).breakdown.find(e=>e.key==='buff').values[0],.2824);
   const restored=await open(t,{saved:h.saved()});assert.equal(restored.query('[data-magazine-level="'+id+'"]').value,'5');assert.equal(restored.query('[data-option="'+id+'"]').checked,true);assert.deepEqual(capture(restored).results.at(-1),capture(h).results.at(-1));
-  edit(h,'[data-member]','LA');assert.equal(capture(h).results.at(-1).supportMagazineDetails,undefined);assert.match(h.query('[data-support-magazine="'+id+'"]').textContent,/目前無可強化的綠控來源/);closeNumber(capture(h).results.at(-1).defenseIgnoreAdditive,.05);
+  edit(h,'[data-member]','LA');assert.equal(capture(h).results.at(-1).supportMagazineDetails,undefined);assert.equal(info.textContent,'攻擊力 Buff +2.5%');closeNumber(capture(h).results.at(-1).defenseIgnoreAdditive,.05);
   await h.openSkills();h.reset();edit(h,'[data-skill-query]','本源');work(h,{calculateTeam:0,updateResults:0,storage:0});
 });
 test('Challenge magazine controls keep three independent team drafts and round-trip their levels',async t=>{
