@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
   pages: write
   id-token: write
 
@@ -15,10 +16,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -54,6 +52,32 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site-dist
+
+  deploy:
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Pages artifact visibility
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          endpoint="repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts?name=github-pages&per_page=1"
+          for attempt in {1..8}; do
+            count=$(timeout 5s gh api --method GET "$endpoint" --jq .total_count)
+            case "$count" in
+              1) echo "Found exactly one github-pages artifact for run $GITHUB_RUN_ID"; exit 0 ;;
+              0) echo "github-pages artifact is not visible yet ($attempt/8)" ;;
+              *) echo "::error::Expected one github-pages artifact for run $GITHUB_RUN_ID, found $count"; exit 1 ;;
+            esac
+            if (( attempt < 8 )); then sleep 6; fi
+          done
+          echo "::error::No github-pages artifact became visible for run $GITHUB_RUN_ID"
+          exit 1
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
