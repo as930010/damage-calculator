@@ -58,6 +58,7 @@ for (const context of choiceContexts()) {
   test(`ordered field choices: ${context.id}`, () => {
     for (const field of Object.keys(fixture.choices[context.id])) {
       const additions = gameData.nephronArmor.fields.some(entry => entry.magazineField === field) ? ['支援彈匣I', '支援彈匣II', '超級彈匣I', '超級彈匣II'] : [];
+      if (gameData.transformations.slots.some(slot => slot.choiceField === field)) additions.push('無關傷害');
       const expected = fixture.choices[context.id][field];
       const magicStoneMapping = index.equipmentMappings.get(field);
       const stoneAdditions = magicStoneMapping?.catalogFile === gameData.mapping.magicStoneSelections.catalogFile
@@ -141,9 +142,20 @@ for (const [id, state] of [['complete', complete], ['legacy-startup', legacyStar
       globals: { __captureChoices: (label, options) => choices.push(normalize({ label, options })) } });
     try {
       const { choices: historicalChoices, resultHash } = await captureLegacyChoices(state);
-      assert.equal(digest(historicalChoices), fixture.pages[id].choicesHash);
+      // Keep the published digest for its original candidate set. Check current
+      // additions separately before comparing the remaining candidates.
+      const engravingLabels = new Set(['效果', '數值']);
+      const transformLabels = new Set(gameData.transformations.slots.map((_, i) => `變換 ${i + 1}`));
+      const historicalCandidates = historicalChoices.filter(({ label }) => !engravingLabels.has(label)).map(choice => {
+        if (!transformLabels.has(choice.label)) return choice;
+        assert.deepEqual(choice.options.at(-1), { value: '無關傷害', label: '無關傷害' });
+        return { ...choice, options: choice.options.slice(0, -1) };
+      });
+      assert.equal(digest(historicalCandidates), fixture.pages[id].choicesHash);
       assert.deepEqual(choiceIdentities(choices), choiceIdentities(historicalChoices));
-      assert.equal(choices.length, fixture.pages[id].pickerCount);
+      assert.equal(choices.filter(({ label }) => label === '效果').length, 3);
+      assert.equal(choices.filter(({ label }) => label === '數值').length, 3);
+      assert.equal(choices.length, fixture.pages[id].pickerCount + 6);
       if (id === 'complete') {
         assert.equal(resultHash, fixture.pages[id].resultHash);
         assert.ok(page.dom.window.document.querySelector('#results [data-disclosure-key="stat:cooldownResetPct"]'));

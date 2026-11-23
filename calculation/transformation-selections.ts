@@ -17,11 +17,19 @@ export function validTransformationValue(rule: WeaponTransformationRule, raw: un
 }
 
 export function normalizeTransformationValues(document: WeaponTransformationDocument,
-  values: Record<string, unknown>, rules: ReadonlyMap<string, WeaponTransformationRule> = new Map(document.rules.map(rule => [rule.choice, rule]))): { fields: string[]; messages: string[] } {
+  values: Record<string, unknown>, rules: ReadonlyMap<string, WeaponTransformationRule> = new Map(document.rules.map(rule => [rule.choice, rule]))): { fields: string[]; messages: string[]; changed: boolean } {
   const fields: string[] = [], messages: string[] = [];
+  let normalizedUnrelated = false;
   document.slots.forEach((slot, index) => {
     const choice = String(values[slot.choiceField] ?? '');
     const raw = values[slot.valueField];
+    if (choice === UNRELATED_TRANSFORMATION) {
+      if (raw !== 0) {
+        values[slot.valueField] = 0;
+        normalizedUnrelated = true;
+      }
+      return;
+    }
     if (raw === undefined || raw === '') return;
     const rule = rules.get(choice);
     if (rule && validTransformationValue(rule, raw)) return;
@@ -34,7 +42,7 @@ export function normalizeTransformationValues(document: WeaponTransformationDocu
       : '沒有可對應的有效傷害屬性';
     messages.push('武器變換第 ' + (index + 1) + ' 條「' + (rule?.label ?? (choice || '未設定')) + '」的數值 ' + display + ' ' + reason + '，已清空。');
   });
-  return { fields, messages };
+  return { fields, messages, changed: normalizedUnrelated || fields.length > 0 };
 }
 
 /** Keep the first effective choice. Blank and explicitly unrelated slots have no roll. */

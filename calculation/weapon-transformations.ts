@@ -1,4 +1,5 @@
 import type { StatContribution } from "./types.ts";
+import { UNRELATED_TRANSFORMATION } from "./transformation-selections.ts";
 
 export interface WeaponTransformationRule {
   choice: string;
@@ -49,7 +50,7 @@ export function resolveWeaponTransformation(
   document: WeaponTransformationDocument,
   input: WeaponTransformationInput,
 ): StatContribution | null {
-  if (input.choice == null || input.choice.trim() === "") return null;
+  if (input.choice == null || input.choice.trim() === "" || input.choice === UNRELATED_TRANSFORMATION) return null;
   if (!input.sourceId.trim()) throw new TypeError("sourceId must not be empty.");
 
   const rule = document.rules.find((candidate) => candidate.choice === input.choice);

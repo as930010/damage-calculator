@@ -1,6 +1,7 @@
 import { archiveLimit, encodeLibrary, decodeLibrary, parseArchiveJson } from './loadout-archive.ts';
 import { isFieldId } from './field-ids.ts';
 import { parseState, type LoadoutState } from './state.ts';
+import { invalidWeaponEngravingFields } from '../calculation/weapon-engravings.ts';
 
 export const profilesKey = 'damage-calculator.profiles.v1';
 export interface SavedLoadoutProfile {
@@ -49,6 +50,10 @@ export function snapshot(value: unknown): LoadoutState {
       || item !== '' && !Object.hasOwn(parsed.values, key)) {
       throw new ProfileError('invalid-data', '配裝含無效欄位（' + key.slice(0,100) + '）。');
     }
+  }
+  const invalidEngravings = invalidWeaponEngravingFields(candidate.values);
+  if (invalidEngravings.length) {
+    throw new ProfileError('invalid-data', '刻印石含無效或重複欄位（' + invalidEngravings.join('、') + '）。');
   }
   // Preserve blank editing fields and numeric strings after the shared parser validates them.
   parsed.values = candidate.values;

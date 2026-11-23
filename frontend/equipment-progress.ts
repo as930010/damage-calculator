@@ -2,7 +2,7 @@ import type { LayoutSlot } from './data.ts';
 import type { LoadoutState } from './state.ts';
 import type { CatalogIndex } from './catalog-index.ts';
 import { configurationProgress } from './configuration-progress.ts';
-import { validTransformationValue } from '../calculation/transformation-selections.ts';
+import { UNRELATED_TRANSFORMATION, validTransformationValue } from '../calculation/transformation-selections.ts';
 import { circuitBoardRowsField, readCircuitBoardRows, validateCircuitBoardRows } from './circuit-board-rows.ts';
 
 const dependencyCache = new WeakMap<CatalogIndex, Map<string, readonly string[]>>();
@@ -29,7 +29,7 @@ export function equipmentProgressFields(slot: LayoutSlot, index: CatalogIndex): 
 export function equipmentProgressChoiceFields(index: CatalogIndex): ReadonlySet<string> {
   const data=index.data;
   return new Set([...data.layout.slots.flatMap(s=>s.stoneFields??[]),...data.appraisals.slots.flatMap(s=>s.inputFields),
-    ...data.nephronArmor.fields.flatMap(s=>s.transformFields.map(t=>t.attributeField)),
+    ...data.nephronArmor.fields.flatMap(s=>s.transformFields.map(t=>t.attributeField)), ...data.transformations.slots.map(t=>t.choiceField),
     ...data.accessoryEffects.groups.flatMap(s=>s.inputFields),...Object.values(data.weaponAppraisals.groups).map(g=>g.settingKey)]);
 }
 export function equipmentProgress(slot: LayoutSlot, state: LoadoutState, index: CatalogIndex) {
@@ -90,7 +90,9 @@ export function equipmentProgress(slot: LayoutSlot, state: LoadoutState, index: 
     for(const g of Object.values(data.weaponAppraisals.groups))required(g.settingKey);
     const seen=new Set<string>();
     for(const t of data.transformations.slots){const rule=data.transformations.rules.find(r=>r.choice===values[t.choiceField]);
-      const valid=required(t.choiceField);checks.push(Boolean(rule&&validTransformationValue(rule,values[t.valueField]))&&!seen.has(String(values[t.choiceField])));if(valid)seen.add(String(values[t.choiceField]));}
+      const valid=required(t.choiceField);
+      if(values[t.choiceField]===UNRELATED_TRANSFORMATION) continue;
+      checks.push(Boolean(rule&&validTransformationValue(rule,values[t.valueField]))&&!seen.has(String(values[t.choiceField])));if(valid)seen.add(String(values[t.choiceField]));}
   }
   if(slot.group==='accessories'&&slot.selectionField&&choice(slot.selectionField)){
     const mapping=index.equipmentMappings.get(slot.selectionField)!;

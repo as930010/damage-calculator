@@ -130,7 +130,10 @@ test('all unrelated-damage fields normalize empty/invalid values while valid sav
   const index = createCatalogIndex(gameData);
   const {equipmentProgressChoiceFields}=await runtime.load('frontend/equipment-progress.ts');
   const progressChoices=equipmentProgressChoiceFields(index);
-  const fields = Object.keys(FIELD_ID_TO_CODE).filter(fieldId => index.resolveFieldChoices(fieldId, {})?.includes('無關傷害'));
+  // Weapon transformation choices and their zero rolls have their own normalizer and UI tests.
+  const weaponChoices = new Set(gameData.transformations.slots.map(slot => slot.choiceField));
+  const fields = Object.keys(FIELD_ID_TO_CODE).filter(fieldId =>
+    !weaponChoices.has(fieldId) && index.resolveFieldChoices(fieldId, {})?.includes('無關傷害'));
   for (const invalid of [undefined, null, '', 'not-a-valid-option']) {
     const values = Object.fromEntries(fields.map(fieldId => [fieldId, invalid]));
     normalizeOptionalEffectValues(values, index);

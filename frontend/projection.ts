@@ -2,6 +2,7 @@ import { resolveSimulatorEquipmentContributions } from "../calculation/equipment
 import { resolveInnerwearSources } from "../calculation/innerwear.ts";
 import { resolveNephronArmorSources, resolveGrettMedalMagazineBonuses } from "../calculation/nephron-armor.ts";
 import { resolveWeaponTransformationsFromFields } from "../calculation/weapon-transformations.ts";
+import { resolveWeaponEngravingSources } from "../calculation/weapon-engravings.ts";
 import { circuitBoardStatKeys, resolveAccessoryEffectOptions, resolveArmorAppraisals, resolveAtmaSetEffects, resolveChipContribution, resolveCircuitBoardEffects, resolveColorSetEffect, resolveMasterBeastEffects, resolveNamedStatOption, resolveRaidSetEffects, resolveResonanceEffects, resolveRightIceSetEffects, resolveSpiritRecordEffects, resolveSpiritRecordSelections, resolveWeaponGrowth } from "../calculation/equipment-effects.ts";
 import type { AttributeRule, CharacterAttributeResult, StatContribution } from "../calculation/types.ts";
 import { calculateLoadoutCombatRates, prepareLoadoutAttributes, evaluatePreparedLoadout, type LoadoutCalculationInput } from "../calculation/loadout-engine.ts";
@@ -168,6 +169,7 @@ export function resolveLoadoutSources(data: GameData, state: LoadoutState) {
   const colorSet = resolveColorSetEffect(data.colorSetEffects, text(data.colorSetEffects.settingKey), requiredCircuitAttribute, requiredCircuitValue);
   if (colorSet) groups.shared.push(colorSet);
   groups.shared.push(...resolveWeaponTransformationsFromFields(data.transformations, values));
+  groups.shared.push(...resolveWeaponEngravingSources(values, data.attack.weaponEnhancementFactors));
   const growth = resolveWeaponGrowth(data.growth, text(data.growth.settingKey));
   if (growth) groups.shared.push(growth);
   for (const group of Object.values(data.weaponAppraisals.groups)) {

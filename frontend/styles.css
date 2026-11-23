@@ -20,6 +20,9 @@ button{padding:10px 15px} h1,h2,p{margin:0} h1{font-size:27px; letter-spacing:.0
 .picker-list{position:absolute; top:100%; left:0; right:0; z-index:20; max-height:300px; overflow-y:auto; border:1px solid #50596a; background:var(--surface-raised); border-radius:9px; box-shadow:0 12px 36px #0008; padding:5px} .picker-list[hidden]{display:none}
 .picker-list button{display:flex; flex-direction:column; align-items:flex-start; gap:5px; width:100%; border:0; border-radius:5px; background:none; text-align:left; padding:11px 10px; font-size:13px} .picker-list button:hover,.picker-list button[aria-selected=true]{background:#3c475c} .picker-list small{font-size:11px; color:#a3b1c8; line-height:1.6} .picker-list p{padding:10px}
 .editor-section{border-top:1px solid var(--border-mid); padding:14px 0 0; margin-top:6px} .editor-section>summary{cursor:pointer; font-size:13px; color:#d0d6e1; margin-bottom:16px} .inspector .panel-note{padding:0 0 15px; font-size:11px}
+.editor-section[open]:has(+ .editor-section):has(> :is(.attribute-value-grid, .circuit-board-actions, .beast-mapping-note):last-child) {
+  padding-block-end: var(--space-3);
+}
 /* 5. Result cards and damage breakdown */
 .results-panel{margin-top:24px} .stat-list{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); padding:0 22px 22px; gap:10px} .stat{border:1px solid var(--border-strong); border-radius:8px; padding:13px; background:var(--surface)} .stat summary{display:flex; align-items:center; gap:10px; cursor:pointer; list-style:none; font-size:12px} .stat summary span{color:var(--text-label)}
 .stat strong{margin-left:auto; font-variant-numeric:tabular-nums; font-size:16px} .stat p{font-size:11px; color:#8e9aac; margin-top:10px} .input-hint{display:block; margin-top:8px; color:var(--warning); line-height:1.6} .positive{color:var(--positive)} .negative{color:var(--negative)} .input-warning,.error-card{color:#e7bf86; padding:22px; font-size:14px}
@@ -153,6 +156,15 @@ footer{position:relative; isolation:isolate; overflow:hidden; display:flex; flex
 
 .field-disabled{opacity:.58} .field-disabled input:disabled{cursor:not-allowed}
 
+.weapon-engraving-row{display:grid;row-gap:2px;min-width:0}
+.weapon-engraving-row+.weapon-engraving-row{margin-block-start:14px}
+.weapon-engraving-row .toggle{min-height:24px}
+@media(max-width:700px){
+  .weapon-engraving-row > .attribute-value-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,10.125rem),1fr))}
+}
+@media(min-width:1200px) and (hover:hover) and (pointer:fine){
+  .weapon-engraving-row .attribute-value-grid > .field:nth-child(2) .picker-clear{inset-inline-end:1px;width:24px}
+}
 .beast-mirror-grid{max-height:none; overflow:visible} .beast-mirror-grid .picker-list{max-height:min(420px,calc(100dvh - 96px))}
 .picker-control>.picker-list.opens-above{top:auto;bottom:100%}
 

@@ -59,6 +59,8 @@ function optionalEffectFields(index: CatalogIndex) {
   for (const fieldId of Object.keys(FIELD_ID_TO_CODE)) {
     const fieldChoices = index.resolveFieldChoices(fieldId, {});
     if (!fieldChoices?.some(choice => String(choice) === '無關傷害')) continue;
+    // Weapon transformations preserve blank and validate their rolls separately.
+    if (index.transformationDocument.slots.some(slot => slot.choiceField === fieldId)) continue;
     optionalFields.push(fieldId);
     choices.set(fieldId, fieldChoices);
   }

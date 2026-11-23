@@ -2,6 +2,7 @@ import { escapeHtml as h, formatNumber as fmt, type GameData } from './data.ts';
 import { DEFAULT_BOSS_HEALTH_CONDITION, type BossHealthCondition } from './state.ts';
 import { readCircuitBoardRows } from './circuit-board-rows.ts';
 import { attributeLabel } from './attribute-label.ts';
+import { weaponEngravingSlots, weaponEngravingEffect } from '../calculation/weapon-engravings.ts';
 
 export interface SourceLabelSelection {
   readonly values: Readonly<Record<string, string | number>>;
@@ -14,6 +15,10 @@ export function sourceLabel(sourceId: string, data: GameData, state: SourceLabel
 
 function resolveSourceLabel(sourceId: string, data: GameData, state: SourceLabelSelection): string {
   const bossHealthCondition = () => state.bossHealthCondition ?? DEFAULT_BOSS_HEALTH_CONDITION;
+  if (sourceId.startsWith('weapon-engraving:')) {
+    const slot = weaponEngravingSlots.find(line => line.sourceId === sourceId);
+    if (slot) return `刻印石 ${slot.line}：${weaponEngravingEffect(state.values[slot.effectField])?.label ?? ''}`;
+  }
   if (sourceId === 'character-base') return '角色基礎係數';
   if (sourceId === 'character-base:crit-damage-product') return '角色原始乘算爆傷基準';
   if (sourceId === 'weapon-base-attack') return '武器基礎攻擊力';

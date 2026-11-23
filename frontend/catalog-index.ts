@@ -2,6 +2,7 @@ import { getEquipmentOptionName, type EquipmentCatalogItem, type SimulatorEquipm
 import type { GameData } from './data.ts';
 import { createValidationCatalogIndex } from './input-validation.ts';
 import { createClassCodeResolver } from './class-code.ts';
+import { UNRELATED_TRANSFORMATION } from '../calculation/transformation-selections.ts';
 
 export type CatalogData = Pick<GameData,
   | 'classes' | 'mapping' | 'catalogs' | 'simulatorInputs' | 'masterBeast'
@@ -113,7 +114,7 @@ export function createCatalogIndex(data: CatalogData, revision: unknown = Symbol
   }
   for (const group of Object.values(data.weaponAppraisals.groups)) register([group.settingKey], names(group.options));
   register(data.giantStones.settingKeys, names(data.giantStones.options));
-  const transformations = memoizeChoices(() => [...data.transformations.options]);
+  const transformations = memoizeChoices(() => [...data.transformations.options, UNRELATED_TRANSFORMATION]);
   for (const slot of data.transformations.slots) register([slot.choiceField], transformations);
   register(data.rightIceSets.selectionFields, memoizeChoices(() => [...new Set(data.rightIceSets.effects.map(entry => entry.setName))]));
   const attributes = data.masterBeast.customAttributeOptions;

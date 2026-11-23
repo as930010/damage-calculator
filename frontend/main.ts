@@ -8,7 +8,8 @@ import { createPickerChoices } from './picker-choices.ts';
 import { createEquipmentStatSummary } from './equipment-stat-summary.ts';
 import * as normalization from './loadout-normalization.ts';
 import { attributeLabel } from './attribute-label.ts';
-import { normalizeTransformationValues, transformationRolls } from '../calculation/transformation-selections.ts';
+import { normalizeTransformationValues, transformationRolls, UNRELATED_TRANSFORMATION } from '../calculation/transformation-selections.ts';
+import { availableWeaponEngravingEffects, clearInvalidWeaponEngravingFields, weaponEngravingEffect, weaponEngravingSlots, weaponEngravingValueLabel } from '../calculation/weapon-engravings.ts';
 import { createResultCardsView, renderDamageFormula } from './result-cards-view.ts';
 import { sourceLabel as resolveSourceLabel } from './source-labels.ts';
 import { renderEquipmentDamageSummary, renderFinalDamageNumber, renderDamageRatio } from './damage-summary-view.ts';
@@ -81,6 +82,9 @@ async function start() {
   const state = initialState;
   let baseline = sampleMode ? null : readBaseline();
   const saveState = (value: LoadoutState, isBaseline = false) => profileDraft.write(isBaseline ? state : value, isBaseline ? value : baseline);
+  const startupEngravingFields = clearInvalidWeaponEngravingFields(state.values);
+  const baselineEngravingFields = baseline ? clearInvalidWeaponEngravingFields(baseline.values) : [];
+  if ((startupEngravingFields.length || baselineEngravingFields.length) && !sampleMode) saveState(state);
   state.transcendenceSkillDamageSharePct = normalizeTranscendenceSkillDamageShare(state.transcendenceSkillDamageSharePct);
   const normalizePortraitAwakeningValues = (target: LoadoutState) => normalizePortraitValues(target.values, data.otherEffects.portraitAwakening);
   const startupPortraitAwakeningNormalized = normalizePortraitAwakeningValues(state);
@@ -89,7 +93,7 @@ async function start() {
   const clearDuplicateTransformationChoices = (target: LoadoutState) => normalization.clearDuplicateTransformationChoices(data, target);
   const startupDuplicateTransformationFields = clearDuplicateTransformationChoices(state);
   const startupTransformationValues = normalizeTransformationValues(data.transformations, state.values);
-  if (startupTransformationValues.fields.length && !sampleMode) saveState(state);
+  if (startupTransformationValues.changed && !sampleMode) saveState(state);
   const clearDuplicateNephronTransformationChoices = (target: LoadoutState) => normalization.clearDuplicateNephronTransformationChoices(data, target);
   const startupDuplicateNephronTransformationFields = clearDuplicateNephronTransformationChoices(state);
   const startupDuplicateNephronMagazineFields = normalizeNephronMagazineSelections(state.values, catalogIndex);
@@ -101,10 +105,8 @@ async function start() {
   let baselineIsValid = false;
   if (baseline) {
     const baselineTransformValues = normalizeTransformationValues(data.transformations, baseline.values);
-    if (baselineTransformValues.fields.length) {
-      startupTransformationValues.messages.push('比較基準：' + baselineTransformValues.messages.join(' '));
-      saveState(baseline, true);
-    }
+    if (baselineTransformValues.messages.length) startupTransformationValues.messages.push('比較基準：' + baselineTransformValues.messages.join(' '));
+    if (baselineTransformValues.changed) saveState(baseline, true);
     const normalizedBaselinePortraitAwakening = normalizePortraitAwakeningValues(baseline);
     const clearedBaselineMagazines = normalizeNephronMagazineSelections(baseline.values, catalogIndex);
     const clearedBaselineTransformations = clearDuplicateNephronTransformationChoices(baseline);
@@ -339,6 +341,8 @@ async function start() {
     document.querySelector<HTMLElement>('#transfer-status')!.textContent = `已清除不符合目前裝備的鑑定選項（${startupInvalidAccessoryAppraisalFields.length} 個欄位）。`;
   }
   const val = (fieldId: string) => String(state.values[fieldId] ?? '');
+  if (startupEngravingFields.length) startupTransformationValues.messages.push(`已清除配裝中無效或重複的刻印石欄位：${startupEngravingFields.join('、')}。`);
+  if (baselineEngravingFields.length) startupTransformationValues.messages.push(`已清除比較基準中無效或重複的刻印石欄位：${baselineEngravingFields.join('、')}。`);
   if (startupTransformationValues.messages.length) document.querySelector<HTMLElement>('#transfer-status')!.textContent = startupTransformationValues.messages.join(' ');
   const summary = createEquipmentStatSummary(data.attributes.attributes);
   const pickerChoices = createPickerChoices(catalogIndex, data.mapping.magicStoneSelections.catalogFile, summary);
@@ -476,8 +480,12 @@ async function start() {
   }
   const field = (parent: HTMLElement, label: string, fieldId: string, choices: readonly PickerOption[], redraw = false, disabled = false, disabledHint = '請先選擇屬性') => {
     const picker = createPicker(label, choices, val(fieldId), value => {
-      state.values[fieldId] = value;
       const transformSlot = data.transformations.slots.find(slot => slot.choiceField === fieldId);
+      if (transformSlot && state.values[fieldId] === UNRELATED_TRANSFORMATION && value !== UNRELATED_TRANSFORMATION) {
+        delete state.values[transformSlot.valueField];
+      }
+      state.values[fieldId] = value;
+      if (weaponEngravingSlots.some(slot => slot.effectField === fieldId)) clearInvalidWeaponEngravingFields(state.values);
       if (transformSlot) {
         const cleaned = normalizeTransformationValues(data.transformations, state.values);
         if (cleaned.messages.length) document.querySelector<HTMLElement>('#transfer-status')!.textContent = cleaned.messages.join(' ');
@@ -1333,21 +1341,61 @@ async function start() {
         const availableOptions = data.transformations.rules
           .filter(rule => !selectedElsewhere.has(rule.choice))
           .map(rule => ({ value: rule.choice, label: rule.label }));
+        availableOptions.push({ value: UNRELATED_TRANSFORMATION, label: UNRELATED_TRANSFORMATION });
         field(transformationGrid, `變換 ${i + 1}`, slot.choiceField, availableOptions, true);
+        const unrelated = val(slot.choiceField) === UNRELATED_TRANSFORMATION;
         const rule = data.transformations.rules.find(rule => rule.choice === val(slot.choiceField));
         const choices = rule ? transformationRolls(rule).map(roll => ({
           value: String(roll / rule.valueMultiplier), label: String(roll) + (rule.valueMultiplier === 1 ? ' 級' : '%'),
         })) : [];
         const raw = state.values[slot.valueField];
         const chosen = rule && raw !== undefined ? choices.find(option => Math.abs((Number(option.value) - Number(raw)) * rule.valueMultiplier) <= 1e-8) : undefined;
-        const picker = createPicker(`變換 ${i + 1} 數值`, choices, chosen?.value ?? '', value => {
+        const picker = createPicker(`變換 ${i + 1} 數值`, choices, unrelated ? '0' : chosen?.value ?? '', value => {
           if (value === '') delete state.values[slot.valueField];
           else state.values[slot.valueField] = Number(value);
           update();
         });
-        if (!rule) picker.querySelector<HTMLInputElement>('input')!.disabled = true;
+        picker.dataset.fieldId = slot.valueField;
+        picker.querySelector('label')!.textContent = '數值';
+        if (!rule) {
+          picker.querySelector<HTMLInputElement>('input')!.disabled = true;
+          picker.querySelector<HTMLButtonElement>('.picker-clear')!.hidden = true;
+        }
         transformationGrid.append(picker);
       });
+      const engraving = section(panel, '刻印石');
+      const participationLabel = '該刻印石是否參與計算';
+      for (const { line, enabledField, effectField, valueField } of weaponEngravingSlots) {
+        const label = `刻印石 ${line}`;
+        const row = document.createElement('div');
+        row.className = 'weapon-engraving-row';
+        row.setAttribute('role', 'group');
+        row.setAttribute('aria-label', label);
+        const toggle = document.createElement('label');
+        toggle.className = 'toggle';
+        const enabled = document.createElement('input');
+        enabled.type = 'checkbox';
+        enabled.dataset.fieldId = enabledField;
+        enabled.setAttribute('aria-label', `${participationLabel}（${label}）`);
+        enabled.checked = val(enabledField) === '1';
+        enabled.addEventListener('change', () => {
+          state.values[enabledField] = Number(enabled.checked);
+          update();
+        });
+        toggle.append(enabled, participationLabel);
+        row.append(toggle);
+        const grid = attributeValueGrid(row);
+        const effects = availableWeaponEngravingEffects(state.values, effectField);
+        field(grid, '效果', effectField, effects.map(({ id, label }) => ({ value: id, label })), true);
+        const unrelated = val(effectField) === 'unrelated';
+        const valueOptions = weaponEngravingEffect(state.values[effectField])?.values ?? [];
+        const valuePicker = field(grid, '數值', valueField,
+          valueOptions.map(value => ({ value, label: weaponEngravingValueLabel(value) })),
+          false, !valueOptions.length, unrelated ? '無需選擇數值' : '請先選擇效果');
+        if (unrelated) updatePicker(valuePicker, '0', true);
+        if (!valueOptions.length) valuePicker.querySelector<HTMLButtonElement>('.picker-clear')!.hidden = true;
+        engraving.append(row);
+      }
     }
   }
   function renderCalculationComparison(
@@ -1530,6 +1578,8 @@ async function start() {
   const refreshConfigurationUi = (previousControlSignature: string, persistedImport = false) => {
     if (!persistedImport) {
       const cleanedTransforms = normalizeTransformationValues(data.transformations, state.values);
+      const clearedEngravings = clearInvalidWeaponEngravingFields(state.values);
+      if (clearedEngravings.length) cleanedTransforms.messages.push(`已清除無效或重複的刻印石欄位：${clearedEngravings.join('、')}。`);
       if (cleanedTransforms.messages.length) document.querySelector<HTMLElement>('#transfer-status')!.textContent = cleanedTransforms.messages.join(' ');
       normalizeOptionalEffectValues(state.values, catalogIndex);
     }
