@@ -151,6 +151,12 @@ export function resultHtml(document) {
   }));
 }
 
+// Keep the historical digests tied to the original display wording.
+export function historicalResultHtml(document) {
+  return Object.fromEntries(Object.entries(resultHtml(document))
+    .map(([section, content]) => [section, content?.replaceAll('聖獸迷鏡變換', '聖獸迷鏡效果') ?? null]));
+}
+
 export function digest(value) {
   const canonical = item => Array.isArray(item) ? item.map(canonical)
     : item && typeof item === 'object' ? Object.fromEntries(Object.keys(item).sort().map(key => [key, canonical(item[key])])) : item;

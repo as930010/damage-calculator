@@ -679,11 +679,11 @@ test('unset mirrors retain an unselected state without pretending completion', a
   const page = await uiPage(state);
   try {
     openHeadMirrors(page);
-    assert.equal(page.dom.window.document.querySelector('input[aria-label="迷鏡效果屬性"]').value, '');
+    assert.equal(page.dom.window.document.querySelector('input[aria-label="迷鏡變換屬性"]').value, '');
     assert.equal(mirrorInput(page).value, '');
     assert.equal(mirrorInput(page).labels[0].textContent, '數值(%)');
     assert.equal(page.readState().values[mirrorAttributeField], undefined);
-    selectPicker(page, '迷鏡效果屬性', '致命一擊%');
+    selectPicker(page, '迷鏡變換屬性', '致命一擊%');
     const input = mirrorInput(page);
     assert.equal(input.disabled, false);
     input.value = '0'; input.dispatchEvent(new page.dom.window.Event('input', { bubbles: true }));
@@ -708,7 +708,7 @@ test('unrelated mirror selection zeroes its value, survives export/reload and un
   try {
     openHeadMirrors(page);
     const beforeDamage = page.dom.window.document.querySelector('#damage-result').textContent;
-    selectPicker(page, '迷鏡效果屬性', '無關傷害');
+    selectPicker(page, '迷鏡變換屬性', '無關傷害');
     assert.equal(page.readState().values[mirrorAttributeField], '無關傷害');
     assert.equal(page.readState().values[mirrorValueField], 0);
     assert.equal(mirrorInput(page).disabled, true); assert.equal(mirrorInput(page).value, '0');
@@ -1215,10 +1215,10 @@ test('beast three-state progress survives clears, history, JSON and reload for a
       values[slot.mirrorFields[2][0]]='極大化%';values[slot.mirrorFields[2][1]]=0.00001;assert.equal(beastAccessoryStatus(slot,values,index),'partial');
     }
     const card=()=>page.dom.window.document.querySelector('[data-beast-slot-id="armor"]');assert.equal(card().dataset.configuration,'empty');
-    card().click();const selectAt=(i,name)=>{const input=page.dom.window.document.querySelectorAll('input[aria-label="迷鏡效果屬性"]')[i];input.dispatchEvent(new page.dom.window.Event('focus'));const list=page.dom.window.document.getElementById(input.getAttribute('aria-controls'));[...list.querySelectorAll('[role="option"]')].find(el=>el.querySelector('span').textContent===name).click();};
+    card().click();const selectAt=(i,name)=>{const input=page.dom.window.document.querySelectorAll('input[aria-label="迷鏡變換屬性"]')[i];input.dispatchEvent(new page.dom.window.Event('focus'));const list=page.dom.window.document.getElementById(input.getAttribute('aria-controls'));[...list.querySelectorAll('[role="option"]')].find(el=>el.querySelector('span').textContent===name).click();};
     selectAt(0,'無關傷害');assert.equal(card().dataset.configuration,'partial');assert.equal(card().querySelector('i'),null);
     selectAt(1,'無關傷害');selectAt(2,'無關傷害');assert.equal(card().dataset.configuration,'complete');assert.ok(card().querySelector('i'));page.dom.window.document.querySelector('#baseline').click();
-    const input=page.dom.window.document.querySelectorAll('input[aria-label="迷鏡效果屬性"]')[2];input.closest('.picker').querySelector('.picker-clear').click();assert.equal(card().dataset.configuration,'partial');assert.equal(card().querySelector('i'),null);
+    const input=page.dom.window.document.querySelectorAll('input[aria-label="迷鏡變換屬性"]')[2];input.closest('.picker').querySelector('.picker-clear').click();assert.equal(card().dataset.configuration,'partial');assert.equal(card().querySelector('i'),null);
     await workloadActions.undo(page);assert.equal(card().dataset.configuration,'complete');await workloadActions.redo(page);assert.equal(card().dataset.configuration,'partial');
     const exported=await page.exportJson();await page.importJson(JSON.stringify(exported));assert.equal(card().dataset.configuration,'partial');
     reloaded=await uiPage(page.readState());assert.equal(reloaded.dom.window.document.querySelector('[data-beast-slot-id="armor"]').dataset.configuration,'partial');

@@ -7,6 +7,7 @@ import { normalizePortraitAwakeningSplit, normalizeTranscendenceSkillDamageShare
 import { resolveUnsignedInteger } from './direct-input.ts';
 import { canonicalizeNumber } from './numeric-input.ts';
 import { normalizeTransformationValues } from '../calculation/transformation-selections.ts';
+import { beastSkills, invalidBeastSkillFields } from '../calculation/beast-armor-skill.ts';
 import { clearInvalidWeaponEngravingFields } from '../calculation/weapon-engravings.ts';
 import { normalizeOptionalEffectValues, isUnrelatedEffectValue, normalizeNephronMagazineSelections, normalizeBossHealthCondition } from './state.ts';
 import { normalizeClassSkillVersions } from '../calculation/class-skill-versions.ts';
@@ -69,6 +70,11 @@ function legacyPayload(state: LoadoutState, data: TransferData, suppliedIndex?: 
   const omittedFields: string[] = [];
   const fieldValues = { ...state.values };
   omittedFields.push(...clearInvalidWeaponEngravingFields(fieldValues));
+  const invalidBeastFields = invalidBeastSkillFields(fieldValues);
+  for (const { enabled } of beastSkills) if (invalidBeastFields.includes(enabled)) {
+    fieldValues[enabled] = 0;
+    omittedFields.push(enabled);
+  }
   const cleanedTransforms = normalizeTransformationValues(index.transformationDocument, fieldValues, index.transformationRules);
   omittedFields.push(...cleanedTransforms.fields);
   const portrait = data.otherEffects.portraitAwakening;
@@ -296,6 +302,7 @@ export function deserializeLoadout(raw: unknown, current: LoadoutState, data: Tr
 
 
   clearedFields.push(...clearInvalidWeaponEngravingFields(values));
+  for (const { enabled } of beastSkills) if (clearedFields.includes(enabled)) values[enabled] = 0;
   Object.assign(values, equipmentValues);
   clearedFields.push(...invalidEquipment);
 

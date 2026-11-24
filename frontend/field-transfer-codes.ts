@@ -310,5 +310,14 @@ export const FIELD_ID_TO_CODE: Readonly<Record<string, number>> = Object.freeze(
   "Weapon.Engraving.3.Effect": 308,
   "Weapon.Engraving.3.Value": 309,
   "Weapon.Type": 310,
-  "Weapon.AbyssGrowth": 311
+  "Weapon.AbyssGrowth": 311,
+  "MasterBeast.Armor.Skill.Effect": 312,
+  "MasterBeast.Armor.Skill.Value": 313,
+  "MasterBeast.Ring1.Skill.Effect": 314,
+  "MasterBeast.Ring1.Skill.Value": 315,
+  "MasterBeast.Ring2.Skill.Effect": 316,
+  "MasterBeast.Ring2.Skill.Value": 317,
+  "MasterBeast.Armor.Skill.Enabled": 318,
+  "MasterBeast.Ring1.Skill.Enabled": 319,
+  "MasterBeast.Ring2.Skill.Enabled": 320
 });

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { createRuntime, createPage, gameData, normalize, digest, resultHtml, historicalEvaluationData } from './loadout-evaluation-harness.mjs';
+import { createRuntime, createPage, gameData, normalize, digest, historicalResultHtml, historicalEvaluationData } from './loadout-evaluation-harness.mjs';
 import { complete, incomplete, legacyStartup, choiceContexts, importCases, candidateTransform, captureCall, monitorCatalogData } from './catalog-index-scenarios.mjs';
 
 const fixture = JSON.parse(await readFile(new URL('./fixtures/catalog-index.json', import.meta.url), 'utf8'));
@@ -125,7 +125,7 @@ async function captureLegacyChoices(state) {
     },
   });
   try {
-    return { choices, resultHash: digest(resultHtml(page.dom.window.document)) };
+    return { choices, resultHash: digest(historicalResultHtml(page.dom.window.document)) };
   } finally { page.close(); }
 }
 

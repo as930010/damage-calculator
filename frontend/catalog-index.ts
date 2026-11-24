@@ -3,6 +3,7 @@ import type { GameData } from './data.ts';
 import { createValidationCatalogIndex } from './input-validation.ts';
 import { createClassCodeResolver } from './class-code.ts';
 import { UNRELATED_TRANSFORMATION } from '../calculation/transformation-selections.ts';
+import { beastSkillEnabledChoices, beastSkills, beastSkillValueChoices } from '../calculation/beast-armor-skill.ts';
 import { abyssWeapon, defaultWeapon, weaponTypeField } from '../calculation/weapon-types.ts';
 
 export type CatalogData = Pick<GameData,
@@ -120,6 +121,11 @@ export function createCatalogIndex(data: CatalogData, revision: unknown = Symbol
   const transformations = memoizeChoices(() => [...data.transformations.options, UNRELATED_TRANSFORMATION]);
   for (const slot of data.transformations.slots) register([slot.choiceField], transformations);
   register(data.rightIceSets.selectionFields, memoizeChoices(() => [...new Set(data.rightIceSets.effects.map(entry => entry.setName))]));
+  for (const skill of beastSkills) {
+    register([skill.enabled], () => beastSkillEnabledChoices);
+    register([skill.effect], memoizeChoices(() => skill.effects.map(effect => effect.id)));
+    register([skill.value], values => beastSkillValueChoices(skill, values[skill.effect]));
+  }
   const attributes = data.masterBeast.customAttributeOptions;
   register(['MasterBeast.Head.CustomAttribute'], memoizeChoices(() => [...attributes.head]));
   register(['MasterBeast.Necklace.CustomAttribute'], memoizeChoices(() => [...attributes.necklace]));

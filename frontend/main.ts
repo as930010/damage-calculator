@@ -1,6 +1,7 @@
 import { ProfileDraft } from './profile-draft.ts';
 import { mountProfileManager } from './loadout-profiles-ui.ts';
 import { equipmentProgress, equipmentProgressFields, equipmentProgressChoiceFields } from './equipment-progress.ts';
+import { beastSkillParticipates, beastSkills, beastSkillValueChoices, readBeastSkillSelection } from '../calculation/beast-armor-skill.ts';
 import { beastAccessoryStatus } from './beast-accessory-status.ts';
 import { mountCircuitBoardEditor } from './circuit-board-editor.ts';
 import { createSkillShareControl } from './skill-share-control.ts';
@@ -485,6 +486,17 @@ async function start() {
       if (transformSlot && state.values[fieldId] === UNRELATED_TRANSFORMATION && value !== UNRELATED_TRANSFORMATION) {
         delete state.values[transformSlot.valueField];
       }
+      const beastSkill = beastSkills.find(skill => skill.effect === fieldId || skill.value === fieldId);
+      if (beastSkill && val(fieldId) !== value) {
+        if (!val(beastSkill.enabled)) {
+          const participates = beastSkillParticipates(beastSkill, readBeastSkillSelection(beastSkill, state.values));
+          state.values[beastSkill.enabled] = Number(participates);
+        }
+        if (fieldId === beastSkill.effect) {
+          if (beastSkillValueChoices(beastSkill, value)[0] === 0) state.values[beastSkill.value] = 0;
+          else delete state.values[beastSkill.value];
+        }
+      }
       state.values[fieldId] = value;
       if (weaponEngravingSlots.some(slot => slot.effectField === fieldId)) clearInvalidWeaponEngravingFields(state.values);
       if (transformSlot) {
@@ -749,9 +761,9 @@ async function start() {
     wrapper.append(input); parent.append(wrapper);
     return input;
   };
-  const section = (parent: HTMLElement, label: string, open = false) => {
+  const section = (parent: HTMLElement, label: string, open = false, preferenceLabel = label) => {
     const details = document.createElement('details'); details.className = 'editor-section';
-    const key = `inspector:${selectedBeastSlotId ?? selected.id}:${label}`;
+    const key = `inspector:${selectedBeastSlotId ?? selected.id}:${preferenceLabel}`;
     details.dataset.disclosureKey = key;
     details.open = disclosurePreferences.preferredOpen(key, open);
     const title = document.createElement('summary'); title.textContent = label; details.append(title); parent.append(details); return details;
@@ -760,6 +772,21 @@ async function start() {
     const grid = document.createElement('div'); grid.className = extraClass ? 'attribute-value-grid ' + extraClass : 'attribute-value-grid';
     parent.append(grid);
     return grid;
+  };
+  const appendParticipationToggle = (parent: HTMLElement, fieldId: string, caption: string, name: string, checked: boolean) => {
+    const toggle = document.createElement('label');
+    toggle.className = 'toggle';
+    const input = document.createElement('input');
+    input.type = 'checkbox';
+    input.dataset.fieldId = fieldId;
+    input.setAttribute('aria-label', `${caption}（${name}）`);
+    input.checked = checked;
+    input.addEventListener('change', () => {
+      state.values[fieldId] = Number(input.checked);
+      update();
+    });
+    toggle.append(input, caption);
+    parent.append(toggle);
   };
   function renderGlobalInputs() {
     const root = document.querySelector<HTMLElement>('#global-source-fields')!;
@@ -1038,7 +1065,7 @@ async function start() {
     for (const slot of beastAccessorySlots) {
       let button = beastButtons.get(slot.id);
       if (!button) {
-        button = document.createElement('button'); button.type = 'button'; button.className = `beast-accessory-slot beast-accessory-slot-${slot.id}`; button.dataset.beastSlotId = slot.id;
+        button = document.createElement('button'); button.type = 'button'; button.className = `gear-slot beast-accessory-slot beast-accessory-slot-${slot.id}`; button.dataset.beastSlotId = slot.id;
         button.addEventListener('click', () => {
           selectedBeastSlotId = slot.id;
           renderBeastAccessories(); renderInspector(); openMobileInspector();
@@ -1051,14 +1078,14 @@ async function start() {
       toggleClass(button, 'selected', selectedBeastSlotId === slot.id);
       setAttribute(button, 'aria-label', `${slot.label}（${{ empty: '未設定', partial: '部分設定', complete: '全部完成' }[configuration]}）`);
       setAttribute(button, 'aria-pressed', String(selectedBeastSlotId === slot.id));
-      writeHtml(button, `${icon(slot.icon)}<span>${h(slot.label)}</span>${configuration === 'complete' ? '<i></i>' : ''}`);
+      writeHtml(button, `${icon(slot.icon)}<span class="gear-slot-label">${h(slot.label)}</span>${configuration === 'complete' ? '<i></i>' : ''}`);
     }
   }
   let circuitEditor: ReturnType<typeof mountCircuitBoardEditor> | undefined;
   function renderBeastInspector(panel: HTMLElement) {
     disposePickers(panel);
     const slot = beastAccessorySlots.find(candidate => candidate.id === selectedBeastSlotId)!;
-    panel.innerHTML = `<div class="inspector-title beast-inspector-title"><span class="beast-inspector-icon">${icon(slot.icon)}</span><div><small>聖獸飾品</small><h2>${h(slot.label)}</h2></div><button class="inspector-close" type="button" aria-label="關閉部位設定">×</button></div>`;
+    panel.innerHTML = `<div class="inspector-title beast-inspector-title">${icon(slot.icon)}<div class="inspector-title-copy"><small>聖獸飾品</small><h2>${h(slot.label)}</h2></div><button class="inspector-close" type="button" aria-label="關閉部位設定">×</button></div>`;
     const fixed = section(panel, '固定效果', true);
     if (slot.fixedFields) slot.fixedFields.forEach((fieldId, index) => field(
       fixed,
@@ -1078,12 +1105,12 @@ async function start() {
       stone.insertAdjacentHTML('beforeend', `<p class="panel-note beast-mapping-note">盔甲精靈石的個別屬性不影響傷害，無需設定。精靈石套裝增幅 ${fmt(data.masterBeast.armorSpiritStoneSetEffect.multiplicativeDamagePct)}% 已預設套用。</p>`);
     }
 
-    const mirrorArea = section(panel, '迷鏡效果', true);
+    const mirrorArea = section(panel, '迷鏡變換', true, '迷鏡效果');
     mirrorArea.classList.add('beast-mirror-section');
     const mirrorGrid = attributeValueGrid(mirrorArea, 'beast-mirror-grid');
     slot.mirrorFields.forEach(([attributeField, valueField]) => {
       const attribute = val(attributeField);
-      field(mirrorGrid, '迷鏡效果屬性', attributeField, options(data.masterBeast.customAttributeOptions.mirror), true);
+      field(mirrorGrid, '迷鏡變換屬性', attributeField, options(data.masterBeast.customAttributeOptions.mirror), true);
       const unrelated = attribute === '無關傷害';
       const valueRule = data.masterBeast.mirrorValueRules.byAttribute[attribute] ?? data.masterBeast.mirrorValueRules.default;
       const input = numeric(
@@ -1101,6 +1128,25 @@ async function start() {
         input.parentElement!.title = '此屬性無需數值';
       }
     });
+
+    const skill = beastSkills.find(candidate => candidate.slotId === slot.id);
+    if (skill) {
+      const row = document.createElement('div');
+      row.className = 'skill-participation-row';
+      section(panel, '聖獸技能', true).append(row);
+      const checked = beastSkillParticipates(skill, readBeastSkillSelection(skill, state.values));
+      appendParticipationToggle(row, skill.enabled, '該聖獸技能是否參與計算', slot.label, checked);
+      const grid = attributeValueGrid(row, skill.slotId === 'armor' ? '' : 'beast-ring-skill-grid');
+      const choices = beastSkillValueChoices(skill, state.values[skill.effect]);
+      const unrelated = choices[0] === 0;
+      field(grid, '技能屬性', skill.effect, skill.effects.map(({ id, label }) => ({ value: id, label })), true);
+      const picker = field(grid, '數值', skill.value, unrelated ? [] : choices.map(value => ({ value: String(value), label: `${value}%` })),
+        false, unrelated || !choices.length, unrelated ? '此屬性無需數值' : '先選技能屬性');
+      if (unrelated) {
+        updatePicker(picker, '0', true);
+        picker.querySelector<HTMLButtonElement>('.picker-clear')!.hidden = true;
+      }
+    }
   }
   function renderSlots() {
     const container = document.querySelector('#slots')!;
@@ -1396,22 +1442,10 @@ async function start() {
       for (const { line, enabledField, effectField, valueField } of weaponEngravingSlots) {
         const label = `刻印石 ${line}`;
         const row = document.createElement('div');
-        row.className = 'weapon-engraving-row';
+        row.className = 'weapon-engraving-row skill-participation-row';
         row.setAttribute('role', 'group');
         row.setAttribute('aria-label', label);
-        const toggle = document.createElement('label');
-        toggle.className = 'toggle';
-        const enabled = document.createElement('input');
-        enabled.type = 'checkbox';
-        enabled.dataset.fieldId = enabledField;
-        enabled.setAttribute('aria-label', `${participationLabel}（${label}）`);
-        enabled.checked = val(enabledField) === '1';
-        enabled.addEventListener('change', () => {
-          state.values[enabledField] = Number(enabled.checked);
-          update();
-        });
-        toggle.append(enabled, participationLabel);
-        row.append(toggle);
+        appendParticipationToggle(row, enabledField, participationLabel, label, val(enabledField) === '1');
         const grid = attributeValueGrid(row);
         const effects = availableWeaponEngravingEffects(state.values, effectField);
         field(grid, '效果', effectField, effects.map(({ id, label }) => ({ value: id, label })), true);

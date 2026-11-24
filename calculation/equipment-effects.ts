@@ -1,3 +1,4 @@
+import { beastArmorSkillEffect, beastArmorSkillSourceId, effectiveBeastArmorSkillValue, type BeastSkillSelection } from './beast-armor-skill.ts';
 import { defaultWeapon } from './weapon-types.ts';
 import type { StatContribution } from "./types.ts";
 import { isResonanceInputField, parseResonancePoints } from "./resonance-input.ts";
@@ -136,6 +137,8 @@ export interface MasterBeastManualValue {
 }
 
 export interface MasterBeastSelection {
+  armorSkill?: BeastSkillSelection;
+  ringSkills?: readonly BeastSkillSelection[];
   overallOption?: string | null;
   headOptions?: readonly (string | null | undefined)[];
   ringOptions?: readonly (string | null | undefined)[];
@@ -492,6 +495,11 @@ export function resolveMasterBeastEffects(
     throw new TypeError("聖獸精靈石套裝增幅必須是有限數值。");
   }
   result.push({ sourceId: setEffect.id, stats: { multiplicativeDamagePct: setEffect.multiplicativeDamagePct } });
+  const skill = beastArmorSkillEffect(selection.armorSkill?.effect);
+  const skillValue = effectiveBeastArmorSkillValue(selection.armorSkill, selection.ringSkills);
+  if (skill?.statKey && skillValue !== undefined) {
+    result.push({ sourceId: beastArmorSkillSourceId, stats: { [skill.statKey]: skillValue } });
+  }
   const addOption = (category: MasterBeastOption["category"], name: string | null | undefined, sourceId: string) => {
     if (name == null || name.trim() === "") return;
     const option = document.options.find((candidate) => candidate.category === category && candidate.name === name);
@@ -526,7 +534,7 @@ export function resolveMasterBeastEffects(
       const rule = document.mirrorValueRules.byAttribute[entry.attribute] ?? document.mirrorValueRules.default;
       if (!rule || ![rule.minPct, rule.maxPct, rule.stepPct].every(Number.isFinite)
         || rule.minPct < 0 || rule.maxPct < rule.minPct || rule.stepPct <= 0) {
-        throw new TypeError(`迷鏡效果「${entry.attribute}」的數值規則無效。`);
+        throw new TypeError(`迷鏡變換「${entry.attribute}」的數值規則無效。`);
       }
       const percentagePoints = entry.value * 100;
       const stepIndex = (percentagePoints - rule.minPct) / rule.stepPct;
@@ -534,7 +542,7 @@ export function resolveMasterBeastEffects(
         || percentagePoints < rule.minPct - 1e-9
         || percentagePoints > rule.maxPct + 1e-9
         || Math.abs(stepIndex - Math.round(stepIndex)) > 1e-8)) {
-        throw new RangeError(`迷鏡效果「${entry.attribute}」數值須為 0% 或 ${rule.minPct}%～${rule.maxPct}%，每檔 ${rule.stepPct}%。`);
+        throw new RangeError(`迷鏡變換「${entry.attribute}」數值須為 0% 或 ${rule.minPct}%～${rule.maxPct}%，每檔 ${rule.stepPct}%。`);
       }
     }
     addManual({ ...entry, fractionToPercentagePoints: true }, sourceId);

@@ -1,3 +1,4 @@
+import { beastSkills, invalidBeastSkillFields } from '../calculation/beast-armor-skill.ts';
 import { equipmentProgressChoiceFields } from './equipment-progress.ts';
 import { isFieldId, FIELD_ID_TO_CODE } from "./field-ids.ts";
 import type { CatalogIndex } from './catalog-index.ts';
@@ -75,6 +76,11 @@ export function normalizeOptionalEffectValues(values: Record<string, string | nu
   const set = (fieldId: string, value: string | number) => {
     if (values[fieldId] !== value) { values[fieldId] = value; changed = true; }
   };
+  for (const fieldId of invalidBeastSkillFields(values)) {
+    // A malformed switch must not fall back to the legacy enabled state.
+    if (beastSkills.some(skill => skill.enabled === fieldId)) set(fieldId, 0);
+    else { delete values[fieldId]; changed = true; }
+  }
   const fields = optionalEffectFields(index);
   for (const fieldId of fields.fields) {
     const choices = index.contextualAppraisals.has(fieldId) ? index.resolveFieldChoices(fieldId, values)

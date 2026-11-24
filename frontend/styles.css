@@ -20,6 +20,7 @@ button{padding:10px 15px} h1,h2,p{margin:0} h1{font-size:27px; letter-spacing:.0
 .picker-list{position:absolute; top:100%; left:0; right:0; z-index:20; max-height:300px; overflow-y:auto; border:1px solid #50596a; background:var(--surface-raised); border-radius:9px; box-shadow:0 12px 36px #0008; padding:5px} .picker-list[hidden]{display:none}
 .picker-list button{display:flex; flex-direction:column; align-items:flex-start; gap:5px; width:100%; border:0; border-radius:5px; background:none; text-align:left; padding:11px 10px; font-size:13px} .picker-list button:hover,.picker-list button[aria-selected=true]{background:#3c475c} .picker-list small{font-size:11px; color:#a3b1c8; line-height:1.6} .picker-list p{padding:10px}
 .editor-section{border-top:1px solid var(--border-mid); padding:14px 0 0; margin-top:6px} .editor-section>summary{cursor:pointer; font-size:13px; color:#d0d6e1; margin-bottom:16px} .inspector .panel-note{padding:0 0 15px; font-size:11px}
+.beast-inspector-title + .editor-section { border-top: 0; margin-top: 0; padding-top: 0; }
 .editor-section[open]:has(+ .editor-section):has(> :is(.attribute-value-grid, .circuit-board-actions, .beast-mapping-note):last-child) {
   padding-block-end: var(--space-3);
 }
@@ -77,12 +78,18 @@ footer{position:relative; isolation:isolate; overflow:hidden; display:flex; flex
 @media(max-width:600px) {
   .right-ice-set-selectors{grid-template-columns:1fr; padding:0 17px 12px}
 }
-.beast-accessories-grid{display:flex; flex-wrap:wrap; align-items:center; gap:10px; padding:0 18px 18px} .beast-accessory-slot{position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; width:68px; height:68px; padding:5px; border:1px solid #574d70; border-radius:8px; background:#27232f; color:#c7a6f3; transition:background .15s,border-color .15s,box-shadow .15s}
-.beast-accessory-slot svg{width:30px; height:30px} .beast-accessory-slot span{font-size:10px; line-height:1.1; color:#d1c7dd; white-space:nowrap} .beast-accessory-slot:hover,.beast-accessory-slot.selected{background:#3a304a; border-color:#c095ee} .beast-accessory-slot.selected{box-shadow:0 0 0 3px #c095ee22}
-.beast-accessory-slot i{position:absolute; right:5px; top:5px; width:5px; height:5px; border-radius:50%; background:#c095ee} .beast-inspector-title .beast-inspector-icon{display:grid; place-items:center; width:42px; height:42px; border:1px solid #7b5e9d; border-radius:9px; color:#c095ee; background:#382d46} .beast-inspector-icon svg{width:28px; height:28px} .beast-mirror-section{margin-top:4px}
+.beast-accessories-grid{display:flex; flex-wrap:wrap; align-items:center; gap:10px; padding:0 18px 18px}
+.beast-inspector-title{--group-color:#c095ee} .beast-mirror-section{margin-top:4px}
 .beast-mirror-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; max-height:580px; overflow-y:auto; padding:0 4px 8px 0} .beast-mapping-note{padding:10px 0 0!important}
+@media (max-width: 700px) {
+  #inspector .beast-ring-skill-grid { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+  #inspector .beast-ring-skill-grid .picker-control > input:disabled { padding-inline-end: var(--space-2); }
+}
+@media (max-width: 360px) {
+  #inspector .beast-ring-skill-grid { grid-template-columns: minmax(0, 1fr); }
+}
 @media(max-width:600px) {
-  .beast-accessories-grid{padding:0 14px 16px} .beast-accessory-slot{width:60px; height:60px} .beast-accessory-slot svg{width:26px; height:26px}
+  .beast-accessories-grid{padding:0 14px 16px}
 }
 .picker-control{position:relative;--picker-clear-color:#9ba5b4;--picker-clear-hover-color:var(--text-main)} .picker-control>input{padding-right:38px} .picker-control>.picker-list{top:100%; left:0; right:0} .picker-clear{position:absolute; right:7px; top:5px; z-index:2; width:30px; min-height:30px; padding:0; border:0; background:transparent; color:var(--picker-clear-color,#9ba5b4); font-size:20px; line-height:1} .picker-clear:hover{color:var(--picker-clear-hover-color,var(--text-main))}
 .picker-clear{isolation:isolate}.picker-clear::before{content:"";position:absolute;inset:15%;z-index:-1;border-radius:6px;background:transparent}.picker-clear:hover{background:transparent}.picker-clear:hover::before{background:var(--border-strong)}
@@ -124,7 +131,7 @@ footer{position:relative; isolation:isolate; overflow:hidden; display:flex; flex
 }
 .transfer-actions{display:flex; align-items:center; gap:12px; margin-left:auto} #save-status{margin-left:0} .picker-clear{top:0; bottom:0; margin-block:auto; display:grid; place-items:center; transform:none}
 
-.beast-label{left:var(--slot-accessory-center-x); top:25%; color:#c095ee} .gear-beast-slots{position:absolute; inset:0; z-index:4; display:block; padding:0; pointer-events:none} .gear-beast-slots .beast-accessory-slot{position:absolute; width:55px; height:59px; transform:translate(-50%,-50%); pointer-events:auto} .gear-beast-slots .beast-accessory-slot-headwear{left:var(--slot-accessory-center-x); top:35%} .gear-beast-slots .beast-accessory-slot-armor{left:var(--slot-accessory-center-x); top:46%} .gear-beast-slots .beast-accessory-slot-necklace{left:var(--slot-accessory-center-x); top:57%} .gear-beast-slots .beast-accessory-slot-ring-one{left:calc(var(--slot-ring-one-x) - 1px); top:68%} .gear-beast-slots .beast-accessory-slot-ring-two{left:var(--slot-ring-two-x); top:68%} .left-label{top:22%} .inner-label{left:calc(18% - 1px)} .beast-label{left:var(--slot-accessory-center-x)}
+.beast-label{left:var(--slot-accessory-center-x); top:25%; color:#c095ee} .gear-beast-slots{position:absolute; inset:0; z-index:4; display:block; padding:0; pointer-events:none; --group-color:#c095ee} .gear-beast-slots .beast-accessory-slot{pointer-events:auto} .gear-beast-slots .beast-accessory-slot-headwear{left:var(--slot-accessory-center-x); top:35%} .gear-beast-slots .beast-accessory-slot-armor{left:var(--slot-accessory-center-x); top:46%} .gear-beast-slots .beast-accessory-slot-necklace{left:var(--slot-accessory-center-x); top:57%} .gear-beast-slots .beast-accessory-slot-ring-one{left:calc(var(--slot-ring-one-x) - 1px); top:68%} .gear-beast-slots .beast-accessory-slot-ring-two{left:var(--slot-ring-two-x); top:68%} .left-label{top:22%} .inner-label{left:calc(18% - 1px)} .beast-label{left:var(--slot-accessory-center-x)}
 /* UX polish preview: strengthen hierarchy and make dense controls easier to scan. */
 :root{--space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-5:24px} body{font-size:15px; line-height:1.55}     .panel-heading{padding:18px 22px} .panel-heading>span,.beast-accessories-heading span{font-size:12px}
 .panel-note{font-size:13px; line-height:1.6; padding:15px 22px} .inspector .panel-note{font-size:12px} .group-label{font-size:12px; letter-spacing:.04em} .gear-slot span,.beast-accessory-slot span{font-size:11px} .field{font-size:13px; line-height:1.45} .field input{min-height:44px; font-size:14px; padding:11px 13px} .picker-list button{font-size:14px} .picker-list small{font-size:12px}
@@ -135,7 +142,7 @@ footer{position:relative; isolation:isolate; overflow:hidden; display:flex; flex
 /* Requested readability and responsive layout refinements. */
 .weapon-magic-stone-color.weapon-magic-stone-red{border-color:#b97878} .weapon-magic-stone-color.weapon-magic-stone-blue{border-color:#718fb8} .weapon-magic-stone-color.weapon-magic-stone-yellow{border-color:#b9a36c}
 @media(max-width:600px) {
-  .gear-beast-slots .beast-accessory-slot{width:60px; height:60px} /* Beast slots are 5px wider than regular gear slots on phones; preserve the ring pair edge gap. */ .gear-beast-slots .beast-accessory-slot-ring-one{left:calc(var(--slot-ring-one-x) - 6px)}
+  .gear-beast-slots .beast-accessory-slot-ring-one{left:calc(var(--slot-ring-one-x) - 6px)}
 }
 .gear-slot[data-slot-id="inner-lowerwearAlternative"]{transform:translate(calc(-50% + 1px),-50%)} .inspector-close,.inspector-backdrop{display:none}
 .mobile-picker-dialog{width:min(680px,calc(100vw - 16px)); height:90dvh; max-width:none; max-height:90dvh; margin:auto; padding:0; overflow:hidden; border:1px solid var(--border-strong); border-radius:16px; background:var(--panel); color:var(--text-main); box-shadow:0 24px 80px #000b} .mobile-picker-dialog::backdrop{background:#080a0ed9; backdrop-filter:blur(3px)}
@@ -156,9 +163,9 @@ footer{position:relative; isolation:isolate; overflow:hidden; display:flex; flex
 
 .field-disabled{opacity:.58} .field-disabled input:disabled{cursor:not-allowed}
 
-.weapon-engraving-row{display:grid;row-gap:2px;min-width:0}
+.skill-participation-row{display:grid;row-gap:2px;min-width:0}
 .weapon-engraving-row+.weapon-engraving-row{margin-block-start:14px}
-.weapon-engraving-row .toggle{min-height:24px}
+.skill-participation-row > .toggle{min-height:24px}
 @media(max-width:700px){
   .weapon-engraving-row > .attribute-value-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,10.125rem),1fr))}
 }

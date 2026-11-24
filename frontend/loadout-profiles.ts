@@ -1,6 +1,7 @@
 import { archiveLimit, encodeLibrary, decodeLibrary, parseArchiveJson } from './loadout-archive.ts';
 import { isFieldId } from './field-ids.ts';
 import { parseState, type LoadoutState } from './state.ts';
+import { invalidBeastSkillFields } from '../calculation/beast-armor-skill.ts';
 import { invalidWeaponEngravingFields } from '../calculation/weapon-engravings.ts';
 
 export const profilesKey = 'damage-calculator.profiles.v1';
@@ -54,6 +55,10 @@ export function snapshot(value: unknown): LoadoutState {
   const invalidEngravings = invalidWeaponEngravingFields(candidate.values);
   if (invalidEngravings.length) {
     throw new ProfileError('invalid-data', '刻印石含無效或重複欄位（' + invalidEngravings.join('、') + '）。');
+  }
+  const invalidBeastSkill = invalidBeastSkillFields(candidate.values);
+  if (invalidBeastSkill.length) {
+    throw new ProfileError('invalid-data', '聖獸技能含無效欄位（' + invalidBeastSkill.join('、') + '）。');
   }
   // Preserve blank editing fields and numeric strings after the shared parser validates them.
   parsed.values = candidate.values;

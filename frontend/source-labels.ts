@@ -2,6 +2,7 @@ import { escapeHtml as h, formatNumber as fmt, type GameData } from './data.ts';
 import { DEFAULT_BOSS_HEALTH_CONDITION, type BossHealthCondition } from './state.ts';
 import { readCircuitBoardRows } from './circuit-board-rows.ts';
 import { attributeLabel } from './attribute-label.ts';
+import { beastArmorSkillEffect, beastArmorSkillFields, beastArmorSkillSourceId } from '../calculation/beast-armor-skill.ts';
 import { weaponEngravingSlots, weaponEngravingEffect } from '../calculation/weapon-engravings.ts';
 import { selectedWeaponGrowth } from '../calculation/weapon-types.ts';
 
@@ -16,6 +17,10 @@ export function sourceLabel(sourceId: string, data: GameData, state: SourceLabel
 
 function resolveSourceLabel(sourceId: string, data: GameData, state: SourceLabelSelection): string {
   const bossHealthCondition = () => state.bossHealthCondition ?? DEFAULT_BOSS_HEALTH_CONDITION;
+  if (sourceId === beastArmorSkillSourceId) {
+    const skill = beastArmorSkillEffect(state.values[beastArmorSkillFields.effect]);
+    return skill ? `聖獸技能：${skill.label}` : '聖獸技能';
+  }
   if (sourceId.startsWith('weapon-engraving:')) {
     const slot = weaponEngravingSlots.find(line => line.sourceId === sourceId);
     if (slot) return `刻印石 ${slot.line}：${weaponEngravingEffect(state.values[slot.effectField])?.label ?? ''}`;
@@ -120,7 +125,7 @@ function resolveSourceLabel(sourceId: string, data: GameData, state: SourceLabel
     const [, part, detail] = sourceId.split(':');
     const partNames: Record<string, string> = { head: '頭飾', ring: '指環' };
     if (part === 'mirror') {
-      return '聖獸迷鏡效果';
+      return '聖獸迷鏡變換';
     }
     if (part === 'head-manual') return `聖獸頭飾精靈石：${String(state.values['MasterBeast.Head.CustomAttribute'] ?? '')}`;
     if (part === 'necklace-manual') return `聖獸項鍊精靈石：${String(state.values['MasterBeast.Necklace.CustomAttribute'] ?? '')}`;

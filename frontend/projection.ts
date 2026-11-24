@@ -2,6 +2,7 @@ import { resolveSimulatorEquipmentContributions } from "../calculation/equipment
 import { resolveInnerwearSources } from "../calculation/innerwear.ts";
 import { resolveNephronArmorSources, resolveGrettMedalMagazineBonuses } from "../calculation/nephron-armor.ts";
 import { resolveWeaponTransformationsFromFields } from "../calculation/weapon-transformations.ts";
+import { beastArmorSkillFields, beastRingSkills, readBeastSkillSelection } from "../calculation/beast-armor-skill.ts";
 import { resolveWeaponEngravingSources } from "../calculation/weapon-engravings.ts";
 import { abyssWeapon, resolveWeaponEnhancementMilestones, selectedWeapon, selectedWeaponGrowth } from "../calculation/weapon-types.ts";
 import { circuitBoardStatKeys, resolveAccessoryEffectOptions, resolveArmorAppraisals, resolveAtmaSetEffects, resolveChipContribution, resolveCircuitBoardEffects, resolveColorSetEffect, resolveMasterBeastEffects, resolveNamedStatOption, resolveRaidSetEffects, resolveResonanceEffects, resolveRightIceSetEffects, resolveSpiritRecordEffects, resolveSpiritRecordSelections, resolveWeaponGrowth } from "../calculation/equipment-effects.ts";
@@ -229,6 +230,8 @@ export function resolveLoadoutSources(data: GameData, state: LoadoutState) {
   const atmaPieces = accessoryFields.map(text).filter(name => name.includes("亞特瑪")).length;
   groups.shared.push(...resolveAtmaSetEffects(data.atma, atmaPieces, text("Atma.Element"), text("Atma.Color")));
   groups.shared.push(...resolveMasterBeastEffects(data.masterBeast, {
+    armorSkill: readBeastSkillSelection(beastArmorSkillFields, values),
+    ringSkills: beastRingSkills.map(skill => readBeastSkillSelection(skill, values)),
     overallOption: text("MasterBeast.OverallPotential"), headOptions: [text("MasterBeast.Head.Option1"), text("MasterBeast.Head.Option2")],
     ringOptions: ["MasterBeast.Ring1.Option1", "MasterBeast.Ring1.Option2", "MasterBeast.Ring2.Option1", "MasterBeast.Ring2.Option2"].map(text),
     headManual: { attribute: text("MasterBeast.Head.CustomAttribute"), value: number("MasterBeast.Head.CustomValue") },

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { createRuntime, createPage, gameData, sample, legacyEvaluation, normalize,
-  evaluationSnapshot, digest, resultHtml, historicalEvaluationData } from './loadout-evaluation-harness.mjs';
+  evaluationSnapshot, digest, historicalResultHtml, historicalEvaluationData } from './loadout-evaluation-harness.mjs';
 import { scenarios, comparisons, engineInput } from './loadout-evaluation-scenarios.mjs';
 
 const fixture = JSON.parse(await readFile(new URL('./fixtures/loadout-evaluation.json', import.meta.url), 'utf8'));
@@ -79,7 +79,7 @@ for (const [id, current, baseline] of comparisons) {
   test(`actual main UI: ${id} keeps all result HTML and comparison formatting`, async () => {
     const page = await createPage(stateFor(current), stateFor(baseline), { data: historicalData });
     try {
-      assert.equal(digest(resultHtml(page.dom.window.document)), fixture.pages[id]);
+      assert.equal(digest(historicalResultHtml(page.dom.window.document)), fixture.pages[id]);
       if (id === 'different') {
         const stored = JSON.parse(page.dom.window.localStorage.getItem('dab-loadout-v1'));
         assert.equal(stored.values['Weapon.Transform.4.Stat'], '雙攻% × 強化');
