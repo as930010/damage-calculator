@@ -3,6 +3,7 @@ import { resolveInnerwearSources } from "../calculation/innerwear.ts";
 import { resolveNephronArmorSources, resolveGrettMedalMagazineBonuses } from "../calculation/nephron-armor.ts";
 import { resolveWeaponTransformationsFromFields } from "../calculation/weapon-transformations.ts";
 import { resolveWeaponEngravingSources } from "../calculation/weapon-engravings.ts";
+import { abyssWeapon, resolveWeaponEnhancementMilestones, selectedWeapon, selectedWeaponGrowth } from "../calculation/weapon-types.ts";
 import { circuitBoardStatKeys, resolveAccessoryEffectOptions, resolveArmorAppraisals, resolveAtmaSetEffects, resolveChipContribution, resolveCircuitBoardEffects, resolveColorSetEffect, resolveMasterBeastEffects, resolveNamedStatOption, resolveRaidSetEffects, resolveResonanceEffects, resolveRightIceSetEffects, resolveSpiritRecordEffects, resolveSpiritRecordSelections, resolveWeaponGrowth } from "../calculation/equipment-effects.ts";
 import type { AttributeRule, CharacterAttributeResult, StatContribution } from "../calculation/types.ts";
 import { calculateLoadoutCombatRates, prepareLoadoutAttributes, evaluatePreparedLoadout, type LoadoutCalculationInput } from "../calculation/loadout-engine.ts";
@@ -36,6 +37,10 @@ export function resolveLoadoutSources(data: GameData, state: LoadoutState) {
     state = { ...state, lowerwearAlternativeEnabled: condition.lowerwear === 'lowerwearB' };
   }
   const values = state.values;
+  const weapon = selectedWeapon(values);
+  const isAbyssWeapon = weapon === abyssWeapon;
+  const weaponEnhancement = String(values["Weapon.ENHC"] ?? "");
+  const weaponEnhancementLevel = weaponEnhancement ? Number(weaponEnhancement.match(/\d+/)?.[0]) : undefined;
   const characterBaseStats = { ...data.parameters.characterBase, ...data.parameters.characterBaseByClass?.[state.Job] };
   const text = (key: string) => String(values[key] ?? "");
   const number = (key: string) => values[key] === undefined || values[key] === "" ? undefined : Number(values[key]);
@@ -168,9 +173,11 @@ export function resolveLoadoutSources(data: GameData, state: LoadoutState) {
     .reduce((total, row) => total + (row.percentageValue ?? 0), 0);
   const colorSet = resolveColorSetEffect(data.colorSetEffects, text(data.colorSetEffects.settingKey), requiredCircuitAttribute, requiredCircuitValue);
   if (colorSet) groups.shared.push(colorSet);
-  groups.shared.push(...resolveWeaponTransformationsFromFields(data.transformations, values));
+  if (isAbyssWeapon) groups.shared.push(...resolveWeaponEnhancementMilestones(data.growth, weaponEnhancementLevel));
+  else groups.shared.push(...resolveWeaponTransformationsFromFields(data.transformations, values));
   groups.shared.push(...resolveWeaponEngravingSources(values, data.attack.weaponEnhancementFactors));
-  const growth = resolveWeaponGrowth(data.growth, text(data.growth.settingKey));
+  const growthOptions = selectedWeaponGrowth(data.growth, values);
+  const growth = resolveWeaponGrowth(growthOptions, text(growthOptions.settingKey));
   if (growth) groups.shared.push(growth);
   for (const group of Object.values(data.weaponAppraisals.groups)) {
     const source = resolveNamedStatOption(group.options, text(group.settingKey), `weapon-appraisal:${group.settingKey}`);
@@ -217,7 +224,7 @@ export function resolveLoadoutSources(data: GameData, state: LoadoutState) {
   groups.shared.push(
     ...resolveRightIceSetEffects(data.rightIceSets, rightIceFields.map(text), data.rightIceSets.selectionFields.map(text)),
       ...resolveResonanceEffects(data.resonance, Object.fromEntries(data.resonance.effects.map(effect => [effect.settingKey, values[effect.settingKey]]))),
-    ...resolveRaidSetEffects(data.raidSets, accessoryFields.map(text)),
+    ...resolveRaidSetEffects(data.raidSets, accessoryFields.map(text), weapon),
   );
   const atmaPieces = accessoryFields.map(text).filter(name => name.includes("亞特瑪")).length;
   groups.shared.push(...resolveAtmaSetEffects(data.atma, atmaPieces, text("Atma.Element"), text("Atma.Color")));
@@ -303,7 +310,9 @@ export function resolveLoadoutSources(data: GameData, state: LoadoutState) {
     ...(lowerwearBonusSources ? { lowerwearBonusSources } : {}),
     ...(condition ? { bossHealthCondition: condition.comparison } : {}),
     attackParameters: data.attack, classId: state.Job,
-    weaponEnhancementLevel: text('Weapon.ENHC') ? Number(text('Weapon.ENHC').match(/\d+/)?.[0]) : undefined };
+    weaponEnhancementLevel,
+    ...(isAbyssWeapon ? { weaponAttackLevelOffset: data.growth.abyss.attackLevelOffset } : {}) };
+
 }
 
 /** Attribute-only callers keep their existing result and incomplete-loadout contract. */
@@ -373,6 +382,7 @@ function damageInputs(data: GameData, state: LoadoutState, attributes: Character
     ...(sources.bossHealthCondition ? { bossHealthCondition: sources.bossHealthCondition } : {}),
     attackParameters: data.attack,
     weaponEnhancementLevel: weaponLevel,
+    ...(sources.weaponAttackLevelOffset === undefined ? {} : { weaponAttackLevelOffset: sources.weaponAttackLevelOffset }),
     classCombatEffects: rateInputs.classCombatEffects,
     classDamagePassives: data.classDamagePassives,
     combatRateSourceRules: data.combatRateSources,

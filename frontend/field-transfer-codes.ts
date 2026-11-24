@@ -308,5 +308,7 @@ export const FIELD_ID_TO_CODE: Readonly<Record<string, number>> = Object.freeze(
   "Weapon.Engraving.2.Value": 306,
   "Weapon.Engraving.3.Enabled": 307,
   "Weapon.Engraving.3.Effect": 308,
-  "Weapon.Engraving.3.Value": 309
+  "Weapon.Engraving.3.Value": 309,
+  "Weapon.Type": 310,
+  "Weapon.AbyssGrowth": 311
 });

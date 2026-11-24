@@ -10,6 +10,7 @@ import * as normalization from './loadout-normalization.ts';
 import { attributeLabel } from './attribute-label.ts';
 import { normalizeTransformationValues, transformationRolls, UNRELATED_TRANSFORMATION } from '../calculation/transformation-selections.ts';
 import { availableWeaponEngravingEffects, clearInvalidWeaponEngravingFields, weaponEngravingEffect, weaponEngravingSlots, weaponEngravingValueLabel } from '../calculation/weapon-engravings.ts';
+import { abyssWeapon, defaultWeapon, selectedWeapon, selectedWeaponGrowth, weaponTypeField } from '../calculation/weapon-types.ts';
 import { createResultCardsView, renderDamageFormula } from './result-cards-view.ts';
 import { sourceLabel as resolveSourceLabel } from './source-labels.ts';
 import { renderEquipmentDamageSummary, renderFinalDamageNumber, renderDamageRatio } from './damage-summary-view.ts';
@@ -350,7 +351,7 @@ async function start() {
   const titleChoices = options([...new Set(catalogIndex.resolveFieldChoices('Effect.Title', state.values) as readonly string[])]);
   const classPickerChoices = Object.freeze(catalogIndex.activeClasses.map(entry => Object.freeze({ value: entry.id, label: entry.name })));
   const equipmentPickerChoices = new Map<string, readonly PickerOption[]>();
-  let growthChoices: readonly PickerOption[] | undefined;
+  const growthChoices = new Map<string, readonly PickerOption[]>();
   const orderedEquipmentItems = new Map<string, ReturnType<typeof catalogIndex.equipmentItems>>();
   const refreshHistoryControls = () => {
     refreshProfiles();
@@ -1151,10 +1152,23 @@ async function start() {
     const innerwearSlot = selected.innerwearId ? data.innerwear.slots.find(slot => slot.id === selected.innerwearId) : undefined;
     const innerwearType = innerwearSlot && val(innerwearSlot.typeField) === "內布隆" ? "內布隆" : "百億";
     const typeSwitch = innerwearSlot ? `<div class="innerwear-type-switch" role="group" aria-label="內裝防具類型"><button type="button" data-innerwear-type="百億" aria-pressed="${innerwearType === "百億"}">百億</button><button type="button" data-innerwear-type="內布隆" aria-pressed="${innerwearType === "內布隆"}">內布隆</button></div>` : "";
-    panel.innerHTML = `<div class="inspector-title" style="--group-color:${group.color}">${icon(selected.icon)}<div class="inspector-title-copy"><small>${h(group.name)}</small><h2>${h(selected.label)}</h2></div>${typeSwitch}<button class="inspector-close" type="button" aria-label="關閉部位設定">×</button></div>`;
+    const weapon = selectedWeapon(state.values);
+    const weaponSwitch = selected.weapon
+      ? `<div class="innerwear-type-switch weapon-type-switch" role="group" aria-label="武器類型">${[abyssWeapon, defaultWeapon].map(name =>
+        `<button type="button" data-weapon-type="${h(name)}" aria-pressed="${name === weapon}">${h(name)}</button>`).join("")}</div>`
+      : '';
+    panel.innerHTML = `<div class="inspector-title" style="--group-color:${group.color}">${icon(selected.icon)}<div class="inspector-title-copy"><small>${h(group.name)}</small><h2>${h(selected.label)}</h2></div>${typeSwitch}${weaponSwitch}<button class="inspector-close" type="button" aria-label="關閉部位設定">×</button></div>`;
     if (innerwearSlot) panel.querySelectorAll<HTMLButtonElement>("[data-innerwear-type]").forEach(button => button.addEventListener("click", () => {
       state.values[innerwearSlot.typeField] = button.dataset.innerwearType!;
       update(); renderInspector();
+    }));
+    if (selected.weapon) panel.querySelectorAll<HTMLButtonElement>("[data-weapon-type]").forEach(button => button.addEventListener("click", () => {
+      const choice = button.dataset.weaponType;
+      if (choice === weapon) return;
+      if (choice === abyssWeapon) state.values[weaponTypeField] = abyssWeapon;
+      else delete state.values[weaponTypeField];
+      update(); renderInspector();
+      panel.querySelector<HTMLButtonElement>('[data-weapon-type][aria-pressed="true"]')?.focus({ preventScroll: true });
     }));
     if (selected.enabledBy && !alternateLowerwearAvailable()) { panel.insertAdjacentHTML('beforeend', '<p class="panel-note">請先啟用上方「強/排褲切換」，或在 Boss 體力條件中選用強/排褲。設定會保留於裝置，停用時不參與計算。</p>'); return; }
     if (selected.selectionField) {
@@ -1173,7 +1187,13 @@ async function start() {
       }
       const isAccessory = mapping.catalogFile === 'equipment/accessories.json';
       let choices = equipmentPickerChoices.get(selectionField);
-      if (!choices) { choices = Object.freeze(items.map(item => Object.freeze({ value: item.name, label: item.name, detail: summary(item.stats ?? {}) }))); equipmentPickerChoices.set(selectionField, choices); }
+      if (!choices) {
+        choices = Object.freeze(items.map(item => Object.freeze({
+          value: item.name, label: item.name,
+          detail: [summary(item.stats ?? {}), item.pickerDescription].filter(Boolean).join(' · '),
+        })));
+        equipmentPickerChoices.set(selectionField, choices);
+      }
       field(panel, selected.sharedSelection ? '左冰套裝（五部位共用）' : '選擇裝備', selectionField, choices, isAccessory);
       if (isAccessory) {
         const appraisalGroup = data.accessoryEffects.groups.find(entry => entry.selectionField === selectionField);
@@ -1276,9 +1296,15 @@ async function start() {
     }
     if (selected.weapon) {
       field(panel, '武器強化', 'Weapon.ENHC', options(Object.keys(data.attack.weaponEnhancementFactors).map(level => `Lv.${level}`)));
-      field(panel, '武器成長', data.growth.settingKey, growthChoices ??= Object.freeze(data.growth.levels.map(level => ({
-        value: level.name, label: level.name, detail: summary(level.stats),
-      }))));
+      const growth = selectedWeaponGrowth(data.growth, state.values);
+      let choices = growthChoices.get(growth.settingKey);
+      if (!choices) {
+        choices = Object.freeze(growth.levels.map(level => ({
+          value: level.name, label: level.name, detail: summary(level.stats),
+        })));
+        growthChoices.set(growth.settingKey, choices);
+      }
+      field(panel, '武器成長', growth.settingKey, choices);
     }
     if (selected.stoneFields?.length) {
       const area = section(panel, '魔法石', true);
@@ -1331,38 +1357,40 @@ async function start() {
     }
     if (selected.weapon) {
       const appraisal = section(panel, '武器鑑定'); Object.values(data.weaponAppraisals.groups).forEach((group, i) => field(appraisal, `鑑定 ${i + 1}`, group.settingKey, group.options.map(option => ({ value: option.name, label: option.name }))));
-      const transform = section(panel, '武器變換');
-      const transformationGrid = attributeValueGrid(transform, 'weapon-transformation-grid');
-      data.transformations.slots.forEach((slot, i) => {
-        const selectedElsewhere = new Set(data.transformations.slots
-          .filter(other => other.choiceField !== slot.choiceField)
-          .map(other => val(other.choiceField))
-          .filter(Boolean));
-        const availableOptions = data.transformations.rules
-          .filter(rule => !selectedElsewhere.has(rule.choice))
-          .map(rule => ({ value: rule.choice, label: rule.label }));
-        availableOptions.push({ value: UNRELATED_TRANSFORMATION, label: UNRELATED_TRANSFORMATION });
-        field(transformationGrid, `變換 ${i + 1}`, slot.choiceField, availableOptions, true);
-        const unrelated = val(slot.choiceField) === UNRELATED_TRANSFORMATION;
-        const rule = data.transformations.rules.find(rule => rule.choice === val(slot.choiceField));
-        const choices = rule ? transformationRolls(rule).map(roll => ({
-          value: String(roll / rule.valueMultiplier), label: String(roll) + (rule.valueMultiplier === 1 ? ' 級' : '%'),
-        })) : [];
-        const raw = state.values[slot.valueField];
-        const chosen = rule && raw !== undefined ? choices.find(option => Math.abs((Number(option.value) - Number(raw)) * rule.valueMultiplier) <= 1e-8) : undefined;
-        const picker = createPicker(`變換 ${i + 1} 數值`, choices, unrelated ? '0' : chosen?.value ?? '', value => {
-          if (value === '') delete state.values[slot.valueField];
-          else state.values[slot.valueField] = Number(value);
-          update();
+      if (weapon === defaultWeapon) {
+        const transform = section(panel, '武器變換');
+        const transformationGrid = attributeValueGrid(transform, 'weapon-transformation-grid');
+        data.transformations.slots.forEach((slot, i) => {
+          const selectedElsewhere = new Set(data.transformations.slots
+            .filter(other => other.choiceField !== slot.choiceField)
+            .map(other => val(other.choiceField))
+            .filter(Boolean));
+          const availableOptions = data.transformations.rules
+            .filter(rule => !selectedElsewhere.has(rule.choice))
+            .map(rule => ({ value: rule.choice, label: rule.label }));
+          availableOptions.push({ value: UNRELATED_TRANSFORMATION, label: UNRELATED_TRANSFORMATION });
+          field(transformationGrid, `變換 ${i + 1}`, slot.choiceField, availableOptions, true);
+          const unrelated = val(slot.choiceField) === UNRELATED_TRANSFORMATION;
+          const rule = data.transformations.rules.find(rule => rule.choice === val(slot.choiceField));
+          const choices = rule ? transformationRolls(rule).map(roll => ({
+            value: String(roll / rule.valueMultiplier), label: String(roll) + (rule.valueMultiplier === 1 ? ' 級' : '%'),
+          })) : [];
+          const raw = state.values[slot.valueField];
+          const chosen = rule && raw !== undefined ? choices.find(option => Math.abs((Number(option.value) - Number(raw)) * rule.valueMultiplier) <= 1e-8) : undefined;
+          const picker = createPicker(`變換 ${i + 1} 數值`, choices, unrelated ? '0' : chosen?.value ?? '', value => {
+            if (value === '') delete state.values[slot.valueField];
+            else state.values[slot.valueField] = Number(value);
+            update();
+          });
+          picker.dataset.fieldId = slot.valueField;
+          picker.querySelector('label')!.textContent = '數值';
+          if (!rule) {
+            picker.querySelector<HTMLInputElement>('input')!.disabled = true;
+            picker.querySelector<HTMLButtonElement>('.picker-clear')!.hidden = true;
+          }
+          transformationGrid.append(picker);
         });
-        picker.dataset.fieldId = slot.valueField;
-        picker.querySelector('label')!.textContent = '數值';
-        if (!rule) {
-          picker.querySelector<HTMLInputElement>('input')!.disabled = true;
-          picker.querySelector<HTMLButtonElement>('.picker-clear')!.hidden = true;
-        }
-        transformationGrid.append(picker);
-      });
+      }
       const engraving = section(panel, '刻印石');
       const participationLabel = '該刻印石是否參與計算';
       for (const { line, enabledField, effectField, valueField } of weaponEngravingSlots) {

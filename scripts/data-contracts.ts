@@ -1,4 +1,4 @@
-import type { AccessoryEffectDocument, ArmorAppraisalDocument, AtmaEffectDocument, ChipCatalogDocument, CircuitBoardRulesDocument, ColorSetEffectDocument, MasterBeastEffectDocument, NamedStatOption, RaidSetEffectDocument, ResonanceEffectDocument, RightIceSetEffectDocument, SpiritRecordEffectDocument, WeaponGrowthDocument } from '../calculation/equipment-effects.ts';
+import type { AccessoryEffectDocument, ArmorAppraisalDocument, AtmaEffectDocument, ChipCatalogDocument, CircuitBoardRulesDocument, ColorSetEffectDocument, MasterBeastEffectDocument, NamedStatOption, RaidSetEffectDocument, ResonanceEffectDocument, RightIceSetEffectDocument, SpiritRecordEffectDocument } from '../calculation/equipment-effects.ts';
 import type { EquipmentCatalogDocument, SimulatorEquipmentMappingDocument } from '../calculation/equipment-catalog.ts';
 import type { ClassCombatEffectsDocument, ClassDamagePassivesDocument, AttackParametersDocument } from '../calculation/types.ts';
 import type { InnerwearRulesDocument } from '../calculation/innerwear.ts';
@@ -70,7 +70,7 @@ const _raidSets: Widen<RaidSetEffectDocument> = raidSets;
 const _resonance: Widen<ResonanceEffectDocument> = resonance;
 const _rightIceSets: Widen<RightIceSetEffectDocument> = rightIceSets;
 const _spiritRecord: Widen<SpiritRecordEffectDocument> = spiritRecord;
-const _weaponGrowth: Widen<WeaponGrowthDocument> = weaponGrowth;
+const _weaponGrowth: Widen<import("../calculation/weapon-types.ts").WeaponGrowthOptions> = weaponGrowth;
 const _weaponTransformations: Widen<WeaponTransformationDocument> = weaponTransformations;
 const _chipCatalog: Widen<ChipCatalogDocument> = chips;
 const _chipSlots: Widen<ChipSlotsDocument> = chipSlots;

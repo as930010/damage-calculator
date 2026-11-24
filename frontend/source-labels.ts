@@ -3,6 +3,7 @@ import { DEFAULT_BOSS_HEALTH_CONDITION, type BossHealthCondition } from './state
 import { readCircuitBoardRows } from './circuit-board-rows.ts';
 import { attributeLabel } from './attribute-label.ts';
 import { weaponEngravingSlots, weaponEngravingEffect } from '../calculation/weapon-engravings.ts';
+import { selectedWeaponGrowth } from '../calculation/weapon-types.ts';
 
 export interface SourceLabelSelection {
   readonly values: Readonly<Record<string, string | number>>;
@@ -145,7 +146,8 @@ function resolveSourceLabel(sourceId: string, data: GameData, state: SourceLabel
     'atma-wood-multiplicative-crit-damage': '草木亞特瑪乘算致命傷害',
   };
   if (atma) return atmaNames[atma.id] ?? `亞特瑪來源待確認（${atma.id}）`;
-  if (sourceId.startsWith('weapon-growth')) return `武器成長：${String(state.values[data.growth.settingKey] ?? '')}`;
+  if (sourceId.startsWith('weapon-growth')) return `武器成長：${String(state.values[selectedWeaponGrowth(data.growth, state.values).settingKey] ?? '')}`;
+  if (sourceId.startsWith('abyss-weapon-enhancement:')) return '深淵暗鬼強化 +' + sourceId.split(':')[1];
   if (sourceId.startsWith('weapon-appraisal:')) {
     const fieldId = sourceId.slice('weapon-appraisal:'.length);
     const group = Object.values(data.weaponAppraisals.groups).find(entry => entry.settingKey === fieldId);

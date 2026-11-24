@@ -10,12 +10,19 @@ export const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const gameData = JSON.parse(await readFile(resolve(root, 'dist/data/game-data.json'), 'utf8'));
 export const sample = JSON.parse(await readFile(resolve(root, 'data/examples/public-example-2026-09-28.json'), 'utf8'));
 
-/** The historical hashes predate the cooldown reset attribute and its two sources. */
+/** Compare historical hashes with the original stat roster and raid-set labels. */
 export function historicalEvaluationData() {
   const data = structuredClone(gameData);
   data.attributes.attributes = data.attributes.attributes.filter(({ key }) => key !== 'cooldownResetPct');
+  const defenseIgnoreIndex = data.attributes.attributes.findIndex(({ key }) => key === 'defenseIgnorePct');
+  data.attributes.attributes.splice(defenseIgnoreIndex, 0, {
+    key: 'actionSpeedPct', name: '動作速度%', unit: 'percent',
+    calculationScope: 'characterTotal', aggregation: 'sum', active: true,
+  });
   delete data.circuits.inputs.find(({ slot }) => slot === 'upper').statKeyByAttributeName['重置機率%'];
   delete data.colorSetEffects.options.find(({ name }) => name === '藍').stats.cooldownResetPct;
+  data.raidSets.sets.find(({ id }) => id === 'raid-set-21').name = '21襲擊套效';
+  data.raidSets.sets.find(({ id }) => id === 'raid-set-18').name = '18襲擊套效';
   return data;
 }
 

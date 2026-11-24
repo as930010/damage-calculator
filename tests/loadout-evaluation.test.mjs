@@ -383,3 +383,17 @@ test('skill share input preserves draft, input/blur/Enter submission, rejection 
     for (const value of ['0', '100', '12.34']) { input.value = value; input.dispatchEvent(new Event('input', { bubbles: true })); assert.equal(stored(), Number(value)); }
   } finally { page.close(); }
 });
+
+test('attribute cards and calculation comparison omit the removed action speed stat', async () => {
+  const current = structuredClone(sample);
+  current.values['Accessory.FaceTop'] = '被侵蝕的荊棘角';
+  const page = await createPage(current, sample);
+  try {
+    const doc = page.dom.window.document;
+    assert.ok(doc.querySelector('#results [data-disclosure-key="stat:adaptabilityPct"]'));
+    assert.equal(doc.querySelector('#results [data-disclosure-key="stat:actionSpeedPct"]'), null);
+    const comparison = doc.querySelector('#calculation-comparison');
+    assert.ok(comparison.querySelector('table'));
+    assert.doesNotMatch(comparison.textContent, /動作速度|actionSpeedPct/);
+  } finally { page.close(); }
+});

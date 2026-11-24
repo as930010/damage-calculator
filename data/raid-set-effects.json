@@ -4,13 +4,14 @@
   "sets": [
     {
       "id": "raid-set-21",
-      "name": "21襲擊套效",
+      "name": "空中要塞的遺產",
       "matchTerms": [
+        "死龍遺言",
         "Type-Q女王的勳章",
         "命運的預言書",
         "靈魂的枷鎖"
       ],
-      "implicitPieces": 1,
+      "implicitPieces": 0,
       "pieceCountCap": 3,
       "tiers": [
         {
@@ -31,8 +32,9 @@
     },
     {
       "id": "raid-set-18",
-      "name": "18襲擊套效",
+      "name": "銳利的深淵",
       "matchTerms": [
+        "深淵暗鬼",
         "暗鬼的徽章",
         "夢緣香爐",
         "夢繞氣息"

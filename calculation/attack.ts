@@ -52,6 +52,7 @@ export function resolveAttackParameters(
   document: AttackParametersDocument,
   classId: string,
   weaponEnhancementLevel: number,
+  weaponAttackLevelOffset?: number,
 ): ResolvedAttackParameters {
   const profile = document.classes[classId];
   if (!profile) {
@@ -68,6 +69,7 @@ export function resolveAttackParameters(
     physicalClassCoefficient: profile.physical,
     magicalClassCoefficient: profile.magical,
     weaponEnhancementFactor,
+    ...(weaponAttackLevelOffset === undefined ? {} : { weaponAttackLevelOffset }),
   };
 }
 
@@ -88,13 +90,13 @@ function floorMath(value: number): number {
 }
 
 export type WeaponBaseAttackInput = Pick<AttackCalculationInput,
-  "attackLevel" | "physicalClassCoefficient" | "magicalClassCoefficient" | "weaponEnhancementFactor"
+  "attackLevel" | keyof ResolvedAttackParameters
 >;
 
 /** Weapon attack before enhancement and model-specific rounding. */
-export function unroundedWeaponAttack(classCoefficient: number, attackLevel: number): number {
+export function unroundedWeaponAttack(classCoefficient: number, attackLevel: number, weaponAttackLevelOffset = 50): number {
   return 0.85 * classCoefficient - 0.7775 * 400 +
-    (0.15 * classCoefficient - 0.0225 * 400) * (99 + attackLevel + 50) + 0.5;
+    (0.15 * classCoefficient - 0.0225 * 400) * (99 + attackLevel + weaponAttackLevelOffset) + 0.5;
 }
 
 /** Resolve weapon base attacks after all attack-level bonuses are accumulated. */
@@ -106,7 +108,7 @@ export function calculateWeaponBaseAttack(input: WeaponBaseAttackInput): {
     if (!Number.isFinite(value)) throw new TypeError(`Weapon base ${key} must be finite.`);
   }
   const calculate = (classCoefficient: number): number => {
-    const classBase = unroundedWeaponAttack(classCoefficient, input.attackLevel);
+    const classBase = unroundedWeaponAttack(classCoefficient, input.attackLevel, input.weaponAttackLevelOffset);
     const value = floorMath(classBase) * input.weaponEnhancementFactor;
     if (!Number.isFinite(value)) throw new RangeError("Weapon base attack must be finite.");
     return value;
@@ -134,6 +136,7 @@ export function calculateAttack(
     physicalClassCoefficient: input.physicalClassCoefficient,
     magicalClassCoefficient: input.magicalClassCoefficient,
     weaponEnhancementFactor: input.weaponEnhancementFactor,
+    ...(input.weaponAttackLevelOffset === undefined ? {} : { weaponAttackLevelOffset: input.weaponAttackLevelOffset }),
   });
   const weaponPhysicalAttack = weaponBase.physicalAttack;
   const weaponMagicalAttack = weaponBase.magicalAttack;

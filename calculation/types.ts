@@ -142,9 +142,10 @@ export interface ResolvedAttackParameters {
   physicalClassCoefficient: number;
   magicalClassCoefficient: number;
   weaponEnhancementFactor: number;
+  weaponAttackLevelOffset?: number;
 }
 
-export interface AttackCalculationInput {
+export interface AttackCalculationInput extends ResolvedAttackParameters {
   attackType: AttackType;
   physicalAttack: number;
   magicalAttack: number;
@@ -154,11 +155,6 @@ export interface AttackCalculationInput {
   skillTypeAttackPct: number;
   /** Attack-level bonus. */
   attackLevel: number;
-  /** Class coefficients for physical and magical weapon base attack. */
-  physicalClassCoefficient: number;
-  magicalClassCoefficient: number;
-  /** Weapon enhancement multiplier resolved from game parameters. */
-  weaponEnhancementFactor: number;
 }
 
 export interface AttackCalculationResult {

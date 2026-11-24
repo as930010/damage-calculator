@@ -3,6 +3,7 @@ import type { GameData } from './data.ts';
 import { createValidationCatalogIndex } from './input-validation.ts';
 import { createClassCodeResolver } from './class-code.ts';
 import { UNRELATED_TRANSFORMATION } from '../calculation/transformation-selections.ts';
+import { abyssWeapon, defaultWeapon, weaponTypeField } from '../calculation/weapon-types.ts';
 
 export type CatalogData = Pick<GameData,
   | 'classes' | 'mapping' | 'catalogs' | 'simulatorInputs' | 'masterBeast'
@@ -93,7 +94,9 @@ export function createCatalogIndex(data: CatalogData, revision: unknown = Symbol
   register([data.weaponGrades.settingKey], names(data.weaponGrades.options));
   for (const group of data.weaponGrades.colorGroups) register(group.settingKeys, names(group.options));
   register(['Weapon.ENHC'], memoizeChoices(() => Object.keys(data.attack.weaponEnhancementFactors).map(level => `Lv.${level}`)));
+  register([weaponTypeField], memoizeChoices(() => [abyssWeapon, defaultWeapon]));
   register([data.growth.settingKey], names(data.growth.levels));
+  register([data.growth.abyss.settingKey], names(data.growth.abyss.levels));
   const appraisals = names(data.appraisals.options);
   for (const slot of data.appraisals.slots) register(slot.inputFields, appraisals);
   const contextualAppraisals = new Set<string>();

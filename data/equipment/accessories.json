@@ -50,6 +50,25 @@
       }
     },
     {
+      "id": "accessories-corrupted-thorn-horn",
+      "name": "被侵蝕的荊棘角",
+      "slotId": "faceTop",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "description": "使用特殊主動技能時，增加所有技能傷害+4%(最大3重疊、再發動等待時間為5秒)；重疊至上限時變更為持續300秒的Buff，增加12%所有技能傷害、3%攻擊力。",
+      "pickerDescription": "動作速度 3%",
+      "stats": {
+        "adaptabilityPct": 3,
+        "multiplicativeDamagePct": 15.0580645161291
+      },
+      "effects": [],
+      "appraisal": {
+        "canAppraise": false,
+        "effectCount": 0
+      }
+    },
+    {
       "id": "accessories-52b0a3f7e43a",
       "name": "MAESTRO光環",
       "slotId": "faceTop",
@@ -93,25 +112,6 @@
       "stats": {
         "doubleAttackPct": -5,
         "multiplicativeDamagePct": 10
-      },
-      "effects": [],
-      "appraisal": {
-        "canAppraise": false,
-        "effectCount": 0
-      }
-    },
-    {
-      "id": "accessories-corrupted-thorn-horn",
-      "name": "被侵蝕的荊棘角",
-      "slotId": "faceTop",
-      "typeId": "accessories",
-      "level": null,
-      "active": true,
-      "description": "使用特殊主動技能時，增加所有技能傷害+4%(最大3重疊、再發動等待時間為5秒)；重疊至上限時變更為持續300秒的Buff，增加12%所有技能傷害、3%攻擊力。",
-      "stats": {
-        "adaptabilityPct": 3,
-        "actionSpeedPct": 3,
-        "multiplicativeDamagePct": 15.0580645161291
       },
       "effects": [],
       "appraisal": {
@@ -199,6 +199,24 @@
       }
     },
     {
+      "id": "accessories-grett-medal",
+      "name": "格雷特的勳章",
+      "slotId": "earring",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "stats": {
+        "adaptabilityPct": 2,
+        "critDamagePct": 3,
+        "multiplicativeDamagePct": 6
+      },
+      "effects": [],
+      "appraisal": {
+        "canAppraise": false,
+        "effectCount": 0
+      }
+    },
+    {
       "id": "accessories-00b2b054cdd1",
       "name": "天線耳環",
       "slotId": "earring",
@@ -226,24 +244,6 @@
       "stats": {
         "critDamagePct": 3,
         "adaptabilityPct": 2
-      },
-      "effects": [],
-      "appraisal": {
-        "canAppraise": false,
-        "effectCount": 0
-      }
-    },
-    {
-      "id": "accessories-grett-medal",
-      "name": "格雷特的勳章",
-      "slotId": "earring",
-      "typeId": "accessories",
-      "level": null,
-      "active": true,
-      "stats": {
-        "adaptabilityPct": 2,
-        "critDamagePct": 3,
-        "multiplicativeDamagePct": 6
       },
       "effects": [],
       "appraisal": {
@@ -531,8 +531,8 @@
       },
       "effects": [],
       "appraisal": {
-        "canAppraise": null,
-        "effectCount": null
+        "canAppraise": false,
+        "effectCount": 0
       }
     },
     {
@@ -548,8 +548,23 @@
       },
       "effects": [],
       "appraisal": {
-        "canAppraise": null,
-        "effectCount": null
+        "canAppraise": false,
+        "effectCount": 0
+      }
+    },
+    {
+      "id": "accessories-dream-wrapped-breath",
+      "name": "夢繞氣息",
+      "slotId": "bottom",
+      "typeId": "accessories",
+      "level": null,
+      "active": true,
+      "pickerDescription": "動作速度 7%",
+      "stats": {},
+      "effects": [],
+      "appraisal": {
+        "canAppraise": false,
+        "effectCount": 0
       }
     },
     {

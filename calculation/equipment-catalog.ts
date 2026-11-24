@@ -16,6 +16,8 @@ export interface EquipmentCatalogItem {
   active: boolean;
   /** Player-facing explanation shown when this item is selected. */
   description?: string;
+  /** Supplemental player-facing text shown on this item’s picker option. */
+  pickerDescription?: string;
   /** Maintainer-only formula notes; never shown in the UI. */
   developerNote?: string;
   stats?: Readonly<Record<string, number>>;

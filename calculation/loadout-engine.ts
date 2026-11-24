@@ -38,6 +38,7 @@ export interface LoadoutCalculationInput {
   bossHealthCondition?: 'above' | 'below';
   attackParameters: AttackParametersDocument;
   weaponEnhancementLevel: number;
+  weaponAttackLevelOffset?: number;
   classCombatEffects: ClassCombatEffectsDocument;
   classDamagePassives: ClassDamagePassivesDocument;
   combatRateSourceRules: CombatRateSourceRulesDocument;
@@ -161,7 +162,7 @@ export function calculateLoadoutCombatRates(input: CombatRateCalculationInput): 
 }
 
 export type LoadoutAttributeInput = Pick<LoadoutCalculationInput,
-  'attributeRules' | 'sources' | 'characterBaseStats' | 'attackParameters' | 'classId'>
+  'attributeRules' | 'sources' | 'characterBaseStats' | 'attackParameters' | 'classId' | 'weaponAttackLevelOffset'>
   & { weaponEnhancementLevel?: number };
 
 /** Resolve preliminary attack modifiers before adding weapon-base attributes. */
@@ -180,6 +181,7 @@ export function prepareLoadoutAttributes(input: LoadoutAttributeInput, requireWe
     input.attackParameters,
     input.classId,
     input.weaponEnhancementLevel!,
+    input.weaponAttackLevelOffset,
   );
   // Weapon base attacks depend on the total attack level before entering physical/magical totals.
   // Resolve this acyclic step before final aggregation so the attack formula consumes them.

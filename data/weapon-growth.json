@@ -55,5 +55,82 @@
       }
     }
   ],
-  "settingKey": "Weapon.Growth"
+  "settingKey": "Weapon.Growth",
+  "abyss": {
+    "schemaVersion": 2,
+    "settingKey": "Weapon.AbyssGrowth",
+    "attackLevelOffset": 35,
+    "levels": [
+      {
+        "id": "abyss-weapon-growth-0",
+        "name": "Lv.0",
+        "stats": {}
+      },
+      {
+        "id": "abyss-weapon-growth-1",
+        "name": "Lv.1",
+        "stats": {
+          "allSkillDamagePct": 10
+        }
+      },
+      {
+        "id": "abyss-weapon-growth-2",
+        "name": "Lv.2",
+        "stats": {
+          "allSkillDamagePct": 10,
+          "attackLevel": 10
+        }
+      },
+      {
+        "id": "abyss-weapon-growth-3",
+        "name": "Lv.3",
+        "stats": {
+          "allSkillDamagePct": 15,
+          "attackLevel": 10
+        }
+      },
+      {
+        "id": "abyss-weapon-growth-4",
+        "name": "Lv.4",
+        "stats": {
+          "allSkillDamagePct": 15,
+          "attackLevel": 15
+        }
+      },
+      {
+        "id": "abyss-weapon-growth-5",
+        "name": "Lv.5",
+        "stats": {
+          "allSkillDamagePct": 20,
+          "attackLevel": 20
+        }
+      }
+    ],
+    "enhancementMilestones": [
+      {
+        "level": 10,
+        "stats": {
+          "doubleAttackPct": 12
+        }
+      },
+      {
+        "level": 11,
+        "stats": {
+          "polarizationPct": 10
+        }
+      },
+      {
+        "level": 12,
+        "stats": {
+          "attackLevel": 12
+        }
+      },
+      {
+        "level": 13,
+        "stats": {
+          "critDamagePct": 10
+        }
+      }
+    ]
+  }
 }

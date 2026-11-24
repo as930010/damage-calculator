@@ -58,7 +58,7 @@ test('公開配裝範例保留技能占比與武器魔力石設定', async () =>
   assert.equal(custom.critDamagePct.finalTotal, result.attributes.stats.critDamagePct.finalTotal + 1.7);
 });
 
-test('被侵蝕的荊棘角把310秒Buff週期平均放入乘算效果，並單獨記錄適應力與動作速度', async () => {
+test('被侵蝕的荊棘角保留310秒Buff週期乘算與適應力，動作速度只作選項說明', async () => {
   const [data, sourceState] = await Promise.all([
     loadData(),
     readJson('examples/public-example-2026-09-28.json'),
@@ -75,11 +75,11 @@ test('被侵蝕的荊棘角把310秒Buff週期平均放入乘算效果，並單�
   const contribution = equippedProjection.calculationSources.shared.find(source => source.sourceId === 'simulator:Accessory.FaceTop');
   assert.ok(contribution);
   assert.equal(contribution.stats.adaptabilityPct, 3);
-  assert.equal(contribution.stats.actionSpeedPct, 3);
+  assert.equal(Object.hasOwn(contribution.stats, 'actionSpeedPct'), false);
   assert.equal(contribution.stats.multiplicativeDamagePct, 15.0580645161291);
 
   const equipped = projectDamage(data, equippedState).result;
-  assert.equal(equipped.attributes.stats.actionSpeedPct.finalTotal, 3);
+  assert.equal(Object.hasOwn(equipped.attributes.stats, 'actionSpeedPct'), false);
   assert.equal(equipped.attributes.stats.allSkillDamagePct.finalTotal, base.attributes.stats.allSkillDamagePct.finalTotal);
   assert.equal(equipped.attributes.stats.doubleAttackPct.finalTotal, base.attributes.stats.doubleAttackPct.finalTotal);
   const expectedProduct = base.generalMultiplicativeDamage.value / (1 + previousMultiplicativePct / 100) * (1 + formulaPct / 100);
@@ -88,5 +88,6 @@ test('被侵蝕的荊棘角把310秒Buff週期平均放入乘算效果，並單�
   const item = data.catalogs['equipment/accessories.json'].items.find(entry => entry.name === '被侵蝕的荊棘角');
   assert.equal(item.appraisal.canAppraise, false);
   assert.match(item.description, /使用特殊主動技能時/);
+  assert.equal(item.pickerDescription, '動作速度 3%');
 
 });

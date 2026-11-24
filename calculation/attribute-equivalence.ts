@@ -71,7 +71,7 @@ export function createAttributeEquivalenceCalculator(input: LoadoutCalculationIn
   const configurations = baseline.lowerwearConfigurations?.map(({ result }) =>
     createAttributeEquivalenceCalculator({ ...input, lowerwearBonusSources: undefined }, result, attributes));
   const baseFinalInput = finalDamageInputs(input, baseline);
-  const attackParameters = resolveAttackParameters(input.attackParameters, input.classId, input.weaponEnhancementLevel);
+  const attackParameters = resolveAttackParameters(input.attackParameters, input.classId, input.weaponEnhancementLevel, input.weaponAttackLevelOffset);
   const generalFactors = baseline.generalMultiplicativeDamage.factors.map(({ sourceId, valuePct }) => ({ sourceId, valuePct }));
   const critFactors = baseline.multiplicativeCritDamage.factors.map(({ sourceId, valuePct }) => ({ sourceId, valuePct }));
   const stat = (key: string) => baseline.attributes.stats[key]?.finalTotal ?? 0;

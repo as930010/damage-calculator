@@ -6,7 +6,8 @@ import type { ChipSlotsDocument } from "../calculation/simulator-sources.ts";
 import type { WeaponTransformationDocument } from "../calculation/weapon-transformations.ts";
 import type { ClassCombatEffectsDocument, ClassDamagePassivesDocument } from "../calculation/types.ts";
 import type { CombatRateSourceRulesDocument } from "../calculation/combat-rate-sources.ts";
-import type { AccessoryEffectDocument, ArmorAppraisalDocument, AtmaEffectDocument, ChipCatalogDocument, CircuitBoardRulesDocument, ColorSetEffectDocument, MasterBeastEffectDocument, NamedStatOption, RaidSetEffectDocument, ResonanceEffectDocument, RightIceSetEffectDocument, SpiritRecordEffectDocument, WeaponGrowthDocument } from "../calculation/equipment-effects.ts";
+import type { AccessoryEffectDocument, ArmorAppraisalDocument, AtmaEffectDocument, ChipCatalogDocument, CircuitBoardRulesDocument, ColorSetEffectDocument, MasterBeastEffectDocument, NamedStatOption, RaidSetEffectDocument, ResonanceEffectDocument, RightIceSetEffectDocument, SpiritRecordEffectDocument } from "../calculation/equipment-effects.ts";
+import type { WeaponGrowthOptions } from "../calculation/weapon-types.ts";
 
 export interface LayoutSlot {
   id: string; label: string; group: string; x: number; y: number; icon: string;
@@ -52,7 +53,7 @@ export interface GameData {
   chipSlots: ChipSlotsDocument;
   circuits: CircuitBoardRulesDocument;
   transformations: WeaponTransformationDocument & { options: string[] };
-  growth: WeaponGrowthDocument & { settingKey: string };
+  growth: WeaponGrowthOptions;
   weaponAppraisals: { groups: Record<string, { settingKey: string; options: NamedStatOption[] }> };
   weaponGrades: {
     settingKey: string;

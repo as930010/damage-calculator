@@ -3,6 +3,7 @@ import { resolveNephronArmorSources } from '../../calculation/nephron-armor.ts';
 import { attributeLabel } from '../../frontend/attribute-label.ts';
 import { calculateLoadout } from '../../calculation/loadout-engine.ts';
 import { resolveWeaponTransformationsFromFields } from '../../calculation/weapon-transformations.ts';
+import { abyssWeapon, selectedWeapon } from '../../calculation/weapon-types.ts';
 import type { GameData } from '../../frontend/data.ts';
 import { evaluateLoadout } from '../../frontend/projection.ts';
 import type { LoadoutState } from '../../frontend/state.ts';
@@ -12,6 +13,7 @@ import { normalizeTransformationSelections, normalizeTransformationValues, UNREL
 export function readRatingLoadout(data: GameData, state: LoadoutState, externalDefenseBreakRate: number | null = 0, defenseIgnoreAdditive: number | null = 0) {
   const job = data.classes.classes.find(entry => entry.id === state.Job);
   if (!job) throw new Error('目前配裝的職業無法辨識。');
+  if (selectedWeapon(state.values) === abyssWeapon) throw new Error('深淵暗鬼沒有武器變換，可切換至防具評分。');
   const transforms = data.transformations;
   const enhancementText = String(state.values[transforms.enhancementField] ?? '');
   const enhancement = Number(enhancementText.match(/\d+/)?.[0]);

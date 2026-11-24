@@ -333,8 +333,8 @@ test('equipment summaries use metadata units, preserve digits and leave source d
   }
   assert.equal(summary({ doubleAttackPct: 4, physicalAttack: 300, magicalAttack: 250, attackLevel: 2 }),
     '物攻 300 · 魔攻 250 · 攻擊力等級 2 · 攻擊力 4%');
-  assert.equal(summary({ fullHealthKillDamagePct: 5, adaptabilityPct: 2.5, physicalAttack: -12345.678912, actionSpeedPct: -0.125 }),
-    '物攻 -12,345.67891 · 適應力 2.5% · 動作速度 -0.125% · 100%血殺 5%');
+  assert.equal(summary({ fullHealthKillDamagePct: 5, adaptabilityPct: 2.5, physicalAttack: -12345.678912, critDamagePct: -0.125 }),
+    '物攻 -12,345.67891 · 適應力 2.5% · 致命傷害 -0.125% · 100%血殺 5%');
   assert.equal(summary({ critRatePct: 0, attackLevel: -0 }), '');
   assert.equal(summary({}), '');
   assert.equal(summary({ critDamagePct: 3 }), '致命傷害 3%');

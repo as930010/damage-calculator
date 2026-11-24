@@ -59,6 +59,7 @@ for (const context of choiceContexts()) {
     for (const field of Object.keys(fixture.choices[context.id])) {
       const additions = gameData.nephronArmor.fields.some(entry => entry.magazineField === field) ? ['支援彈匣I', '支援彈匣II', '超級彈匣I', '超級彈匣II'] : [];
       if (gameData.transformations.slots.some(slot => slot.choiceField === field)) additions.push('無關傷害');
+      if (field === 'Accessory.Bottom') additions.push('夢繞氣息');
       const expected = fixture.choices[context.id][field];
       const magicStoneMapping = index.equipmentMappings.get(field);
       const stoneAdditions = magicStoneMapping?.catalogFile === gameData.mapping.magicStoneSelections.catalogFile

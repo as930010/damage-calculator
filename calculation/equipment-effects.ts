@@ -1,3 +1,4 @@
+import { defaultWeapon } from './weapon-types.ts';
 import type { StatContribution } from "./types.ts";
 import { isResonanceInputField, parseResonancePoints } from "./resonance-input.ts";
 
@@ -430,15 +431,16 @@ export function resolveResonanceEffects(
 export function resolveRaidSetEffects(
   document: RaidSetEffectDocument,
   equippedItemNames: readonly (string | null | undefined)[],
+  weaponName: string = defaultWeapon,
 ): StatContribution[] {
-  const names = equippedItemNames.filter((name): name is string => Boolean(name?.trim()));
+  const names = [...new Set([...equippedItemNames, weaponName].filter((name): name is string => Boolean(name?.trim())))];
   const result: StatContribution[] = [];
   for (const set of document.sets) {
     requireNonEmpty(set.id, "raidSet.id");
     if (!Number.isInteger(set.implicitPieces) || set.implicitPieces < 0) {
       throw new RangeError(`${set.id}.implicitPieces must be a non-negative integer.`);
     }
-    const matchedItems = names.filter((name) => set.matchTerms.some((term) => name.includes(term))).length;
+    const matchedItems = set.matchTerms.filter(term => names.some(name => name.includes(term))).length;
     const pieceCount = Math.min(set.pieceCountCap, set.implicitPieces + matchedItems);
     for (const tier of set.tiers) {
       if (!Number.isInteger(tier.requiredPieces) || tier.requiredPieces < 1) {

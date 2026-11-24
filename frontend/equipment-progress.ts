@@ -2,6 +2,7 @@ import type { LayoutSlot } from './data.ts';
 import type { LoadoutState } from './state.ts';
 import type { CatalogIndex } from './catalog-index.ts';
 import { configurationProgress } from './configuration-progress.ts';
+import { abyssWeapon, selectedWeapon, selectedWeaponGrowth, weaponTypeField } from '../calculation/weapon-types.ts';
 import { UNRELATED_TRANSFORMATION, validTransformationValue } from '../calculation/transformation-selections.ts';
 import { circuitBoardRowsField, readCircuitBoardRows, validateCircuitBoardRows } from './circuit-board-rows.ts';
 
@@ -11,7 +12,7 @@ export function equipmentProgressFields(slot: LayoutSlot, index: CatalogIndex): 
   let slots = dependencyCache.get(index); if (!slots) { slots = new Map(); dependencyCache.set(index, slots); }
   const cached = slots.get(slot.id); if (cached) return cached;
   const data = index.data, fields = [...(slot.selectionField ? [slot.selectionField] : []), ...(slot.stoneFields ?? [])];
-  if (slot.weapon) fields.push('Weapon.ENHC', data.growth.settingKey, ...Object.values(data.weaponAppraisals.groups).map(g=>g.settingKey), ...data.transformations.slots.flatMap(s=>[s.choiceField,s.valueField]));
+  if (slot.weapon) fields.push(weaponTypeField, 'Weapon.ENHC', data.growth.settingKey, data.growth.abyss.settingKey, ...Object.values(data.weaponAppraisals.groups).map(g=>g.settingKey), ...data.transformations.slots.flatMap(s=>[s.choiceField,s.valueField]));
   if (slot.innerwearId) {
     const armor = data.innerwear.slots.find(s=>s.id===slot.innerwearId)!;
     const nephron = data.nephronArmor.fields.find(s=>s.slotId===slot.innerwearId)!;
@@ -86,10 +87,10 @@ export function equipmentProgress(slot: LayoutSlot, state: LoadoutState, index: 
     }
   }
   if(slot.weapon){
-    required('Weapon.ENHC');required(data.growth.settingKey);
+    required('Weapon.ENHC');required(selectedWeaponGrowth(data.growth,values).settingKey);
     for(const g of Object.values(data.weaponAppraisals.groups))required(g.settingKey);
     const seen=new Set<string>();
-    for(const t of data.transformations.slots){const rule=data.transformations.rules.find(r=>r.choice===values[t.choiceField]);
+    if (selectedWeapon(values) !== abyssWeapon) for(const t of data.transformations.slots){const rule=data.transformations.rules.find(r=>r.choice===values[t.choiceField]);
       const valid=required(t.choiceField);
       if(values[t.choiceField]===UNRELATED_TRANSFORMATION) continue;
       checks.push(Boolean(rule&&validTransformationValue(rule,values[t.valueField]))&&!seen.has(String(values[t.choiceField])));if(valid)seen.add(String(values[t.choiceField]));}
