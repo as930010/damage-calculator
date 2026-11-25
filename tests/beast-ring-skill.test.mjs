@@ -183,7 +183,7 @@ test('both ring editors preserve section order, history and saved rolls independ
     const skills = [armor.slotId, first.slotId, second.slotId].includes(id) ? ['聖獸技能'] : [];
     assert.deepEqual([...document.querySelectorAll('#inspector > details > summary')].map(node => node.textContent),
       ['固定效果', '精靈石', '迷鏡變換', ...skills]);
-    assert.equal(document.querySelector('#inspector .beast-mirror-section').dataset.disclosureKey, 'inspector:' + id + ':迷鏡效果');
+    assert.equal(document.querySelector('#inspector .beast-mirror-grid').closest('details').dataset.disclosureKey, 'inspector:' + id + ':迷鏡效果');
   }
   assert.match(document.querySelector('#results').textContent, /聖獸迷鏡變換/);
   const firstButton = document.querySelector('[data-beast-slot-id="ring-one"]');

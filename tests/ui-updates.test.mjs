@@ -1215,7 +1215,9 @@ test('beast three-state progress survives clears, history, JSON and reload for a
       values[slot.mirrorFields[2][0]]='極大化%';values[slot.mirrorFields[2][1]]=0.00001;assert.equal(beastAccessoryStatus(slot,values,index),'partial');
     }
     const card=()=>page.dom.window.document.querySelector('[data-beast-slot-id="armor"]');assert.equal(card().dataset.configuration,'empty');
-    card().click();const selectAt=(i,name)=>{const input=page.dom.window.document.querySelectorAll('input[aria-label="迷鏡變換屬性"]')[i];input.dispatchEvent(new page.dom.window.Event('focus'));const list=page.dom.window.document.getElementById(input.getAttribute('aria-controls'));[...list.querySelectorAll('[role="option"]')].find(el=>el.querySelector('span').textContent===name).click();};
+    card().click();
+    assert.deepEqual([...page.dom.window.document.querySelectorAll('.gear-slot[aria-pressed="true"]')], [card()]);
+    const selectAt=(i,name)=>{const input=page.dom.window.document.querySelectorAll('input[aria-label="迷鏡變換屬性"]')[i];input.dispatchEvent(new page.dom.window.Event('focus'));const list=page.dom.window.document.getElementById(input.getAttribute('aria-controls'));[...list.querySelectorAll('[role="option"]')].find(el=>el.querySelector('span').textContent===name).click();};
     selectAt(0,'無關傷害');assert.equal(card().dataset.configuration,'partial');assert.equal(card().querySelector('i'),null);
     selectAt(1,'無關傷害');selectAt(2,'無關傷害');assert.equal(card().dataset.configuration,'complete');assert.ok(card().querySelector('i'));page.dom.window.document.querySelector('#baseline').click();
     const input=page.dom.window.document.querySelectorAll('input[aria-label="迷鏡變換屬性"]')[2];input.closest('.picker').querySelector('.picker-clear').click();assert.equal(card().dataset.configuration,'partial');assert.equal(card().querySelector('i'),null);
@@ -1540,4 +1542,46 @@ test('equipment and growth pickers show stat details without changing option nam
     assert.ok(growth.length > 0);
     assert.ok(growth.some(option => /\d%/.test(option.querySelector('small').textContent)));
   } finally { page.close(); }
+});
+
+test('all equipment slots share selection, progress and disclosure contracts', async t => {
+  const page = await uiPage();
+  t.after(() => page.close());
+  const { document } = page.dom.window;
+  const panel = document.querySelector('#inspector[data-equipment-fields]');
+  const slots = [...document.querySelectorAll('.equipment-canvas .gear-slot')];
+  assert.equal(slots.length, 41);
+  for (const slot of slots) {
+    slot.click();
+    assert.deepEqual(slots.filter(x => x.getAttribute('aria-pressed') === 'true'), [slot]);
+    assert.ok(slot.matches('.selected'));
+    assert.ok(panel.querySelector('.inspector-title h2').textContent.trim());
+    assert.equal(Boolean(slot.querySelector('svg')), slot.hasAttribute('data-beast-slot-id'));
+    assert.equal(Boolean(slot.querySelector('i')), slot.dataset.configuration === 'complete');
+    assert.doesNotMatch(slot.textContent, /[◐✓]/);
+    for (const section of panel.querySelectorAll('details')) {
+      assert.deepEqual([...section.children].map(n => n.tagName), ['SUMMARY', 'DIV']);
+      assert.ok(section.lastElementChild.matches('.editor-section-body'));
+      assert.ok(section.dataset.disclosureKey.startsWith('inspector:'));
+    }
+  }
+  for (const id of ['title-input', 'master-beast-controls', 'right-ice-set-selectors', 'weapon-magic-stone-fields']) {
+    assert.ok(document.querySelector(`#${id}[data-equipment-fields] input[role="combobox"]`));
+  }
+  assert.equal(document.querySelector('#battle-settings').closest('[data-equipment-fields]'), null);
+});
+
+test('keyboard selection returns to the replaced equipment combobox with its list closed', async t => {
+  const page = await uiPage();
+  t.after(() => page.close());
+  const { document, KeyboardEvent } = page.dom.window;
+  document.querySelector('[data-beast-slot-id="ring-two"]').click();
+  const field = () => document.querySelector('[data-field-id="MasterBeast.Ring2.Skill.Effect"] input');
+  const original = field();
+  original.focus();
+  for (const key of ['ArrowDown', 'Enter']) original.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
+  assert.ok(!original.isConnected);
+  assert.equal(document.activeElement, field());
+  assert.equal(field().getAttribute('aria-expanded'), 'false');
+  assert.equal(field().value, '增加聖獸盔甲效果');
 });

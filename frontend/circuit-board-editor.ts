@@ -60,6 +60,7 @@ export function mountCircuitBoardEditor(
         commitRows(rows);
         renderCircuitRows();
       });
+      picker.dataset.equipmentFocus = `circuit-row-${index}`;
       rowElement.append(picker);
 
       const valueField = document.createElement('label');

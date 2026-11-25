@@ -78,7 +78,7 @@ test('a seasonal CSS edit changes only its URL; removing its HTML link omits its
   }
   const html = (await readFile(join(root, 'index.html'), 'utf8')).replace(/\s*<link[^>]+seasonal-effects\.css[^>]+>/, '');
   const without = await productionAssets({ ...options, html });
-  assert.equal(without.manifest.css.length, 3);
+  assert.deepEqual(without.manifest.css.map(item => item.source), ['styles.css', 'polish.css', 'site-shell.css', 'equipment-workspace.css']);
   assert.ok(![...without.files.keys()].some(name => name.includes('seasonal')));
 });
 

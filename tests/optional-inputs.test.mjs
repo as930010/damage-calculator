@@ -242,7 +242,7 @@ test('all circuit boards support bounded rows and retain them across compact exp
       assert.equal(JSON.parse(page.readState().values[rowField]).length, board.max, board.slot);
       assert.equal(add.disabled, true, board.slot);
       const styles = page.dom.window.document.createElement('style');
-      styles.textContent = await readFile(new URL('../frontend/styles.css', import.meta.url), 'utf8');
+      styles.textContent = await readFile(new URL('../frontend/equipment-workspace.css', import.meta.url), 'utf8');
       page.dom.window.document.head.append(styles);
       assert.equal(page.dom.window.getComputedStyle(add).opacity, '0.58', `${board.slot} add button visibly disabled`);
       assert.equal(page.dom.window.getComputedStyle(add).cursor, 'not-allowed', `${board.slot} add button cursor`);

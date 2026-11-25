@@ -1,6 +1,5 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 
 import { resolveWeaponTransformationsFromFields } from '../dist/calculation/weapon-transformations.js';
 import { projectDamage } from '../dist/frontend/projection.js';
@@ -9,17 +8,14 @@ import { parseLoadoutJson, serializeLoadout } from '../dist/frontend/loadout-tra
 import { gameData, sample } from './loadout-evaluation-harness.mjs';
 import { uiPage } from './ui-update-harness.mjs';
 
-const main = readFileSync(new URL('../frontend/main.ts', import.meta.url), 'utf8');
-const styles = readFileSync(new URL('../frontend/styles.css', import.meta.url), 'utf8');
-
-test('武器變換屬性和數值共用雙欄網格', () => {
-  assert.ok(main.includes("attributeValueGrid(transform, 'weapon-transformation-grid')"));
-  assert.ok(main.includes('field(transformationGrid,'));
-  assert.ok(main.includes('transformationGrid.append(picker)'));
-  assert.ok(main.includes('transformationRolls(rule).map'));
-  assert.match(styles, /\.attribute-value-grid\{display:grid; grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+test('武器變換的四組屬性和數值依序使用共用容器格線', async t => {
+  const page = await uiPage(parseState(JSON.stringify(sample)), null);
+  t.after(() => page.dom.window.close());
+  const grid = page.dom.window.document.querySelector('#inspector .weapon-transformation-grid');
+  assert.ok(grid.matches('.editor-section-body > .attribute-value-grid'));
+  assert.deepEqual([...grid.children].map(field => field.dataset.fieldId),
+    gameData.transformations.slots.flatMap(slot => [slot.choiceField, slot.valueField]));
 });
-
 
 test('weapon transformations accept repeated unrelated effects and retain visible and accessible labels', async t => {
   const original = parseState(JSON.stringify(sample));

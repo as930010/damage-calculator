@@ -14,7 +14,7 @@ body{min-width:320px; background:transparent; letter-spacing:.012em} .app-shell{
 /* Pass 3 — Make controls cohesive and their interactive states easier to read. */
 button,input,.pet-skill-toggle{border-radius:10px; transition:background-color 140ms ease,border-color 140ms ease,box-shadow 140ms ease,transform 140ms ease} button{font-weight:550} button:hover{border-color:#62738d} button:active{filter:brightness(1.08)} input::placeholder{color:#7f8ea2} input:hover{border-color:#536277}
 button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid #9ec3f5; outline-offset:3px; box-shadow:0 0 0 5px rgb(103 153 218 / 16%)} .field{gap:7px; color:#bdc9d9; font-weight:550} .field input{min-width:0; border-color:#394657; background:#141b24} .picker-list{border-color:#53647b; border-radius:12px} .picker-list button{min-height:42px; border-radius:8px} .inspector{padding:22px}
-.inspector-title{padding-bottom:18px} .editor-section{border-color:rgb(123 145 174 / 23%)} .mobile-picker-dialog{border-radius:20px}
+.mobile-picker-dialog{border-radius:20px}
 /* Pass 4 — Improve scanability and make the final result the visual anchor. */
 .results-panel,.attribute-equivalence-panel{overflow:clip} .results-panel>.panel-heading,.attribute-equivalence-panel>.panel-heading,.damage-panel>.panel-heading{background:rgb(18 24 33 / 36%)} .stat-list{gap:12px; padding:4px 22px 24px} .stat{min-width:0; border-color:var(--site-border); border-radius:11px; transition:background-color 150ms ease,border-color 150ms ease}
 .stat:hover{border-color:var(--site-control-hover-edge)} .stat summary{min-height:24px; gap:8px} .stat summary span{line-height:1.5} .stat strong{font-size:16px; letter-spacing:.015em} .stat[open]{border-color:#607b9f; background:#1b2634} .stat-details{border-top-color:rgb(122 146 176 / 22%)} .stat-source-row{min-height:35px}
@@ -42,7 +42,7 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
   html,body{max-width:100%; overflow-x:clip} #app.layout,.workbench,.battle-panel,.battle-fields,.battle-fields>*{width:100%; max-width:100%; min-width:0} .battle-fields{grid-template-columns:minmax(0,1fr)} .battle-fields .field,.battle-fields .picker,.battle-fields .picker-control,.battle-fields .picker-control>input{width:100%; max-width:100%; min-width:0}
 }
 /* Continued refinement — add a restrained navigation cue and improve slot label clarity. */
-.panel-heading h2{display:inline-flex; align-items:center; gap:10px} .panel-heading h2::before{width:3px; height:16px; flex:none; border-radius:3px; background:linear-gradient(180deg,#9fc8ff,#6e94c6); content:""} .gear-slot span,.beast-accessory-slot span{font-size:11px; letter-spacing:.015em} button,input,.pet-skill-toggle{transition:background-color 140ms ease,border-color 140ms ease,box-shadow 140ms ease}
+.panel-heading h2{display:inline-flex; align-items:center; gap:10px} .panel-heading h2::before{width:3px; height:16px; flex:none; border-radius:3px; background:linear-gradient(180deg,#9fc8ff,#6e94c6); content:""} .gear-slot span{letter-spacing:.015em} button,input,.pet-skill-toggle{transition:background-color 140ms ease,border-color 140ms ease,box-shadow 140ms ease}
 /* Surface the damage comparison beside the equipment build. */
 .workbench{padding-top:clamp(12px,2.5vw,34px)}
 

@@ -52,7 +52,12 @@ test('dispose removes registrations and callbacks immediately, is idempotent and
   const page = await pickerPage(false, true);
   try {
     const sibling = page.make('另一欄');
-    page.input.focus(); page.type('v3'); page.api.disposePickers(page.root); page.api.disposePickers(page.root);
+    page.input.focus(); page.type('v3');
+    const oldCandidate = page.list.querySelector('button span');
+    page.api.disposePickers(page.root); page.api.disposePickers(page.root);
+    assert.equal(page.list.hidden, true);
+    oldCandidate.click();
+    assert.deepEqual(page.commits, []);
     assert.deepEqual([...page.api.__registrations()], [true]);
     page.root.remove(); page.key('Enter'); assert.deepEqual(page.commits, []);
     const input = sibling.querySelector('input'); input.value = 'V4'; input.dispatchEvent(new page.dom.window.Event('input'));

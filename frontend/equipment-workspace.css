@@ -1,0 +1,188 @@
+/* Homepage equipment presentation. Site and seasonal themes supply the palette. */
+:is(.equipment-workspace, .weapon-magic-stone-panel) {
+  --eq-field-gap: 6px;
+  --eq-row-gap: var(--space-3);
+  --eq-section-gap: var(--space-4);
+  --eq-label: 12px;
+  --eq-value: 14px;
+  --eq-control: 36px;
+  --eq-clear: 28px;
+  --eq-radius: 6px;
+  --eq-text: var(--site-text);
+  --eq-muted: var(--site-muted);
+  --eq-rule: var(--site-border);
+  --eq-focus: var(--site-focus-ring);
+  --eq-edge: var(--site-control-edge);
+}
+.equipment-canvas {
+  container-type: inline-size;
+  --eq-slot-height: 60px;
+  --eq-group-gap: 7px;
+}
+/* Row centers follow equipment-layout.json and the positioned Beast slots. */
+.equipment-canvas :is(.costume-label, .weapon-label) { --eq-first-row: 15%; }
+.equipment-canvas .left-label { --eq-first-row: 30%; }
+.equipment-canvas .inner-label { --eq-first-row: 42%; }
+.equipment-canvas :is(.beast-label, .right-label, .accessory-label) { --eq-first-row: 35%; }
+.equipment-canvas .group-label {
+  top: calc(var(--eq-first-row) - var(--eq-slot-height) / 2 - var(--eq-group-gap));
+  transform: translate(-50%, -100%);
+  font-size: 13px;
+  line-height: 1.4;
+  font-weight: 650;
+  letter-spacing: .035em;
+}
+.equipment-canvas .gear-slot {
+  width: 57px;
+  height: var(--eq-slot-height);
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2px;
+  padding: 3px;
+  border-radius: 6px;
+}
+.equipment-canvas .gear-slot svg { width: 21px; height: 21px; stroke-width: 1.65; }
+.equipment-canvas .gear-slot .gear-slot-label { font-size: 11px; line-height: 14px; font-weight: 500; }
+.equipment-canvas .gear-slot .gear-slot-item-name { font-size: 12px; line-height: 15px; font-weight: 650; }
+.equipment-canvas .gear-slot .slot-set-index {
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  font: 650 11px/14px system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  color: var(--eq-text);
+  background: transparent;
+}
+.equipment-canvas .gear-slot[aria-pressed="true"] { outline: 2px solid var(--eq-focus); outline-offset: -2px; }
+.equipment-canvas .gear-slot:focus-visible { outline: 2px solid var(--eq-focus); outline-offset: 2px; }
+.inspector-item-name { display: block; font-size: 13px; line-height: 1.5; color: var(--eq-text); overflow-wrap: anywhere; }
+.inspector-item-name:empty { display: none; }
+
+/* Explicit section bodies are the sole owner of the open section's lower inset. */
+#inspector { container: equipment-editor / inline-size; min-width: 0; }
+#inspector .inspector-title {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--border-mid);
+  padding-bottom: 18px;
+  margin-bottom: var(--eq-section-gap);
+  flex-wrap: wrap;
+  column-gap: var(--space-3);
+  row-gap: var(--space-2);
+}
+#inspector .inspector-title:has(+ .editor-section) { margin-bottom: 0; }
+#inspector .inspector-title svg { width: 32px; height: 32px; flex: none; }
+:where(.inspector-title) :is(svg, small) { color: var(--group-color); }
+#inspector .inspector-title h2 { font-size: 20px; line-height: 1.3; font-weight: 650; }
+#inspector .inspector-title small { display: block; font-size: 12px; margin-bottom: 2px; }
+#inspector .inspector-title-copy { flex: 1; min-width: 4em; }
+#inspector .editor-section {
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--eq-rule);
+}
+#inspector .inspector-title + .editor-section { border-top: 0; }
+#inspector .editor-section > summary {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.45;
+  padding-block: var(--space-3);
+  margin: 0;
+}
+#inspector .editor-section-body {
+  display: grid;
+  gap: var(--eq-row-gap);
+  padding-block-end: var(--eq-section-gap);
+}
+#inspector .editor-section:last-child > .editor-section-body { padding-block-end: 0; }
+#inspector > .field { margin-block: 0 var(--eq-row-gap); }
+#inspector > .field:last-child, #inspector .editor-section-body .field,
+#inspector .editor-section-body :is(.panel-note, .circuit-board-total) { margin: 0; }
+#inspector .panel-note { padding: 0; font-size: 12px; line-height: 1.55; }
+/* The shared native-input skin reads the same tokens as the workspace. */
+[data-equipment-fields] {
+  --site-field-text: var(--eq-value);
+  --site-control-radius: var(--eq-radius);
+}
+[data-equipment-fields] .field {
+  min-width: 0;
+  gap: var(--eq-field-gap);
+  font-size: var(--eq-label);
+  line-height: 1.5;
+  font-weight: 500;
+}
+[data-equipment-fields] .field input:not([type="checkbox"]) {
+  min-width: 0;
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--eq-control);
+  min-height: var(--eq-control);
+  padding: 0 8px;
+  font-size: var(--eq-value);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.4;
+  border-radius: var(--eq-radius);
+}
+[data-equipment-fields] .picker-control:has(> .picker-clear:not([hidden])) > input { padding-inline-end: calc(var(--eq-clear) + 2px); }
+[data-equipment-fields] .picker-clear { inset-inline-end: 1px; width: var(--eq-clear); }
+#inspector .attribute-value-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr);
+  gap: var(--eq-row-gap) var(--space-2);
+  align-items: end;
+  padding: 0;
+}
+#inspector .skill-participation-row { display: grid; min-width: 0; gap: var(--space-1); }
+#inspector .skill-participation-row > .toggle { justify-self: start; min-height: 28px; margin: 0; }
+#inspector .circuit-board-rows { display: grid; gap: var(--eq-row-gap); }
+#inspector .circuit-board-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr) auto;
+  gap: var(--space-2);
+  align-items: end;
+  margin: 0;
+}
+#inspector .circuit-board-actions { display: flex; }
+#inspector :is(.circuit-board-add, .circuit-board-remove) {
+  min-height: var(--site-control-compact);
+  padding: 5px var(--space-2);
+  font-size: var(--eq-label);
+  border-radius: var(--site-control-radius);
+}
+#inspector .circuit-board-add:disabled { opacity: .58; cursor: not-allowed; }
+#inspector .circuit-board-remove:disabled { opacity: .45; cursor: not-allowed; }
+#inspector .circuit-board-total { font-size: var(--eq-label); color: var(--site-muted); }
+#inspector .circuit-board-total.input-warning { color: var(--site-danger); }
+@container equipment-editor (max-width: 315px) {
+  #inspector .circuit-board-row { grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr); }
+  #inspector .circuit-board-remove { grid-column: 2; justify-self: end; }
+}
+@container equipment-editor (max-width: 276px) {
+  #inspector :is(.attribute-value-grid, .circuit-board-row) { grid-template-columns: minmax(0, 1fr); }
+  #inspector .circuit-board-remove { grid-column: 1; }
+}
+[data-equipment-fields] input::placeholder { color: var(--eq-muted); opacity: 1; }
+#inspector .attribute-value-grid input:placeholder-shown { text-overflow: ellipsis; }
+/* Lists remain on the field that owns search, validation and keyboard focus. */
+#inspector .attribute-value-grid .picker-list { min-width: min(220px, 100cqi); }
+#inspector .attribute-value-grid > .field:nth-child(even) .picker-list { left: auto; right: 0; }
+[data-equipment-fields] .picker-list { overscroll-behavior: contain; border-color: var(--eq-edge); background: var(--site-surface); }
+[data-equipment-fields] .picker-list button {
+  min-height: 36px;
+  color: var(--eq-text);
+  padding: 6px 10px;
+  overflow-wrap: anywhere;
+}
+[data-equipment-fields] .picker-list button small { font-size: 12px; line-height: 1.5; color: var(--eq-muted); }
+[data-equipment-fields] .picker-list button[data-current] { border-inline-start: 3px solid var(--site-action-edge); }
+[data-equipment-fields] .picker-list button[data-active] { outline: 2px solid var(--eq-focus); outline-offset: -2px; }
+@media (max-width: 700px), (pointer: coarse) {
+  :is(.equipment-workspace, .weapon-magic-stone-panel) { --eq-value: 16px; --eq-control: 44px; --eq-clear: 44px; }
+  #inspector :is(.innerwear-type-switch button, .circuit-board-add, .circuit-board-remove, .skill-participation-row > .toggle, summary) { min-height: 44px; }
+  [data-equipment-fields] .picker-clear { min-height: var(--eq-control); }
+  .mobile-inspector-open #inspector .inspector-title { z-index: 4; }
+  [data-equipment-fields] .field { scroll-margin-block-start: 100px; }
+}

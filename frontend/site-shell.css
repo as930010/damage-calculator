@@ -374,7 +374,7 @@ html:is(
     line-height: 1.5;
   }
   & :where(select) { color-scheme: dark; padding-inline-start: var(--space-3, 12px); }
-  & :where(.boss-health-controls select, .circuit-board-row input, .support-magazine select,
+  & :where(.boss-health-controls select, .support-magazine select,
       .option-editor-input input, .boss-control .percent-input, .skill-damage-share-number-wrap) {
     min-height: var(--site-control-compact);
     font-size: var(--site-control-label);
@@ -399,7 +399,7 @@ html:is(
     border-color: var(--site-control-hover-edge);
   }
 
-  & :where(.field-disabled, .beast-unavailable-field) { opacity: 1; color: var(--site-muted); }
+  & :where(.field-disabled) { opacity: 1; color: var(--site-muted); }
   & :is(button, input, select, textarea):disabled,
   & #profile-manager :where(.profile-chip, .profile-manage-toggle):disabled {
     opacity: 1;
@@ -566,14 +566,6 @@ html:is(
 
   body.site-page .boss-health-controls select { padding-block: 4px; }
 
-  body.site-page .circuit-board-row .field input { padding-block: 4px; }
-
-  body.site-page :is(.circuit-board-add, .circuit-board-remove) {
-    min-height: var(--site-control-compact);
-    border-radius: var(--site-control-radius);
-    padding-block: 5px;
-  }
-
   @media (max-width: 1240px) {
     body.site-page .workbench,
     body.site-page:not(.site-page-main) .site-main {
@@ -676,25 +668,6 @@ html:is(
 @media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
   body.site-page-main #app:has(> .loading-card) {
     min-height: 100dvh;
-  }
-
-  body.site-page-main #inspector :is(.attribute-value-grid, .circuit-board-row) {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  body.site-page-main #inspector .circuit-board-remove {
-    grid-column: 1 / -1;
-    justify-self: end;
-  }
-
-  @media (min-width: 1200px) {
-    body.site-page-main #inspector :is(.attribute-value-grid, .circuit-board-row) {
-      grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
-    }
-
-    body.site-page-main #inspector :is(.attribute-value-grid, .circuit-board-row) > .field:nth-child(even) input:placeholder-shown {
-      text-overflow: ellipsis;
-    }
   }
 
   @media (min-width: 1100px) {

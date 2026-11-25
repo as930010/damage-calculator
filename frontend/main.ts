@@ -31,7 +31,7 @@ import { compareLoadoutResults } from './calculation-comparison.ts';
 import { renderCalculationComparisonHtml } from './calculation-comparison-view.ts';
 import { createPicker, updatePicker, disposePickers, type PickerOption } from './picker.ts';
 import { circuitBoardRowsField, readCircuitBoardRows, serializeCircuitBoardRows, normalizeCircuitPercentage } from './circuit-board-rows.ts';
-import { icon } from './icons.ts';
+import { renderSlotContent, updateSlotState, renderEquipmentHeading, createEditorSection, attributeValueGrid, statusLabels } from './equipment-workspace.ts';
 import { createCatalogIndexScope } from './catalog-index.ts';
 import { canonicalizeNumber, preventScientificNotation } from './numeric-input.ts';
 import { sanitizeClassCode } from './class-code.ts';
@@ -180,7 +180,7 @@ async function start() {
     { id: 'ring-two', label: '指環 2', icon: 'ring', fixedFields: ['MasterBeast.Ring2.Option1', 'MasterBeast.Ring2.Option2'], stoneFields: ['MasterBeast.Ring2.CustomAttribute', 'MasterBeast.Ring2.CustomValue'], stoneCategory: 'ring', mirrorFields: [['MasterBeast.Ring2.Mirror.1.Attribute', 'MasterBeast.Ring2.Mirror.1.Value'], ['MasterBeast.Ring2.Mirror.2.Attribute', 'MasterBeast.Ring2.Mirror.2.Value'], ['MasterBeast.Ring2.Mirror.3.Attribute', 'MasterBeast.Ring2.Mirror.3.Value']] },
   ];
   const app = document.querySelector<HTMLElement>('#app')!;
-    app.innerHTML = `<section class="workbench"><header class="workspace-heading"><div class="workspace-intro"><h1>裝備傷害比較</h1><p class="workspace-summary">比較同一角色的配裝。結果為理論最高傷害，不計冷卻與動作速度</p></div></header><div class="toolbar"><div id="class-picker"></div><label class="toggle"><input id="alternate" type="checkbox">啟用強/排褲切換</label><div class="toolbar-actions"><button id="baseline" type="button">設為比較基準</button><div class="transfer-actions"><button id="import-loadout" type="button">匯入配裝</button><button id="export-loadout" type="button">匯出配裝</button></div></div><input id="loadout-file" type="file" accept="application/json,.json" hidden><span id="transfer-status" role="status" aria-live="polite"></span><span id="save-status" role="status"></span></div><section class="battle-panel"><div class="panel-heading"><h2>關卡設定</h2></div><div id="battle-settings" class="battle-fields"></div></section><div class="equipment-workspace"><section class="equipment-panel"><div class="panel-heading"><h2 id="equipment-config-heading" class="site-inpage-target" tabindex="-1">裝備配置</h2><a class="site-inpage-link" href="#damage-detail-heading">查看傷害明細</a></div><div id="equipment-damage-summary" class="equipment-damage-summary" aria-live="polite"></div><div class="canvas-scroll"><div class="equipment-canvas"><span class="group-label costume-label">連身時裝</span><span class="group-label left-label">左冰</span><span class="group-label inner-label">內裝左四</span><span class="group-label weapon-label">冰武 / 武器</span><span class="group-label right-label">右冰</span><span class="group-label accessory-label">飾品</span><span class="group-label beast-label">聖獸飾品</span><div id="title-input" class="canvas-title-input"></div><div id="slots"></div><div id="beast-accessory-fields" class="beast-accessories-grid gear-beast-slots" aria-label="聖獸飾品配置"></div></div></div><p class="panel-note">左冰不支援混搭，但各部位魔法石仍須獨立設定。擁有強/排褲則褲子的傷害增幅會被平均計算。</p><section class="right-ice-set-area"><div class="beast-accessories-heading"><h3>右冰套效</h3><span>最多選擇 ${data.rightIceSets.maxSelectedSets} 套</span></div><p class="panel-note">選擇要啟用的套裝效果。</p><div id="right-ice-set-selectors" class="right-ice-set-selectors"></div></section><div class="beast-accessories-area"><div class="beast-accessories-heading"><h3>聖獸效果設定</h3></div><p class="panel-note">共通顏色與潛力設定</p><div id="master-beast-controls" class="master-beast-controls"></div></div></section><div id="inspector-backdrop" class="inspector-backdrop" aria-hidden="true"></div><aside id="inspector" class="inspector" aria-label="部位設定"></aside></div><details class="global-source-panel weapon-magic-stone-panel"><summary>武器魔力石</summary><div id="weapon-magic-stone-fields"></div></details><details id="global-source-settings" class="global-source-panel"><summary>其他效果來源設定</summary><p class="panel-note">未列在此處的特殊條件或 Buff／Debuff 尚未納入計算。</p><div id="global-source-fields"></div></details><section class="results-panel"><div class="panel-heading"><h2>目前填寫的屬性</h2><span id="comparison-label"></span></div><p class="panel-note">包含裝備、冰裝、飾品、聖獸、關卡、效果設定等所有已填入的屬性加總</p><div id="results" aria-live="polite"></div><section class="damage-panel"><div class="panel-heading"><h2 id="damage-detail-heading" class="site-inpage-target" tabindex="-1">攻擊與最終傷害</h2><a class="site-inpage-link" href="#equipment-config-heading">返回裝備配置</a></div><div id="damage-result" aria-live="polite"></div><details class="calculation-inspection-panel"><summary>計算結果驗算</summary><div class="calculation-inspection-content"><div id="calculation-comparison" class="calculation-comparison" aria-live="polite"><p>先點選「設為比較基準」保存目前配置，表格就會比較基準與目前配裝。</p></div><div id="calculation-details"></div></div></details></section></section></section>`;
+    app.innerHTML = `<section class="workbench"><header class="workspace-heading"><div class="workspace-intro"><h1>裝備傷害比較</h1><p class="workspace-summary">比較同一角色的配裝。結果為理論最高傷害，不計冷卻與動作速度</p></div></header><div class="toolbar"><div id="class-picker"></div><label class="toggle"><input id="alternate" type="checkbox">啟用強/排褲切換</label><div class="toolbar-actions"><button id="baseline" type="button">設為比較基準</button><div class="transfer-actions"><button id="import-loadout" type="button">匯入配裝</button><button id="export-loadout" type="button">匯出配裝</button></div></div><input id="loadout-file" type="file" accept="application/json,.json" hidden><span id="transfer-status" role="status" aria-live="polite"></span><span id="save-status" role="status"></span></div><section class="battle-panel"><div class="panel-heading"><h2>關卡設定</h2></div><div id="battle-settings" class="battle-fields"></div></section><div class="equipment-workspace"><section class="equipment-panel"><div class="panel-heading"><h2 id="equipment-config-heading" class="site-inpage-target" tabindex="-1">裝備配置</h2><a class="site-inpage-link" href="#damage-detail-heading">查看傷害明細</a></div><div id="equipment-damage-summary" class="equipment-damage-summary" aria-live="polite"></div><div class="canvas-scroll"><div class="equipment-canvas"><span class="group-label costume-label">連身時裝</span><span class="group-label left-label">左冰</span><span class="group-label inner-label">內裝左四</span><span class="group-label weapon-label">冰武 / 武器</span><span class="group-label right-label">右冰</span><span class="group-label accessory-label">飾品</span><span class="group-label beast-label">聖獸飾品</span><div id="title-input" data-equipment-fields class="canvas-title-input"></div><div id="slots"></div><div id="beast-accessory-fields" class="gear-beast-slots" aria-label="聖獸飾品配置"></div></div></div><p class="panel-note">左冰不支援混搭，但各部位魔法石仍須獨立設定。擁有強/排褲則褲子的傷害增幅會被平均計算。</p><section class="right-ice-set-area"><div class="beast-accessories-heading"><h3>右冰套效</h3><span>最多選擇 ${data.rightIceSets.maxSelectedSets} 套</span></div><p class="panel-note">選擇要啟用的套裝效果。</p><div id="right-ice-set-selectors" data-equipment-fields class="right-ice-set-selectors"></div></section><div class="beast-accessories-area"><div class="beast-accessories-heading"><h3>聖獸效果設定</h3></div><p class="panel-note">共通顏色與潛力設定</p><div id="master-beast-controls" data-equipment-fields class="master-beast-controls"></div></div></section><div id="inspector-backdrop" class="inspector-backdrop" aria-hidden="true"></div><aside id="inspector" data-equipment-fields class="inspector" aria-label="部位設定"></aside></div><details class="global-source-panel weapon-magic-stone-panel"><summary>武器魔力石</summary><div id="weapon-magic-stone-fields" data-equipment-fields></div></details><details id="global-source-settings" class="global-source-panel"><summary>其他效果來源設定</summary><p class="panel-note">未列在此處的特殊條件或 Buff／Debuff 尚未納入計算。</p><div id="global-source-fields"></div></details><section class="results-panel"><div class="panel-heading"><h2>目前填寫的屬性</h2><span id="comparison-label"></span></div><p class="panel-note">包含裝備、冰裝、飾品、聖獸、關卡、效果設定等所有已填入的屬性加總</p><div id="results" aria-live="polite"></div><section class="damage-panel"><div class="panel-heading"><h2 id="damage-detail-heading" class="site-inpage-target" tabindex="-1">攻擊與最終傷害</h2><a class="site-inpage-link" href="#equipment-config-heading">返回裝備配置</a></div><div id="damage-result" aria-live="polite"></div><details class="calculation-inspection-panel"><summary>計算結果驗算</summary><div class="calculation-inspection-content"><div id="calculation-comparison" class="calculation-comparison" aria-live="polite"><p>先點選「設為比較基準」保存目前配置，表格就會比較基準與目前配裝。</p></div><div id="calculation-details"></div></div></details></section></section></section>`;
   const disclosurePreferences = createDisclosurePreferences(document);
   const resultsPanel = app.querySelector<HTMLElement>('.results-panel')!;
   const resultsDisclosure = document.createElement('details');
@@ -425,9 +425,6 @@ async function start() {
       if (prior.has(key)) detail.open = prior.get(key)!;
     });
   };
-  const setAttribute = (node: HTMLElement, name: string, value: string) => {
-    if (node.getAttribute(name) !== value) node.setAttribute(name, value);
-  };
   const toggleClass = (node: HTMLElement, name: string, enabled: boolean) => {
     if (node.classList.contains(name) !== enabled) node.classList.toggle(name, enabled);
   };
@@ -435,11 +432,11 @@ async function start() {
   const beastButtons = new Map<string, HTMLButtonElement>();
   let slotUiKey = '', beastUiKey = '', masterUiKey = '', rightIceUiKey = '';
   const progressChoices = equipmentProgressChoiceFields(catalogIndex);
-  const slotSignature = () => JSON.stringify([selected.id, state.lowerwearAlternativeEnabled, state.bossHealthCondition,
+  const slotSignature = () => JSON.stringify([selectedWeapon(state.values), state.lowerwearAlternativeEnabled, state.bossHealthCondition,
     data.layout.slots.map(slot => equipmentProgressFields(slot, catalogIndex).map(val)),
     data.rightIceSets.selectionFields.map(val)]);
-  const beastSignature = () => JSON.stringify([selectedBeastSlotId,
-    beastAccessorySlots.map(slot => [...(slot.fixedFields ?? []), ...(slot.stoneFields ?? []), ...slot.mirrorFields.flat()].map(val))]);
+  const beastSignature = () => JSON.stringify(beastAccessorySlots.map(slot =>
+    [...(slot.fixedFields ?? []), ...(slot.stoneFields ?? []), ...slot.mirrorFields.flat()].map(val)));
   const masterSignature = () => JSON.stringify([state.masterBeastSpiritStoneColor, val('MasterBeast.OverallPotential')]);
   const rightIceSignature = () => JSON.stringify([data.rightIceSets.selectionFields.map(val),
     data.mapping.selections.filter(selection => selection.catalogFile.endsWith('right-ice.json')).map(selection => val(selection.selectionField))]);
@@ -569,6 +566,7 @@ async function start() {
         renderRightIceSetSelectors();
       });
       const selectedName = selectedNames[index];
+      picker.dataset.fieldId = fieldId;
       picker.classList.add('right-ice-set-picker', `right-ice-effect-${index + 1}`);
       picker.classList.toggle('has-selection', !!selectedName);
       root.append(picker);
@@ -762,16 +760,8 @@ async function start() {
     return input;
   };
   const section = (parent: HTMLElement, label: string, open = false, preferenceLabel = label) => {
-    const details = document.createElement('details'); details.className = 'editor-section';
     const key = `inspector:${selectedBeastSlotId ?? selected.id}:${preferenceLabel}`;
-    details.dataset.disclosureKey = key;
-    details.open = disclosurePreferences.preferredOpen(key, open);
-    const title = document.createElement('summary'); title.textContent = label; details.append(title); parent.append(details); return details;
-  };
-  const attributeValueGrid = (parent: HTMLElement, extraClass = '') => {
-    const grid = document.createElement('div'); grid.className = extraClass ? 'attribute-value-grid ' + extraClass : 'attribute-value-grid';
-    parent.append(grid);
-    return grid;
+    return createEditorSection(parent, label, key, disclosurePreferences.preferredOpen(key, open));
   };
   const appendParticipationToggle = (parent: HTMLElement, fieldId: string, caption: string, name: string, checked: boolean) => {
     const toggle = document.createElement('label');
@@ -993,6 +983,7 @@ async function start() {
       update();
       renderWeaponMagicStones();
     });
+    gradePicker.dataset.fieldId = data.weaponGrades.settingKey;
     gradePicker.classList.add('weapon-magic-stone-grade');
     grid.append(gradePicker);
     data.giantStones.settingKeys.forEach((fieldId, index) => field(
@@ -1043,6 +1034,17 @@ async function start() {
     if (picker) { updatePicker(picker, val('Effect.Title'), true); return; }
     field(root, '稱號', 'Effect.Title', titleChoices);
   }
+  function openEquipmentSlot(button: HTMLButtonElement) {
+    const previous = inspectorPanel.parentElement!.querySelector('.gear-slot[aria-pressed="true"]');
+    if (previous !== button) {
+      previous?.classList.remove('selected');
+      previous?.setAttribute('aria-pressed', 'false');
+      button.classList.add('selected');
+      button.setAttribute('aria-pressed', 'true');
+    }
+    renderInspector();
+    openMobileInspector();
+  }
   function renderBeastAccessories() {
     const root = document.querySelector<HTMLElement>('#beast-accessory-fields')!;
     beastUiKey = beastSignature();
@@ -1068,24 +1070,20 @@ async function start() {
         button = document.createElement('button'); button.type = 'button'; button.className = `gear-slot beast-accessory-slot beast-accessory-slot-${slot.id}`; button.dataset.beastSlotId = slot.id;
         button.addEventListener('click', () => {
           selectedBeastSlotId = slot.id;
-          renderBeastAccessories(); renderInspector(); openMobileInspector();
+          openEquipmentSlot(button!);
         });
         beastButtons.set(slot.id, button); root.append(button);
       }
       const configuration = beastAccessoryStatus(slot, state.values, catalogIndex);
-      setAttribute(button, 'data-configuration', configuration);
-      toggleClass(button, 'configured', configuration === 'complete');
-      toggleClass(button, 'selected', selectedBeastSlotId === slot.id);
-      setAttribute(button, 'aria-label', `${slot.label}（${{ empty: '未設定', partial: '部分設定', complete: '全部完成' }[configuration]}）`);
-      setAttribute(button, 'aria-pressed', String(selectedBeastSlotId === slot.id));
-      writeHtml(button, `${icon(slot.icon)}<span class="gear-slot-label">${h(slot.label)}</span>${configuration === 'complete' ? '<i></i>' : ''}`);
+      updateSlotState(button, configuration, selectedBeastSlotId === slot.id,
+        `聖獸飾品 ${slot.label}（${statusLabels[configuration]}）`);
+      writeHtml(button, renderSlotContent(slot.icon, slot.label, '', configuration));
     }
   }
   let circuitEditor: ReturnType<typeof mountCircuitBoardEditor> | undefined;
   function renderBeastInspector(panel: HTMLElement) {
-    disposePickers(panel);
     const slot = beastAccessorySlots.find(candidate => candidate.id === selectedBeastSlotId)!;
-    panel.innerHTML = `<div class="inspector-title beast-inspector-title">${icon(slot.icon)}<div class="inspector-title-copy"><small>聖獸飾品</small><h2>${h(slot.label)}</h2></div><button class="inspector-close" type="button" aria-label="關閉部位設定">×</button></div>`;
+    panel.innerHTML = renderEquipmentHeading('聖獸飾品', slot.label, slot.icon, '', '', true);
     const fixed = section(panel, '固定效果', true);
     if (slot.fixedFields) slot.fixedFields.forEach((fieldId, index) => field(
       fixed,
@@ -1093,7 +1091,7 @@ async function start() {
       fieldId,
       validationChoices(fieldId),
     ));
-    else fixed.insertAdjacentHTML('beforeend', `<p class="panel-note beast-mapping-note">${h(slot.label)}的鑑定效果與傷害無關，無需設定。</p>`);
+    else fixed.insertAdjacentHTML('beforeend', `<p class="panel-note">${h(slot.label)}的鑑定效果與傷害無關，無需設定。</p>`);
 
     const stone = section(panel, '精靈石', true);
     if (slot.stoneFields && slot.stoneCategory) {
@@ -1102,13 +1100,12 @@ async function start() {
       field(stoneGrid, '精靈石屬性', attributeField, options(data.masterBeast.customAttributeOptions[slot.stoneCategory]), true);
       field(stoneGrid, '精靈石數值（%）', valueField, validationChoices(valueField, true), false, val(attributeField) === '' || val(attributeField) === '無關傷害');
     } else {
-      stone.insertAdjacentHTML('beforeend', `<p class="panel-note beast-mapping-note">盔甲精靈石的個別屬性不影響傷害，無需設定。精靈石套裝增幅 ${fmt(data.masterBeast.armorSpiritStoneSetEffect.multiplicativeDamagePct)}% 已預設套用。</p>`);
+      stone.insertAdjacentHTML('beforeend', `<p class="panel-note">盔甲精靈石的個別屬性不影響傷害，無需設定。精靈石套裝增幅 ${fmt(data.masterBeast.armorSpiritStoneSetEffect.multiplicativeDamagePct)}% 已預設套用。</p>`);
     }
 
     const mirrorArea = section(panel, '迷鏡變換', true, '迷鏡效果');
-    mirrorArea.classList.add('beast-mirror-section');
     const mirrorGrid = attributeValueGrid(mirrorArea, 'beast-mirror-grid');
-    slot.mirrorFields.forEach(([attributeField, valueField]) => {
+    slot.mirrorFields.forEach(([attributeField, valueField], index) => {
       const attribute = val(attributeField);
       field(mirrorGrid, '迷鏡變換屬性', attributeField, options(data.masterBeast.customAttributeOptions.mirror), true);
       const unrelated = attribute === '無關傷害';
@@ -1122,6 +1119,7 @@ async function start() {
         unrelated,
         true,
       );
+      input.setAttribute('aria-label', `迷鏡變換 ${index + 1} 數值(%)`);
       if (unrelated) {
         input.value = '0';
         input.placeholder = '此屬性無需數值';
@@ -1136,12 +1134,13 @@ async function start() {
       section(panel, '聖獸技能', true).append(row);
       const checked = beastSkillParticipates(skill, readBeastSkillSelection(skill, state.values));
       appendParticipationToggle(row, skill.enabled, '該聖獸技能是否參與計算', slot.label, checked);
-      const grid = attributeValueGrid(row, skill.slotId === 'armor' ? '' : 'beast-ring-skill-grid');
+      const grid = attributeValueGrid(row);
       const choices = beastSkillValueChoices(skill, state.values[skill.effect]);
       const unrelated = choices[0] === 0;
       field(grid, '技能屬性', skill.effect, skill.effects.map(({ id, label }) => ({ value: id, label })), true);
       const picker = field(grid, '數值', skill.value, unrelated ? [] : choices.map(value => ({ value: String(value), label: `${value}%` })),
         false, unrelated || !choices.length, unrelated ? '此屬性無需數值' : '先選技能屬性');
+      picker.querySelector('input')!.setAttribute('aria-label', `${slot.label} 聖獸技能數值`);
       if (unrelated) {
         updatePicker(picker, '0', true);
         picker.querySelector<HTMLButtonElement>('.picker-clear')!.hidden = true;
@@ -1162,38 +1161,47 @@ async function start() {
       if (!button) {
         button = document.createElement('button'); button.type = 'button'; button.className = 'gear-slot'; button.dataset.slotId = slot.id;
         button.style.cssText = `left:${slot.x}%;top:${slot.y}%;--group-color:${group.color}`;
-        button.addEventListener('click', () => { selected = slot; selectedBeastSlotId = null; renderSlots(); renderBeastAccessories(); renderInspector(); openMobileInspector(); });
+        button.addEventListener('click', () => {
+          selected = slot;
+          selectedBeastSlotId = null;
+          openEquipmentSlot(button!);
+        });
         slotButtons.set(slot.id, button); container.append(button);
       }
       const configured = slot.selectionField ? val(slot.selectionField) : slot.weapon ? val('Weapon.ENHC') : slot.innerwearId ? val(data.innerwear.slots.find(s => s.id === slot.innerwearId)!.enhancementField) : '';
-      const isAccessory = slot.group === 'accessories';
       const isIceEquipment = slot.group === 'leftIce' || slot.group === 'rightIce' || slot.group === 'iceWeapon';
-      const selectedItemName = slot.selectionField && slot.group !== 'costume' && !isAccessory && configured
-        ? isIceEquipment ? ICE_EQUIPMENT_SHORT_NAMES[configured] ?? configured : configured
-        : '';
+      const item = slot.weapon ? selectedWeapon(state.values) : slot.selectionField ? configured : '';
+      const selectedItemName = isIceEquipment ? ICE_EQUIPMENT_SHORT_NAMES[item] ?? item : '';
       const isRightIceSetSlot = (slot.group === 'rightIce' || slot.group === 'iceWeapon') && !!slot.selectionField && !!configured;
       const rightIceEffectIndex = isRightIceSetSlot ? rightIceSetEffectIndexes.get(configured) : undefined;
       const rightIceSetHint = rightIceEffectIndex ? `；屬於套效 ${rightIceEffectIndex}` : '';
       const inactive = !!slot.enabledBy && !alternateLowerwearAvailable();
       const progress = inactive ? 'empty' : equipmentProgress(slot, state, catalogIndex);
-      setAttribute(button, 'data-configuration', progress);
-      toggleClass(button, 'configured', progress === 'complete'); toggleClass(button, 'selected', selected.id === slot.id);
-      toggleClass(button, 'inactive', !!slot.enabledBy && !alternateLowerwearAvailable());
+      const pressed = !selectedBeastSlotId && selected.id === slot.id;
+      toggleClass(button, 'inactive', inactive);
       toggleClass(button, 'right-ice-effect-1', rightIceEffectIndex === 1);
       toggleClass(button, 'right-ice-effect-2', rightIceEffectIndex === 2);
       toggleClass(button, 'right-ice-effect-3', rightIceEffectIndex === 3);
-      setAttribute(button, 'aria-label', `${group.name} ${slot.label}：${configured || '未設定'}${rightIceSetHint}`); setAttribute(button, 'aria-pressed', String(selected.id === slot.id));
-      setAttribute(button, 'title', `${group.name} ${slot.label}${configured && slot.group !== 'costume' ? '\n' + configured : ''}${rightIceSetHint}`);
-      writeHtml(button, `<span class="gear-slot-label">${h(slot.label)}</span>${selectedItemName ? `<span class="gear-slot-item-name">${h(selectedItemName)}</span>` : ''}${progress === 'complete' ? '<i></i>' : ''}`);
+      const description = [group.name + ' ' + slot.label, item, slot.weapon ? configured : '', inactive ? '未啟用' : statusLabels[progress]].filter(Boolean).join(' · ') + rightIceSetHint;
+      updateSlotState(button, progress, pressed, description);
+      if (pressed && slot.selectionField) {
+        const fullName = inspectorPanel.querySelector('.inspector-item-name');
+        if (fullName && fullName.textContent !== configured) fullName.textContent = configured;
+      }
+      writeHtml(button, renderSlotContent(null, slot.label, selectedItemName, progress, rightIceEffectIndex));
     }
   }
   function renderInspector() {
     circuitEditor?.dispose();
     circuitEditor = undefined;
-    const panel = document.querySelector<HTMLElement>('#inspector')!;
     configurationControlKeys.set('inspector', JSON.stringify([selected.id, selectedBeastSlotId, configurationControlSignature()]));
-    if (selectedBeastSlotId) { renderBeastInspector(panel); return; }
-    disposePickers(panel);
+    disposePickers(inspectorPanel);
+    const content = document.createElement('div');
+    if (selectedBeastSlotId) renderBeastInspector(content);
+    else renderEquipmentInspector(content);
+    inspectorPanel.replaceChildren(...content.childNodes);
+  }
+  function renderEquipmentInspector(panel: HTMLElement) {
     const group = data.layout.groups.find(group => group.id === selected.group)!;
     const innerwearSlot = selected.innerwearId ? data.innerwear.slots.find(slot => slot.id === selected.innerwearId) : undefined;
     const innerwearType = innerwearSlot && val(innerwearSlot.typeField) === "內布隆" ? "內布隆" : "百億";
@@ -1203,7 +1211,13 @@ async function start() {
       ? `<div class="innerwear-type-switch weapon-type-switch" role="group" aria-label="武器類型">${[abyssWeapon, defaultWeapon].map(name =>
         `<button type="button" data-weapon-type="${h(name)}" aria-pressed="${name === weapon}">${h(name)}</button>`).join("")}</div>`
       : '';
-    panel.innerHTML = `<div class="inspector-title" style="--group-color:${group.color}">${icon(selected.icon)}<div class="inspector-title-copy"><small>${h(group.name)}</small><h2>${h(selected.label)}</h2></div>${typeSwitch}${weaponSwitch}<button class="inspector-close" type="button" aria-label="關閉部位設定">×</button></div>`;
+    panel.innerHTML = renderEquipmentHeading(group.name, selected.label, selected.icon, typeSwitch + weaponSwitch, group.color);
+    if (selected.selectionField) {
+      const item = document.createElement('span');
+      item.className = 'inspector-item-name';
+      item.textContent = val(selected.selectionField);
+      panel.querySelector('.inspector-title-copy')!.append(item);
+    }
     if (innerwearSlot) panel.querySelectorAll<HTMLButtonElement>("[data-innerwear-type]").forEach(button => button.addEventListener("click", () => {
       state.values[innerwearSlot.typeField] = button.dataset.innerwearType!;
       update(); renderInspector();
@@ -1214,7 +1228,7 @@ async function start() {
       if (choice === abyssWeapon) state.values[weaponTypeField] = abyssWeapon;
       else delete state.values[weaponTypeField];
       update(); renderInspector();
-      panel.querySelector<HTMLButtonElement>('[data-weapon-type][aria-pressed="true"]')?.focus({ preventScroll: true });
+      inspectorPanel.querySelector<HTMLButtonElement>('[data-weapon-type][aria-pressed="true"]')?.focus({ preventScroll: true });
     }));
     if (selected.enabledBy && !alternateLowerwearAvailable()) { panel.insertAdjacentHTML('beforeend', '<p class="panel-note">請先啟用上方「強/排褲切換」，或在 Boss 體力條件中選用強/排褲。設定會保留於裝置，停用時不參與計算。</p>'); return; }
     if (selected.selectionField) {
@@ -1454,6 +1468,7 @@ async function start() {
         const valuePicker = field(grid, '數值', valueField,
           valueOptions.map(value => ({ value, label: weaponEngravingValueLabel(value) })),
           false, !valueOptions.length, unrelated ? '無需選擇數值' : '請先選擇效果');
+        valuePicker.querySelector('input')!.setAttribute('aria-label', `${label} 數值`);
         if (unrelated) updatePicker(valuePicker, '0', true);
         if (!valueOptions.length) valuePicker.querySelector<HTMLButtonElement>('.picker-clear')!.hidden = true;
         engraving.append(row);
