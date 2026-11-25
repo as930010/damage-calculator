@@ -166,6 +166,7 @@ export function createBattleDefenseStore(host: Window) {
   return {
     get value() { return value; },
     get error() { try { if (readError) return readError; externalDefenseRate(value); return storageError; } catch (error) { return (error as Error).message; } },
+    get hasReadError() { return readError !== ''; },
     get rate() { return currentRate; },
     get defenseIgnoreAdditive() { return currentAdditive; },
     set(next: BattleDefenseEnvironment) {

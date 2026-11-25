@@ -38,6 +38,8 @@ test('Battle defense editor has its own disclosure key and does not change loado
       assert.equal(input.value,'89.6');assert.equal(document.activeElement,input);
       assert.equal(document.querySelector('#damage-result').textContent,damage);
       assert.match(panel.querySelector('.defense-error').textContent,/不需輸入 %/);
+      assert.equal(input.getAttribute('aria-describedby'), panel.querySelector('.defense-error').id);
+      assert.notEqual(input.getAttribute('aria-invalid'), 'true', 'the rejected value was never committed');
     }
     input.setSelectionRange(0,input.value.length);
     const invalidKey=new page.dom.window.InputEvent('beforeinput',{inputType:'insertText',data:'負數-1',bubbles:true,cancelable:true});
@@ -49,6 +51,13 @@ test('Battle defense editor has its own disclosure key and does not change loado
     const key='damage-calculator.battle-defense.v1';const saved=JSON.parse(page.dom.window.localStorage.getItem(key));saved.manualPercentage='1e2';
     page.dom.window.localStorage.setItem(key,JSON.stringify(saved));page.dom.window.dispatchEvent(new page.dom.window.StorageEvent('storage',{key}));
     assert.match(document.querySelector('#damage-result').textContent,/戰鬥破防/);assert.match(panel.querySelector('.defense-error').textContent,/十進位/);
+    assert.equal(input.getAttribute('aria-invalid'), 'true');
+    assert.equal(input.getAttribute('aria-describedby'), panel.querySelector('.defense-error').id);
+    page.dom.window.localStorage.setItem(key, '{');
+    page.dom.window.dispatchEvent(new page.dom.window.StorageEvent('storage', { key }));
+    assert.ok(panel.querySelector('.defense-error').textContent);
+    assert.equal(input.hasAttribute('aria-invalid'), false, 'storage read failure is a panel error');
+    assert.equal(input.hasAttribute('aria-describedby'), false);
   } finally { page.close(); }
 });
 
@@ -67,6 +76,28 @@ test('Independent source rows retain editing nodes, validate drafts and combine 
     }
     assert.match(panel.querySelector('.defense-summary-values').textContent,/89\.6%.*90\.4008%/);
     const rows=[...panel.querySelectorAll('.defense-source-row')];
+    const rates = rows.map(row => row.querySelector('[data-source-percentage]'));
+    rates[1].value = '.';
+    rates[1].dispatchEvent(new Event('input', { bubbles: true }));
+    assert.deepEqual(rates.map(rate => rate.getAttribute('aria-invalid')), [null, 'true', null, null]);
+    assert.equal(rates[1].getAttribute('aria-describedby'), panel.querySelector('.defense-error').id);
+    assert.match(panel.querySelector('.defense-error').textContent, /第 2 條尚未完成/);
+    rates[1].value = '50';
+    rates[1].dispatchEvent(new Event('input', { bubbles: true }));
+    assert.deepEqual(rates.map(rate => rate.hasAttribute('aria-invalid')), [false, false, false, false]);
+    assert.equal(rates[1].hasAttribute('aria-describedby'), false);
+    assert.equal(panel.querySelector('.defense-error').textContent, '');
+
+    const totalsObserver = new page.dom.window.MutationObserver(() => {});
+    for (const selector of ['.defense-summary-values', '.defense-totals']) {
+      totalsObserver.observe(panel.querySelector(selector), { childList: true, characterData: true, subtree: true });
+    }
+    const firstName = rows[0].querySelector('[data-source-name]');
+    firstName.value = '只修改名稱';
+    firstName.dispatchEvent(new Event('input', { bubbles: true }));
+    assert.equal(totalsObserver.takeRecords().length, 0);
+    totalsObserver.disconnect();
+
     const percentage=rows[0].querySelector('[data-source-percentage]');percentage.focus();percentage.value='50%';percentage.dispatchEvent(new Event('input',{bubbles:true}));
     assert.equal(percentage.value,'48');assert.equal(document.activeElement,percentage);assert.match(panel.querySelector('.defense-summary-values').textContent,/89\.6%.*90\.4008%/);
     percentage.value='';percentage.dispatchEvent(new Event('input',{bubbles:true}));
@@ -1584,4 +1615,48 @@ test('keyboard selection returns to the replaced equipment combobox with its lis
   assert.equal(document.activeElement, field());
   assert.equal(field().getAttribute('aria-expanded'), 'false');
   assert.equal(field().value, '增加聖獸盔甲效果');
+});
+
+test('the six fixed action controls retain the page history controls and their accessible names', async () => {
+  const page = await uiPage();
+  try {
+    const { document } = page.dom.window;
+    const buttons = [...document.querySelectorAll('.toolbar-actions button')];
+    assert.deepEqual(buttons.map(button => button.id),
+      ['undo', 'redo', 'restore-baseline', 'baseline', 'import-loadout', 'export-loadout']);
+    for (const [id, glyph, label, shortcut] of [['undo', '↶', '復原', 'Control+Z'], ['redo', '↷', '重做', 'Control+Y']]) {
+      const button = document.getElementById(id);
+      const icon = button.querySelector('.history-action-glyph');
+      assert.equal(button.type, 'button');
+      assert.equal(button.disabled, true);
+      assert.equal(icon.textContent, glyph);
+      assert.equal(icon.getAttribute('aria-hidden'), 'true');
+      assert.ok(button.title.startsWith(label));
+      assert.ok(button.getAttribute('aria-label').startsWith(label));
+      assert.ok(button.getAttribute('aria-keyshortcuts').split(' ').includes(shortcut));
+    }
+  } finally { page.close(); }
+});
+
+test('invalid stage values keep the last committed value and clear the error on recovery', async () => {
+  const page = await uiPage();
+  try {
+    const { document, Event } = page.dom.window;
+    for (const [fieldId, label] of stageFields) {
+      const input = document.querySelector(`#battle-settings input[aria-label="${label}"]`);
+      const error = input.closest('.picker').nextElementSibling;
+      const previous = page.readState().values[fieldId];
+      input.focus();
+      input.value = '';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.blur();
+      assert.equal(error.getAttribute('role'), 'alert');
+      assert.equal(error.hidden, false);
+      assert.equal(error.textContent, '請輸入純數字（非負整數），或從選項中選擇。');
+      assert.equal(page.readState().values[fieldId], previous);
+      await enter(page, label, '25');
+      assert.equal(error.hidden, true);
+      assert.equal(page.readState().values[fieldId], '25');
+    }
+  } finally { page.close(); }
 });

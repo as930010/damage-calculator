@@ -260,9 +260,9 @@ body.site-page {
 .battle-defense label { display: block; }
 .battle-defense :is(input, select) { box-sizing: border-box; width: 100%; min-width: 0; min-height: 2.75rem; padding: .625rem .75rem; border: 1px solid var(--border-control, var(--site-border)); border-radius: .5rem; background: var(--control, var(--site-surface)); color: var(--text-input, var(--site-text)); font: inherit; }
 .battle-defense :is(input, select, button, summary):focus-visible { outline: 2px solid var(--accent, var(--site-text)); outline-offset: 2px; }
-.battle-defense .defense-source-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(7rem, .2fr) auto; align-items: center; gap: .5rem; margin-block: .5rem; }
+.battle-defense .defense-source-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(calc(16ch + 1.5rem + 2px), .2fr) auto; align-items: center; gap: .5rem; margin-block: .5rem; }
 .battle-defense .defense-source-row button { min-width: 2.75rem; min-height: 2.75rem; border: 1px solid var(--border-control, var(--site-border)); border-radius: .5rem; background: var(--control, var(--site-surface)); color: inherit; font: inherit; cursor: pointer; }
-.battle-defense [data-defense-add] { width: fit-content; min-width: calc(100% / 3); max-width: 100%; margin-block: .5rem; }
+.battle-defense [data-defense-add] { max-width: 100%; margin-block: .5rem; }
 .battle-defense .defense-note { font-size: .875rem; line-height: 1.6; }
 .battle-defense .defense-error, .battle-defense .defense-import-status { color: var(--warning, var(--site-text)); overflow-wrap: anywhere; }
 .battle-defense .defense-totals { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; border-top: 1px solid var(--border, var(--site-border)); padding-top: 1rem; margin-block: 1rem 0; }
@@ -280,6 +280,7 @@ body.site-page {
   .battle-defense .defense-summary-values { grid-column: 1 / -1; grid-row: 2; }
   .battle-defense .defense-summary-values > span { display: flex; flex-direction: column; align-items: center; text-align: center; }
   .battle-defense .defense-summary-values > span > span { font-size: .75rem; }
+  .battle-defense .mode-switch button { min-height: var(--site-control-height, 44px); }
   .battle-defense .defense-source-row { grid-template-columns: minmax(0, 1fr) auto; }
   .battle-defense [data-source-name] { grid-column: 1 / -1; }
   .battle-defense .defense-body { padding-inline: 1rem; }
@@ -374,7 +375,18 @@ html:is(
     line-height: 1.5;
   }
   & :where(select) { color-scheme: dark; padding-inline-start: var(--space-3, 12px); }
-  & :where(.boss-health-controls select, .support-magazine select,
+  & :where(.boss-health-controls select) {
+    inline-size: max-content;
+    max-inline-size: 100%;
+    min-height: var(--site-control-compact);
+    padding: 0 var(--space-2, 8px);
+    font-size: var(--site-control-label);
+
+    @media (max-width: 700px) {
+      min-height: var(--site-control-height);
+    }
+  }
+  & :where(.support-magazine select,
       .option-editor-input input, .boss-control .percent-input, .skill-damage-share-number-wrap) {
     min-height: var(--site-control-compact);
     font-size: var(--site-control-label);
@@ -563,8 +575,6 @@ html:is(
     border-radius: var(--site-control-radius);
     padding-block: 6px;
   }
-
-  body.site-page .boss-health-controls select { padding-block: 4px; }
 
   @media (max-width: 1240px) {
     body.site-page .workbench,

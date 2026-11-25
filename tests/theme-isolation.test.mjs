@@ -182,6 +182,16 @@ test("shared styles and DOM own toolbar grouping and responsive sizing", () => {
   assert.match(mainSource, /historyActions\.className\s*=\s*'history-actions'/);
 });
 
+test("the mobile action bar lays out the six buttons in two aligned rows", () => {
+  const mobileCss = sharedStyles.match(/@media\(max-width:700px\)\{\s*\.app-shell[\s\S]*?\n\}/)?.[0];
+  assert.ok(mobileCss, "homepage phone styles");
+  assert.match(mobileCss, /grid-template-columns:44px repeat\(2,minmax\(0,1fr\)\);grid-template-rows:repeat\(2,1fr\);grid-template-areas:"history restore baseline" "history transfer transfer"/);
+  assert.match(mobileCss, /\.history-actions\{grid-area:history;display:grid;grid-template-rows:repeat\(2,1fr\);gap:inherit/);
+  assert.match(mobileCss, /\.history-actions button\{display:grid;grid-template-columns:minmax\(0,1fr\);place-items:center;width:44px;min-height:44px;padding:0\}/);
+  assert.match(mobileCss, /button>span:not\(\.history-action-glyph\)\{display:none\}/);
+  assert.match(mobileCss, /\.transfer-actions\{grid-area:transfer;display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\);gap:var\(--mobile-toolbar-gap\)/);
+});
+
 // Evaluate the actual styles on representative DOM. jsdom does not evaluate
 // viewport media queries, so flatten the active rules for each tested width.
 // Real-browser geometry and interactive states are checked in Production Preview.

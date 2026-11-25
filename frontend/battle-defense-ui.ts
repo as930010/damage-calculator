@@ -1,4 +1,4 @@
-import { combineDefenseRates, isDefensePercentageDraft } from '../calculation/battle-defense.ts';
+import { combineDefenseRates, isDefensePercentageDraft, parseDefensePercentage } from '../calculation/battle-defense.ts';
 import type { LoadoutCalculationResult } from '../calculation/loadout-engine.ts';
 import { findTeamDefenseSource, replaceTeamDefenseSource, teamRevision, teamSnapshotUpdateReason, type BattleDefenseStore } from './battle-defense-state.ts';
 import { TEAM_STATE_KEY } from '../features/buff-simulator/frontend/saved-state.ts';
@@ -7,6 +7,9 @@ import { TEAM_STATE_KEY } from '../features/buff-simulator/frontend/saved-state.
 const loadTeamReferenceModule = () => import('./team-defense-reference.ts');
 
 const percentageText = (value: number, places: number) => (value * 100).toFixed(places).replace(/0+$/, '').replace(/\.$/, '');
+const setText = (node: Element, text: string) => {
+  if (node.textContent !== text) node.textContent = text;
+};
 const shown = (value: number | null, places = 4) => value === null ? '—' : percentageText(value, places) + '%';
 export function equipmentDefenseRates(result: LoadoutCalculationResult | undefined, fallback?: number): number[] {
   return result ? (result.lowerwearConfigurations?.map(c => (c.result.attributes.stats.defenseIgnorePct?.finalTotal ?? 0) / 100)
@@ -33,11 +36,20 @@ export function createBattleDefenseEditor(store: BattleDefenseStore, teamUrl: UR
         <p class="defense-note">請只填入可以同時生效的獨立破防來源，並避免重複計入已包含於隊伍引用內的相同破防效果。</p>
         <p class="defense-note">技能特性若只適用特定技能，計算結果僅適用相同條件，不代表所有技能均享有該破防。</p>
       </div>
-      <p class="defense-error" role="status"></p><dl class="defense-totals"></dl><p class="defense-note defense-additive-info"></p><p class="defense-note">此區塊獨立保存，不包含在匯入匯出設定中且不受復原、重做按鈕影響</p>
+      <p id="battle-defense-error" class="defense-error" role="status"></p><dl class="defense-totals"></dl><p class="defense-note defense-additive-info"></p><p class="defense-note">此區塊獨立保存，不包含在匯入匯出設定中且不受復原、重做按鈕影響</p>
     </div>`;
   const manual = root.querySelector<HTMLInputElement>('[data-defense-manual]')!;
   const sourceArea = root.querySelector<HTMLElement>('.defense-sources')!;
   const error = root.querySelector<HTMLElement>('.defense-error')!;
+  let describedInput: HTMLInputElement | undefined;
+  const showError = (message: string, input?: HTMLInputElement) => {
+    if (input !== describedInput) {
+      describedInput?.removeAttribute('aria-describedby');
+      input?.setAttribute('aria-describedby', error.id);
+      describedInput = input;
+    }
+    setText(error, message);
+  };
   const importStatus = root.querySelector<HTMLElement>('.defense-reference .defense-import-status')!;
   const target = root.querySelector<HTMLSelectElement>('.defense-target select')!;
   const importButton = root.querySelector<HTMLButtonElement>('[data-defense-import]')!;
@@ -79,7 +91,7 @@ export function createBattleDefenseEditor(store: BattleDefenseStore, teamUrl: UR
   const percentages = new WeakMap<HTMLInputElement, { value: string; start: number | null; end: number | null }>();
   const rememberPercentage = (input: HTMLInputElement) => percentages.set(input, { value: input.value, start: input.selectionStart, end: input.selectionEnd });
   const isPercentageInput = (target: EventTarget | null): target is HTMLInputElement => target instanceof HTMLInputElement && !target.readOnly && target.matches('[data-defense-manual], [data-source-percentage]');
-  const rejectedPercentage = () => { error.textContent = '請只輸入 0～100 的數字與小數點，最多八位小數，不需輸入 %；未接受的內容不會變更原值。'; };
+  const rejectedPercentage = (input: HTMLInputElement) => showError('請只輸入 0～100 的數字與小數點，最多八位小數，不需輸入 %；未接受的內容不會變更原值。', input);
   const canInsertPercentage = (input: HTMLInputElement, text: string) => isDefensePercentageDraft(
     input.value.slice(0, input.selectionStart ?? 0) + text + input.value.slice(input.selectionEnd ?? input.value.length));
   root.addEventListener('beforeinput', event => {
@@ -87,18 +99,19 @@ export function createBattleDefenseEditor(store: BattleDefenseStore, teamUrl: UR
     const input = event as InputEvent;
     rememberPercentage(event.target);
     if (input.inputType.startsWith('insert') && input.data !== null && !canInsertPercentage(event.target, input.data)) {
-      event.preventDefault(); rejectedPercentage();
+      event.preventDefault(); rejectedPercentage(event.target);
     }
   });
   root.addEventListener('paste', event => {
     if (!isPercentageInput(event.target)) return;
     const text = (event as ClipboardEvent).clipboardData?.getData('text/plain');
     rememberPercentage(event.target);
-    if (text !== undefined && !canInsertPercentage(event.target, text)) { event.preventDefault(); rejectedPercentage(); }
+    if (text !== undefined && !canInsertPercentage(event.target, text)) { event.preventDefault(); rejectedPercentage(event.target); }
   });
   const titles = ['裝備無視防禦', '裝備以外的破防來源', '最終有效破防率'];
   const summary = root.querySelector<HTMLElement>('.defense-summary-values')!;
   const totals = root.querySelector<HTMLElement>('.defense-totals')!;
+  const additiveInfo = root.querySelector<HTMLElement>('.defense-additive-info')!;
   for (const title of titles) {
     const item = document.createElement('span'); const label = document.createElement('span'); label.textContent = title;
     const value = document.createElement('strong'); item.append(label, value); summary.append(item);
@@ -109,10 +122,13 @@ export function createBattleDefenseEditor(store: BattleDefenseStore, teamUrl: UR
     const displayRates = (values: number[]) => !values.length ? '—' : values.every(v => v === values[0]) ? shown(values[0]) : values.map((v, i) => `${i === 0 ? '下衣' : '強/排褲'} ${shown(v)}`).join('／');
     let effective = '—';
     try { if (rate !== null && additive !== null) effective = displayRates(equipment.map(value => combineDefenseRates(value, rate, additive))); } catch { effective = '無法計算'; }
-    root.querySelector<HTMLElement>('.defense-additive-info')!.textContent = additive && equipment.length
-      ? `原始裝備 ${displayRates(equipment)} + 隊伍無視防禦加算 ${shown(additive)} = 加算後 ${displayRates(equipment.map(value => value + additive))}` : '';
+    setText(additiveInfo, additive && equipment.length
+      ? `原始裝備 ${displayRates(equipment)} + 隊伍無視防禦加算 ${shown(additive)} = 加算後 ${displayRates(equipment.map(value => value + additive))}` : '');
     const values = [displayRates(equipment), shown(rate), effective];
-    values.forEach((value, i) => { summary.children[i].querySelector('strong')!.textContent = value; totals.children[i].querySelector('dd')!.textContent = value; });
+    values.forEach((value, i) => {
+      setText(summary.children[i].querySelector('strong')!, value);
+      setText(totals.children[i].querySelector('dd')!, value);
+    });
   };
 
   let currentDataRevision: string | undefined, checkedSnapshotRevision: string | undefined;
@@ -191,10 +207,6 @@ export function createBattleDefenseEditor(store: BattleDefenseStore, teamUrl: UR
         if (name.value !== displayName) name.value = displayName;
         const formattedRate = percentageText(snapshot.rate, 12);
         if (percentage.value !== formattedRate) percentage.value = formattedRate;
-        const setText = (selector: string, text: string) => {
-          const node = row.querySelector<HTMLElement>(selector)!;
-          if (node.textContent !== text) node.textContent = text;
-        };
         const contributions = snapshot.contributions;
         const groups = [
           ['class', '.defense-team-classes', '職業'],
@@ -204,10 +216,10 @@ export function createBattleDefenseEditor(store: BattleDefenseStore, teamUrl: UR
         for (const [category, selector, heading] of groups) {
           const items = contributions?.filter(item => item.category === category).map(item => item.label + ' ' + shown(item.rate, 12)) ?? [];
           if (!contributions && category === 'defense-ignore') items.push(...(snapshot.defenseIgnoreSources ?? []));
-          setText(selector, items.length ? heading + '：' + items.join('、') : '');
+          setText(row.querySelector(selector)!, items.length ? heading + '：' + items.join('、') : '');
         }
         const legacy = snapshot.sources?.join('、');
-        setText('.defense-team-sources', contributions
+        setText(row.querySelector('.defense-team-sources')!, contributions
           ? contributions.some(item => item.category !== 'defense-ignore') ? '' : '無額外破防來源'
           : (legacy ? '引用來源：' + legacy + '。' : '') + '舊快照未保存個別百分比，重新引用後可查看。');
         return;
@@ -223,8 +235,17 @@ export function createBattleDefenseEditor(store: BattleDefenseStore, teamUrl: UR
     const legacyCount = value.legacyManualSources?.length ?? 0;
     legacy.hidden = !legacyCount;
     if (legacyCount) legacy.querySelector('p')!.textContent = '已保留舊版隊伍模式中未生效的 ' + legacyCount + ' 筆手動來源。按下加入後才納入計算。';
-    error.textContent = store.error;
-    for (const input of root.querySelectorAll<HTMLInputElement>('[data-defense-manual], [data-source-percentage]:not([readonly])')) input.setAttribute('aria-invalid', String(store.rate === null && !input.closest('[hidden]')));
+    // The store's calculation message identifies the first invalid source.
+    let firstInvalid: HTMLInputElement | undefined;
+    for (const input of root.querySelectorAll<HTMLInputElement>('[data-defense-manual], [data-source-percentage]:not([readonly])')) {
+      const invalid = !store.hasReadError && !input.closest('[hidden]')
+        && input.value.trim() !== '' && parseDefensePercentage(input.value) === null;
+      if (invalid) {
+        input.setAttribute('aria-invalid', 'true');
+        firstInvalid ??= input;
+      } else input.removeAttribute('aria-invalid');
+    }
+    showError(store.error, firstInvalid);
     const snapshot = currentTeam()?.snapshot;
     const snapshotKey = JSON.stringify(snapshot);
     if (selectionSnapshot !== snapshotKey || renderedMode !== value.mode) {
@@ -234,7 +255,7 @@ export function createBattleDefenseEditor(store: BattleDefenseStore, teamUrl: UR
       updateSnapshotNotice();
       if (value.mode === 'sources') { renderReferenceSelection(); checkSnapshotVersion(); }
     }
-    importButton.textContent = snapshot ? '重新引用' : '引用隊伍增益破防量';
+    setText(importButton, snapshot ? '重新引用' : '引用隊伍增益破防量');
     renderTotals();
 
   };
@@ -246,7 +267,7 @@ export function createBattleDefenseEditor(store: BattleDefenseStore, teamUrl: UR
       const previous = percentages.get(input);
       input.value = previous?.value ?? '';
       input.setSelectionRange(previous?.start ?? input.value.length, previous?.end ?? input.value.length);
-      rejectedPercentage(); return;
+      rejectedPercentage(input); return;
     }
     if (input === manual) set({ manualPercentage: input.value });
     else {
