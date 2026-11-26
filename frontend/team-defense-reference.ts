@@ -1,6 +1,6 @@
 import { teamRevision } from './battle-defense-state.ts';
 import { parseCoreCatalog, type CoreCatalog } from '../features/buff-simulator/frontend/data-loader.ts';
-import { parseSavedSimulatorState, resolveSavedMembers, resolveSavedOptions } from '../features/buff-simulator/frontend/saved-state.ts';
+import { parseSavedSimulatorState, resolveSavedMembers, resolveSavedOptions, resolveTeamClass } from '../features/buff-simulator/frontend/saved-state.ts';
 import { calculateTeam, calculateChallenge } from '../features/buff-simulator/calculation/engine.ts';
 import type { TeamCalculationResult } from '../features/buff-simulator/calculation/types.ts';
 import type { TeamDefenseSnapshot } from './battle-defense-state.ts';
@@ -18,16 +18,16 @@ export function teamDefenseReferences(raw: string | null, catalog: CoreCatalog, 
   const missing = requestedMode ? `目前尚無已保存的${mode === 'single' ? '單隊' : '挑戰雙隊'}配置。` : NO_TEAM;
   const activeTeams = mode === 'single' ? ['single'] as const : ['first', 'second'] as const;
   for (const team of activeTeams) {
-    if ((saved.membersByTeam[team] ?? []).some(name => name.trim() && !resolveSavedMembers(catalog, [name], mode).length)) throw new Error(NO_TEAM);
+    if ((saved.membersByTeam[team] ?? []).some(name => name.trim() && !resolveTeamClass(catalog, name))) throw new Error(NO_TEAM);
   }
   const team = (key: 'single' | 'first' | 'second') => ({
-    members: resolveSavedMembers(catalog, saved.membersByTeam[key] ?? [], mode),
+    members: resolveSavedMembers(catalog, saved.membersByTeam[key] ?? [], mode, saved.classSkillVersionsByTeam?.[key]),
     options: resolveSavedOptions(catalog, saved.optionsByTeam[key] ?? {}),
   });
   const single = team('single'), first = team('first'), second = team('second');
   const common = { uniqueClassCodes: catalog.classes.filter(c => c.uniquenessGroup === 'green-control').map(c => c.code),
     actionSpeedCap: catalog.parameters.actionSpeedCap,
-    includeDefenseContributions: true,
+    includeDefenseContributions: true, damageBase: catalog.damageBase,
     // This coefficient is only required to run the existing team engine. Its multipliers are never imported.
     defense: { bossDamageReduction: 0, challengeBreakCoefficient: 0 } };
   const optionLabels = new Map(catalog.loadoutOptions.map(option => [option.id, option.label]));

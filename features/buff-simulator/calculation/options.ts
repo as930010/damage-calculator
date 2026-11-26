@@ -23,15 +23,7 @@ export function resolveLoadoutOption(
       continue;
     }
 
-    const base = parameters[spec.parameter];
-    if (spec.kind === "relative-parameter-increase") {
-      if (base === 0) {
-        throw new RangeError(`Cannot resolve ${definition.id}: ${spec.parameter} is zero`);
-      }
-      effects[key as keyof typeof effects] = (base + spec.additiveIncrease) / base - 1;
-    } else {
-      effects[key as keyof typeof effects] = base * spec.factor;
-    }
+    effects[key as keyof typeof effects] = parameters[spec.parameter] * spec.factor;
   }
 
   if (!selected) {

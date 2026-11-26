@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { stripTypeScriptTypes } from 'node:module';
-import { SourceTextModule, createContext } from 'node:vm';
+import { SourceTextModule, SyntheticModule, createContext } from 'node:vm';
 import { JSDOM, VirtualConsole } from 'jsdom';
 
 const buildRoot = new URL('../dist/', import.meta.url);
@@ -75,6 +75,12 @@ export async function boot({ saved = null, savedDisclosures = null, storageThrow
   async function moduleFor(url) {
     if (modules.has(url.href)) return modules.get(url.href);
     let source = await readFile(url, 'utf8');
+    if (url.pathname.endsWith('.json')) {
+      const value = JSON.parse(source);
+      const module = new SyntheticModule(['default'], function () { this.setExport('default', value); }, { context, identifier: url.href });
+      modules.set(url.href, module);
+      return module;
+    }
     if (!compiled && !production) source = stripTypeScriptTypes(source);
     if (!production && /\/frontend\/main\.(js|ts)$/.test(url.pathname)) {
       for (const name of ['updateResults', 'updateSkillReference', 'saveCurrentInputs', 'shell']) source = countFunction(source, name);

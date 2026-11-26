@@ -687,7 +687,7 @@ body.site-page-buff {
 .site-page-buff .result-title > small,
 .site-page-buff .skill-result span,
 .site-page-buff .skill-empty{color:#a9a4b3}
-.site-page-buff .member-slot input,
+.site-page-buff .member-slot-field > input,
 .site-page-buff .option-editor-input input,
 .site-page-buff .skill-search-controls input{
   border-color:#4a5274;
@@ -695,8 +695,8 @@ body.site-page-buff {
   color:#eee8f6;
   caret-color:#d4b9ed;
 }
-.site-page-buff .member-slot input{background:transparent;border-color:transparent}
-.site-page-buff .member-slot input::placeholder,
+.site-page-buff .member-slot-field > input{background:transparent;border-color:transparent}
+.site-page-buff .member-slot-field > input::placeholder,
 .site-page-buff .skill-search-controls input::placeholder{color:#9ba3c0}
 .site-page-buff .option-chip:has(input:checked){
   border-color:var(--violet-control-edge);

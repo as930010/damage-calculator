@@ -94,7 +94,7 @@ html[data-preview-theme] body.site-page :is(h1,h2,h3,.optimizer-result summary){
 html[data-preview-theme] body.site-page :is(.eyebrow,.total-multiplier strong,:is(.optimizer-result-header, .optimizer-result-state) > span){color:var(--p-accent)}
 html[data-preview-theme] body.site-page :is(.eyebrow,.panel-heading h2)::before{background:var(--p-accent)}
 /* Keep nested surfaces visually continuous inside their existing controls. */
-html[data-preview-theme] body.site-page .member-slot input{background:transparent;border-color:transparent}
+html[data-preview-theme] body.site-page .member-slot-field > input{background:transparent;border-color:transparent}
 html[data-preview-theme] body.site-page .canvas-title-input{background:var(--p-surface);border-color:var(--p-edge)}
 /* The picker is one control: input and clear share a surface; only the floating list is raised. */
 html[data-preview-theme] body.site-page .picker-control>input{caret-color:var(--p-accent)}

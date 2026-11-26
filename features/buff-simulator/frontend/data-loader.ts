@@ -1,6 +1,8 @@
+import { getClassSkillVersionOptions, type ClassSkillVersionOption } from '../calculation/class-skill-definitions.ts';
 import { GREEN_CONTROL_BUFF_COMPONENTS } from '../calculation/support-magazines.ts';
 import type {
   CalculationParameters,
+  DamageBase,
   ControlTimeCategory,
   ClassModeProfile,
   ClassRecord,
@@ -14,7 +16,8 @@ import type {
 
 interface RawCalculationParameters {
   challenge: { defenseBreakCoefficient: number };
-  criticalDamage: { defaultPercent: number };
+  criticalDamage: { defaultPercent: number; characterBasePercent: number };
+  bossDamage: { defaultBonusPercent: number };
   loadoutDefaults: {
     movementSpeedShoePercent: number;
     skillDamageGlovePercent: number;
@@ -25,9 +28,16 @@ interface RawCalculationParameters {
   supportRank: { labels: { superArmor: Record<string, string> } };
 }
 
+interface TeamSkillVersion extends ClassSkillVersionOption {
+  normal: EffectValues;
+  converted: EffectValues;
+}
+
 export interface CoreCatalog {
   classes: ClassRecord[];
   classEffects: ClassModeProfile[];
+  classSkillVersions: ReadonlyMap<string, readonly TeamSkillVersion[]>;
+  damageBase: DamageBase;
   effectTypes: EffectTypeDefinition[];
   loadoutOptions: LoadoutOptionDefinition[];
   parameters: CalculationParameters & {
@@ -97,6 +107,9 @@ export function parseCoreCatalog(payloads: CoreCatalogPayloads): CoreCatalog {
       if ((key === "defenseBreak" || key === "shield" || key === "defenseIgnoreAdditive") && (number < 0 || number > 1)) {
         throw new TypeError(`${label}.${key} must be a ratio between 0 and 1`);
       }
+      if (['critDamageAdditive', 'bossDamageAdditive', 'multiplicativeCritDamage', 'legacyCompositeBuff'].includes(key) && number < 0) {
+        throw new TypeError(`${label}.${key} must be nonnegative`);
+      }
       if (effectTypes.find(effect => effect.key === key)?.unit === "count" && (!Number.isInteger(number) || number < 0)) {
         throw new TypeError(`${label}.${key} must be a nonnegative count`);
       }
@@ -104,6 +117,20 @@ export function parseCoreCatalog(payloads: CoreCatalogPayloads): CoreCatalog {
     }
     return effects;
   };
+  const characterBaseCritPct = requireFinite(raw.criticalDamage?.characterBasePercent, "criticalDamage.characterBasePercent");
+  if (characterBaseCritPct <= 0) throw new RangeError("Invalid character base critical damage");
+  const damageBase = {
+    critDamagePct: requireFinite(raw.criticalDamage?.defaultPercent, "criticalDamage.defaultPercent"),
+    bossDamagePct: requireFinite(raw.bossDamage?.defaultBonusPercent, "bossDamage.defaultBonusPercent"),
+  };
+  if (!(damageBase.critDamagePct > 0) || damageBase.bossDamagePct < 0) throw new RangeError("Invalid default damage attributes");
+  const parseSkillEffect = (value: unknown, label: string): EffectValues => {
+    if (!isRecord(value) || Object.keys(value).some(key => key !== "effects")) {
+      throw new TypeError(`${label} must specify a skill's effects`);
+    }
+    return parseEffects(value.effects, label);
+  };
+  const classSkillVersions = new Map<string, TeamSkillVersion[]>();
   const profiles = new Map<string, { code: string; effects: EffectValues; challengeEffects?: EffectValues }>();
   for (const entry of entries) {
     if (!isRecord(entry) || typeof entry.classId !== "string" || !classById.has(entry.classId)) {
@@ -111,8 +138,20 @@ export function parseCoreCatalog(payloads: CoreCatalogPayloads): CoreCatalog {
     }
     if (entry.code !== classById.get(entry.classId)!.code) throw new TypeError(`Invalid code for ${entry.classId}`);
     if (profiles.has(entry.classId)) throw new TypeError(`Duplicate class ${entry.classId}`);
-    if (Object.keys(entry).some(key => !["classId", "code", "effects", "challengeEffects"].includes(key))) {
+    if (Object.keys(entry).some(key => !["classId", "code", "effects", "challengeEffects", "skillVersions"].includes(key))) {
       throw new TypeError(`Unknown class-effects field for ${entry.classId}`);
+    }
+    if (Object.hasOwn(entry, "skillVersions")) {
+      const versions = entry.skillVersions;
+      if (!isRecord(versions)) throw new TypeError(`Invalid skill versions for ${entry.code}`);
+      const options = getClassSkillVersionOptions(entry.code as string);
+      classSkillVersions.set(entry.code as string, Object.entries(versions).map(([id, version]) => {
+        const option = options.find(item => item.id === id);
+        if (!option || !isRecord(version) || Object.keys(version).some(key => key !== "normal" && key !== "converted")) {
+          throw new TypeError(`Invalid skill version ${id} for ${entry.code}`);
+        }
+        return { ...option, normal: parseSkillEffect(version.normal, `${id}.normal`), converted: parseSkillEffect(version.converted, `${id}.converted`) };
+      }));
     }
     profiles.set(entry.classId, {
       code: entry.code as string,
@@ -142,18 +181,20 @@ export function parseCoreCatalog(payloads: CoreCatalogPayloads): CoreCatalog {
         throw new TypeError(`Invalid user input metadata for ${option.id}`);
       }
     }
-    for (const spec of Object.values(option.effects)) {
-      if (spec?.kind === "fixed") requireFinite(spec.value, `${option.id}.value`);
-      else if (spec?.kind === "relative-parameter-increase") requireFinite(spec.additiveIncrease, `${option.id}.additiveIncrease`);
-      else if (spec?.kind === "scaled-parameter") requireFinite(spec.factor, `${option.id}.factor`);
-      else throw new TypeError(`Invalid option effect for ${option.id}`);
+    for (const [key, spec] of Object.entries(option.effects)) {
+      if (!effectKeys.has(key as EffectKey)) throw new TypeError(`Unknown effect key ${key}`);
+      if (spec?.kind === "fixed") parseEffects({ [key]: spec.value }, option.id);
+      else if (spec?.kind === "scaled-parameter"
+        && ["movementSpeedShoePercent", "skillDamageGlovePercent"].includes(spec.parameter)
+        && !["critDamageAdditive", "bossDamageAdditive", "multiplicativeCritDamage", "legacyCompositeBuff"].includes(key)) {
+        requireFinite(spec.factor, `${option.id}.factor`);
+      } else throw new TypeError(`Invalid option effect for ${option.id}`);
     }
   }
 
   assertUnique(loadoutOptions.flatMap(option => option.userInput?.kind === 'support-magazine' ? [option.userInput.target] : []), 'support magazine targets');
 
   const parameters: CoreCatalog["parameters"] = {
-    criticalDamagePercent: requireFinite(raw.criticalDamage.defaultPercent, "criticalDamage.defaultPercent") / 100,
     movementSpeedShoePercent: requireFinite(raw.loadoutDefaults.movementSpeedShoePercent, "movementSpeedShoePercent"),
     skillDamageGlovePercent: requireFinite(raw.loadoutDefaults.skillDamageGlovePercent, "skillDamageGlovePercent"),
     bossDamageReduction: requireFinite(raw.single.bossDamageReductionDefault, "single.bossDamageReductionDefault"),
@@ -171,7 +212,7 @@ export function parseCoreCatalog(payloads: CoreCatalogPayloads): CoreCatalog {
     },
   };
 
-  return { classes, classEffects, effectTypes, loadoutOptions, parameters };
+  return { classes, classEffects, classSkillVersions, damageBase, effectTypes, loadoutOptions, parameters };
 }
 
 export function parseSkillReferenceCatalog(payload: unknown, classes: readonly ClassRecord[]): SkillReferenceCatalog {

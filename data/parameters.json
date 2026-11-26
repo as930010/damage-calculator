@@ -7,11 +7,6 @@
     "critDamagePct": 150,
     "skillTypeAttackPct": 26.5
   },
-  "characterBaseByClass": {
-    "RM": {
-      "critDamagePct": 180
-    }
-  },
   "fixedEffects": [
     {
       "sourceId": "fixed-effect:master-beast",

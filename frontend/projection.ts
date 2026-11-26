@@ -9,7 +9,7 @@ import { circuitBoardStatKeys, resolveAccessoryEffectOptions, resolveArmorApprai
 import type { AttributeRule, CharacterAttributeResult, StatContribution } from "../calculation/types.ts";
 import { calculateLoadoutCombatRates, prepareLoadoutAttributes, evaluatePreparedLoadout, type LoadoutCalculationInput } from "../calculation/loadout-engine.ts";
 import { resolveClassDamagePassiveContributions } from "../calculation/class-damage-passives.ts";
-import { applyClassSkillVersions } from '../calculation/class-skill-versions.ts';
+import { applyClassSkillVersions, resolveClassSkillVersionContributions } from '../calculation/class-skill-versions.ts';
 import type { GameData } from "./data.ts";
 import { DEFAULT_TRANSCENDENCE_SKILL_DAMAGE_SHARE_PCT, normalizePortraitAwakeningSplit, type LoadoutState } from "./state.ts";
 import { readCircuitBoardRows, validateCircuitBoardRows, type CircuitBoardRow } from "./circuit-board-rows.ts";
@@ -70,6 +70,7 @@ export function resolveLoadoutSources(data: GameData, state: LoadoutState) {
     shared: [
       { sourceId: "character-base", stats: characterBaseStats },
       ...resolveClassDamagePassiveContributions(data.classDamagePassives, state.Job),
+      ...resolveClassSkillVersionContributions(state.Job, state.classSkillVersions),
       ...data.parameters.fixedEffects, ...configuredEffects, ...equipment.shared, ...inner.shared,
     ],
     lowerwearA: [...equipment.lowerwearA, ...inner.lowerwearA], lowerwearB: [...equipment.lowerwearB, ...inner.lowerwearB],

@@ -1,22 +1,28 @@
 import { resolveClassId } from './class-effects.ts';
-import type { ClassCombatEffectsDocument, CombatAttribute } from './types.ts';
+import type { ClassCombatEffectsDocument, CombatAttribute, StatContribution } from './types.ts';
+import { classSkillSourcePrefix, classSkillVersionOptions, getClassSkillVersionOptions, type ClassSkillVersionOption } from '../features/buff-simulator/calculation/class-skill-definitions.ts';
 
-interface ClassSkillVersionOption {
-  id: string;
-  classId: string;
-  label: string;
-  defaultEnabled: boolean;
-  effects: readonly { attribute: CombatAttribute; effectId: string }[];
+export { getClassSkillVersionOptions };
+
+// Each option controls only its own effects.
+const convertedCombatEffects: Readonly<Record<string, readonly { attribute: CombatAttribute; effectId: string }[]>> = {
+  'FP.FatalShotConverted': [{ attribute: 'critRate', effectId: 'crit-1' }],
+};
+const convertedStatEffects: Readonly<Record<string, StatContribution['stats']>> = {
+  'DN.FieldPowerConverted': { critDamagePct: 9.2 },
+};
+
+export function classSkillVersionSourceLabel(sourceId: string): string | undefined {
+  if (sourceId.startsWith(classSkillSourcePrefix)) return classSkillVersionOptions.find(option => option.id === sourceId.slice(classSkillSourcePrefix.length))?.sourceLabel;
 }
 
-// Options control only their listed effects; independent class passives stay intact.
-const classSkillVersionOptions: readonly ClassSkillVersionOption[] = [
-  { id: 'FP.FatalShotConverted', classId: 'FP', label: '致命神槍是否轉換', defaultEnabled: true,
-    effects: [{ attribute: 'critRate', effectId: 'crit-1' }] },
-];
-
-export function getClassSkillVersionOptions(classId: string) {
-  return classSkillVersionOptions.filter(option => option.classId === classId);
+export function resolveClassSkillVersionContributions(classId: string,
+  selections?: Readonly<Record<string, boolean>>): StatContribution[] {
+  return getClassSkillVersionOptions(classId).flatMap(option => {
+    const effect = convertedStatEffects[option.id];
+    return effect && isClassSkillVersionEnabled(option, selections)
+      ? [{ sourceId: classSkillSourcePrefix + option.id, stats: effect }] : [];
+  });
 }
 
 export function isClassSkillVersionEnabled(option: ClassSkillVersionOption, selections?: Readonly<Record<string, boolean>>): boolean {
@@ -39,11 +45,12 @@ export function normalizeClassSkillVersions(value: unknown): Record<string, bool
 export function applyClassSkillVersions(document: ClassCombatEffectsDocument, requestedClassId: string,
   selections?: Readonly<Record<string, boolean>>): ClassCombatEffectsDocument {
   const classId = resolveClassId(document, requestedClassId);
-  const disabled = getClassSkillVersionOptions(classId).filter(option => !isClassSkillVersionEnabled(option, selections));
-  if (!disabled.length) return document;
+  const excludedEffects = getClassSkillVersionOptions(classId).flatMap(option =>
+    isClassSkillVersionEnabled(option, selections) ? [] : convertedCombatEffects[option.id] ?? []);
+  if (!excludedEffects.length) return document;
   const profile = { ...document.classes[classId] };
   for (const attribute of ['critRate', 'extremization'] as const) {
-    const excluded = new Set(disabled.flatMap(option => option.effects.filter(effect => effect.attribute === attribute).map(effect => effect.effectId)));
+    const excluded = new Set(excludedEffects.filter(effect => effect.attribute === attribute).map(effect => effect.effectId));
     if (excluded.size) profile[attribute] = profile[attribute].filter(effect => !excluded.has(effect.id));
   }
   return { ...document, classes: { ...document.classes, [classId]: profile } };

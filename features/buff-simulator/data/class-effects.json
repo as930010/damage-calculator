@@ -62,17 +62,18 @@
       "code": "MM",
       "effects": {
         "buff": 0.12,
-        "defenseBreak": 0.20999999999999996
+        "defenseBreak": 0.21
       }
     },
     {
       "classId": "la",
       "code": "LA",
       "effects": {
-        "buff": 0.08686170212765965,
+        "buff": 0.05,
+        "multiplicativeCritDamage": 0.05,
         "debuff": 0.05,
         "defenseBreak": 0.1,
-        "shield": 0.31999999999999995,
+        "shield": 0.32,
         "mpRecoveryPerSecond": 0.02222222222,
         "actionSpeedMultiplicative": 0.05,
         "superArmor": 1,
@@ -93,7 +94,7 @@
       "classId": "dab",
       "code": "DaB",
       "effects": {
-        "debuff": 0.2100000000000002
+        "debuff": 0.21
       }
     },
     {
@@ -111,9 +112,9 @@
       "classId": "pr",
       "code": "PR",
       "effects": {
-        "buff": 0.11142933881818173,
+        "buff": 0.179675,
         "defenseBreak": 0.1,
-        "shield": 0.15039999999999998,
+        "shield": 0.1504,
         "mpRecoveryPerSecond": 0.05,
         "actionSpeedDiminishing": 0.1,
         "debuffCleanse": 2,
@@ -144,7 +145,7 @@
       "effects": {
         "buff": 0.1,
         "debuff": 0.12,
-        "shield": 0.04500000000000004,
+        "shield": 0.045,
         "resistanceReduction": 150,
         "mpRecoveryPerSecond": 0.03636363636363636
       }
@@ -164,7 +165,7 @@
       "classId": "cu",
       "code": "CU",
       "effects": {
-        "debuff": 0.12000000000000001,
+        "debuff": 0.12,
         "defenseBreak": 0.2,
         "shield": 0.3
       }
@@ -204,7 +205,7 @@
       "code": "CC",
       "effects": {
         "debuff": 0.12,
-        "defenseBreak": 0.19999999999999996,
+        "defenseBreak": 0.2,
         "shield": 0.5,
         "attackReduction": 0.2,
         "actionSpeedMultiplicative": 0.08,
@@ -216,8 +217,13 @@
       "classId": "fp",
       "code": "FP",
       "effects": {
-        "buff": 0.2,
-        "actionSpeedMultiplicative": 0.18
+        "buff": 0.2
+      },
+      "skillVersions": {
+        "FP.FatalShotConverted": {
+          "normal": { "effects": { "actionSpeedMultiplicative": 0.18 } },
+          "converted": { "effects": {} }
+        }
       }
     },
     {
@@ -235,9 +241,9 @@
       "classId": "dia",
       "code": "DiA",
       "effects": {
-        "buff": 0.2544000000000002,
+        "buff": 0.2544,
         "defenseBreak": 0.15,
-        "shield": 0.19999999999999996,
+        "shield": 0.2,
         "cooldownAcceleration": 0.2,
         "resistanceReduction": 150,
         "mpRecoveryPerSecond": 0.2121212121,
@@ -277,9 +283,9 @@
       "classId": "su",
       "code": "SU",
       "effects": {
-        "buff": 0.2544000000000002,
+        "buff": 0.2544,
         "defenseBreak": 0.15,
-        "shield": 0.2799999999999999,
+        "shield": 0.28,
         "cooldownAcceleration": 0.2,
         "resistanceReduction": 150,
         "mpRecoveryPerSecond": 0.21939393939393925,
@@ -323,7 +329,8 @@
       "classId": "ad",
       "code": "AD",
       "effects": {
-        "buff": 0.101,
+        "buff": 0.05,
+        "bossDamageAdditive": 0.03,
         "debuff": 0.07,
         "defenseBreak": 0.2,
         "shield": 0.2,
@@ -343,9 +350,14 @@
       "classId": "dn",
       "code": "DN",
       "effects": {
-        "buff": 0.15345404255319162,
         "debuff": 0.0507,
         "defenseBreak": 0.1
+      },
+      "skillVersions": {
+        "DN.FieldPowerConverted": {
+          "normal": { "effects": { "buff": 0.115, "shield": 0.138 } },
+          "converted": { "effects": { "buff": 0.092, "critDamageAdditive": 0.092 } }
+        }
       }
     },
     {
@@ -360,7 +372,7 @@
       "classId": "om",
       "code": "OM",
       "effects": {
-        "buff": 0.2544000000000002,
+        "buff": 0.2544,
         "defenseBreak": 0.15,
         "shield": 0.24,
         "attackReduction": 0.2,
@@ -376,7 +388,7 @@
       "classId": "ct",
       "code": "CT",
       "effects": {
-        "debuff": 0.20960000000000023,
+        "debuff": 0.2096,
         "attackReduction": 0.1,
         "cooldownAcceleration": 0.3
       }
@@ -394,14 +406,14 @@
       "code": "DA",
       "effects": {
         "debuff": 0.12,
-        "defenseBreak": 0.19999999999999996
+        "defenseBreak": 0.2
       }
     },
     {
       "classId": "de",
       "code": "DE",
       "effects": {
-        "buff": 0.2544000000000002,
+        "buff": 0.2544,
         "defenseBreak": 0.15,
         "shield": 0.2,
         "cooldownAcceleration": 0.2,
@@ -428,7 +440,7 @@
       "code": "BMa",
       "effects": {
         "debuff": 0.12,
-        "defenseBreak": 0.19999999999999996
+        "defenseBreak": 0.2
       }
     },
     {
@@ -463,9 +475,9 @@
       "classId": "bl",
       "code": "BL",
       "effects": {
-        "buff": 0.2544000000000002,
+        "buff": 0.2544,
         "defenseBreak": 0.15,
-        "shield": 0.2799999999999999,
+        "shield": 0.28,
         "cooldownAcceleration": 0.2,
         "resistanceReduction": 150,
         "mpRecoveryPerSecond": 0.203030303,
@@ -478,7 +490,7 @@
       "classId": "he",
       "code": "HE",
       "effects": {
-        "buff": 0.1123404255319147,
+        "multiplicativeCritDamage": 0.16,
         "defenseBreak": 0.2,
         "resistanceReduction": 100
       }
@@ -487,7 +499,7 @@
       "classId": "bi",
       "code": "BI",
       "effects": {
-        "buff": 0.13190000000000013,
+        "buff": 0.1319,
         "defenseBreak": 0.2,
         "attackReduction": 0.13,
         "mpRecoveryPerSecond": 0.1
@@ -500,7 +512,7 @@
         "debuff": 0.12,
         "defenseBreak": 0.2,
         "resistanceReduction": 100,
-        "mpRecoveryPerSecond": 0.0062499999999999995,
+        "mpRecoveryPerSecond": 0.00625,
         "debuffCleanse": 1
       }
     },
@@ -508,7 +520,7 @@
       "classId": "rs",
       "code": "RS",
       "effects": {
-        "buff": 0.2544000000000002,
+        "buff": 0.2544,
         "defenseBreak": 0.15,
         "shield": 0.2,
         "attackReduction": 0.15,
@@ -540,7 +552,7 @@
       "classId": "li",
       "code": "LI",
       "effects": {
-        "buff": 0.029090909090909056,
+        "bossDamageAdditive": 0.08,
         "debuff": 0.18,
         "defenseBreak": 0.07
       }
@@ -549,7 +561,7 @@
       "classId": "cel",
       "code": "CeL",
       "effects": {
-        "buff": 0.1806666667,
+        "buff": 0.166,
         "debuff": 0.04,
         "defenseBreak": 0.15,
         "shield": 0.25,
@@ -562,9 +574,9 @@
       "classId": "np",
       "code": "NP",
       "effects": {
-        "buff": 0.2544000000000002,
+        "buff": 0.2544,
         "defenseBreak": 0.15,
-        "shield": 0.19999999999999996,
+        "shield": 0.2,
         "cooldownAcceleration": 0.2,
         "resistanceReduction": 150,
         "mpRecoveryPerSecond": 0.2,
@@ -593,9 +605,9 @@
       "classId": "av",
       "code": "AV",
       "effects": {
-        "buff": 0.2544000000000002,
+        "buff": 0.2544,
         "defenseBreak": 0.15,
-        "shield": 0.2619999999999999,
+        "shield": 0.262,
         "cooldownAcceleration": 0.2,
         "resistanceReduction": 150,
         "mpRecoveryPerSecond": 0.2,

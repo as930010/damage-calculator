@@ -1,9 +1,11 @@
+import { attributePercent, mountDamageBasis, damageBasisMarkup } from './damage-basis-ui.ts';
+import { damageDraftJournalKey, damageDraftKey } from './damage-basis-state.ts';
 import { GREEN_CONTROL_BUFF_COMPONENTS, SUPPORT_MAGAZINE_LEVELS, normalizeSupportMagazineLevel, supportMagazineBonus, supportMagazineLevelKey } from '../calculation/support-magazines.ts';
 import { calculateBeneficiaryDefenseGain } from '../calculation/defense.ts';
-import { parseSavedSimulatorState, resolveSavedMembers, TEAM_STATE_KEY, type SavedSimulatorState } from './saved-state.ts';
+import { normalizeMemberSkillVersions, parseSavedSimulatorState, resolveSavedMembers, resolveTeamClass, TEAM_STATE_KEY, type SavedSimulatorState, type TeamKey, type TeamSkillVersions } from './saved-state.ts';
 import { calculateChallenge, calculateTeam } from "../calculation/engine.ts";
 import { calculateControlTimes } from "../calculation/control-time.ts";
-import type { EffectKey, SelectedMember, SelectedOption, SkillReferenceCatalog, TeamMode } from "../calculation/types.ts";
+import type { DamageAdditiveSource, DamageBase, EffectKey, SelectedMember, SelectedOption, SkillReferenceCatalog, TeamMode } from "../calculation/types.ts";
 import { resolveLoadoutOption } from "../calculation/options.ts";
 import { supportRankLabel } from "./formatters.ts";
 import { loadCoreCatalog, loadSkillReferenceCatalog, type CoreCatalog } from "./data-loader.ts";
@@ -15,13 +17,13 @@ function getAppRoot(): HTMLElement {
 }
 const app = getAppRoot();
 
-type TeamKey = "single" | "first" | "second";
-
 let catalog: CoreCatalog;
 let skillReference: SkillReferenceCatalog | null = null;
 let skillReferenceRequest: Promise<void> | null = null;
 let mode: TeamMode = "single";
-let membersByTeam: Record<string, string[]> = { single: [], first: [], second: [] };
+const membersByTeam: Record<TeamKey, string[]> = { single: [], first: [], second: [] };
+let classSkillVersionsByTeam: TeamSkillVersions = {};
+let damageBasis: DamageBase | undefined;
 let optionsByTeam: Record<string, Record<string, boolean | number>> = { single: {}, first: {}, second: {} };
 let bossReductions: Partial<Record<TeamMode, number>> = {};
 let optionDisclosureOpen: Partial<Record<TeamKey, boolean>> = {};
@@ -110,20 +112,25 @@ function restoreSavedState(): void {
       if (typeof saved.optionDisclosureOpen[team] === 'boolean') optionDisclosureOpen[team] = saved.optionDisclosureOpen[team];
     }
     bossReductions = saved.bossReductions;
+    classSkillVersionsByTeam = saved.classSkillVersionsByTeam ?? {};
+    damageBasis = saved.damageBasis;
   } catch {
     // Storage may be disabled or contain invalid JSON; keep the default simulator state.
   }
 }
 
-function persistSavedState(): void {
-  const saved: SavedSimulatorState = { version: 1, mode, membersByTeam, optionsByTeam, bossReductions, optionDisclosureOpen };
+function persistSavedState(): boolean {
+  const saved: SavedSimulatorState = { version: 1, mode, membersByTeam, optionsByTeam, bossReductions, optionDisclosureOpen,
+    ...(Object.keys(classSkillVersionsByTeam).length ? { classSkillVersionsByTeam } : {}), ...(damageBasis ? { damageBasis } : {}) };
   const serialized = JSON.stringify(saved);
-  if (serialized === lastPersistedState) return;
+  if (serialized === lastPersistedState) return true;
   try {
     window.localStorage.setItem(STORAGE_KEY, serialized);
     lastPersistedState = serialized;
+    return true;
   } catch {
-    // The simulator remains usable when browser storage is unavailable or full.
+    // Manual settings remain usable when browser storage is unavailable or full.
+    return false;
   }
 }
 
@@ -160,18 +167,14 @@ function optionsFor(team: string): SelectedOption[] {
   });
 }
 
-function membersFor(team: string): SelectedMember[] {
-  return resolveSavedMembers(catalog, membersByTeam[team] ?? [], mode);
+function membersFor(team: TeamKey): SelectedMember[] {
+  return resolveSavedMembers(catalog, membersByTeam[team], mode, classSkillVersionsByTeam[team]);
 }
 
 function invalidMemberEntries(): string[] {
-  const teams = mode === "single" ? ["single"] : ["first", "second"];
+  const teams = mode === "single" ? ["single"] as const : ["first", "second"] as const;
   return teams.flatMap((team) => [...app.querySelectorAll<HTMLInputElement>(`[data-member][data-team="${team}"]`)]
-    .filter((input) => {
-      const value = input.value.trim().toLocaleLowerCase();
-      return value.length > 0 && !catalog.classes.some((record) => record.enabled &&
-        (record.code.toLocaleLowerCase() === value || record.name.toLocaleLowerCase() === value));
-    })
+    .filter(input => input.value.trim() && !resolveTeamClass(catalog, input.value))
     .map((input) => `${input.getAttribute("aria-label")}: ${input.value.trim()}`));
 }
 
@@ -183,7 +186,7 @@ function invalidMemberNote(): string {
 }
 
 function emptyRosterNote(): string {
-  const teams = mode === "single" ? ["single"] : ["first", "second"];
+  const teams = mode === "single" ? ["single"] as const : ["first", "second"] as const;
   return teams.every((team) => membersFor(team).length === 0)
     ? '<p class="roster-note" role="status">尚未選擇職業；以下結果仍包含目前啟用的配置效果。</p>'
     : "";
@@ -249,7 +252,7 @@ function updateSkillReference(): void {
   const results = app.querySelector<HTMLElement>("[data-skill-results]");
   if (!results) return;
   const query = app.querySelector<HTMLInputElement>("[data-skill-query]")?.value.trim().toLocaleLowerCase() ?? "";
-  const teams = mode === "single" ? ["single"] : ["first", "second"];
+  const teams = mode === "single" ? ["single"] as const : ["first", "second"] as const;
   const selectedCodes = new Set(teams.flatMap((team) => membersFor(team).map((member) => member.classCode)));
   const hasSelection = selectedCodes.size > 0;
   const matches = skillReference.roles.map((role) => {
@@ -304,11 +307,48 @@ function ensureSkillReference(): void {
   })();
 }
 
+function memberSkillControls(classCode: string, team: TeamKey, index: number): string {
+  const selections = classSkillVersionsByTeam[team]?.[index];
+  return (catalog.classSkillVersions.get(classCode) ?? []).map(option => {
+    const checked = selections?.[option.id] ?? option.teamDefaultEnabled;
+    return `<label><input type="checkbox" data-member-skill-version="${escapeHtml(option.id)}" ${checked ? 'checked' : ''}>${escapeHtml(option.label)}</label>`;
+  }).join('');
+}
+
+function memberSlot(team: TeamKey, title: string, index: number): string {
+  const value = membersByTeam[team][index] ?? '';
+  const classCode = resolveTeamClass(catalog, value)?.code ?? '';
+  const label = `${title}隊員 ${index + 1}`;
+  return `<div class="member-slot" role="group" aria-label="${label}">
+    <label class="member-slot-field"><span class="slot-index">${String(index + 1).padStart(2, "0")}</span><input data-member data-team="${team}" data-member-index="${index}" list="class-list" autocomplete="off" value="${escapeHtml(value)}" placeholder="輸入代碼" aria-label="${label}"></label>
+    <div class="member-skill-versions" data-class-code="${escapeHtml(classCode)}">${memberSkillControls(classCode, team, index)}</div>
+  </div>`;
+}
+
+function syncMemberSkillControls(input: HTMLInputElement): void {
+  const team = input.dataset.team as TeamKey;
+  const index = Number(input.dataset.memberIndex);
+  const record = resolveTeamClass(catalog, input.value);
+  const teamSelections = classSkillVersionsByTeam[team];
+  // Incomplete text edits may temporarily stop matching a class.
+  if (teamSelections && (record || !input.value.trim())) {
+    const valid = normalizeMemberSkillVersions(catalog, record, teamSelections[index]);
+    if (valid) teamSelections[index] = valid;
+    else delete teamSelections[index];
+    if (!Object.keys(teamSelections).length) delete classSkillVersionsByTeam[team];
+  }
+  const root = input.closest('.member-slot')!.querySelector<HTMLElement>('.member-skill-versions')!;
+  const classCode = record?.code ?? '';
+  if (root.dataset.classCode === classCode) return;
+  root.dataset.classCode = classCode;
+  root.innerHTML = memberSkillControls(classCode, team, index);
+}
+
 function teamPanel(team: TeamKey, title: string, memberCount: number): string {
   const bossControlMarkup = team === "single" ? bossControl() : "";
   return `<section class="panel team-panel">
     <div class="panel-heading"><div><h2>${title}</h2></div>${bossControlMarkup}</div>
-    <div class="member-grid">${Array.from({ length: memberCount }, (_, index) => `<label class="member-slot"><span class="slot-index">${String(index + 1).padStart(2, "0")}</span><input data-member data-team="${team}" list="class-list" autocomplete="off" value="${escapeHtml(membersByTeam[team]?.[index] ?? "")}" placeholder="輸入代碼" aria-label="${title}隊員 ${index + 1}"></label>`).join("")}</div>
+    <div class="member-grid">${Array.from({ length: memberCount }, (_, index) => memberSlot(team, title, index)).join("")}</div>
     <details class="option-disclosure" data-team="${team}" ${optionDisclosureOpen[team] ? "open" : ""}><summary>配置效果</summary>${optionPanel(team)}</details>
   </section>`;
 }
@@ -326,7 +366,8 @@ function syncInputs(event: Event): void {
   if (input instanceof HTMLSelectElement && input.hasAttribute('data-magazine-level')) input.value = String(normalizeSupportMagazineLevel(Number(input.value)));
   const isSearch = input.hasAttribute("data-skill-query");
   const isMember = input.hasAttribute("data-member");
-  if (!isSearch && !isMember && !input.hasAttribute("data-option") && !input.hasAttribute("data-option-value") && !input.hasAttribute("data-magazine-level") && input.id !== "boss-reduction") return;
+  const memberSkill = input.dataset.memberSkillVersion;
+  if (!isSearch && !isMember && !memberSkill && !input.hasAttribute("data-option") && !input.hasAttribute("data-option-value") && !input.hasAttribute("data-magazine-level") && input.id !== "boss-reduction") return;
   const value = inputValue(input);
   if (inputValues.get(input) === value) return;
   inputValues.set(input, value);
@@ -334,11 +375,28 @@ function syncInputs(event: Event): void {
     updateSkillReference();
     return;
   }
+  if (input instanceof HTMLInputElement) {
+    if (isMember) syncMemberSkillControls(input);
+    if (memberSkill) {
+      const member = input.closest('.member-slot')!.querySelector<HTMLInputElement>('[data-member]')!;
+      const team = member.dataset.team as TeamKey;
+      const index = Number(member.dataset.memberIndex);
+      const slots = classSkillVersionsByTeam[team] ??= {};
+      (slots[index] ??= {})[memberSkill] = input.checked;
+    }
+  }
   saveCurrentInputs();
   persistSavedState();
   syncSupportMagazineControls();
   updateResults();
   if (isMember) updateSkillReference();
+}
+
+function saveDamageBasis(next: DamageBase): boolean {
+  damageBasis = next;
+  const saved = persistSavedState();
+  updateResults();
+  return saved;
 }
 
 function shell(): void {
@@ -355,6 +413,7 @@ function shell(): void {
     </div>
   </section>
   <div id="buff-mode-panel" role="tabpanel" aria-labelledby="buff-mode-${mode}">
+  ${damageBasisMarkup}
   <div id="buff-configuration" class="section-label configuration-heading site-inpage-target" tabindex="-1" role="region" aria-label="隊伍配置">
     <div class="buff-configuration-nav"><strong>隊伍配置</strong><a class="site-inpage-link" href="#buff-results" data-buff-jump>查看增益結果</a></div>
     ${mode === "challenge" ? bossControl() : ""}
@@ -367,6 +426,7 @@ function shell(): void {
   </section>
   </div>
   ${skillReferencePanel()}`;
+  mountDamageBasis(app.querySelector<HTMLElement>('[data-damage-basis]')!, damageBasis ?? catalog.damageBase, saveDamageBasis);
   const skillPanel = app.querySelector<HTMLDetailsElement>(".skill-reference")!;
   let skillPanelOpen = skillPanel.open;
   skillPanel.addEventListener("toggle", () => {
@@ -422,7 +482,7 @@ function shell(): void {
 }
 
 function saveCurrentInputs(): void {
-  const teams = mode === "single" ? ["single"] : ["first", "second"];
+  const teams = mode === "single" ? ["single"] as const : ["first", "second"] as const;
   for (const team of teams) {
     membersByTeam[team] = [...app.querySelectorAll<HTMLInputElement>(`[data-member][data-team="${team}"]`)].map((input) => input.value);
     const previous = optionsByTeam[team];
@@ -461,6 +521,45 @@ function formatResultValue(key: EffectKey, value: number | string, definitions: 
   return formatEffectValue(key, value, definitions);
 }
 
+function damageSourceLabel(source: string): string {
+  const id = source.startsWith('loadout:') ? source.slice('loadout:'.length) : source;
+  return catalog.loadoutOptions.find(option => option.id === id)?.label ?? id;
+}
+
+function additiveLabel(source: DamageAdditiveSource): string {
+  return source.id.startsWith('loadout:') ? damageSourceLabel(source.id) : source.label;
+}
+
+function damageBaseDetails(result: ReturnType<typeof calculateTeam>) {
+  const details = result.damageBuff;
+  if (!details) return { additive: '', rest: '' };
+  const row = (label: string, expression: string, value: string) =>
+    `<div class="detail-row"><span>${escapeHtml(label)}</span><code>${escapeHtml(expression)}</code><b>${escapeHtml(value)}</b></div>`;
+  const channel = (key: 'critDamageAdditive' | 'bossDamageAdditive', label: string, points: number, factor: number, denominator: number) => {
+    const sources = details.sources.filter(source => source.key === key).map(source =>
+      additiveLabel(source) + ' +' + attributePercent(source.value * 100));
+    return row(label, (sources.length ? sources.join(' ＋ ') + '；' : '')
+      + '(' + attributePercent(denominator) + ' ＋ ' + attributePercent(points) + ') ÷ ' + attributePercent(denominator), asMultiplier(factor));
+  };
+  const product = details.productSources.length ? row('基礎乘算暴傷',
+    details.productSources.map(({ label, value }) => damageSourceLabel(label) + ' +' + attributePercent(value * 100)).join(' × ')
+      + '；共同乘積 ' + asMultiplier(details.critProduct),
+    '+' + attributePercent(details.critProductPoints) + '（百分點）') : '';
+  const crit = details.productSources.length ? row('致命傷害合計換算',
+    '(' + attributePercent(details.base.critDamagePct) + ' ＋ ' + attributePercent(details.critPoints) + ' ＋ '
+      + attributePercent(details.critProductPoints) + ') ÷ ' + attributePercent(details.base.critDamagePct),
+    asMultiplier(details.critFactor)) : '';
+  const legacy = details.legacySources.length ? row('歷史合成增幅（固定）',
+    details.legacySources.map(source => damageSourceLabel(source.label) + ' +' + attributePercent(source.value * 100)).join(' × '),
+    asMultiplier(details.legacySources.reduce((total, source) => total * (1 + source.value), 1))) : '';
+  return {
+    additive: channel('critDamageAdditive', '致命傷害加算', details.critPoints,
+      (details.base.critDamagePct + details.critPoints) / details.base.critDamagePct, details.base.critDamagePct)
+      + channel('bossDamageAdditive', 'Boss 傷害加算', details.bossPoints, details.bossFactor, 100 + details.base.bossDamagePct),
+    rest: product + crit + legacy + row('Buff 合計', '獨立乘算 × 致命傷害合計換算 × Boss 傷害加算（含適用的歷史係數）', asMultiplier(result.buffMultiplier)),
+  };
+}
+
 function detailList(result: ReturnType<typeof calculateTeam>): string {
   const magazineRows = (result.supportMagazineDetails ?? []).map(detail => {
     const label = catalog.loadoutOptions.find(option => option.id === detail.optionId)?.label ?? detail.optionId;
@@ -468,6 +567,7 @@ function detailList(result: ReturnType<typeof calculateTeam>): string {
     return `<div class="detail-row"><span>${escapeHtml(label)} Lv.${detail.level} · ${escapeHtml(detail.classCode)}</span><code>${escapeHtml(component)} ${asPercent(detail.baseValue)} → ${asPercent(detail.effectiveValue)}</code><b>+${((detail.effectiveValue - detail.baseValue) * 100).toFixed(1)}%</b></div>`;
   }).join('');
   const definitions = new Map(catalog.effectTypes.map((definition) => [definition.key, definition]));
+  const damageDetails = damageBaseDetails(result);
   return `<details class="calculation-details"><summary>展開計算明細</summary><div class="detail-grid">${result.breakdown.map((entry) => {
     const inputs = entry.values.filter((value) => value !== 0);
     let expression = "無來源";
@@ -483,8 +583,9 @@ function detailList(result: ReturnType<typeof calculateTeam>): string {
         ? `MIN(${asPercent(catalog.parameters.actionSpeedCap)}, ${factors} − 1)`
         : factors;
     }
-    return `<div class="detail-row"><span>${escapeHtml(definitions.get(entry.key)?.label ?? entry.key)}</span><code>${escapeHtml(expression)}</code><b>${escapeHtml(formatResultValue(entry.key, entry.result, definitions))}</b></div>`;
-  }).join("")}${magazineRows}</div></details>`;
+    const isAttack = entry.key === 'buff' && result.damageBuff;
+    return `<div class="detail-row"><span>${isAttack ? 'Buff增幅' : escapeHtml(definitions.get(entry.key)?.label ?? entry.key)}</span><code>${escapeHtml(expression)}</code><b>${escapeHtml(formatResultValue(entry.key, isAttack ? result.damageBuff!.attackFactor : entry.result, definitions))}</b></div>${isAttack ? damageDetails.additive : ''}`;
+  }).join("")}${damageDetails.rest}${magazineRows}</div></details>`;
 }
 
 type BeneficiaryDefense = { rates: number[]; source: 'loadout' | 'empty' };
@@ -521,7 +622,12 @@ function beneficiaryDefenseNote(result: ReturnType<typeof calculateTeam>): strin
   }
   return `<p class="roster-note">裝備無視防禦加算 +${asPercent(result.defenseIgnoreAdditive)}。${escapeHtml(detail)}此項獨立表示，上方增益未包含此條。</p>`;
 }
-window.addEventListener('storage', event => { if (event.key === 'dab-loadout-v1' || event.key === null) { beneficiaryRaw = undefined; updateResults(); } });
+window.addEventListener('storage', event => {
+  if (event.key === damageDraftKey || event.key === damageDraftJournalKey || event.key === null) {
+    beneficiaryRaw = undefined;
+    updateResults();
+  }
+});
 window.addEventListener('pageshow', () => { if (catalog && beneficiaryRaw !== undefined) updateResults(); });
 
 function damagePanel(title: string, result: ReturnType<typeof calculateTeam>): string {
@@ -557,46 +663,52 @@ function updateResults(): void {
   const results = app.querySelector<HTMLElement>("#results");
   if (!results || !catalog) return;
   captureDisclosures();
-  if (mode === "single") {
-    const bossInput = app.querySelector<HTMLInputElement>("#boss-reduction");
-    const bossDamageReduction = Number(bossInput?.value ?? catalog.parameters.bossDamageReduction * 100) / 100;
-    if (!(bossDamageReduction >= 0 && bossDamageReduction < 1)) {
-      results.innerHTML = `<p class="validation-note">Boss 減傷率請輸入 0%（含）至 100%（不含）。</p>`;
+  const damageBase = damageBasis ?? catalog.damageBase;
+  try {
+    if (mode === "single") {
+      const bossInput = app.querySelector<HTMLInputElement>("#boss-reduction");
+      const bossDamageReduction = Number(bossInput?.value ?? catalog.parameters.bossDamageReduction * 100) / 100;
+      if (!(bossDamageReduction >= 0 && bossDamageReduction < 1)) {
+        results.innerHTML = `<p class="validation-note">Boss 減傷率請輸入 0%（含）至 100%（不含）。</p>`;
+        return;
+      }
+      const result = calculateTeam({
+        mode: "single", damageBase,
+        members: membersFor("single"),
+        options: optionsFor("single"),
+        defense: { bossDamageReduction },
+        uniqueClassCodes: uniqueSupportCodes(),
+        actionSpeedCap: catalog.parameters.actionSpeedCap,
+      });
+      results.innerHTML = `${invalidMemberNote()}${emptyRosterNote()}<div class="results-heading"><div class="section-label"><strong>隊伍效益</strong></div></div>${damagePanel("單隊結果", result)}`;
+      applyResultDisclosures();
       return;
     }
-    const result = calculateTeam({
-      mode: "single",
-      members: membersFor("single"),
-      options: optionsFor("single"),
-      defense: { bossDamageReduction },
+
+    const bossInput = app.querySelector<HTMLInputElement>("#boss-reduction");
+    const bossDamageReduction = Number(bossInput?.value ?? catalog.parameters.challengeBreakCoefficient * 100) / 100;
+    if (!(bossDamageReduction >= 0 && bossDamageReduction < 1)) {
+      results.innerHTML = '<p class="validation-note">Boss 減傷率請輸入 0%（含）至 100%（不含）。</p>';
+      return;
+    }
+    const challenge = calculateChallenge({
+      damageBase,
+      firstTeam: { members: membersFor("first"), options: optionsFor("first") },
+      secondTeam: { members: membersFor("second"), options: optionsFor("second") },
+      defense: { challengeBreakCoefficient: bossDamageReduction },
       uniqueClassCodes: uniqueSupportCodes(),
       actionSpeedCap: catalog.parameters.actionSpeedCap,
     });
-    results.innerHTML = `${invalidMemberNote()}${emptyRosterNote()}<div class="results-heading"><div class="section-label"><strong>隊伍效益</strong></div></div>${damagePanel("單隊結果", result)}`;
+    results.innerHTML = `${invalidMemberNote()}${emptyRosterNote()}<div class="results-heading"><div class="section-label"><strong>分路與八人同場</strong></div><span class="result-context">同場重複效果只計一次</span></div><div class="result-stack">${damagePanel("第一隊・分路", challenge.firstTeam)}${damagePanel("第二隊・分路", challenge.secondTeam)}${damagePanel("八人同場", challenge.sharedArena)}</div>`;
     applyResultDisclosures();
-    return;
+  } catch (error) {
+    results.innerHTML = '<p class="validation-note" role="status">' + escapeHtml(error instanceof Error ? error.message : '無法計算隊伍結果。') + '</p>';
   }
-
-  const bossInput = app.querySelector<HTMLInputElement>("#boss-reduction");
-  const bossDamageReduction = Number(bossInput?.value ?? catalog.parameters.challengeBreakCoefficient * 100) / 100;
-  if (!(bossDamageReduction >= 0 && bossDamageReduction < 1)) {
-    results.innerHTML = '<p class="validation-note">Boss 減傷率請輸入 0%（含）至 100%（不含）。</p>';
-    return;
-  }
-  const challenge = calculateChallenge({
-    firstTeam: { members: membersFor("first"), options: optionsFor("first") },
-    secondTeam: { members: membersFor("second"), options: optionsFor("second") },
-    defense: { challengeBreakCoefficient: bossDamageReduction },
-    uniqueClassCodes: uniqueSupportCodes(),
-    actionSpeedCap: catalog.parameters.actionSpeedCap,
-  });
-  results.innerHTML = `${invalidMemberNote()}${emptyRosterNote()}<div class="results-heading"><div class="section-label"><strong>分路與八人同場</strong></div><span class="result-context">同場重複效果只計一次</span></div><div class="result-stack">${damagePanel("第一隊・分路", challenge.firstTeam)}${damagePanel("第二隊・分路", challenge.secondTeam)}${damagePanel("八人同場", challenge.sharedArena)}</div>`;
-  applyResultDisclosures();
 }
 
 async function start(): Promise<void> {
   catalog = await loadCoreCatalog(new URL("data/", document.baseURI));
-  for (const team of ["single", "first", "second"]) {
+  for (const team of ["single", "first", "second"] as const) {
     optionsByTeam[team] = Object.fromEntries(catalog.loadoutOptions.filter(option => option.userInput?.kind !== 'support-magazine').map((option) => {
       if (option.userInput?.kind === "percentage") {
         return [option.id, Number((catalog.parameters[option.userInput.parameter] * 100).toFixed(6))];

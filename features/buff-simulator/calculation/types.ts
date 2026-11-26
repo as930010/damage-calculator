@@ -3,6 +3,10 @@ export type TeamMode = "single" | "challenge";
 
 export type EffectKey =
   | "buff"
+  | "critDamageAdditive"
+  | "bossDamageAdditive"
+  | "multiplicativeCritDamage"
+  | "legacyCompositeBuff"
   | "debuff"
   | "defenseBreak"
   | "defenseIgnoreAdditive"
@@ -49,10 +53,29 @@ export interface EffectTypeDefinition {
 export type SupportMagazineTarget = 'attackBuff' | 'allSkillDamageBuff' | 'allSpeedBuff';
 export interface SupportMagazineSelection { id: string; target: SupportMagazineTarget; level: number; enabled: boolean }
 export interface SupportMagazineDetail { optionId: string; target: SupportMagazineTarget; level: number; classCode: string; baseValue: number; effectiveValue: number }
+export type DamageAdditiveKey = 'critDamageAdditive' | 'bossDamageAdditive';
+export type TeamKey = 'single' | 'first' | 'second';
+export interface DamageAdditiveSource { id: string; label: string; key: DamageAdditiveKey; value: number }
+export interface DamageBase { critDamagePct: number; bossDamagePct: number }
+export interface DamageBuffDetails {
+  base: DamageBase;
+  sources: DamageAdditiveSource[];
+  attackFactor: number;
+  critPoints: number;
+  critFactor: number;
+  bossPoints: number;
+  bossFactor: number;
+  productSources: { id: string; label: string; value: number }[];
+  critProduct: number;
+  critProductPoints: number;
+  legacySources: { label: string; value: number }[];
+}
+
 export interface SelectedMember {
   classId: string;
   classCode: string;
   effects: EffectValues;
+  additiveSources?: DamageAdditiveSource[];
   /** Ephemeral owning-team settings, bound before shared-arena uniqueness. */
   supportMagazines?: readonly SupportMagazineSelection[];
   /** Values in one exclusivity group overwrite each other on the same map. */
@@ -68,11 +91,6 @@ export interface SelectedOption {
 
 export type OptionValueSpec =
   | { kind: "fixed"; value: number }
-  | {
-      kind: "relative-parameter-increase";
-      parameter: "criticalDamagePercent";
-      additiveIncrease: number;
-    }
   | { kind: "scaled-parameter"; parameter: "movementSpeedShoePercent" | "skillDamageGlovePercent"; factor: number };
 
 export interface LoadoutOptionDefinition {
@@ -90,8 +108,6 @@ export interface LoadoutOptionDefinition {
 }
 
 export interface CalculationParameters {
-  /** Decimal multiplier; 2.35 represents a 235% critical-damage stat. */
-  criticalDamagePercent: number;
   movementSpeedShoePercent: number;
   skillDamageGlovePercent: number;
 }
@@ -149,6 +165,7 @@ export interface TeamCalculationInput {
   uniqueClassCodes?: string[];
   actionSpeedCap?: number;
   includeDefenseContributions?: boolean;
+  damageBase?: DamageBase;
 }
 
 export type SupportRank = "none" | "has" | "good" | "strong";
@@ -170,6 +187,7 @@ export interface DefenseContribution {
 }
 
 export interface TeamCalculationResult {
+  damageBuff?: DamageBuffDetails;
   defenseContributions?: DefenseContribution[];
   mode: TeamMode;
   buffMultiplier: number;
@@ -201,7 +219,7 @@ export interface TeamCalculationResult {
 }
 
 export interface ChallengeCalculationInput {
-  firstTeam: Omit<TeamCalculationInput, "mode" | "defense" | "uniqueClassCodes" | "actionSpeedCap" | "includeDefenseContributions">;
+  firstTeam: Omit<TeamCalculationInput, "mode" | "defense" | "uniqueClassCodes" | "actionSpeedCap" | "includeDefenseContributions" | "damageBase">;
   secondTeam: Omit<TeamCalculationInput, "mode" | "defense" | "uniqueClassCodes" | "actionSpeedCap" | "includeDefenseContributions">;
   /** Options applied only to the combined eight-person calculation. */
   sharedOptions?: SelectedOption[];
@@ -209,6 +227,7 @@ export interface ChallengeCalculationInput {
   uniqueClassCodes?: string[];
   actionSpeedCap?: number;
   includeDefenseContributions?: boolean;
+  damageBase?: DamageBase;
 }
 
 export interface ChallengeCalculationResult {

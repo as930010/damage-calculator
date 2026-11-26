@@ -19,10 +19,10 @@ test('initial library is empty and has no startup persistence or legacy migratio
 });
 test('complete state and baseline round-trip with independent profiles for multiple jobs',()=>{
   const {manager,storage}=setup();
-  for(const Job of ['DaB','TB','LA']){
+  for(const Job of ['DaB','TB','LA','DN']){
     const state=structuredClone(original);state.Job=Job;
     state.bossHealthCondition={enabled:true,comparison:'below',lowerwear:'lowerwearB'};
-    state.classSkillVersions={'FP.FatalShotConverted':false};
+    state.classSkillVersions={'FP.FatalShotConverted':false,'DN.FieldPowerConverted':Job==='DN'};
     state.lowerwearAlternativeEnabled=true;state.petSkillAttackEnabled=false;state.nephronRaidEnabled=true;
     state.nutProtectionPotionEnabled=true;state.masterBeastSpiritStoneColor='綠';
     state.values['Stage.BossDEF']='';

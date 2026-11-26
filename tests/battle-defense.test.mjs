@@ -10,6 +10,7 @@ import { teamDefenseReferences, loadTeamDefenseDataRevision, loadTeamDefenseRefe
 import { parseCoreCatalog } from '../dist/features/buff-simulator/frontend/data-loader.js';
 import { parseSavedSimulatorState, resolveSavedMembers, resolveSavedOptions } from '../dist/features/buff-simulator/frontend/saved-state.js';
 import { calculateChallenge, calculateTeam } from '../dist/features/buff-simulator/calculation/engine.js';
+import { projectBeneficiaryDamage } from '../dist/frontend/beneficiary-defense.js';
 import { projectDamage, evaluateLoadout } from '../dist/frontend/projection.js';
 import { createBaselineEvaluationCache } from '../dist/frontend/baseline-evaluation.js';
 import { readRatingLoadout, readArmorRatingLoadout } from '../dist/features/transformation-score/loadout.js';
@@ -137,13 +138,13 @@ test('Same-page notifications, storage sync and loadout isolation', () => {
 });
 test('Team single snapshot equals actual simulator engine with default and selected options', () => {
   const raw=JSON.stringify(savedTeam()),saved=parseSavedSimulatorState(raw,catalog);const refs=teamDefenseReferences(raw,catalog,'fixture');
-  const expected=calculateTeam({mode:'single',members:resolveSavedMembers(catalog,saved.membersByTeam.single,'single'),options:resolveSavedOptions(catalog,saved.optionsByTeam.single),defense:{bossDamageReduction:.7192},uniqueClassCodes:catalog.classes.filter(c=>c.uniquenessGroup==='green-control').map(c=>c.code),actionSpeedCap:catalog.parameters.actionSpeedCap});
+  const expected=calculateTeam({mode:'single',damageBase:catalog.damageBase,members:resolveSavedMembers(catalog,saved.membersByTeam.single,'single'),options:resolveSavedOptions(catalog,saved.optionsByTeam.single),defense:{bossDamageReduction:.7192},uniqueClassCodes:catalog.classes.filter(c=>c.uniquenessGroup==='green-control').map(c=>c.code),actionSpeedCap:catalog.parameters.actionSpeedCap});
   close(refs.refs[0].rate,expected.defenseBreak);assert.equal(refs.sourceRevision,teamRevision(raw));assert.equal(refs.refs.length,1);
 });
 test('Challenge exposes explicit route/arena snapshots, preserving source uniqueness', () => {
   const raw=JSON.stringify(savedTeam('challenge')),saved=parseSavedSimulatorState(raw,catalog),refs=teamDefenseReferences(raw,catalog,'fixture');
   const team=key=>({members:resolveSavedMembers(catalog,saved.membersByTeam[key],'challenge'),options:resolveSavedOptions(catalog,saved.optionsByTeam[key])});
-  const expected=calculateChallenge({firstTeam:team('first'),secondTeam:team('second'),defense:{challengeBreakCoefficient:.7192},uniqueClassCodes:catalog.classes.filter(c=>c.uniquenessGroup==='green-control').map(c=>c.code),actionSpeedCap:catalog.parameters.actionSpeedCap});
+  const expected=calculateChallenge({firstTeam:team('first'),secondTeam:team('second'),damageBase:catalog.damageBase,defense:{challengeBreakCoefficient:.7192},uniqueClassCodes:catalog.classes.filter(c=>c.uniquenessGroup==='green-control').map(c=>c.code),actionSpeedCap:catalog.parameters.actionSpeedCap});
   assert.deepEqual(refs.refs.map(r=>r.target),['firstTeam','secondTeam','sharedArena']);for(const ref of refs.refs)close(ref.rate,expected[ref.target].defenseBreak);
   const snapshot=parseBattleDefense(JSON.stringify(legacyEnvironment('team',[],{...refs.refs[2],mode:refs.mode,sourceRevision:refs.sourceRevision,dataRevision:refs.dataRevision,importedAt:'2026-11-06'})));
   const value=externalDefenseRate(snapshot);const changed=savedTeam('challenge');changed.membersByTeam.first=['BL'];assert.notEqual(teamRevision(JSON.stringify(changed)),refs.sourceRevision);assert.equal(externalDefenseRate(parseBattleDefense(JSON.stringify(snapshot))),value);
@@ -310,8 +311,8 @@ test('Explicit reference modes resolve both saved rosters independently of last 
     for(const requested of['single','challenge']){
       const refs=teamDefenseReferences(raw,scoped,'data',requested);assert.equal(refs.mode,requested);assert.equal(refs.sourceRevision,teamRevision(raw));
       const resolve=key=>({members:resolveSavedMembers(scoped,parsed.membersByTeam[key],requested),options:resolveSavedOptions(scoped,parsed.optionsByTeam[key])});
-      if(requested==='single'){const expected=calculateTeam({mode:requested,...resolve('single'),defense:{bossDamageReduction:.7192}});close(refs.refs[0].rate,expected.defenseBreak);close(refs.refs[0].rate,.1);close(refs.refs[0].defenseIgnoreAdditive,.05);}
-      else {const expected=calculateChallenge({firstTeam:resolve('first'),secondTeam:resolve('second'),defense:{challengeBreakCoefficient:.9601}});assert.deepEqual(refs.refs.map(r=>r.target),['firstTeam','secondTeam','sharedArena']);
+      if(requested==='single'){const expected=calculateTeam({mode:requested,...resolve('single'),damageBase:scoped.damageBase,defense:{bossDamageReduction:.7192}});close(refs.refs[0].rate,expected.defenseBreak);close(refs.refs[0].rate,.1);close(refs.refs[0].defenseIgnoreAdditive,.05);}
+      else {const expected=calculateChallenge({firstTeam:resolve('first'),secondTeam:resolve('second'),damageBase:scoped.damageBase,defense:{challengeBreakCoefficient:.9601}});assert.deepEqual(refs.refs.map(r=>r.target),['firstTeam','secondTeam','sharedArena']);
         for(const ref of refs.refs){close(ref.rate,expected[ref.target].defenseBreak);close(ref.defenseIgnoreAdditive??0,expected[ref.target].defenseIgnoreAdditive??0);}
         close(refs.refs[0].rate,.4);close(refs.refs[1].rate,0);close(refs.refs[2].rate,.4);close(refs.refs[2].defenseIgnoreAdditive,.05);
       }
@@ -375,4 +376,108 @@ test('Structured snapshots round-trip and reject malformed or duplicate contribu
     environment.sources[0].snapshot.contributions = contributions;
     assert.throws(()=>parseBattleDefense(JSON.stringify(environment)),/隊伍破防來源明細/);
   }
+});
+
+test('Saved FP/DN variants share the live resolver and leave the active defense snapshot intact', () => {
+  const saved = savedTeam();
+  saved.membersByTeam = { single: ['', 'FP', 'DN'], first: ['', 'DN'], second: ['', '', 'FP', 'DN'] };
+  saved.classSkillVersionsByTeam = {
+    single: { 1: { 'FP.FatalShotConverted': true }, 2: { 'DN.FieldPowerConverted': false } },
+    second: { 3: { 'DN.FieldPowerConverted': false } }
+  };
+  const raw = JSON.stringify(saved);
+  const active = parseSavedSimulatorState(raw, catalog);
+  const resolve = (key, mode) => ({
+    members: resolveSavedMembers(catalog, active.membersByTeam[key], mode, active.classSkillVersionsByTeam[key]),
+    options: resolveSavedOptions(catalog, active.optionsByTeam[key])
+  });
+  const defense = { bossDamageReduction: .5, challengeBreakCoefficient: .5 };
+  const single = teamDefenseReferences(raw, catalog, 'data-new', 'single');
+  const challenge = teamDefenseReferences(raw, catalog, 'data-new', 'challenge');
+  const expected = calculateChallenge({ firstTeam: resolve('first', 'challenge'), secondTeam: resolve('second', 'challenge'), damageBase: catalog.damageBase, defense });
+  close(single.refs[0].rate, calculateTeam({ mode: 'single', ...resolve('single', 'single'), damageBase: catalog.damageBase, defense }).defenseBreak);
+  for (const ref of challenge.refs) {
+    close(ref.rate, expected[ref.target].defenseBreak);
+    assert.ok(ref.contributions.some(row => row.label === 'DN' && row.rate === .1));
+  }
+  const snapshot = testSnapshot(challenge.refs.at(-1).rate, { mode: 'challenge', target: 'sharedArena',
+    sourceRevision: challenge.sourceRevision, dataRevision: challenge.dataRevision });
+  const initial = { ...defaultBattleDefense(), mode: 'sources' };
+  const environment = { ...initial, sources: replaceTeamDefenseSource(initial, snapshot) };
+  saved.classSkillVersionsByTeam.second[3]['DN.FieldPowerConverted'] = true;
+  const changed = teamDefenseReferences(JSON.stringify(saved), catalog, 'data-new', 'challenge');
+  assert.equal(teamSnapshotUpdateReason(snapshot, changed.sourceRevision, changed.dataRevision), 'team');
+  close(changed.refs.at(-1).rate, snapshot.rate);
+  assert.deepEqual(findTeamDefenseSource(environment.sources).snapshot, snapshot);
+});
+
+test('DN conversion adds ordinary critical damage once in average, single-pants and transformation scoring', () => {
+  const base = { ...state, Job: 'DN', lowerwearAlternativeEnabled: true };
+  const skill = 'DN.FieldPowerConverted';
+  for (const condition of [undefined, { enabled: true, comparison: 'above', lowerwear: 'lowerwearA' },
+    { enabled: true, comparison: 'below', lowerwear: 'lowerwearB' }]) {
+    const normal = { ...base, bossHealthCondition: condition };
+    const enabled = { ...normal, classSkillVersions: { [skill]: true } };
+    const off = projectDamage(data, normal).result, on = projectDamage(data, enabled).result;
+    assert.equal(off.classCritDamagePassivePct, 60);
+    assert.equal(on.classCritDamagePassivePct, 60);
+    close(on.attributes.stats.critDamagePct.finalTotal - off.attributes.stats.critDamagePct.finalTotal, 9.2);
+    assert.deepEqual(on.combatRates, off.combatRates);
+    assert.deepEqual(on.multiplicativeCritDamage, off.multiplicativeCritDamage);
+    assert.deepEqual(on.generalMultiplicativeDamage, off.generalMultiplicativeDamage);
+    assert.ok(on.finalDamage.finalDamage > off.finalDamage.finalDamage);
+    assert.deepEqual(on.lowerwearConfigurations?.map(x => x.configuration), off.lowerwearConfigurations?.map(x => x.configuration));
+    for (const [i, item] of (on.lowerwearConfigurations ?? []).entries()) {
+      assert.ok(item.result.finalDamage.finalDamage > off.lowerwearConfigurations[i].result.finalDamage.finalDamage);
+    }
+    const withoutTransforms = { ...enabled, values: { ...enabled.values } };
+    for (const { choiceField, valueField } of data.transformations.slots) {
+      delete withoutTransforms.values[choiceField]; delete withoutTransforms.values[valueField];
+    }
+    const score = readRatingLoadout(data, enabled);
+    close(score.baselineDamage, projectDamage(data, withoutTransforms).result.finalDamage.finalDamage);
+    assert.ok(score.baselineDamage > readRatingLoadout(data, normal).baselineDamage);
+  }
+  const sameJob = { ...state, Job: 'FP' };
+  assert.deepEqual(projectDamage(data, { ...sameJob, classSkillVersions: { [skill]: true } }), projectDamage(data, sameJob));
+});
+
+test('The beneficiary bridge returns just the effective working-draft percentages', () => {
+  const copy = structuredClone(data);
+  const role = { ...structuredClone(state), Job: 'DN', lowerwearAlternativeEnabled: false,
+    classSkillVersions: { 'DN.FieldPowerConverted': true } };
+  const original = projectBeneficiaryDamage(copy, JSON.stringify(role));
+  assert.deepEqual(original, { critDamagePct: 303, bossDamagePct: 185.5 });
+  copy.parameters.characterBase.critDamagePct -= 16.5; // Isolate the requested 286.5% example.
+  const controlled = projectBeneficiaryDamage(copy, JSON.stringify(role));
+  close(controlled.critDamagePct, 286.5);
+  const team = calculateTeam({ mode: 'single', defense: { bossDamageReduction: .5 }, damageBase: controlled,
+    members: resolveSavedMembers(catalog, ['', 'DN'], 'single', { 1: role.classSkillVersions }) });
+  close(team.damageBuff.base.critDamagePct, 286.5);
+  close(team.damageBuff.critPoints, 9.2);
+  close(team.buffMultiplier, 1.092 * (286.5 + 9.2) / 286.5);
+  role.classSkillVersions['DN.FieldPowerConverted'] = false;
+  close(projectBeneficiaryDamage(copy, JSON.stringify(role)).critDamagePct, 277.3);
+  role.lowerwearAlternativeEnabled = true;
+  role.values['Left.Armor.Bottom.FORGE'] = 0;
+  assert.throws(() => projectBeneficiaryDamage(copy, JSON.stringify(role)), /屬性|致命傷害或 Boss/);
+  role.bossHealthCondition = { enabled: true, comparison: 'below', lowerwear: 'lowerwearB' };
+  assert.ok(projectBeneficiaryDamage(copy, JSON.stringify(role)).critDamagePct > 0);
+  assert.throws(() => projectBeneficiaryDamage(copy, JSON.stringify({ schemaVersion: 1 })), /格式無效/);
+  assert.throws(() => projectBeneficiaryDamage(copy, 'invalid'), /格式無效/);
+});
+test('CeL uses the same 25-point Boss passive in the calculator, baseline and rating', () => {
+  const loadout = { ...state, Job: 'CEL' };
+  const current = projectDamage(data, loadout).result;
+  const sources = current.attributes.stats.bossDamagePct.sharedSources.filter(source => source.sourceId === 'class-passive:CEL:boss-damage');
+  assert.deepEqual(sources, [{ sourceId: 'class-passive:CEL:boss-damage', valuePct: 25 }]);
+  assert.equal(current.classCritDamagePassivePct, 20);
+  const former = structuredClone(data);
+  former.classDamagePassives.bossDamagePctByClass.CEL = 20;
+  const before = projectDamage(former, loadout).result;
+  close(current.finalDamage.finalDamage / before.finalDamage.finalDamage,
+    (100 + current.attributes.stats.bossDamagePct.finalTotal) / (100 + before.attributes.stats.bossDamagePct.finalTotal));
+  close(createBaselineEvaluationCache().get(data, loadout, Symbol()).damage.result.finalDamage.finalDamage, current.finalDamage.finalDamage);
+  const rating = readRatingLoadout(data, loadout);
+  close(scoreConfiguration(rating, rating.actual).after, current.finalDamage.finalDamage);
 });

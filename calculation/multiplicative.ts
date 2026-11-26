@@ -1,3 +1,4 @@
+import { multiplyBonuses } from '../features/buff-simulator/calculation/aggregation.ts';
 import type { ProductStatEffect, ProductStatResult } from "./types.ts";
 
 function requireFinite(value: number, label: string): void {
@@ -29,10 +30,7 @@ export function calculateProductStat(
     return { sourceId, valuePct, factor: 1 + valuePct / 100 };
   });
 
-  const productBeforeBaseline = factors.reduce(
-    (product, effect) => product * effect.factor,
-    1,
-  );
+  const productBeforeBaseline = multiplyBonuses(factors.map(effect => effect.valuePct / 100));
   const value = productBeforeBaseline - baselinePctToSubtract / 100;
   requireFinite(value, "productStat.value");
   return { factors, productBeforeBaseline, baselinePct: baselinePctToSubtract, value };

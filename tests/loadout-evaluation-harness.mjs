@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { stripTypeScriptTypes } from 'node:module';
 import { resolve, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createContext, SourceTextModule } from 'node:vm';
+import { createContext, SourceTextModule, SyntheticModule } from 'node:vm';
 import { JSDOM } from 'jsdom';
 import { createHash } from 'node:crypto';
 
@@ -69,6 +69,12 @@ export async function createRuntime({ dom, data = gameData, sourceReader, transf
   }
   async function createModule(path) {
     let source = sourceReader ? await sourceReader(relative(root, path).replaceAll('\\', '/')) : await readFile(path.split('?')[0], 'utf8');
+    if (path.split('?')[0].endsWith('.json')) {
+      const value = JSON.parse(source);
+      const module = new SyntheticModule(['default'], function () { this.setExport('default', value); }, { context, identifier: path });
+      modules.set(path, module);
+      return module;
+    }
     source = stripTypeScriptTypes(source);
     const file = relative(root, path).replaceAll('\\', '/');
     if (transformSource) source = transformSource(file, source);

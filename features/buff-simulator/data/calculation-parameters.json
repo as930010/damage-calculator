@@ -5,14 +5,14 @@
   },
   "criticalDamage": {
     "defaultPercent": 235,
-    "usedForTitleBonus": 15
+    "characterBasePercent": 150
   },
   "loadoutDefaults": {
     "movementSpeedShoePercent": 0.144,
     "skillDamageGlovePercent": 0.18
   },
   "bossDamage": {
-    "defaultPercent": 175
+    "defaultBonusPercent": 175
   },
   "actionSpeed": {
     "multiplicativeCap": 0.4

@@ -221,13 +221,13 @@ async function start() {
   classSettings.className = 'class-settings';
   toolbarSettings.append(classSettings);
   classSettings.append(classPickerRoot);
-  toolbarSettings.append(toolbar.querySelector<HTMLElement>('.toggle')!);
+  const alternateControl = toolbar.querySelector<HTMLElement>('.toggle')!;
   const skillShareControl = createSkillShareControl(
     () => state.transcendenceSkillDamageSharePct,
     value => { state.transcendenceSkillDamageSharePct = value; },
     () => update(),
   );
-  classSettings.append(skillShareControl.root);
+  toolbarSettings.append(skillShareControl.root, alternateControl);
   const renderSkillDamageShare = skillShareControl.render;
   const inspectorPanel = document.querySelector<HTMLElement>('#inspector')!;
   const inspectorBackdrop = document.querySelector<HTMLElement>('#inspector-backdrop')!;
@@ -327,8 +327,13 @@ async function start() {
   toolbarFeedback.className = 'toolbar-feedback';
   toolbar.append(toolbarFeedback);
   const placeToolbarFeedback = () => {
-    toolbarFeedback.append(saveStatus, transferStatus);
+    if (mobileInspectorQuery.matches) toolbarFeedback.append(saveStatus, transferStatus);
+    else {
+      baselineControlGroup.append(saveStatus);
+      transferControlGroup.append(transferStatus);
+    }
   };
+  mobileInspectorQuery.addEventListener('change', placeToolbarFeedback);
   placeToolbarFeedback();
 
   if (sampleMode) {

@@ -2,6 +2,28 @@
   "defaultSingle": {
     "results": [
       {
+        "damageBuff": {
+          "base": {
+            "critDamagePct": 235,
+            "bossDamagePct": 175
+          },
+          "sources": [],
+          "attackFactor": 1.3087360000000001,
+          "critPoints": 0,
+          "critFactor": 1.0638297872340425,
+          "bossPoints": 0,
+          "bossFactor": 1,
+          "productSources": [
+            {
+              "id": "loadout:hundred-billion-red-top-critical-damage",
+              "label": "hundred-billion-red-top-critical-damage",
+              "value": 0.1
+            }
+          ],
+          "critProduct": 1.1,
+          "critProductPoints": 15,
+          "legacySources": []
+        },
         "mode": "single",
         "buffMultiplier": 1.392272340425532,
         "debuffMultiplier": 1,
@@ -30,7 +52,7 @@
               0.144,
               0.04,
               0.1,
-              0.06382978723404253,
+              0,
               0,
               0,
               0,
@@ -265,13 +287,35 @@
         "ignoredClassIds": []
       }
     ],
-    "resultHtmlHash": "e670ff20aec396c42a21b3d84459d68a241b3e9f92b329cde1e3815d6a949769",
-    "skillHtmlHash": "f57919c1fdfc3e5b3ea1bff99a146e4f15fb2bfde54cea49d0870294b8ab3fa2",
+    "resultHtmlHash": "dfb230a6db7daed80c35f261103275b440c433ad32ca3d08546688c82c569d7b",
+    "skillHtmlHash": "c34eb6cd88585215c33356e5e70cd0816993b5d0758f886afd19170ae1edd312",
     "saved": null
   },
   "configuredSingle": {
     "results": [
       {
+        "damageBuff": {
+          "base": {
+            "critDamagePct": 235,
+            "bossDamagePct": 175
+          },
+          "sources": [],
+          "attackFactor": 1.6558080000000004,
+          "critPoints": 0,
+          "critFactor": 1.0638297872340425,
+          "bossPoints": 0,
+          "bossFactor": 1,
+          "productSources": [
+            {
+              "id": "loadout:hundred-billion-red-top-critical-damage",
+              "label": "hundred-billion-red-top-critical-damage",
+              "value": 0.1
+            }
+          ],
+          "critProduct": 1.1,
+          "critProductPoints": 15,
+          "legacySources": []
+        },
         "mode": "single",
         "buffMultiplier": 1.761497872340426,
         "debuffMultiplier": 1.2100000000000002,
@@ -302,7 +346,7 @@
               0.2,
               0,
               0.1,
-              0.06382978723404253,
+              0,
               0,
               0,
               0,
@@ -563,7 +607,7 @@
         "ignoredClassIds": []
       }
     ],
-    "resultHtmlHash": "b555d35cee909e426d4338ba12bb81cd2f439725f5f8f19f4b94a3da0b3da76b",
+    "resultHtmlHash": "3fcbb239cd0443d624ed055c0baf0f6966f8cd272cf32a13f8c2a39dd8c48a02",
     "skillHtmlHash": "ea5591580bfe5c6ccbf09fd4526e66e4c41ca9e67a02752510bc268cd0d9fa46",
     "saved": {
       "version": 1,
@@ -637,6 +681,28 @@
   "configuredChallenge": {
     "results": [
       {
+        "damageBuff": {
+          "base": {
+            "critDamagePct": 235,
+            "bossDamagePct": 175
+          },
+          "sources": [],
+          "attackFactor": 1.6416784384000003,
+          "critPoints": 0,
+          "critFactor": 1.0638297872340425,
+          "bossPoints": 0,
+          "bossFactor": 1,
+          "productSources": [
+            {
+              "id": "loadout:hundred-billion-red-top-critical-damage",
+              "label": "hundred-billion-red-top-critical-damage",
+              "value": 0.1
+            }
+          ],
+          "critProduct": 1.1,
+          "critProductPoints": 15,
+          "legacySources": []
+        },
         "mode": "challenge",
         "buffMultiplier": 1.7464664238297876,
         "debuffMultiplier": 1.2100000000000002,
@@ -667,7 +733,7 @@
               0.144,
               0.04,
               0.1,
-              0.06382978723404253,
+              0,
               0,
               0,
               0,
@@ -928,6 +994,28 @@
         "ignoredClassIds": []
       },
       {
+        "damageBuff": {
+          "base": {
+            "critDamagePct": 235,
+            "bossDamagePct": 175
+          },
+          "sources": [],
+          "attackFactor": 1.7794416640000004,
+          "critPoints": 0,
+          "critFactor": 1.0638297872340425,
+          "bossPoints": 0,
+          "bossFactor": 1,
+          "productSources": [
+            {
+              "id": "loadout:hundred-billion-red-top-critical-damage",
+              "label": "hundred-billion-red-top-critical-damage",
+              "value": 0.1
+            }
+          ],
+          "critProduct": 1.1,
+          "critProductPoints": 15,
+          "legacySources": []
+        },
         "mode": "challenge",
         "buffMultiplier": 1.893023046808511,
         "debuffMultiplier": 1,
@@ -957,7 +1045,7 @@
               0.24,
               0.04,
               0.1,
-              0.06382978723404253,
+              0,
               0,
               0,
               0,
@@ -1207,6 +1295,28 @@
         ]
       },
       {
+        "damageBuff": {
+          "base": {
+            "critDamagePct": 235,
+            "bossDamagePct": 175
+          },
+          "sources": [],
+          "attackFactor": 1.7794416640000004,
+          "critPoints": 0,
+          "critFactor": 1.0638297872340425,
+          "bossPoints": 0,
+          "bossFactor": 1,
+          "productSources": [
+            {
+              "id": "loadout:hundred-billion-red-top-critical-damage",
+              "label": "hundred-billion-red-top-critical-damage",
+              "value": 0.1
+            }
+          ],
+          "critProduct": 1.1,
+          "critProductPoints": 15,
+          "legacySources": []
+        },
         "mode": "challenge",
         "buffMultiplier": 1.893023046808511,
         "debuffMultiplier": 1.2100000000000002,
@@ -1237,7 +1347,7 @@
               0.24,
               0.04,
               0.1,
-              0.06382978723404253,
+              0,
               0,
               0,
               0,
@@ -1501,7 +1611,7 @@
         ]
       }
     ],
-    "resultHtmlHash": "38183e6902d3c388445a72b4aba99a7863bbe2cf44a622530e5ff73c19c03e1f",
+    "resultHtmlHash": "81dea2508df90d70a214528f7b6fab0513e561373de5970d1cf05836ac9cd66a",
     "skillHtmlHash": "125a0460facdd2f264ad6cda464c0d1bdaee0a835959182ddcfcb482b6efd8f0",
     "saved": {
       "version": 1,
@@ -1576,7 +1686,7 @@
   "invalidInputs": {
     "results": [],
     "resultHtmlHash": "1b123be7e6bdddadc6859c51663bdb40ca296fae66b3a3880fa389daab53477f",
-    "skillHtmlHash": "f57919c1fdfc3e5b3ea1bff99a146e4f15fb2bfde54cea49d0870294b8ab3fa2",
+    "skillHtmlHash": "c34eb6cd88585215c33356e5e70cd0816993b5d0758f886afd19170ae1edd312",
     "saved": {
       "version": 1,
       "mode": "single",

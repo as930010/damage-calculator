@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { projectAttributes, projectDamage } from '../dist/frontend/projection.js';
+import { calculateProductStat } from '../dist/calculation/multiplicative.js';
+import { sourceLabel } from '../dist/frontend/source-labels.js';
 import { normalizePortraitAwakeningSplit } from '../dist/frontend/state.js';
 import { resolveInnerwearSources } from '../dist/calculation/innerwear.js';
 import { resolveMasterBeastEffects, resolveRightIceSetEffects, resolveSpiritRecordEffects, resolveSpiritRecordSelections } from '../dist/calculation/equipment-effects.js';
@@ -574,7 +576,7 @@ test('單技傷電路板、芯片、武器變換、共鳴、聖獸與賦靈錄�
   assert.equal(defaultRecord.valuePct, data.spiritRecord.defaultMaxedStats.transcendenceSkillDamagePct);
   assert.equal(defaultRecord.valuePct, data.spiritRecord.defaultMaxedStats.strongSkillDamagePct);
 });
-test('RM 致命傷害基底採 180%，乘算後扣除同一個 180% 基準', async () => {
+test('RM uses the common crit base and the converted sword preserves old loadout damage', async () => {
   const data = await loadData();
   const values = {
     "Weapon.ENHC": 'Lv.8',
@@ -583,12 +585,39 @@ test('RM 致命傷害基底採 180%，乘算後扣除同一個 180% 基準', asy
     "Left.Armor.Upper.FORGE": 0, "Left.Armor.Bottom.FORGE": 0,
     "Left.Armor.Gloves.FORGE": 0, "Left.Armor.Shoes.FORGE": 0,
   };
-  const result = projectDamage(data, { schemaVersion: 2, Job: 'RM', values, lowerwearAlternativeEnabled: false }).result;
-  const baseFactor = result.multiplicativeCritDamage.factors.find(effect => effect.sourceId === 'character-base:crit-damage-product')?.factor;
-  assert.equal(result.attributes.stats.critDamagePct.sharedSources.find(source => source.sourceId === 'character-base')?.valuePct, 180);
-  assert.equal(baseFactor, 1.8);
-  assert.equal(result.multiplicativeCritDamage.baselinePct, 180);
-  assert.ok(Math.abs(result.multiplicativeCritDamage.value - 0.18) < 1e-12);
+  const state = { schemaVersion: 2, Job: 'RM', values, lowerwearAlternativeEnabled: false };
+  const sourceId = 'class-passive:RM:multiplicative-crit-damage:1';
+  const close = (actual, expected) => assert.ok(Math.abs(actual - expected) < 1e-12, actual + ' != ' + expected);
+  const withoutRed = { ...data, parameters: { ...data.parameters,
+    fixedEffects: data.parameters.fixedEffects.filter(effect => effect.sourceId !== 'fixed-effect:red-upper-crit-damage') } };
+  const neutral = projectDamage(withoutRed, { ...state, Job: 'AS' }).result;
+  close(neutral.multiplicativeCritDamage.value, 0);
+  const solo = projectDamage(withoutRed, state).result;
+  const result = projectDamage(data, state).result;
+  assert.equal(result.attributes.stats.critDamagePct.sharedSources.find(source => source.sourceId === 'character-base')?.valuePct, 150);
+  assert.equal(result.multiplicativeCritDamage.baselinePct, 150);
+  assert.deepEqual(solo.multiplicativeCritDamage.factors.find(effect => effect.sourceId === sourceId),
+    { sourceId, valuePct: 20, factor: 1.2 });
+  assert.equal(sourceLabel(sourceId, data, state), 'RM [轉換]暴擊劍');
+  close(solo.multiplicativeCritDamage.productBeforeBaseline, 1.8);
+  close(solo.multiplicativeCritDamage.value, .30);
+  close(result.multiplicativeCritDamage.productBeforeBaseline, 1.98);
+  close(result.multiplicativeCritDamage.value, .48);
+  const all = calculateProductStat([50, 20, 5, 16, 10].map((valuePct, i) => ({ sourceId: 'crit:' + i, valuePct })), 150);
+  close(all.productBeforeBaseline, 2.41164);
+  close(all.value, .91164);
+  close(all.productBeforeBaseline - solo.multiplicativeCritDamage.productBeforeBaseline, .61164);
+
+  const previous = { ...data, parameters: { ...data.parameters, characterBaseByClass: { RM: { critDamagePct: 180 } } },
+    classDamagePassives: { ...data.classDamagePassives,
+      multiplicativeCritDamagePctByClass: { ...data.classDamagePassives.multiplicativeCritDamagePctByClass, RM: [] } } };
+  const old = projectDamage(previous, state).result;
+  const panelCrit = ({ attributes, classCritDamagePassivePct, multiplicativeCritDamage }) =>
+    attributes.stats.critDamagePct.finalTotal + classCritDamagePassivePct + multiplicativeCritDamage.value * 100;
+  close(panelCrit(result), panelCrit(old));
+  close(result.finalDamage.critFactor, old.finalDamage.critFactor);
+  assert.ok(Math.abs(result.finalDamage.finalDamage - old.finalDamage.finalDamage)
+    < 1e-12 * old.finalDamage.finalDamage);
 });
 
 test('極度緩慢彈匣各等級獨立乘算、不增加加算技傷，並遵守完整名稱唯一限制', async () => {
@@ -767,8 +796,8 @@ test('職業加算爆傷、乘算爆傷與 Boss 傷害按獨立公式投影', as
 
   const rm = projectDamage(data, stateFor('RM')).result;
   assert.equal(rm.classCritDamagePassivePct, 0);
-  assert.equal(rm.attributes.stats.critDamagePct.sharedSources.find(source => source.sourceId === 'character-base').valuePct, 180);
-  assert.equal(rm.multiplicativeCritDamage.baselinePct, 180);
+  assert.equal(rm.attributes.stats.critDamagePct.sharedSources.find(source => source.sourceId === 'character-base').valuePct, 150);
+  assert.equal(rm.multiplicativeCritDamage.baselinePct, 150);
 });
 
 test('隨機抽樣十個職業在多裝備傷害環境下交叉驗算', async () => {

@@ -370,3 +370,35 @@ test('搜尋 Top K 不遺失縮減雙部位探索後漏掉的固定合法穿搭'
   assert.ok(search.results.at(-1).damage >= actual - Math.max(1e-6, actual * 1e-12),
     '較快的第一名不足以證明整體排名品質；Top K 仍須保留已知較佳解');
 });
+
+test('DN skill conversion survives the ice search baseline and candidate loadouts', async () => {
+  const normal = { ...iceScenario(data, base, 6), Job: 'DN' };
+  const converted = { ...normal, classSkillVersions: { 'DN.FieldPowerConverted': true } };
+  const search = await searchIce(data, converted, () => {});
+  assert.ok(search.results.length > 0);
+  const damage = state => projectDamage(data, state).result.finalDamage.finalDamage;
+  assert.equal(search.baselineDamage, damage(converted));
+  assert.ok(search.baselineDamage > damage(normal));
+  for (const result of search.results) {
+    const values = { ...converted.values, ...result.choices };
+    data.rightIceSets.selectionFields.forEach((field, i) => { values[field] = result.setNames[i] ?? ''; });
+    assert.ok(sameDamage(result.damage, damage({ ...converted, values })));
+    assert.ok(result.damage > damage({ ...normal, values }));
+  }
+});
+
+test('CeL ice search baseline and candidate damage use the updated 25-point Boss passive', async () => {
+  const state = { ...iceScenario(data, base, 6), Job: 'CEL' };
+  const oldData = structuredClone(data);
+  oldData.classDamagePassives.bossDamagePctByClass.CEL = 20;
+  const damage = (game, loadout) => projectDamage(game, loadout).result.finalDamage.finalDamage;
+  const actual = await searchIce(data, state, () => {});
+  assert.equal(actual.baselineDamage, damage(data, state));
+  assert.ok(actual.baselineDamage > damage(oldData, state));
+  assert.ok(actual.results.length > 0);
+  const [candidate] = actual.results;
+  const values = { ...state.values, ...candidate.choices };
+  data.rightIceSets.selectionFields.forEach((field, i) => { values[field] = candidate.setNames[i] ?? ''; });
+  assert.ok(sameDamage(candidate.damage, damage(data, { ...state, values })));
+  assert.ok(candidate.damage > damage(oldData, { ...state, values }));
+});

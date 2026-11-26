@@ -13,5 +13,9 @@
   { "key": "roarBlock", "label": "扛吼／擋傷", "unit": "count", "group": "utility", "aggregation": "rank", "sortOrder": 11 },
   { "key": "debuffCleanse", "label": "消火／解Debuff", "unit": "count", "group": "utility", "aggregation": "rank", "sortOrder": 12 },
   { "key": "superArmor", "label": "霸體", "unit": "count", "group": "utility", "aggregation": "rank", "sortOrder": 13 },
-  {"key": "defenseIgnoreAdditive", "label": "無視防禦加算", "unit": "ratio", "group": "damage", "aggregation": "sum", "sortOrder": 14}
+  {"key": "defenseIgnoreAdditive", "label": "無視防禦加算", "unit": "ratio", "group": "damage", "aggregation": "sum", "sortOrder": 14},
+  {"key":"critDamageAdditive","label":"致命傷害加算","unit":"ratio","group":"damage","aggregation":"sum","sortOrder":15},
+  {"key":"bossDamageAdditive","label":"Boss 傷害加算","unit":"ratio","group":"damage","aggregation":"sum","sortOrder":16},
+  {"key":"multiplicativeCritDamage","label":"基礎乘算暴傷","unit":"ratio","group":"damage","aggregation":"multiply","sortOrder":17},
+  {"key":"legacyCompositeBuff","label":"歷史合成增幅","unit":"ratio","group":"damage","aggregation":"multiply","sortOrder":18}
 ]

@@ -1660,3 +1660,39 @@ test('invalid stage values keep the last committed value and clear the error on 
     }
   } finally { page.close(); }
 });
+
+test('DN shows separate passive and converted critical damage, with baseline and restored selections', async () => {
+  const state = { ...structuredClone(stateA), Job: 'DN' };
+  const page = await uiPage(state);
+  let reloaded;
+  const skill = 'DN.FieldPowerConverted';
+  const checkbox = target => target.dom.window.document.querySelector('input[data-class-skill-version="' + skill + '"]');
+  const critCard = () => page.dom.window.document.querySelector('[data-disclosure-key="stat:critDamagePct"]');
+  const damage = () => page.dom.window.document.querySelector('#equipment-damage-summary').textContent;
+  try {
+    assert.equal(checkbox(page).checked, false);
+    assert.equal(checkbox(page).parentElement.textContent, '原野力量是否轉換');
+    assert.match(critCard().textContent, /DN 全新升級!\+60%/);
+    assert.doesNotMatch(critCard().textContent, /\[轉換\]原野力量/);
+    const off = damage();
+    await workloadActions.baseline(page);
+    checkbox(page).click();
+    assert.notEqual(damage(), off);
+    assert.match(critCard().textContent, /DN \[轉換\]原野力量9\.2%/);
+    assert.match(critCard().textContent, /DN 全新升級!\+60%/);
+    assert.equal(critCard().textContent.match(/DN \[轉換\]原野力量/g).length, 1);
+    await workloadActions.undo(page); assert.equal(checkbox(page).checked, false);
+    await workloadActions.redo(page); assert.equal(checkbox(page).checked, true);
+    await workloadActions.restore(page); assert.equal(checkbox(page).checked, false);
+    await workloadActions.undo(page); assert.equal(checkbox(page).checked, true);
+    selectPicker(page, '職業', 'KE'); assert.equal(checkbox(page), null);
+    selectPicker(page, '職業', 'DN'); assert.equal(checkbox(page).checked, true);
+    const saved = await page.exportJson();
+    assert.equal(saved.classSkillVersions[skill], true);
+    checkbox(page).click();
+    await page.importJson(JSON.stringify(saved)); assert.equal(checkbox(page).checked, true);
+    reloaded = await uiPage(page.readState()); assert.equal(checkbox(reloaded).checked, true);
+    delete saved.classSkillVersions;
+    await page.importJson(JSON.stringify(saved)); assert.equal(checkbox(page).checked, false);
+  } finally { page.close(); reloaded?.close(); }
+});

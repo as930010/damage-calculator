@@ -1,3 +1,4 @@
+import { parseDamageBasis } from '../frontend/damage-basis-state.ts';
 import { resolveLoadoutOption } from '../calculation/options.ts';
 import { SUPPORT_MAGAZINE_LEVELS, supportMagazineBonus, supportMagazineLevelKey } from '../calculation/support-magazines.ts';
 import { parseSavedSimulatorState, resolveSavedMembers, resolveSavedOptions } from '../frontend/saved-state.ts';
@@ -7,13 +8,16 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import { parseCoreCatalog } from '../frontend/data-loader.ts';
 import { calculateBeneficiaryDefenseGain } from '../calculation/defense.ts';
+import { calculateProductStat } from '../../../calculation/multiplicative.ts';
 import { calculateTeam, calculateChallenge } from '../calculation/engine.ts';
 import { boot, fixturesUrl, storageKey } from './dom-harness.mjs';
 import { capture, edit, scenarios } from './scenarios.mjs';
 
 // Recorded from the unmodified 54f16fb production build before event routing changes.
 // Full numeric outputs and v1 payloads are checked alongside complete result/skill HTML hashes.
-// VI/DN reference edits change only full-roster skill digests. NP single and DaB corrections change only
+// DN's approved 9.2% copy changes full-roster skill digests. Damage basis adds calculation detail; the
+// original baseline scenarios retain the same numerical results at the original assumptions.
+// NP single and DaB corrections change only
 // MP metrics/breakdowns; old-data replay and independent field/DOM checks verified both fixtures.
 // The UI audit removed redundant result eyebrows; only the corresponding result digests changed.
 const fixtures = JSON.parse(await readFile(fixturesUrl, 'utf8'));
@@ -28,9 +32,23 @@ function work(h, expected) {
   }
 }
 
+// The archived results retain their original IEEE-754 tails. Compare only engine numbers
+// within a few machine epsilons; keep the HTML, storage and result structure exact.
+function matchArchivedNumbers(actual, expected) {
+  if (typeof actual === 'number' && typeof expected === 'number'
+    && Math.abs(actual - expected) <= 16 * Number.EPSILON * Math.max(1, Math.abs(expected))) return expected;
+  if (Array.isArray(actual) && Array.isArray(expected)) return actual.map((value, i) => matchArchivedNumbers(value, expected[i]));
+  if (actual && expected && typeof actual === 'object' && typeof expected === 'object') {
+    return Object.fromEntries(Object.entries(actual).map(([key, value]) => [key, matchArchivedNumbers(value, expected[key])]));
+  }
+  return actual;
+}
 for (const [name, setup] of Object.entries(scenarios)) {
   test(`baseline numeric results, complete formatted HTML and v1 storage: ${name}`, async t => {
-    const h = await open(t); setup(h); await h.openSkills(); assert.deepEqual(capture(h), fixtures[name]);
+    const h = await open(t); setup(h); await h.openSkills();
+    const actual = capture(h);
+    actual.results = matchArchivedNumbers(actual.results, fixtures[name].results);
+    assert.deepEqual(actual, fixtures[name]);
   });
 }
 
@@ -449,17 +467,17 @@ const corePayloads = Object.fromEntries(await Promise.all(Object.entries({classe
   .map(async([key,name])=>[key,JSON.parse(await readFile(new URL('../data/'+name+'.json',import.meta.url),'utf8'))])));
 const closeNumber = (a,b) => assert.ok(Math.abs(a-b)<1e-12*Math.max(1,Math.abs(b)), `${a} != ${b}`);
 
-test('all 60 classes share effects and preserve every field outside the seven authorized corrections', () => {
+test('All 60 classes preserve default effects outside the documented balance corrections', () => {
   const catalog=parseCoreCatalog(corePayloads);
   assert.equal(corePayloads.classEffects.classes.length,60);assert.equal(catalog.classEffects.length,120);
   for(const role of catalog.classes){const profiles=catalog.classEffects.filter(p=>p.classId===role.id);assert.equal(profiles.length,2);assert.deepEqual(profiles[0].effects,profiles[1].effects);assert.notEqual(profiles[0].effects,profiles[1].effects);assert.equal('estimatedDamageScore' in profiles[0],false);}
   assert.equal(corePayloads.classEffects.classes.filter(p=>p.challengeEffects).length,0);
-  const changed={RM:['buff','debuff'],DaB:['mpRecoveryPerSecond'],PR:['buff','mpRecoveryPerSecond','debuffCleanse'],BL:['actionSpeedMultiplicative'],NP:['mpRecoveryPerSecond'],LA:['buff','debuff','defenseIgnoreAdditive'],VI:['defenseBreak']};
-  const projection=catalog.classEffects.map(p=>({code:p.code,mode:p.mode,effects:Object.fromEntries(Object.entries(p.effects).filter(([key])=>!changed[p.code]?.includes(key)).sort(([a],[b])=>a.localeCompare(b)))})).sort((a,b)=>(a.code+':'+a.mode).localeCompare(b.code+':'+b.mode));
-  assert.equal(createHash('sha256').update(JSON.stringify(projection)).digest('hex'),'a27e1e0d6389818801fd46500ea17c0885bfcaac7f1aa0fb92a2fe110dd96e65');
+  const changed={RM:['buff','debuff'],DaB:['mpRecoveryPerSecond'],PR:['buff','legacyCompositeBuff','mpRecoveryPerSecond','debuffCleanse'],BL:['actionSpeedMultiplicative'],NP:['mpRecoveryPerSecond'],LA:['buff','multiplicativeCritDamage','debuff','defenseIgnoreAdditive'],VI:['defenseBreak'],DN:['buff','critDamageAdditive'],LI:['buff','bossDamageAdditive'],AD:['buff','legacyCompositeBuff','bossDamageAdditive'],HE:['buff','legacyCompositeBuff','multiplicativeCritDamage'],CeL:['buff','legacyCompositeBuff']};
+  const projection=catalog.classEffects.map(p=>({code:p.code,mode:p.mode,effects:Object.fromEntries(Object.entries(resolveSavedMembers(catalog,[p.code],p.mode)[0]?.effects ?? p.effects).filter(([key])=>!changed[p.code]?.includes(key)).sort(([a],[b])=>a.localeCompare(b)))})).sort((a,b)=>(a.code+':'+a.mode).localeCompare(b.code+':'+b.mode));
+  assert.equal(createHash('sha256').update(JSON.stringify(projection)).digest('hex'),'5d29732cf1f58189f85c8c154a6809afb2846d407e8fa5b39431e6ef59e3bb4f');
   for(const mode of ['single','challenge']){const fx=code=>catalog.classEffects.find(p=>p.code===code&&p.mode===mode).effects;
-    closeNumber(fx('RM').debuff,.12);assert.equal('buff' in fx('RM'),false);assert.equal('mpRecoveryPerSecond' in fx('DaB'),false);closeNumber(fx('PR').mpRecoveryPerSecond,.05);closeNumber((1+fx('PR').buff)*1.1,1.2225722727);assert.equal(fx('PR').debuffCleanse,2);closeNumber(fx('BL').actionSpeedMultiplicative,.1);closeNumber(fx('NP').mpRecoveryPerSecond,.2);
-    closeNumber(fx('LA').buff,1.05*(2.35+.0825)/2.35-1);closeNumber((1+fx('LA').buff)*1.0382-1,.12837981914893626);closeNumber((1+fx('LA').buff)*1.0382*1.05-1,.1847988101063831);closeNumber(fx('LA').debuff,.05);closeNumber(fx('LA').defenseIgnoreAdditive,.05);closeNumber(fx('LA').defenseBreak,.1);closeNumber(fx('VI').defenseBreak,.1925);
+    closeNumber(fx('RM').debuff,.12);assert.equal('buff' in fx('RM'),false);assert.equal('mpRecoveryPerSecond' in fx('DaB'),false);closeNumber(fx('PR').mpRecoveryPerSecond,.05);assert.equal(fx('PR').buff,.179675);assert.equal(fx('PR').debuffCleanse,2);closeNumber(fx('BL').actionSpeedMultiplicative,.1);closeNumber(fx('NP').mpRecoveryPerSecond,.2);
+    assert.equal(fx('LA').buff,.05);assert.equal(fx('LA').multiplicativeCritDamage,.05);assert.equal(fx('HE').multiplicativeCritDamage,.16);assert.equal(fx('LI').bossDamageAdditive,.08);closeNumber(fx('LA').debuff,.05);closeNumber(fx('LA').defenseIgnoreAdditive,.05);closeNumber(fx('LA').defenseBreak,.1);closeNumber(fx('VI').defenseBreak,.1925);
   }
 });
 
@@ -491,15 +509,15 @@ test('LA additive ignore is unique per source, independent of Buff/Debuff and dy
   assert.notEqual(calculateBeneficiaryDefenseGain(.087,.05,.915,.9601),calculateBeneficiaryDefenseGain(.2,.05,.915,.9601));
   for(const[e,l,b,d]of[[.98,.05,.5,.9],[0,.05,1,1],[NaN,.05,0,.9],[-.1,.05,0,.9]])assert.throws(()=>calculateBeneficiaryDefenseGain(e,l,b,d));
   const catalog=parseCoreCatalog(corePayloads),profile=catalog.classEffects.find(p=>p.code==='LA'&&p.mode==='single'),member={classId:profile.classId,classCode:profile.code,effects:profile.effects};
-  const one=calculateTeam({mode:'single',members:[member],defense:{bossDamageReduction:.9601}}),duplicate=calculateTeam({mode:'single',members:[member,member],defense:{bossDamageReduction:.9601}});closeNumber(one.defenseIgnoreAdditive,.05);assert.deepEqual(duplicate.breakdown,one.breakdown);closeNumber(one.defenseBreak,.1);closeNumber(one.totalDamageMultiplier,(1+profile.effects.buff)*1.05/(1-.9601*.1));
-  const challenge=calculateChallenge({firstTeam:{members:[member]},secondTeam:{members:[member]},defense:{challengeBreakCoefficient:.9601}});for(const r of Object.values(challenge))closeNumber(r.defenseIgnoreAdditive,.05);
+  const one=calculateTeam({mode:'single',members:[member],damageBase:catalog.damageBase,defense:{bossDamageReduction:.9601}}),duplicate=calculateTeam({mode:'single',members:[member,member],damageBase:catalog.damageBase,defense:{bossDamageReduction:.9601}});closeNumber(one.defenseIgnoreAdditive,.05);assert.deepEqual(duplicate.breakdown,one.breakdown);closeNumber(one.defenseBreak,.1);closeNumber(one.totalDamageMultiplier,1.05*(235+7.5)/235*1.05/(1-.9601*.1));
+  const challenge=calculateChallenge({firstTeam:{members:[member]},secondTeam:{members:[member]},damageBase:catalog.damageBase,defense:{challengeBreakCoefficient:.9601}});for(const r of Object.values(challenge))closeNumber(r.defenseIgnoreAdditive,.05);
   const h=await open(t);edit(h,'[data-member]','LA');assert.match(h.query('#results').textContent,/裝備無視防禦加算 \+5.00%/);assert.match(h.query('#results').textContent,/0% 試算/);assert.match(h.query('#results').textContent,/此項獨立表示，上方增益未包含此條。/);
 });
 
 const magazineCatalog=()=>parseCoreCatalog(corePayloads);
 const magazineOptions=(catalog,settings={})=>catalog.loadoutOptions.filter(o=>o.userInput?.kind==='support-magazine').map(def=>resolveLoadoutOption(def,catalog.parameters,settings[def.id]?.enabled??false,settings[def.id]?.level??1));
 const magazineMember=(catalog,code,mode='single')=>resolveSavedMembers(catalog,[code],mode)[0];
-const magazineTeam=(members,options=[])=>calculateTeam({mode:'single',members,options,defense:{bossDamageReduction:.7192}});
+const magazineTeam=(members,options=[])=>calculateTeam({mode:'single',members,options,damageBase:magazineCatalog().damageBase,defense:{bossDamageReduction:.7192}});
 
 test('Support magazines follow all six tiers and compose only the targeted green-control components',()=>{
   const c=magazineCatalog(),green=c.classes.filter(r=>r.uniquenessGroup==='green-control');assert.equal(green.length,8);
@@ -510,7 +528,10 @@ test('Support magazines follow all six tiers and compose only the targeted green
     closeNumber(m.effects.buff,.2544);closeNumber(m.effects.actionSpeedMultiplicative,.1);assert.deepEqual(magazineTeam([m],magazineOptions(c)),base);
     for(const[i,ii,iii,buff,speed]of[[5,0,0,.2824,.1],[0,6,0,.288,.1],[5,6,0,.31675,.1],[0,0,2,.2544,.11],[0,0,6,.2544,.13]]){
       const result=magazineTeam([m],magazineOptions(c,settings(i,ii,iii)));closeNumber(result.buffIncrease,buff);closeNumber(result.actionSpeedMultiplicative,speed);
-      for(const key of Object.keys(base).filter(k=>!['buffIncrease','buffMultiplier','actionSpeedMultiplicative','totalDamageMultiplier','breakdown','supportMagazineDetails'].includes(k)))assert.deepEqual(result[key],base[key],role.code+':'+key);
+      for(const key of Object.keys(base).filter(k=>!['buffIncrease','buffMultiplier','actionSpeedMultiplicative','totalDamageMultiplier','breakdown','supportMagazineDetails','damageBuff'].includes(k)))assert.deepEqual(result[key],base[key],role.code+':'+key);
+      const { attackFactor, ...otherDamageDetails } = result.damageBuff;
+      closeNumber(attackFactor, 1 + buff);
+      assert.deepEqual(otherDamageDetails, Object.fromEntries(Object.entries(base.damageBuff).filter(([key]) => key !== 'attackFactor')));
       assert.ok(result.supportMagazineDetails.every(d=>d.classCode===role.code));
     }
     for(const level of SUPPORT_MAGAZINE_LEVELS){closeNumber(magazineTeam([m],magazineOptions(c,settings(level,0,0))).buffIncrease,(1+.12+level*.005)*1.12-1);closeNumber(magazineTeam([m],magazineOptions(c,settings(0,level,0))).buffIncrease,1.12*(1+.12+level*.005)-1);closeNumber(magazineTeam([m],magazineOptions(c,settings(0,0,level))).actionSpeedMultiplicative,.1+level*.005);}
@@ -565,11 +586,11 @@ test('Challenge magazine controls keep three independent team drafts and round-t
   h.clickMode('single');assert.equal(h.query('[data-magazine-level="support-magazine-i"]').value,'3');h.clickMode('challenge');assert.equal(h.query('[data-magazine-level="support-magazine-i"][data-team="first"]').value,'5');assert.equal(h.query('[data-magazine-level="support-magazine-ii"][data-team="second"]').value,'6');
   const restored=await open(t,{saved});assert.deepEqual(capture(restored).results,capture(h).results.slice(-3));assert.equal(restored.query('[data-magazine-level="support-magazine-iii"][data-team="first"]').value,'2');
 });
-test('DN field power descriptions remove only the physical restriction and retain icons, values and line breaks',async t=>{
+test('DN field power references keep the verified values, icons and line breaks',async t=>{
   const skills=JSON.parse(await readFile(new URL('../data/skill-reference.json',import.meta.url),'utf8')).roles.find(r=>r.code==='DN').skills;
   assert.deepEqual(skills.filter(s=>s.name.startsWith('原野力量')).map(s=>({name:s.name,description:s.description,icon:s.icon})),[
     {name:'原野力量',description:'我方\n攻擊力 +11.5%\n所受傷害 -13.8%',icon:'skill-icons/DN-03.png'},
-    {name:'原野力量(轉換)',description:'我方\n攻擊力、致命傷害 +9.2%\n覺醒回復速度 +34.5%',icon:'skill-icons/DN-04.png'}]);
+    {name:'原野力量(轉換)',description:'我方\n攻擊力 +9.2%、致命傷害 +9.2%\n覺醒回復速度 +34.5%',icon:'skill-icons/DN-04.png'}]);
   const h=await open(t);edit(h,'[data-member]','DN');await h.openSkills();h.reset();edit(h,'[data-skill-query]','原野力量');assert.equal(h.app.querySelectorAll('.skill-entry').length,2);assert.doesNotMatch(h.query('[data-skill-results]').textContent,/物理攻擊/);assert.match(h.query('[data-skill-results]').innerHTML,/我方<br>攻擊力/);work(h,{calculateTeam:0,updateResults:0,storage:0});
 });
 
@@ -605,4 +626,379 @@ test('Support accessory and both resistance sources default on and preserve inde
   for (const [team,option,checked] of [['first',accessory,false],['second',accessory,true],['first',badge,false],['second',badge,true],['first',crystal,true],['second',crystal,false]]) {
     assert.equal(separate.query(field(option,team)).checked,checked);
   }
+});
+
+test('FP and DN team skill variants share existing effect channels and mode-specific base effects', () => {
+  const catalog = parseCoreCatalog(corePayloads);
+  const fp = 'FP.FatalShotConverted', dn = 'DN.FieldPowerConverted';
+  for (const mode of ['single', 'challenge']) {
+    const resolve = (code, selection) => resolveSavedMembers(catalog, [code], mode, { 0: selection })[0];
+    assert.deepEqual(resolve('FP').effects, { buff: .2, actionSpeedMultiplicative: .18 });
+    assert.deepEqual(resolve('FP', { [fp]: true }).effects, { buff: .2 });
+    assert.deepEqual(resolve('DN', { [dn]: false }).effects, { buff: .115, shield: .138, debuff: .0507, defenseBreak: .1 });
+    const converted = resolve('DN').effects;
+    assert.equal(converted.buff, .092);
+    assert.equal(converted.critDamageAdditive, .092);
+    assert.equal(converted.debuff, .0507);
+    assert.equal(converted.defenseBreak, .1);
+    assert.equal(converted.shield, undefined);
+    const { shield, ignoredClassIds } = calculateTeam({
+      mode, members: [resolve('DN', { [dn]: false }), resolve('DN'), resolve('KE')],
+      defense: { bossDamageReduction: .5, challengeBreakCoefficient: .5 }
+    });
+    closeNumber(shield, 1 - (1 - .138) * (1 - .2));
+    assert.deepEqual(ignoredClassIds, ['dn']);
+  }
+  const custom = structuredClone(corePayloads);
+  custom.calculationParameters.criticalDamage.defaultPercent = 300;
+  custom.classEffects.classes.find(role => role.code === 'DN').challengeEffects = { defenseBreak: .25, buff: .03 };
+  custom.classes.find(role => role.code === 'DN').name = '丹尼安';
+  const alternate = parseCoreCatalog(custom);
+  const [{ effects }] = resolveSavedMembers(alternate, ['丹尼安'], 'challenge');
+  closeNumber(effects.buff, 1.03 * 1.092 - 1);
+  assert.equal(effects.critDamageAdditive, .092);
+  assert.equal(effects.defenseBreak, .25);
+});
+
+test('Skill variant data rejects unknown and cross-class options or malformed effects', () => {
+  for (const mutate of [
+    row => { row.skillVersions['FP.FatalShotConverted'] = row.skillVersions['DN.FieldPowerConverted']; },
+    row => { row.skillVersions['DN.FieldPowerConverted'].converted.effects.critDamageAdditive = -1; },
+    row => { row.skillVersions['DN.FieldPowerConverted'].normal.effects.shield = 1.1; },
+    row => { delete row.skillVersions['DN.FieldPowerConverted'].normal; },
+  ]) {
+    const input = structuredClone(corePayloads);
+    mutate(input.classEffects.classes.find(role => role.code === 'DN'));
+    assert.throws(() => parseCoreCatalog(input));
+  }
+});
+
+test('Roster skill selections use raw slot positions, validate matching IDs and retain explicit false', () => {
+  const catalog = parseCoreCatalog(corePayloads);
+  const dn = 'DN.FieldPowerConverted', fp = 'FP.FatalShotConverted';
+  const saved = parseSavedSimulatorState(JSON.stringify({
+    version: 1, mode: 'challenge',
+    membersByTeam: { single: ['', 'DN', 'fp'], first: ['', '', 'FP'], second: ['DN', 'KE'] },
+    classSkillVersionsByTeam: { single: { 0: { [dn]: false }, 1: { [dn]: false, [fp]: true }, 2: { [fp]: 'true' } },
+      first: { 2: { [fp]: true }, 4: { [fp]: true } }, second: { 0: { [dn]: true }, 1: { [dn]: true } } }
+  }), catalog);
+  assert.deepEqual(saved.classSkillVersionsByTeam, {
+    single: { 1: { [dn]: false } }, first: { 2: { [fp]: true } }, second: { 0: { [dn]: true } }
+  });
+  assert.deepEqual(resolveSavedMembers(catalog, saved.membersByTeam.single, 'single', saved.classSkillVersionsByTeam.single).map(m => m.effects.buff), [.115, .2]);
+  assert.equal(resolveSavedMembers(catalog, saved.membersByTeam.first, 'challenge', saved.classSkillVersionsByTeam.first)[0].effects.actionSpeedMultiplicative, undefined);
+});
+
+test('Roster checkbox updates preserve focus, mode-specific selections and reload', async t => {
+  const h = await open(t);
+  const member = (team, index) => '[data-member][data-team="' + team + '"][data-member-index="' + index + '"]';
+  const inSlot = (team, index) => h.query(member(team, index)).closest('.member-slot').querySelector('[data-member-skill-version]');
+  const setMember = (team, index, value) => edit(h, member(team, index), value);
+  assert.equal(h.app.querySelectorAll('[data-member]').length, 6);
+  assert.equal(inSlot('single', 0), null);
+  const dn = setMember('single', 2, 'dn');
+  const skill = inSlot('single', 2);
+  assert.equal(skill.checked, true);
+  assert.equal(skill.closest('label').textContent, '原野力量是否轉換');
+  assert.equal(skill.closest('label').contains(dn), false);
+  skill.focus(); h.reset(); skill.click();
+  assert.equal(h.window.document.activeElement, skill);
+  assert.equal(inSlot('single', 2), skill);
+  assert.equal(h.query(member('single', 2)), dn);
+  assert.equal(h.calls.shell, 0);
+  assert.equal(h.calls.calculateTeam, 1);
+  assert.equal(h.calls.storage, 1);
+  dn.focus();
+  setMember('single', 2, ' DN ');
+  assert.equal(h.window.document.activeElement, dn);
+  assert.equal(inSlot('single', 2), skill);
+  assert.equal(skill.checked, false);
+  setMember('single', 3, 'DN');
+  assert.equal(inSlot('single', 3).checked, true);
+  closeNumber(h.teamResults.at(-1).shield, .138);
+  h.clickMode('challenge');
+  assert.equal(h.app.querySelectorAll('[data-member]').length, 8);
+  setMember('first', 2, 'FP');
+  setMember('second', 2, 'FP');
+  assert.equal(inSlot('first', 2).closest('label').textContent, '致命神槍是否轉換');
+  inSlot('first', 2).click();
+  assert.equal(inSlot('second', 2).checked, false);
+  h.clickMode('single');
+  assert.equal(inSlot('single', 2).checked, false);
+  const saved = h.saved();
+  assert.deepEqual(saved.classSkillVersionsByTeam, { single: { 2: { 'DN.FieldPowerConverted': false } },
+    first: { 2: { 'FP.FatalShotConverted': true } } });
+  const restored = await open(t, { saved });
+  assert.equal(restored.query(member('single', 2)).closest('.member-slot').querySelector('input[type="checkbox"]').checked, false);
+  restored.clickMode('challenge');
+  assert.equal(restored.query(member('first', 2)).closest('.member-slot').querySelector('input[type="checkbox"]').checked, true);
+  setMember('single', 2, 'D');
+  assert.equal(inSlot('single', 2), null);
+  setMember('single', 2, 'DN');
+  assert.equal(inSlot('single', 2).checked, false);
+  setMember('single', 2, 'FP');
+  setMember('single', 2, 'DN');
+  assert.equal(inSlot('single', 2).checked, true);
+  inSlot('single', 2).click();
+  setMember('single', 2, '');
+  assert.equal(inSlot('single', 2), null);
+  assert.equal(h.saved().classSkillVersionsByTeam.single, undefined);
+});
+
+test('Ordinary crit points and Boss bonuses use their respective denominators in each arena', () => {
+  const catalog = parseCoreCatalog(corePayloads);
+  const defense = { bossDamageReduction: .6, challengeBreakCoefficient: .95 };
+  const red = resolveSavedOptions(catalog, Object.fromEntries(catalog.loadoutOptions.map(option =>
+    [option.id, option.id === 'hundred-billion-red-top-critical-damage'])))
+    .find(option => option.id === 'hundred-billion-red-top-critical-damage');
+  assert.deepEqual(red.effects, { multiplicativeCritDamage: .1 });
+  const result = (codes, base = catalog.damageBase, options = []) => calculateTeam({
+    mode: 'single', defense, damageBase: base, options, members: resolveSavedMembers(catalog, codes, 'single')
+  });
+  closeNumber(result(['DN']).buffIncrease, 1.092 * 244.2 / 235 - 1);
+  closeNumber(result(['DN'], { critDamagePct: 300, bossDamagePct: 175 }).buffIncrease, .125488);
+  const stacked = result(['DN', 'LI'], catalog.damageBase, [red]);
+  closeNumber(stacked.buffMultiplier, 1.092 * (235 + 9.2 + 15) / 235 * (275 + 8) / 275);
+  closeNumber(stacked.damageBuff.critPoints, 9.2);
+  closeNumber(stacked.damageBuff.critProductPoints, 15);
+  assert.equal(stacked.damageBuff.bossPoints, 8);
+  closeNumber(result(['LI'], { critDamagePct: 235, bossDamagePct: 0 }).buffMultiplier, 1.08);
+  const five = { id: 'test-boss-five', effects: { bossDamageAdditive: .05 } };
+  closeNumber(result([], catalog.damageBase, [five]).buffMultiplier, 280 / 275);
+  closeNumber(result([], { critDamagePct: 235, bossDamagePct: 0 }, [five]).buffMultiplier, 1.05);
+  closeNumber(result(['FP'], { critDamagePct: 300, bossDamagePct: 0 }).buffMultiplier, 1.2);
+  closeNumber(result(['LA']).buffMultiplier, 1.05 * (235 + 7.5) / 235);
+  closeNumber(result(['LA'], { critDamagePct: 300, bossDamagePct: 0 }, [red]).buffMultiplier, 1.05 * (300 + 23.25) / 300);
+  for (const code of ['PR','CeL']) {
+    const fixed = result([code]).buffMultiplier;
+    closeNumber(result([code], { critDamagePct: 300, bossDamagePct: 0 }).buffMultiplier, fixed);
+  }
+  const challenge = calculateChallenge({ defense, damageBase: catalog.damageBase,
+    firstTeam: { members: resolveSavedMembers(catalog, ['DN'], 'challenge'), options: [red] },
+    secondTeam: { members: resolveSavedMembers(catalog, ['DN','LI'], 'challenge'), options: [red, five] } });
+  closeNumber(challenge.firstTeam.buffMultiplier, 1.092 * 259.2 / 235);
+  closeNumber(challenge.sharedArena.buffMultiplier, 1.092 * 259.2 / 235 * 288 / 275);
+  assert.equal(challenge.sharedArena.damageBuff.productSources.filter(source => source.id === 'loadout:' + red.id).length, 1);
+  assert.deepEqual(challenge.sharedArena.ignoredClassIds, ['dn']);
+});
+
+test('The entered damage basis is used unchanged in every scope as members and variants change', () => {
+  const catalog = parseCoreCatalog(corePayloads);
+  const damageBase = { critDamagePct: 286.5, bossDamagePct: 175 };
+  const defense = { challengeBreakCoefficient: .96 };
+  const resolve = (names, converted) => resolveSavedMembers(catalog, names, 'challenge', { 0: { 'DN.FieldPowerConverted': converted } });
+  for (const [names, converted, points] of [[['DN'], true, 9.2], [['DN'], false, 0], [[], true, 0]]) {
+    const result = calculateChallenge({ defense, damageBase, firstTeam: { members: resolve(['DN'], true) },
+      secondTeam: { members: resolve(names, converted) } });
+    for (const scope of Object.values(result)) assert.deepEqual(scope.damageBuff.base, damageBase);
+    closeNumber(result.secondTeam.damageBuff.critPoints, points);
+    closeNumber(result.sharedArena.damageBuff.critPoints, 9.2);
+    closeNumber(result.sharedArena.buffMultiplier, 1.092 * (286.5 + 9.2) / 286.5);
+  }
+});
+
+test('The manual basis keeps valid decimals, rejects incomplete values, and follows both team modes', async t => {
+  const h = await open(t);
+  const crit = '[data-damage-attribute="critDamagePct"]', boss = '[data-damage-attribute="bossDamagePct"]';
+  assert.equal(h.query(crit).value, '235');
+  assert.equal(h.query(boss).value, '175');
+  assert.equal(h.saved(), null);
+  edit(h, crit, '300.25'); edit(h, boss, '0');
+  for (const input of ['零', 'abc', '100元', '+8', '-5', '1e3', 'Infinity', '12..5', '15%']) {
+    edit(h, crit, input);
+    assert.equal(h.query(crit).value, '300.25');
+    assert.equal(h.saved().damageBasis.critDamagePct, 300.25);
+  }
+  for (const input of ['0', '300.', '.', '']) {
+    edit(h, crit, input);
+    assert.equal(h.query(crit).getAttribute('aria-invalid'), 'true');
+    assert.equal(h.saved().damageBasis.critDamagePct, 300.25);
+    h.query(crit).dispatchEvent(new h.window.Event('blur'));
+    assert.equal(h.query(crit).value, '300.25');
+  }
+  edit(h, crit, '２８６．５１２３４５６');
+  edit(h, boss, '.1234');
+  assert.equal(h.query(crit).value, '286.512');
+  assert.equal(h.query(boss).value, '.123');
+  assert.deepEqual(h.saved().damageBasis, { critDamagePct: 286.512, bossDamagePct: .123 });
+  const composing = h.query(crit);
+  composing.value = '中文';
+  h.event(composing, 'input', { isComposing: true });
+  assert.equal(h.saved().damageBasis.critDamagePct, 286.512);
+  h.event(composing, 'compositionend');
+  assert.equal(composing.value, '286.512');
+  edit(h, boss, '0');
+  edit(h, crit, '300');
+  assert.equal(h.query(crit).hasAttribute('aria-invalid'), false);
+  h.clickMode('challenge');
+  assert.equal(h.query(crit).value, '300');
+  assert.equal(h.query(boss).value, '0');
+  assert.deepEqual(JSON.parse(JSON.stringify(h.teamResults.at(-1).damageBuff.base)), { critDamagePct: 300, bossDamagePct: 0 });
+  const reloaded = await open(t, { saved: h.saved() });
+  assert.equal(reloaded.query(crit).value, '300');
+  assert.equal(reloaded.query(boss).value, '0');
+});
+
+test('Legacy damage settings keep the original reference pair, valid manual pair, or defaults', async t => {
+  const defaults = { critDamagePct: 235, bossDamagePct: 175 };
+  const manual = { critDamagePct: 300, bossDamagePct: 0 };
+  const base = { critDamagePct: 286.5, bossDamagePct: 185.5 };
+  const reference = { version: 1, base, deductions: [{ value: .092 }] };
+  assert.equal(parseDamageBasis(undefined, defaults), undefined);
+  assert.deepEqual(parseDamageBasis({ mode: 'manual', manual, reference }, defaults), manual);
+  assert.deepEqual(parseDamageBasis({ critDamagePct: 286.51284, bossDamagePct: 185.50000000003 }, defaults),
+    { critDamagePct: 286.513, bossDamagePct: 185.5 });
+  assert.deepEqual(parseDamageBasis({ critDamagePct: .0001, bossDamagePct: 200 }, defaults), defaults);
+  assert.deepEqual(parseDamageBasis({ mode: 'reference', manual, reference }, defaults), base);
+  assert.deepEqual(parseDamageBasis({ mode: 'reference', manual, reference: { version: 2, base } }, defaults), manual);
+  assert.deepEqual(parseDamageBasis({ mode: 'reference', reference: { version: 1, base: { critDamagePct: 0 } } }, defaults), defaults);
+  const h = await open(t, { saved: {
+    version: 1, mode: 'single', membersByTeam: { single: ['DN','DN'] },
+    classSkillVersionsByTeam: { single: { 0: { 'DN.FieldPowerConverted': false } } },
+    damageBasis: { mode: 'reference', manual, reference },
+  } });
+  assert.equal(h.query('[data-damage-attribute="critDamagePct"]').value, '286.5');
+  assert.equal(h.query('[data-damage-attribute="bossDamagePct"]').value, '185.5');
+  assert.equal(h.query('[data-member-skill-version]').checked, false);
+  h.clickMode('challenge');
+  assert.deepEqual(h.saved().damageBasis, base);
+  assert.deepEqual(h.saved().membersByTeam.single.slice(0, 2), ['DN', 'DN']);
+  assert.equal(h.saved().classSkillVersionsByTeam.single[0]['DN.FieldPowerConverted'], false);
+});
+
+test('The standalone damage panel precedes the roster and details use the same order in both modes', async t => {
+  const h = await open(t);
+  const check = () => {
+    const panel = h.query('[data-damage-basis]');
+    const roster = h.query('#buff-configuration');
+    assert.equal(panel.nextElementSibling, roster);
+    assert.equal(h.app.querySelectorAll('[data-damage-basis]').length, 1);
+    assert.equal(panel.querySelectorAll('input:not(:disabled)').length, 2);
+    assert.equal(panel.querySelector('#damage-basis-help').textContent, 'Boss傷害請填面板%數。如果職業有影響致命傷害、Boss傷害的Buff時請自行扣除，避免重複計算。');
+    assert.ok(h.app.querySelectorAll('.calculation-details').length > 0);
+    for (const details of h.app.querySelectorAll('.calculation-details')) {
+      const rows = [...details.querySelectorAll('.detail-row > span')].map(row => row.textContent);
+      assert.deepEqual(rows.slice(0, 4), ['Buff增幅', '致命傷害加算', 'Boss 傷害加算', 'Debuff增幅']);
+    }
+  };
+  check();
+  h.clickMode('challenge');
+  check();
+});
+
+test('LA, HE, AD, CeL and PR use the confirmed channels in both routes and the shared arena', () => {
+  const catalog = parseCoreCatalog(corePayloads);
+  const defense = { bossDamageReduction: .6, challengeBreakCoefficient: .95 };
+  for (const mode of ['single', 'challenge']) {
+    const team = (codes, critDamagePct, bossDamagePct) => calculateTeam({
+      mode, members: resolveSavedMembers(catalog, codes, mode), defense, damageBase: { critDamagePct, bossDamagePct },
+    });
+    for (const [crit, boss] of [[235, 175], [300, 0]]) {
+      closeNumber(team(['LA'], crit, boss).buffMultiplier, 1.05 * (crit + 7.5) / crit);
+      closeNumber(team(['HE'], crit, boss).buffMultiplier, (crit + 24) / crit);
+      const both = team(['LA', 'HE', 'LA'], crit, boss);
+      closeNumber(both.buffMultiplier, 1.05 * (crit + 32.7) / crit);
+      assert.deepEqual(both.damageBuff.productSources, [{ id: 'class:la', label: 'LA', value: .05 }, { id: 'class:he', label: 'HE', value: .16 }]);
+      assert.equal(both.damageBuff.critPoints, 0);
+      assert.deepEqual(both.ignoredClassIds, ['la']);
+      const ad = team(['AD'], crit, boss);
+      closeNumber(ad.damageBuff.attackFactor, 1.05);
+      assert.equal(ad.damageBuff.bossPoints, 3);
+      closeNumber(ad.damageBuff.bossFactor, (103 + boss) / (100 + boss));
+      closeNumber(ad.buffMultiplier, 1.05 * (103 + boss) / (100 + boss));
+      closeNumber(team(['AD','LI'], crit, boss).damageBuff.bossFactor, (111 + boss) / (100 + boss));
+      closeNumber(ad.actionSpeedMultiplicative, .1);
+      closeNumber(ad.shield, .2);
+      closeNumber(ad.defenseBreak, .2);
+      closeNumber(ad.debuffIncrease, .07);
+      closeNumber(team(['CeL'], crit, boss).buffMultiplier, 1.1 * 1.06);
+      closeNumber(team(['PR'], crit, boss).buffMultiplier, 1.05 * 1.05 * 1.07);
+    }
+  }
+  const challenge = calculateChallenge({ defense, damageBase: catalog.damageBase,
+    firstTeam: { members: resolveSavedMembers(catalog, ['LA','AD','CeL'], 'challenge') },
+    secondTeam: { members: resolveSavedMembers(catalog, ['HE','LA','PR'], 'challenge') } });
+  closeNumber(challenge.firstTeam.damageBuff.critProductPoints, 7.5);
+  closeNumber(challenge.secondTeam.damageBuff.critProductPoints, 32.7);
+  closeNumber(challenge.sharedArena.damageBuff.critProductPoints, 32.7);
+  assert.deepEqual(challenge.sharedArena.ignoredClassIds, ['la']);
+  assert.ok(Object.values(challenge).every(scope => scope.damageBuff.legacySources.length === 0));
+});
+
+
+test('Multiplicative crit combines raw sources once and shares the calculator product at any panel value', () => {
+  const catalog = parseCoreCatalog(corePayloads);
+  const redId = 'hundred-billion-red-top-critical-damage';
+  const definition = catalog.loadoutOptions.find(option => option.id === redId);
+  assert.equal(definition.label, '百億紅套上衣／暴上');
+  assert.equal(definition.defaultSelected, true);
+  assert.equal(definition.scope, 'per-team');
+  assert.deepEqual(definition.effects, { multiplicativeCritDamage: { kind: 'fixed', value: .1 } });
+  const red = resolveLoadoutOption(definition, catalog.parameters, true);
+  const redOff = resolveLoadoutOption(definition, catalog.parameters, false);
+  const defense = { bossDamageReduction: .6, challengeBreakCoefficient: .95 };
+  const cases = [
+    [[], false, 1, 0], [['LA'], false, 1.05, 7.5], [['HE'], false, 1.16, 24],
+    [[], true, 1.1, 15], [['LA', 'HE'], false, 1.218, 32.7], [['LA'], true, 1.155, 23.25],
+    [['HE'], true, 1.276, 41.4], [['LA', 'HE'], true, 1.3398, 50.97],
+  ];
+  for (const mode of ['single', 'challenge']) {
+    const resolve = codes => resolveSavedMembers(catalog, codes, mode);
+    for (const panel of [235, 300]) {
+      const damageBase = { critDamagePct: panel, bossDamagePct: 175 };
+      const team = (codes, selected) => calculateTeam({
+        mode, members: resolve(codes), options: [selected ? red : redOff], defense, damageBase,
+      });
+      for (const [codes, selected, product, points] of cases) {
+        const result = team(codes, selected);
+        const details = result.damageBuff;
+        closeNumber(details.critProduct, product);
+        closeNumber(details.critProductPoints, points);
+        closeNumber(details.critFactor, (panel + points) / panel);
+        closeNumber(result.buffMultiplier, (codes.includes('LA') ? 1.05 : 1) * (panel + points) / panel);
+        assert.equal(details.critPoints, 0);
+        assert.equal(details.productSources.length, codes.length + Number(selected));
+        assert.deepEqual(details.base, damageBase);
+        const ordinary = calculateProductStat([
+          { sourceId: 'character-base', valuePct: 50 },
+          ...details.productSources.map(source => ({ sourceId: source.id, valuePct: source.value * 100 })),
+        ], 150);
+        closeNumber(details.critProductPoints, ordinary.value * 100);
+      }
+      const mixed = team(['LA', 'HE', 'DN'], true);
+      closeNumber(mixed.damageBuff.critPoints, 9.2);
+      closeNumber(mixed.damageBuff.critFactor, (panel + 9.2 + 50.97) / panel);
+      closeNumber(mixed.buffMultiplier, 1.05 * 1.092 * (panel + 9.2 + 50.97) / panel);
+    }
+  }
+  const challenge = calculateChallenge({ defense, damageBase: catalog.damageBase,
+    firstTeam: { members: resolveSavedMembers(catalog, ['LA'], 'challenge'), options: [red] },
+    secondTeam: { members: resolveSavedMembers(catalog, ['HE', 'LA'], 'challenge'), options: [red] },
+  });
+  closeNumber(challenge.firstTeam.damageBuff.critProductPoints, 23.25);
+  closeNumber(challenge.secondTeam.damageBuff.critProductPoints, 50.97);
+  closeNumber(challenge.sharedArena.damageBuff.critProductPoints, 50.97);
+  assert.deepEqual(challenge.sharedArena.ignoredClassIds, ['la']);
+  assert.equal(challenge.sharedArena.damageBuff.productSources.filter(source => source.id === 'loadout:' + redId).length, 1);
+});
+
+test('The red top keeps its saved toggle and shows the raw bonus separately from ordinary crit', async t => {
+  const redId = 'hundred-billion-red-top-critical-damage';
+  const selector = '[data-option="' + redId + '"]';
+  const h = await open(t);
+  assert.equal(h.query(selector).checked, true);
+  assert.match(h.query(selector).closest('label').textContent, /百億紅套上衣／暴上/);
+  edit(h, '[data-member][data-team="single"]', 'LA');
+  edit(h, '[data-member][data-team="single"][data-member-index="1"]', 'HE');
+  const rows = () => [...h.app.querySelectorAll('.calculation-details .detail-row')];
+  const row = label => rows().find(entry => entry.firstElementChild.textContent === label)?.textContent;
+  assert.ok(row('基礎乘算暴傷').includes('LA +5% × HE +16% × 百億紅套上衣／暴上 +10%'));
+  assert.ok(row('基礎乘算暴傷').includes('1.3398'));
+  assert.ok(row('基礎乘算暴傷').includes('50.97'));
+  assert.ok(!row('致命傷害加算').includes('暴上'));
+  edit(h, selector, false);
+  assert.ok(row('基礎乘算暴傷').includes('32.7'));
+  assert.ok(!row('基礎乘算暴傷').includes('暴上'));
+  const restored = await open(t, { saved: h.saved() });
+  assert.equal(restored.query(selector).checked, false);
 });

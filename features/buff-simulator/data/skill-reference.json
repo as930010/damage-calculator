@@ -1055,7 +1055,7 @@
         {
           "name": "原野力量(轉換)",
           "category": "Buff",
-          "description": "我方\n攻擊力、致命傷害 +9.2%\n覺醒回復速度 +34.5%",
+          "description": "我方\n攻擊力 +9.2%、致命傷害 +9.2%\n覺醒回復速度 +34.5%",
           "icon": "skill-icons/DN-04.png"
         }
       ]

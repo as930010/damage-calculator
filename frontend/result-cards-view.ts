@@ -94,7 +94,7 @@ export function createResultCardsView(data: GameData, visibleNumberFormatter: In
       const result = currentDamage.result;
       const rows = (effects: typeof result.generalMultiplicativeDamage.factors) => effects
         .filter(effect => !excludeBase || effect.sourceId !== 'character-base:crit-damage-product')
-        .map(effect => `<p class="stat-source-row"><span>${h(sourceLabel(effect.sourceId))}</span><strong>×${fmt(effect.factor)}</strong></p>`).join('');
+        .map(effect => `<p class="stat-source-row"><span>${h(sourceLabel(effect.sourceId))}</span><strong>${effect.sourceId === 'class-passive:RM:multiplicative-crit-damage:1' ? signedDelta(effect.valuePct, fmt, '%') || '0%' : '×' + fmt(effect.factor)}</strong></p>`).join('');
       const commonIds = new Set(result[kind].factors.map(effect => effect.sourceId));
       return rows(result[kind].factors) + (result.lowerwearConfigurations ?? []).map(({ configuration, result: variant }) => {
         const effects = variant[kind].factors.filter(effect => !commonIds.has(effect.sourceId));
@@ -138,8 +138,9 @@ export function createResultCardsView(data: GameData, visibleNumberFormatter: In
       const commonSources = allCommonSources.filter(source => !innerwearOrder.has(source.sourceId));
       if (firstInnerwearIndex >= 0) commonSources.splice(Math.min(firstInnerwearIndex, commonSources.length), 0, ...innerwearSources);
       else commonSources.push(...innerwearSources);
+      const passiveLabel = state.Job === 'CU' ? '精神集中' : state.Job === 'DN' ? 'DN 全新升級!' : (currentClass?.id ?? state.Job) + '自身技能';
       const passiveSourceRow = isCritDamage && currentDamage && currentDamage.result.classCritDamagePassivePct > 0
-        ? `<p class="stat-source-row"><span>${state.Job === 'CU' ? '精神集中' : h(currentClass?.id ?? state.Job) + '自身技能'}</span><strong>+${fmt(currentDamage.result.classCritDamagePassivePct)}%</strong></p>`
+        ? `<p class="stat-source-row"><span>${h(passiveLabel)}</span><strong>+${fmt(currentDamage.result.classCritDamagePassivePct)}%</strong></p>`
         : '';
       const sharedDetails = commonSources.length || passiveSourceRow
         ? `<p class="stat-detail-heading">共同來源</p>${sourceRows(commonSources, isPercent)}${passiveSourceRow}`

@@ -4,6 +4,7 @@ import { readCircuitBoardRows } from './circuit-board-rows.ts';
 import { attributeLabel } from './attribute-label.ts';
 import { beastArmorSkillEffect, beastArmorSkillFields, beastArmorSkillSourceId } from '../calculation/beast-armor-skill.ts';
 import { weaponEngravingSlots, weaponEngravingEffect } from '../calculation/weapon-engravings.ts';
+import { classSkillVersionSourceLabel } from '../calculation/class-skill-versions.ts';
 import { selectedWeaponGrowth } from '../calculation/weapon-types.ts';
 
 export interface SourceLabelSelection {
@@ -16,6 +17,8 @@ export function sourceLabel(sourceId: string, data: GameData, state: SourceLabel
 }
 
 function resolveSourceLabel(sourceId: string, data: GameData, state: SourceLabelSelection): string {
+  const skillVersionLabel = classSkillVersionSourceLabel(sourceId);
+  if (skillVersionLabel) return skillVersionLabel;
   const bossHealthCondition = () => state.bossHealthCondition ?? DEFAULT_BOSS_HEALTH_CONDITION;
   if (sourceId === beastArmorSkillSourceId) {
     const skill = beastArmorSkillEffect(state.values[beastArmorSkillFields.effect]);
@@ -37,6 +40,7 @@ function resolveSourceLabel(sourceId: string, data: GameData, state: SourceLabel
     'fixed-effect:weapon': '武器',
     'fixed-effect:title-adaptability': '稱號',
     'fixed-effect:title-defense-ignore': '稱號',
+    'class-passive:RM:multiplicative-crit-damage:1': 'RM [轉換]暴擊劍',
     'fixed-effect:red-upper-crit-damage': '百億紅上衣、暴上',
     'fixed-effect:maestro-aura': 'MAESTRO光環',
     'special-potion:nut-protection': '努特的庇護',

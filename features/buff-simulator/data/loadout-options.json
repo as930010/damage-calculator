@@ -31,10 +31,10 @@
   },
   {
     "id": "hundred-billion-red-top-critical-damage",
-    "label": "百億紅套上衣／爆上",
+    "label": "百億紅套上衣／暴上",
     "scope": "per-team",
     "defaultSelected": true,
-    "effects": { "buff": { "kind": "relative-parameter-increase", "parameter": "criticalDamagePercent", "additiveIncrease": 0.15 } }
+    "effects": { "multiplicativeCritDamage": { "kind": "fixed", "value": 0.1 } }
   },
   {
     "id": "steel-wall-defense-break",

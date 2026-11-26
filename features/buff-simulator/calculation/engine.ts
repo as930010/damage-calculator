@@ -1,3 +1,4 @@
+import { calculateDamageBuff } from './damage-buff.ts';
 import { applySupportMagazines, bindSupportMagazineSources } from './support-magazines.ts';
 import {
   cappedMultiplicativeBonus,
@@ -86,7 +87,10 @@ export function calculateTeam(input: TeamCalculationInput): TeamCalculationResul
   const options = activeOptions.map(option => option.effects);
   const values = (key: keyof EffectValues) => collectValues(members, options, key);
 
-  const buffMultiplier = multiplyBonuses(values("buff"));
+  const attackFactor = multiplyBonuses(values("buff"));
+  const damageBuff = calculateDamageBuff(input, uniqueness.activeMembers.map((member, index) => ({ ...member, effects: members[index] })), activeOptions, attackFactor);
+  const buffMultiplier = attackFactor * multiplyBonuses(values("legacyCompositeBuff"))
+    * (damageBuff ? damageBuff.critFactor * damageBuff.bossFactor : 1);
   const debuffMultiplier = multiplyBonuses(values("debuff"));
   const defenseBreak = combineDefenseBreak(values("defenseBreak"));
   const defenseDamageMultiplier = calculateDefenseDamageMultiplier(
@@ -102,6 +106,7 @@ export function calculateTeam(input: TeamCalculationInput): TeamCalculationResul
   );
 
   const result: TeamCalculationResult = {
+    ...(damageBuff ? { damageBuff } : {}),
     mode: input.mode,
     ...(input.includeDefenseContributions ? { defenseContributions: [
       ...uniqueness.activeMembers.flatMap((member, index) => defenseContributions("class:" + member.classId, member.classCode, "class", members[index])),
@@ -141,7 +146,8 @@ export function calculateChallenge(
 ): ChallengeCalculationResult {
   const sharedOptions = input.sharedOptions ?? [];
   const sharedSettings = { defense: input.defense, uniqueClassCodes: input.uniqueClassCodes,
-    actionSpeedCap: input.actionSpeedCap, includeDefenseContributions: input.includeDefenseContributions };
+    actionSpeedCap: input.actionSpeedCap, includeDefenseContributions: input.includeDefenseContributions,
+    damageBase: input.damageBase };
   const team1: TeamCalculationInput = {
     ...input.firstTeam,
     mode: "challenge",

@@ -292,7 +292,7 @@ test("malformed JSON and unsupported format versions are rejected", () => {
 });
 
 test('unrelated effect zero values round-trip without false warnings while invalid values remain reported', () => {
-  const source = { ...state, Job: 'FP', values: {}, classSkillVersions: { 'FP.FatalShotConverted': false } };
+  const source = { ...state, Job: 'FP', values: {}, classSkillVersions: { 'FP.FatalShotConverted': false, 'DN.FieldPowerConverted': true } };
   normalizeOptionalEffectValues(source.values, catalogIndex);
   const custom = 'MasterBeast.Head.CustomValue';
   const transform = data.nephronArmor.fields[0].transformFields[0];

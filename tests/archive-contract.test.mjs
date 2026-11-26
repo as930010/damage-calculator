@@ -120,7 +120,7 @@ for (const seed of [1597, 65537, 20261118]) test('seed ' + seed + ': typed round
       }
     }
     const state = { ...instance, values, lowerwearAlternativeEnabled: !!draw(2), Job: 'FP',
-      classSkillVersions: { 'FP.FatalShotConverted': !!draw(2) } };
+      classSkillVersions: { 'FP.FatalShotConverted': !!draw(2), 'DN.FieldPowerConverted': (seed % 2) === 0 } };
     const json = exportWorkingLoadout(state);
     const restored = parseLoadoutJson(json, instance, gameData, catalog).state;
     assert.deepEqual(restored, state, 'seed ' + seed + ' case ' + i + ': typed loadout');

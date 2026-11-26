@@ -435,7 +435,8 @@ html:is(
   /* Keep the keyboard signal on one surface of each compound control. */
   & :where(button, summary, a, select, textarea,
       input:not([data-member], #boss-reduction, #transcendence-skill-share-number)):focus-visible,
-  & :where(.member-slot, .percent-input, .skill-damage-share-number-wrap):has(> input:focus-visible) {
+  & :where(.member-slot):has(> .member-slot-field > input:focus-visible),
+  & :where(.percent-input, .skill-damage-share-number-wrap):has(> input:focus-visible) {
     outline: 2px solid var(--site-focus-ring);
     outline-offset: 2px;
     box-shadow: none;
@@ -555,13 +556,13 @@ html:is(
     padding-block: 6px;
   }
 
-  body.site-page #class-picker input { padding-block: 6px; }
+  body.site-page #class-picker input:not([type="checkbox"]) { padding-block: 6px; }
   body.site-page #class-picker .picker-clear {
     height: var(--site-control-height);
     border-radius: var(--site-control-radius);
   }
 
-  body.site-page .toolbar .toggle { min-height: var(--site-control-height); }
+  body.site-page .toolbar .class-skill-versions .toggle { min-height: var(--site-control-height); }
 
   body.site-page .pet-skill-toggle {
     min-height: var(--site-control-height);
