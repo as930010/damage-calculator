@@ -13,7 +13,7 @@ const convertedCombatEffects: Readonly<Record<string, readonly { attribute: Comb
   'FP.FatalShotConverted': [{ attribute: 'critRate', effectId: 'crit-1' }],
 };
 const convertedStatEffects: Readonly<Record<string, StatContribution['stats']>> = {
-  'DN.FieldPowerConverted': { critDamagePct: 9.2 },
+  'DN.FieldPowerConverted': { critDamagePct: 11.5 },
 };
 
 export function classSkillVersionSourceLabel(sourceId: string): string | undefined {

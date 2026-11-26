@@ -421,7 +421,7 @@ test('DN conversion adds ordinary critical damage once in average, single-pants 
     const off = projectDamage(data, normal).result, on = projectDamage(data, enabled).result;
     assert.equal(off.classCritDamagePassivePct, 60);
     assert.equal(on.classCritDamagePassivePct, 60);
-    close(on.attributes.stats.critDamagePct.finalTotal - off.attributes.stats.critDamagePct.finalTotal, 9.2);
+    close(on.attributes.stats.critDamagePct.finalTotal - off.attributes.stats.critDamagePct.finalTotal, 11.5);
     assert.deepEqual(on.combatRates, off.combatRates);
     assert.deepEqual(on.multiplicativeCritDamage, off.multiplicativeCritDamage);
     assert.deepEqual(on.generalMultiplicativeDamage, off.generalMultiplicativeDamage);
@@ -447,17 +447,17 @@ test('The beneficiary bridge returns just the effective working-draft percentage
   const role = { ...structuredClone(state), Job: 'DN', lowerwearAlternativeEnabled: false,
     classSkillVersions: { 'DN.FieldPowerConverted': true } };
   const original = projectBeneficiaryDamage(copy, JSON.stringify(role));
-  assert.deepEqual(original, { critDamagePct: 303, bossDamagePct: 185.5 });
-  copy.parameters.characterBase.critDamagePct -= 16.5; // Isolate the requested 286.5% example.
+  assert.deepEqual(original, { critDamagePct: 305.3, bossDamagePct: 185.5 });
+  copy.parameters.characterBase.critDamagePct -= 18.8; // Isolate the requested 286.5% example.
   const controlled = projectBeneficiaryDamage(copy, JSON.stringify(role));
   close(controlled.critDamagePct, 286.5);
   const team = calculateTeam({ mode: 'single', defense: { bossDamageReduction: .5 }, damageBase: controlled,
     members: resolveSavedMembers(catalog, ['', 'DN'], 'single', { 1: role.classSkillVersions }) });
   close(team.damageBuff.base.critDamagePct, 286.5);
-  close(team.damageBuff.critPoints, 9.2);
-  close(team.buffMultiplier, 1.092 * (286.5 + 9.2) / 286.5);
+  close(team.damageBuff.critPoints, 11.5);
+  close(team.buffMultiplier, 1.092 * (286.5 + 11.5) / 286.5);
   role.classSkillVersions['DN.FieldPowerConverted'] = false;
-  close(projectBeneficiaryDamage(copy, JSON.stringify(role)).critDamagePct, 277.3);
+  close(projectBeneficiaryDamage(copy, JSON.stringify(role)).critDamagePct, 275);
   role.lowerwearAlternativeEnabled = true;
   role.values['Left.Armor.Bottom.FORGE'] = 0;
   assert.throws(() => projectBeneficiaryDamage(copy, JSON.stringify(role)), /屬性|致命傷害或 Boss/);

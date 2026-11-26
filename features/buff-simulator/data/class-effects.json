@@ -408,7 +408,7 @@
       "skillVersions": {
         "DN.FieldPowerConverted": {
           "normal": { "effects": { "buff": 0.115, "shield": 0.138 } },
-          "converted": { "effects": { "buff": 0.092, "critDamageAdditive": 0.092 } }
+          "converted": { "effects": { "buff": 0.092, "critDamageAdditive": 0.115 } }
         }
       }
     },

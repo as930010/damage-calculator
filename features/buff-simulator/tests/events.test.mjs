@@ -637,7 +637,7 @@ test('DN field power references keep the verified values, icons and line breaks'
   const skills=JSON.parse(await readFile(new URL('../data/skill-reference.json',import.meta.url),'utf8')).roles.find(r=>r.code==='DN').skills;
   assert.deepEqual(skills.filter(s=>s.name.replace(/^\[轉換\]/, '').startsWith('原野力量')).map(s=>({name:s.name,description:s.description,icon:s.icon})),[
     {name:'原野力量',description:'我方\n攻擊力 +11.5%\n所受傷害 -13.8%',icon:'skill-icons/DN-03.png'},
-    {name:'[轉換]原野力量',description:'我方\n攻擊力 +9.2%、致命傷害 +9.2%\n覺醒回復速度 +34.5%',icon:'skill-icons/DN-04.png'}]);
+    {name:'[轉換]原野力量',description:'我方\n攻擊力 +9.2%、致命傷害 +11.5%\n覺醒回復速度 +34.5%',icon:'skill-icons/DN-04.png'}]);
   const h=await open(t);edit(h,'[data-member]','DN');await h.openSkills();h.reset();edit(h,'[data-skill-query]','原野力量');assert.equal(h.app.querySelectorAll('.skill-entry').length,2);assert.doesNotMatch(h.query('[data-skill-results]').textContent,/物理攻擊/);assert.match(h.query('[data-skill-results]').innerHTML,/我方<br>攻擊力/);work(h,{calculateTeam:0,updateResults:0,storage:0});
 });
 
@@ -686,7 +686,7 @@ test('FP and DN team skill variants share existing effect channels and mode-spec
     assert.deepEqual(resolve('DN').effects, resolve('DN', { [dn]: false }).effects);
     const converted = resolve('DN', { [dn]: true }).effects;
     assert.equal(converted.buff, .092);
-    assert.equal(converted.critDamageAdditive, .092);
+    assert.equal(converted.critDamageAdditive, .115);
     assert.equal(converted.debuff, .0507);
     assert.equal(converted.defenseBreak, .1);
     assert.equal(converted.shield, undefined);
@@ -704,7 +704,7 @@ test('FP and DN team skill variants share existing effect channels and mode-spec
   const alternate = parseCoreCatalog(custom);
   const [{ effects }] = resolveSavedMembers(alternate, ['丹尼安'], 'challenge', { 0: { [dn]: true } });
   closeNumber(effects.buff, 1.03 * 1.092 - 1);
-  assert.equal(effects.critDamageAdditive, .092);
+  assert.equal(effects.critDamageAdditive, .115);
   assert.equal(effects.defenseBreak, .25);
 });
 
@@ -809,11 +809,11 @@ test('Ordinary crit points and Boss bonuses use their respective denominators in
   const result = (codes, base = catalog.damageBase, options = []) => calculateTeam({
     mode: 'single', defense, damageBase: base, options, members: resolveSavedMembers(catalog, codes, 'single', dnSelections)
   });
-  closeNumber(result(['DN']).buffIncrease, 1.092 * 244.2 / 235 - 1);
-  closeNumber(result(['DN'], { critDamagePct: 300, bossDamagePct: 175 }).buffIncrease, .125488);
+  closeNumber(result(['DN']).buffIncrease, 1.092 * 246.5 / 235 - 1);
+  closeNumber(result(['DN'], { critDamagePct: 300, bossDamagePct: 175 }).buffIncrease, 1.092 * 311.5 / 300 - 1);
   const stacked = result(['DN', 'LI'], catalog.damageBase, [red]);
-  closeNumber(stacked.buffMultiplier, 1.092 * (235 + 9.2 + 15) / 235 * (275 + 8) / 275);
-  closeNumber(stacked.damageBuff.critPoints, 9.2);
+  closeNumber(stacked.buffMultiplier, 1.092 * (235 + 11.5 + 15) / 235 * (275 + 8) / 275);
+  closeNumber(stacked.damageBuff.critPoints, 11.5);
   closeNumber(stacked.damageBuff.critProductPoints, 15);
   assert.equal(stacked.damageBuff.bossPoints, 8);
   closeNumber(result(['LI'], { critDamagePct: 235, bossDamagePct: 0 }).buffMultiplier, 1.08);
@@ -830,8 +830,8 @@ test('Ordinary crit points and Boss bonuses use their respective denominators in
   const challenge = calculateChallenge({ defense, damageBase: catalog.damageBase,
     firstTeam: { members: resolveSavedMembers(catalog, ['DN'], 'challenge', dnSelections), options: [red] },
     secondTeam: { members: resolveSavedMembers(catalog, ['DN','LI'], 'challenge', dnSelections), options: [red, five] } });
-  closeNumber(challenge.firstTeam.buffMultiplier, 1.092 * 259.2 / 235);
-  closeNumber(challenge.sharedArena.buffMultiplier, 1.092 * 259.2 / 235 * 288 / 275);
+  closeNumber(challenge.firstTeam.buffMultiplier, 1.092 * 261.5 / 235);
+  closeNumber(challenge.sharedArena.buffMultiplier, 1.092 * 261.5 / 235 * 288 / 275);
   assert.equal(challenge.sharedArena.damageBuff.productSources.filter(source => source.id === 'loadout:' + red.id).length, 1);
   assert.deepEqual(challenge.sharedArena.ignoredClassIds, ['dn']);
 });
@@ -841,13 +841,13 @@ test('The entered damage basis is used unchanged in every scope as members and v
   const damageBase = { critDamagePct: 286.5, bossDamagePct: 175 };
   const defense = { challengeBreakCoefficient: .96 };
   const resolve = (names, converted) => resolveSavedMembers(catalog, names, 'challenge', { 0: { 'DN.FieldPowerConverted': converted } });
-  for (const [names, converted, points] of [[['DN'], true, 9.2], [['DN'], false, 0], [[], true, 0]]) {
+  for (const [names, converted, points] of [[['DN'], true, 11.5], [['DN'], false, 0], [[], true, 0]]) {
     const result = calculateChallenge({ defense, damageBase, firstTeam: { members: resolve(['DN'], true) },
       secondTeam: { members: resolve(names, converted) } });
     for (const scope of Object.values(result)) assert.deepEqual(scope.damageBuff.base, damageBase);
     closeNumber(result.secondTeam.damageBuff.critPoints, points);
-    closeNumber(result.sharedArena.damageBuff.critPoints, 9.2);
-    closeNumber(result.sharedArena.buffMultiplier, 1.092 * (286.5 + 9.2) / 286.5);
+    closeNumber(result.sharedArena.damageBuff.critPoints, 11.5);
+    closeNumber(result.sharedArena.buffMultiplier, 1.092 * (286.5 + 11.5) / 286.5);
   }
 });
 
@@ -1020,9 +1020,9 @@ test('Multiplicative crit combines raw sources once and shares the calculator pr
         closeNumber(details.critProductPoints, ordinary.value * 100);
       }
       const mixed = team(['LA', 'HE', 'DN'], true);
-      closeNumber(mixed.damageBuff.critPoints, 9.2);
-      closeNumber(mixed.damageBuff.critFactor, (panel + 9.2 + 50.97) / panel);
-      closeNumber(mixed.buffMultiplier, 1.05 * 1.092 * (panel + 9.2 + 50.97) / panel);
+      closeNumber(mixed.damageBuff.critPoints, 11.5);
+      closeNumber(mixed.damageBuff.critFactor, (panel + 11.5 + 50.97) / panel);
+      closeNumber(mixed.buffMultiplier, 1.05 * 1.092 * (panel + 11.5 + 50.97) / panel);
     }
   }
   const challenge = calculateChallenge({ defense, damageBase: catalog.damageBase,

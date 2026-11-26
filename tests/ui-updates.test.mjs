@@ -1678,7 +1678,7 @@ test('DN shows separate passive and converted critical damage, with baseline and
     await workloadActions.baseline(page);
     checkbox(page).click();
     assert.notEqual(damage(), off);
-    assert.match(critCard().textContent, /DN \[轉換\]原野力量9\.2%/);
+    assert.match(critCard().textContent, /DN \[轉換\]原野力量11\.5%/);
     assert.match(critCard().textContent, /DN 全新升級!\+60%/);
     assert.equal(critCard().textContent.match(/DN \[轉換\]原野力量/g).length, 1);
     await workloadActions.undo(page); assert.equal(checkbox(page).checked, false);
