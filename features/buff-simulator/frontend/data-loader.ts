@@ -144,7 +144,7 @@ export function parseCoreCatalog(payloads: CoreCatalogPayloads): CoreCatalog {
     if (Object.hasOwn(entry, "skillVersions")) {
       const versions = entry.skillVersions;
       if (!isRecord(versions)) throw new TypeError(`Invalid skill versions for ${entry.code}`);
-      const options = getClassSkillVersionOptions(entry.code as string);
+      const options = getClassSkillVersionOptions(entry.code as string, 'team');
       classSkillVersions.set(entry.code as string, Object.entries(versions).map(([id, version]) => {
         const option = options.find(item => item.id === id);
         if (!option || !isRecord(version) || Object.keys(version).some(key => key !== "normal" && key !== "converted")) {

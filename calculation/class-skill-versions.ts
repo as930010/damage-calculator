@@ -1,8 +1,12 @@
 import { resolveClassId } from './class-effects.ts';
 import type { ClassCombatEffectsDocument, CombatAttribute, StatContribution } from './types.ts';
-import { classSkillSourcePrefix, classSkillVersionOptions, getClassSkillVersionOptions, type ClassSkillVersionOption } from '../features/buff-simulator/calculation/class-skill-definitions.ts';
+import { classSkillSourcePrefix, classSkillVersionOptions, getClassSkillVersionOptions as findClassSkillVersionOptions, normalizeSkillSelections, type ClassSkillVersionOption } from '../features/buff-simulator/calculation/class-skill-definitions.ts';
 
-export { getClassSkillVersionOptions };
+const calculatorOptions = classSkillVersionOptions.filter(option => option.scope === 'both');
+
+export function getClassSkillVersionOptions(classId: string) {
+  return findClassSkillVersionOptions(classId, 'calculator');
+}
 
 // Each option controls only its own effects.
 const convertedCombatEffects: Readonly<Record<string, readonly { attribute: CombatAttribute; effectId: string }[]>> = {
@@ -26,19 +30,12 @@ export function resolveClassSkillVersionContributions(classId: string,
 }
 
 export function isClassSkillVersionEnabled(option: ClassSkillVersionOption, selections?: Readonly<Record<string, boolean>>): boolean {
-  const value = selections?.[option.id];
-  return typeof value === 'boolean' ? value : option.defaultEnabled;
+  return selections?.[option.id] === true;
 }
 
-/** Missing legacy settings keep each option's default without adding synthetic state. */
+/** Missing legacy settings remain unconverted without adding synthetic state. */
 export function normalizeClassSkillVersions(value: unknown): Record<string, boolean> | undefined {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return undefined;
-  const input = value as Record<string, unknown>;
-  const entries = classSkillVersionOptions.flatMap(option => {
-    const selected = input[option.id];
-    return typeof selected === 'boolean' ? [[option.id, selected] as const] : [];
-  });
-  return entries.length ? Object.fromEntries(entries) : undefined;
+  return normalizeSkillSelections(value, calculatorOptions);
 }
 
 /** Select a class profile before passing it to the unchanged combat formulas. */

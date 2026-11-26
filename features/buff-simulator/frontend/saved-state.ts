@@ -1,5 +1,5 @@
 import { parseDamageBasis } from './damage-basis-state.ts';
-import { classSkillSourcePrefix } from '../calculation/class-skill-definitions.ts';
+import { classSkillSourcePrefix, normalizeSkillSelections } from '../calculation/class-skill-definitions.ts';
 import { damageAdditiveSources } from '../calculation/damage-buff.ts';
 import { combineDefenseBreak, multiplyBonuses } from '../calculation/aggregation.ts';
 import { normalizeSupportMagazineLevel, supportMagazineLevelKey } from '../calculation/support-magazines.ts';
@@ -15,6 +15,7 @@ export interface SavedSimulatorState {
   version: 1; mode: TeamMode;
   membersByTeam: Partial<Record<TeamKey, string[]>>;
   classSkillVersionsByTeam?: TeamSkillVersions;
+  classSkillVersionPreferences?: MemberSkillVersions;
   damageBasis?: DamageBase;
   optionsByTeam: Partial<Record<TeamKey, Record<string, boolean | number>>>;
   bossReductions: Partial<Record<TeamMode, number>>;
@@ -59,6 +60,8 @@ export function parseSavedSimulatorState(raw: string | null, catalog: CoreCatalo
     const value = saved.bossReductions?.[mode];
     if (typeof value === 'number' && Number.isFinite(value) && value >= 0 && value < 1) result.bossReductions[mode] = value;
   }
+  const preferences = normalizeSkillSelections(saved.classSkillVersionPreferences, [...catalog.classSkillVersions.values()].flat());
+  if (preferences) result.classSkillVersionPreferences = preferences;
   const damageBasis = parseDamageBasis(saved.damageBasis, catalog.damageBase);
   if (damageBasis) result.damageBasis = damageBasis;
   return result;
@@ -71,12 +74,7 @@ export function resolveTeamClass(catalog: CoreCatalog, value: string): ClassReco
 }
 
 export function normalizeMemberSkillVersions(catalog: CoreCatalog, record: ClassRecord | undefined, value: unknown): MemberSkillVersions | undefined {
-  if (!record || !value || typeof value !== 'object' || Array.isArray(value)) return undefined;
-  const entries = (catalog.classSkillVersions.get(record.code) ?? []).flatMap(({ id }) => {
-    const selected = (value as Record<string, unknown>)[id];
-    return typeof selected === 'boolean' ? [[id, selected] as const] : [];
-  });
-  return entries.length ? Object.fromEntries(entries) : undefined;
+  return record ? normalizeSkillSelections(value, catalog.classSkillVersions.get(record.code) ?? []) : undefined;
 }
 
 export function resolveSavedMembers(catalog: CoreCatalog, names: readonly string[], mode: TeamMode,
@@ -89,9 +87,7 @@ export function resolveSavedMembers(catalog: CoreCatalog, names: readonly string
     const effects: EffectValues = skills.length ? { ...profile?.effects } : profile?.effects ?? {};
     const additiveSources = damageAdditiveSources(effects, 'class:' + record.id, record.code);
     for (const skill of skills) {
-      const selection = skillsByPosition?.[index]?.[skill.id];
-      const converted = typeof selection === 'boolean' ? selection : skill.teamDefaultEnabled;
-      const variant = converted ? skill.converted : skill.normal;
+      const variant = skillsByPosition?.[index]?.[skill.id] === true ? skill.converted : skill.normal;
       additiveSources.push(...damageAdditiveSources(variant, classSkillSourcePrefix + skill.id, skill.sourceLabel ?? skill.label));
       for (const { key, aggregation } of catalog.effectTypes) {
         const bonus = variant[key];

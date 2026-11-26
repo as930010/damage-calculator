@@ -15,7 +15,8 @@ import { abyssWeapon, defaultWeapon, selectedWeapon, selectedWeaponGrowth, weapo
 import { createResultCardsView, renderDamageFormula } from './result-cards-view.ts';
 import { sourceLabel as resolveSourceLabel } from './source-labels.ts';
 import { renderEquipmentDamageSummary, renderFinalDamageNumber, renderDamageRatio } from './damage-summary-view.ts';
-import { getClassSkillVersionOptions, isClassSkillVersionEnabled } from '../calculation/class-skill-versions.ts';
+import { initializeSkillSelections } from '../features/buff-simulator/calculation/class-skill-definitions.ts';
+import { getClassSkillVersionOptions, isClassSkillVersionEnabled, normalizeClassSkillVersions } from '../calculation/class-skill-versions.ts';
 import { type AccessoryEffectOption } from '../calculation/equipment-effects.ts';
 import { loadGameData, readJson, escapeHtml as h, formatNumber as fmt } from './data.ts';
 import { parseState, readState, readBaseline, normalizePortraitAwakeningValues as normalizePortraitValues, normalizeTranscendenceSkillDamageShare, type LoadoutState } from './state.ts';
@@ -82,6 +83,15 @@ async function start() {
     : readState(catalogIndex.activeClasses[0]?.id ?? 'DaB');
   if (!initialState) throw Error('範例配裝格式無效。');
   const state = initialState;
+  const skillPreferencesKey = 'damage-calculator.class-skill-version-preferences.v1';
+  const skillPreferences = (() => {
+    if (!sampleMode) {
+      try {
+        return normalizeClassSkillVersions(JSON.parse(localStorage.getItem(skillPreferencesKey) ?? 'null')) ?? {};
+      } catch { /* Keep preferences in memory if storage is unavailable. */ }
+    }
+    return {};
+  })() as Record<string, boolean>;
   let baseline = sampleMode ? null : readBaseline();
   const saveState = (value: LoadoutState, isBaseline = false) => profileDraft.write(isBaseline ? state : value, isBaseline ? value : baseline);
   const startupEngravingFields = clearInvalidWeaponEngravingFields(state.values);
@@ -1561,7 +1571,12 @@ async function start() {
         input.dataset.classSkillVersion = option.id;
         input.addEventListener('change', () => {
           state.classSkillVersions = { ...state.classSkillVersions, [option.id]: input.checked };
+          skillPreferences[option.id] = input.checked;
           update();
+          if (!sampleMode) {
+            try { localStorage.setItem(skillPreferencesKey, JSON.stringify(skillPreferences)); }
+            catch { saveStatus.textContent = '技能轉換偏好僅保留於此頁，無法儲存。'; }
+          }
         });
         label.append(input, document.createTextNode(option.label));
         classSkillVersionRoot.append(label);
@@ -1584,7 +1599,12 @@ async function start() {
     error.className = 'input-hint class-picker-error';
     error.hidden = true;
     error.setAttribute('role', 'alert');
-    const picker = createPicker('職業', classPickerChoices, state.Job, value => { state.Job = value; error.textContent = ''; error.hidden = true; renderClassSkillVersions(); update(); }, {
+    const picker = createPicker('職業', classPickerChoices, state.Job, value => {
+      state.Job = value;
+      const selections = initializeSkillSelections(getClassSkillVersionOptions(value), skillPreferences, state.classSkillVersions);
+      if (selections) state.classSkillVersions = selections;
+      error.textContent = ''; error.hidden = true; renderClassSkillVersions(); update();
+    }, {
       sanitize: sanitizeClassCode,
       resolve: catalogIndex.resolveActiveClassCode,
       onInvalid: value => { error.textContent = value ? '查無此職業代碼，請確認後再按 Enter。' : '請輸入職業代碼。'; error.hidden = false; },

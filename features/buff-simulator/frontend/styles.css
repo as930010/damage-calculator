@@ -312,6 +312,7 @@ body::before {
   cursor: pointer;
 }
 .member-skill-versions input[type="checkbox"] { flex: none; margin: 0; }
+.member-skill-versions label { overflow-wrap: anywhere; }
 @media (max-width: 700px), (pointer: coarse) {
   .member-skill-versions label { min-height: var(--site-control-height, 44px); }
 }
@@ -620,7 +621,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .section-label {
   min-height: 30px;
   padding-left: 10px;
-  border-left: 2px solid #596b9c;
+  border-left: 2px solid var(--buff-section-marker, #596b9c);
 }
 .results-heading {
   padding-bottom: 10px;
@@ -759,7 +760,9 @@ details:not(.skill-reference)[open] > summary::before { transform: rotate(45deg)
   .option-editor-input input { width: 8.4em; min-width: 8.4em; text-align: left; }
 }
 
-.configuration-heading { justify-content: space-between; flex-wrap: wrap; gap: 4px 16px; }
+.configuration-heading { justify-content: space-between; flex-wrap: wrap; gap: 4px 16px; padding-inline-start: 0; border-inline-start: 0; }
+.buff-configuration-nav > strong { display: flex; gap: 10px; }
+.configuration-mark { flex: 0 0 2px; background: var(--buff-section-marker, #596b9c); }
 .buff-configuration-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 0 14px; }
 .configuration-heading .boss-control { flex: 0 1 260px; }
 @media (max-width: 700px) {

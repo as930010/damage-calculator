@@ -1,5 +1,6 @@
 import { attributePercent, mountDamageBasis, damageBasisMarkup } from './damage-basis-ui.ts';
 import { damageDraftJournalKey, damageDraftKey } from './damage-basis-state.ts';
+import { initializeSkillSelections } from '../calculation/class-skill-definitions.ts';
 import { GREEN_CONTROL_BUFF_COMPONENTS, SUPPORT_MAGAZINE_LEVELS, normalizeSupportMagazineLevel, supportMagazineBonus, supportMagazineLevelKey } from '../calculation/support-magazines.ts';
 import { calculateBeneficiaryDefenseGain } from '../calculation/defense.ts';
 import { normalizeMemberSkillVersions, parseSavedSimulatorState, resolveSavedMembers, resolveTeamClass, TEAM_STATE_KEY, type SavedSimulatorState, type TeamKey, type TeamSkillVersions } from './saved-state.ts';
@@ -23,6 +24,7 @@ let skillReferenceRequest: Promise<void> | null = null;
 let mode: TeamMode = "single";
 const membersByTeam: Record<TeamKey, string[]> = { single: [], first: [], second: [] };
 let classSkillVersionsByTeam: TeamSkillVersions = {};
+let classSkillVersionPreferences: Record<string, boolean> = {};
 let damageBasis: DamageBase | undefined;
 let optionsByTeam: Record<string, Record<string, boolean | number>> = { single: {}, first: {}, second: {} };
 let bossReductions: Partial<Record<TeamMode, number>> = {};
@@ -113,6 +115,7 @@ function restoreSavedState(): void {
     }
     bossReductions = saved.bossReductions;
     classSkillVersionsByTeam = saved.classSkillVersionsByTeam ?? {};
+    classSkillVersionPreferences = saved.classSkillVersionPreferences ?? {};
     damageBasis = saved.damageBasis;
   } catch {
     // Storage may be disabled or contain invalid JSON; keep the default simulator state.
@@ -121,7 +124,9 @@ function restoreSavedState(): void {
 
 function persistSavedState(): boolean {
   const saved: SavedSimulatorState = { version: 1, mode, membersByTeam, optionsByTeam, bossReductions, optionDisclosureOpen,
-    ...(Object.keys(classSkillVersionsByTeam).length ? { classSkillVersionsByTeam } : {}), ...(damageBasis ? { damageBasis } : {}) };
+    ...(Object.keys(classSkillVersionsByTeam).length ? { classSkillVersionsByTeam } : {}),
+    ...(Object.keys(classSkillVersionPreferences).length ? { classSkillVersionPreferences } : {}),
+    ...(damageBasis ? { damageBasis } : {}) };
   const serialized = JSON.stringify(saved);
   if (serialized === lastPersistedState) return true;
   try {
@@ -310,7 +315,7 @@ function ensureSkillReference(): void {
 function memberSkillControls(classCode: string, team: TeamKey, index: number): string {
   const selections = classSkillVersionsByTeam[team]?.[index];
   return (catalog.classSkillVersions.get(classCode) ?? []).map(option => {
-    const checked = selections?.[option.id] ?? option.teamDefaultEnabled;
+    const checked = selections?.[option.id] === true;
     return `<label><input type="checkbox" data-member-skill-version="${escapeHtml(option.id)}" ${checked ? 'checked' : ''}>${escapeHtml(option.label)}</label>`;
   }).join('');
 }
@@ -341,13 +346,15 @@ function syncMemberSkillControls(input: HTMLInputElement): void {
   const classCode = record?.code ?? '';
   if (root.dataset.classCode === classCode) return;
   root.dataset.classCode = classCode;
+  const initialized = initializeSkillSelections(catalog.classSkillVersions.get(classCode) ?? [], classSkillVersionPreferences,
+    classSkillVersionsByTeam[team]?.[index]);
+  if (initialized) (classSkillVersionsByTeam[team] ??= {})[index] = initialized;
   root.innerHTML = memberSkillControls(classCode, team, index);
 }
 
 function teamPanel(team: TeamKey, title: string, memberCount: number): string {
-  const bossControlMarkup = team === "single" ? bossControl() : "";
   return `<section class="panel team-panel">
-    <div class="panel-heading"><div><h2>${title}</h2></div>${bossControlMarkup}</div>
+    <div class="panel-heading"><div><h2>${title}</h2></div></div>
     <div class="member-grid">${Array.from({ length: memberCount }, (_, index) => memberSlot(team, title, index)).join("")}</div>
     <details class="option-disclosure" data-team="${team}" ${optionDisclosureOpen[team] ? "open" : ""}><summary>配置效果</summary>${optionPanel(team)}</details>
   </section>`;
@@ -383,10 +390,13 @@ function syncInputs(event: Event): void {
       const index = Number(member.dataset.memberIndex);
       const slots = classSkillVersionsByTeam[team] ??= {};
       (slots[index] ??= {})[memberSkill] = input.checked;
+      classSkillVersionPreferences[memberSkill] = input.checked;
     }
   }
   saveCurrentInputs();
-  persistSavedState();
+  const saved = persistSavedState();
+  const skillWarning = app.querySelector<HTMLElement>('[data-skill-save-warning]')!;
+  if (saved || memberSkill) skillWarning.hidden = saved;
   syncSupportMagazineControls();
   updateResults();
   if (isMember) updateSkillReference();
@@ -415,10 +425,11 @@ function shell(): void {
   <div id="buff-mode-panel" role="tabpanel" aria-labelledby="buff-mode-${mode}">
   ${damageBasisMarkup}
   <div id="buff-configuration" class="section-label configuration-heading site-inpage-target" tabindex="-1" role="region" aria-label="隊伍配置">
-    <div class="buff-configuration-nav"><strong>隊伍配置</strong><a class="site-inpage-link" href="#buff-results" data-buff-jump>查看增益結果</a></div>
-    ${mode === "challenge" ? bossControl() : ""}
+    <div class="buff-configuration-nav"><strong><span class="configuration-mark" aria-hidden="true"></span>隊伍配置</strong><a class="site-inpage-link" href="#buff-results" data-buff-jump>查看增益結果</a></div>
+    ${bossControl()}
   </div>
   ${mode === "single" ? `<div class="workspace single-workspace">${teamPanel("single", "單隊配置", 6)}</div>` : `<div class="workspace challenge-workspace">${teamPanel("first", "第一隊", 4)}${teamPanel("second", "第二隊", 4)}</div>`}
+  <p class="validation-note" data-skill-save-warning role="status" hidden>技能轉換偏好僅保留於此頁，無法儲存。</p>
   <datalist id="class-list">${catalog.classes.filter((record) => record.enabled).map((record) => `<option value="${escapeHtml(record.code)}">${escapeHtml(record.name)}</option>`).join("")}</datalist>
   <section id="buff-results" class="site-inpage-target" tabindex="-1" aria-label="隊伍增益結果">
     <a class="site-inpage-link" href="#buff-configuration">返回隊伍配置</a>

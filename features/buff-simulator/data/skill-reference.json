@@ -12,7 +12,7 @@
           "icon": "skill-icons/KE-01.png"
         },
         {
-          "name": "防禦破壞(轉換)",
+          "name": "[轉換]防禦破壞",
           "category": "DeBuff",
           "description": "10.5秒間\n敵方防禦 -20%，\n但會使其攻擊 +12%",
           "icon": "skill-icons/KE-02.png"
@@ -35,8 +35,8 @@
       "code": "RM",
       "skills": [
         {
-          "name": "魔力鎖鏈(被動)",
-          "category": "DeBuff",
+          "name": "魔力鎖鏈",
+          "category": "DeBuff、被動",
           "description": "敵方防禦 -20%",
           "icon": "skill-icons/RM-01.png"
         },
@@ -47,7 +47,7 @@
           "icon": "skill-icons/RM-02.png"
         },
         {
-          "name": "月神之刃(轉換)",
+          "name": "[轉換]月神之刃",
           "category": "DeBuff、降抗",
           "description": "7秒間\n所有屬性抗性 -80",
           "icon": "skill-icons/RM-03.png"
@@ -65,8 +65,8 @@
           "icon": "skill-icons/RM-05.png"
         },
         {
-          "name": "魔力的脈動(被動)",
-          "category": "DeBuff、降抗",
+          "name": "魔力的脈動",
+          "category": "DeBuff、降抗、被動",
           "description": "狂野之風、風之痕、裂刃風暴\n技能打擊敵方\n10秒間所有屬性抗性 -30\n(最多3層90,發動間隔3秒)",
           "icon": "skill-icons/RM-06.png"
         }
@@ -82,8 +82,8 @@
           "icon": "skill-icons/IM-01.png"
         },
         {
-          "name": "戰鬥達人(被動)",
-          "category": "DeBuff",
+          "name": "戰鬥達人",
+          "category": "DeBuff、被動",
           "description": "受康沃爾攻擊時附加DeBuff\n10秒間\n所受傷害 +20%",
           "icon": "skill-icons/IM-02.png"
         }
@@ -180,8 +180,8 @@
           "icon": "skill-icons/MM-01.png"
         },
         {
-          "name": "解放意志(被動)",
-          "category": "DeBuff",
+          "name": "解放意志",
+          "category": "DeBuff、被動",
           "description": "魔杖/特殊主動技能攻擊\n10秒間\n敵方防禦 -7%\n(最大3重疊21%)\n(再發動冷卻時間1秒)",
           "icon": "skill-icons/MM-02.png"
         }
@@ -244,7 +244,7 @@
       "code": "AN",
       "skills": [
         {
-          "name": "風暴之箭",
+          "name": "風暴之箭(原版)",
           "category": "Buff",
           "description": "每秒恢復HP/MP 5%\n總共恢復3次",
           "icon": "skill-icons/AN-01.png"
@@ -267,7 +267,7 @@
       "code": "DaB",
       "skills": [
         {
-          "name": "風暴之箭",
+          "name": "風暴之箭(原版)",
           "category": "Buff",
           "description": "每秒恢復HP/MP 5%\n總共恢復3次",
           "icon": "skill-icons/DaB-01.png"
@@ -279,8 +279,8 @@
           "icon": "skill-icons/DaB-02.png"
         },
         {
-          "name": "烙印的痕跡(被動)",
-          "category": "DeBuff",
+          "name": "烙印的痕跡",
+          "category": "DeBuff、被動",
           "description": "施展三次箭矢技能後\n敵方10秒間(冷卻3秒)\n所受傷害 +10%\n所受致命傷害 +10%\n※無法與烙印射擊共存，必定覆蓋烙印射擊。",
           "icon": "skill-icons/DaB-03.png"
         }
@@ -290,7 +290,7 @@
       "code": "TW",
       "skills": [
         {
-          "name": "風暴之箭",
+          "name": "風暴之箭(原版)",
           "category": "Buff",
           "description": "每秒恢復HP/MP 5%\n總共恢復3次",
           "icon": "skill-icons/TW-01.png"
@@ -313,7 +313,7 @@
       "code": "PR",
       "skills": [
         {
-          "name": "風暴之箭",
+          "name": "風暴之箭(原版)",
           "category": "Buff",
           "description": "每秒恢復HP/MP 5%\n總共恢復3次",
           "icon": "skill-icons/PR-01.png"
@@ -401,7 +401,7 @@
           "icon": "skill-icons/RH-01.png"
         },
         {
-          "name": "核子爆破(轉換)",
+          "name": "[轉換]核子爆破",
           "category": "DeBuff、降抗",
           "description": "10秒間\n敵方防禦 -20%\n受致命攻擊傷害 +12%\n所有屬性抗性 -150",
           "icon": "skill-icons/RH-02.png"
@@ -418,14 +418,14 @@
           "icon": "skill-icons/NI-01.png"
         },
         {
-          "name": "實戰的代價(被動)",
-          "category": "Buff",
+          "name": "實戰的代價",
+          "category": "Buff、被動",
           "description": "過熱達最大重疊時\n我方MP恢復100\n(發動後5秒冷卻)",
           "icon": "skill-icons/NI-02.png"
         },
         {
-          "name": "傭兵生存法則(被動)",
-          "category": "Buff",
+          "name": "傭兵生存法則",
+          "category": "Buff、被動",
           "description": "HP未滿75%時\n我方全體攻擊、防禦+10%",
           "icon": "skill-icons/NI-03.png"
         }
@@ -453,8 +453,8 @@
           "icon": "skill-icons/RE-03.png"
         },
         {
-          "name": "侵蝕(被動)",
-          "category": "DeBuff",
+          "name": "侵蝕",
+          "category": "DeBuff、被動",
           "description": "防禦 -2%(最大5重疊)\n(敵方HP低於50%時一次疊兩層)",
           "icon": "skill-icons/RE-04.png"
         },
@@ -471,8 +471,8 @@
           "icon": "skill-icons/RE-06.png"
         },
         {
-          "name": "抹殺(被動)",
-          "category": "Buff",
+          "name": "抹殺",
+          "category": "Buff、被動",
           "description": "吸收靈魂痕跡：\n所有速度 +10%\n吸收濃厚靈魂痕跡：\n套用吸收靈魂痕跡效果，\n打擊/被擊MP恢復量1.5倍",
           "icon": "skill-icons/RE-07.png"
         },
@@ -489,7 +489,7 @@
       "skills": [
         {
           "name": "精神集中",
-          "category": "(被動)",
+          "category": "被動",
           "description": "使用特殊動技能命中時，\n10秒間\n敵方防禦 -20%",
           "icon": "skill-icons/CU-01.png"
         },
@@ -512,13 +512,13 @@
       "skills": [
         {
           "name": "女王的守護",
-          "category": "(被動)",
+          "category": "被動",
           "description": "以「女皇的召喚」攻擊時，\n10秒間\n敵方所受傷害+ 12%",
           "icon": "skill-icons/CE-01.png"
         },
         {
-          "name": "戰略密碼:軸碎(被動)Buff",
-          "category": "",
+          "name": "戰略密碼:軸碎",
+          "category": "Buff、被動",
           "description": "僕人附加Buff\n10秒間\n特殊主動技能傷害 +12%\n所受物理傷害 -20%\n180秒間\n超技能傷害 +30%",
           "icon": "skill-icons/CE-02.png"
         },
@@ -547,7 +547,7 @@
         },
         {
           "name": "進化",
-          "category": "(被動)",
+          "category": "被動",
           "description": "覺醒後30秒內\n被「力場技能」攻擊的敵方\n10秒間\n所受致命傷害 +10%",
           "icon": "skill-icons/CS-02.png"
         }
@@ -569,8 +569,8 @@
           "icon": "skill-icons/CA-02.png"
         },
         {
-          "name": "解放意志:Code:Failess(被動)",
-          "category": "DeBuff",
+          "name": "解放意志:Code:Failess",
+          "category": "DeBuff、被動",
           "description": "5秒間\n敵方防禦 -20%\n10秒間\n敵方所受傷害 +12%",
           "icon": "skill-icons/CA-03.png"
         },
@@ -586,7 +586,7 @@
       "code": "CC",
       "skills": [
         {
-          "name": "炸裂狼嚎(轉換)",
+          "name": "[轉換]炸裂狼嚎",
           "category": "DeBuff",
           "description": "4秒間\n敵方所受傷害 +6%\n(無法與無限混亂重複，無限混亂無條件覆蓋炸裂狼嚎)",
           "icon": "skill-icons/CC-01.png"
@@ -610,8 +610,8 @@
           "icon": "skill-icons/CC-04.png"
         },
         {
-          "name": "守護者之姿(被動)",
-          "category": "DeBuff",
+          "name": "守護者之姿",
+          "category": "DeBuff、被動",
           "description": "無限混亂、卡歐波加的痛楚、\n鐵之咆嘯、急速衛士攻擊時\n20秒間\n敵方 -10%攻擊、 -10%防禦\n(最大2重疊)\n(20%攻擊 / 20%防禦)",
           "icon": "skill-icons/CC-05.png"
         }
@@ -656,7 +656,7 @@
           "icon": "skill-icons/CeT-03.png"
         },
         {
-          "name": "機動領域(轉換)",
+          "name": "[轉換]機動領域",
           "category": "Buff",
           "description": "領域中我方\n給予BOSS/中BOSS傷害 +12%\n所受傷害 -40%\n每秒恢復 6 MP\n獲得霸體狀態",
           "icon": "skill-icons/CeT-04.png"
@@ -756,8 +756,8 @@
           "icon": "skill-icons/VI-03.png"
         },
         {
-          "name": "槍術的極致(被動)",
-          "category": "DeBuff",
+          "name": "槍術的極致",
+          "category": "DeBuff、被動",
           "description": "指令/主動技能/特殊主動技能打擊時\n敵方5秒間防禦 -5%\n所受傷害 +12%",
           "icon": "skill-icons/VI-05.png"
         }
@@ -773,8 +773,8 @@
           "icon": "skill-icons/BR-01.png"
         },
         {
-          "name": "氣力擴散(被動)",
-          "category": "DeBuff",
+          "name": "氣力擴散",
+          "category": "DeBuff、被動",
           "description": "受羅剎奧義攻擊敵方\n30秒間\n防禦 -5%\n所受傷害 +12%",
           "icon": "skill-icons/BR-02.png"
         }
@@ -796,7 +796,7 @@
           "icon": "skill-icons/SH-02.png"
         },
         {
-          "name": "術式:降靈(轉換)",
+          "name": "[轉換]術式:降靈",
           "category": "Buff",
           "description": "我方強烈、超越技能傷害 +6%",
           "icon": "skill-icons/SH-03.png"
@@ -808,8 +808,8 @@
           "icon": "skill-icons/SH-04.png"
         },
         {
-          "name": "釋放魔力(被動)",
-          "category": "DeBuff",
+          "name": "釋放魔力",
+          "category": "DeBuff、被動",
           "description": "8秒間\n受影子技能攻擊敵方\n所受傷害 +7%",
           "icon": "skill-icons/SH-05.png"
         }
@@ -890,7 +890,7 @@
           "icon": "skill-icons/ES-01.png"
         },
         {
-          "name": "挑釁(轉換)",
+          "name": "[轉換]挑釁",
           "category": "DeBuff",
           "description": "6秒間\n敵方所受傷害 +8%\n但攻擊 +10%",
           "icon": "skill-icons/ES-02.png"
@@ -902,7 +902,7 @@
           "icon": "skill-icons/ES-03.png"
         },
         {
-          "name": "戰鬥序曲(轉換)",
+          "name": "[轉換]戰鬥序曲",
           "category": "Buff",
           "description": "36秒間\n我方特殊主動技能傷害 +5%\n所受傷害 -15%",
           "icon": "skill-icons/ES-04.png"
@@ -915,7 +915,7 @@
         },
         {
           "name": "騎士團長的威嚴",
-          "category": "(被動)、Buff",
+          "category": "Buff、被動",
           "description": "提升隊員致命一擊/極大化/動作速度/額外傷害\n根據隊員數量 +1%(最大3重疊3%)\n(動作速度為加算)",
           "icon": "skill-icons/ES-06.png"
         },
@@ -931,8 +931,8 @@
       "code": "FL",
       "skills": [
         {
-          "name": "火焰的烙印(被動)",
-          "category": "DeBuff",
+          "name": "火焰的烙印",
+          "category": "DeBuff、被動",
           "description": "指令/主動技能攻擊時\n10秒間\n敵方防禦 -10%\n(最大2重疊20%)\n(再發動冷卻時間0.5秒)",
           "icon": "skill-icons/FL-01.png"
         },
@@ -1053,7 +1053,7 @@
           "icon": "skill-icons/DN-03.png"
         },
         {
-          "name": "原野力量(轉換)",
+          "name": "[轉換]原野力量",
           "category": "Buff",
           "description": "我方\n攻擊力 +9.2%、致命傷害 +9.2%\n覺醒回復速度 +34.5%",
           "icon": "skill-icons/DN-04.png"
@@ -1140,8 +1140,8 @@
       "code": "CT",
       "skills": [
         {
-          "name": "恐懼入侵(被動)",
-          "category": "DeBuff",
+          "name": "恐懼入侵",
+          "category": "DeBuff、被動",
           "description": "敵方攻擊 -2%\n(最大5重疊 10%)\n(再發動冷卻時間1秒)",
           "icon": "skill-icons/CT-01.png"
         },
@@ -1245,8 +1245,8 @@
           "icon": "skill-icons/DE-06.png"
         },
         {
-          "name": "死亡本能(被動)",
-          "category": "",
+          "name": "死亡本能",
+          "category": "被動",
           "description": "連攜條相關效果 +10%\n※已計入左方Buff效果內",
           "icon": "skill-icons/DE-07.png"
         }
@@ -1256,14 +1256,14 @@
       "code": "TB",
       "skills": [
         {
-          "name": "解放意志(被動)",
-          "category": "Buff",
+          "name": "解放意志",
+          "category": "Buff、被動",
           "description": "過熱時\n我方攻擊 +10%",
           "icon": "skill-icons/TB-01.png"
         },
         {
-          "name": "重武器特化(被動)",
-          "category": "DeBuff",
+          "name": "重武器特化",
+          "category": "DeBuff、被動",
           "description": "受雷射技能攻擊敵方80%機率\n20秒間\n所受傷害 +8%",
           "icon": "skill-icons/TB-02.png"
         },
@@ -1279,14 +1279,14 @@
       "code": "BMa",
       "skills": [
         {
-          "name": "靈魂之刃(被動)",
-          "category": "DeBuff",
+          "name": "靈魂之刃",
+          "category": "DeBuff、被動",
           "description": "使用鎖鏈左輪手槍/槍刃技能\n攻擊出血狀態的敵方時\n10秒間\n敵方防禦 -20%",
           "icon": "skill-icons/BMa-01.png"
         },
         {
-          "name": "探索標誌(被動)",
-          "category": "DeBuff",
+          "name": "探索標誌",
+          "category": "DeBuff、被動",
           "description": "敵方所受致命傷害 +12%",
           "icon": "skill-icons/BMa-02.png"
         }
@@ -1302,7 +1302,7 @@
           "icon": "skill-icons/MN-01.png"
         },
         {
-          "name": "練擊(轉換)",
+          "name": "[轉換]練擊",
           "category": "DeBuff、降抗",
           "description": "敵方所有屬性抗性 -120",
           "icon": "skill-icons/MN-02.png"
@@ -1331,7 +1331,7 @@
           "icon": "skill-icons/PO-03.png"
         },
         {
-          "name": "G-1日冕(轉換)",
+          "name": "[轉換]G-1日冕",
           "category": "DeBuff",
           "description": "20秒間\n敵方所受傷害 +8%",
           "icon": "skill-icons/PO-04.png"
@@ -1371,14 +1371,14 @@
           "icon": "skill-icons/BL-03.png"
         },
         {
-          "name": "狂越連爆(轉換)",
+          "name": "[轉換]狂越連爆",
           "category": "Buff",
           "description": "60秒間\n我方技能傷害 +12%\n技能冷卻加速1.2倍\n敵方防禦 -15%",
           "icon": "skill-icons/BL-04.png"
         },
         {
           "name": "善良的影響力",
-          "category": "(被動)、Buff",
+          "category": "Buff、被動",
           "description": "60秒間\n消耗神之鎖時我方獲得\n紅色/勇氣：攻擊 +12%\n黃色/意志：MP回收率 +40%\n藍色/純淨：所有速度 +10%\n隊員能力值+5%\n(動作速度為乘算)",
           "icon": "skill-icons/BL-05.png"
         },
@@ -1400,8 +1400,8 @@
           "icon": "skill-icons/HE-01.png"
         },
         {
-          "name": "混沌的禁戒(被動)",
-          "category": "DeBuff、降抗",
+          "name": "混沌的禁戒",
+          "category": "DeBuff、降抗、被動",
           "description": "使用赫尼爾技能時產生結界\n10秒間\n我方致命傷害 +16%\n敵方所有屬性抗性 -100\n※致命傷害為乘算",
           "icon": "skill-icons/HE-02.png"
         }
@@ -1452,14 +1452,14 @@
           "icon": "skill-icons/EW-02.png"
         },
         {
-          "name": "解放的意志(被動)",
-          "category": "DeBuff、降抗",
+          "name": "解放的意志",
+          "category": "DeBuff、降抗、被動",
           "description": "施展覺醒動作打擊敵方\n所有屬性抗性 -100",
           "icon": "skill-icons/EW-03.png"
         },
         {
-          "name": "實力菈比(被動)",
-          "category": "Buff",
+          "name": "實力菈比",
+          "category": "Buff、被動",
           "description": "指令打擊時產生恢復玉\n我方接觸時恢復HP/MP 15%",
           "icon": "skill-icons/EW-04.png"
         }
@@ -1556,14 +1556,14 @@
           "icon": "skill-icons/LI-01.png"
         },
         {
-          "name": "極夜(被動)",
-          "category": "Buff",
+          "name": "極夜",
+          "category": "Buff、被動",
           "description": "發動時\n我方對BOSS/中BOSS傷害 +8%",
           "icon": "skill-icons/LI-02.png"
         },
         {
-          "name": "陌生凌晨(被動)",
-          "category": "DeBuff",
+          "name": "陌生凌晨",
+          "category": "DeBuff、被動",
           "description": "覺醒中有黑曜月芒狀態時\n15秒間敵方所受致命傷害 +4%\n(最大3重疊)",
           "icon": "skill-icons/LI-03.png"
         }
@@ -1573,8 +1573,8 @@
       "code": "CeL",
       "skills": [
         {
-          "name": "天宮圖 (被動)",
-          "category": "Buff",
+          "name": "天宮圖",
+          "category": "Buff、被動",
           "description": "得到水瓶標誌時\n15秒間魔法攻擊 +1%\n(最大7重疊)\n二轉獲得「宇宙之痕」後可達最大10重疊",
           "icon": "skill-icons/CeL-01.png"
         },
@@ -1585,8 +1585,8 @@
           "icon": "skill-icons/CeL-02.png"
         },
         {
-          "name": "無限軌跡(被動)",
-          "category": "Buff",
+          "name": "無限軌跡",
+          "category": "Buff、被動",
           "description": "得到獅子標誌時防禦、最大HP +1% (最大40重疊)",
           "icon": "skill-icons/CeL-03.png"
         },
@@ -1603,8 +1603,8 @@
           "icon": "skill-icons/CeL-05.png"
         },
         {
-          "name": "天體航行者(被動)",
-          "category": "Buff",
+          "name": "天體航行者",
+          "category": "Buff、被動",
           "description": "施展占星術技能時生成領域\n一瞬間我方所受傷害 -80%",
           "icon": "skill-icons/CeL-06.png"
         },
@@ -1662,8 +1662,8 @@
           "icon": "skill-icons/NP-07.png"
         },
         {
-          "name": "暴風大洋(被動)",
-          "category": "Buff",
+          "name": "暴風大洋",
+          "category": "Buff、被動",
           "description": "施放3次告解技能時60秒間我方攻擊 +12%\n施放3次安息技能時60秒間我方防禦 +20%、MP回收率 +40%",
           "icon": "skill-icons/NP-08.png"
         },
@@ -1797,7 +1797,7 @@
         {
           "name": "扯鈴",
           "category": "降抗",
-          "description": "敵方10秒內抗性 -100+[骰子]\n\n\n※100+(骰子2+骰子5) =125",
+          "description": "敵方10秒內抗性 -100+[骰子]\n※100+(骰子2+骰子5) =125",
           "icon": "skill-icons/MI-02.png"
         },
         {

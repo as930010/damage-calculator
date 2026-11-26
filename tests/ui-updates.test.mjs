@@ -610,7 +610,7 @@ test('Nephron magazines normalize legacy and imported duplicates in fixed slot o
   } finally { page.close(); reloaded?.close(); }
 });
 
-test('FP skill versions change only the 10% diminishing crit effect and preserve legacy results', async () => {
+test('FP missing settings use the normal skill and explicit conversion changes only the 10% diminishing crit effect', async () => {
   const runtime = await createRuntime();
   const { evaluateLoadout } = await runtime.load('frontend/projection.ts');
   const { applyClassSkillVersions } = await runtime.load('calculation/class-skill-versions.ts');
@@ -618,9 +618,9 @@ test('FP skill versions change only the 10% diminishing crit effect and preserve
   const before = evaluateLoadout(gameData, state);
   const enabled = evaluateLoadout(gameData, { ...state, classSkillVersions: { 'FP.FatalShotConverted': true } });
   const disabled = evaluateLoadout(gameData, { ...state, classSkillVersions: { 'FP.FatalShotConverted': false } });
-  assert.deepEqual(JSON.parse(JSON.stringify(enabled)), JSON.parse(JSON.stringify(before)));
+  assert.deepEqual(JSON.parse(JSON.stringify(disabled)), JSON.parse(JSON.stringify(before)));
   assert.ok(before.damage); assert.ok(disabled.damage);
-  assert.equal(before.combatRates.critRate.diminishingAddedPct - disabled.combatRates.critRate.diminishingAddedPct, 10);
+  assert.equal(enabled.combatRates.critRate.diminishingAddedPct - disabled.combatRates.critRate.diminishingAddedPct, 10);
   for (const value of [before, enabled, disabled]) {
     const passive = value.combatRates.critRate.nonDiminishingSources.find(source => source.sourceId === 'FP:critRate:crit-2');
     assert.equal(passive.valuePct, 15);
@@ -631,7 +631,7 @@ test('FP skill versions change only the 10% diminishing crit effect and preserve
 });
 
 test('FP skill checkbox preserves sources, history, baseline, JSON round-trip and reload', async () => {
-  const page = await uiPage({ ...structuredClone(stateA), Job: 'FP' });
+  const page = await uiPage({ ...structuredClone(stateA), Job: 'FP', classSkillVersions: { 'FP.FatalShotConverted': true } });
   let reloaded;
   const checkbox = target => target.dom.window.document.querySelector('input[data-class-skill-version="FP.FatalShotConverted"]');
   const critCard = () => page.dom.window.document.querySelector('.combat-rate-pair details');
@@ -664,8 +664,8 @@ test('FP skill checkbox preserves sources, history, baseline, JSON round-trip an
     selectPicker(page, '職業', 'FP'); assert.equal(checkbox(page).checked, false);
     const legacy = { ...exported }; delete legacy.classSkillVersions;
     await page.importJson(JSON.stringify(legacy));
-    assert.equal(checkbox(page).checked, true, 'legacy import replaces a prior unchecked setting with the default');
-    assert.match(critCard().textContent, /crit-1/);
+    assert.equal(checkbox(page).checked, false, 'legacy import uses the new unconverted default');
+    assert.doesNotMatch(critCard().textContent, /crit-1/);
   } finally { page.close(); reloaded?.close(); }
 });
 
@@ -1695,4 +1695,45 @@ test('DN shows separate passive and converted critical damage, with baseline and
     delete saved.classSkillVersions;
     await page.importJson(JSON.stringify(saved)); assert.equal(checkbox(page).checked, false);
   } finally { page.close(); reloaded?.close(); }
+});
+
+test('Calculator preferences seed explicit class selection only, isolated from team and restored loadouts', async () => {
+  const prefKey='damage-calculator.class-skill-version-preferences.v1';
+  const teamKey='buff-team-simulator.state.v1';
+  const fp='FP.FatalShotConverted',dn='DN.FieldPowerConverted';
+  const seed=JSON.stringify({version:1,classSkillVersionPreferences:{[fp]:true,[dn]:true}});
+  const page=await uiPage({...structuredClone(stateA),Job:'FP'},stateA,{storage:{[teamKey]:seed}});
+  let reloaded, replay;
+  const get=(target,id)=>target.dom.window.document.querySelector('[data-class-skill-version="'+id+'"]');
+  const storage=target=>target.dom.window.localStorage;
+  try{
+    assert.equal(get(page,fp).checked,false);
+    assert.equal(storage(page).getItem(prefKey),null);
+    get(page,fp).click();
+    assert.deepEqual(JSON.parse(storage(page).getItem(prefKey)),{[fp]:true});
+    selectPicker(page,'職業','DN');
+    assert.equal(get(page,dn).checked,false);
+    selectPicker(page,'職業','ES');
+    assert.equal(page.dom.window.document.querySelectorAll('[data-class-skill-version]').length,0);
+    selectPicker(page,'職業','FP');
+    assert.equal(get(page,fp).checked,true);
+    assert.equal(storage(page).getItem(teamKey),seed);
+    const freshState={...page.readState(),Job:'DN'};
+    delete freshState.classSkillVersions;
+    reloaded=await uiPage(freshState,stateA,{storage:{[prefKey]:storage(page).getItem(prefKey)}});
+    selectPicker(reloaded,'職業','FP');
+    assert.equal(get(reloaded,fp).checked,true);
+    get(reloaded,fp).click();
+    assert.deepEqual(JSON.parse(storage(reloaded).getItem(prefKey)),{[fp]:false});
+    await workloadActions.undo(reloaded);
+    assert.equal(get(reloaded,fp).checked,true);
+    assert.deepEqual(JSON.parse(storage(reloaded).getItem(prefKey)),{[fp]:false});
+    replay=await uiPage({...freshState,Job:'FP',classSkillVersions:{[fp]:false}},stateA,
+      {storage:{[prefKey]:JSON.stringify({[fp]:true})}});
+    assert.equal(get(replay,fp).checked,false);
+    const legacy = await replay.exportJson();
+    delete legacy.classSkillVersions;
+    await replay.importJson(JSON.stringify(legacy));
+    assert.equal(get(replay,fp).checked,false);
+  }finally{page.close();reloaded?.close();replay?.close();}
 });

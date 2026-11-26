@@ -17,5 +17,6 @@
   {"key":"critDamageAdditive","label":"致命傷害加算","unit":"ratio","group":"damage","aggregation":"sum","sortOrder":15},
   {"key":"bossDamageAdditive","label":"Boss 傷害加算","unit":"ratio","group":"damage","aggregation":"sum","sortOrder":16},
   {"key":"multiplicativeCritDamage","label":"基礎乘算暴傷","unit":"ratio","group":"damage","aggregation":"multiply","sortOrder":17},
-  {"key":"legacyCompositeBuff","label":"歷史合成增幅","unit":"ratio","group":"damage","aggregation":"multiply","sortOrder":18}
+  {"key":"legacyCompositeBuff","label":"歷史合成增幅","unit":"ratio","group":"damage","aggregation":"multiply","sortOrder":18},
+  {"key":"magicalAttackReduction","label":"敵方魔法攻擊降低","unit":"ratio","group":"defense","aggregation":"multiply","sortOrder":19}
 ]

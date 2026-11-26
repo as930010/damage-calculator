@@ -12,6 +12,7 @@ export type EffectKey =
   | "defenseIgnoreAdditive"
   | "shield"
   | "attackReduction"
+  | "magicalAttackReduction"
   | "cooldownAcceleration"
   | "cooldownReductionSeconds"
   | "resistanceReduction"

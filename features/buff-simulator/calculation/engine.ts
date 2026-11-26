@@ -69,6 +69,8 @@ function makeBreakdown(
   ];
 
   if (result.defenseIgnoreAdditive) entries.push(["defenseIgnoreAdditive", "sum", result.defenseIgnoreAdditive]);
+  const magicAttackReductions = collectValues(members, options, "magicalAttackReduction");
+  if (magicAttackReductions.some(Boolean)) entries.push(["magicalAttackReduction", "multiply", multiplyBonuses(magicAttackReductions) - 1]);
 
   return entries.map(([key, aggregation, value]) => ({
     key: key as EffectBreakdown["key"],

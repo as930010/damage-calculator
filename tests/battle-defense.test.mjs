@@ -481,3 +481,20 @@ test('CeL uses the same 25-point Boss passive in the calculator, baseline and ra
   const rating = readRatingLoadout(data, loadout);
   close(scoreConfiguration(rating, rating.actual).after, current.finalDamage.finalDamage);
 });
+
+test('Team defense references resolve new variants without taking unrelated saved preferences', () => {
+  const raw=savedTeam('challenge');
+  raw.membersByTeam={ first:['KE','MP'], second:['KE'] };
+  raw.optionsByTeam={ first:{}, second:{} };
+  raw.classSkillVersionPreferences={'KE.ArmorBreakConverted':true,'MP.MindBreakConverted':true};
+  const base=teamDefenseReferences(JSON.stringify(raw),catalog,'test','challenge');
+  const find=(ref,target,id)=>ref.refs.find(item=>item.target===target).contributions.find(source=>source.id===id)?.rate;
+  close(find(base,'firstTeam','class:ke'),.12);
+  assert.equal(find(base,'firstTeam','class:mp'),undefined);
+  raw.classSkillVersionsByTeam={first:{0:{'KE.ArmorBreakConverted':true},1:{'MP.MindBreakConverted':true}}};
+  const variant=teamDefenseReferences(JSON.stringify(raw),catalog,'test','challenge');
+  close(find(variant,'firstTeam','class:ke'),.2);
+  close(find(variant,'firstTeam','class:mp'),.196);
+  close(find(variant,'secondTeam','class:ke'),.12);
+  close(find(variant,'sharedArena','class:ke'),.2);
+});

@@ -14,13 +14,44 @@ import { boot, fixturesUrl, storageKey } from './dom-harness.mjs';
 import { capture, edit, scenarios } from './scenarios.mjs';
 
 // Recorded from the unmodified 54f16fb production build before event routing changes.
-// Full numeric outputs and v1 payloads are checked alongside complete result/skill HTML hashes.
-// DN's approved 9.2% copy changes full-roster skill digests. Damage basis adds calculation detail; the
+// Keep the archived numeric outputs, v1 payloads and complete result HTML exact.
+// Check the revised skill reference directly against the ordered catalog.
+// Damage basis adds calculation detail; the
 // original baseline scenarios retain the same numerical results at the original assumptions.
 // NP single and DaB corrections change only
 // MP metrics/breakdowns; old-data replay and independent field/DOM checks verified both fixtures.
 // The UI audit removed redundant result eyebrows; only the corresponding result digests changed.
 const fixtures = JSON.parse(await readFile(fixturesUrl, 'utf8'));
+const reference = JSON.parse(await readFile(new URL('../data/skill-reference.json', import.meta.url), 'utf8'));
+function assertReference(h, selectedCodes = []) {
+  const roles = reference.roles.filter(role => !selectedCodes.length || selectedCodes.includes(role.code));
+  const articles = [...h.app.querySelectorAll('.skill-result')];
+  assert.equal(articles.length, roles.length);
+  for (const [index, role] of roles.entries()) {
+    const article = articles[index];
+    const heading = article.querySelector('.skill-role-heading');
+    assert.equal(heading.querySelector('strong').textContent.split(' · ')[0], role.code);
+    assert.equal(heading.querySelector('span').textContent, role.skills.length + ' 項技能');
+    const entries = [...article.querySelectorAll('.skill-entry')];
+    assert.equal(entries.length, role.skills.length, role.code);
+    for (const [skillIndex, skill] of role.skills.entries()) {
+      const row = entries[skillIndex];
+      assert.equal(row.querySelector('strong').textContent, skill.name);
+      assert.equal(row.querySelector('header span').textContent, skill.category || '未標示類型', skill.name);
+      const description = [...row.querySelector('p').childNodes]
+        .map(node => node.nodeName === 'BR' ? '\n' : node.textContent).join('');
+      assert.equal(description, skill.description, skill.name);
+      if (skill.icon) {
+        const image = row.querySelector('img');
+        assert.equal(image.src, new URL('data/' + skill.icon, h.window.document.baseURI).href);
+        assert.equal(image.getAttribute('loading'), 'lazy');
+      } else {
+        assert.equal(row.querySelector('.skill-icon-placeholder').getAttribute('aria-hidden'), 'true');
+      }
+    }
+  }
+}
+
 async function open(t, options) { const h = await boot(options); t.after(h.close); return h; }
 function work(h, expected) {
   for (const [key, value] of Object.entries(expected)) assert.equal(h.calls[key], value, key);
@@ -48,7 +79,12 @@ for (const [name, setup] of Object.entries(scenarios)) {
     const h = await open(t); setup(h); await h.openSkills();
     const actual = capture(h);
     actual.results = matchArchivedNumbers(actual.results, fixtures[name].results);
-    assert.deepEqual(actual, fixtures[name]);
+    assert.deepEqual(actual.results, fixtures[name].results);
+    assert.equal(actual.resultHtmlHash, fixtures[name].resultHtmlHash);
+    assert.deepEqual(actual.saved, fixtures[name].saved);
+    const selectedCodes = name === 'configuredSingle' ? ['DaB', 'NP']
+      : name === 'configuredChallenge' ? ['DaB', 'NP', 'SU'] : [];
+    assertReference(h, selectedCodes);
   });
 }
 
@@ -187,13 +223,14 @@ test('blank, malformed and negative percentages preserve the existing number con
 
 test('Chinese skill search and clear update only skill references, without roster scans', async t => {
   const h = await open(t); await h.openSkills(); h.reset();
+  const completeReference = h.query('[data-skill-results]').innerHTML;
   const search = edit(h, '[data-skill-query]', '護盾');
   work(h, { calculateTeam: 0, updateResults: 0, storage: 0, saveCurrentInputs: 0, memberScans: 0, updateSkillReference: 1 });
   assert.ok(h.query('[data-skill-results]').textContent.includes('護盾'));
   h.reset(); h.event(search, 'change');
   work(h, { calculateTeam: 0, updateResults: 0, storage: 0, updateSkillReference: 0 });
   edit(h, '[data-skill-query]', '');
-  assert.equal(capture(h).skillHtmlHash, fixtures.defaultSingle.skillHtmlHash);
+  assert.equal(h.query('[data-skill-results]').innerHTML, completeReference);
 });
 
 test('skill reference retains selected-class filtering and no-match behavior', async t => {
@@ -327,13 +364,13 @@ test('core initialization requests five JSON files and builds no collapsed skill
   assert.equal(h.calls.calculateTeam, 4);
 });
 
-test('first expansion loads once, keeps original ordered HTML/icons, and reuses the session cache', async t => {
+test('first expansion loads once, keeps catalog order and icons, and reuses the session cache', async t => {
   const h = await open(t); h.reset(); await h.openSkills();
   assert.equal(skillRequests(h), 1);
-  assert.equal(capture(h).skillHtmlHash, fixtures.defaultSingle.skillHtmlHash);
+  assertReference(h);
   assert.equal(h.app.querySelectorAll('.skill-entry').length, 251);
   const skillList = h.query('[data-skill-results]');
-  assert.equal(skillList.querySelectorAll('*').length, 2512);
+  assert.equal(skillList.querySelectorAll('*').length, 2510); // MI's extra two line breaks were removed.
   assert.doesNotMatch(skillList.textContent, /亂殺快感|解放意志:織語者/);
   assert.match(skillList.textContent, /使用特殊主動技能時恢復5%最大MP/);
   for (const image of h.app.querySelectorAll('.skill-entry img')) {
@@ -473,7 +510,17 @@ test('All 60 classes preserve default effects outside the documented balance cor
   for(const role of catalog.classes){const profiles=catalog.classEffects.filter(p=>p.classId===role.id);assert.equal(profiles.length,2);assert.deepEqual(profiles[0].effects,profiles[1].effects);assert.notEqual(profiles[0].effects,profiles[1].effects);assert.equal('estimatedDamageScore' in profiles[0],false);}
   assert.equal(corePayloads.classEffects.classes.filter(p=>p.challengeEffects).length,0);
   const changed={RM:['buff','debuff'],DaB:['mpRecoveryPerSecond'],PR:['buff','legacyCompositeBuff','mpRecoveryPerSecond','debuffCleanse'],BL:['actionSpeedMultiplicative'],NP:['mpRecoveryPerSecond'],LA:['buff','multiplicativeCritDamage','debuff','defenseIgnoreAdditive'],VI:['defenseBreak'],DN:['buff','critDamageAdditive'],LI:['buff','bossDamageAdditive'],AD:['buff','legacyCompositeBuff','bossDamageAdditive'],HE:['buff','legacyCompositeBuff','multiplicativeCritDamage'],CeL:['buff','legacyCompositeBuff']};
-  const projection=catalog.classEffects.map(p=>({code:p.code,mode:p.mode,effects:Object.fromEntries(Object.entries(resolveSavedMembers(catalog,[p.code],p.mode)[0]?.effects ?? p.effects).filter(([key])=>!changed[p.code]?.includes(key)).sort(([a],[b])=>a.localeCompare(b)))})).sort((a,b)=>(a.code+':'+a.mode).localeCompare(b.code+':'+b.mode));
+  const previousVariantEffects = {
+    KE: { defenseBreak: .2, attackReduction: -.12 }, SH: { buff: .06 },
+    ES: { shield: .15 }, MP: { defenseBreak: .196 },
+  };
+  const projection = catalog.classEffects.map(p => {
+    const effects = { ...resolveSavedMembers(catalog, [p.code], p.mode)[0]?.effects, ...previousVariantEffects[p.code] };
+    if (p.code === 'DN') delete effects.shield;
+    if (p.code === 'MP') delete effects.magicalAttackReduction;
+    return { code: p.code, mode: p.mode, effects: Object.fromEntries(Object.entries(effects)
+      .filter(([key]) => !changed[p.code]?.includes(key)).sort(([a], [b]) => a.localeCompare(b))) };
+  }).sort((a, b) => (a.code + ':' + a.mode).localeCompare(b.code + ':' + b.mode));
   assert.equal(createHash('sha256').update(JSON.stringify(projection)).digest('hex'),'5d29732cf1f58189f85c8c154a6809afb2846d407e8fa5b39431e6ef59e3bb4f');
   for(const mode of ['single','challenge']){const fx=code=>catalog.classEffects.find(p=>p.code===code&&p.mode===mode).effects;
     closeNumber(fx('RM').debuff,.12);assert.equal('buff' in fx('RM'),false);assert.equal('mpRecoveryPerSecond' in fx('DaB'),false);closeNumber(fx('PR').mpRecoveryPerSecond,.05);assert.equal(fx('PR').buff,.179675);assert.equal(fx('PR').debuffCleanse,2);closeNumber(fx('BL').actionSpeedMultiplicative,.1);closeNumber(fx('NP').mpRecoveryPerSecond,.2);
@@ -588,9 +635,9 @@ test('Challenge magazine controls keep three independent team drafts and round-t
 });
 test('DN field power references keep the verified values, icons and line breaks',async t=>{
   const skills=JSON.parse(await readFile(new URL('../data/skill-reference.json',import.meta.url),'utf8')).roles.find(r=>r.code==='DN').skills;
-  assert.deepEqual(skills.filter(s=>s.name.startsWith('原野力量')).map(s=>({name:s.name,description:s.description,icon:s.icon})),[
+  assert.deepEqual(skills.filter(s=>s.name.replace(/^\[轉換\]/, '').startsWith('原野力量')).map(s=>({name:s.name,description:s.description,icon:s.icon})),[
     {name:'原野力量',description:'我方\n攻擊力 +11.5%\n所受傷害 -13.8%',icon:'skill-icons/DN-03.png'},
-    {name:'原野力量(轉換)',description:'我方\n攻擊力 +9.2%、致命傷害 +9.2%\n覺醒回復速度 +34.5%',icon:'skill-icons/DN-04.png'}]);
+    {name:'[轉換]原野力量',description:'我方\n攻擊力 +9.2%、致命傷害 +9.2%\n覺醒回復速度 +34.5%',icon:'skill-icons/DN-04.png'}]);
   const h=await open(t);edit(h,'[data-member]','DN');await h.openSkills();h.reset();edit(h,'[data-skill-query]','原野力量');assert.equal(h.app.querySelectorAll('.skill-entry').length,2);assert.doesNotMatch(h.query('[data-skill-results]').textContent,/物理攻擊/);assert.match(h.query('[data-skill-results]').innerHTML,/我方<br>攻擊力/);work(h,{calculateTeam:0,updateResults:0,storage:0});
 });
 
@@ -636,7 +683,8 @@ test('FP and DN team skill variants share existing effect channels and mode-spec
     assert.deepEqual(resolve('FP').effects, { buff: .2, actionSpeedMultiplicative: .18 });
     assert.deepEqual(resolve('FP', { [fp]: true }).effects, { buff: .2 });
     assert.deepEqual(resolve('DN', { [dn]: false }).effects, { buff: .115, shield: .138, debuff: .0507, defenseBreak: .1 });
-    const converted = resolve('DN').effects;
+    assert.deepEqual(resolve('DN').effects, resolve('DN', { [dn]: false }).effects);
+    const converted = resolve('DN', { [dn]: true }).effects;
     assert.equal(converted.buff, .092);
     assert.equal(converted.critDamageAdditive, .092);
     assert.equal(converted.debuff, .0507);
@@ -654,7 +702,7 @@ test('FP and DN team skill variants share existing effect channels and mode-spec
   custom.classEffects.classes.find(role => role.code === 'DN').challengeEffects = { defenseBreak: .25, buff: .03 };
   custom.classes.find(role => role.code === 'DN').name = '丹尼安';
   const alternate = parseCoreCatalog(custom);
-  const [{ effects }] = resolveSavedMembers(alternate, ['丹尼安'], 'challenge');
+  const [{ effects }] = resolveSavedMembers(alternate, ['丹尼安'], 'challenge', { 0: { [dn]: true } });
   closeNumber(effects.buff, 1.03 * 1.092 - 1);
   assert.equal(effects.critDamageAdditive, .092);
   assert.equal(effects.defenseBreak, .25);
@@ -698,7 +746,8 @@ test('Roster checkbox updates preserve focus, mode-specific selections and reloa
   assert.equal(inSlot('single', 0), null);
   const dn = setMember('single', 2, 'dn');
   const skill = inSlot('single', 2);
-  assert.equal(skill.checked, true);
+  assert.equal(skill.checked, false);
+  assert.equal(h.saved().classSkillVersionPreferences, undefined);
   assert.equal(skill.closest('label').textContent, '原野力量是否轉換');
   assert.equal(skill.closest('label').contains(dn), false);
   skill.focus(); h.reset(); skill.click();
@@ -712,10 +761,12 @@ test('Roster checkbox updates preserve focus, mode-specific selections and reloa
   setMember('single', 2, ' DN ');
   assert.equal(h.window.document.activeElement, dn);
   assert.equal(inSlot('single', 2), skill);
-  assert.equal(skill.checked, false);
+  assert.equal(skill.checked, true);
   setMember('single', 3, 'DN');
   assert.equal(inSlot('single', 3).checked, true);
-  closeNumber(h.teamResults.at(-1).shield, .138);
+  inSlot('single', 3).click();
+  assert.equal(skill.checked, true);
+  closeNumber(h.teamResults.at(-1).shield, 0);
   h.clickMode('challenge');
   assert.equal(h.app.querySelectorAll('[data-member]').length, 8);
   setMember('first', 2, 'FP');
@@ -724,25 +775,27 @@ test('Roster checkbox updates preserve focus, mode-specific selections and reloa
   inSlot('first', 2).click();
   assert.equal(inSlot('second', 2).checked, false);
   h.clickMode('single');
-  assert.equal(inSlot('single', 2).checked, false);
+  assert.equal(inSlot('single', 2).checked, true);
   const saved = h.saved();
-  assert.deepEqual(saved.classSkillVersionsByTeam, { single: { 2: { 'DN.FieldPowerConverted': false } },
+  assert.deepEqual(saved.classSkillVersionPreferences, { 'DN.FieldPowerConverted': false, 'FP.FatalShotConverted': true });
+  assert.deepEqual(saved.classSkillVersionsByTeam, { single: { 2: { 'DN.FieldPowerConverted': true }, 3: { 'DN.FieldPowerConverted': false } },
     first: { 2: { 'FP.FatalShotConverted': true } } });
   const restored = await open(t, { saved });
-  assert.equal(restored.query(member('single', 2)).closest('.member-slot').querySelector('input[type="checkbox"]').checked, false);
+  assert.equal(restored.query(member('single', 2)).closest('.member-slot').querySelector('input[type="checkbox"]').checked, true);
   restored.clickMode('challenge');
   assert.equal(restored.query(member('first', 2)).closest('.member-slot').querySelector('input[type="checkbox"]').checked, true);
   setMember('single', 2, 'D');
   assert.equal(inSlot('single', 2), null);
   setMember('single', 2, 'DN');
-  assert.equal(inSlot('single', 2).checked, false);
-  setMember('single', 2, 'FP');
-  setMember('single', 2, 'DN');
   assert.equal(inSlot('single', 2).checked, true);
-  inSlot('single', 2).click();
+  setMember('single', 2, 'FP');
+  assert.equal(inSlot('single', 2).checked, true);
+  setMember('single', 2, 'DN');
+  assert.equal(inSlot('single', 2).checked, false);
   setMember('single', 2, '');
   assert.equal(inSlot('single', 2), null);
-  assert.equal(h.saved().classSkillVersionsByTeam.single, undefined);
+  assert.equal(h.saved().classSkillVersionsByTeam.single[2], undefined);
+  assert.equal(h.saved().classSkillVersionPreferences['DN.FieldPowerConverted'], false);
 });
 
 test('Ordinary crit points and Boss bonuses use their respective denominators in each arena', () => {
@@ -752,8 +805,9 @@ test('Ordinary crit points and Boss bonuses use their respective denominators in
     [option.id, option.id === 'hundred-billion-red-top-critical-damage'])))
     .find(option => option.id === 'hundred-billion-red-top-critical-damage');
   assert.deepEqual(red.effects, { multiplicativeCritDamage: .1 });
+  const dnSelections = { 0: { 'DN.FieldPowerConverted': true } };
   const result = (codes, base = catalog.damageBase, options = []) => calculateTeam({
-    mode: 'single', defense, damageBase: base, options, members: resolveSavedMembers(catalog, codes, 'single')
+    mode: 'single', defense, damageBase: base, options, members: resolveSavedMembers(catalog, codes, 'single', dnSelections)
   });
   closeNumber(result(['DN']).buffIncrease, 1.092 * 244.2 / 235 - 1);
   closeNumber(result(['DN'], { critDamagePct: 300, bossDamagePct: 175 }).buffIncrease, .125488);
@@ -774,8 +828,8 @@ test('Ordinary crit points and Boss bonuses use their respective denominators in
     closeNumber(result([code], { critDamagePct: 300, bossDamagePct: 0 }).buffMultiplier, fixed);
   }
   const challenge = calculateChallenge({ defense, damageBase: catalog.damageBase,
-    firstTeam: { members: resolveSavedMembers(catalog, ['DN'], 'challenge'), options: [red] },
-    secondTeam: { members: resolveSavedMembers(catalog, ['DN','LI'], 'challenge'), options: [red, five] } });
+    firstTeam: { members: resolveSavedMembers(catalog, ['DN'], 'challenge', dnSelections), options: [red] },
+    secondTeam: { members: resolveSavedMembers(catalog, ['DN','LI'], 'challenge', dnSelections), options: [red, five] } });
   closeNumber(challenge.firstTeam.buffMultiplier, 1.092 * 259.2 / 235);
   closeNumber(challenge.sharedArena.buffMultiplier, 1.092 * 259.2 / 235 * 288 / 275);
   assert.equal(challenge.sharedArena.damageBuff.productSources.filter(source => source.id === 'loadout:' + red.id).length, 1);
@@ -943,7 +997,7 @@ test('Multiplicative crit combines raw sources once and shares the calculator pr
     [['HE'], true, 1.276, 41.4], [['LA', 'HE'], true, 1.3398, 50.97],
   ];
   for (const mode of ['single', 'challenge']) {
-    const resolve = codes => resolveSavedMembers(catalog, codes, mode);
+    const resolve = codes => resolveSavedMembers(catalog, codes, mode, { 2: { 'DN.FieldPowerConverted': true } });
     for (const panel of [235, 300]) {
       const damageBase = { critDamagePct: panel, bossDamagePct: 175 };
       const team = (codes, selected) => calculateTeam({
@@ -1001,4 +1055,194 @@ test('The red top keeps its saved toggle and shows the raw bonus separately from
   assert.ok(!row('基礎乘算暴傷').includes('暴上'));
   const restored = await open(t, { saved: h.saved() });
   assert.equal(restored.query(selector).checked, false);
+});
+test('KE, CeT, SH and MP variants preserve common effects in each arena', () => {
+  const catalog = parseCoreCatalog(corePayloads);
+  const defense = { bossDamageReduction: .6, challengeBreakCoefficient: .95 };
+  const keys = {
+    ke: 'KE.ArmorBreakConverted', cet: 'CeT.TacticalFieldConverted', sh: 'SH.NecromancyConverted',
+    mp: 'MP.MindBreakConverted',
+  };
+  for (const mode of ['single', 'challenge']) {
+    const members = (codes, saved) => resolveSavedMembers(catalog, codes, mode, saved);
+    const one = (code, selected) => members([code], { 0: selected })[0].effects;
+    assert.deepEqual(one('KE'), { defenseBreak: .12, debuff: .12, shield: .2, superArmor: 1 });
+    assert.deepEqual(one('KE', { [keys.ke]: true }),
+      { defenseBreak: .2, attackReduction: -.12, debuff: .12, shield: .2, superArmor: 1 });
+    const field = one('CeT', { [keys.cet]: true });
+    assert.equal(field.shield, .4);
+    assert.equal(field.bossDamageAdditive, .12);
+    const initialField = one('CeT');
+    assert.equal(initialField.shield, .2);
+    for (const key of ['mpRecoveryPerSecond', 'superArmor', 'debuff', 'defenseBreak']) {
+      assert.equal(field[key], initialField[key]);
+    }
+    assert.deepEqual(one('SH'), { buff: .05, debuff: .07, defenseBreak: .1925 });
+    assert.deepEqual(one('SH', { [keys.sh]: true }), { buff: .06, debuff: .07, defenseBreak: .1925 });
+
+    assert.deepEqual(one('MP'), { debuff: .12, magicalAttackReduction: .28 });
+    assert.deepEqual(one('MP', { [keys.mp]: true }), { debuff: .12, defenseBreak: .196 });
+    const normal = calculateTeam({ mode, members: members(['MP']), defense });
+    assert.equal(normal.attackReduction, 0);
+    closeNumber(normal.breakdown.find(row => row.key === 'magicalAttackReduction').result, .28);
+    const result = calculateTeam({ mode, damageBase: catalog.damageBase, defense,
+      members: members(['KE', 'CeT', 'MP', 'KE'], { 1: { [keys.cet]: true }, 2: { [keys.mp]: true }, 3: { [keys.ke]: true } }) });
+    closeNumber(result.defenseBreak, 1 - .88 * .8 * .804);
+    closeNumber(result.damageBuff.bossFactor, 287 / 275);
+    assert.deepEqual(result.ignoredClassIds, ['ke']);
+  }
+});
+
+test('New skill toggles are independent, and saved preferences seed new slots without changing existing slots', async t => {
+  const h = await open(t);
+  const input = (team, index) => '[data-member][data-team="' + team + '"][data-member-index="' + index + '"]';
+  const controls = (target, team, index) => [...target.query(input(team, index)).closest('.member-slot').querySelectorAll('[data-member-skill-version]')];
+  function assign(target, team, index, code) {
+    edit(target, input(team,index), code);
+    return controls(target, team, index);
+  }
+  for (const [index, code] of ['FP', 'DN', 'KE', 'CeT', 'SH', 'MP'].entries()) {
+    const field = assign(h, 'single', index, code);
+    assert.equal(field.length, 1, code);
+    assert.equal(field[0].checked, false, code);
+  }
+  assert.equal(h.saved().classSkillVersionPreferences, undefined);
+  assert.equal(h.saved().classSkillVersionsByTeam, undefined);
+  const choices = assign(h, 'single', 0, 'ES');
+  assert.equal(choices.length, 1);
+  assert.equal(choices[0].closest('label').textContent, '戰鬥序曲是否轉換');
+  assert.equal(choices[0].checked, false);
+  choices[0].click();
+  h.clickMode('challenge');
+  const [otherPrelude] = assign(h, 'first', 1, 'ES');
+  assert.equal(otherPrelude.checked, true);
+  otherPrelude.click();
+  assert.deepEqual(assign(h, 'second', 1, 'ES').map(field => field.checked), [false]);
+  h.clickMode('single');
+  assert.deepEqual(controls(h, 'single', 0).map(field => field.checked), [true]);
+  const saved = h.saved();
+  const restored = await open(t, { saved });
+  assert.deepEqual(controls(restored, 'single', 0).map(field => field.checked), [true]);
+  assign(restored, 'single', 0, '');
+  assert.equal(controls(restored, 'single', 0).length, 0);
+  assert.deepEqual(assign(restored, 'single', 0, 'ES').map(field => field.checked), [false]);
+
+  const legacy = structuredClone(saved);
+  delete legacy.classSkillVersionsByTeam.single;
+  legacy.classSkillVersionPreferences['FP.FatalShotConverted'] = 'true';
+  legacy.classSkillVersionPreferences.unknown = true;
+  const replay = await open(t, { saved: legacy });
+  assert.deepEqual(controls(replay, 'single', 0).map(field => field.checked), [false]);
+  assert.equal(controls(replay, 'single', 1)[0].checked, false);
+  assert.deepEqual(assign(replay, 'single', 5, 'ES').map(field => field.checked), [false]);
+  assert.equal(replay.saved().classSkillVersionPreferences['FP.FatalShotConverted'],undefined);
+  assert.equal(replay.saved().classSkillVersionPreferences.unknown,undefined);
+});
+
+test('ES keeps Provoke once in all arenas for both War Prelude choices, including legacy saves', async t => {
+  const catalog = parseCoreCatalog(corePayloads);
+  const removed = 'ES.ProvokeConverted', war = 'ES.WarPreludeConverted', fp = 'FP.FatalShotConverted';
+  const validSlots = { single: { 0: { [war]: true } }, first: { 0: { [war]: false } },
+    second: { 0: { [war]: true }, 1: { [fp]: false } } };
+  const validPreferences = { [war]: false, [fp]: true };
+  const legacy = { version: 1, mode: 'single',
+    membersByTeam: { single: ['ES'], first: ['ES'], second: ['ES', 'FP'] },
+    classSkillVersionsByTeam: {
+      single: { 0: { [war]: true, [removed]: true } },
+      first: { 0: { [war]: false } },
+      second: { 0: { [war]: true, [removed]: false }, 1: { [fp]: false } },
+    },
+    classSkillVersionPreferences: { ...validPreferences, [removed]: true },
+  };
+  for (const value of [true, false, undefined]) {
+    const raw = structuredClone(legacy);
+    raw.classSkillVersionPreferences[removed] = value;
+    for (const slots of Object.values(raw.classSkillVersionsByTeam)) slots[0][removed] = value;
+    const parsed = parseSavedSimulatorState(JSON.stringify(raw), catalog);
+    assert.deepEqual(parsed.classSkillVersionsByTeam, validSlots);
+    assert.deepEqual(parsed.classSkillVersionPreferences, validPreferences);
+    const members = (team, mode) => resolveSavedMembers(catalog, parsed.membersByTeam[team], mode, parsed.classSkillVersionsByTeam[team]);
+    const defense = { bossDamageReduction: .6, challengeBreakCoefficient: .95 };
+    const single = calculateTeam({ mode: 'single', defense, members: members('single', 'single') });
+    const first = members('first', 'challenge');
+    const second = members('second', 'challenge');
+    const common = { buff: .1, debuff: .08, defenseBreak: .2, attackReduction: -.1, resistanceReduction: 100, actionSpeedDiminishing: .03 };
+    assert.deepEqual(first[0].effects, { ...common, debuffCleanse: 3 });
+    assert.deepEqual(second[0].effects, { ...common, shield: .15 });
+    const challenge = calculateChallenge({ defense, firstTeam: { members: first }, secondTeam: { members: second } });
+    for (const result of [single, ...Object.values(challenge)]) {
+      closeNumber(result.debuffIncrease, .08);
+      closeNumber(result.attackReduction, -.1);
+    }
+    closeNumber(single.shield, .15);
+    closeNumber(challenge.firstTeam.shield, 0);
+    closeNumber(challenge.secondTeam.shield, .15);
+    closeNumber(challenge.sharedArena.shield, 0);
+  }
+
+  const h = await open(t, { saved: legacy });
+  const controls = (page, team) => [...page.app.querySelectorAll('.member-slot')].find(slot =>
+    slot.querySelector('[data-member]').dataset.team === team).querySelectorAll('[data-member-skill-version]');
+  const assertPrelude = (page, team, checked) => {
+    const fields = controls(page, team);
+    assert.equal(fields.length, 1);
+    assert.equal(fields[0].closest('label').textContent, '戰鬥序曲是否轉換');
+    assert.equal(fields[0].checked, checked);
+  };
+  assertPrelude(h, 'single', true);
+  h.clickMode('challenge');
+  assertPrelude(h, 'first', false);
+  assertPrelude(h, 'second', true);
+  assert.deepEqual(h.saved().classSkillVersionsByTeam, validSlots);
+  assert.deepEqual(h.saved().classSkillVersionPreferences, validPreferences);
+  const reloaded = await open(t, { saved: h.saved() });
+  assertPrelude(reloaded, 'first', false);
+  assertPrelude(reloaded, 'second', true);
+  reloaded.clickMode('single');
+  assertPrelude(reloaded, 'single', true);
+});
+
+test('Confirmed converted-only reference skills are marked once and have no toggle', () => {
+  const catalog = parseCoreCatalog(corePayloads);
+  // The user confirmed that only these converted forms provide team effects.
+  const names = [
+    ['RM', '月神之刃'], ['IM', '無限追逐者'], ['PR', '滂沱之箭'], ['RH', '核子爆破'],
+    ['CC', '炸裂狼嚎'], ['SU', '制壓:搗'], ['SU', '隱形'], ['DB', 'EMP衝擊'],
+    ['MN', '練擊'], ['PO', 'G-1日冕'], ['BL', '狂越連爆'],
+  ];
+  assert.ok(reference.roles.every(role => role.skills.every(skill => !skill.name.endsWith('(轉換)'))));
+  const markedName = /^\[轉換\]/;
+  for (const [code, name] of names) {
+    const matches = reference.roles.find(role => role.code === code).skills.filter(skill => skill.name.replace(markedName, '') === name);
+    assert.equal(matches.length, 1, code + ' ' + name);
+    assert.equal(matches[0].name, '[轉換]' + name);
+    assert.equal(catalog.classSkillVersions.has(code), false);
+    for (const mode of ['single', 'challenge']) {
+      const [member] = resolveSavedMembers(catalog, [code], mode);
+      assert.deepEqual(member.effects, catalog.classEffects.find(profile => profile.code === code && profile.mode === mode).effects);
+    }
+  }
+});
+
+test('Reference normalization keeps icons, classifications and searchable passives', async t => {
+  const h=await open(t);
+  await h.openSkills();
+  edit(h,'[data-skill-query]','被動');
+  const rows=[...h.app.querySelectorAll('.skill-entry')];
+  assert.equal(rows.length,36);
+  for(const row of rows){
+    assert.doesNotMatch(row.querySelector('strong').textContent,/\(被動\)/);
+    assert.match(row.querySelector('header span').textContent,/被動$/);
+  }
+  const find=(name)=>rows.find(row=>row.querySelector('strong').textContent===name);
+  assert.equal(find('戰略密碼:軸碎').querySelector('header span').textContent,'Buff、被動');
+  assert.match(find('戰略密碼:軸碎').querySelector('img').src,/CE-02\.png$/);
+  assert.equal(find('解放意志:Code:Failess').querySelector('header span').textContent,'DeBuff、被動');
+  assert.equal(find('死亡本能').querySelector('header span').textContent,'被動');
+  for(const [code,name] of [['RM','火鳳昇華'],...['AN','DaB','TW','PR'].map(code=>[code,'風暴之箭'])]){
+    assert.equal(reference.roles.find(role=>role.code===code).skills.filter(row=>row.name===name+'(原版)').length,1);
+    assert.equal(parseCoreCatalog(corePayloads).classSkillVersions.has(code),false);
+  }
+  assert.equal(reference.roles.find(role=>role.code==='MI').skills.find(row=>row.name==='扯鈴').description,
+    '敵方10秒內抗性 -100+[骰子]\n※100+(骰子2+骰子5) =125');
 });

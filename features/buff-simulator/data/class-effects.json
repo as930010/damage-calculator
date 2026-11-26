@@ -6,10 +6,23 @@
       "code": "KE",
       "effects": {
         "debuff": 0.12,
-        "defenseBreak": 0.2,
         "shield": 0.2,
-        "attackReduction": -0.12,
         "superArmor": 1
+      },
+      "skillVersions": {
+        "KE.ArmorBreakConverted": {
+          "normal": {
+            "effects": {
+              "defenseBreak": 0.12
+            }
+          },
+          "converted": {
+            "effects": {
+              "defenseBreak": 0.2,
+              "attackReduction": -0.12
+            }
+          }
+        }
       }
     },
     {
@@ -232,9 +245,23 @@
       "effects": {
         "debuff": 0.12,
         "defenseBreak": 0.2,
-        "shield": 0.2,
         "mpRecoveryPerSecond": 0.0109,
         "superArmor": 3
+      },
+      "skillVersions": {
+        "CeT.TacticalFieldConverted": {
+          "normal": {
+            "effects": {
+              "shield": 0.2
+            }
+          },
+          "converted": {
+            "effects": {
+              "shield": 0.4,
+              "bossDamageAdditive": 0.12
+            }
+          }
+        }
       }
     },
     {
@@ -274,9 +301,22 @@
       "classId": "sh",
       "code": "SH",
       "effects": {
-        "buff": 0.06,
         "debuff": 0.07,
         "defenseBreak": 0.1925
+      },
+      "skillVersions": {
+        "SH.NecromancyConverted": {
+          "normal": {
+            "effects": {
+              "buff": 0.05
+            }
+          },
+          "converted": {
+            "effects": {
+              "buff": 0.06
+            }
+          }
+        }
       }
     },
     {
@@ -301,11 +341,23 @@
         "buff": 0.1,
         "debuff": 0.08,
         "defenseBreak": 0.2,
-        "shield": 0.15,
         "attackReduction": -0.1,
         "resistanceReduction": 100,
-        "actionSpeedDiminishing": 0.03,
-        "debuffCleanse": 3
+        "actionSpeedDiminishing": 0.03
+      },
+      "skillVersions": {
+        "ES.WarPreludeConverted": {
+          "normal": {
+            "effects": {
+              "debuffCleanse": 3
+            }
+          },
+          "converted": {
+            "effects": {
+              "shield": 0.15
+            }
+          }
+        }
       }
     },
     {
@@ -364,8 +416,21 @@
       "classId": "mp",
       "code": "MP",
       "effects": {
-        "debuff": 0.12,
-        "defenseBreak": 0.196
+        "debuff": 0.12
+      },
+      "skillVersions": {
+        "MP.MindBreakConverted": {
+          "normal": {
+            "effects": {
+              "magicalAttackReduction": 0.28
+            }
+          },
+          "converted": {
+            "effects": {
+              "defenseBreak": 0.196
+            }
+          }
+        }
       }
     },
     {

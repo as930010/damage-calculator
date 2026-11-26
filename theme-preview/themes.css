@@ -121,7 +121,8 @@ html[data-preview-theme] body.site-page :is(.formula-detail,.optimizer-result de
 html[data-preview-theme] body.site-page :is(.damage-summary .final-damage strong,.control-time-grid strong,.total-multiplier strong){color:var(--p-accent)}
 html[data-preview-theme] body.site-page .damage-summary .final-damage{background:var(--p-active);border-color:var(--p-edge)}
 /* Shared wayfinding and Buff's formerly blue badges use the current material. */
-html[data-preview-theme] body.site-page :is(.section-label,.roster-note){border-left-color:var(--p-accent)}
+html[data-preview-theme] body.site-page .section-label{--buff-section-marker:var(--p-accent)}
+html[data-preview-theme] body.site-page .roster-note{border-left-color:var(--p-accent)}
 html[data-preview-theme] body.site-page :is(.results-heading,.metric-section,.support-grid,.primary-grid){border-color:var(--p-line)}
 html[data-preview-theme] body.site-page :is(.boss-control .percent-input span,.option-editor-input span){color:var(--p-accent)}
 html[data-preview-theme] body.site-page .background-option-note{background:var(--p-active);border-color:var(--p-edge);color:var(--p-ink)}
