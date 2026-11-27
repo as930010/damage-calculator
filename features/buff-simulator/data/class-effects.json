@@ -454,8 +454,7 @@
       "code": "CT",
       "effects": {
         "debuff": 0.2096,
-        "attackReduction": 0.1,
-        "cooldownAcceleration": 0.3
+        "attackReduction": 0.1
       }
     },
     {
