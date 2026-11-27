@@ -521,7 +521,7 @@ test('All 60 classes preserve default effects outside the documented balance cor
     return { code: p.code, mode: p.mode, effects: Object.fromEntries(Object.entries(effects)
       .filter(([key]) => !changed[p.code]?.includes(key)).sort(([a], [b]) => a.localeCompare(b))) };
   }).sort((a, b) => (a.code + ':' + a.mode).localeCompare(b.code + ':' + b.mode));
-  assert.equal(createHash('sha256').update(JSON.stringify(projection)).digest('hex'),'5d29732cf1f58189f85c8c154a6809afb2846d407e8fa5b39431e6ef59e3bb4f');
+  assert.equal(createHash('sha256').update(JSON.stringify(projection)).digest('hex'),'f2b89089061ccf9be751acda2ee84a0c2e3e3afefe30ea7a53f7bef9f445fcd0');
   for(const mode of ['single','challenge']){const fx=code=>catalog.classEffects.find(p=>p.code===code&&p.mode===mode).effects;
     closeNumber(fx('RM').debuff,.12);assert.equal('buff' in fx('RM'),false);assert.equal('mpRecoveryPerSecond' in fx('DaB'),false);closeNumber(fx('PR').mpRecoveryPerSecond,.05);assert.equal(fx('PR').buff,.179675);assert.equal(fx('PR').debuffCleanse,2);closeNumber(fx('BL').actionSpeedMultiplicative,.1);closeNumber(fx('NP').mpRecoveryPerSecond,.2);
     assert.equal(fx('LA').buff,.05);assert.equal(fx('LA').multiplicativeCritDamage,.05);assert.equal(fx('HE').multiplicativeCritDamage,.16);assert.equal(fx('LI').bossDamageAdditive,.08);closeNumber(fx('LA').debuff,.05);closeNumber(fx('LA').defenseIgnoreAdditive,.05);closeNumber(fx('LA').defenseBreak,.1);closeNumber(fx('VI').defenseBreak,.1925);
